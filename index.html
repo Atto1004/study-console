@@ -1433,7 +1433,10 @@ p,.hint,.step,.empty,.md{text-indent:0}
     <div class="topbar-in">
       <div class="brand">
         <div class="brand-mark">◎</div>
-        <div class="brand-s" id="termTag">—</div>
+        <div style="min-width:0">
+          <div class="brand-t" id="todayTag">—</div>
+          <div class="brand-s" id="termTag">—</div>
+        </div>
       </div>
       <div class="topact">
         <button class="btn sm" id="btnSave" title="다른 기기에서도 열리도록 저장">저장</button>
@@ -2578,6 +2581,12 @@ function nextExam(){
   var td=today();
   return exams().filter(function(e){return diffDays(td,e.date)>=0;})[0]||null;
 }
+/* 상단 D-day 기준 — 가장 빠른 '중간고사'. 없으면 다가오는 아무 시험으로 폴백. */
+function heroExam(){
+  var td=today();
+  var mid=exams().filter(function(e){return e.kind==="중간" && diffDays(td,e.date)>=0;})[0];
+  return mid || nextExam();
+}
 
 /* ---------- 학습모드 판정 (§7.4.3) ---------- */
 function evalOf(c){
@@ -2857,8 +2866,13 @@ function renderNav(){
 }
 
 /* ---------- 상단 게이지 ---------- */
+function todayLabel(){
+  var d=new Date();
+  return (d.getMonth()+1)+"월 "+d.getDate()+"일 ("+DAY[d.getDay()]+")";
+}
 function renderGauges(){
-  var t=term(), ph=phase(), w=currentWeek(), ex=nextExam();
+  var t=term(), ph=phase(), w=currentWeek(), ex=heroExam();
+  var _tt=$("#todayTag"); if(_tt) _tt.textContent=todayLabel();
   $("#termTag").textContent=t.label+(t.compressed?" 압축":"")+" · "+PHASE[ph].n;
   var g=[];
   if(ex){
@@ -2879,7 +2893,8 @@ function renderGauges(){
   }).join("");
 }
 function tickDday(){
-  var ex=nextExam(); if(!ex) return;
+  var _t=$("#todayTag"); if(_t) _t.textContent=todayLabel();
+  var ex=heroExam(); if(!ex) return;
   var el=$("#gDday .gauge-v"); if(!el) return;
   var target=new Date(ex.date+"T"+(ex.time||"09:00")+":00");
   var ms=target-new Date();
