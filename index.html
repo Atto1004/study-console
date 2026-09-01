@@ -2876,8 +2876,8 @@ function renderGauges(){
   $("#termTag").textContent=t.label+(t.compressed?" 압축":"")+" · "+PHASE[ph].n;
   var g=[];
   if(ex){
-    var c=course(ex.courseId), dd=diffDays(today(),ex.date);
-    g.push({l:(c?c.name:"시험")+" "+ex.kind,v:"D-"+dd,
+    var dd=diffDays(today(),ex.date);
+    g.push({l:(ex.kind==="중간"?"중간고사":ex.kind==="기말"?"기말고사":ex.kind),v:"D-"+dd,
       s:fmtDate(ex.date),cls:(dd<=7?"hot":dd<=14?"near":"calm")+" hero",id:"gDday"});
   } else {
     g.push({l:"다가오는 시험",v:"미등록",s:"시험을 추가하세요",cls:"calm hero"});
