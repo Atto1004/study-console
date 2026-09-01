@@ -2154,15 +2154,20 @@ function seedCADD(){
   c.typeA="MAKE";
   c.slots=[{d:2,s:"13:00",e:"19:00",room:"1공 306 CAD실"}];   /* 13–16 + 16–19 연속 */
   c.evalMix={mid:25,fin:0,hw:25,quiz:0,att:10,proj:40,quizCycle:""};
-  c.examForm=["실기"];
+  c.examForm=["객관식","서술형"];      /* 중간고사는 이론 암기 위주 — 실기 아님 */
   c.syllabus=CADD_SYLLABUS;
-  c.profStyle=CADD_STYLE;
+  c.profStyle=CADD_STYLE+
+    "\n\n[중간고사 — 암기 전략]\n"+
+    "- 중간고사(W10)는 이론수업 기반, 암기 위주. 제도 규칙·기호·치수 기입법·단면 도시법·\n"+
+    "  표면거칠기·기하공차의 명칭·조건·기입법을 정확히 외우는 것이 점수.\n"+
+    "- 개념 이해보다 '정확한 암기 + 표기 규칙'이 핵심 — 분류표·카드로 반복.\n"+
+    "- ★ 중간이 끝나면 W13~W16은 팀프로젝트로 전환. 그때부터는 암기가 아니라 산출물 마감.";
 
   var pl=planned(c);
   var midWeek=pl.filter(function(p){return p.week===10;})[0];   /* W10 — 다른 과목과 다름 */
   if(midWeek) t.exams.push({id:uid(),courseId:c.id,kind:"중간",date:midWeek.date,time:"13:00",
-    scope:"투상도법 · 형상의 표시 · 치수 기입법 · 단면 도시법 · 도면의 예 · 치수공차와 끼워맞춤 (W1~W9)",weight:25});
-  /* 기말고사 없음 — 시험을 만들지 않는다 */
+    scope:"이론 (암기 위주) — 제도 규칙·기호·치수 기입법·단면 도시법·표면거칠기·기하공차 (W1~W9)",weight:25});
+  /* 기말고사 없음 — 시험을 만들지 않는다. 중간 후 W13~W16 팀프로젝트 */
 }
 
 /* 아카데믹글쓰기 — 강의계획서(김혜선 교수) 실물 반영 */
@@ -4918,6 +4923,20 @@ function boot(){
     term().seedV=2;
     try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   }
+  /* 데이터 패치 — CADD 중간고사를 이론 암기 위주로 (기존 저장 데이터에도 1회 적용) */
+  (function(){
+    var t=term(); if(t.patchCADDv1) return;
+    var cad=t.courses.filter(function(x){return x.name==="CADD";})[0];
+    if(cad){
+      if(Array.isArray(cad.examForm)&&cad.examForm.length===1&&cad.examForm[0]==="실기") cad.examForm=["객관식","서술형"];
+      var mid=t.exams.filter(function(e){return e.courseId===cad.id&&e.kind==="중간";})[0];
+      if(mid&&/투상도법/.test(mid.scope||"")) mid.scope="이론 (암기 위주) — 제도 규칙·기호·치수 기입법·단면 도시법·표면거칠기·기하공차 (W1~W9)";
+      if(cad.profStyle&&cad.profStyle.indexOf("암기 위주")<0)
+        cad.profStyle+="\n\n[중간고사 — 암기 전략]\n- 중간고사(W10)는 이론 기반, 암기 위주. 제도 규칙·기호·치수·공차의 명칭·조건·기입법을 정확히 암기.\n- 중간 이후 W13~W16은 팀프로젝트로 전환 — 산출물 마감.";
+    }
+    t.patchCADDv1=true;
+    try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+  })();
   applyFont();
   renderNav();
 
