@@ -1410,6 +1410,22 @@ p,.hint,.step,.empty,.md{text-indent:0}
 .penrow input[type=color]{width:34px;height:30px;padding:0;border:1px solid var(--line-2);border-radius:7px;background:none;cursor:pointer}
 .penchip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px}
 .penchip i{width:11px;height:11px;border-radius:3px;flex:0 0 auto;border:1px solid rgba(0,0,0,.12)}
+
+/* ============ 오늘 · 주간 요일 선택 ============ */
+.wstrip{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;width:100%}
+.wday{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px 7px;border:1px solid var(--line);
+  border-radius:12px;background:var(--surface);cursor:pointer;position:relative;min-width:0}
+.wday .wd{font-size:10.5px;color:var(--ink-3);font-family:var(--font-num);letter-spacing:.02em}
+.wday .wn{font-size:15px;font-weight:600;font-family:var(--font-num);font-variant-numeric:tabular-nums;line-height:1}
+.wday:hover{background:var(--surface-2)}
+.wday.on{background:var(--accent);border-color:var(--accent)}
+.wday.on .wd,.wday.on .wn{color:#fff}
+.wday.today:not(.on){border-color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.wday.sun:not(.on) .wd{color:var(--crit)} .wday.sat:not(.on) .wd{color:var(--info)}
+.wday .wtoday{position:absolute;top:-7px;font-size:8px;font-weight:700;background:var(--accent);color:#fff;
+  padding:1px 6px;border-radius:99px;font-family:var(--font-num);white-space:nowrap}
+.wday.on .wtoday{background:#fff;color:var(--accent)}
+.wday .whol{position:absolute;bottom:2px;width:4px;height:4px;border-radius:99px;background:var(--warn)}
 </style>
 
 <script type="application/json" id="state">null</script>
@@ -1514,13 +1530,13 @@ p,.hint,.step,.empty,.md{text-indent:0}
           <h1 id="todayTitle">오늘</h1>
           <div class="sub" id="todayDate"></div>
           <div class="sp">
-            <div class="seg" id="dayNav">
-              <button data-d="-1" aria-label="어제">◀</button>
-              <button data-d="0">오늘</button>
-              <button data-d="1" aria-label="내일">▶</button>
+            <div class="seg" id="weekNav">
+              <button data-wk="-1" aria-label="이전 주">◀ 주</button>
+              <button data-wk="0">오늘</button>
+              <button data-wk="1" aria-label="다음 주">주 ▶</button>
             </div>
-            <input class="input mono" id="dayPick" type="date" style="width:auto;padding:5px 9px;font-size:12.5px">
           </div>
+          <div id="weekStrip" style="flex:1 1 100%;order:5"></div>
         </div>
         <div class="card">
           <div class="card-h"><h3 id="dayBooksT">오늘 수업</h3><span class="hs" id="dayBooksHs"></span>
@@ -2603,7 +2619,8 @@ function attStats(c){
   /* 출결 규정은 과목별 값이 있으면 그것을, 없으면 전역 설정을 쓴다 */
   var lta=+c.lateToAbsent||+S.profile.lateToAbsent||3;
   var eff=n.absent+Math.floor(n.late/lta);
-  var total=planned(c).length||term().weeks;
+  var cancelledN=ss.filter(function(s){return s.cancelled;}).length;
+  var total=Math.max(1,(planned(c).length||term().weeks)-cancelledN);
   var limit=+c.absentLimit>0
     ? +c.absentLimit
     : Math.max(1,Math.floor(total*(S.profile.absentLimitRatio||0.25)));
@@ -2651,9 +2668,10 @@ function gapWeeks(c){
   var examW={}; exams(c.id).forEach(function(e){ examW[weekOf(e.date)]=1; });
   pl.forEach(function(p){
     if(p.week>upto || examW[p.week]) return;   // 시험 주간은 자료가 없는 게 정상
+    var s=sessionOn(c.id,p.date);
+    if(s&&s.cancelled) return;                 // 휴강은 결손 아님
     byWeek[p.week]=byWeek[p.week]||{n:0,f:0};
     byWeek[p.week].n++;
-    var s=sessionOn(c.id,p.date);
     if(s){
       if(s.slots){ ["pre","note","rec","notice"].forEach(function(k){ if(s.slots[k]) byWeek[p.week].f++; }); }
       byWeek[p.week].f += (Array.isArray(s.timeline)?s.timeline.length:0) + (+s.matCount||0);
@@ -2855,9 +2873,7 @@ function renderGauges(){
   /* 개강 전이면 D-day 바로 오른쪽에 개강 카운트 */
   var toStart=diffDays(today(),t.startDate);
   if(toStart>0) g.push({l:"개강",v:"D-"+toStart,s:fmtDate(t.startDate),cls:"calm"});
-  else g.push({l:"주차",v:(w?("W"+w+"/"+t.weeks):"—"),s:PHASE[ph].n,cls:"calm"});
-  g.push({l:"스트릭",v:(S.game.streak||0)+"일",s:"연속",cls:"calm"});
-  g.push({l:"XP",v:String(S.game.xp||0),s:"누적",cls:"calm"});
+  else g.push({l:"주차",v:(w?(w+"주차"):"—"),s:(w?"/ "+t.weeks:PHASE[ph].n),cls:"calm"});
   $("#gauges").innerHTML=g.map(function(x){
     return '<div class="gauge '+x.cls+'"'+(x.id?' id="'+x.id+'"':'')+'>'+
       '<div class="gauge-l">'+esc(x.l)+'</div>'+
@@ -3261,9 +3277,22 @@ function renderToday(){
     : fmtDate(date);
   $("#todayDate").textContent=fmtDate(date)+" · W"+(weekOf(date)||"-")+" · "+PHASE[ph].n+
     (isToday?"":"  (오늘 아님)");
-  $("#dayPick").value=date;
-  $$("#dayNav button").forEach(function(b){
-    b.setAttribute("aria-pressed", (b.dataset.d==="0"&&isToday)?"true":"false"); });
+  /* 주간 요일 스트립 (월~일) */
+  var mon=addDays(date, -((D(date).getDay()+6)%7));
+  var strip="";
+  for(var wi=0;wi<7;wi++){
+    var dd=addDays(mon,wi), dj=D(dd), dow=dj.getDay();
+    var isSel=(dd===date), isTd=(dd===today()), hol=holidayOn(dd);
+    strip+='<button class="wday'+(isSel?" on":"")+(isTd?" today":"")+
+      (dow===0?" sun":dow===6?" sat":"")+'" data-day="'+dd+'">'+
+      (isTd?'<span class="wtoday">오늘</span>':"")+
+      '<span class="wd">'+DAY[dow]+'</span><span class="wn">'+dj.getDate()+'</span>'+
+      (hol?'<span class="whol"></span>':"")+'</button>';
+  }
+  $("#weekStrip").innerHTML=strip;
+  $$("#weekStrip .wday").forEach(function(b){ b.onclick=function(){ ui.day=b.dataset.day; renderToday(); }; });
+  $$("#weekNav button").forEach(function(b){
+    b.setAttribute("aria-pressed", (b.dataset.wk==="0"&&isToday)?"true":"false"); });
 
   /* ---- 그날 수업 표지 (시간순) ---- */
   var todayCls=holidayOn(date)?[]:classesOn(date).sort(function(a,b){return toMin(a.s)-toMin(b.s);});
@@ -3357,6 +3386,14 @@ function renderToday(){
     var body;
     if(it.type==="class"){
       var ss=sessionOn(it.c.id,date)||{};
+      if(ss.cancelled){
+        body='<div class="tl-class t-'+esc(it.c.typeA)+'" style="opacity:.55"><span class="tl-cbar"></span><div>'+
+          '<div class="tl-head"><span class="tl-name" style="text-decoration:line-through">'+esc(it.c.name)+'</span>'+
+          '<span class="chip warn">휴강</span></div>'+
+          '<div class="hint">이 회차는 휴강 — 출결·복습·진도 계산에서 빠집니다.</div>'+
+          '<button class="btn xs" data-uncancel="'+it.c.id+'">휴강 해제</button>'+
+          '</div></div>';
+      } else {
       body='<div class="tl-class t-'+esc(it.c.typeA)+'"><span class="tl-cbar"></span><div>'+
         '<div class="tl-head"><span class="tl-name">'+esc(it.c.name)+'</span>'+
         '<span class="chip mut">'+esc(it.sl.room||"")+'</span></div>'+
@@ -3369,10 +3406,12 @@ function renderToday(){
         '<div class="row tightg" style="margin-top:2px">'+
           '<button class="btn xs" data-cs="'+it.c.id+'">▶ 시작'+(ss.startedAt?" "+esc(ss.startedAt):"")+'</button>'+
           '<button class="btn xs" data-ce="'+it.c.id+'">■ 종료'+(ss.endedAt?" "+esc(ss.endedAt):"")+'</button>'+
+          '<button class="btn xs dgr" data-cancel="'+it.c.id+'">휴강</button>'+
           (elapsedLabel(ss)?'<span class="chip mut" style="align-self:center">'+esc(elapsedLabel(ss))+'</span>':"")+
         '</div>'+
         '<button class="btn sm wide" data-open="'+it.c.id+'">진도 · 자료 기록 →</button>'+
         '</div></div>';
+      }
     } else {
       var p=it.p, pc=p.courseId?course(p.courseId):null;
       body='<div class="tl-plan'+(p.done?" ok":"")+'">'+
@@ -3404,6 +3443,7 @@ function renderToday(){
       '<span>완료 <b>'+(doneMin/60).toFixed(1)+'</b>h</span>'+
       '<span>하루 목표 <b>'+(cap/60).toFixed(1)+'</b>h</span>'+
       (planMin>cap?'<span class="chip warn">목표 초과</span>':"")+
+      (!isToday&&classesOn(date).length?'<span class="chip acc">미리 지정 — 결석 예정·휴강을 앞당겨 정할 수 있어요</span>':"")+
     '</div>'+
     '<div class="tl">'+(rows.length?rows.join(""):'<div class="empty"><span class="big">◌</span>이 날은 비어 있습니다.</div>')+'</div>';
 
@@ -3418,6 +3458,10 @@ function renderToday(){
   $$("#dayLine [data-open]").forEach(function(b){ b.onclick=function(){ logSheet(b.dataset.open,date); }; });
   $$("#dayLine [data-cs]").forEach(function(b){ b.onclick=function(){ startClass(b.dataset.cs,date); renderToday(); renderGauges(); toast("수업 시작 "+nowHM()); }; });
   $$("#dayLine [data-ce]").forEach(function(b){ b.onclick=function(){ endClass(b.dataset.ce,date); renderToday(); toast("수업 종료 "+nowHM()); }; });
+  $$("#dayLine [data-cancel]").forEach(function(b){ b.onclick=function(){
+    setSession(b.dataset.cancel,date,{cancelled:true,status:null,startedAt:"",endedAt:""}); renderToday(); renderGauges(); toast("휴강 처리 — 계산에서 빠집니다"); }; });
+  $$("#dayLine [data-uncancel]").forEach(function(b){ b.onclick=function(){
+    setSession(b.dataset.uncancel,date,{cancelled:false}); renderToday(); renderGauges(); toast("휴강 해제"); }; });
   $$("#dayLine .tl-gap").forEach(function(b){ b.onclick=function(){
     planSheet(null,date,b.dataset.gs,b.dataset.ge); }; });
   $$("#dayLine [data-pd]").forEach(function(b){ b.onclick=function(){
@@ -3965,7 +4009,7 @@ function buildReviewQueue(){
   courses().filter(isActive).forEach(function(c){
     if(c.typeA==="NONE") return;
     sessions(c.id).forEach(function(s){
-      if(s.status==="absent" || !sessionEnded(c,s)) return;
+      if(s.status==="absent" || s.cancelled || !sessionEnded(c,s)) return;
       if(!ready){
         if(s.reviewed) return;
         q.push({c:c,s:s,due:D(s.date),isNew:true,R:null,age:diffDays(s.date,td)}); return;
@@ -3977,6 +4021,25 @@ function buildReviewQueue(){
   });
   q.sort(function(a,b){ return a.due.getTime()-b.due.getTime() || b.age-a.age; });
   return q;
+}
+
+/* 수업 시작 시각이 되면 자동으로 시작(출석) 처리 — 오늘, 사전 지정(결석/휴강)은 존중 */
+function autoStartClasses(){
+  var td=today();
+  if(holidayOn(td)) return false;
+  var now=nowMin(), dow=D(td).getDay(), started=false;
+  courses().filter(isActive).forEach(function(c){
+    if(c.typeA==="NONE") return;
+    c.slots.forEach(function(sl){
+      if(sl.d!==dow) return;
+      if(now < toMin(sl.s)) return;                       // 아직 시작 시각 전
+      var s=sessionOn(c.id,td);
+      if(s && (s.startedAt || s.status || s.cancelled)) return;   // 이미 시작했거나 사전 지정됨
+      setSession(c.id,td,{startedAt:sl.s, status:"present"});
+      started=true;
+    });
+  });
+  return started;
 }
 function elapsedLabel(s){
   if(!s||!s.startedAt) return "";
@@ -4853,11 +4916,10 @@ function boot(){
   $$("#shelfView button").forEach(function(b){ b.onclick=function(){ setShelfView(b.dataset.v); }; });
 
   ui.day=today();
-  $$("#dayNav button").forEach(function(b){ b.onclick=function(){
-    var d=+b.dataset.d;
-    ui.day = d===0 ? today() : addDays(ui.day||today(), d);
+  $$("#weekNav button").forEach(function(b){ b.onclick=function(){
+    var wk=+b.dataset.wk;
+    ui.day = wk===0 ? today() : addDays(ui.day||today(), wk*7);
     renderToday(); }; });
-  $("#dayPick").onchange=function(){ ui.day=$("#dayPick").value||today(); renderToday(); };
   $("#btnAddPlan").onclick=function(){ planSheet(null,ui.day||today()); };
   $("#btnAutoPlan").onclick=autoPlan;
 
@@ -4887,8 +4949,12 @@ function boot(){
     r.setAttribute("data-theme", dark?"light":"dark");
   };
 
+  autoStartClasses();          // 부팅 시 이미 시작된 수업 반영
   go("shelf");
-  setInterval(tickDday,1000);
+  setInterval(function(){
+    tickDday();
+    if(autoStartClasses() && ui.view==="today"){ renderToday(); renderGauges(); }
+  },1000);
   ui.dirty=false; markSave();
 }
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",boot);
