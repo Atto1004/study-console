@@ -3466,15 +3466,15 @@ function renderToday(){
 
   $$("#dayLine .attq").forEach(function(g){
     $$("button",g).forEach(function(b){ b.onclick=function(){
-      setSession(g.dataset.c,date,{status:b.dataset.s}); renderToday(); renderGauges(); }; });
+      setSession(g.dataset.c,date,{status:b.dataset.s}); awSync(g.dataset.c,date); renderToday(); renderGauges(); }; });
   });
   $$("#dayLine .und").forEach(function(g){
     $$("button",g).forEach(function(b){ b.onclick=function(){
       setSession(g.dataset.c,date,{und:+b.dataset.u}); renderToday(); }; });
   });
   $$("#dayLine [data-open]").forEach(function(b){ b.onclick=function(){ logSheet(b.dataset.open,date); }; });
-  $$("#dayLine [data-cs]").forEach(function(b){ b.onclick=function(){ startClass(b.dataset.cs,date); renderToday(); renderGauges(); toast("수업 시작 "+nowHM()); }; });
-  $$("#dayLine [data-ce]").forEach(function(b){ b.onclick=function(){ endClass(b.dataset.ce,date); renderToday(); toast("수업 종료 "+nowHM()); }; });
+  $$("#dayLine [data-cs]").forEach(function(b){ b.onclick=function(){ startClass(b.dataset.cs,date); awSync(b.dataset.cs,date); renderToday(); renderGauges(); toast("수업 시작 "+nowHM()); }; });
+  $$("#dayLine [data-ce]").forEach(function(b){ b.onclick=function(){ endClass(b.dataset.ce,date); awSync(b.dataset.ce,date); renderToday(); toast("수업 종료 "+nowHM()); }; });
   $$("#dayLine [data-cancel]").forEach(function(b){ b.onclick=function(){
     setSession(b.dataset.cancel,date,{cancelled:true,status:null,startedAt:"",endedAt:""}); renderToday(); renderGauges(); toast("휴강 처리 — 계산에서 빠집니다"); }; });
   $$("#dayLine [data-uncancel]").forEach(function(b){ b.onclick=function(){
@@ -3866,11 +3866,14 @@ function renderSet(){
     '<div class="field"><label>하루 가용 (h)</label><input class="input mono" id="pCap" type="number" step="0.5" min="0" max="16" value="'+p.dailyCap+'"></div></div>'+
     '<div class="row" style="margin-top:11px"><div class="field"><label>지각 N회 = 결석 1회</label><input class="input mono" id="pLate" type="number" min="1" max="10" value="'+p.lateToAbsent+'"></div>'+
     '<div class="field"><label>결석 한도 비율</label><input class="input mono" id="pAbs" type="number" step="0.05" min="0.05" max="0.5" value="'+p.absentLimitRatio+'"></div></div>'+
+    '<div class="field" style="margin-top:11px"><label>얼라이브위크 웹훅 URL</label><input class="input mono" id="pHook" placeholder="https://script.google.com/macros/s/…/exec" value="'+esc(p.awHook||"")+'">'+
+    '<div class="hint">출결·수업시각을 구글 캘린더에 자동 반영합니다. 비워두면 꺼짐. 배포법: 저장소 docs/aliveweek-webhook.md</div></div>'+
     '<button class="btn a sm wide" id="pSave" style="margin-top:13px">저장</button>';
   $("#pSave").onclick=function(){
     p.name=$("#pName").value.trim(); p.school=$("#pSchool").value.trim(); p.major=$("#pMajor").value.trim();
     p.targetGPA=+$("#pGpa").value||3.5; p.dailyCap=+$("#pCap").value||4;
     p.lateToAbsent=+$("#pLate").value||3; p.absentLimitRatio=+$("#pAbs").value||0.25;
+    p.awHook=$("#pHook").value.trim();
     persist(); render(); toast("저장했습니다");
   };
 
@@ -3977,6 +3980,23 @@ function startClass(cid,date){
   setSession(cid,date,patch);
 }
 function endClass(cid,date){ setSession(cid,date,{endedAt:nowHM()}); }
+
+/* ---------- 얼라이브위크 연동 — 출결·시간을 구글 캘린더에 반영 (Apps Script 웹훅) ---------- */
+function awSync(cid,date){
+  var url=(S.profile.awHook||"").trim(); if(!url) return;
+  var c=course(cid); if(!c||!c.slots||!c.slots.length) return;     /* 캘린더에 없는 과목(사회봉사)은 스킵 */
+  var s=sessionOn(cid,date); if(!s||s.cancelled) return;           /* 휴강 회차는 보내지 않음 */
+  var at=attStats(c), lta=+c.lateToAbsent||+S.profile.lateToAbsent||3;
+  var payload={v:1,course:c.name,date:date,status:s.status||"",
+    startedAt:s.startedAt||"",endedAt:s.endedAt||"",
+    counts:{present:at.n.present,late:at.n.late,ghost:at.n.ghost,absent:at.n.absent,
+            eff:at.eff,limit:at.limit,lta:lta}};
+  try{
+    fetch(url,{method:"POST",mode:"no-cors",keepalive:true,
+      headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+    toast("얼라이브위크 반영 전송 · "+c.name);
+  }catch(e){}
+}
 /* 일 단위 컨디션 (피로도·수면·전날 음주) */
 function setCondition(date,patch){
   var t=term(); if(!t.conditions||typeof t.conditions!=="object") t.conditions={};
@@ -4104,6 +4124,7 @@ function captureLog(cid,date){
   setSession(cid,date,{status:st,und:un,progress:(v("lqP")||"").trim(),
     knew:v("lqKnew"),stuck:v("lqStuck"),learned:v("lqLearned"),missedFrom:v("lqMissed"),
     memo:v("lqM"),reviewed:$("#lqR")?$("#lqR").checked:false});
+  awSync(cid,date);
 }
 function logSheet(cid,date){
   var c=course(cid), s=sessionOn(cid,date)||{status:null,und:null,reviewed:false,progress:"",memo:"",slots:{},
@@ -4163,8 +4184,8 @@ function logSheet(cid,date){
         $$(sel+" button",root).forEach(function(x){x.setAttribute("aria-pressed","false");});
         b.setAttribute("aria-pressed",on?"false":"true"); }; }); };
       single("#lqA"); single("#lqU");
-      $("#lqStart",root).onclick=function(){ captureLog(cid,date); startClass(cid,date); reopen(); };
-      $("#lqEnd",root).onclick=function(){ captureLog(cid,date); endClass(cid,date); reopen(); };
+      $("#lqStart",root).onclick=function(){ captureLog(cid,date); startClass(cid,date); awSync(cid,date); reopen(); };
+      $("#lqEnd",root).onclick=function(){ captureLog(cid,date); endClass(cid,date); awSync(cid,date); reopen(); };
       $("#lqAddTL",root).onclick=function(){ captureLog(cid,date); timelineItemSheet(cid,date,null,reopen); };
       $$("[data-tedit]",root).forEach(function(b){ b.onclick=function(){ captureLog(cid,date); timelineItemSheet(cid,date,b.dataset.tedit,reopen); }; });
       $$("[data-tdel]",root).forEach(function(b){ b.onclick=function(){
