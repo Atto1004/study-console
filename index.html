@@ -815,7 +815,7 @@ th{font-size:clamp(9.5px,0.2vw + 9px,10.5px)}
 .wk .ex{position:absolute;inset:0;display:grid;place-items:center;font-size:11px;color:#fff;z-index:2}
 .wk.exam .bar{background:var(--crit)}
 .wk.noted .lb::after{content:"•";color:var(--accent);margin-left:1px}
-.wn-row{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:8px 10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.wn-row{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:8px 10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
 .wn-row:first-child{border-top:0}
 .wn-row .w{font-family:var(--font-num);font-size:12px;color:var(--accent);font-weight:600}
 .wn-row .t{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1876,23 +1876,23 @@ var EM_SYLLABUS=
 "공결 미응시자: 상대 시험 성적 기준 환산 × 0.9 penalty\n"+
 "시험 부정행위 적발 시 학칙에 의거 성적 취소\n\n"+
 "[16주 진도 — 포털 주별 강의계획 기준]\n"+
-"W1  1계 상미분방정식 — OT, 기본개념, 모델링, Euler 방법\n"+
-"W2  1계 상미분방정식 — 분리가능 상미분방정식, 모델링\n"+
-"W3  1계→2계 — 완전 상미분방정식·적분인자, 선형 ODE·Bernoulli 방정식\n"+
-"W4  2계 선형 — 2계 제차 선형 ODE, 상수계수 제차, 질량-용수철 자유진동   ⚠ 추석\n"+
-"W5  2계 선형 — Euler-Cauchy 방정식, Wronskian, 비제차 ODE, 강제진동·공진\n"+
-"W6  고계 선형 — 제차 선형 ODE, 상수계수 제차 ODE                        ⚠ 한글날\n"+
-"W7  고계 선형 — 비제차 선형 ODE\n"+
-"W8  ★ 중간시험\n"+
-"W9  연립 상미분방정식 — 행렬과 벡터의 기본이론\n"+
-"W10 연립 상미분방정식 — 상수계수 연립방정식, 비제차 선형연립\n"+
-"W11 상미분방정식의 급수해 — 거듭제곱급수 해법\n"+
-"W12 Laplace 변환 — Laplace 변환, 선형성, 제1이동정리\n"+
-"W13 Laplace 변환 — 단위계단함수, 제2이동정리, Dirac 델타\n"+
-"W14 Laplace 변환 — 부분분수, 합성곱(convolution)\n"+
-"W15 Laplace 변환 — 변환의 미분과 적분, 변수계수 ODE\n"+
-"W16 ★ 기말시험\n\n"+
-"※ PDF 강의자료는 W15를 '종합 정리'로 적었으나 포털은 Laplace 변환 계속.\n"+
+"1주차  1계 상미분방정식 — OT, 기본개념, 모델링, Euler 방법\n"+
+"2주차  1계 상미분방정식 — 분리가능 상미분방정식, 모델링\n"+
+"3주차  1계→2계 — 완전 상미분방정식·적분인자, 선형 ODE·Bernoulli 방정식\n"+
+"4주차  2계 선형 — 2계 제차 선형 ODE, 상수계수 제차, 질량-용수철 자유진동   ⚠ 추석\n"+
+"5주차  2계 선형 — Euler-Cauchy 방정식, Wronskian, 비제차 ODE, 강제진동·공진\n"+
+"6주차  고계 선형 — 제차 선형 ODE, 상수계수 제차 ODE                        ⚠ 한글날\n"+
+"7주차  고계 선형 — 비제차 선형 ODE\n"+
+"8주차  ★ 중간시험\n"+
+"9주차  연립 상미분방정식 — 행렬과 벡터의 기본이론\n"+
+"10주차 연립 상미분방정식 — 상수계수 연립방정식, 비제차 선형연립\n"+
+"11주차 상미분방정식의 급수해 — 거듭제곱급수 해법\n"+
+"12주차 Laplace 변환 — Laplace 변환, 선형성, 제1이동정리\n"+
+"13주차 Laplace 변환 — 단위계단함수, 제2이동정리, Dirac 델타\n"+
+"14주차 Laplace 변환 — 부분분수, 합성곱(convolution)\n"+
+"15주차 Laplace 변환 — 변환의 미분과 적분, 변수계수 ODE\n"+
+"16주차 ★ 기말시험\n\n"+
+"※ PDF 강의자료는 15주차를 '종합 정리'로 적었으나 포털은 Laplace 변환 계속.\n"+
 "   포털이 최신이므로 포털 기준으로 잡았다. 첫 주에 교수 공지로 확인할 것.\n"+
 "※ 합성곱(convolution)은 PDF 목차에 없고 포털에만 있다. 자료 확보 필요.";
 var EM_STYLE=
@@ -1908,10 +1908,10 @@ var EM_STYLE=
 "[주의]\n"+
 "- 총 수업시간의 2/3 이상 출석해야 시험 응시 가능. 1/3 초과 결석 = F.\n"+
 "- 중간·기말 중 하나라도 미응시하면 F.\n"+
-"- 공휴일로 금요일 수업이 2회 날아간다 (W4 추석 9/25, W6 한글날 10/9).\n"+
+"- 공휴일로 금요일 수업이 2회 날아간다 (4주차 추석 9/25, 6주차 한글날 10/9).\n"+
 "  둘 다 금요일 = 제1공학관 301. 보강 공지를 놓치지 말 것.\n"+
-"- W4~W5 (Ch.2 2계 선형 ODE) 강의자료 PDF가 없다. 중간고사 핵심 구간이므로 반드시 확보.\n"+
-"- W14 합성곱(convolution)은 보유 PDF 목차에 없다. 기말 범위이므로 자료 확보 필요.";
+"- 4~5주차 (Ch.2 2계 선형 ODE) 강의자료 PDF가 없다. 중간고사 핵심 구간이므로 반드시 확보.\n"+
+"- 14주차 합성곱(convolution)은 보유 PDF 목차에 없다. 기말 범위이므로 자료 확보 필요.";
 var EM_WEEKMAT={
   1:"[Ch.1 1계 상미분방정식] 강의자료 보유 (46p)\n· 기본 개념과 모델링\n· 방향장, Euler 방법",
   2:"[Ch.1 1계 상미분방정식] 강의자료 보유\n· 분리가능 상미분방정식\n· 모델링 응용",
@@ -1959,23 +1959,23 @@ var GP2_SYLLABUS=
 "(1) 전기학 — 전하, 전기장, Gauss 법칙, 전기퍼텐셜, 전기용량, 전류와 저항, 회로\n"+
 "(2) 자기학 — 운동전하에 의한 자기장, 전류가 만드는 자기장\n\n"+
 "[주차 진도 — 포털 주별 강의계획]\n"+
-"W1  21장 전하 — 전기·자기학을 공부하기\n"+
-"W2  22장 전기장 — source 전하의 종류와 분포\n"+
-"W3  22장 전기장 — 가우스의 전기장선다발\n"+
-"W4  23장 가우스 법칙                              ⚠ 추석\n"+
-"W5  24장 전위 — 전기퍼텐셜의 정의\n"+
-"W6  25장 전기용량 — 전기퍼텐셜에너지 저장          ⚠ 한글날\n"+
-"W7  26장 전류 및 저항 — 전류밀도, 전류의 세기\n"+
-"W8  ★ 중간고사\n"+
-"W9  28장 자기장(1) — 운동전하(도체에서 전류)에 의한 자기장\n"+
-"W10 28장 자기장(2) — 전기장과 자기장의 수직 교차\n"+
-"W11 29장 전류고리 — 28장에서 주어진 자기장의 원천\n"+
-"W12 30장 유도와 유도계수 — 전기장의 변화가 만드는 유도자기장\n"+
-"W13 31장 전자기진동 — 전자기 진동과 교류\n"+
-"W14 32장 맥스웰 방정식 — 교류전류가 입력 전원에 되먹임\n"+
-"W15 전자기학 정리 — 전기·자기에 대한 맥스웰의 종합\n"+
-"W16 ★ 기말고사\n\n"+
-"※ '32장까지 수학적 전개'인데 진도가 W14에 32장으로 끝난다.\n"+
+"1주차  21장 전하 — 전기·자기학을 공부하기\n"+
+"2주차  22장 전기장 — source 전하의 종류와 분포\n"+
+"3주차  22장 전기장 — 가우스의 전기장선다발\n"+
+"4주차  23장 가우스 법칙                              ⚠ 추석\n"+
+"5주차  24장 전위 — 전기퍼텐셜의 정의\n"+
+"6주차  25장 전기용량 — 전기퍼텐셜에너지 저장          ⚠ 한글날\n"+
+"7주차  26장 전류 및 저항 — 전류밀도, 전류의 세기\n"+
+"8주차  ★ 중간고사\n"+
+"9주차  28장 자기장(1) — 운동전하(도체에서 전류)에 의한 자기장\n"+
+"10주차 28장 자기장(2) — 전기장과 자기장의 수직 교차\n"+
+"11주차 29장 전류고리 — 28장에서 주어진 자기장의 원천\n"+
+"12주차 30장 유도와 유도계수 — 전기장의 변화가 만드는 유도자기장\n"+
+"13주차 31장 전자기진동 — 전자기 진동과 교류\n"+
+"14주차 32장 맥스웰 방정식 — 교류전류가 입력 전원에 되먹임\n"+
+"15주차 전자기학 정리 — 전기·자기에 대한 맥스웰의 종합\n"+
+"16주차 ★ 기말고사\n\n"+
+"※ '32장까지 수학적 전개'인데 진도가 14주차에 32장으로 끝난다.\n"+
 "   → 전 범위가 수학적 전개 구간이다. 개념만 읽는 공부법은 통하지 않는다.";
 var GP2_STYLE=
 "[강의계획서에서 읽히는 것]\n"+
@@ -1991,7 +1991,7 @@ var GP2_STYLE=
 "- 10번 이상 결석(병결·공결 포함)이면 F. 앱의 결석 한도를 10회로 잡아 뒀다.\n"+
 "- 지각은 3번까지 -1점, 4번부터 -0.5점씩. 공업수학1(-0.25/회)보다 무겁다.\n\n"+
 "[주의]\n"+
-"- 공휴일로 금요일 수업이 2회 날아간다 (W4 추석 9/25, W6 한글날 10/9). 공업수학1과 같은 날.\n"+
+"- 공휴일로 금요일 수업이 2회 날아간다 (4주차 추석 9/25, 6주차 한글날 10/9). 공업수학1과 같은 날.\n"+
 "- 강의자료 PDF가 아직 하나도 없다. 교재 장 단위로 진도가 나가므로 최소한 필기라도 남길 것.";
 function seedPhysics2(){
   var t=term();
@@ -2012,9 +2012,9 @@ function seedPhysics2(){
   var midWeek=pl.filter(function(p){return p.week===8;})[0];
   var finWeek=pl.filter(function(p){return p.week===16;})[0]||pl[pl.length-1];
   if(midWeek) t.exams.push({id:uid(),courseId:c.id,kind:"중간",date:midWeek.date,time:"10:30",
-    scope:"21장 전하 · 22장 전기장 · 23장 가우스 법칙 · 24장 전위 · 25장 전기용량 · 26장 전류와 저항 (W1~W7)",weight:45});
+    scope:"21장 전하 · 22장 전기장 · 23장 가우스 법칙 · 24장 전위 · 25장 전기용량 · 26장 전류와 저항 (1~7주차)",weight:45});
   if(finWeek) t.exams.push({id:uid(),courseId:c.id,kind:"기말",date:finWeek.date,time:"10:30",
-    scope:"28장 자기장 · 29장 전류고리 · 30장 유도와 유도계수 · 31장 전자기진동 · 32장 맥스웰 방정식 (W9~W15)",weight:45});
+    scope:"28장 자기장 · 29장 전류고리 · 30장 유도와 유도계수 · 31장 전자기진동 · 32장 맥스웰 방정식 (9~15주차)",weight:45});
 }
 
 /* 미분적분학2 — 강의계획서(홍순필 교수, Stewart) 실물 반영 */
@@ -2045,22 +2045,22 @@ var CAL2_SYLLABUS=
 "[유의사항]\n"+
 "총 수업시간수의 2/3 이상 출석해야만 시험에 응시할 수 있다.\n\n"+
 "[16주 진도 — 포털 주별 강의계획]\n"+
-"W1  행렬과 행렬식 — 행렬의 정의 / 행렬의 기본 연산\n"+
-"W2  행렬과 행렬식 — 행렬식 / 소행렬식과 여인수\n"+
-"W3  행렬과 행렬식 — 역행렬과 크래머의 법칙\n"+
-"W4  벡터와 공간 — 삼차원 좌표계 / 벡터            ⚠ 추석 (목요일 수업 결손)\n"+
-"W5  벡터와 공간 — 내적 / 벡터곱\n"+
-"W6  벡터와 공간 — 직선과 평면의 방정식 / 기둥면\n"+
-"W7  벡터함수 — 벡터함수와 공간곡선 / 벡터의 미적분\n"+
-"W8  ★ 중간고사\n"+
-"W9  벡터함수 — 호의 길이와 곡률\n"+
-"W10 편도함수 — 편도함수 / 접평면과 선형근사\n"+
-"W11 편도함수 — 방향도함수와 기울기 벡터\n"+
-"W12 편도함수 — 최댓값과 최솟값 / 라그랑주 승수\n"+
-"W13 다중적분 — 직사각형 위에서의 이중적분\n"+
-"W14 다중적분 — 일반 영역 위의 이중적분\n"+
-"W15 다중적분 — 극좌표에서의 이중적분 / 곡면적\n"+
-"W16 ★ 기말고사";
+"1주차  행렬과 행렬식 — 행렬의 정의 / 행렬의 기본 연산\n"+
+"2주차  행렬과 행렬식 — 행렬식 / 소행렬식과 여인수\n"+
+"3주차  행렬과 행렬식 — 역행렬과 크래머의 법칙\n"+
+"4주차  벡터와 공간 — 삼차원 좌표계 / 벡터            ⚠ 추석 (목요일 수업 결손)\n"+
+"5주차  벡터와 공간 — 내적 / 벡터곱\n"+
+"6주차  벡터와 공간 — 직선과 평면의 방정식 / 기둥면\n"+
+"7주차  벡터함수 — 벡터함수와 공간곡선 / 벡터의 미적분\n"+
+"8주차  ★ 중간고사\n"+
+"9주차  벡터함수 — 호의 길이와 곡률\n"+
+"10주차 편도함수 — 편도함수 / 접평면과 선형근사\n"+
+"11주차 편도함수 — 방향도함수와 기울기 벡터\n"+
+"12주차 편도함수 — 최댓값과 최솟값 / 라그랑주 승수\n"+
+"13주차 다중적분 — 직사각형 위에서의 이중적분\n"+
+"14주차 다중적분 — 일반 영역 위의 이중적분\n"+
+"15주차 다중적분 — 극좌표에서의 이중적분 / 곡면적\n"+
+"16주차 ★ 기말고사";
 var CAL2_STYLE=
 "[강의계획서에서 읽히는 것]\n"+
 "- 시험 75%(중간 35 + 기말 40) + 과제 15% + 출석 10%.\n"+
@@ -2068,9 +2068,9 @@ var CAL2_STYLE=
 "- 과제 15%는 공짜 점수다. 미제출로 깎이면 시험으로 메우기 어렵다.\n"+
 "- 일반수업 · 강의중심. 토론·팀플 없음. 순수 문제풀이 과목.\n\n"+
 "★★ [공업수학1과 겹치는 구간 — 시간 절약 포인트]\n"+
-"- W1~W3 행렬·행렬식·역행렬 → 공업수학1 W9 '행렬과 벡터의 기본이론'과 동일\n"+
-"- W4~W6 벡터·내적·벡터곱     → 공업수학1 연립 ODE의 선수지식\n"+
-"- W10~W12 편도함수           → 공업수학1 완전미분방정식(적분인자)의 뿌리\n"+
+"- 1~3주차 행렬·행렬식·역행렬 → 공업수학1 9주차 '행렬과 벡터의 기본이론'과 동일\n"+
+"- 4~6주차 벡터·내적·벡터곱     → 공업수학1 연립 ODE의 선수지식\n"+
+"- 10~12주차 편도함수           → 공업수학1 완전미분방정식(적분인자)의 뿌리\n"+
 "→ 두 과목을 따로 공부하지 말고 묶어서 볼 것. 실제로 중복이 30% 가까이 된다.\n\n"+
 "[주의]\n"+
 "- 추석(9/24 목)으로 목요일 수업 1회 결손. 화/목 수업이라 한글날(금)은 영향 없다.\n"+
@@ -2092,9 +2092,9 @@ function seedCalculus2(){
   var midWeek=pl.filter(function(p){return p.week===8;})[0];
   var finWeek=pl.filter(function(p){return p.week===16;})[0]||pl[pl.length-1];
   if(midWeek) t.exams.push({id:uid(),courseId:c.id,kind:"중간",date:midWeek.date,time:"09:00",
-    scope:"행렬과 행렬식 · 벡터와 공간 · 벡터함수(공간곡선) (W1~W7)",weight:35});
+    scope:"행렬과 행렬식 · 벡터와 공간 · 벡터함수(공간곡선) (1~7주차)",weight:35});
   if(finWeek) t.exams.push({id:uid(),courseId:c.id,kind:"기말",date:finWeek.date,time:"09:00",
-    scope:"벡터함수(곡률) · 편도함수 · 다중적분 (W9~W15)",weight:40});
+    scope:"벡터함수(곡률) · 편도함수 · 다중적분 (9~15주차)",weight:40});
 }
 
 /* CADD — 강의계획서(최이현 교수, CATIA) 실물 반영 */
@@ -2123,37 +2123,37 @@ var CADD_SYLLABUS=
 "★ 기말고사 0% — 기말시험이 없다. 기말 프로젝트가 그 자리를 대신한다.\n"+
 "퀴즈 0% · 토론 0% · 학습참여도 0%\n\n"+
 "[16주 진도 — 포털 주별 강의계획 · CATIA 실습]\n"+
-"W1  Introduction — CATIA 설치 및 Option 설정\n"+
-"W2  1. 서론 및 선 — 초기 구성 및 toolbar 학습\n"+
-"W3  2. 투상도법 — 2D Sketch: Trim 등\n"+
-"W4  3. 형상의 표시 — Part Design: Pad, Pocket\n"+
-"W5  ⚠ 휴강 (공휴일) — 포털에 명시됨\n"+
-"W6  4. 치수 기입법 — Part Design: Groove\n"+
-"W7  5. 단면 도시법 — Part Design: Reference\n"+
-"W8  6. 도면의 예 — Part Design: Rib, Slot\n"+
-"W9  7. 치수공차와 끼워맞춤 — 여러 가지 도면 실습\n"+
-"W10 ★ 중간고사   ← 다른 과목(W8)과 2주 차이\n"+
-"W11 8. 표면거칠기 — Assembly Design\n"+
-"W12 9. 기하공차 — Assembly Design\n"+
-"W13 기말 프로젝트 — 각 팀별 선정 주제 진행\n"+
-"W14 기말 프로젝트\n"+
-"W15 기말 프로젝트\n"+
-"W16 기말 프로젝트 (기말시험 없음)";
+"1주차  Introduction — CATIA 설치 및 Option 설정\n"+
+"2주차  1. 서론 및 선 — 초기 구성 및 toolbar 학습\n"+
+"3주차  2. 투상도법 — 2D Sketch: Trim 등\n"+
+"4주차  3. 형상의 표시 — Part Design: Pad, Pocket\n"+
+"5주차  ⚠ 휴강 (공휴일) — 포털에 명시됨\n"+
+"6주차  4. 치수 기입법 — Part Design: Groove\n"+
+"7주차  5. 단면 도시법 — Part Design: Reference\n"+
+"8주차  6. 도면의 예 — Part Design: Rib, Slot\n"+
+"9주차  7. 치수공차와 끼워맞춤 — 여러 가지 도면 실습\n"+
+"10주차 ★ 중간고사   ← 다른 과목(8주차)과 2주 차이\n"+
+"11주차 8. 표면거칠기 — Assembly Design\n"+
+"12주차 9. 기하공차 — Assembly Design\n"+
+"13주차 기말 프로젝트 — 각 팀별 선정 주제 진행\n"+
+"14주차 기말 프로젝트\n"+
+"15주차 기말 프로젝트\n"+
+"16주차 기말 프로젝트 (기말시험 없음)";
 var CADD_STYLE=
 "[강의계획서에서 읽히는 것]\n"+
-"- ★ 기말고사가 0%다. 학기 후반 4주(W13~W16)가 통째로 팀 프로젝트다.\n"+
+"- ★ 기말고사가 0%다. 학기 후반 4주(13~16주차)가 통째로 팀 프로젝트다.\n"+
 "  → 기말고사 기간에 이 과목은 시험 공부가 아니라 산출물 마감이다. 다른 과목과 겹치지 않아 유리.\n"+
 "- 팀프로젝트 40% + 과제 25% = 65%가 산출물. 중간고사 25%.\n"+
 "  → 시험보다 '제출물을 제때 좋은 품질로 내는 것'이 학점을 결정한다.\n"+
-"- ★ 중간고사가 W10이다. 다른 과목은 W8 — 2주 늦다.\n"+
+"- ★ 중간고사가 10주차이다. 다른 과목은 8주차 — 2주 늦다.\n"+
 "  중간 기간에 이 과목만 따로 준비해야 한다. 일정 관리에서 놓치기 쉬운 지점.\n"+
-"- CATIA 실습 과목. W1에 설치·Option 설정부터 한다. 노트북 준비 필수.\n"+
+"- CATIA 실습 과목. 1주차에 설치·Option 설정부터 한다. 노트북 준비 필수.\n"+
 "- 강의평가유형이 '실험/실습'으로 고정 → 이론 시험형 공부법이 통하지 않는다.\n\n"+
 "[시간 부담]\n"+
 "- 화요일 13:00~19:00, 6시간 연속. 이 날 저녁 복습은 현실적으로 불가능하다.\n"+
 "  화요일은 학습 계획에서 빼고 다른 요일에 배분할 것.\n\n"+
 "[확인 필요]\n"+
-"- W5가 '휴강(공휴일)'로 표시돼 있는데, 다른 과목은 W4를 추석으로 표시한다.\n"+
+"- 5주차가 '휴강(공휴일)'로 표시돼 있는데, 다른 과목은 4주차를 추석으로 표시한다.\n"+
 "  화요일 기준 날짜가 어긋나므로 실제 휴강일을 첫 주에 확인하고\n"+
 "  설정 → 학기 → 공휴일에 직접 추가할 것.";
 function seedCADD(){
@@ -2172,16 +2172,16 @@ function seedCADD(){
   c.syllabus=CADD_SYLLABUS;
   c.profStyle=CADD_STYLE+
     "\n\n[중간고사 — 암기 전략]\n"+
-    "- 중간고사(W10)는 이론수업 기반, 암기 위주. 제도 규칙·기호·치수 기입법·단면 도시법·\n"+
+    "- 중간고사(10주차)는 이론수업 기반, 암기 위주. 제도 규칙·기호·치수 기입법·단면 도시법·\n"+
     "  표면거칠기·기하공차의 명칭·조건·기입법을 정확히 외우는 것이 점수.\n"+
     "- 개념 이해보다 '정확한 암기 + 표기 규칙'이 핵심 — 분류표·카드로 반복.\n"+
-    "- ★ 중간이 끝나면 W13~W16은 팀프로젝트로 전환. 그때부터는 암기가 아니라 산출물 마감.";
+    "- ★ 중간이 끝나면 13~16주차은 팀프로젝트로 전환. 그때부터는 암기가 아니라 산출물 마감.";
 
   var pl=planned(c);
-  var midWeek=pl.filter(function(p){return p.week===10;})[0];   /* W10 — 다른 과목과 다름 */
+  var midWeek=pl.filter(function(p){return p.week===10;})[0];   /* 10주차 — 다른 과목과 다름 */
   if(midWeek) t.exams.push({id:uid(),courseId:c.id,kind:"중간",date:midWeek.date,time:"13:00",
-    scope:"이론 (암기 위주) — 제도 규칙·기호·치수 기입법·단면 도시법·표면거칠기·기하공차 (W1~W9)",weight:25});
-  /* 기말고사 없음 — 시험을 만들지 않는다. 중간 후 W13~W16 팀프로젝트 */
+    scope:"이론 (암기 위주) — 제도 규칙·기호·치수 기입법·단면 도시법·표면거칠기·기하공차 (1~9주차)",weight:25});
+  /* 기말고사 없음 — 시험을 만들지 않는다. 중간 후 13~16주차 팀프로젝트 */
 }
 
 /* 아카데믹글쓰기 — 강의계획서(김혜선 교수) 실물 반영 */
@@ -2205,37 +2205,37 @@ var WR_SYLLABUS=
 "3. 자신과 타인의 글을 읽고 피드백을 나누며 소통하는 글쓰기 능력을 기른다.\n\n"+
 "[평가 — 합계 100%]\n"+
 "★ 과제 45% · 출석 20% · 기말고사 20% · 학습참여도 15%\n"+
-"★ 중간고사 0% — 중간시험이 없다. W8에 '중간고사 대체' 과제를 온라인 제출한다.\n"+
+"★ 중간고사 0% — 중간시험이 없다. 8주차에 '중간고사 대체' 과제를 온라인 제출한다.\n"+
 "퀴즈 0% · 토론 0% · 팀프로젝트 0%\n"+
 "※ 앱에는 학습참여도 15%를 출석·참여(20%)에 합산해 35%로 넣었다. 원본 수치는 위와 같다.\n\n"+
 "[16주 진도 — 포털 주별 강의계획]\n"+
-"W1  교과목 소개\n"+
-"W2  좋은 글이란\n"+
-"W3  글에 담는 내용\n"+
-"W4  글의 구조화\n"+
-"W5  글의 시각화\n"+
-"W6  서술 방식 ①\n"+
-"W7  자기 서사 워크숍 — 자신의 경험을 재해석하기\n"+
-"W8  ★ 중간고사 대체 과제 — 온라인 과제란에 제출\n"+
-"W9  서술 방식 ②\n"+
-"W10 비평적 글쓰기 — 개요를 기반으로\n"+
-"W11 비평적 글쓰기\n"+
-"W12 비평적 글쓰기\n"+
-"W13 비평적 글쓰기 — 온라인 과제란에 제출\n"+
-"W14 AI 시대의 글쓰기\n"+
-"W15 ★ 기말고사 (대체 가능)\n"+
-"W16 필요 시 보강";
+"1주차  교과목 소개\n"+
+"2주차  좋은 글이란\n"+
+"3주차  글에 담는 내용\n"+
+"4주차  글의 구조화\n"+
+"5주차  글의 시각화\n"+
+"6주차  서술 방식 ①\n"+
+"7주차  자기 서사 워크숍 — 자신의 경험을 재해석하기\n"+
+"8주차  ★ 중간고사 대체 과제 — 온라인 과제란에 제출\n"+
+"9주차  서술 방식 ②\n"+
+"10주차 비평적 글쓰기 — 개요를 기반으로\n"+
+"11주차 비평적 글쓰기\n"+
+"12주차 비평적 글쓰기\n"+
+"13주차 비평적 글쓰기 — 온라인 과제란에 제출\n"+
+"14주차 AI 시대의 글쓰기\n"+
+"15주차 ★ 기말고사 (대체 가능)\n"+
+"16주차 필요 시 보강";
 var WR_STYLE=
 "[강의계획서에서 읽히는 것]\n"+
-"- ★ 중간고사가 없다. W8은 온라인 과제 제출로 대체된다.\n"+
+"- ★ 중간고사가 없다. 8주차은 온라인 과제 제출로 대체된다.\n"+
 "  → 중간고사 기간에 이 과목은 '시험'이 아니라 '마감'이다. 미리 써두면 그 주가 편해진다.\n"+
 "- 과제 45% + 학습참여도 15% + 출석 20% = 80%가 시험이 아닌 항목이다.\n"+
 "  기말 20%만 시험. 벼락치기가 통하지 않고, 매주 쌓아야 하는 구조.\n"+
 "- 출석 20%는 이번 학기 과목 중 가장 높다. 빠지면 바로 티가 난다.\n"+
 "- 토론식 수업이 체크돼 있고 학습참여도 15%가 있다 → 수업 중 발언·피드백이 점수다.\n"+
 "  조용히 앉아만 있으면 15%를 통째로 잃는다.\n"+
-"- W7 자기 서사 워크숍, W10~W13 비평적 글쓰기 — 결과물을 4주에 걸쳐 만든다.\n"+
-"  W13 제출이므로 W10에 개요를 잡아두지 않으면 마지막 주에 몰린다.\n\n"+
+"- 7주차 자기 서사 워크숍, 10~13주차 비평적 글쓰기 — 결과물을 4주에 걸쳐 만든다.\n"+
+"  13주차 제출이므로 10주차에 개요를 잡아두지 않으면 마지막 주에 몰린다.\n\n"+
 "[주의]\n"+
 "- 화요일 11:00~13:00 수업 직후 13:00부터 CADD가 6시간 이어진다.\n"+
 "  화요일은 오전 11시부터 저녁 7시까지 연속. 이 날 과제 작업은 계획에 넣지 말 것.";
@@ -2257,15 +2257,15 @@ function seedWriting(){
   var pl=planned(c);
   var finWeek=pl.filter(function(p){return p.week===15;})[0]||pl[pl.length-1];
   if(finWeek) t.exams.push({id:uid(),courseId:c.id,kind:"기말",date:finWeek.date,time:"11:00",
-    scope:"글쓰기 이론 전반 · 비평적 글쓰기 · AI 시대의 글쓰기 (W1~W14) — 대체 가능",weight:20});
-  /* 중간고사 없음 — W8은 온라인 과제 제출 */
+    scope:"글쓰기 이론 전반 · 비평적 글쓰기 · AI 시대의 글쓰기 (1~14주차) — 대체 가능",weight:20});
+  /* 중간고사 없음 — 8주차은 온라인 과제 제출 */
 }
 
 /* 정역학 — 수강정정 기간에 확보 예정 (일단 확정으로 잡아 둠) */
 var ST_NOTE=
 "[상태] 수강정정으로 확보 예정 — 앱에는 확정으로 잡아 둠\n"+
 "강의계획서를 아직 못 받아서 평가 구성이 비어 있다. 학습모드 M1은 과목 성격만으로 잡은 가설.\n"+
-"시험 일정도 다른 과목의 W8/W16을 따라 추정해 넣었으니, 정정 후 계획서로 확인할 것.\n\n"+
+"시험 일정도 다른 과목의 8주차/16주차을 따라 추정해 넣었으니, 정정 후 계획서로 확인할 것.\n\n"+
 "[왜 이 과목이 최우선인가]\n"+
 "정역학은 기계공학 전공의 첫 관문이다. 여기서 막히면 연쇄로 밀린다.\n"+
 "  정역학 → 고체역학 → 기계요소설계 → 캡스톤\n"+
@@ -2285,10 +2285,10 @@ var ST_NOTE=
 "4순위: 다음 학기 1순위 신청 + 겨울방학에 선수지식 독학\n\n"+
 "[선수지식 — 지금 미리 볼 것]\n"+
 "벡터(고교) · 뉴턴 운동 3법칙(고교) · 자유물체도 · 평형방정식 · 도심과 단면 2차 모멘트\n"+
-"★ 미분적분학2 W4~W6(벡터와 공간 · 내적 · 벡터곱)이 정확히 정역학의 선수지식이다.\n"+
+"★ 미분적분학2 4~6주차(벡터와 공간 · 내적 · 벡터곱)이 정확히 정역학의 선수지식이다.\n"+
 "  같은 학기에 듣고 있으므로 묶어서 보면 양쪽 다 이득이다.";
 
-/* 정역학 — 강의계획서(포털 캡처 4장) + W1 오리엔테이션 슬라이드(강석경 교수, 9/2) 실물 반영 */
+/* 정역학 — 강의계획서(포털 캡처 4장) + 1주차 오리엔테이션 슬라이드(강석경 교수, 9/2) 실물 반영 */
 var STA_SYLLABUS=
 "정역학 / Engineering Mechanics: Statics\n"+
 "학수번호 COE2003 · 수업코드 24814 (202620HY24814)\n"+
@@ -2309,7 +2309,7 @@ var STA_SYLLABUS=
 "유의사항 총 수업시간의 2/3 이상 출석해야 시험 응시 가능. 부정행위 시 성적 취소.\n\n"+
 "[평가 — 합계 100%]\n"+
 "출석 10% · 과제 10% · 중간고사 30% · 기말고사 50%  (퀴즈·토론·팀프로젝트·학습참여도 0%)\n\n"+
-"[수업 운영 — W1 오리엔테이션 슬라이드 (9/2)]\n"+
+"[수업 운영 — 1주차 오리엔테이션 슬라이드 (9/2)]\n"+
 "- 영어 강의: 영어로 설명한 뒤 한국어로 짧게 요약. 영어 기반이라 채점은 비교적 유연.\n"+
 "- 과제·시험 답안은 원칙적으로 영어. 서술형은 한국어 가능하나 핵심 용어는 영어로 기억할 것.\n"+
 "- 출석: 결석 1회당 −2점.\n"+
@@ -2319,23 +2319,23 @@ var STA_SYLLABUS=
 "- 시험 중 화장실 이용 불가. 부정행위 엄금.\n"+
 "- 초청강연 등 일정으로 온라인 강의가 몇 차례 있을 예정 (사전 공지).\n\n"+
 "[16주 진도 — 오리엔테이션 슬라이드 일정표 (날짜 기준, 진도에 따라 변경 가능)]\n"+
-"W1  9/2  오리엔테이션\n"+
-"W2  9/7 Ch.1 Introduction · Ch.2 Vectors / 9/9 Ch.2\n"+
-"W3  9/14 · 9/16 Ch.2 Vectors\n"+
-"W4  9/21 · 9/23 Ch.3 Forces\n"+
-"W5  9/28 · 9/30 Ch.4 Systems of Forces and Moments\n"+
-"W6  10/5 ⚠ 개천절 대체공휴일 / 10/7 Ch.5 Objects in Equilibrium\n"+
-"W7  10/12 · 10/14 Ch.5\n"+
-"W8  10/19 ★ 중간고사 (Ch.3–5) / 10/21 Grading buffer\n"+
-"W9  10/26 · 10/28 Ch.6 Structures in Equilibrium\n"+
-"W10 11/2 · 11/4 Ch.6\n"+
-"W11 11/9 · 11/11 Ch.7 Centroids and Centers of Mass\n"+
-"W12 11/16 · 11/18 Ch.7\n"+
-"W13 11/23 Ch.7 / 11/25 Ch.8 Moments of Inertia\n"+
-"W14 11/30 · 12/2 Ch.8\n"+
-"W15 12/7 · 12/9 Ch.8\n"+
-"W16 12/14 ★ 기말고사 (Ch.6–8) / 12/16 Grading buffer\n"+
-"※ 포털 주별계획(W1 Ch.1 … W5 Ch.4 … W7 Ch.5 … W14–15 Ch.8)은 장 단위라 슬라이드 날짜표와 1주 정도 어긋남. 슬라이드가 최신.";
+"1주차  9/2  오리엔테이션\n"+
+"2주차  9/7 Ch.1 Introduction · Ch.2 Vectors / 9/9 Ch.2\n"+
+"3주차  9/14 · 9/16 Ch.2 Vectors\n"+
+"4주차  9/21 · 9/23 Ch.3 Forces\n"+
+"5주차  9/28 · 9/30 Ch.4 Systems of Forces and Moments\n"+
+"6주차  10/5 ⚠ 개천절 대체공휴일 / 10/7 Ch.5 Objects in Equilibrium\n"+
+"7주차  10/12 · 10/14 Ch.5\n"+
+"8주차  10/19 ★ 중간고사 (Ch.3–5) / 10/21 Grading buffer\n"+
+"9주차  10/26 · 10/28 Ch.6 Structures in Equilibrium\n"+
+"10주차 11/2 · 11/4 Ch.6\n"+
+"11주차 11/9 · 11/11 Ch.7 Centroids and Centers of Mass\n"+
+"12주차 11/16 · 11/18 Ch.7\n"+
+"13주차 11/23 Ch.7 / 11/25 Ch.8 Moments of Inertia\n"+
+"14주차 11/30 · 12/2 Ch.8\n"+
+"15주차 12/7 · 12/9 Ch.8\n"+
+"16주차 12/14 ★ 기말고사 (Ch.6–8) / 12/16 Grading buffer\n"+
+"※ 포털 주별계획(1주차 Ch.1 … 5주차 Ch.4 … 7주차 Ch.5 … 14~15주차 Ch.8)은 장 단위라 슬라이드 날짜표와 1주 정도 어긋남. 슬라이드가 최신.";
 var STA_STYLE=
 "[강의계획서·오리엔테이션에서 읽히는 것]\n"+
 "- 기말 50% > 중간 30%. 기말(Ch.6–8: 구조물·도심·관성모멘트)이 성적의 절반. 중간(Ch.3–5)과 범위가 분리돼 있다.\n"+
@@ -2348,7 +2348,7 @@ var STA_STYLE=
 "- 온라인 강의 회차가 몇 번 있다 — 공지를 놓치면 결석(−2점) 처리될 수 있다.\n\n"+
 "[선수지식 — 지금 볼 것]\n"+
 "벡터(성분·내적·외적) · 뉴턴 운동 3법칙 · 자유물체도 · 삼각함수 · 단위(N, N·m).\n"+
-"★ 미분적분학2 W4~W6(벡터와 공간 · 내적 · 벡터곱)이 Ch.2 Vectors와 정확히 겹친다. 같은 학기라 묶어서 보면 양쪽 다 이득.\n\n"+
+"★ 미분적분학2 4~6주차(벡터와 공간 · 내적 · 벡터곱)이 Ch.2 Vectors와 정확히 겹친다. 같은 학기라 묶어서 보면 양쪽 다 이득.\n\n"+
 "[일정]\n"+
 "- 월·수 15:00–16:30. 월요일은 창업(11:00–13:00) 뒤, 수요일은 공업수학1·일반물리학2 뒤 세 번째 수업.\n"+
 "- 10/5(월) 개천절 대체공휴일 휴강. 중간 10/19(월) · 기말 12/14(월). 시험 다음 수업은 Grading buffer(수업 없음 가능성).";
@@ -2395,39 +2395,39 @@ var ST_SYLLABUS=
 "[평가 — 합계 100%]\n"+
 "중간고사 30% · 기말고사 30% · 출석 20% · 과제 20%\n"+
 "퀴즈 0% · 토론 0% · 팀프로젝트 0% · 학습참여도 0%\n"+
-"★ 다만 진도표를 보면 W8이 '중간 발표', W16이 '기말 프로젝트 발표'다.\n"+
+"★ 다만 진도표를 보면 8주차이 '중간 발표', 16주차이 '기말 프로젝트 발표'다.\n"+
 "   즉 중간·기말 60%는 지필시험이 아니라 발표 산출물이다.\n\n"+
 "[16주 진도 — 포털 주별 강의계획]\n"+
-"W1  오리엔테이션 — 교과목 소개 및 평가 방법\n"+
-"W2  메가 트렌드 — 사회·기술·산업 트렌드 분석\n"+
-"W3  고객 관찰 — 고객 관찰 방법의 이해\n"+
-"W4  문제 정의 — 일상생활 속 문제 발견\n"+
-"W5  ⚠ 대체공휴일 (개천절) — 휴강\n"+
-"W6  아이디어 발상 — 아이디어 평가 및 선택\n"+
-"W7  프로토타이핑 — 프로토타이핑 및 테스트\n"+
-"W8  ★ 중간 발표 — 문제 정의 및 아이디어 발표\n"+
-"W9  경쟁 분석 — 경쟁 환경 분석\n"+
-"W10 비즈니스 모델 — 비즈니스 모델의 개념\n"+
-"W11 비즈니스 모델 — BMC 프레임워크 이해\n"+
-"W12 린 스타트업 — 린 스타트업 핵심 원리\n"+
-"W13 MVP 설계 — 가설 설정, MVP 설계\n"+
-"W14 지식재산권 — 지식재산권의 이해\n"+
-"W15 사업계획서 — 사업계획서 구성\n"+
-"W16 ★ 최종 비즈니스 발표 — 기말 프로젝트 발표";
+"1주차  오리엔테이션 — 교과목 소개 및 평가 방법\n"+
+"2주차  메가 트렌드 — 사회·기술·산업 트렌드 분석\n"+
+"3주차  고객 관찰 — 고객 관찰 방법의 이해\n"+
+"4주차  문제 정의 — 일상생활 속 문제 발견\n"+
+"5주차  ⚠ 대체공휴일 (개천절) — 휴강\n"+
+"6주차  아이디어 발상 — 아이디어 평가 및 선택\n"+
+"7주차  프로토타이핑 — 프로토타이핑 및 테스트\n"+
+"8주차  ★ 중간 발표 — 문제 정의 및 아이디어 발표\n"+
+"9주차  경쟁 분석 — 경쟁 환경 분석\n"+
+"10주차 비즈니스 모델 — 비즈니스 모델의 개념\n"+
+"11주차 비즈니스 모델 — BMC 프레임워크 이해\n"+
+"12주차 린 스타트업 — 린 스타트업 핵심 원리\n"+
+"13주차 MVP 설계 — 가설 설정, MVP 설계\n"+
+"14주차 지식재산권 — 지식재산권의 이해\n"+
+"15주차 사업계획서 — 사업계획서 구성\n"+
+"16주차 ★ 최종 비즈니스 발표 — 기말 프로젝트 발표";
 var ST_STYLE=
 "[강의계획서에서 읽히는 것]\n"+
-"- ★ 중간·기말 60%가 '시험'으로 적혀 있지만 실제로는 발표다 (W8 중간 발표, W16 최종 발표).\n"+
+"- ★ 중간·기말 60%가 '시험'으로 적혀 있지만 실제로는 발표다 (8주차 중간 발표, 16주차 최종 발표).\n"+
 "  → 시험 공부가 아니라 발표 준비다. 슬라이드와 말하기가 점수를 만든다.\n"+
 "- 출석 20% + 과제 20% = 40%. 출석 비중이 높은 편이니 빠지면 바로 깎인다.\n"+
 "- 팀프로젝트 항목은 0%인데 개요에 '팀 활동, 발표'가 명시돼 있다.\n"+
 "  → 팀으로 하되 점수는 개인 발표·과제로 매겨진다는 뜻으로 읽힌다. 첫 주에 확인할 것.\n"+
 "- 아이디어 → 고객 관찰 → 문제 정의 → 프로토타입 → BMC → 린 스타트업 → MVP → 사업계획서.\n"+
-"  한 학기 내내 하나의 아이디어를 굴린다. W2~W4에 잡은 주제가 W16까지 간다.\n"+
+"  한 학기 내내 하나의 아이디어를 굴린다. 2~4주차에 잡은 주제가 16주차까지 간다.\n"+
 "  → 초반 4주에 주제를 잘 고르는 것이 학기 전체를 좌우한다.\n\n"+
 "[일정]\n"+
 "- 월요일 11:00~13:00. 같은 날 15:00에 정역학이 있어 오후가 비어 있다.\n"+
 "  월요일 오후 13:00~15:00은 이 과목 과제·발표 준비에 쓰기 좋은 유일한 빈 시간.\n"+
-"- ★ W5는 개천절 대체공휴일로 휴강 (포털 명시).";
+"- ★ 5주차는 개천절 대체공휴일로 휴강 (포털 명시).";
 function seedStartup(){
   var t=term();
   var c=t.courses.filter(function(x){return x.name==="창업아이디어탐색";})[0];
@@ -2447,9 +2447,9 @@ function seedStartup(){
   var midWeek=pl.filter(function(p){return p.week===8;})[0];
   var finWeek=pl.filter(function(p){return p.week===16;})[0]||pl[pl.length-1];
   if(midWeek) t.exams.push({id:uid(),courseId:c.id,kind:"중간",date:midWeek.date,time:"11:00",
-    scope:"중간 발표 — 문제 정의 및 아이디어 발표 (W1~W7)",weight:30});
+    scope:"중간 발표 — 문제 정의 및 아이디어 발표 (1~7주차)",weight:30});
   if(finWeek) t.exams.push({id:uid(),courseId:c.id,kind:"기말",date:finWeek.date,time:"11:00",
-    scope:"최종 비즈니스 발표 — 기말 프로젝트 (W9~W15)",weight:30});
+    scope:"최종 비즈니스 발표 — 기말 프로젝트 (9~15주차)",weight:30});
 }
 
 /* S가 만들어진 뒤 실행 — planned() 등 헬퍼를 쓰기 위해 */
@@ -2475,9 +2475,9 @@ function seedEngMath(){
   var midWeek=pl.filter(function(p){return p.week===8;})[0];
   var finWeek=pl.filter(function(p){return p.week===16;})[0]||pl[pl.length-1];
   if(midWeek) t.exams.push({id:uid(),courseId:c.id,kind:"중간",date:midWeek.date,time:"09:00",
-    scope:"Ch.1 1계 상미분방정식 · Ch.2 2계 선형 상미분방정식 · Ch.3 고계 선형 상미분방정식 (W1~W7)",weight:40});
+    scope:"Ch.1 1계 상미분방정식 · Ch.2 2계 선형 상미분방정식 · Ch.3 고계 선형 상미분방정식 (1~7주차)",weight:40});
   if(finWeek) t.exams.push({id:uid(),courseId:c.id,kind:"기말",date:finWeek.date,time:"09:00",
-    scope:"Ch.4 연립 상미분방정식 · Ch.5 급수해 · Ch.6 Laplace 변환 (W9~W14)",weight:40});
+    scope:"Ch.4 연립 상미분방정식 · Ch.5 급수해 · Ch.6 Laplace 변환 (9~14주차)",weight:40});
 }
 function blank(){
   var t=seedTerm();
@@ -3239,7 +3239,7 @@ function renderCourse(){
         covRow("이해",cv.mastery,"시험장에서 나올 점수")+
       '</div>'+
       (cv.gaps.length?'<div class="hint" style="margin-top:11px;color:var(--crit)">⚠ 자료 결손 주차 — '+
-        cv.gaps.map(function(w){return "W"+w;}).join(", ")+
+        cv.gaps.map(function(w){return w+"주차";}).join(", ")+
         '<br>이미 지나간 수업인데 자료가 하나도 없는 주차입니다.</div>':
         '<div class="hint" style="margin-top:11px">지나간 주차 중 결손 없음</div>')
     : '<div class="empty" style="padding:18px 8px"><span class="big">◷</span>'+
@@ -3260,11 +3260,11 @@ function renderCourse(){
       var cx=cancelled(c);
       if(!cx.length) return "";
       return '<div class="hint" style="margin-top:9px;color:var(--warn)">⚠ 공휴일 휴강 '+cx.length+'회 — '+
-        cx.map(function(p){return "W"+p.week+" "+fmtDate(p.date)+" "+esc(p.holiday.name);}).join(" · ")+
+        cx.map(function(p){return p.week+"주차 "+fmtDate(p.date)+" "+esc(p.holiday.name);}).join(" · ")+
         '<br>보강 일정이 잡히면 회차를 추가하세요.</div>';
     })();
 
-  $("#cWkHs").textContent="W1–W"+term().weeks;
+  $("#cWkHs").textContent="1~"+term().weeks+"주차";
   $("#cWeeks").innerHTML=weeksHTML(c)+wkLegend();
   $$("#cWeeks .wk").forEach(function(b){ b.onclick=function(){ weekSheet(c.id,+b.dataset.w); }; });
 
@@ -3275,7 +3275,7 @@ function renderCourse(){
   $("#cNotesHs").textContent= wks.length? (wks.length+"주 정리 · ★"+exN+(openT?" · 할 일 "+openT:"")) : "";
   $("#cNotes").innerHTML= wks.length? wks.map(function(w){
       var n=weekNote(c,w), f=weekNoteFilled(c,w), ot=n.tasks.filter(function(t){return !t.done;}).length;
-      return '<div class="wn-row"><span class="w">W'+w+'</span><div style="min-width:0">'+
+      return '<div class="wn-row"><span class="w">'+w+'주차</span><div style="min-width:0">'+
         '<div class="t">'+esc(n.summary||n.range||"정리 없음")+'</div>'+
         '<div class="s">'+(n.range&&n.summary?'<span>'+esc(n.range)+'</span>':"")+
           '<span>섹션 '+f+'/5</span>'+(n.exam.length?'<span style="color:var(--warn)">★ 시험 언급 '+n.exam.length+'</span>':"")+
@@ -3294,7 +3294,7 @@ function renderCourse(){
       var st=s?s.status:null;
       return '<div class="lrow"><span class="swatch" style="background:'+
         (st==="present"?"var(--ok)":st==="late"?"var(--warn)":st==="ghost"?"var(--info)":st==="absent"?"var(--crit)":"var(--line-2)")+'"></span>'+
-        '<div class="gr"><div class="t">W'+p.week+' · '+fmtDate(p.date)+
+        '<div class="gr"><div class="t">'+p.week+'주차 · '+fmtDate(p.date)+
           (s&&s.progress?' <span style="font-weight:400;color:var(--ink-3)">'+esc(s.progress)+'</span>':"")+'</div>'+
         '<div class="s">'+(s?(ATT[st]?ATT[st].n:"—")+
           (typeof s.und==="number"?" · 이해도 "+s.und+"/5":"")+
@@ -3340,7 +3340,7 @@ function weeksHTML(c){
     if(exW[w]) cls.push("exam");
     if(c&&weekNoteFilled(c,w)) cls.push("noted");
     var fill= st==="full"?100 : st==="part"?52 : st==="gap"?14 : 0;
-    h+='<button class="'+cls.join(" ")+'" data-c="'+(c?c.id:"")+'" data-w="'+w+'" title="W'+w+'"><span class="bar">'+
+    h+='<button class="'+cls.join(" ")+'" data-c="'+(c?c.id:"")+'" data-w="'+w+'" title="'+w+'주차"><span class="bar">'+
       '<i style="height:'+fill+'%"></i>'+(exW[w]?'<span class="ex">⚑</span>':"")+
       '</span><span class="lb">'+w+'</span></button>';
   }
@@ -3439,7 +3439,7 @@ function renderToday(){
     : date===addDays(today(),1) ? "내일"
     : date===addDays(today(),-1) ? "어제"
     : fmtDate(date);
-  $("#todayDate").textContent=fmtDate(date)+" · W"+(weekOf(date)||"-")+" · "+PHASE[ph].n+
+  $("#todayDate").textContent=fmtDate(date)+" · "+(weekOf(date)||"-")+"주차 · "+PHASE[ph].n+
     (isToday?"":"  (오늘 아님)");
   /* 주간 요일 스트립 (월~일) */
   var mon=addDays(date, -((D(date).getDay()+6)%7));
@@ -3720,7 +3720,7 @@ function renderCal(){
 }
 function renderCalTerm(){
   var t=term(), cs=courses().filter(function(c){return c.slots.length;});
-  $("#calTitle").textContent=t.label+" · W1–W"+t.weeks;
+  $("#calTitle").textContent=t.label+" · 1~"+t.weeks+"주차";
   var totalGap=0; cs.forEach(function(c){ totalGap+=coverage(c).gaps.length; });
   $("#calHs").textContent="결손 "+totalGap+"주";
   $("#calBody").innerHTML= cs.length
@@ -3777,7 +3777,7 @@ function renderCalMonth(anchor,td){
     h+='<button class="cal-cell'+(out?" out":"")+(date===td?" today":"")+(hol?" hol":"")+'" data-cd="'+date+'">'+
       '<span class="cal-dn'+(dd.getDay()===0?" sun":dd.getDay()===6?" sat":"")+'">'+dd.getDate()+
         (weekOf(date)&&!out&&diffDays(t.startDate,date)>=0&&diffDays(date,t.endDate)>=0
-          ? ' <span class="cal-wk">W'+weekOf(date)+'</span>':"")+'</span>'+
+          ? ' <span class="cal-wk">'+weekOf(date)+'주</span>':"")+'</span>'+
       '<span class="cal-dots">'+dshow.join("")+
         (dextra>0?'<em>+'+dextra+'</em>':"")+'</span>'+
       shown.join("")+(extra>0?'<span class="cal-more">+'+extra+'</span>':"")+
@@ -3793,7 +3793,7 @@ function renderCalWeek(anchor,td){
   for(var i=0;i<7;i++) days.push(addDays(start,i));
   var s0=D(days[0]), s6=D(days[6]);
   $("#calTitle").textContent=(s0.getMonth()+1)+"/"+s0.getDate()+" – "+(s6.getMonth()+1)+"/"+s6.getDate()+
-    (weekOf(days[0])?"  ·  W"+weekOf(days[0]):"");
+    (weekOf(days[0])?"  ·  "+weekOf(days[0])+"주차":"");
 
   var all=[];
   days.forEach(function(d){
@@ -4043,7 +4043,7 @@ function renderSet(){
       (t.holidays.length? t.holidays.slice().sort(function(a,b){return a.date<b.date?-1:1;}).map(function(h){
         return '<div class="lrow" style="padding:7px 0"><div class="gr">'+
           '<div class="t" style="font-size:13.5px">'+esc(h.name)+'</div>'+
-          '<div class="s">'+fmtDate(h.date)+' · W'+(weekOf(h.date)||"-")+'</div></div>'+
+          '<div class="s">'+fmtDate(h.date)+' · '+(weekOf(h.date)||"-")+'주차</div></div>'+
           '<button class="btn xs dgr" data-delhol="'+esc(h.date)+'">삭제</button></div>';
       }).join("") : '<div class="hint">등록된 휴일이 없습니다.</div>')+
     '</div>'+
@@ -4619,7 +4619,7 @@ function weekSheet(cid,w){
   var reopen=function(){ saveWN(); closeSheet(); weekSheet(cid,w); };
   openSheet({
     wide:true,
-    title:c.name+" · W"+w+" 수업 정리 ("+fmtDate(weekStart(w))+" 주)",
+    title:c.name+" · "+w+"주차 수업 정리 ("+fmtDate(weekStart(w))+" 주)",
     body:
       '<div class="field"><label>이 주 회차</label>'+sess+'</div>'+
       '<div class="row" style="margin-top:8px"><div class="field" style="flex:1 1 180px"><label>진도 범위</label><input class="input" id="wn_range" value="'+esc(n.range)+'" placeholder="예: Ch.1 p.10–19"></div>'+
@@ -4644,7 +4644,7 @@ function weekSheet(cid,w){
       $$("[data-exdel]",root).forEach(function(b){ b.onclick=function(){ n.exam.splice(+b.dataset.exdel,1); reopen(); }; });
       $("#wn_t_add",root).onclick=function(){
         var tx=$("#wn_t_text",root).value.trim(); if(!tx){ toast("할 일을 적어 주세요"); return; }
-        n.tasks.push({id:uid(),text:tx,due:$("#wn_t_due",root).value||"",done:false,src:"W"+w}); reopen(); };
+        n.tasks.push({id:uid(),text:tx,due:$("#wn_t_due",root).value||"",done:false,src:w+"주차"}); reopen(); };
       $$("[data-tdone]",root).forEach(function(b){ b.onclick=function(){ var t=n.tasks[+b.dataset.tdone]; if(t){ t.done=b.checked; if(t.done) addXP(10); persist(); } }; });
       $$("[data-tdel]",root).forEach(function(b){ b.onclick=function(){ n.tasks.splice(+b.dataset.tdel,1); reopen(); }; });
       $("#wn_l_add",root).onclick=function(){
@@ -5152,15 +5152,15 @@ function boot(){
     if(cad){
       if(Array.isArray(cad.examForm)&&cad.examForm.length===1&&cad.examForm[0]==="실기") cad.examForm=["객관식","서술형"];
       var mid=t.exams.filter(function(e){return e.courseId===cad.id&&e.kind==="중간";})[0];
-      if(mid&&/투상도법/.test(mid.scope||"")) mid.scope="이론 (암기 위주) — 제도 규칙·기호·치수 기입법·단면 도시법·표면거칠기·기하공차 (W1~W9)";
+      if(mid&&/투상도법/.test(mid.scope||"")) mid.scope="이론 (암기 위주) — 제도 규칙·기호·치수 기입법·단면 도시법·표면거칠기·기하공차 (1~9주차)";
       if(cad.profStyle&&cad.profStyle.indexOf("암기 위주")<0)
-        cad.profStyle+="\n\n[중간고사 — 암기 전략]\n- 중간고사(W10)는 이론 기반, 암기 위주. 제도 규칙·기호·치수·공차의 명칭·조건·기입법을 정확히 암기.\n- 중간 이후 W13~W16은 팀프로젝트로 전환 — 산출물 마감.";
+        cad.profStyle+="\n\n[중간고사 — 암기 전략]\n- 중간고사(10주차)는 이론 기반, 암기 위주. 제도 규칙·기호·치수·공차의 명칭·조건·기입법을 정확히 암기.\n- 중간 이후 13~16주차은 팀프로젝트로 전환 — 산출물 마감.";
     }
     t.patchCADDv1=true;
     try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   })();
 
-  /* 데이터 패치 — 2026-2 W1 주차별 수업 정리 시드 (9/1~9/4 업로드 자료 반영, 1회) */
+  /* 데이터 패치 — 2026-2 1주차 주차별 수업 정리 시드 (9/1~9/4 업로드 자료 반영, 1회) */
   (function(){
     var t=term(); if(t.patchWeekNotesV1) return;
     var byName=function(nm){ return t.courses.filter(function(c){return c.name===nm;})[0]; };
@@ -5191,7 +5191,7 @@ function boot(){
             {t:"녹음 9/4 04:06",quote:"선형 위주로 할 거고 비선형은 거의 안 할 거야. 비선형은 특이한 경우만.",memo:"1장의 변수분리·동차·Bernoulli처럼 선형으로 바꾸는 꼴만"},
             {t:"슬라이드 p.4–5",quote:"Written test 80% (중간 40 · 기말 40). 과제 미제출 −1.0/회, 지각제출 −0.5/회(2주까지). 결석 −0.5, 지각 −0.25. 1/3 이상 결석·시험 미응시·원점수 30 미만 F.",memo:""}],
       tasks:[{id:uid(),text:"1주차 과제 Kreyszig 1.3 #6·7·8·16·17 — 수업 전 교탁 제출",due:"2026-09-09",done:false,src:"판서 9/4"},
-             {id:uid(),text:"Ch.2(2계 ODE, W4–5) 강의자료 확보 — 중간고사 핵심 구간",due:"2026-09-16",done:false,src:"자료 점검"}],
+             {id:uid(),text:"Ch.2(2계 ODE, 4~5주차) 강의자료 확보 — 중간고사 핵심 구간",due:"2026-09-16",done:false,src:"자료 점검"}],
       links:[{label:"1계 ODE 쉬운 정리 (개념·공식·문제·풀이·교육과정)",url:"https://claude.ai/code/artifact/26569254-d9a0-4eda-9d80-60826d15c571"},
              {label:"9/2 결석 보강 — 모델화부터 선형·비선형까지 (p.10–17)",url:"https://claude.ai/code/artifact/51f01342-e9f3-4518-b528-790809d55be6"},
              {label:"1주차 과제 가이드 (1.3 #6·7·8·16·17)",url:"https://claude.ai/code/artifact/d4876786-444b-4966-a2f4-f78917954dca"},
@@ -5232,7 +5232,7 @@ function boot(){
       board:"판서 사진 없음. 녹음으로 복원: q=ne, e=1.6×10⁻¹⁹ C / 시험전하 +1C → n≈6×10¹⁸ / 불연속 Σ(점전하·점전하군·쌍극자) · 연속 ∫(직선·원형·원판) / 학생 20명 그룹 q₁=−3e, q₂=+9e, q₃=+4e / F=kq₁q₂/r² r̂, k=1/4πε₀=9×10⁹, ε₀=8.854×10⁻¹² / μ₀=4π×10⁻⁷, c=1/√(ε₀μ₀) / 자하 분리 불가 → 전류 I=dq/dt / 정전기학 21–25장, 동전기학 26장~ / Thomson·Hall·Biot-Savart·Ampère·Faraday·Lenz·Maxwell",
       recording:"9/4 60분 — 전기의 소스는 전하. 시험전하는 무조건 +1C(양성자 6×10¹⁸개=전기력선 개수). 전기장 = 전기력선 n개를 어떻게 셀 것인가: 불연속이면 Σ, 연속이면 ∫dq. 알짜 전하(net charge)만 센다, 양자화는 '덩어리로 묶였다' 이상 의미 두지 말 것. 쿨롱 법칙은 13장 역제곱 법칙과 같은 꼴. 유전율(誘: 꼬시는 정도): 진공 ε₀가 가장 작아 100% 통과 → k 최대 → 진공에서 전기력 최대, 유전체는 25장. 자기의 μ₀(투자율). c=1/√(ε₀μ₀): 가장 작은 둘을 곱해 역수 → 가장 큰 값 = 빛의 속도. 물리는 결국 파동방정식을 구하는 학문(16장 파동의 연장). 자기의 소스는 자하여야 하지만 N/S 분리 불가(r=0 → ∞) → 전류 I=dq/dt로 대체. 정전기학(21–25) vs 동전기학(26~), 자기장은 3차원·회전·벡터곱. 자기 파트는 실험한 사람들(Thomson·Hall·Biot-Savart·Ampère·Faraday·Lenz·Maxwell)이 뭘 했는지만 알면 끝. 34:05~49:44 여담(강의평가·진로·AI).",
       material:"강의노트 63p(톡방) p.3–9 — p.3 전자기학의 집(전하→전기장→전위→가우스→전기용량 / 전류→자기장→자기력→앙페르→유도용량), p.4 물질의 구성(e, m 표)·양자화(quark ±e/3)·도체/부도체/절연체·유도, p.5 쿨롱 법칙 3배치·전기장 정의 E=lim F/q₀·전기력선, p.6–8 전기장 표현 ①점전하 ②점전하군 ③쌍극자 ④직선도선(λ) ⑤원형고리 ⑥원판(R→∞: σ/2ε₀)·쌍극자 퍼텐셜에너지, p.8–9 필수문제 1~6(답 수록: F=k(15/4 i+80/9 j) / k√2/2·Qq/a² j / √3kq²/a² / E=1×10⁵, a=−20k, z=270 / a=−3.2×10¹³, t=5×10⁻⁸, y=−0.04 / U=2.4k, E=5/12 k). 중간 범위 27장 = 강의노트 p.1–32.",
-      exam:[{t:"녹음 9/4 54:58",quote:"시험 범위는 27장까지 보게 될 거예요.",memo:"계획서 W7(26장)보다 한 장 더 · 강의노트 p.1–32"},
+      exam:[{t:"녹음 9/4 54:58",quote:"시험 범위는 27장까지 보게 될 거예요.",memo:"계획서 7주차(26장)보다 한 장 더 · 강의노트 p.1–32"},
             {t:"녹음 9/4 59:19",quote:"중간고사를 정말 열심히 공부하기를 바라요. 중간고사를 포기하면서 뒤에 부분을 아예 포기해 버리고…",memo:"전기 파트를 알아야 자기 파트가 쉬움"},
             {t:"녹음 9/4 32:14",quote:"다다음 시간 정도에 하는 전기장의 계산에 치일 거야. 짜증 날 거거든.",memo:"9/11부터 직선·고리·원판 적분"},
             {t:"녹음 9/4 25:55",quote:"예전에는 다 k로만 썼지만 이제는 무조건 1/(4πε₀)로 써야 돼. 그게 정확하게 쓰는 거야.",memo:"답안 표기"},
@@ -5270,9 +5270,9 @@ function boot(){
       });
       var n=weekNote(st,1,true);
       if(!(n.summary||"").trim()){
-        n.range="W1 9/2 오리엔테이션 (Ch.1 Introduction은 9/7부터)";
+        n.range="1주차 9/2 오리엔테이션 (Ch.1 Introduction은 9/7부터)";
         n.summary="영어 강의 · 과제는 손글씨 LMS 제출(완성도 기준 만점) · 과제 1~2문제 시험에 그대로 · 중간 Ch.3–5 30%, 기말 Ch.6–8 50% · 절대평가";
-        n.material="OT 슬라이드 8p(Statics_2026F_W1_Orientation) — 과목 개요(정지·등속 물체의 힘·모멘트 평형: 벡터·힘계·모멘트·자유물체도·평형·구조물·도심·관성모멘트), 강의실(월 409·수 503), 운영(영어 설명 후 한국어 요약, 답안 영어 원칙), 16주 날짜별 일정표(중간 10/19 Ch.3–5, 기말 12/14 Ch.6–8, 10/5 휴강, 시험 다음 수업은 grading buffer, 온라인 강의 몇 회 예정), 교재 Bedford & Fowler 5판, 평가(출석10 −2/결석 · 과제10 · 중간30 · 기말50).";
+        n.material="OT 슬라이드 8p(Statics_2026F_1주차_Orientation) — 과목 개요(정지·등속 물체의 힘·모멘트 평형: 벡터·힘계·모멘트·자유물체도·평형·구조물·도심·관성모멘트), 강의실(월 409·수 503), 운영(영어 설명 후 한국어 요약, 답안 영어 원칙), 16주 날짜별 일정표(중간 10/19 Ch.3–5, 기말 12/14 Ch.6–8, 10/5 휴강, 시험 다음 수업은 grading buffer, 온라인 강의 몇 회 예정), 교재 Bedford & Fowler 5판, 평가(출석10 −2/결석 · 과제10 · 중간30 · 기말50).";
         n.textbook="Engineering Mechanics: Statics 5th ed. (Bedford & Fowler) — PDF 미보유. 9/7 Ch.1 Introduction, Ch.2 Vectors부터.";
         n.exam=[{t:"OT 슬라이드 p.8",quote:"1-2 homework problems will appear exactly as given on the exam. No partial credit will be given for these problems. (과제 문제 중 1~2문제는 그대로 출제, 틀리면 부분점수 없음)",memo:"과제 오답노트가 곧 시험 대비"},
                 {t:"OT 슬라이드 p.8",quote:"Midterm exam 30% (Chapter 3, 4, 5) · Final exam 50% (Chapter 6, 7, 8) · Absolute grading will be applied.",memo:"중간·기말 범위 분리, 절대평가"},
@@ -5310,7 +5310,7 @@ function boot(){
     t.patchWeekNotesV3=true;
     try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   })();
-  /* 데이터 패치 V4 — 일반물리학2 수업 슬라이드 22p(전하와 전기장) W1 강의자료 반영 (1회) */
+  /* 데이터 패치 V4 — 일반물리학2 수업 슬라이드 22p(전하와 전기장) 1주차 강의자료 반영 (1회) */
   (function(){
     var t=term(); if(t.patchWeekNotesV4) return;
     var ph=t.courses.filter(function(c){return c.name==="일반물리학2";})[0];
