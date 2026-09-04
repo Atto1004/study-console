@@ -5297,6 +5297,19 @@ function boot(){
     t.patchWeekNotesV2=true;
     try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   })();
+  /* 데이터 패치 V3 — 정역학은 9/3 수강정정으로 추가됨 → 9/2 회차는 출결 계산 제외 (1회) */
+  (function(){
+    var t=term(); if(t.patchWeekNotesV3) return;
+    var st=t.courses.filter(function(c){return c.name==="정역학";})[0];
+    if(st){
+      var s=t.sessions.filter(function(x){return x.courseId===st.id&&x.date==="2026-09-02";})[0];
+      if(!s){ s={id:uid(),courseId:st.id,date:"2026-09-02",week:1,status:null,progress:"",und:null,reviewed:false,memo:"",
+               slots:{pre:"",note:"",rec:"",notice:""},startedAt:"",endedAt:"",knew:"",stuck:"",learned:"",missedFrom:"",timeline:[]}; t.sessions.push(s); }
+      if(!s.status){ s.cancelled=true; s.status=null; if(!s.memo) s.memo="수강정정 전(9/3 신청) — 출결 계산에서 제외. 내용은 오리엔테이션(OT 슬라이드로 대체)"; if(!s.progress) s.progress="오리엔테이션 (Lecture Orientation)"; }
+    }
+    t.patchWeekNotesV3=true;
+    try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+  })();
   applyFont();
   renderNav();
 
