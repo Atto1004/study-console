@@ -1,0 +1,455 @@
+<title>9/2 결석 보강 · 모델화</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F5F7F6; --paper:#FFFFFF; --ink:#1B2430; --ink-2:#3F4C5A; --ink-3:#6E7B88;
+  --line:#DCE2E6; --line-2:#C5CED5;
+  --acc:#0F6E8C; --acc-soft:#E3F0F4; --acc-ink:#0B5468;
+  --warn:#B9791A; --warn-soft:#FBF1DD; --warn-ink:#7A4E0B;
+  --ok:#3D7A4E; --ok-soft:#E5F1E7; --ok-ink:#2B5A39;
+  --crit:#B2483F; --crit-soft:#F8E6E3; --crit-ink:#7E2F28;
+  --ans:#F0F3F5;
+  --font-display:"Gowun Batang","Noto Serif KR",Georgia,serif;
+  --font-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121820; --paper:#1A222C; --ink:#E6EAF0; --ink-2:#BCC6D1; --ink-3:#8593A2;
+    --line:#2A3542; --line-2:#3A4756;
+    --acc:#4FB3D1; --acc-soft:#173039; --acc-ink:#8FD3E8;
+    --warn:#D9A34A; --warn-soft:#332816; --warn-ink:#F0C87E;
+    --ok:#7FBF8F; --ok-soft:#1B2E21; --ok-ink:#A9DDB5;
+    --crit:#E07C72; --crit-soft:#34201E; --crit-ink:#F1B0A9;
+    --ans:#202A35; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121820; --paper:#1A222C; --ink:#E6EAF0; --ink-2:#BCC6D1; --ink-3:#8593A2;
+  --line:#2A3542; --line-2:#3A4756;
+  --acc:#4FB3D1; --acc-soft:#173039; --acc-ink:#8FD3E8;
+  --warn:#D9A34A; --warn-soft:#332816; --warn-ink:#F0C87E;
+  --ok:#7FBF8F; --ok-soft:#1B2E21; --ok-ink:#A9DDB5;
+  --crit:#E07C72; --crit-soft:#34201E; --crit-ink:#F1B0A9;
+  --ans:#202A35; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased}
+mjx-container{color:inherit}
+mjx-container[display="true"]{margin:.5em 0 !important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 90px}
+.head{padding:44px 0 24px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.eyebrow b{color:var(--acc);font-weight:500}
+.eyebrow .abs{background:var(--crit-soft);color:var(--crit-ink);border-radius:5px;padding:1px 8px;letter-spacing:.06em;text-transform:none}
+h1{font-family:var(--font-display);font-weight:700;font-size:clamp(28px,4.4vw,40px);line-height:1.22;margin:12px 0 10px;letter-spacing:-.01em;text-wrap:balance}
+.lede{font-size:16.5px;color:var(--ink-2);margin:0}
+.cover{margin-top:18px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+.cover .k{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;color:var(--ink-3);margin-bottom:6px}
+.cover ol{margin:0;padding-left:20px;font-size:15px;color:var(--ink-2)}
+.cover li b{color:var(--ink)}
+section{padding:34px 0 6px}
+section+section{border-top:1px solid var(--line)}
+h2{font-family:var(--font-display);font-weight:700;font-size:26px;line-height:1.3;margin:0 0 8px;letter-spacing:-.005em;text-wrap:balance}
+h2 .no{font-family:var(--font-mono);font-weight:500;font-size:12px;color:var(--acc);letter-spacing:.1em;display:block;margin-bottom:6px}
+h3{font-size:17.5px;font-weight:700;margin:28px 0 8px}
+p{margin:0 0 12px} ul,ol{margin:0 0 12px;padding-left:22px} li{margin:3px 0}
+.hs{display:inline-block;font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;background:var(--ok-soft);color:var(--ok-ink);border-radius:5px;padding:1px 7px;margin-left:4px;vertical-align:middle}
+.easy{background:var(--ans);border-radius:8px;padding:10px 14px;font-size:15px;color:var(--ink-2);margin:8px 0 14px}
+.easy b{color:var(--acc-ink)}
+.def{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:12px 0 16px}
+.def .lab{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;color:var(--acc);text-transform:uppercase;margin-bottom:3px}
+.def .t{font-weight:700;margin-bottom:4px}
+.def p:last-child{margin-bottom:0}
+.steps{list-style:none;padding:0;margin:10px 0 16px;counter-reset:st}
+.steps li{position:relative;padding:8px 0 8px 40px;margin:0;border-top:1px dashed var(--line)}
+.steps li:first-child{border-top:0}
+.steps li::before{counter-increment:st;content:counter(st);position:absolute;left:0;top:9px;width:26px;height:26px;border-radius:50%;background:var(--acc);color:#fff;font-family:var(--font-mono);font-size:13px;display:flex;align-items:center;justify-content:center}
+.steps li b{display:block;font-size:15px} .steps li span{color:var(--ink-2);font-size:15px}
+.model{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0 22px}
+.model .h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px}
+.model .h .tag{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.08em;color:var(--acc-ink);background:var(--acc-soft);border-radius:6px;padding:2px 8px}
+.model .h .t{font-weight:700;font-size:17px}
+.model .pic{font-size:14px;color:var(--ink-3);margin-bottom:8px}
+.model .stp{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;align-items:baseline;margin-top:6px}
+.model .stp .k{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);white-space:nowrap;padding-top:4px}
+.model .stp .v{min-width:0} .model .stp .v em{font-style:normal;color:var(--ink-3);font-size:14px}
+.model .res{margin-top:10px;padding:9px 12px;border-radius:8px;background:var(--ans);border-left:3px solid var(--acc)}
+.model .res .k{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--acc);margin-bottom:2px}
+.chart{margin:12px 0 4px;border:1px solid var(--line);border-radius:10px;background:var(--paper);padding:10px 12px 6px;overflow-x:auto}
+.chart svg{display:block;width:100%;height:auto;max-width:640px;margin:0 auto}
+.chart .cap{font-size:13px;color:var(--ink-3);text-align:center;margin-top:4px}
+.note{border-radius:10px;padding:12px 16px;margin:14px 0 18px;font-size:15px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.note .ic{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;padding:2px 7px;border-radius:5px;margin-top:3px;white-space:nowrap;color:#fff}
+.note.exam{background:var(--warn-soft);color:var(--warn-ink)} .note.exam .ic{background:var(--warn)}
+.note.tip{background:var(--acc-soft);color:var(--acc-ink)} .note.tip .ic{background:var(--acc)}
+.note.todo{background:var(--crit-soft);color:var(--crit-ink)} .note.todo .ic{background:var(--crit)}
+.note p{margin:0 0 6px}.note p:last-child{margin:0}
+.tw{overflow-x:auto;margin:12px 0 16px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:14.5px}
+th,td{padding:9px 14px;text-align:left;vertical-align:top;border-top:1px solid var(--line)}
+thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3);font-weight:500;background:var(--ans)}
+.quiz{border-top:1px solid var(--line);padding:12px 0;display:grid;grid-template-columns:34px minmax(0,1fr);gap:4px 10px}
+.quiz:last-of-type{border-bottom:1px solid var(--line)}
+.quiz .no{font-family:var(--font-mono);font-size:12.5px;color:var(--acc);padding-top:4px}
+.quiz details{grid-column:2} .quiz summary{cursor:pointer;font-size:13.5px;color:var(--ink-3);list-style:none;display:inline-flex;gap:6px;align-items:center}
+.quiz summary::-webkit-details-marker{display:none} .quiz summary::before{content:"▸";font-size:11px}
+.quiz details[open] summary::before{content:"▾"}
+.quiz summary:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:4px}
+.quiz .ans{margin-top:8px;padding:9px 13px;background:var(--ans);border-radius:8px;font-size:15px;color:var(--ink-2)}
+.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+@media (prefers-reduced-motion:reduce){ *{transition:none !important} }
+
+.wrap{padding-bottom:60px}
+</style>
+
+<div class="wrap">
+<header class="head">
+  <div class="eyebrow"><b>공업수학1</b><span>1주차 · 9/2(수) 1일차</span><span class="abs">결석 보강</span></div>
+  <h1>못 들은 첫 수업 — 모델화부터 선형·비선형까지</h1>
+  <p class="lede">9/2 수업은 강의자료 <b>10~17쪽</b> 범위다. 슬라이드에는 제목과 사진만 있고 식은 교수님이 칠판에 푸셨을 것이다. 그 빈칸을 고등학교 물리·미적분 수준에서 채워 넣었다.</p>
+  <div class="cover"><div class="k">그날 다룬 것 (슬라이드 순서)</div>
+    <ol><li><b>모델화</b>란 무엇인가, 전형적인 3단계 (p.10)</li>
+        <li>공학 문제의 수학적 모델 세 가지 — <b>Newton 냉각 법칙 · 낙하물과 공기저항 · 투사체</b> (p.11–13)</li>
+        <li><b>미분방정식 / 상미분방정식 / 편미분방정식</b>의 정의와 예 (p.14)</li>
+        <li><b>계(Order)</b>, 1계 ODE의 <b>양함수·음함수 형태</b> (p.15)</li>
+        <li><b>선형 vs 비선형</b> 판별 기준 2가지와 분류 예제 3문제 (p.16–17)</li></ol></div>
+</header>
+
+<!-- 1. 모델화 -->
+<section>
+  <h2><span class="no">p.10</span>모델화 — 이 과목이 하는 일</h2>
+  <div class="def"><div class="lab">Definition</div><div class="t">모델화 (Modeling, 모형화)</div>
+    <p>물리적인 시스템을 <b>수학적인 모델</b>(함수, 방정식, 미분방정식)로 표현하는 것.</p></div>
+  <div class="easy">고등학교 물리에서 "공을 던지면 \(y=v_0t-\tfrac12gt^2\)"라고 배웠다. 그 식이 어디서 왔는지 생각해 보면, <b>"가속도는 \(-g\)로 일정하다"</b>는 규칙에서 출발해 두 번 적분한 것이다. 규칙(변화율)을 식으로 적는 게 <b>모델화</b>, 그 식을 푸는 게 이 과목의 나머지 전부다.</div>
+  <h3>모델화의 전형적인 3단계</h3>
+  <ol class="steps">
+    <li><b>1단계 · 물리적 상황 → 수학적 공식(모델) 도출</b><span>"~에 비례한다", "힘의 합 = 질량 × 가속도" 같은 법칙을 미분방정식으로 적는다.</span></li>
+    <li><b>2단계 · 수학적 방법으로 해를 구한다</b><span>미분방정식을 풀어 함수 \(y(t)\)를 얻는다. (2~3주차에 배울 변수분리·선형 해법)</span></li>
+    <li><b>3단계 · 결과의 물리적 해석</b><span>답이 상식과 맞는지 본다. 시간이 오래 지나면 어디로 가는가? 부호는 맞는가? 단위는?</span></li>
+  </ol>
+  <div class="note exam"><span class="ic">EXAM</span><div><p>교수님은 이후 모든 예제를 <b>Step 1 · 2 · 3</b>으로 쓰신다. 시험 서술형도 이 세 단계 골격으로 답안을 쓰면 채점자가 원하는 흐름 그대로다.</p></div></div>
+</section>
+
+<!-- 2. 세 모델 -->
+<section>
+  <h2><span class="no">p.11–13</span>공학 문제의 수학적 모델 세 가지</h2>
+  <p>슬라이드 사진 세 장은 각각 하나의 미분방정식을 가리킨다. 셋 다 <b>"변화율 = 현재 상태의 함수"</b>라는 같은 구조다. 이게 1계 상미분방정식 \(y'=f(t,y)\)의 정체다.</p>
+
+  <div class="model"><div class="h"><span class="tag">MODEL 1</span><span class="t">Newton의 냉각 법칙</span></div>
+    <div class="pic">사진: 공장 지붕의 대형 공랭식 냉각기(팬). 뜨거운 것이 주변 공기로 열을 내보내며 식는 장치.</div>
+    <div class="stp">
+      <span class="k">Step 1 모델</span><span class="v">물체 온도 \(T(t)\), 주변 온도 \(T_A\)(일정). 뉴턴의 관찰: <b>식는 속도는 온도 차에 비례</b>한다. \[\frac{dT}{dt}=-k\,(T-T_A)\qquad(k>0)\] <em>— 뜨거울수록(차이가 클수록) 빨리 식고, 주변 온도에 가까워지면 천천히 식는다. 부호 −는 "줄어든다".</em></span>
+      <span class="k">Step 2 풀이</span><span class="v">\(u=T-T_A\)로 두면 \(u'=-ku\), 즉 "미분하면 자기 자신의 \(-k\)배" → 지수함수. \(u=Ce^{-kt}\) \[T(t)=T_A+(T_0-T_A)\,e^{-kt}\] <em>— \(T_0\)는 처음 온도. (변수분리형, 2주차에 정식으로 배움)</em></span>
+      <span class="k">Step 3 해석</span><span class="v">\(t\to\infty\)이면 \(e^{-kt}\to0\), \(T\to T_A\). 아무리 뜨거워도 결국 <b>주변 온도로 수렴</b>하고, 절대 그 아래로 내려가진 않는다. \(k\)가 크면(팬을 세게 돌리면) 빨리 식는다.</span></div>
+    <div class="res"><div class="k">숫자로</div>90 °C 커피, 실온 20 °C, 10분 뒤 60 °C였다면 \(40=70e^{-10k}\)에서 \(k\approx0.056\)/분. 20분 뒤엔 \(20+70e^{-1.12}\approx43\) °C. 실제로 커피는 처음에 확 식고 나중엔 미지근한 상태로 오래 머문다.</div></div>
+
+  <div class="model"><div class="h"><span class="tag">MODEL 2</span><span class="t">낙하물과 공기저항</span></div>
+    <div class="pic">사진: 낙하산을 편 스카이다이버, 낙하산을 매달고 달리는 훈련. 둘 다 <b>속도에 비례해 커지는 저항</b>을 이용한다.</div>
+    <div class="stp">
+      <span class="k">Step 1 모델</span><span class="v">아래 방향을 +로, 속도 \(v(t)\). 힘은 중력 \(mg\)(아래)와 공기저항 \(kv\)(위, 속도에 비례). 뉴턴 제2법칙 \(F=ma\): \[m\frac{dv}{dt}=mg-kv\] <em>— 고교 물리와 다른 점은 딱 하나, 저항 \(kv\)가 붙어 가속도가 일정하지 않다는 것.</em></span>
+      <span class="k">Step 2 풀이</span><span class="v">정리하면 \(v'+\dfrac km v=g\) (1계 선형, 3주차). 정지 상태에서 출발(\(v(0)=0\))하면 \[v(t)=\frac{mg}{k}\left(1-e^{-kt/m}\right)\]</span>
+      <span class="k">Step 3 해석</span><span class="v">\(t\to\infty\)에서 \(v\to\dfrac{mg}{k}\) = <b>종단속도</b>(terminal velocity). 중력과 저항이 같아져 더 이상 빨라지지 않는 속도다. 낙하산은 \(k\)를 수십 배 키워 종단속도를 사람이 견딜 만큼 낮춘다. 달리기 훈련용 낙하산은 반대로 <b>저항을 일부러 만들어</b> 근력을 키운다.</span></div>
+    <div class="res"><div class="k">비교</div>공기저항 없음(고교): \(v=gt\), 끝없이 빨라짐 &nbsp;·&nbsp; 공기저항 있음: \(v\)가 \(mg/k\)에서 멈춤. 저항 하나가 "직선"을 "포화 곡선"으로 바꾼다.</div></div>
+
+  <div class="model"><div class="h"><span class="tag">MODEL 3</span><span class="t">투사체 문제</span></div>
+    <div class="pic">사진: 같은 속력으로 각도만 달리 던진 공 네 개의 궤적. 파랑(높게) · 초록 · 빨강(멀리) · 노랑(낮게).</div>
+    <div class="stp">
+      <span class="k">Step 1 모델</span><span class="v">공기저항이 없으면 가로·세로 방향을 따로 쓴다. \[x''=0,\qquad y''=-g\] <em>— 2계 미분방정식이 두 개. 가로는 힘이 없고, 세로는 중력만.</em></span>
+      <span class="k">Step 2 풀이</span><span class="v">각각 두 번 적분: \(x=v_0\cos\theta\,t\), \(y=v_0\sin\theta\,t-\tfrac12gt^2\). \(t\)를 소거하면 \(y=x\tan\theta-\dfrac{g}{2v_0^2\cos^2\theta}x^2\) — <b>포물선</b>.</span>
+      <span class="k">Step 3 해석</span><span class="v">사거리 \(R=\dfrac{v_0^2\sin2\theta}{g}\)는 \(\theta=45^\circ\)에서 최대. 그림에서 빨강이 가장 멀리 가고, 파랑(가파름)과 노랑(낮음)은 짧다. 공기저항을 넣으면 \(x''=-\tfrac km x',\ y''=-g-\tfrac km y'\)가 되어 궤적이 <b>뒤쪽이 더 가파른 비대칭</b>이 된다 — 실제 야구공 궤적.</span></div>
+    <div class="res"><div class="k">연결</div>이 문제는 미분방정식이 <b>여러 개</b>(연립)이고 <b>2계</b>다. 4~5주차(2계 ODE), 9~10주차(연립 ODE)에서 정식으로 다룬다. 1장에서는 1계 하나짜리만 푼다.</div></div>
+
+  <div class="chart">
+    <svg viewBox="0 0 640 250" role="img" aria-label="세 모델의 시간에 따른 거동: 냉각은 주변 온도로 수렴, 낙하 속도는 종단속도로 수렴, 투사체는 포물선">
+      <defs><style>.ax{stroke:var(--line-2);stroke-width:1;fill:none}.lb{font:11px var(--font-mono);fill:var(--ink-3)}.ttl{font:600 12.5px var(--font-body);fill:var(--ink)}.dash{stroke:var(--ink-3);stroke-width:1;stroke-dasharray:3 3;fill:none}</style></defs>
+      <!-- 1 cooling -->
+      <g transform="translate(16,14)">
+        <text class="ttl" x="0" y="8">① 냉각: T → T_A</text>
+        <path class="ax" d="M18 30 V190 H190"/>
+        <path class="dash" d="M18 160 H190"/>
+        <path d="M18 40 C 50 130, 90 152, 190 159" fill="none" stroke="var(--acc)" stroke-width="2.2"/>
+        <text class="lb" x="148" y="156">T_A</text><text class="lb" x="22" y="42">T₀</text><text class="lb" x="176" y="204">t</text>
+      </g>
+      <!-- 2 falling -->
+      <g transform="translate(228,14)">
+        <text class="ttl" x="0" y="8">② 낙하: v → mg/k</text>
+        <path class="ax" d="M18 30 V190 H190"/>
+        <path class="dash" d="M18 62 H190"/>
+        <path d="M18 190 C 50 100, 90 70, 190 63" fill="none" stroke="var(--acc)" stroke-width="2.2"/>
+        <path d="M18 190 L 120 40" fill="none" stroke="var(--ink-3)" stroke-width="1.2" stroke-dasharray="2 3"/>
+        <text class="lb" x="128" y="58">종단속도</text><text class="lb" x="104" y="36">저항 없음</text><text class="lb" x="176" y="204">t</text>
+      </g>
+      <!-- 3 projectile -->
+      <g transform="translate(440,14)">
+        <text class="ttl" x="0" y="8">③ 투사체: 포물선</text>
+        <path class="ax" d="M18 30 V190 H190"/>
+        <path d="M18 190 Q 60 40 102 190" fill="none" stroke="var(--acc)" stroke-width="2" opacity=".55"/>
+        <path d="M18 190 Q 95 60 172 190" fill="none" stroke="var(--acc)" stroke-width="2.2"/>
+        <path d="M18 190 Q 80 120 142 190" fill="none" stroke="var(--acc)" stroke-width="2" opacity=".55"/>
+        <text class="lb" x="150" y="204">x</text><text class="lb" x="118" y="70">45°</text>
+      </g>
+    </svg>
+    <div class="cap">세 모델의 시간 거동. ①②는 "지수적으로 어떤 값에 다가감", ③은 "포물선". 1장에서는 ①②형을 푼다.</div>
+  </div>
+
+  <div class="note tip"><span class="ic">WHY</span><div><p>세 모델의 공통점을 한 문장으로: <b>지금 상태가 다음 순간의 변화를 결정한다.</b> 온도 차가 냉각 속도를, 속도가 저항을, 위치·속도가 다음 위치를 정한다. 이걸 식으로 쓰면 항상 \(\dfrac{dy}{dt}=f(t,y)\)가 된다. 그래서 첫 시간에 "왜 미분방정식인가"를 보여 주려고 이 사진들을 고르신 것이다.</p></div></div>
+</section>
+
+<!-- 3. 정의 -->
+<section>
+  <h2><span class="no">p.14</span>미분방정식 · 상미분 · 편미분</h2>
+  <div class="def"><div class="lab">Definition</div><div class="t">미분방정식 (Differential Equation)</div>
+    <p>한 개 이상의 <b>종속변수</b>(\(y\))를 한 개 이상의 <b>독립변수</b>(\(x\) 또는 \(t\))에 대해 미분한 <b>도함수</b>를 포함하는 방정식.</p></div>
+  <div class="easy"><span class="hs">고교 연결</span> 종속변수·독립변수는 함수 \(y=f(x)\)에서 "\(x\)를 정하면 \(y\)가 따라 정해진다"의 그 \(x\)(독립)와 \(y\)(종속)다. 위의 모델들에서는 시간 \(t\)가 독립변수, 온도 \(T\)·속도 \(v\)가 종속변수.</div>
+  <div class="tw"><table>
+    <thead><tr><th>구분</th><th>독립변수 개수</th><th>도함수 표기</th><th>슬라이드의 예</th></tr></thead>
+    <tbody>
+      <tr><td><b>상미분방정식</b><br><small>ODE, Ordinary</small></td><td><b>1개</b></td><td>\(y',\ y'',\ \dfrac{dy}{dx}\)</td><td>\(y'=\cos x\) &nbsp;·&nbsp; \(y''+9y=e^{-2x}\) &nbsp;·&nbsp; \(y'y'''-\tfrac32y'^2=0\)</td></tr>
+      <tr><td><b>편미분방정식</b><br><small>PDE, Partial</small></td><td><b>2개 이상</b></td><td>\(\dfrac{\partial u}{\partial x},\ \dfrac{\partial^2u}{\partial y^2}\)</td><td>\(\dfrac{\partial^2u}{\partial x^2}+\dfrac{\partial^2u}{\partial y^2}=0\) (12장)</td></tr>
+    </tbody></table></div>
+  <p>구분법은 간단하다. 미분 기호가 \(d\)나 프라임(\('\))이면 ODE, 둥근 \(\partial\)가 보이면 PDE. <b>이 과목 1~14주는 전부 ODE</b>다.</p>
+  <div class="easy">세 번째 예 \(y'y'''-\tfrac32y'^2=0\)를 보고 겁먹을 필요 없다. 그냥 "\(y'\), \(y'''\)이 들어 있으니 미분방정식이고, 가장 많이 미분한 게 3번이니 3계"라는 것만 읽으면 된다. 계(order)·선형성은 다음 수업(p.15~) 내용.</div>
+</section>
+
+
+<!-- 3b. 계 · 형태 -->
+<section>
+  <h2><span class="no">p.15</span>계(Order)와 1계 ODE의 두 가지 모양</h2>
+  <div class="def"><div class="lab">Definition</div><div class="t">계 (Order)</div>
+    <p>미분방정식에 포함된 도함수 중 <b>가장 많이 미분된 횟수</b>.</p></div>
+  <div class="tw"><table>
+    <thead><tr><th>식</th><th>가장 높은 도함수</th><th>계</th></tr></thead>
+    <tbody>
+      <tr><td>\(y'=\cos x\)</td><td>\(y'\)</td><td><b>1계</b></td></tr>
+      <tr><td>\(y''+9y=e^{-2x}\)</td><td>\(y''\)</td><td><b>2계</b></td></tr>
+      <tr><td>\(y'y'''-\tfrac32y'^2=0\)</td><td>\(y'''\)</td><td><b>3계</b></td></tr>
+      <tr><td>\(\left(\dfrac{dy}{dx}\right)^3\) — 슬라이드의 "??"</td><td>\(y'\)를 <b>세제곱</b>한 것일 뿐</td><td><b>1계</b></td></tr>
+    </tbody></table></div>
+  <div class="easy">"??"의 함정: 위에 붙은 3은 <b>미분 횟수가 아니라 거듭제곱</b>이다. \(y'''\)(세 번 미분)과 \((y')^3\)(한 번 미분한 것의 세제곱)은 완전히 다르다. 계는 "몇 번 미분했나"만 센다.</div>
+
+  <div class="def"><div class="lab">Definition</div><div class="t">1계 상미분방정식 (First-order ODE)</div>
+    <p>미지의 함수 \(y\), 그 도함수 \(y'\), 변수 \(x\)의 함수로만 구성된 식. 쓰는 방법이 두 가지다.</p></div>
+  <div class="tw"><table>
+    <thead><tr><th>형태</th><th>일반꼴</th><th>슬라이드 예</th><th>뜻</th></tr></thead>
+    <tbody>
+      <tr><td><b>양함수 형태</b><br><small>Explicit</small></td><td>\(y'=f(x,y)\)</td><td>\(y'=4x^3y^2\)</td><td>\(y'\)에 대해 <b>풀어 놓은</b> 모양. "기울기 = \(x,y\)의 함수"로 바로 읽힌다.</td></tr>
+      <tr><td><b>음함수 형태</b><br><small>Implicit</small></td><td>\(F(x,y,y')=0\)</td><td>\(x^{-3}y'-4y^2=0\)</td><td>전부 한쪽으로 몰아 <b>\(=0\)</b>으로 둔 모양. 양변에 \(x^3\)을 곱하면 위 식과 같은 식이다.</td></tr>
+    </tbody></table></div>
+  <div class="easy"><span class="hs">고교 연결</span> 함수 \(y=x^2\)(양함수)와 \(x^2-y=0\)(음함수)의 관계와 똑같다. 같은 내용을 다르게 적었을 뿐이고, 문제에 따라 편한 쪽으로 바꿔 쓴다. 1.4 완전미분방정식은 음함수 꼴 \(M\,dx+N\,dy=0\)을 쓴다.</div>
+</section>
+
+<!-- 3c. 선형/비선형 -->
+<section>
+  <h2><span class="no">p.16–17</span>선형 미분방정식 vs 비선형 미분방정식</h2>
+  <div class="def"><div class="lab">Definition</div><div class="t">선형 (Linear)</div>
+    <p>\[a_n(x)\,y^{(n)}+a_{n-1}(x)\,y^{(n-1)}+\cdots+a_1(x)\,y'+a_0(x)\,y=r(x)\] 이 꼴로 쓸 수 있으면 <b>선형</b>, 아니면 <b>비선형</b>.</p></div>
+  <p>말로 풀면 조건은 딱 두 개다. 시험에서 "선형성을 구분하시오"는 이 두 가지를 확인하라는 뜻이다.</p>
+  <ol class="steps">
+    <li><b>\(y\)와 \(y\)의 모든 도함수의 거듭제곱(멱, power)이 1</b><span>\((y''')^2\), \((y')^4\), \(y^2\), \(\sin y\), \(e^{y}\)처럼 \(y\) 쪽에 무언가 "씌워져" 있으면 비선형. 서로 곱해도(\(y\,y'\)) 비선형.</span></li>
+    <li><b>계수는 독립변수 \(x\)만의 함수</b><span>\(x^3,\ e^{x},\ 3,\ 4x\)는 괜찮다. \((1-y)y'\)처럼 계수에 \(y\)가 들어가면 비선형.</span></li>
+  </ol>
+  <div class="easy">슬라이드의 선형 예 \(x^3y'''+e^xy''+3y'+4xy=e^{-x}\): \(y''',y'',y',y\)가 전부 1제곱이고 계수 \(x^3, e^x, 3, 4x\)는 모두 \(x\)만의 식 → <b>선형</b>. 우변 \(e^{-x}\)는 \(y\)가 없으므로 \(r(x)\) 자리. 선형성 판정에 우변은 상관없다.</div>
+  <div class="easy"><span class="hs">고교 연결</span> "선형(linear)"은 일차함수 \(y=ax+b\)의 그 "일차"다. \(y\)와 그 도함수들에 대해 <b>일차식</b>이면 선형. \(x\)에 대해서는 아무리 복잡해도(\(e^x,\ x^3\)) 상관없다는 게 포인트.</div>
+
+  <h3>예제 — 다음 미분방정식의 계수와 선형성을 구분하시오 (p.17)</h3>
+  <div class="tw"><table>
+    <thead><tr><th>식</th><th>계</th><th>선형?</th><th>이유</th></tr></thead>
+    <tbody>
+      <tr><td>(1) \((y')^3+xy=0\)</td><td>1계</td><td><b>비선형</b></td><td>\(y'\)이 세제곱 → 조건 1 위반</td></tr>
+      <tr><td>(2) \(y'''+xy''+e^{-x}y'+3y=\sin x\)</td><td>3계</td><td><b>선형</b></td><td>도함수 모두 1제곱, 계수 \(1,x,e^{-x},3\)은 \(x\)만의 함수. 우변 \(\sin x\ne0\)이라 <b>비제차</b></td></tr>
+      <tr><td>(3) \(x^2y''+4xy'+3y=0\)</td><td>2계</td><td><b>선형</b></td><td>계수 \(x^2,4x,3\) 모두 \(x\)만의 함수. 우변 0 → <b>제차</b>. (5주차 Euler–Cauchy 방정식)</td></tr>
+    </tbody></table></div>
+  <h3>비선형 미분방정식의 예 — 어디가 걸리는가</h3>
+  <div class="tw"><table>
+    <thead><tr><th>식</th><th>위반한 조건</th><th>걸린 부분</th></tr></thead>
+    <tbody>
+      <tr><td>\((1-y)\,y'+2y=e^x\)</td><td>조건 2</td><td>\(y'\)의 계수 \((1-y)\)에 \(y\)가 들어 있음 (전개하면 \(y\,y'\) 항)</td></tr>
+      <tr><td>\(y''+\sin y=0\)</td><td>조건 1</td><td>\(\sin y\) — \(y\)에 함수가 씌워짐 (진자 방정식)</td></tr>
+      <tr><td>\(y^{IV}+y^2=0\)</td><td>조건 1</td><td>\(y^2\) — \(y\)의 제곱. \(y^{IV}\)는 4계 도함수라 괜찮음</td></tr>
+    </tbody></table></div>
+  <div class="note exam"><span class="ic">EXAM</span><div><p>"계와 선형성 구분" 문제는 <b>계 · 선형/비선형 · (선형이면) 제차/비제차</b> 세 가지를 한 줄로 답하면 만점이다. 예: "(2) 3계 선형 비제차". 비선형이면 <b>어느 항 때문인지</b>를 한마디 덧붙일 것.</p></div></div>
+  <div class="note tip"><span class="ic">WHY</span><div><p>왜 선형/비선형을 첫날부터 나누나? <b>선형은 항상 풀리는 공식이 있고, 비선형은 대부분 공식이 없다.</b> 그래서 이 과목의 대부분은 선형 ODE를 다루고, 비선형은 1장에서 몇 가지 특수한 꼴(변수분리·동차·Bernoulli)만 배운다.</p></div></div>
+</section>
+
+<!-- 4. 체크 -->
+<section>
+  <h2><span class="no">CHECK</span>3분 자가 점검</h2>
+  <div class="quiz"><span class="no">Q1</span><span>뜨거운 국이 식는다. 온도 \(T\)에 대한 미분방정식을 세우고, 부호가 왜 −인지 말하라.</span><details><summary>답</summary><div class="ans">\(T'=-k(T-T_A)\). 국이 실온보다 뜨거우면 \(T-T_A>0\)인데 온도는 <b>내려가야</b> 하므로(\(T'<0\)) 앞에 −가 붙는다. 반대로 냉장고에서 꺼낸 음료(\(T<T_A\))는 같은 식으로 온도가 올라간다.</div></details></div>
+  <div class="quiz"><span class="no">Q2</span><span>낙하산을 펴면 식의 어느 글자가 바뀌고, 그 결과 종단속도는 어떻게 되나?</span><details><summary>답</summary><div class="ans">저항 계수 \(k\)가 커진다. 종단속도 \(mg/k\)는 \(k\)에 반비례하므로 <b>작아진다</b>. 질량 \(m\)과 \(g\)는 그대로.</div></details></div>
+  <div class="quiz"><span class="no">Q3</span><span>다음 중 편미분방정식은? (a) \(y''+4y=0\) &nbsp;(b) \(u_t=u_{xx}\) &nbsp;(c) \(\dfrac{dy}{dt}=ty\)</span><details><summary>답</summary><div class="ans"><b>(b)</b>. \(u\)가 \(t\)와 \(x\) 두 변수에 달려 있고 편미분 \(u_t,u_{xx}\)가 쓰였다(열전도 방정식). (a)(c)는 독립변수가 하나인 ODE.</div></details></div>
+  <div class="quiz"><span class="no">Q4</span><span>\(x\,y''+y\,y'=x^2\) 의 계와 선형성은?</span><details><summary>답</summary><div class="ans"><b>2계, 비선형</b>. \(y'\)의 계수가 \(y\)(조건 2 위반). \(xy''\)의 계수 \(x\)는 문제없다.</div></details></div>
+  <div class="quiz"><span class="no">Q5</span><span>\(y'=4x^3y^2\) 을 음함수 형태로, \(x^{-3}y'-4y^2=0\) 을 양함수 형태로 바꿔라.</span><details><summary>답</summary><div class="ans">\(y'-4x^3y^2=0\) &nbsp;/&nbsp; \(y'=4x^3y^2\) (양변에 \(x^3\)). 둘은 같은 방정식이다.</div></details></div>
+  <div class="quiz"><span class="no">Q6</span><span>모델화 3단계 중 "종단속도가 \(mg/k\)이므로 낙하산은 \(k\)를 키운다"는 설명은 몇 단계인가?</span><details><summary>답</summary><div class="ans"><b>3단계(결과의 물리적 해석)</b>. 식을 세운 것(1), 푼 것(2)이 아니라 푼 결과를 현실에 되비춘 것.</div></details></div>
+</section>
+
+<!-- 5. 다음 -->
+<section>
+  <h2><span class="no">NEXT</span>결석 뒤처리와 다음 수업</h2>
+  <div class="note todo"><span class="ic">TODO</span><div>
+    <p><b>출결</b> — 결석 1회는 −0.5점, 학기 중 1/3 이상이면 F. 학습앱 9/2 공업수학1 회차를 <b>결석</b>으로 기록해 두면 한도 계산에 반영된다. 병결·공결 사유가 있으면 공학대 절차로 처리.</p>
+    <p><b>과제</b> — 1주차에 과제가 나갔는지 동기나 LMS에서 확인. 제출은 다음 주차 수업 시작 전 교탁, 미제출은 −1.0점이라 결석보다 더 크다.</p></div></div>
+  <div class="tw"><table>
+    <thead><tr><th>수업</th><th>범위(슬라이드)</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td>9/2 (수) <b>결석</b></td><td>p.10–17</td><td>모델화 · 세 모델 · DE/ODE/PDE 정의 · 계 · 양/음함수 형태 · 선형/비선형 — <b>이 노트</b></td></tr>
+      <tr><td>9/4 (금)</td><td>p.18–20 예상 (+1.3 시작)</td><td>해의 종류(일반해·특수해·특이해) · 초기값 문제 · Ex.4, Ex.5(방사성 붕괴)</td></tr>
+      <tr><td>2주차 (9/9·9/11)</td><td>p.21–28</td><td>변수분리형 · Torricelli · 동차형(\(y=ux\))</td></tr>
+      <tr><td>3주차 (9/16·9/18)</td><td>p.29–46</td><td>완전미분방정식 · 적분인자 · 선형 ODE · Bernoulli</td></tr>
+    </tbody></table></div>
+  <p>다음 내용은 이미 만들어 둔 두 노트에 있다. <b>1계 ODE 쉬운 정리</b>(개념·공식·문제·풀이)로 p.15 이후를 미리 훑고 가면 금요일 수업이 복습처럼 들린다.</p>
+  <p class="foot">출처: 공업수학1 Ch.1 강의자료 p.10–17 (이기영 교수) · 모델 식과 풀이는 Kreyszig AEM 10판 1.1·1.3·1.5 및 일반물리 역학을 바탕으로 보충했다. 슬라이드에 식이 없는 부분은 교수님 판서와 다를 수 있으니 동기 필기와 대조할 것.</p>
+</section>
+</div>
+
+<style>
+/* ---- 지침: 단어 중간 줄바꿈 금지 · 텍스트 잘림 방지 ---- */
+body,p,li,td,th,dd,dt,span,div,summary{word-break:keep-all;overflow-wrap:anywhere}
+h1,h2,h3,h4{word-break:keep-all;overflow-wrap:normal}
+th,td{white-space:normal}
+/* ---- 용어 사전 (클릭 팝업) ---- */
+.term{all:unset;cursor:pointer;color:inherit;border-bottom:1.5px dotted var(--acc);padding-bottom:1px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.term:hover{background:var(--acc-soft)}
+.term:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:3px}
+.gl-scrim{position:fixed;inset:0;background:rgba(0,0,0,.28);z-index:60;display:none}
+.gl-scrim.on{display:block}
+.gl-pop{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);width:min(560px,calc(100vw - 24px));z-index:61;
+  background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.22);
+  padding:16px 18px 14px;display:none;font-family:var(--font-body);line-height:1.7}
+.gl-pop.on{display:block}
+.gl-pop .gh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px;padding-right:32px}
+.gl-pop .gt{font-weight:700;font-size:18px}
+.gl-pop .ge{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+.gl-pop .gc{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.gl-pop .gc.hs{background:var(--ok-soft);color:var(--ok-ink)}
+.gl-pop .gc.uni{background:var(--acc-soft);color:var(--acc-ink)}
+.gl-pop .gd{font-size:15px;color:var(--ink-2);margin:0}
+.gl-pop .gd b{color:var(--ink)}
+.gl-pop .gr{margin-top:8px;font-size:13px;color:var(--ink-3)}
+.gl-pop .gr button{all:unset;cursor:pointer;color:var(--acc-ink);border-bottom:1px dotted var(--acc);margin-right:10px}
+.gl-pop .gx{position:absolute;right:10px;top:8px;all:unset;cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:var(--ink-3);font-size:16px;position:absolute}
+.gl-pop .gx:hover{background:var(--ans)}
+.gl-help{font-size:13px;color:var(--ink-3);margin:6px 0 0}
+.gl-help .term{font-size:13px}
+@media print{.term{border-bottom:0}.gl-scrim,.gl-pop{display:none !important}}
+</style>
+<script>
+/* 용어 사전 — 본문 용어를 클릭하면 뜻·영어·교육과정 시기가 뜬다. cur: 한국 교육과정에서 처음 만나는 시기 */
+window.GLOSSARY = {
+  "미분방정식":{en:"differential equation",cur:"대학",def:"도함수(y′, y″ …)가 들어 있는 방정식. 답이 숫자가 아니라 <b>함수</b>다. 고교에서는 다루지 않고 대학 1학년 미적분 이후에 처음 만난다.",rel:["도함수","상미분방정식","해"]},
+  "상미분방정식":{en:"ordinary differential equation, ODE",cur:"대학",def:"독립변수가 <b>하나</b>(x 또는 t)뿐인 미분방정식. 이 과목 1~14주는 전부 ODE.",rel:["편미분방정식","독립변수"]},
+  "편미분방정식":{en:"partial differential equation, PDE",cur:"대학",def:"독립변수가 둘 이상이고 편미분 기호 ∂가 들어가는 미분방정식. 12장에서 다룬다.",rel:["편미분"]},
+  "도함수":{en:"derivative",cur:"고2 수학Ⅱ · 고3 미적분",def:"함수의 순간 변화율. 다항함수의 미분은 고2 수학Ⅱ, 지수·로그·삼각함수의 미분은 고3 미적분에서 배운다.",rel:["미분방정식"]},
+  "독립변수":{en:"independent variable",cur:"중1 · 중2 함수",def:"내가 정하는 쪽의 변수(x 또는 시간 t). 함수 y=f(x)에서 x. 중1 '정비례·반비례', 중2 '일차함수'에서 처음 나온다.",rel:["종속변수"]},
+  "종속변수":{en:"dependent variable",cur:"중1 · 중2 함수",def:"독립변수에 따라 정해지는 변수(y, 온도 T, 속도 v). 미분방정식에서 우리가 찾는 미지의 함수.",rel:["독립변수"]},
+  "계":{en:"order",cur:"대학",def:"식에 나오는 도함수 중 <b>가장 많이 미분한 횟수</b>. y‴이면 3계. (y′)³은 세제곱일 뿐이라 1계.",rel:["도함수"]},
+  "선형":{en:"linear",cur:"중2 일차함수 (개념) · 대학",def:"y와 그 도함수들에 대해 <b>일차식</b>인 것. 조건 두 개: ① y, y′, y″의 거듭제곱이 1 ② 계수는 x만의 함수. 중2 일차함수의 '일차'가 같은 뜻.",rel:["비선형","제차"]},
+  "비선형":{en:"nonlinear",cur:"대학",def:"선형 조건을 하나라도 어긴 것. y², sin y, (y′)³, 계수에 y가 들어간 경우. 대부분 일반 공식이 없다.",rel:["선형"]},
+  "양함수":{en:"explicit form",cur:"고1 수학 (함수) · 고3 미적분(음함수 미분)",def:"y′=f(x,y)처럼 y′에 대해 <b>풀어 놓은</b> 꼴. y=x² 같은 보통 함수 표기.",rel:["음함수"]},
+  "음함수":{en:"implicit form",cur:"고3 미적분",def:"F(x,y,y′)=0처럼 전부 한쪽으로 몰아 =0으로 둔 꼴. x²−y=0. 고3 미적분 '음함수의 미분법'에서 처음 만난다.",rel:["양함수"]},
+  "해":{en:"solution",cur:"중1 방정식 (개념) · 대학",def:"방정식에 넣으면 등식이 성립하는 것. 중1의 해는 숫자, 미분방정식의 해는 <b>함수</b>.",rel:["일반해","특수해"]},
+  "일반해":{en:"general solution",cur:"대학",def:"임의의 상수 c를 포함한 해의 모임. 적분할 때 생기는 적분상수 때문에 항상 c가 하나 붙는다.",rel:["적분상수","특수해"]},
+  "특수해":{en:"particular solution",cur:"대학",def:"초기조건 등으로 상수 c가 하나로 정해진 해. 일반해 중 하나.",rel:["일반해","초기조건"]},
+  "특이해":{en:"singular solution",cur:"대학",def:"일반해에 어떤 c를 넣어도 안 나오는 별도의 해. 예: (y′)²−xy′+y=0에서 y=x²/4.",rel:["일반해"]},
+  "적분상수":{en:"constant of integration",cur:"고2 수학Ⅱ (부정적분)",def:"∫2x dx = x²+C의 그 C. 미분하면 사라지므로 적분 결과에는 항상 임의의 상수가 붙는다.",rel:["일반해"]},
+  "초기조건":{en:"initial condition",cur:"대학 (고1 물리 '초기속도' 개념)",def:"y(x₀)=y₀처럼 '시작할 때 값이 이랬다'는 정보. 이것으로 일반해의 c가 정해진다.",rel:["초기값 문제"]},
+  "초기값 문제":{en:"initial value problem, IVP",cur:"대학",def:"미분방정식 + 초기조건. 일반해를 구한 뒤 조건을 대입해 특수해를 얻는 문제.",rel:["초기조건","특수해"]},
+  "모델화":{en:"modeling",cur:"대학 (중1 '함수로 상황 표현'이 원형)",def:"현실 상황을 수학 식으로 옮기는 일. 3단계: ① 상황→미분방정식 ② 풀기 ③ 결과를 물리적으로 해석.",rel:["미분방정식"]},
+  "변수분리":{en:"separation of variables",cur:"대학",def:"y는 왼쪽, x는 오른쪽으로 갈라 g(y)dy=f(x)dx로 만든 뒤 양변을 각각 적분하는 방법. 가장 기본 해법.",rel:["치환적분"]},
+  "변수분리형":{en:"separable equation",cur:"대학",def:"변수분리가 가능한 꼴의 미분방정식. y′=f(x)g(y).",rel:["변수분리"]},
+  "치환적분":{en:"integration by substitution",cur:"고3 미적분",def:"u=g(x)로 바꿔 적분하는 기법. 변수분리 뒤의 적분에서 자주 쓴다.",rel:["부분적분"]},
+  "부분적분":{en:"integration by parts",cur:"고3 미적분",def:"∫u v′ = uv − ∫u′v. x sin x, y eʸ 같은 곱의 적분에 쓴다.",rel:["치환적분"]},
+  "부분분수":{en:"partial fractions",cur:"고1 수학 (유리식) · 대학",def:"1/((y−1)(y+1)) = ½(1/(y−1) − 1/(y+1))처럼 분수를 쪼개는 것. 유리식 자체는 고1, 적분에 쓰는 것은 대학.",rel:["변수분리"]},
+  "동차":{en:"homogeneous (function)",cur:"대학",def:"모든 항의 차수가 같은 함수. x²+y²는 동차, x²+y²+4는 아님. 동차 미분방정식은 y=ux 치환으로 변수분리형이 된다. 1.5의 '제차'와 다른 개념.",rel:["제차"]},
+  "동차함수":{en:"homogeneous function",cur:"대학",def:"f(tx,ty)=tᵏf(x,y)인 함수. 실전에서는 '모든 항의 차수가 같은가'로 본다.",rel:["동차"]},
+  "편미분":{en:"partial derivative",cur:"대학 (미분적분학2)",def:"두 변수 함수 u(x,y)를 한 변수로만 미분하는 것(다른 변수는 상수 취급). ∂u/∂x. 계산 자체는 고교 미분과 같다.",rel:["전미분"]},
+  "전미분":{en:"total differential",cur:"대학",def:"du = (∂u/∂x)dx + (∂u/∂y)dy. 두 변수가 조금씩 변할 때 u의 변화량.",rel:["편미분","완전미분방정식"]},
+  "완전미분방정식":{en:"exact differential equation",cur:"대학",def:"M dx + N dy = 0의 좌변이 어떤 u(x,y)의 전미분과 같은 식. 판별은 M_y = N_x. 해는 u(x,y)=c.",rel:["전미분","적분인자"]},
+  "적분인자":{en:"integrating factor",cur:"대학",def:"완전하지 않은 식에 곱해서 완전하게 만드는 함수 F. x만의 함수 또는 y만의 함수인 경우만 노린다. 선형 ODE의 e^∫p dx도 적분인자.",rel:["완전미분방정식"]},
+  "제차":{en:"homogeneous (linear ODE)",cur:"대학",def:"선형 ODE y′+p(x)y=r(x)에서 r(x)=0인 경우. '외부 입력이 없다'는 뜻. 1.3의 '동차'와 한자·영어가 비슷하지만 다른 개념.",rel:["비제차","동차"]},
+  "비제차":{en:"nonhomogeneous",cur:"대학",def:"r(x)≠0인 선형 ODE. r(x)는 힘·전압 같은 외부 입력.",rel:["제차"]},
+  "표준형":{en:"standard form",cur:"대학",def:"y′의 계수가 1이 되도록 나눈 꼴 y′+p(x)y=r(x). 공식을 쓰기 전에 반드시 이 꼴로 만든다.",rel:["선형"]},
+  "Bernoulli 방정식":{en:"Bernoulli equation",cur:"대학",def:"y′+p(x)y=g(x)yᵃ. u=y^(1−a) 치환으로 선형이 된다.",rel:["선형","로지스틱"]},
+  "로지스틱":{en:"logistic equation",cur:"대학 (고1 생명과학 '개체군 성장' 개념)",def:"y′=Ay−By². 처음엔 지수 성장, 나중엔 A/B에서 포화하는 S자 곡선. Bernoulli 방정식의 대표 예.",rel:["Bernoulli 방정식"]},
+  "지수함수":{en:"exponential function",cur:"고2 수학Ⅰ · 미분은 고3 미적분",def:"e^x. 미분해도 자기 자신이라 '변화율 ∝ 자기 자신'인 모든 현상(냉각·붕괴·성장)의 해가 된다.",rel:["자연로그"]},
+  "자연로그":{en:"natural logarithm, ln",cur:"고2 수학Ⅰ(로그) · 고3 미적분(ln)",def:"밑이 e인 로그. ∫dy/y = ln|y| 때문에 미분방정식 풀이에 항상 나온다.",rel:["지수함수"]},
+  "arctan":{en:"arctangent, 역탄젠트",cur:"대학 (고교 과정에 없음)",def:"tan의 역함수. ∫dy/(1+y²) = arctan y. 고교에서는 배우지 않으니 처음 봐도 정상.",rel:["치환적분"]},
+  "종단속도":{en:"terminal velocity",cur:"고1 통합과학 · 물리학Ⅰ",def:"공기저항과 중력이 같아져 더 이상 빨라지지 않는 속도 mg/k.",rel:["모델화"]},
+  "비례":{en:"proportional",cur:"중1 정비례",def:"한쪽이 2배가 되면 다른 쪽도 2배. '변화율이 현재 양에 비례' = y′=ky.",rel:["지수함수"]},
+  "포물선":{en:"parabola",cur:"중3 이차함수 · 고1 기하",def:"y=ax²+bx+c의 그래프. 공기저항 없는 투사체 궤적.",rel:["모델화"]},
+  "뉴턴 제2법칙":{en:"Newton's second law",cur:"고1 물리학Ⅰ",def:"F=ma. 힘의 합이 가속도(속도의 도함수)를 정하므로 운동 문제는 자동으로 미분방정식이 된다.",rel:["모델화"]},
+  "Euler-Cauchy":{en:"Euler–Cauchy equation",cur:"대학 (5주차)",def:"x²y″+axy′+by=0 꼴. 계수가 x의 거듭제곱인 2계 선형 ODE. 5주차에 배운다.",rel:["선형"]},
+  "Wronskian":{en:"Wronskian",cur:"대학 (5주차)",def:"두 해가 서로 독립인지 판정하는 행렬식. 5주차.",rel:["선형"]},
+  "Laplace 변환":{en:"Laplace transform",cur:"대학 (12~14주차)",def:"미분방정식을 대수방정식으로 바꿔 푸는 도구. 12~14주차.",rel:["미분방정식"]}
+};
+(function(){
+  var G=window.GLOSSARY, keys=Object.keys(G).sort(function(a,b){return b.length-a.length;});
+  var esc=function(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');};
+  var re=new RegExp('('+keys.map(esc).join('|')+')','g');
+  var SKIP={SCRIPT:1,STYLE:1,BUTTON:1,A:1,TEXTAREA:1,SUMMARY:0,H1:1};
+  function wrapIn(root){
+    var seen={}; /* 섹션 안에서 같은 용어는 첫 등장만 표시 */
+    var walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:function(n){
+      var p=n.parentNode; if(!p) return NodeFilter.FILTER_REJECT;
+      for(var e=p;e&&e!==root;e=e.parentNode){
+        if(SKIP[e.tagName]||e.classList&&(e.classList.contains('term')||e.classList.contains('gl-pop')||e.classList.contains('eyebrow')||e.classList.contains('toc')||e.classList.contains('seg'))) return NodeFilter.FILTER_REJECT;
+        if(e.tagName&&e.tagName.toLowerCase().indexOf('mjx')===0) return NodeFilter.FILTER_REJECT;
+      }
+      return re.test(n.nodeValue)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_SKIP;
+    }});
+    var nodes=[]; while(walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(function(n){
+      var txt=n.nodeValue, parts=txt.split(re); if(parts.length<2) return;
+      var frag=document.createDocumentFragment();
+      parts.forEach(function(part,i){
+        if(i%2===1 && G[part] && !seen[part]){
+          seen[part]=1;
+          var b=document.createElement('button'); b.type='button'; b.className='term'; b.textContent=part;
+          b.setAttribute('data-term',part); b.setAttribute('aria-label',part+' 뜻 보기'); frag.appendChild(b);
+        } else if(part) frag.appendChild(document.createTextNode(part));
+      });
+      n.parentNode.replaceChild(frag,n);
+    });
+  }
+  function build(){
+    var scrim=document.createElement('div'); scrim.className='gl-scrim';
+    var pop=document.createElement('div'); pop.className='gl-pop'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-modal','true');
+    document.body.appendChild(scrim); document.body.appendChild(pop);
+    function close(){ scrim.classList.remove('on'); pop.classList.remove('on'); }
+    function open(term){
+      var g=G[term]; if(!g) return;
+      var uni=/^대학/.test(g.cur);
+      pop.innerHTML='<button class="gx" aria-label="닫기">✕</button>'+
+        '<div class="gh"><span class="gt">'+term+'</span><span class="ge">'+g.en+'</span>'+
+        '<span class="gc '+(uni?'uni':'hs')+'">'+(uni?'':'교육과정 · ')+g.cur+'</span></div>'+
+        '<p class="gd">'+g.def+'</p>'+
+        (g.rel&&g.rel.length?'<div class="gr">관련: '+g.rel.filter(function(r){return G[r];}).map(function(r){return '<button type="button" data-term="'+r+'">'+r+'</button>';}).join('')+'</div>':'');
+      pop.querySelector('.gx').onclick=close;
+      Array.prototype.forEach.call(pop.querySelectorAll('.gr button'),function(b){ b.onclick=function(){ open(b.getAttribute('data-term')); }; });
+      scrim.classList.add('on'); pop.classList.add('on');
+    }
+    scrim.onclick=close;
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+    document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('.term'); if(t){ e.preventDefault(); open(t.getAttribute('data-term')); } });
+  }
+  function run(){
+    build();
+    var roots=document.querySelectorAll('section, main > section, .head .lede, .cover');
+    if(!roots.length) roots=[document.body];
+    Array.prototype.forEach.call(roots,wrapIn);
+    var h=document.querySelector('.head');
+    if(h){ var help=document.createElement('p'); help.className='gl-help'; help.innerHTML='점선 밑줄이 있는 <button type="button" class="term" data-term="미분방정식">용어</button>를 누르면 뜻과 한국 교육과정에서 처음 배우는 시기가 뜹니다. 모르는 단어인지 스스로 확인하는 용도.'; h.appendChild(help); }
+  }
+  function start(){
+    if(window.MathJax&&MathJax.startup&&MathJax.startup.promise) MathJax.startup.promise.then(run,run);
+    else run();
+  }
+  if(document.readyState==='complete') setTimeout(start,50); else window.addEventListener('load',function(){ setTimeout(start,50); });
+})();
+</script>
+
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>

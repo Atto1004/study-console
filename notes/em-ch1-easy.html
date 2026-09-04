@@ -1,0 +1,706 @@
+<title>1계 ODE 쉬운 정리</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F5F7F6; --paper:#FFFFFF; --ink:#1B2430; --ink-2:#3F4C5A; --ink-3:#6E7B88;
+  --line:#DCE2E6; --line-2:#C5CED5;
+  --acc:#0F6E8C; --acc-soft:#E3F0F4; --acc-ink:#0B5468;
+  --warn:#B9791A; --warn-soft:#FBF1DD; --warn-ink:#7A4E0B;
+  --ok:#3D7A4E; --ok-soft:#E5F1E7; --ok-ink:#2B5A39;
+  --pink:#A8467A; --pink-soft:#F7E6EF; --pink-ink:#7D2F58;
+  --ans:#F0F3F5;
+  --font-display:"Gowun Batang","Noto Serif KR",Georgia,serif;
+  --font-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121820; --paper:#1A222C; --ink:#E6EAF0; --ink-2:#BCC6D1; --ink-3:#8593A2;
+    --line:#2A3542; --line-2:#3A4756;
+    --acc:#4FB3D1; --acc-soft:#173039; --acc-ink:#8FD3E8;
+    --warn:#D9A34A; --warn-soft:#332816; --warn-ink:#F0C87E;
+    --ok:#7FBF8F; --ok-soft:#1B2E21; --ok-ink:#A9DDB5;
+    --pink:#D77FAE; --pink-soft:#33202B; --pink-ink:#EBAFD0;
+    --ans:#202A35; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121820; --paper:#1A222C; --ink:#E6EAF0; --ink-2:#BCC6D1; --ink-3:#8593A2;
+  --line:#2A3542; --line-2:#3A4756;
+  --acc:#4FB3D1; --acc-soft:#173039; --acc-ink:#8FD3E8;
+  --warn:#D9A34A; --warn-soft:#332816; --warn-ink:#F0C87E;
+  --ok:#7FBF8F; --ok-soft:#1B2E21; --ok-ink:#A9DDB5;
+  --pink:#D77FAE; --pink-soft:#33202B; --pink-ink:#EBAFD0;
+  --ans:#202A35; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} *{transition:none !important} }
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased}
+mjx-container{color:inherit}
+mjx-container[display="true"]{margin:.5em 0 !important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px 90px}
+
+/* 머리 */
+.head{padding:44px 0 22px}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:flex;gap:14px;flex-wrap:wrap}
+.eyebrow b{color:var(--acc);font-weight:500}
+h1{font-family:var(--font-display);font-weight:700;font-size:clamp(30px,4.6vw,42px);line-height:1.2;margin:12px 0 10px;letter-spacing:-.01em;text-wrap:balance}
+.lede{font-size:16.5px;color:var(--ink-2);margin:0}
+
+/* 4부 내비 */
+.seg{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0 12px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.seg ul{list-style:none;margin:0;padding:3px;display:grid;grid-template-columns:repeat(5,1fr);gap:3px;background:var(--paper);border:1px solid var(--line);border-radius:12px}
+.seg a{display:flex;flex-direction:column;align-items:center;gap:0;text-decoration:none;color:var(--ink-2);padding:8px 4px;border-radius:9px;font-size:14px;font-weight:500;line-height:1.3}
+.seg a small{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;color:var(--ink-3)}
+.seg a:hover{background:var(--ans)}
+.seg a.on{background:var(--acc);color:#fff}
+.seg a.on small{color:rgba(255,255,255,.75)}
+.seg a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+
+/* 부 제목 */
+.part{padding-top:36px}
+.part>header{margin-bottom:16px}
+.part .pn{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;color:var(--acc);text-transform:uppercase}
+h2{font-family:var(--font-display);font-weight:700;font-size:28px;line-height:1.25;margin:4px 0 8px;letter-spacing:-.005em;text-wrap:balance}
+.part>header p{margin:0;color:var(--ink-2)}
+h3{font-size:18px;font-weight:700;margin:34px 0 10px;padding-top:26px;border-top:1px solid var(--line);letter-spacing:-.005em}
+h3:first-of-type{border-top:0;padding-top:0;margin-top:10px}
+h3 .k{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.1em;color:var(--ink-3);font-weight:500;margin-right:8px}
+p{margin:0 0 12px}
+ul,ol{margin:0 0 12px;padding-left:22px} li{margin:3px 0}
+.hs{display:inline-block;font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;background:var(--ok-soft);color:var(--ok-ink);border-radius:5px;padding:1px 7px;margin-left:4px;vertical-align:middle}
+
+/* 개념 카드 */
+.con{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px 14px;margin:0 0 14px}
+.con .t{font-weight:700;font-size:16.5px;margin-bottom:4px}
+.con .t .en{font-family:var(--font-mono);font-weight:400;font-size:12px;color:var(--ink-3);margin-left:6px;letter-spacing:.02em}
+.con .one{color:var(--ink);margin-bottom:8px}
+.con .easy{background:var(--ans);border-radius:8px;padding:9px 12px;font-size:15px;color:var(--ink-2);margin:6px 0}
+.con .easy b{color:var(--acc-ink);font-weight:700}
+.con .ex{font-size:15px;color:var(--ink-2);margin-top:6px}
+.con .ex b{color:var(--ink)}
+.con p:last-child{margin-bottom:0}
+
+/* 공식 카드 */
+.fm{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:10px;padding:14px 18px;margin:0 0 14px;display:grid;grid-template-columns:minmax(0,1fr);gap:2px}
+.fm .no{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;color:var(--acc)}
+.fm .t{font-weight:700;font-size:16px}
+.fm .eq{font-size:17px;padding:4px 0}
+.fm dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 12px;margin:4px 0 0;font-size:14.5px}
+.fm dt{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-3);padding-top:4px;white-space:nowrap}
+.fm dd{margin:0;color:var(--ink-2)}
+.fm dd b{color:var(--ink)}
+.mini{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--paper);margin:12px 0 4px}
+.mini table{border-collapse:collapse;width:100%;min-width:480px;font-size:14.5px}
+.mini th,.mini td{padding:9px 14px;text-align:left;border-top:1px solid var(--line);vertical-align:top}
+.mini thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3);font-weight:500;background:var(--ans)}
+
+/* 문제 */
+.pl{border-top:1px solid var(--line)}
+.pr{display:grid;grid-template-columns:52px minmax(0,1fr);gap:2px 12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.pr .no{font-family:var(--font-mono);font-size:12.5px;color:var(--acc);padding-top:5px;font-weight:500}
+.pr .st{min-width:0}
+.pr .st .src{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);letter-spacing:.06em;margin-left:6px}
+.pr details{grid-column:2}
+.pr summary{cursor:pointer;font-size:13px;color:var(--ink-3);list-style:none;display:inline-flex;gap:6px;align-items:center}
+.pr summary::-webkit-details-marker{display:none}
+.pr summary::before{content:"▸";font-size:11px;transition:transform .15s}
+.pr details[open] summary::before{transform:rotate(90deg)}
+.pr summary:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:4px}
+.pr .hint{margin-top:6px;font-size:14.5px;color:var(--ink-2);background:var(--warn-soft);border-radius:8px;padding:8px 12px}
+.pr .hint b{color:var(--warn-ink)}
+.pr a.go{font-size:12.5px;color:var(--acc-ink);text-decoration:none;margin-left:8px}
+
+/* 풀이 */
+.sol{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:0 0 16px;scroll-margin-top:96px}
+.sol .h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.sol .h .no{font-family:var(--font-mono);font-size:12.5px;color:var(--acc);font-weight:500}
+.sol .h .type{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;color:var(--pink-ink);background:var(--pink-soft);border-radius:6px;padding:2px 8px}
+.sol .h .t{font-weight:700}
+.sol .q{color:var(--ink-2);font-size:15px;margin-bottom:8px}
+.sol .stp{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:baseline}
+.sol .stp .k{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);white-space:nowrap;padding-top:4px}
+.sol .stp .v{min-width:0}
+.sol .stp .v em{font-style:normal;color:var(--ink-3);font-size:14px}
+.sol .res{margin-top:10px;padding:9px 12px;border-radius:8px;background:var(--ans);border-left:3px solid var(--acc)}
+.sol .res .k{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--acc);margin-bottom:2px}
+.sol .why{margin-top:8px;font-size:14.5px;color:var(--ok-ink);background:var(--ok-soft);border-radius:8px;padding:8px 12px}
+.sol .why b{font-weight:700}
+
+.note{border-radius:10px;padding:12px 16px;margin:14px 0 18px;font-size:15px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.note .ic{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;padding:2px 7px;border-radius:5px;margin-top:3px;white-space:nowrap;color:#fff}
+.note.exam{background:var(--warn-soft);color:var(--warn-ink)} .note.exam .ic{background:var(--warn)}
+.note.tip{background:var(--acc-soft);color:var(--acc-ink)} .note.tip .ic{background:var(--acc)}
+.note p{margin:0 0 6px}.note p:last-child{margin:0}
+.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+
+.wrap{padding-bottom:60px}
+</style>
+
+<div class="wrap">
+<header class="head">
+  <div class="eyebrow"><b>공업수학1</b><span>Chapter 1 · 1계 상미분방정식</span><span>1~3주차</span></div>
+  <h1>1계 ODE 쉬운 정리 — 개념 · 공식 · 문제 · 풀이 · 교육과정</h1>
+  <p class="lede">고등학교 미적분까지만 안다고 치고 썼다. 새 용어가 나올 때마다 <span class="hs">고교 연결</span> 표시로 이미 아는 것과 이어 준다. 순서대로 읽어도 되고, 위 탭으로 필요한 부분만 봐도 된다.</p>
+</header>
+
+<nav class="seg" aria-label="4부 구성">
+  <ul>
+    <li><a href="#p1" class="on"><small>PART 1</small>개념</a></li>
+    <li><a href="#p2"><small>PART 2</small>공식</a></li>
+    <li><a href="#p3"><small>PART 3</small>문제</a></li>
+    <li><a href="#p4"><small>PART 4</small>문제풀이</a></li>
+    <li><a href="#p5"><small>PART 5</small>교육과정</a></li>
+  </ul>
+</nav>
+
+<!-- ================= PART 1 개념 ================= -->
+<section class="part" id="p1">
+  <header><div class="pn">Part 1 · Concepts</div><h2>개념 — 무슨 이야기를 하는 과목인가</h2><p>고등학교에선 "함수를 줄 테니 미분해라"였다. 이 과목은 정반대다. <b>"미분한 결과(변화 규칙)를 줄 테니 원래 함수를 찾아라."</b></p></header>
+
+  <h3><span class="k">1.1</span>기본 개념</h3>
+
+  <div class="con"><div class="t">미분방정식<span class="en">Differential Equation</span></div>
+    <p class="one">도함수(\(y',\ y''\) …)가 들어 있는 방정식.</p>
+    <div class="easy">고교 방정식 \(x^2-3x+2=0\)의 답은 <b>숫자</b>(1, 2)다. 미분방정식 \(y'=3y\)의 답은 <b>함수</b>(\(y=ce^{3x}\))다. "미분하면 자기 자신의 3배가 되는 함수를 찾아라"는 뜻.</div>
+    <p class="ex"><b>왜 배우나:</b> 자연법칙은 대부분 "변화율이 현재 상태에 따라 정해진다"는 꼴로 나온다. 식는 커피, 떨어지는 낙하산, 방사성 붕괴, 회로의 전류가 전부 미분방정식이다.</p></div>
+
+  <div class="con"><div class="t">상미분방정식 vs 편미분방정식<span class="en">ODE vs PDE</span></div>
+    <p class="one">독립변수가 <b>하나</b>(\(x\) 또는 \(t\))면 상미분방정식(ODE). 둘 이상이면 편미분방정식(PDE).</p>
+    <div class="easy">이 과목의 1~14주는 전부 <b>ODE</b>다. \(y\)는 \(x\) 하나에만 달린 함수 \(y(x)\). PDE(\(\partial u/\partial x\) 같은 것)는 12장에서 따로.</div></div>
+
+  <div class="con"><div class="t">계<span class="en">Order</span></div>
+    <p class="one">식에 나오는 도함수 중 <b>가장 많이 미분한 횟수</b>.</p>
+    <div class="easy">\(y'=\cos x\) → 1계, \(y''+9y=e^{-2x}\) → 2계. 주의: \((y')^3\)은 "1번 미분한 것의 세제곱"이라 여전히 <b>1계</b>다. 지수와 미분 횟수를 헷갈리지 말 것.</div></div>
+
+  <div class="con"><div class="t">선형 / 비선형<span class="en">Linear / Nonlinear</span></div>
+    <p class="one">\(y,\ y',\ y''\)이 전부 <b>1제곱</b>으로만 나오고, 그 앞의 계수가 <b>\(x\)만의 함수</b>이면 선형.</p>
+    <div class="easy">두 가지만 확인한다. ① \(y\)나 그 도함수에 제곱·\(\sin\)·\(e^{y}\) 같은 게 붙었나? ② 계수에 \(y\)가 섞였나? 둘 중 하나라도 "예"면 <b>비선형</b>.</div>
+    <p class="ex">선형: \(x^3y'''+e^xy''+3y'+4xy=e^{-x}\) &nbsp;/&nbsp; 비선형: \((1-y)y'+2y=e^x\) (계수에 \(y\)), \(y''+\sin y=0\), \(y^{IV}+y^2=0\)</p>
+    <p class="ex"><b>왜 중요한가:</b> 선형이면 해끼리 더해도 해다(고교 벡터의 "선형결합"과 같은 뜻). 이 성질 덕분에 선형 ODE는 <b>항상 정해진 공식으로 풀린다.</b></p></div>
+
+  
+  <div class="note tip"><span class="ic">9/4 수업</span><div><p>교수님: "선형 위주로 할 거고 <b>비선형은 거의 안 할 거야</b>. 비선형은 특이한 경우만." 판별 질문 "선형이야 비선형이야? 멱수가 얼마야?"를 뒷자리 학생을 지목해 물었다. 식을 보면 <b>계·선형성을 바로 답할 수 있게</b> 해 둘 것.</p></div></div>
+
+  <div class="con"><div class="t">해 · 일반해 · 특수해 · 특이해<span class="en">Solution</span></div>
+    <p class="one"><b>해</b>: 식에 넣으면 등식이 성립하는 함수. <b>일반해</b>: 임의의 상수 \(c\)가 들어 있는 해의 모임. <b>특수해</b>: 조건으로 \(c\)가 정해진 하나. <b>특이해</b>: 일반해에 어떤 \(c\)를 넣어도 안 나오는 별도의 해.</p>
+    <div class="easy"><span class="hs">고교 연결</span> 부정적분 \(\int 2x\,dx=x^2+C\)의 \(C\)가 바로 그 \(c\)다. 미분방정식을 풀 때마다 적분을 하므로 상수가 하나 생기고, 그게 일반해의 \(c\)다.</div>
+    <p class="ex"><b>예</b> \((y')^2-xy'+y=0\): 일반해 \(y=cx-c^2\)(직선들), 특수해 \(y=2x-4\)(\(c=2\)), 특이해 \(y=x^2/4\)(그 직선들이 전부 접하는 포물선 — 어떤 \(c\)로도 안 나옴). 연습문제 1.1-16번.</p></div>
+
+  
+  <div class="note tip"><span class="ic">9/4 수업</span><div><p><b>교수님 발언(녹음):</b> "특이해는 해는 해인데 공학적으로 의미가 없는 해. 여러분이 관심 가질 해는 <b>일반해와 특수해만</b>. 특이해는 거의 안 할 거다." 정의만 알아 두고 유도는 넘어가도 된다.</p><p>"1계 → 적분 1번 → 적분상수 1개 → 조건 1개. 2계 → 2개. 3계 → 3개." 그리고 "우리 쪽(공학)에서는 <b>경계조건</b>이라는 말을 많이 쓴다. 초기조건은 독립변수가 0일 때의 값."</p></div></div>
+
+  <div class="con"><div class="t">초기값 문제<span class="en">Initial Value Problem, IVP</span></div>
+    <p class="one">미분방정식 + 조건 \(y(x_0)=y_0\). 일반해를 구한 뒤 조건을 대입해 \(c\)를 정한다.</p>
+    <div class="easy">"시작할 때 값이 이랬다"는 정보 하나면 상수 \(c\)가 딱 정해진다. 그래서 답이 <b>함수 하나</b>로 확정된다.</div></div>
+
+  <div class="con"><div class="t">모델화<span class="en">Modeling</span></div>
+    <p class="one">현실 상황을 식으로 옮기는 일. 교수님은 항상 세 단계로 쓴다.</p>
+    <div class="easy"><b>Step 1</b> 물리 상황 → 미분방정식 &nbsp;·&nbsp; <b>Step 2</b> 수학으로 풀기 &nbsp;·&nbsp; <b>Step 3</b> 답을 다시 물리적으로 읽기(부호가 맞나? 시간이 가면 어떻게 되나?)</div>
+    <p class="ex">강의의 예시: Newton의 냉각 법칙, 낙하물과 공기저항, 투사체 운동. 시험 답안도 이 세 단계 골격으로 쓰면 깔끔하다.</p></div>
+
+  <h3><span class="k">1.3</span>변수분리형과 동차형</h3>
+  <div class="note exam"><span class="ic">과제 1주차</span><div><p>9/4 공지: <b>Kreyszig 1.3 연습문제 6 · 7 · 8 · 16 · 17</b>, 9/9(수) 수업 전 교탁 제출. 유형은 6 변수분리 / 7·17 동차(y=ux) / 8·16 치환형(v=y+4x, v=x+y−2). 이 노트의 P26·P27이 8·16번과 같은 유형이다. 과제 가이드는 별도 문서.</p></div></div>
+
+
+  <div class="con"><div class="t">변수분리형<span class="en">Separable</span></div>
+    <p class="one">식을 정리해서 <b>왼쪽엔 \(y\)만, 오른쪽엔 \(x\)만</b> 남길 수 있는 미분방정식.</p>
+    <div class="easy">\(y'=\dfrac{dy}{dx}\)를 분수처럼 다뤄 \(g(y)\,dy=f(x)\,dx\)로 갈라놓고 <b>양변을 각각 적분</b>하면 끝. 가장 쉬운 유형이라 뒤의 유형들도 결국 이 꼴로 바꾸는 게 목표다.</div>
+    <div class="easy"><span class="hs">고교 연결</span> 여기서 막히면 ODE가 아니라 <b>적분</b>이 막힌 것이다. 치환적분·부분적분과, 교과 밖이지만 간단한 <b>부분분수</b>(\(\frac1{(y-1)(y+1)}=\frac12\big(\frac1{y-1}-\frac1{y+1}\big)\))가 자주 나온다.</div></div>
+
+  <div class="con"><div class="t">동차 함수 · 동차 방정식<span class="en">Homogeneous</span></div>
+    <p class="one">\(f(x,y)\)의 <b>모든 항의 차수가 같으면</b> 동차 함수. 그런 \(M,N\)으로 된 \(M\,dx+N\,dy=0\)이 동차 방정식이고, \(y'=f(y/x)\) 꼴로 쓸 수 있다.</p>
+    <div class="easy">\(x^2+y^2\)는 둘 다 2차라 동차. \(x^2+y^2+4\)는 상수 4가 0차라 <b>아니다</b>. \(\dfrac yx+1\)은 둘 다 0차라 동차.</div>
+    <p class="ex"><b>왜 따로 배우나:</b> 그대로는 변수가 안 갈라지지만, \(y=ux\)로 바꾸면 갈라진다. 즉 "변수분리형으로 <b>변환</b>하는 기술"이다.</p></div>
+
+  <h3><span class="k">1.4</span>완전미분방정식과 적분인자</h3>
+
+  <div class="con"><div class="t">전미분<span class="en">Total differential</span> <span class="hs">고교 연결</span></div>
+    <p class="one">두 변수 함수 \(u(x,y)\)가 조금 변할 때의 변화량: \(du=\dfrac{\partial u}{\partial x}dx+\dfrac{\partial u}{\partial y}dy\).</p>
+    <div class="easy">\(\partial u/\partial x\)(편미분)는 "\(y\)는 상수 취급하고 \(x\)로만 미분"이다. 고교 미분과 완전히 같은 계산에 규칙 하나만 추가된 것. 예: \(u=x^2y\)이면 \(u_x=2xy,\ u_y=x^2\).</div></div>
+
+  <div class="con"><div class="t">완전미분방정식<span class="en">Exact ODE</span></div>
+    <p class="one">\(M\,dx+N\,dy=0\)의 좌변이 어떤 \(u(x,y)\)의 전미분 \(du\)와 <b>정확히 같을 때</b>. 그러면 식은 \(du=0\)이므로 답은 \(u(x,y)=c\).</p>
+    <div class="easy">판별은 딱 한 줄: <b>\(M_y=N_x\)</b>(\(M\)을 \(y\)로 편미분한 것과 \(N\)을 \(x\)로 편미분한 것이 같은가). 같으면 완전. 이유는 \(u_{xy}=u_{yx}\)(어느 순서로 미분해도 같다)이기 때문.</div>
+    <p class="ex"><b>비유:</b> 미분된 조각 \(M,N\)을 보고 원래 함수 \(u\)를 "복원"하는 퍼즐. 조각이 진짜 한 함수에서 나온 것인지 먼저 확인(\(M_y=N_x\))하고, 맞으면 적분으로 붙인다.</p></div>
+
+  <div class="con"><div class="t">적분인자<span class="en">Integrating factor</span></div>
+    <p class="one">완전하지 않은 식에 <b>곱해서 완전하게 만들어 주는 함수</b> \(F(x,y)\).</p>
+    <div class="easy">\(-y\,dx+x\,dy=0\)은 완전이 아니지만 \(\dfrac1{x^2}\)을 곱하면 완전해진다. 아무 함수나 찾긴 어려우니 <b>\(x\)만의 함수 \(F(x)\)</b> 또는 <b>\(y\)만의 함수 \(F(y)\)</b>인 경우만 노린다(정리 1, 2).</div></div>
+
+  <h3><span class="k">1.5</span>선형 ODE와 Bernoulli</h3>
+
+  <div class="con"><div class="t">1계 선형 ODE의 표준형<span class="en">Standard form</span></div>
+    <p class="one">\(y'+p(x)\,y=r(x)\). \(y'\)의 계수가 <b>1</b>이 되도록 나눈 모양.</p>
+    <div class="easy">\(xy'+2y=3\)을 그대로 공식에 넣으면 안 된다. \(x\)로 나눠 \(y'+\dfrac2xy=\dfrac3x\)로 만들고 나서 \(p=\dfrac2x,\ r=\dfrac3x\)를 읽는다.</div></div>
+
+  <div class="con"><div class="t">제차 / 비제차 · 입력 / 출력<span class="en">Homogeneous / Nonhomogeneous</span></div>
+    <p class="one">\(r(x)=0\)이면 <b>제차</b>, 아니면 <b>비제차</b>. 공학에서 \(r(x)\)는 <b>입력</b>(힘, 전압), \(y(x)\)는 <b>출력</b>(변위, 전류).</p>
+    <div class="easy">제차는 "외부에서 아무것도 안 넣었을 때 시스템이 알아서 하는 운동", 비제차는 "밖에서 밀어줄 때의 반응". 1.3의 "동차"와 한자가 같지만(齊次/同次) <b>다른 개념</b>이다. 영어는 둘 다 homogeneous라 더 헷갈린다.</div></div>
+
+  <div class="con"><div class="t">Bernoulli 방정식<span class="en">Bernoulli equation</span></div>
+    <p class="one">\(y'+p(x)\,y=g(x)\,y^a\). 우변에 \(y^a\)가 붙어 비선형이지만, \(u=y^{1-a}\)로 바꾸면 <b>선형이 된다</b>.</p>
+    <div class="easy">\(a=0\)이나 \(1\)이면 원래 선형이라 바꿀 필요 없음. 대표 예는 인구 성장 모델(로지스틱): \(y'=Ay-By^2\).</div></div>
+
+  <div class="note tip"><span class="ic">BIG PICTURE</span><div><p>이 장의 다섯 유형은 결국 <b>두 가지 기술</b>이다. ① 갈라서 적분하기(변수분리) ② 원래 함수 \(u\) 복원하기(완전). 동차형은 ①로 바꾸는 치환, 적분인자·선형·Bernoulli는 ②로 바꾸는 곱셈·치환이다.</p></div></div>
+</section>
+
+<!-- ================= PART 2 공식 ================= -->
+<section class="part" id="p2">
+  <header><div class="pn">Part 2 · Formulas</div><h2>공식 — 유형별 한 장 카드</h2><p>각 카드는 <b>모양 → 언제 쓰나 → 공식 → 주의</b> 순서다. 공식만 외우지 말고 "언제"를 같이 외울 것.</p></header>
+
+  <div class="fm"><div class="no">F1 · 변수분리</div><div class="t">\(g(y)\,y'=f(x)\)</div>
+    <div class="eq">\[\int g(y)\,dy=\int f(x)\,dx+c\]</div>
+    <dl><dt>언제</dt><dd>\(x\)와 \(y\)가 곱·나눗셈으로만 얽혀 있을 때</dd><dt>주의</dt><dd>적분상수는 <b>한쪽에 한 번만</b>. \(\ln\)이 나오면 \(e^{c}\)를 새 상수 \(c\)로 묶는다.</dd></dl></div>
+
+  <div class="fm"><div class="no">F2 · 동차형 치환</div><div class="t">\(y'=f\!\left(\dfrac yx\right)\)</div>
+    <div class="eq">\[y=ux,\quad y'=u'x+u\quad\Longrightarrow\quad \frac{du}{f(u)-u}=\frac{dx}{x}\]</div>
+    <dl><dt>언제</dt><dd>모든 항의 차수가 같을 때(상수항 없음)</dd><dt>주의</dt><dd>\(y'=u'x+u\)의 <b>\(+u\)를 빼먹는 실수</b>가 제일 많다. 곱의 미분법이다. 마지막에 \(u=y/x\) 되돌리기.</dd></dl></div>
+
+  <div class="fm"><div class="no">F3 · 완전성 판별</div><div class="t">\(M(x,y)\,dx+N(x,y)\,dy=0\)</div>
+    <div class="eq">\[\frac{\partial M}{\partial y}=\frac{\partial N}{\partial x}\ \Longleftrightarrow\ \text{완전}\]</div>
+    <dl><dt>언제</dt><dd>\(dx,\ dy\) 꼴로 정리된 식을 받았을 때 가장 먼저</dd><dt>주의</dt><dd>\(M\)은 \(y\)로, \(N\)은 \(x\)로 — <b>서로 반대 변수</b>로 미분한다.</dd></dl></div>
+
+  <div class="fm"><div class="no">F4 · 완전 ODE의 해</div><div class="t">\(u(x,y)=c\) 복원</div>
+    <div class="eq">\[u=\int M\,dx+k(y),\qquad \frac{\partial u}{\partial y}=N\ \text{로 } k'(y)\text{ 결정}\]</div>
+    <dl><dt>또는</dt><dd>\(u=\int N\,dy+l(x)\), \(u_x=M\)으로 \(l'(x)\) 결정 — 적분이 쉬운 쪽을 고른다</dd><dt>주의</dt><dd>\(x\)로 적분할 때 "상수"는 숫자가 아니라 <b>\(y\)만의 함수 \(k(y)\)</b>다. 마지막에 \(u_x=M,\ u_y=N\) 검산.</dd></dl></div>
+
+  <div class="fm"><div class="no">F5 · 적분인자 (정리 1 · 2)</div><div class="t">\(P\,dx+Q\,dy=0\)이 완전이 아닐 때</div>
+    <div class="eq">\[R(x)=\frac{1}{Q}\left(P_y-Q_x\right)\ \text{가 }x\text{만의 함수}\ \Rightarrow\ F(x)=e^{\int R\,dx}\]
+      \[R^*(y)=\frac{1}{P}\left(Q_x-P_y\right)\ \text{가 }y\text{만의 함수}\ \Rightarrow\ F^*(y)=e^{\int R^*\,dy}\]</div>
+    <dl><dt>순서</dt><dd>\(R\) 먼저 시도 → 안 되면 \(R^*\) → 곱한 뒤 F3로 완전 확인 → F4</dd><dt>주의</dt><dd>분자의 <b>부호가 서로 반대</b>(\(P_y-Q_x\) vs \(Q_x-P_y\)), 분모가 \(Q\) vs \(P\).</dd></dl></div>
+
+  <div class="fm"><div class="no">F6 · 선형 제차</div><div class="t">\(y'+p(x)\,y=0\)</div>
+    <div class="eq">\[y=c\,e^{-\int p(x)\,dx}\]</div>
+    <dl><dt>왜</dt><dd>그냥 변수분리: \(\dfrac{dy}{y}=-p\,dx\)</dd></dl></div>
+
+  <div class="fm"><div class="no">F7 · 선형 비제차 (이 장의 대표 공식)</div><div class="t">\(y'+p(x)\,y=r(x)\)</div>
+    <div class="eq">\[h=\int p(x)\,dx,\qquad y=e^{-h}\left(\int e^{h}\,r(x)\,dx+c\right)\]</div>
+    <dl><dt>원리</dt><dd>\(e^{h}\)를 곱하면 좌변이 \((e^{h}y)'\)로 <b>뭉쳐진다</b>. 그 뒤 양변 적분.</dd><dt>주의</dt><dd>반드시 <b>표준형</b>(\(y'\) 계수 1)으로 만든 뒤 \(p,r\)을 읽을 것. \(h\)를 구할 때 적분상수는 생략.</dd></dl></div>
+
+  <div class="fm"><div class="no">F8 · Bernoulli</div><div class="t">\(y'+p(x)\,y=g(x)\,y^a\quad(a\ne0,1)\)</div>
+    <div class="eq">\[u=y^{1-a}\ \Longrightarrow\ u'+(1-a)\,p\,u=(1-a)\,g\]</div>
+    <dl><dt>다음</dt><dd>\(u\)에 대한 선형이므로 F7로 풀고 \(y=u^{1/(1-a)}\)로 되돌린다</dd><dt>주의</dt><dd>\(a\)는 <b>우변 \(y\)의 지수</b>. \(y^{-2}\)면 \(a=-2\), \(u=y^{3}\).</dd></dl></div>
+
+  <div class="fm"><div class="no">F9 · 치환형</div><div class="t">\(y'=f(ax+by+c)\)</div>
+    <div class="eq">\[u=ax+by+c\ \Longrightarrow\ u'=a+b\,y'=a+b\,f(u)\quad(\text{변수분리형})\]</div>
+    <dl><dt>언제</dt><dd>\(x,y\)가 항상 한 덩어리로만 등장할 때. 베르누이 연습문제 (2)(3)이 이 유형.</dd></dl></div>
+
+  <h3><span class="k">MEMO</span>자주 쓰는 적분 미니표 <span class="hs">고교 연결</span></h3>
+  <div class="mini"><table>
+    <thead><tr><th>적분</th><th>결과</th><th>어디서 나오나</th></tr></thead>
+    <tbody>
+      <tr><td>\(\displaystyle\int\frac{dy}{y}\)</td><td>\(\ln|y|+c\)</td><td>거의 모든 제차식, 지수 성장·붕괴</td></tr>
+      <tr><td>\(\displaystyle\int\frac{dy}{1+y^2}\)</td><td>\(\arctan y+c\)</td><td>\(y'=1+y^2\), 치환형</td></tr>
+      <tr><td>\(\displaystyle\int\frac{dy}{y^2-1}\)</td><td>\(\tfrac12\ln\left|\dfrac{y-1}{y+1}\right|+c\)</td><td>부분분수. 로지스틱 계열</td></tr>
+      <tr><td>\(\displaystyle\int\tan x\,dx\)</td><td>\(-\ln|\cos x|=\ln|\sec x|+c\)</td><td>선형 Ex.1의 \(h\)</td></tr>
+      <tr><td>\(\displaystyle\int x\sin x\,dx\)</td><td>\(-x\cos x+\sin x+c\)</td><td>부분적분. 변수분리 연습 (1)</td></tr>
+      <tr><td>\(\displaystyle\int y\,e^{y}\,dy\)</td><td>\((y-1)e^{y}+c\)</td><td>부분적분</td></tr>
+      <tr><td>\(\displaystyle\int y^2e^{-y}\,dy\)</td><td>\(-e^{-y}(y^2+2y+2)+c\)</td><td>부분적분 2회. 선형 연습 (2)</td></tr>
+      <tr><td>\(\displaystyle\int\frac{2u\,du}{1+u^2}\)</td><td>\(\ln(1+u^2)+c\)</td><td>치환 \(t=1+u^2\). 동차 Ex.8</td></tr>
+    </tbody></table></div>
+</section>
+
+<!-- ================= PART 3 문제 ================= -->
+<section class="part" id="p3">
+  <header><div class="pn">Part 3 · Problems</div><h2>문제 — 강의 예제 10 + 연습 17</h2><p>먼저 <b>유형을 맞혀 보고</b>(Part 1의 다섯 유형 중 무엇인가) 힌트를 펼쳐 확인한 뒤 풀어라. 풀이는 Part 4에 같은 번호로 있다.</p></header>
+
+  <h3><span class="k">A</span>강의 예제 (교재 Ex. 번호)</h3>
+  <div class="pl">
+    <div class="pr"><span class="no">P01</span><span class="st">\(y'=3y,\quad y(0)=5.7\) <span class="src">1.1 Ex.4</span></span><details><summary>힌트</summary><div class="hint"><b>변수분리(F1)</b> → 일반해 → 초기조건 대입.</div></details></div>
+    <div class="pr"><span class="no">P02</span><span class="st">방사성 물질 0.5 g이 붕괴한다. 붕괴 속도는 현재 양에 비례. 시간 \(t\) 후의 양은? <span class="src">1.1 Ex.5</span></span><details><summary>힌트</summary><div class="hint"><b>모델화 3단계</b>. "비례"는 \(y'=-ky\). 부호 주의(줄어드니까 −).</div></details></div>
+    <div class="pr"><span class="no">P03</span><span class="st">\(y'=1+y^2\) <span class="src">1.3 Ex.1</span></span><details><summary>힌트</summary><div class="hint"><b>변수분리</b>. \(\int\frac{dy}{1+y^2}\)는 미니표.</div></details></div>
+    <div class="pr"><span class="no">P04</span><span class="st">지름 2 m 탱크 바닥에 지름 1 cm 구멍. 초기 수위 2.25 m. 임의 시각의 수위와 물이 다 빠지는 시각은? (Torricelli: \(v=0.600\sqrt{2gh}\)) <span class="src">1.3 Ex.7</span></span><details><summary>힌트</summary><div class="hint"><b>모델화 + 변수분리</b>. "빠져나간 부피 = 줄어든 부피"로 \(dh/dt\)를 세운다. 단위는 cm, s.</div></details></div>
+    <div class="pr"><span class="no">P05</span><span class="st">\(2xyy'=y^2-x^2\) <span class="src">1.3 Ex.8</span></span><details><summary>힌트</summary><div class="hint"><b>동차형(F2)</b>. \(y'\)에 대해 정리하면 \(y/x\)만의 식.</div></details></div>
+    <div class="pr"><span class="no">P06</span><span class="st">\(\cos(x+y)\,dx+\big(3y^2+2y+\cos(x+y)\big)\,dy=0\) <span class="src">1.4 Ex.1</span></span><details><summary>힌트</summary><div class="hint"><b>완전(F3→F4)</b>. \(M_y,N_x\)부터.</div></details></div>
+    <div class="pr"><span class="no">P07</span><span class="st">\((e^{x+y}+ye^{y})\,dx+(xe^{y}-1)\,dy=0,\quad y(0)=-1\) <span class="src">1.4 Ex.5</span></span><details><summary>힌트</summary><div class="hint"><b>적분인자(F5)</b>. 완전이 아니다. \(R\)이 안 되면 \(R^*\).</div></details></div>
+    <div class="pr"><span class="no">P08</span><span class="st">\(y'+y\tan x=\sin 2x,\quad y(0)=1\) <span class="src">1.5 Ex.1</span></span><details><summary>힌트</summary><div class="hint"><b>선형(F7)</b>. \(\sin2x=2\sin x\cos x\), \(\int\tan x=\ln|\sec x|\).</div></details></div>
+    <div class="pr"><span class="no">P09</span><span class="st">RL 회로(인덕턴스 \(L\), 저항 \(R\), 기전력 \(E\) 일정). 전류 \(I(t)\)를 구하라. 초기 전류 0. <span class="src">1.5 Ex.2</span></span><details><summary>힌트</summary><div class="hint"><b>모델화 + 선형</b>. Kirchhoff: \(LI'+RI=E\).</div></details></div>
+    <div class="pr"><span class="no">P10</span><span class="st">로지스틱 방정식 \(y'=Ay-By^2\) <span class="src">1.5 Ex.4</span></span><details><summary>힌트</summary><div class="hint"><b>Bernoulli(F8)</b>, \(a=2\), \(u=1/y\).</div></details></div>
+  </div>
+
+  <h3><span class="k">B</span>연습 — 1.1 계수와 선형성</h3>
+  <div class="pl">
+    <div class="pr"><span class="no">P11</span><span class="st">\((y')^3+xy=0\) 의 계와 선형성은?</span></div>
+    <div class="pr"><span class="no">P12</span><span class="st">\(y'''+xy''+e^{-x}y'+3y=\sin x\) 의 계와 선형성은?</span></div>
+    <div class="pr"><span class="no">P13</span><span class="st">\(x^2y''+4xy'+3y=0\) 의 계와 선형성은?</span></div>
+  </div>
+
+  <h3><span class="k">C</span>연습 — 1.3 변수분리 · 동차</h3>
+  <div class="pl">
+    <div class="pr"><span class="no">P14</span><span class="st">\(xe^{-y}\sin x\,dx-y\,dy=0\)</span><details><summary>힌트</summary><div class="hint">양변에 \(e^{y}\)를 곱하면 갈라진다. 부분적분 2개.</div></details></div>
+    <div class="pr"><span class="no">P15</span><span class="st">\(x^2y'=y^2+1\)</span><details><summary>힌트</summary><div class="hint">\(\dfrac{dy}{y^2+1}=\dfrac{dx}{x^2}\)</div></details></div>
+    <div class="pr"><span class="no">P16</span><span class="st">\(\dfrac{dy}{dx}=y^2-1\)</span><details><summary>힌트</summary><div class="hint">부분분수. 상수해 \(y=\pm1\)도 잊지 말 것.</div></details></div>
+    <div class="pr"><span class="no">P17</span><span class="st">다음이 동차함수인지 판정: (1) \(x-\sqrt{xy}+3y\) &nbsp;(2) \(x^4-x^2y^2+8y^4\) &nbsp;(3) \(x^2+y^2+4\) &nbsp;(4) \(\dfrac yx+1\)</span><details><summary>힌트</summary><div class="hint">각 항의 차수만 센다. \(\sqrt{xy}\)는 1차.</div></details></div>
+    <div class="pr"><span class="no">P18</span><span class="st">\((x+y)\,dx+x\,dy=0\) — 동차인지 판별하고 일반해</span><details><summary>힌트</summary><div class="hint">동차(F2)로도, 완전(F3)으로도 풀린다. 둘 다 해 보고 비교.</div></details></div>
+    <div class="pr"><span class="no">P19</span><span class="st">\(y'=\dfrac{y-x}{y+x}\) — 동차인지 판별하고 일반해</span><details><summary>힌트</summary><div class="hint">분자·분모를 \(x\)로 나누면 \(u=y/x\)만 남는다.</div></details></div>
+  </div>
+
+  <h3><span class="k">D</span>연습 — 1.4 완전미분방정식</h3>
+  <div class="pl">
+    <div class="pr"><span class="no">P20</span><span class="st">\((x^3+y^3)\,dx+3xy^2\,dy=0\)</span></div>
+    <div class="pr"><span class="no">P21</span><span class="st">\((\sin y-y\sin x)\,dx+(\cos x+x\cos y+2y)\,dy=0\)</span></div>
+  </div>
+
+  <h3><span class="k">E</span>연습 — 1.5 선형 · 적분인자</h3>
+  <div class="pl">
+    <div class="pr"><span class="no">P22</span><span class="st">\(x\dfrac{dy}{dx}+2y=3\)</span><details><summary>힌트</summary><div class="hint">표준형으로 먼저. 적분인자는 \(x^2\).</div></details></div>
+    <div class="pr"><span class="no">P23</span><span class="st">\(y'=\dfrac1{x+y^2}\)</span><details><summary>힌트</summary><div class="hint">\(y\)에 대해선 비선형. <b>뒤집어서</b> \(x\)를 \(y\)의 함수로 보면 선형.</div></details></div>
+    <div class="pr"><span class="no">P24</span><span class="st">\((1+e^x)y'+e^xy=0\)</span><details><summary>힌트</summary><div class="hint">제차 선형 = 변수분리. 좌변이 무엇의 미분인지 보이면 한 줄.</div></details></div>
+  </div>
+
+  <h3><span class="k">F</span>연습 — 1.5 Bernoulli (치환)</h3>
+  <div class="pl">
+    <div class="pr"><span class="no">P25</span><span class="st">\(xy'+y=\dfrac1{y^2}\)</span><details><summary>힌트</summary><div class="hint">\(a=-2\), \(u=y^3\).</div></details></div>
+    <div class="pr"><span class="no">P26</span><span class="st">\(y'=(x+y+2)^2\)</span><details><summary>힌트</summary><div class="hint">Bernoulli가 아니라 <b>치환형(F9)</b>.</div></details></div>
+    <div class="pr"><span class="no">P27</span><span class="st">\(y'=1+e^{\,y-x+3}\)</span><details><summary>힌트</summary><div class="hint">역시 치환형. \(u=y-x+3\).</div></details></div>
+  </div>
+</section>
+
+<!-- ================= PART 4 풀이 ================= -->
+<section class="part" id="p4">
+  <header><div class="pn">Part 4 · Solutions</div><h2>문제풀이 — 단계마다 "왜"를 붙여서</h2><p>각 단계 옆의 회색 글씨는 <em>그 단계를 왜 하는지</em>다. 답만 맞히지 말고 단계의 이유를 말로 설명할 수 있으면 끝난 것이다.</p></header>
+
+  <div class="sol" id="s01"><div class="h"><span class="no">P01</span><span class="type">변수분리 · IVP</span><span class="t">\(y'=3y,\ y(0)=5.7\)</span></div>
+    <div class="stp"><span class="k">1 분리</span><span class="v">\(\dfrac{dy}{y}=3\,dx\) <em>— \(y\)는 왼쪽, \(x\)는 오른쪽</em></span>
+    <span class="k">2 적분</span><span class="v">\(\ln|y|=3x+c^*\ \Rightarrow\ y=e^{c^*}e^{3x}=ce^{3x}\) <em>— \(e^{c^*}\)를 새 상수 \(c\)로</em></span>
+    <span class="k">3 조건</span><span class="v">\(y(0)=c\cdot1=5.7\)</span></div>
+    <div class="res"><div class="k">답</div>\(y=5.7\,e^{3x}\)</div></div>
+
+  <div class="sol" id="s02"><div class="h"><span class="no">P02</span><span class="type">모델화 · 변수분리</span><span class="t">방사성 붕괴</span></div>
+    <div class="stp"><span class="k">Step 1 모델</span><span class="v">"속도가 양에 비례, 줄어든다" → \(\dfrac{dy}{dt}=-ky\ (k>0)\), 초기 \(y(0)=0.5\)</span>
+    <span class="k">Step 2 풀이</span><span class="v">P01과 같은 꼴: \(y=ce^{-kt}\), \(c=0.5\). 검산 \(y'=-0.5ke^{-kt}=-ky\) ✓</span>
+    <span class="k">Step 3 해석</span><span class="v">지수 \(-kt<0\)이므로 시간이 갈수록 0으로 줄어든다. \(k\)는 물질마다 다른 상수.</span></div>
+    <div class="res"><div class="k">답</div>\(y(t)=0.5\,e^{-kt}\)</div>
+    <div class="why"><b>고교 연결</b> 지수함수 \(e^{-kt}\)의 도함수가 자기 자신의 \(-k\)배라는 사실이 모델과 딱 맞물린다. "변화율 ∝ 자기 자신" = 지수함수, 이것만 기억해도 반은 푼다.</div></div>
+
+  <div class="sol" id="s03"><div class="h"><span class="no">P03</span><span class="type">변수분리</span><span class="t">\(y'=1+y^2\)</span></div>
+    <div class="stp"><span class="k">1 분리</span><span class="v">\(\dfrac{dy}{1+y^2}=dx\)</span>
+    <span class="k">2 적분</span><span class="v">\(\arctan y=x+c\) <em>— 미니표</em></span></div>
+    <div class="res"><div class="k">답</div>\(y=\tan(x+c)\)</div></div>
+
+  <div class="sol" id="s04"><div class="h"><span class="no">P04</span><span class="type">모델화 · 변수분리</span><span class="t">Torricelli 탱크</span></div>
+    <div class="stp"><span class="k">Step 1 모델</span><span class="v">짧은 시간 \(\Delta t\) 동안 구멍으로 나간 부피 \(=A\,v\,\Delta t\), 탱크에서 줄어든 부피 \(=-B\,\Delta h\). 둘이 같으므로 \(\dfrac{dh}{dt}=-\dfrac AB v\).<br>\(A=\pi(0.5)^2\approx0.785\) cm², \(B=\pi(100)^2\approx31416\) cm², \(v=0.600\sqrt{2\cdot980\cdot h}=26.56\sqrt h\) cm/s<br>\(\Rightarrow\ \dfrac{dh}{dt}=-0.000664\sqrt h\)</span>
+    <span class="k">Step 2 분리·적분</span><span class="v">\(h^{-1/2}dh=-0.000664\,dt\ \Rightarrow\ 2\sqrt h=c-0.000664\,t\). \(h(0)=225\) cm → \(2\cdot15=c=30\).<br>\(\sqrt h=15-0.000332\,t\)</span>
+    <span class="k">Step 3 해석</span><span class="v">\(h(t)=(15-0.000332t)^2\). 빈 순간 \(\sqrt h=0\): \(t=15/0.000332\approx45{,}200\) s ≈ <b>12.6시간</b>. 처음엔 빨리, 나중엔 천천히 빠진다(제곱근 때문).</span></div>
+    <div class="res"><div class="k">답</div>\(h(t)=(15-0.000332\,t)^2\) cm, 약 12.6시간 뒤 빈다</div></div>
+
+  <div class="sol" id="s05"><div class="h"><span class="no">P05</span><span class="type">동차형</span><span class="t">\(2xyy'=y^2-x^2\)</span></div>
+    <div class="stp"><span class="k">1 모양 확인</span><span class="v">\(y'=\dfrac{y^2-x^2}{2xy}=\dfrac12\dfrac yx-\dfrac12\dfrac xy\) <em>— \(y/x\)만의 식 → 동차</em></span>
+    <span class="k">2 치환</span><span class="v">\(y=ux,\ y'=u'x+u\): \(u'x+u=\dfrac u2-\dfrac1{2u}\ \Rightarrow\ u'x=-\dfrac{1+u^2}{2u}\)</span>
+    <span class="k">3 분리·적분</span><span class="v">\(\dfrac{2u}{1+u^2}du=-\dfrac{dx}x\ \Rightarrow\ \ln(1+u^2)=-\ln|x|+c^*\ \Rightarrow\ x(1+u^2)=c\)</span>
+    <span class="k">4 되돌리기</span><span class="v">\(u=y/x\): \(x+\dfrac{y^2}{x}=c\ \Rightarrow\ x^2+y^2=cx\)</span></div>
+    <div class="res"><div class="k">답</div>\(x^2+y^2=cx\) — 원점을 지나는 원들</div></div>
+
+  <div class="sol" id="s06"><div class="h"><span class="no">P06</span><span class="type">완전</span><span class="t">\(\cos(x+y)\,dx+(3y^2+2y+\cos(x+y))\,dy=0\)</span></div>
+    <div class="stp"><span class="k">1 판별</span><span class="v">\(M_y=-\sin(x+y)\), \(N_x=-\sin(x+y)\) → 같다, 완전 <em>— F3</em></span>
+    <span class="k">2 적분</span><span class="v">\(u=\int M\,dx=\sin(x+y)+k(y)\) <em>— 상수 자리에 \(k(y)\)</em></span>
+    <span class="k">3 \(k\) 결정</span><span class="v">\(u_y=\cos(x+y)+k'(y)\overset{!}{=}N\ \Rightarrow\ k'=3y^2+2y\ \Rightarrow\ k=y^3+y^2\)</span>
+    <span class="k">4 검산</span><span class="v">\(u_x=\cos(x+y)=M\) ✓</span></div>
+    <div class="res"><div class="k">답</div>\(\sin(x+y)+y^3+y^2=c\)</div></div>
+
+  <div class="sol" id="s07"><div class="h"><span class="no">P07</span><span class="type">적분인자</span><span class="t">\((e^{x+y}+ye^y)dx+(xe^y-1)dy=0,\ y(0)=-1\)</span></div>
+    <div class="stp"><span class="k">1 판별</span><span class="v">\(P_y=e^{x+y}+e^y+ye^y\), \(Q_x=e^y\) → 다르다, 완전 아님</span>
+    <span class="k">2 \(R\) 시도</span><span class="v">\(R=\dfrac{P_y-Q_x}{Q}=\dfrac{e^{x+y}+ye^y}{xe^y-1}\) — \(y\)가 남는다, 불가</span>
+    <span class="k">3 \(R^*\) 시도</span><span class="v">\(R^*=\dfrac{Q_x-P_y}{P}=\dfrac{-(e^{x+y}+ye^y)}{e^{x+y}+ye^y}=-1\) — 상수, 가능! \(F^*=e^{\int-1\,dy}=e^{-y}\)</span>
+    <span class="k">4 곱하기</span><span class="v">\((e^x+y)\,dx+(x-e^{-y})\,dy=0\), 이제 \(M_y=1=N_x\) ✓</span>
+    <span class="k">5 복원</span><span class="v">\(u=\int(e^x+y)dx=e^x+xy+k(y)\), \(u_y=x+k'=x-e^{-y}\Rightarrow k=e^{-y}\)</span>
+    <span class="k">6 조건</span><span class="v">\(u(0,-1)=1+0+e^{1}\approx3.72\)</span></div>
+    <div class="res"><div class="k">답</div>\(e^x+xy+e^{-y}=3.72\)</div>
+    <div class="why"><b>채점 포인트</b> "\(R\)이 안 되어 \(R^*\)로 갔다"는 과정을 반드시 적는다. 답만 쓰면 감점.</div></div>
+
+  <div class="sol" id="s08"><div class="h"><span class="no">P08</span><span class="type">선형</span><span class="t">\(y'+y\tan x=\sin2x,\ y(0)=1\)</span></div>
+    <div class="stp"><span class="k">1 읽기</span><span class="v">이미 표준형. \(p=\tan x,\ r=\sin2x=2\sin x\cos x\)</span>
+    <span class="k">2 \(h\)</span><span class="v">\(h=\int\tan x\,dx=\ln|\sec x|\ \Rightarrow\ e^{h}=\sec x=\dfrac1{\cos x},\ e^{-h}=\cos x\)</span>
+    <span class="k">3 공식 F7</span><span class="v">\(y=\cos x\left(\int\dfrac{1}{\cos x}\cdot2\sin x\cos x\,dx+c\right)=\cos x\left(-2\cos x+c\right)=c\cos x-2\cos^2x\)</span>
+    <span class="k">4 조건</span><span class="v">\(y(0)=c-2=1\Rightarrow c=3\)</span></div>
+    <div class="res"><div class="k">답</div>\(y=3\cos x-2\cos^2x\)</div></div>
+
+  <div class="sol" id="s09"><div class="h"><span class="no">P09</span><span class="type">모델화 · 선형</span><span class="t">RL 회로</span></div>
+    <div class="stp"><span class="k">Step 1 모델</span><span class="v">전압 합 = 기전력: \(LI'+RI=E\). 표준형 \(I'+\dfrac RLI=\dfrac EL\)</span>
+    <span class="k">Step 2 풀이</span><span class="v">\(p=R/L\), \(h=Rt/L\). \(I=e^{-Rt/L}\!\left(\int e^{Rt/L}\dfrac EL\,dt+c\right)=e^{-Rt/L}\!\left(\dfrac ERe^{Rt/L}+c\right)=\dfrac ER+ce^{-Rt/L}\)<br>\(I(0)=0\Rightarrow c=-E/R\)</span>
+    <span class="k">Step 3 해석</span><span class="v">0에서 출발해 \(E/R\)(옴의 법칙 값)로 다가간다. 인덕터가 전류 변화를 "버티기" 때문에 즉시 못 올라간다. 시정수 \(L/R\).</span></div>
+    <div class="res"><div class="k">답</div>\(I(t)=\dfrac ER\left(1-e^{-Rt/L}\right)\)</div></div>
+
+  <div class="sol" id="s10"><div class="h"><span class="no">P10</span><span class="type">Bernoulli</span><span class="t">\(y'=Ay-By^2\)</span></div>
+    <div class="stp"><span class="k">1 읽기</span><span class="v">\(y'-Ay=-By^2\): \(p=-A,\ g=-B,\ a=2\) → \(u=y^{1-2}=y^{-1}\)</span>
+    <span class="k">2 치환</span><span class="v">\(u'=-y^{-2}y'=-y^{-2}(Ay-By^2)=-Au+B\ \Rightarrow\ u'+Au=B\) <em>— 선형!</em></span>
+    <span class="k">3 F7</span><span class="v">\(h=Ax\): \(u=e^{-Ax}\left(\int Be^{Ax}dx+c\right)=\dfrac BA+ce^{-Ax}\)</span>
+    <span class="k">4 되돌리기</span><span class="v">\(y=1/u\)</span></div>
+    <div class="res"><div class="k">답</div>\(y=\dfrac1{ce^{-Ax}+B/A}\) — \(x\to\infty\)이면 \(y\to A/B\)로 포화</div>
+    <div class="why"><b>의미</b> 인구가 적을 땐 \(Ay\)가 커서 지수 성장, 많아지면 \(-By^2\)(경쟁)이 따라잡아 \(A/B\)에서 멈춘다. S자 곡선.</div></div>
+
+  <div class="sol" id="s11"><div class="h"><span class="no">P11–P13</span><span class="type">분류</span><span class="t">계와 선형성</span></div>
+    <div class="stp"><span class="k">P11</span><span class="v">\((y')^3+xy=0\): <b>1계, 비선형</b> <em>— \(y'\)의 세제곱</em></span>
+    <span class="k">P12</span><span class="v">\(y'''+xy''+e^{-x}y'+3y=\sin x\): <b>3계, 선형, 비제차</b> <em>— 계수 \(x,e^{-x}\)는 \(x\)만의 함수, 우변 \(\ne0\)</em></span>
+    <span class="k">P13</span><span class="v">\(x^2y''+4xy'+3y=0\): <b>2계, 선형, 제차</b> <em>— 5주차 Euler–Cauchy 꼴</em></span></div></div>
+
+  <div class="sol" id="s14"><div class="h"><span class="no">P14</span><span class="type">변수분리</span><span class="t">\(xe^{-y}\sin x\,dx-y\,dy=0\)</span></div>
+    <div class="stp"><span class="k">1 분리</span><span class="v">\(e^{y}\)를 곱하고 정리: \(ye^{y}\,dy=x\sin x\,dx\)</span>
+    <span class="k">2 적분</span><span class="v">좌: \(\int ye^y dy=(y-1)e^y\), 우: \(\int x\sin x\,dx=-x\cos x+\sin x\) <em>— 둘 다 부분적분</em></span></div>
+    <div class="res"><div class="k">답</div>\((y-1)e^{y}=\sin x-x\cos x+c\)</div></div>
+
+  <div class="sol" id="s15"><div class="h"><span class="no">P15</span><span class="type">변수분리</span><span class="t">\(x^2y'=y^2+1\)</span></div>
+    <div class="stp"><span class="k">1 분리</span><span class="v">\(\dfrac{dy}{1+y^2}=\dfrac{dx}{x^2}\)</span>
+    <span class="k">2 적분</span><span class="v">\(\arctan y=-\dfrac1x+c\)</span></div>
+    <div class="res"><div class="k">답</div>\(y=\tan\!\left(c-\dfrac1x\right)\)</div></div>
+
+  <div class="sol" id="s16"><div class="h"><span class="no">P16</span><span class="type">변수분리 · 부분분수</span><span class="t">\(y'=y^2-1\)</span></div>
+    <div class="stp"><span class="k">1 분리</span><span class="v">\(\dfrac{dy}{(y-1)(y+1)}=dx\)</span>
+    <span class="k">2 부분분수</span><span class="v">\(\dfrac1{(y-1)(y+1)}=\dfrac12\left(\dfrac1{y-1}-\dfrac1{y+1}\right)\)</span>
+    <span class="k">3 적분</span><span class="v">\(\tfrac12\ln\left|\dfrac{y-1}{y+1}\right|=x+c\ \Rightarrow\ \dfrac{y-1}{y+1}=Ce^{2x}\)</span></div>
+    <div class="res"><div class="k">답</div>\(\dfrac{y-1}{y+1}=Ce^{2x}\) &nbsp;(+ 상수해 \(y=1,\ y=-1\))</div>
+    <div class="why"><b>왜 상수해가 따로?</b> 1단계에서 \(y^2-1\)로 나눴는데, \(y=\pm1\)이면 0으로 나눈 셈이라 그 경우를 놓친다. 나누기 전에 "나누는 것이 0인 경우"를 항상 따로 확인.</div></div>
+
+  <div class="sol" id="s17"><div class="h"><span class="no">P17</span><span class="type">동차 판정</span><span class="t">차수만 센다</span></div>
+    <div class="stp"><span class="k">(1)</span><span class="v">\(x-\sqrt{xy}+3y\): 1, 1, 1차 → <b>동차</b></span>
+    <span class="k">(2)</span><span class="v">\(x^4-x^2y^2+8y^4\): 4, 4, 4차 → <b>동차</b></span>
+    <span class="k">(3)</span><span class="v">\(x^2+y^2+4\): 2, 2, <b>0</b>차 → <b>아님</b></span>
+    <span class="k">(4)</span><span class="v">\(\dfrac yx+1\): 0, 0차 → <b>동차</b></span></div></div>
+
+  <div class="sol" id="s18"><div class="h"><span class="no">P18</span><span class="type">동차형 (= 완전)</span><span class="t">\((x+y)\,dx+x\,dy=0\)</span></div>
+    <div class="stp"><span class="k">판별</span><span class="v">\(M=x+y,\ N=x\) 모두 1차 → 동차</span>
+    <span class="k">방법 A 동차</span><span class="v">\(y'=-1-\dfrac yx\), \(y=ux\): \(u'x+u=-1-u\ \Rightarrow\ \dfrac{du}{1+2u}=-\dfrac{dx}x\ \Rightarrow\ \tfrac12\ln|1+2u|=-\ln|x|+c^*\ \Rightarrow\ x^2(1+2u)=C\)</span>
+    <span class="k">방법 B 완전</span><span class="v">\(M_y=1=N_x\) → 완전. \(u=\int(x+y)dx=\dfrac{x^2}2+xy+k(y)\), \(u_y=x+k'=x\Rightarrow k=0\)</span></div>
+    <div class="res"><div class="k">답</div>\(x^2+2xy=C\) — 두 방법이 같은 답. <b>완전 쪽이 훨씬 짧다.</b></div></div>
+
+  <div class="sol" id="s19"><div class="h"><span class="no">P19</span><span class="type">동차형</span><span class="t">\(y'=\dfrac{y-x}{y+x}\)</span></div>
+    <div class="stp"><span class="k">1 확인</span><span class="v">분자·분모를 \(x\)로 나누면 \(\dfrac{u-1}{u+1}\) → 동차</span>
+    <span class="k">2 치환</span><span class="v">\(u'x+u=\dfrac{u-1}{u+1}\ \Rightarrow\ u'x=\dfrac{u-1-u^2-u}{u+1}=-\dfrac{u^2+1}{u+1}\)</span>
+    <span class="k">3 분리·적분</span><span class="v">\(\dfrac{u+1}{u^2+1}du=-\dfrac{dx}x\ \Rightarrow\ \tfrac12\ln(u^2+1)+\arctan u=-\ln|x|+c\) <em>— 분자를 \(u\)와 1로 쪼개서 적분</em></span>
+    <span class="k">4 되돌리기</span><span class="v">\(\tfrac12\ln\dfrac{x^2+y^2}{x^2}+\ln|x|=\tfrac12\ln(x^2+y^2)\)</span></div>
+    <div class="res"><div class="k">답</div>\(\tfrac12\ln(x^2+y^2)+\arctan\dfrac yx=c\) &nbsp;(극좌표로 \(\ln r+\theta=c\): 로그나선)</div></div>
+
+  <div class="sol" id="s20"><div class="h"><span class="no">P20</span><span class="type">완전</span><span class="t">\((x^3+y^3)dx+3xy^2dy=0\)</span></div>
+    <div class="stp"><span class="k">1 판별</span><span class="v">\(M_y=3y^2,\ N_x=3y^2\) ✓</span>
+    <span class="k">2 복원</span><span class="v">\(u=\int(x^3+y^3)dx=\dfrac{x^4}4+xy^3+k(y)\); \(u_y=3xy^2+k'=3xy^2\Rightarrow k'=0\)</span></div>
+    <div class="res"><div class="k">답</div>\(\dfrac{x^4}{4}+xy^3=c\)</div></div>
+
+  <div class="sol" id="s21"><div class="h"><span class="no">P21</span><span class="type">완전</span><span class="t">\((\sin y-y\sin x)dx+(\cos x+x\cos y+2y)dy=0\)</span></div>
+    <div class="stp"><span class="k">1 판별</span><span class="v">\(M_y=\cos y-\sin x\), \(N_x=-\sin x+\cos y\) ✓</span>
+    <span class="k">2 복원</span><span class="v">\(u=\int M\,dx=x\sin y+y\cos x+k(y)\); \(u_y=x\cos y+\cos x+k'\overset{!}{=}N\Rightarrow k'=2y\Rightarrow k=y^2\)</span></div>
+    <div class="res"><div class="k">답</div>\(x\sin y+y\cos x+y^2=c\)</div></div>
+
+  <div class="sol" id="s22"><div class="h"><span class="no">P22</span><span class="type">선형</span><span class="t">\(xy'+2y=3\)</span></div>
+    <div class="stp"><span class="k">1 표준형</span><span class="v">\(y'+\dfrac2xy=\dfrac3x\) → \(p=\dfrac2x,\ r=\dfrac3x\)</span>
+    <span class="k">2 적분인자</span><span class="v">\(h=\int\dfrac2x=2\ln x\), \(e^{h}=x^2\)</span>
+    <span class="k">3 뭉치기</span><span class="v">\(x^2\)를 곱하면 \((x^2y)'=3x\ \Rightarrow\ x^2y=\dfrac32x^2+c\)</span></div>
+    <div class="res"><div class="k">답</div>\(y=\dfrac32+\dfrac c{x^2}\)</div></div>
+
+  <div class="sol" id="s23"><div class="h"><span class="no">P23</span><span class="type">선형 (x를 y의 함수로)</span><span class="t">\(y'=\dfrac1{x+y^2}\)</span></div>
+    <div class="stp"><span class="k">1 뒤집기</span><span class="v">\(\dfrac{dx}{dy}=x+y^2\ \Rightarrow\ \dfrac{dx}{dy}-x=y^2\) <em>— \(x(y)\)에 대한 선형, \(p=-1,\ r=y^2\)</em></span>
+    <span class="k">2 적분인자</span><span class="v">\(e^{\int-1\,dy}=e^{-y}\): \((xe^{-y})'=y^2e^{-y}\)</span>
+    <span class="k">3 적분</span><span class="v">\(xe^{-y}=-e^{-y}(y^2+2y+2)+c\) <em>— 미니표</em></span></div>
+    <div class="res"><div class="k">답</div>\(x=ce^{y}-y^2-2y-2\)</div>
+    <div class="why"><b>발상</b> \(y\)를 미지함수로 보면 아무 유형도 아니다. 이럴 땐 <b>역할을 바꿔</b> \(x\)를 \(y\)의 함수로 본다. \(dy/dx\)를 뒤집으면 \(dx/dy\).</div></div>
+
+  <div class="sol" id="s24"><div class="h"><span class="no">P24</span><span class="type">제차 선형 = 변수분리</span><span class="t">\((1+e^x)y'+e^xy=0\)</span></div>
+    <div class="stp"><span class="k">1 분리</span><span class="v">\(\dfrac{dy}y=-\dfrac{e^x}{1+e^x}dx\)</span>
+    <span class="k">2 적분</span><span class="v">\(\ln|y|=-\ln(1+e^x)+c^*\) <em>— 분자가 분모의 미분</em></span></div>
+    <div class="res"><div class="k">답</div>\(y=\dfrac{c}{1+e^x}\) &nbsp;(좌변이 \(\big((1+e^x)y\big)'\)임을 보면 한 줄)</div></div>
+
+  <div class="sol" id="s25"><div class="h"><span class="no">P25</span><span class="type">Bernoulli</span><span class="t">\(xy'+y=y^{-2}\)</span></div>
+    <div class="stp"><span class="k">1 표준형</span><span class="v">\(y'+\dfrac1xy=\dfrac1xy^{-2}\): \(a=-2\), \(u=y^{1-(-2)}=y^3\)</span>
+    <span class="k">2 치환</span><span class="v">\(u'=3y^2y'=3y^2\left(-\dfrac yx+\dfrac1{xy^2}\right)=-\dfrac{3u}x+\dfrac3x\ \Rightarrow\ u'+\dfrac3xu=\dfrac3x\)</span>
+    <span class="k">3 선형</span><span class="v">적분인자 \(x^3\): \((x^3u)'=3x^2\ \Rightarrow\ x^3u=x^3+c\)</span></div>
+    <div class="res"><div class="k">답</div>\(y^3=1+\dfrac c{x^3}\)</div></div>
+
+  <div class="sol" id="s26"><div class="h"><span class="no">P26</span><span class="type">치환형</span><span class="t">\(y'=(x+y+2)^2\)</span></div>
+    <div class="stp"><span class="k">1 치환</span><span class="v">\(u=x+y+2\ \Rightarrow\ u'=1+y'=1+u^2\)</span>
+    <span class="k">2 분리·적분</span><span class="v">\(\dfrac{du}{1+u^2}=dx\ \Rightarrow\ \arctan u=x+c\)</span></div>
+    <div class="res"><div class="k">답</div>\(y=\tan(x+c)-x-2\)</div></div>
+
+  <div class="sol" id="s27"><div class="h"><span class="no">P27</span><span class="type">치환형</span><span class="t">\(y'=1+e^{\,y-x+3}\)</span></div>
+    <div class="stp"><span class="k">1 치환</span><span class="v">\(u=y-x+3\ \Rightarrow\ u'=y'-1=e^{u}\)</span>
+    <span class="k">2 분리·적분</span><span class="v">\(e^{-u}du=dx\ \Rightarrow\ -e^{-u}=x+c\ \Rightarrow\ u=-\ln(C-x)\)</span></div>
+    <div class="res"><div class="k">답</div>\(y=x-3-\ln(C-x)\)</div>
+    <div class="why"><b>제목을 믿지 말 것</b> P26·P27은 슬라이드에 "베르누이 예제"로 묶여 있지만 실제론 치환형이다. 유형은 이름이 아니라 <b>식의 모양</b>이 정한다.</div></div>
+
+  <div class="note exam"><span class="ic">EXAM</span><div><p>중간고사 대비 최소 세트: <b>P05(동차) · P07(적분인자) · P08(선형) · P10(Bernoulli) · P23(뒤집기)</b>. 이 다섯을 풀이 없이 처음부터 끝까지 써 낼 수 있으면 이 장은 끝이다.</p></div></div>
+
+  <p class="foot">출처: 공업수학1 Chapter 1 강의자료(이기영 교수, 46p) · Kreyszig AEM 10판 1.1–1.5. 연습문제 답은 노트 작성 시 직접 풀어 검산했다.</p>
+</section>
+
+<!-- ================= PART 5 교육과정 ================= -->
+<section class="part" id="p5">
+  <header><div class="pn">Part 5 · Curriculum Map</div><h2>교육과정 지도 — 이 개념을 한국에서는 언제 배우나</h2><p>Chapter 1에 나오는 개념을 <b>처음 만나는 학년</b> 순으로 늘어놓았다. 막히는 개념이 있으면 그 줄의 학년 교재로 돌아가면 된다. 대학 항목은 고교 과정에 없으므로 처음 봐도 정상이다.</p></header>
+  <div class="mini" style="margin-top:6px"><table>
+    <thead><tr><th style="width:24%">시기</th><th>이 장에서 쓰는 개념</th><th style="width:34%">어디에 쓰이나</th></tr></thead>
+    <tbody>
+      <tr><td><b>중1</b> 수학</td><td>정비례·반비례, 방정식의 해, 함수의 뜻(독립변수·종속변수)</td><td>"변화율이 양에 비례" 모델, 해의 개념</td></tr>
+      <tr><td><b>중2</b> 수학</td><td>일차함수(선형의 어원), 연립방정식</td><td>선형/비선형 판별의 직관</td></tr>
+      <tr><td><b>중3</b> 수학</td><td>이차함수·포물선, 제곱근</td><td>투사체 궤적, Torricelli의 √h</td></tr>
+      <tr><td><b>고1</b> 수학 · 통합과학</td><td>유리식(부분분수의 바탕), 지수법칙 / 뉴턴 제2법칙, 종단속도</td><td>P16 부분분수, 낙하물 모델</td></tr>
+      <tr><td><b>고2</b> 수학Ⅰ</td><td>지수함수 eˣ, 로그, 삼각함수</td><td>모든 해에 등장하는 e^{kx}, ln</td></tr>
+      <tr><td><b>고2</b> 수학Ⅱ</td><td>도함수(다항함수), 부정적분과 <b>적분상수 C</b>, 정적분</td><td>일반해의 c, 곱의 미분법(y=ux 치환)</td></tr>
+      <tr><td><b>고3</b> 미적분</td><td>지수·로그·삼각함수의 미분, <b>치환적분·부분적분</b>, 음함수 미분, 매개변수</td><td>변수분리 뒤의 적분 전부, 양함수/음함수 형태</td></tr>
+      <tr><td><b>대학</b> 미분적분학</td><td>편미분 ∂, 전미분, 역삼각함수 arctan, 부분분수 적분</td><td>완전미분방정식, ∫dy/(1+y²)</td></tr>
+      <tr><td><b>대학</b> 공업수학 (이 장)</td><td>미분방정식, 계, 일반해·특수해·특이해, IVP, 변수분리·동차·완전·적분인자·선형·Bernoulli</td><td>Chapter 1 전체</td></tr>
+    </tbody></table></div>
+  <div class="note tip"><span class="ic">진단</span><div><p>이 장에서 막히면 원인은 대개 셋 중 하나다. ① <b>고3 미적분의 적분 기법</b>(치환·부분적분)이 손에 안 익음 ② <b>고2 수학Ⅱ의 적분상수</b> 감각이 없어 일반해·특수해가 헷갈림 ③ <b>편미분</b>을 처음 봐서 완전미분방정식이 낯섦. ①②는 고교 교재로 하루면 복구되고, ③은 "다른 변수는 상수 취급"만 기억하면 된다.</p></div></div>
+</section>
+
+</div>
+
+<style>
+/* ---- 지침: 단어 중간 줄바꿈 금지 · 텍스트 잘림 방지 ---- */
+body,p,li,td,th,dd,dt,span,div,summary{word-break:keep-all;overflow-wrap:anywhere}
+h1,h2,h3,h4{word-break:keep-all;overflow-wrap:normal}
+th,td{white-space:normal}
+/* ---- 용어 사전 (클릭 팝업) ---- */
+.term{all:unset;cursor:pointer;color:inherit;border-bottom:1.5px dotted var(--acc);padding-bottom:1px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.term:hover{background:var(--acc-soft)}
+.term:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:3px}
+.gl-scrim{position:fixed;inset:0;background:rgba(0,0,0,.28);z-index:60;display:none}
+.gl-scrim.on{display:block}
+.gl-pop{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);width:min(560px,calc(100vw - 24px));z-index:61;
+  background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.22);
+  padding:16px 18px 14px;display:none;font-family:var(--font-body);line-height:1.7}
+.gl-pop.on{display:block}
+.gl-pop .gh{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px;padding-right:32px}
+.gl-pop .gt{font-weight:700;font-size:18px}
+.gl-pop .ge{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-3)}
+.gl-pop .gc{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.gl-pop .gc.hs{background:var(--ok-soft);color:var(--ok-ink)}
+.gl-pop .gc.uni{background:var(--acc-soft);color:var(--acc-ink)}
+.gl-pop .gd{font-size:15px;color:var(--ink-2);margin:0}
+.gl-pop .gd b{color:var(--ink)}
+.gl-pop .gr{margin-top:8px;font-size:13px;color:var(--ink-3)}
+.gl-pop .gr button{all:unset;cursor:pointer;color:var(--acc-ink);border-bottom:1px dotted var(--acc);margin-right:10px}
+.gl-pop .gx{position:absolute;right:10px;top:8px;all:unset;cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:8px;color:var(--ink-3);font-size:16px;position:absolute}
+.gl-pop .gx:hover{background:var(--ans)}
+.gl-help{font-size:13px;color:var(--ink-3);margin:6px 0 0}
+.gl-help .term{font-size:13px}
+@media print{.term{border-bottom:0}.gl-scrim,.gl-pop{display:none !important}}
+</style>
+<script>
+/* 용어 사전 — 본문 용어를 클릭하면 뜻·영어·교육과정 시기가 뜬다. cur: 한국 교육과정에서 처음 만나는 시기 */
+window.GLOSSARY = {
+  "미분방정식":{en:"differential equation",cur:"대학",def:"도함수(y′, y″ …)가 들어 있는 방정식. 답이 숫자가 아니라 <b>함수</b>다. 고교에서는 다루지 않고 대학 1학년 미적분 이후에 처음 만난다.",rel:["도함수","상미분방정식","해"]},
+  "상미분방정식":{en:"ordinary differential equation, ODE",cur:"대학",def:"독립변수가 <b>하나</b>(x 또는 t)뿐인 미분방정식. 이 과목 1~14주는 전부 ODE.",rel:["편미분방정식","독립변수"]},
+  "편미분방정식":{en:"partial differential equation, PDE",cur:"대학",def:"독립변수가 둘 이상이고 편미분 기호 ∂가 들어가는 미분방정식. 12장에서 다룬다.",rel:["편미분"]},
+  "도함수":{en:"derivative",cur:"고2 수학Ⅱ · 고3 미적분",def:"함수의 순간 변화율. 다항함수의 미분은 고2 수학Ⅱ, 지수·로그·삼각함수의 미분은 고3 미적분에서 배운다.",rel:["미분방정식"]},
+  "독립변수":{en:"independent variable",cur:"중1 · 중2 함수",def:"내가 정하는 쪽의 변수(x 또는 시간 t). 함수 y=f(x)에서 x. 중1 '정비례·반비례', 중2 '일차함수'에서 처음 나온다.",rel:["종속변수"]},
+  "종속변수":{en:"dependent variable",cur:"중1 · 중2 함수",def:"독립변수에 따라 정해지는 변수(y, 온도 T, 속도 v). 미분방정식에서 우리가 찾는 미지의 함수.",rel:["독립변수"]},
+  "계":{en:"order",cur:"대학",def:"식에 나오는 도함수 중 <b>가장 많이 미분한 횟수</b>. y‴이면 3계. (y′)³은 세제곱일 뿐이라 1계.",rel:["도함수"]},
+  "선형":{en:"linear",cur:"중2 일차함수 (개념) · 대학",def:"y와 그 도함수들에 대해 <b>일차식</b>인 것. 조건 두 개: ① y, y′, y″의 거듭제곱이 1 ② 계수는 x만의 함수. 중2 일차함수의 '일차'가 같은 뜻.",rel:["비선형","제차"]},
+  "비선형":{en:"nonlinear",cur:"대학",def:"선형 조건을 하나라도 어긴 것. y², sin y, (y′)³, 계수에 y가 들어간 경우. 대부분 일반 공식이 없다.",rel:["선형"]},
+  "양함수":{en:"explicit form",cur:"고1 수학 (함수) · 고3 미적분(음함수 미분)",def:"y′=f(x,y)처럼 y′에 대해 <b>풀어 놓은</b> 꼴. y=x² 같은 보통 함수 표기.",rel:["음함수"]},
+  "음함수":{en:"implicit form",cur:"고3 미적분",def:"F(x,y,y′)=0처럼 전부 한쪽으로 몰아 =0으로 둔 꼴. x²−y=0. 고3 미적분 '음함수의 미분법'에서 처음 만난다.",rel:["양함수"]},
+  "해":{en:"solution",cur:"중1 방정식 (개념) · 대학",def:"방정식에 넣으면 등식이 성립하는 것. 중1의 해는 숫자, 미분방정식의 해는 <b>함수</b>.",rel:["일반해","특수해"]},
+  "일반해":{en:"general solution",cur:"대학",def:"임의의 상수 c를 포함한 해의 모임. 적분할 때 생기는 적분상수 때문에 항상 c가 하나 붙는다.",rel:["적분상수","특수해"]},
+  "특수해":{en:"particular solution",cur:"대학",def:"초기조건 등으로 상수 c가 하나로 정해진 해. 일반해 중 하나.",rel:["일반해","초기조건"]},
+  "특이해":{en:"singular solution",cur:"대학",def:"일반해에 어떤 c를 넣어도 안 나오는 별도의 해. 예: (y′)²−xy′+y=0에서 y=x²/4.",rel:["일반해"]},
+  "적분상수":{en:"constant of integration",cur:"고2 수학Ⅱ (부정적분)",def:"∫2x dx = x²+C의 그 C. 미분하면 사라지므로 적분 결과에는 항상 임의의 상수가 붙는다.",rel:["일반해"]},
+  "초기조건":{en:"initial condition",cur:"대학 (고1 물리 '초기속도' 개념)",def:"y(x₀)=y₀처럼 '시작할 때 값이 이랬다'는 정보. 이것으로 일반해의 c가 정해진다.",rel:["초기값 문제"]},
+  "초기값 문제":{en:"initial value problem, IVP",cur:"대학",def:"미분방정식 + 초기조건. 일반해를 구한 뒤 조건을 대입해 특수해를 얻는 문제.",rel:["초기조건","특수해"]},
+  "모델화":{en:"modeling",cur:"대학 (중1 '함수로 상황 표현'이 원형)",def:"현실 상황을 수학 식으로 옮기는 일. 3단계: ① 상황→미분방정식 ② 풀기 ③ 결과를 물리적으로 해석.",rel:["미분방정식"]},
+  "변수분리":{en:"separation of variables",cur:"대학",def:"y는 왼쪽, x는 오른쪽으로 갈라 g(y)dy=f(x)dx로 만든 뒤 양변을 각각 적분하는 방법. 가장 기본 해법.",rel:["치환적분"]},
+  "변수분리형":{en:"separable equation",cur:"대학",def:"변수분리가 가능한 꼴의 미분방정식. y′=f(x)g(y).",rel:["변수분리"]},
+  "치환적분":{en:"integration by substitution",cur:"고3 미적분",def:"u=g(x)로 바꿔 적분하는 기법. 변수분리 뒤의 적분에서 자주 쓴다.",rel:["부분적분"]},
+  "부분적분":{en:"integration by parts",cur:"고3 미적분",def:"∫u v′ = uv − ∫u′v. x sin x, y eʸ 같은 곱의 적분에 쓴다.",rel:["치환적분"]},
+  "부분분수":{en:"partial fractions",cur:"고1 수학 (유리식) · 대학",def:"1/((y−1)(y+1)) = ½(1/(y−1) − 1/(y+1))처럼 분수를 쪼개는 것. 유리식 자체는 고1, 적분에 쓰는 것은 대학.",rel:["변수분리"]},
+  "동차":{en:"homogeneous (function)",cur:"대학",def:"모든 항의 차수가 같은 함수. x²+y²는 동차, x²+y²+4는 아님. 동차 미분방정식은 y=ux 치환으로 변수분리형이 된다. 1.5의 '제차'와 다른 개념.",rel:["제차"]},
+  "동차함수":{en:"homogeneous function",cur:"대학",def:"f(tx,ty)=tᵏf(x,y)인 함수. 실전에서는 '모든 항의 차수가 같은가'로 본다.",rel:["동차"]},
+  "편미분":{en:"partial derivative",cur:"대학 (미분적분학2)",def:"두 변수 함수 u(x,y)를 한 변수로만 미분하는 것(다른 변수는 상수 취급). ∂u/∂x. 계산 자체는 고교 미분과 같다.",rel:["전미분"]},
+  "전미분":{en:"total differential",cur:"대학",def:"du = (∂u/∂x)dx + (∂u/∂y)dy. 두 변수가 조금씩 변할 때 u의 변화량.",rel:["편미분","완전미분방정식"]},
+  "완전미분방정식":{en:"exact differential equation",cur:"대학",def:"M dx + N dy = 0의 좌변이 어떤 u(x,y)의 전미분과 같은 식. 판별은 M_y = N_x. 해는 u(x,y)=c.",rel:["전미분","적분인자"]},
+  "적분인자":{en:"integrating factor",cur:"대학",def:"완전하지 않은 식에 곱해서 완전하게 만드는 함수 F. x만의 함수 또는 y만의 함수인 경우만 노린다. 선형 ODE의 e^∫p dx도 적분인자.",rel:["완전미분방정식"]},
+  "제차":{en:"homogeneous (linear ODE)",cur:"대학",def:"선형 ODE y′+p(x)y=r(x)에서 r(x)=0인 경우. '외부 입력이 없다'는 뜻. 1.3의 '동차'와 한자·영어가 비슷하지만 다른 개념.",rel:["비제차","동차"]},
+  "비제차":{en:"nonhomogeneous",cur:"대학",def:"r(x)≠0인 선형 ODE. r(x)는 힘·전압 같은 외부 입력.",rel:["제차"]},
+  "표준형":{en:"standard form",cur:"대학",def:"y′의 계수가 1이 되도록 나눈 꼴 y′+p(x)y=r(x). 공식을 쓰기 전에 반드시 이 꼴로 만든다.",rel:["선형"]},
+  "Bernoulli 방정식":{en:"Bernoulli equation",cur:"대학",def:"y′+p(x)y=g(x)yᵃ. u=y^(1−a) 치환으로 선형이 된다.",rel:["선형","로지스틱"]},
+  "로지스틱":{en:"logistic equation",cur:"대학 (고1 생명과학 '개체군 성장' 개념)",def:"y′=Ay−By². 처음엔 지수 성장, 나중엔 A/B에서 포화하는 S자 곡선. Bernoulli 방정식의 대표 예.",rel:["Bernoulli 방정식"]},
+  "지수함수":{en:"exponential function",cur:"고2 수학Ⅰ · 미분은 고3 미적분",def:"e^x. 미분해도 자기 자신이라 '변화율 ∝ 자기 자신'인 모든 현상(냉각·붕괴·성장)의 해가 된다.",rel:["자연로그"]},
+  "자연로그":{en:"natural logarithm, ln",cur:"고2 수학Ⅰ(로그) · 고3 미적분(ln)",def:"밑이 e인 로그. ∫dy/y = ln|y| 때문에 미분방정식 풀이에 항상 나온다.",rel:["지수함수"]},
+  "arctan":{en:"arctangent, 역탄젠트",cur:"대학 (고교 과정에 없음)",def:"tan의 역함수. ∫dy/(1+y²) = arctan y. 고교에서는 배우지 않으니 처음 봐도 정상.",rel:["치환적분"]},
+  "종단속도":{en:"terminal velocity",cur:"고1 통합과학 · 물리학Ⅰ",def:"공기저항과 중력이 같아져 더 이상 빨라지지 않는 속도 mg/k.",rel:["모델화"]},
+  "비례":{en:"proportional",cur:"중1 정비례",def:"한쪽이 2배가 되면 다른 쪽도 2배. '변화율이 현재 양에 비례' = y′=ky.",rel:["지수함수"]},
+  "포물선":{en:"parabola",cur:"중3 이차함수 · 고1 기하",def:"y=ax²+bx+c의 그래프. 공기저항 없는 투사체 궤적.",rel:["모델화"]},
+  "뉴턴 제2법칙":{en:"Newton's second law",cur:"고1 물리학Ⅰ",def:"F=ma. 힘의 합이 가속도(속도의 도함수)를 정하므로 운동 문제는 자동으로 미분방정식이 된다.",rel:["모델화"]},
+  "Euler-Cauchy":{en:"Euler–Cauchy equation",cur:"대학 (5주차)",def:"x²y″+axy′+by=0 꼴. 계수가 x의 거듭제곱인 2계 선형 ODE. 5주차에 배운다.",rel:["선형"]},
+  "Wronskian":{en:"Wronskian",cur:"대학 (5주차)",def:"두 해가 서로 독립인지 판정하는 행렬식. 5주차.",rel:["선형"]},
+  "Laplace 변환":{en:"Laplace transform",cur:"대학 (12~14주차)",def:"미분방정식을 대수방정식으로 바꿔 푸는 도구. 12~14주차.",rel:["미분방정식"]}
+};
+(function(){
+  var G=window.GLOSSARY, keys=Object.keys(G).sort(function(a,b){return b.length-a.length;});
+  var esc=function(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');};
+  var re=new RegExp('('+keys.map(esc).join('|')+')','g');
+  var SKIP={SCRIPT:1,STYLE:1,BUTTON:1,A:1,TEXTAREA:1,SUMMARY:0,H1:1};
+  function wrapIn(root){
+    var seen={}; /* 섹션 안에서 같은 용어는 첫 등장만 표시 */
+    var walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:function(n){
+      var p=n.parentNode; if(!p) return NodeFilter.FILTER_REJECT;
+      for(var e=p;e&&e!==root;e=e.parentNode){
+        if(SKIP[e.tagName]||e.classList&&(e.classList.contains('term')||e.classList.contains('gl-pop')||e.classList.contains('eyebrow')||e.classList.contains('toc')||e.classList.contains('seg'))) return NodeFilter.FILTER_REJECT;
+        if(e.tagName&&e.tagName.toLowerCase().indexOf('mjx')===0) return NodeFilter.FILTER_REJECT;
+      }
+      return re.test(n.nodeValue)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_SKIP;
+    }});
+    var nodes=[]; while(walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(function(n){
+      var txt=n.nodeValue, parts=txt.split(re); if(parts.length<2) return;
+      var frag=document.createDocumentFragment();
+      parts.forEach(function(part,i){
+        if(i%2===1 && G[part] && !seen[part]){
+          seen[part]=1;
+          var b=document.createElement('button'); b.type='button'; b.className='term'; b.textContent=part;
+          b.setAttribute('data-term',part); b.setAttribute('aria-label',part+' 뜻 보기'); frag.appendChild(b);
+        } else if(part) frag.appendChild(document.createTextNode(part));
+      });
+      n.parentNode.replaceChild(frag,n);
+    });
+  }
+  function build(){
+    var scrim=document.createElement('div'); scrim.className='gl-scrim';
+    var pop=document.createElement('div'); pop.className='gl-pop'; pop.setAttribute('role','dialog'); pop.setAttribute('aria-modal','true');
+    document.body.appendChild(scrim); document.body.appendChild(pop);
+    function close(){ scrim.classList.remove('on'); pop.classList.remove('on'); }
+    function open(term){
+      var g=G[term]; if(!g) return;
+      var uni=/^대학/.test(g.cur);
+      pop.innerHTML='<button class="gx" aria-label="닫기">✕</button>'+
+        '<div class="gh"><span class="gt">'+term+'</span><span class="ge">'+g.en+'</span>'+
+        '<span class="gc '+(uni?'uni':'hs')+'">'+(uni?'':'교육과정 · ')+g.cur+'</span></div>'+
+        '<p class="gd">'+g.def+'</p>'+
+        (g.rel&&g.rel.length?'<div class="gr">관련: '+g.rel.filter(function(r){return G[r];}).map(function(r){return '<button type="button" data-term="'+r+'">'+r+'</button>';}).join('')+'</div>':'');
+      pop.querySelector('.gx').onclick=close;
+      Array.prototype.forEach.call(pop.querySelectorAll('.gr button'),function(b){ b.onclick=function(){ open(b.getAttribute('data-term')); }; });
+      scrim.classList.add('on'); pop.classList.add('on');
+    }
+    scrim.onclick=close;
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+    document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('.term'); if(t){ e.preventDefault(); open(t.getAttribute('data-term')); } });
+  }
+  function run(){
+    build();
+    var roots=document.querySelectorAll('section, main > section, .head .lede, .cover');
+    if(!roots.length) roots=[document.body];
+    Array.prototype.forEach.call(roots,wrapIn);
+    var h=document.querySelector('.head');
+    if(h){ var help=document.createElement('p'); help.className='gl-help'; help.innerHTML='점선 밑줄이 있는 <button type="button" class="term" data-term="미분방정식">용어</button>를 누르면 뜻과 한국 교육과정에서 처음 배우는 시기가 뜹니다. 모르는 단어인지 스스로 확인하는 용도.'; h.appendChild(help); }
+  }
+  function start(){
+    if(window.MathJax&&MathJax.startup&&MathJax.startup.promise) MathJax.startup.promise.then(run,run);
+    else run();
+  }
+  if(document.readyState==='complete') setTimeout(start,50); else window.addEventListener('load',function(){ setTimeout(start,50); });
+})();
+</script>
+
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+(function(){
+  var links=Array.prototype.slice.call(document.querySelectorAll('.seg a'));
+  var parts=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+  function upd(){
+    var y=window.scrollY+120, idx=0;
+    parts.forEach(function(p,i){ if(p&&p.offsetTop<=y) idx=i; });
+    links.forEach(function(a,i){ a.classList.toggle('on',i===idx); });
+  }
+  window.addEventListener('scroll',upd,{passive:true}); window.addEventListener('load',upd);
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>

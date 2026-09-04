@@ -1,0 +1,155 @@
+<title>미적분학2 · 9/3 행렬 연산과 행렬식</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F5F7F6;--paper:#FFFFFF;--ink:#1B2430;--ink-2:#3F4C5A;--ink-3:#6E7B88;--line:#DCE2E6;--line-2:#C5CED5;
+  --acc:#4E5FB5;--acc-soft:#E8EAF7;--acc-ink:#36418C;--warn:#B9791A;--warn-soft:#FBF1DD;--warn-ink:#7A4E0B;
+  --ok:#3D7A4E;--ok-soft:#E5F1E7;--ok-ink:#2B5A39;--crit:#B2483F;--crit-soft:#F8E6E3;--crit-ink:#7E2F28;--ans:#F0F3F5;
+  --font-display:"Gowun Batang","Noto Serif KR",Georgia,serif;--font-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;--font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#121820;--paper:#1A222C;--ink:#E6EAF0;--ink-2:#BCC6D1;--ink-3:#8593A2;--line:#2A3542;--line-2:#3A4756;--acc:#8B9BE8;--acc-soft:#1E2542;--acc-ink:#B7C2F5;--warn:#D9A34A;--warn-soft:#332816;--warn-ink:#F0C87E;--ok:#7FBF8F;--ok-soft:#1B2E21;--ok-ink:#A9DDB5;--crit:#E07C72;--crit-soft:#34201E;--crit-ink:#F1B0A9;--ans:#202A35;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121820;--paper:#1A222C;--ink:#E6EAF0;--ink-2:#BCC6D1;--ink-3:#8593A2;--line:#2A3542;--line-2:#3A4756;--acc:#8B9BE8;--acc-soft:#1E2542;--acc-ink:#B7C2F5;--warn:#D9A34A;--warn-soft:#332816;--warn-ink:#F0C87E;--ok:#7FBF8F;--ok-soft:#1B2E21;--ok-ink:#A9DDB5;--crit:#E07C72;--crit-soft:#34201E;--crit-ink:#F1B0A9;--ans:#202A35;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere}
+mjx-container{color:inherit} mjx-container[display="true"]{margin:.5em 0 !important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.wrap{max-width:740px;margin:0 auto;padding:0 20px 90px}
+.head{padding:44px 0 22px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.eyebrow b{color:var(--acc);font-weight:500}
+.eyebrow .rec{background:var(--ok-soft);color:var(--ok-ink);border-radius:5px;padding:1px 8px;text-transform:none;letter-spacing:.04em}
+h1{font-family:var(--font-display);font-weight:700;font-size:clamp(28px,4.4vw,40px);line-height:1.22;margin:12px 0 10px;letter-spacing:-.01em;text-wrap:balance}
+.lede{font-size:16.5px;color:var(--ink-2);margin:0}
+section{padding:34px 0 6px} section+section{border-top:1px solid var(--line)}
+h2{font-family:var(--font-display);font-weight:700;font-size:25px;line-height:1.3;margin:0 0 8px;letter-spacing:-.005em;text-wrap:balance}
+h2 .no{font-family:var(--font-mono);font-weight:500;font-size:12px;color:var(--acc);letter-spacing:.1em;display:block;margin-bottom:6px}
+h3{font-size:17.5px;font-weight:700;margin:26px 0 8px}
+p{margin:0 0 12px} ul,ol{margin:0 0 12px;padding-left:22px} li{margin:4px 0}
+.tw{overflow-x:auto;margin:12px 0 16px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:540px;font-size:14.5px}
+th,td{padding:9px 14px;text-align:left;vertical-align:top;border-top:1px solid var(--line)}
+thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3);font-weight:500;background:var(--ans)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0 14px}
+.card .t{font-weight:700;margin-bottom:4px} .card p:last-child{margin-bottom:0}
+.card .say{font-size:15px;color:var(--ink-2);background:var(--ans);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:8px 12px;margin:8px 0 0}
+.card .say b{color:var(--acc-ink)}
+.ts{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-left:6px}
+.ev{display:inline-block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;border-radius:5px;padding:1px 7px;vertical-align:middle;margin-left:6px;white-space:nowrap}
+.ev.r{background:var(--ok-soft);color:var(--ok-ink)} .ev.q{background:var(--warn-soft);color:var(--warn-ink)} .ev.x{background:var(--crit-soft);color:var(--crit-ink)}
+.note{border-radius:10px;padding:12px 16px;margin:14px 0 18px;font-size:15px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.note .ic{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;padding:2px 7px;border-radius:5px;margin-top:3px;white-space:nowrap;color:#fff}
+.note.exam{background:var(--warn-soft);color:var(--warn-ink)} .note.exam .ic{background:var(--warn)}
+.note.tip{background:var(--acc-soft);color:var(--acc-ink)} .note.tip .ic{background:var(--acc)}
+.note.todo{background:var(--crit-soft);color:var(--crit-ink)} .note.todo .ic{background:var(--crit)}
+.note p{margin:0 0 6px}.note p:last-child{margin:0}
+.hs{display:inline-block;font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;background:var(--ok-soft);color:var(--ok-ink);border-radius:5px;padding:1px 7px;margin-left:4px;vertical-align:middle}
+.log{font-size:14px;color:var(--ink-2)} .log b{font-family:var(--font-mono);font-weight:500;color:var(--ink-3);margin-right:8px}
+.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+@media print{body{background:#fff}.card,.tw,.note{break-inside:avoid}@page{size:A4;margin:14mm 12mm}}
+
+.wrap{padding-bottom:60px}
+</style>
+<div class="wrap">
+<header class="head">
+  <div class="eyebrow"><b>미분적분학2 · 홍순필 교수</b><span>1주차 · 9/3(목) 2일차</span><span class="rec">녹음 62분 26초 정리</span></div>
+  <h1>행렬의 연산과 행렬식 — 시험은 여기서부터 나온다</h1>
+  <p class="lede">9/1의 "행렬의 정의와 종류"에 이어 <b>기본 연산(덧셈·실수배·곱셈·거듭제곱)</b>과 <b>행렬식(2차 ad−bc, 3차 사루스 법칙)</b>을 다뤘다. 교수님이 직접 "시험 문제는 행렬식부터 나온다"고 했으므로 이 노트의 후반부가 중간고사의 출발점이다.</p>
+</header>
+
+<section>
+  <h2><span class="no">1 · CLASS</span>수업 내용 정리</h2>
+
+  <h3>복습 — 왜 행렬인가 <span class="ts">00:00</span></h3>
+  <p>연립일차방정식을 풀기 위한 도구. 계수를 직사각형 배열에 넣고 <b>행(row)·열(column)</b>로 해석한다. \(n\times n\)이면 \(n\)차 정사각행렬. 예전엔 4차까지 시험에 냈지만 <b>손으로 푸는 건 3차까지</b>, 그 이상은 컴퓨터의 몫.</p>
+
+  <h3>특수한 행렬 <span class="ts">01:06</span></h3>
+  <div class="tw"><table><thead><tr><th>이름</th><th>정의</th><th>비유</th></tr></thead><tbody>
+    <tr><td>단위행렬 \(I_n\)</td><td>대각(행=열) 1, 나머지 0. \(I_2=\begin{bmatrix}1&0\\0&1\end{bmatrix},\ I_3=\begin{bmatrix}1&0&0\\0&1&0\\0&0&1\end{bmatrix}\)</td><td>숫자 <b>1</b></td></tr>
+    <tr><td>영행렬 \(O\)</td><td>모든 성분 0</td><td>숫자 <b>0</b></td></tr>
+    <tr><td>전치행렬 \(A^T\)</td><td>행과 열을 바꾼 것</td><td>뒤집기</td></tr>
+    <tr><td>대칭행렬</td><td>\(A^T=A\). <b>정사각행렬에서만</b> 의미 있음</td><td>거울</td></tr>
+  </tbody></table></div>
+
+  <h3>기본 연산 — 되는 것과 안 되는 것 <span class="ts">02:17</span></h3>
+  <ul>
+    <li><b>덧셈·뺄셈·실수배·곱셈</b>은 된다. <b>나눗셈은 없다</b>(닫혀 있지 않다).</li>
+    <li><b>상등</b> \(A=B\): 모든 성분 \(a_{ij}=b_{ij}\).</li>
+    <li><b>덧셈·뺄셈</b>: 두 행렬이 <b>같은 꼴(\(m\times n\))</b>일 때만, 같은 자리 성분끼리.</li>
+    <li><b>실수배</b> \(kA\): 모든 성분에 \(k\)를 곱한다.</li>
+  </ul>
+
+  <h3>곱셈 — 앞의 열 수 = 뒤의 행 수 <span class="ts">06:15</span></h3>
+  <p>\(A\)가 \(m\times n\), \(B\)가 \(n\times r\)이어야 \(AB\)가 정의되고 결과는 \(m\times r\). 가운데 \(n\)이 소거된다. 그래서 <b>\(AB\ne BA\)</b>가 보통이다(아예 정의가 안 되기도 한다). \(n\)차 정사각행렬끼리는 항상 곱할 수 있다.</p>
+  <p>\[c_{ij}=\sum_{k=1}^{n}a_{ik}\,b_{kj}=a_{i1}b_{1j}+a_{i2}b_{2j}+\cdots+a_{in}b_{nj}\]</p>
+  <p>앞 행렬의 <b>\(i\)행</b>과 뒤 행렬의 <b>\(j\)열</b>을 짝지어 곱해 더한다. <span class="hs">고교 연결</span> 교수님은 교재의 인덱스 \(r\) 대신 <b>\(\Sigma\)의 인덱스를 \(k\)로 통일</b>한다 — 고교 수열 표기와 맞추기 위해서.</p>
+  <div class="card"><div class="t">시연 예제</div>
+    <p>\(A=\begin{bmatrix}1&2\\3&4\end{bmatrix},\ B=\begin{bmatrix}0&1\\2&0\end{bmatrix}\) → \(AB=\begin{bmatrix}1\cdot0+2\cdot2 & 1\cdot1+2\cdot0\\ 3\cdot0+4\cdot2 & 3\cdot1+4\cdot0\end{bmatrix}=\begin{bmatrix}4&1\\8&3\end{bmatrix}\)</p>
+    <div class="say"><b>17:08</b> "저도 계산하다 잘못할 수 있어요. 머릿속에서 안 되면 <b>써 놔야 돼</b>." — 곱셈은 암산하지 말고 성분별로 적어 가며 계산.</div></div>
+
+  <h3>거듭제곱 <span class="ts">18:35</span></h3>
+  <p>\(A^n=AA\cdots A\)(\(n\)개). \(A^rA^s=A^{r+s}\), \((A^r)^s=A^{rs}\) (\(r,s\)는 양의 정수). <b>행렬 곱에 \(\times\) 기호를 쓰지 말 것</b> — 나중에 다른 연산(외적)의 의미로 쓰이므로 점을 찍거나 나란히 쓴다. 고교 과정에 행렬이 작년부터 다시 들어왔다.</p>
+
+  <h3>예제 2 — 다섯 문항 <span class="ts">22:25</span></h3>
+  <div class="tw"><table><thead><tr><th>문항</th><th>내용</th><th>결과 · 교수 코멘트</th></tr></thead><tbody>
+    <tr><td>(1)</td><td>\(A+B\), \(A=\begin{bmatrix}3&2&6\\3&5&4\end{bmatrix},\ B=\begin{bmatrix}2&4&0\\3&0&2\end{bmatrix}\) <span class="ev q">수치 일부 추정</span></td><td>같은 자리끼리. "1번, 2번은 너무 심플. <b>시험에 안 나온다</b>."</td></tr>
+    <tr><td>(2)</td><td>\(kA\), \(k=4\)</td><td>성분마다 4배</td></tr>
+    <tr><td>(3)</td><td>\(A-2B\)</td><td>"수능 2점짜리." 부호는 그대로 두고 숫자 2만 \(B\)에 곱해서 빼는 방식을 권장</td></tr>
+    <tr><td>(4)</td><td>\(A\)(3×2)와 \(B\)(3×2)의 곱 → 그대로는 불가. \(B^T\)(2×3)를 취해 \(AB^T\) = 3×3</td><td>\(\begin{bmatrix}14&6&4\\24&9&6\\26&12&8\end{bmatrix}\) — <b>꼴이 안 맞으면 전치로 맞춘다</b></td></tr>
+    <tr><td>(5)</td><td>3차 행렬 \(A\)의 거듭제곱 \(A^2\)</td><td>0이 하나도 없는 \(A\)인데 \(A^2=O\). "<b>영행렬이 아닌 둘을 곱해도 영행렬</b>이 나올 수 있다" — 수능 2~3점 유형</td></tr>
+  </tbody></table></div>
+
+  <h3>행렬식(determinant) — 오늘의 키 포인트 <span class="ts">30:54</span></h3>
+  <div class="card"><div class="t">행렬식은 행렬이 아니라 <b>값</b>이다</div>
+    <p>표기 \(\det A\) 또는 \(|A|\). <b>\(|A|\)는 절댓값이 아니다.</b> 헷갈리니 <b>\(\det A\)</b>를 쓰라고 권장. 결과는 숫자 또는 문자식.</p>
+    <p>출발점은 연립방정식 \(\begin{cases}a_{11}x+a_{12}y=b_1\\a_{21}x+a_{22}y=b_2\end{cases}\) → \(AX=B\) 꼴. 계수행렬 \(A\)의 행렬식이 해의 존재를 결정한다(다음 시간에 연결).</p>
+    <div class="say"><b>32:00</b> "오늘 배운 거 오늘 바로 하면, <b>중간고사에 관련된 문제 두세 문제를 낼 예정</b>인데 이 행렬식을 가지고 문제 나오는 파트가 있다. <b>시험 문제는 여기서부터</b> 하나씩 나온다."</div></div>
+
+  <div class="card"><div class="t">2차: \(\det\begin{bmatrix}a&b\\c&d\end{bmatrix}=ad-bc\)</div>
+    <p>왼쪽 위→오른쪽 아래 곱에서 반대 대각 곱을 뺀다. <span class="hs">고교 연결</span> 고1 유리함수 \(y=\dfrac{ax+b}{cx+d}\)의 역함수에서 보던 \(ad-bc\)와 같은 것. 사실은 3차 행렬식 규칙의 특수한 경우인데, 2차는 그냥 공식처럼 쓴다.</p></div>
+
+  <div class="card"><div class="t">3차: 사루스(Sarrus) 법칙</div>
+    <p>\[\det A=\underbrace{a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32}}_{\text{+ 대각 방향 3개}}\;-\;\underbrace{\big(a_{13}a_{22}a_{31}+a_{12}a_{21}a_{33}+a_{11}a_{23}a_{32}\big)}_{\text{− 반대 대각 3개}}\]</p>
+    <p>"그림 모양이 중요한 게 아니라 <b>3개씩 곱한다</b>는 것. 왜 그렇게 되냐가 아니라 <b>정의</b>다. 갖다 쓰면 된다." 세로줄 \(|\ |\)과 \(\det\) 표기는 <b>반드시 쓴다</b> — "당연히 알겠지 하고 안 쓰면 <b>감점</b>."</p>
+    <div class="say"><b>44:43</b> "중간고사 내용, 결과입니다. 이렇게 써야 돼."</div></div>
+
+  <h3>예제 3 · 4 <span class="ts">51:25</span></h3>
+  <div class="card"><div class="t">예제 3 — \(\det A=0\)을 만족하는 \(x\)</div>
+    <p>2차 행렬 \(A\)(성분에 \(x\) 포함)에서 \(ad-bc=x^2-5x+6=(x-2)(x-3)=0\) → \(x=2\) 또는 \(3\). "실제 시험에서는 답이 <b>하나만</b> 나오게 낸다." 행렬식 → 2차방정식 → 인수분해 흐름. 답 표기는 sol 또는 \(\therefore\).</p></div>
+  <div class="card"><div class="t">예제 4 — 3차 행렬식 계산</div>
+    <p>\(B=\begin{bmatrix}2&1&3\\4&2&1\\6&-3&4\end{bmatrix}\)</p>
+    <p>+ 방향: \(2\cdot2\cdot4=16,\ 1\cdot1\cdot6=6,\ 3\cdot4\cdot(-3)=-36\) → 합 \(-14\)<br>− 방향: \(3\cdot2\cdot6=36,\ 1\cdot4\cdot4=16,\ 2\cdot1\cdot(-3)=-6\) → 합 \(46\)<br>\(\det B=-14-46=\mathbf{-60}\) (노트 작성 시 재계산으로 확인)</p>
+    <p>"세 개를 다 계산해서 <b>조그맣게 써 놓으면</b> 돼요." 부호가 섞이므로 +를 미리 쓰지 말고 각 곱을 따로 적은 뒤 합산.</p></div>
+
+  <h3>다음 시간 예고 <span class="ts">58:40</span></h3>
+  <p>성분이 크거나 문자면 사루스가 복잡하다. 계산기는 못 쓴다. 그래서 3차를 2차 행렬식으로 쪼개는 <b>소행렬식(minor)·여인수(cofactor)</b>를 다음 주 화요일(9/8)에 한다. 행렬식의 성질을 이용한 계산은 올해부터 뺐다. <b>여인수 전개는 중간고사 범위.</b></p>
+  <div class="note todo"><span class="ic">TODO</span><div><p><b>주말에 강의자료실</b>에 행렬·행렬식 연습문제(답안 포함)가 올라온다. 제출은 아니지만 <b>화요일 수업 전까지 풀어올 것.</b> 이 문제들이 사실상 출제 풀이다.</p></div></div>
+</section>
+
+<section>
+  <h2><span class="no">2 · PROFESSOR</span>홍순필 교수 — 풀이 스타일 · 출제 방식 분석 v0.1</h2>
+  <p>근거: 9/1 녹음 35분, 9/3 녹음 62분, 학습지 Lecture 2-1. <span class="ev r">녹음</span> 직접 발언 &nbsp;<span class="ev q">추정</span> 발언에서 유추 &nbsp;<span class="ev x">미확인</span></p>
+
+  <h3>풀이 스타일</h3>
+  <div class="tw"><table><thead><tr><th>관찰</th><th>내용</th><th>근거</th></tr></thead><tbody>
+    <tr><td>고교 과정과 연결</td><td>\(\Sigma\) 인덱스 \(k\) 통일, \(ad-bc\)를 고1 유리함수와 연결, "수능 2점·3점짜리" 언급, "작년부터 고교에 행렬 재도입"</td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>정의 → 짧은 예 → 칠판 계산 시연</td><td>모든 개념을 2×2 예로 즉시 계산해 보임. 3×3은 성분별로 소리 내어 계산</td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>표기에 엄격</td><td>\(\det A\)와 세로줄 필수(누락 감점), \(|A|\)는 절댓값 아님, 행렬 곱에 \(\times\) 금지, 행렬은 대문자·성분은 소문자</td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>"암기하지 말고 구조로"</td><td>사루스는 그림이 아니라 "3개씩 곱한다"로 이해. 단, 3차 행렬식 자체는 "머릿속에 암기해야" 한다고도 함</td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>계산 실수를 인정하고 검산</td><td>"나도 틀릴 수 있어요" → 부분 계산을 작게 적고 합산하는 습관을 가르침</td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>범위를 명시적으로 자름</td><td>4차 이상 안 함, 행렬식의 성질 이용 계산은 올해 제외, 곱셈 교환 관련 내용 제외</td><td><span class="ev r">녹음</span></td></tr>
+  </tbody></table></div>
+
+  <h3>출제 방식</h3>
+  <div class="tw"><table><thead><tr><th>항목</th><th>내용</th><th>근거</th></tr></thead><tbody>
+    <tr><td>시작점</td><td>"시험 문제는 <b>행렬식부터</b> 나온다." 덧셈·실수배는 안 나옴</td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>중간고사 비중</td><td>행렬식 관련 <b>2~3문제</b> 예정</td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>예상 유형</td><td>① \(\det A=0\)인 \(x\) 구하기(답 하나로 설계) ② 3차 행렬식 수치 계산(사루스) ③ 문자·큰 수 포함 3차 → 여인수 전개 ④ 연립방정식과 연결(역행렬·크래머 가능성)</td><td><span class="ev q">추정</span> — ①②③은 발언 기반</td></tr>
+    <tr><td>채점 포인트</td><td>\(\det\)·세로줄 표기, 부호 처리, 부분 계산 기록</td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>출제 풀</td><td>주말 업로드 연습문제(답안 포함), 학습지 예제</td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>도구</td><td>계산기 불가 — 손계산</td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>기말 범위·누적 여부</td><td>—</td><td><span class="ev x">미확인</span></td></tr>
+  </tbody></table></div>
+  <div class="note exam"><span class="ic">EXAM</span><div><p>이번 주 안에 할 일: 3×3 사루스 계산을 <b>부호 실수 없이 2분 안에</b> 끝내는 연습, \(\det=0\) → 2차방정식 유형 3문제, 주말 연습문제 전부. 여인수 전개는 화요일 전에 학습지로 미리 훑어 두면 수업이 복습이 된다.</p></div></div>
+  <p class="log"><b>2026-09-04 v0.1</b> 9/1·9/3 녹음 기반 최초 작성.</p>
+  <p class="foot">출처: 클로바노트 녹음 텍스트(STT 오인식은 문맥으로 복원). 예제 (1)의 행렬 수치 일부는 STT가 불명확해 추정 표시. 원본·정리 파일: study-materials/미분적분학2/2026-09-03/</p>
+</section>
+</div>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>

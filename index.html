@@ -815,6 +815,22 @@ th{font-size:clamp(9.5px,0.2vw + 9px,10.5px)}
 .wk .ex{position:absolute;inset:0;display:grid;place-items:center;font-size:11px;color:#fff;z-index:2}
 .wk.exam .bar{background:var(--crit)}
 .wk.noted .lb::after{content:"•";color:var(--accent);margin-left:1px}
+/* 노트 라이브러리 · 앱 내 열람 */
+.nt-course{margin:0 0 14px}
+.nt-course h4{margin:0 0 6px;font-size:14px;color:var(--ink-2);display:flex;align-items:center;gap:8px}
+.nt-course h4 .cnt{font-family:var(--font-num);font-size:11px;color:var(--ink-3)}
+.nt-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);margin-bottom:6px;cursor:pointer}
+.nt-row:hover{background:var(--surface-2)}
+.nt-row .ty{font-family:var(--font-num);font-size:10.5px;letter-spacing:.06em;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.nt-row .ty.a{background:var(--accent-soft,var(--surface-2));color:var(--accent)} .nt-row .ty.b{background:var(--warn-soft);color:var(--warn)} .nt-row .ty.c{background:var(--info-soft,var(--surface-2));color:var(--info)} .nt-row .ty.d{background:var(--crit-soft);color:var(--crit)} .nt-row .ty.e{background:var(--ok-soft);color:var(--ok)}
+.nt-row .t{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nt-row .s{font-size:12px;color:var(--ink-3)}
+.nt-row .go{font-size:12px;color:var(--ink-3)}
+.ntv{position:fixed;inset:0;z-index:70;background:var(--bg);display:none;flex-direction:column}
+.ntv.on{display:flex}
+.ntv .ntv-h{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--surface);flex:0 0 auto}
+.ntv .ntv-h .tt{flex:1 1 auto;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ntv iframe{flex:1 1 auto;width:100%;border:0;background:#fff}
 .wn-row{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:8px 10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
 .wn-row:first-child{border-top:0}
 .wn-row .w{font-family:var(--font-num);font-size:12px;color:var(--accent);font-weight:600}
@@ -1538,6 +1554,20 @@ p,.hint,.step,.empty,.md{text-indent:0}
           </div>
         </div>
       </section>
+
+      <!-- ========== 노트 ========== -->
+      <section class="view" id="v-notes">
+        <div class="card">
+          <div class="card-h"><h3>강의 정리 노트</h3><span class="hs" id="ntHs"></span>
+            <div class="ha"><button class="btn xs" id="btnHub">허브 열기</button></div>
+          </div>
+          <div class="card-b" id="ntList"></div>
+        </div>
+      </section>
+      <div class="ntv" id="ntv" aria-modal="true" role="dialog">
+        <div class="ntv-h"><button class="btn xs" id="ntvBack">← 닫기</button><span class="tt" id="ntvTitle"></span><a class="btn xs" id="ntvOpen" target="_blank" rel="noopener">새 탭</a></div>
+        <iframe id="ntvFrame" title="정리 노트"></iframe>
+      </div>
 
       <!-- ========== 오늘 ========== -->
       <section class="view" id="v-today">
@@ -2889,6 +2919,7 @@ var NAV=[
     '<rect x="9.9" y="4" width="4.2" height="16" rx="1.2"/>'+
     '<rect x="16.4" y="4" width="4.2" height="16" rx="1.2"/>')},
   {k:"today",n:"오늘",ic:icon('<circle cx="12" cy="12" r="8.6"/><path d="M12 7.3V12l3.1 2"/>')},
+  {k:"notes",n:"노트",ic:icon('<path d="M5 4.5h11.5a2 2 0 0 1 2 2v13H7a2 2 0 0 1-2-2z"/><path d="M5 17.5a2 2 0 0 1 2-2h11.5"/><path d="M8.5 8.5h6M8.5 11.5h6"/>')},
   {k:"cal",n:"달력",ic:icon('<rect x="3.4" y="5.2" width="17.2" height="15.4" rx="3"/>'+
     '<path d="M3.4 10.2h17.2M8.2 2.9v4.2M15.8 2.9v4.2"/>')},
   {k:"grade",n:"학점",ic:icon('<path d="M3 20.2h18"/><path d="M6.4 20.2v-6.1M12 20.2V6.6M17.6 20.2v-9.4"/>')},
@@ -3325,6 +3356,11 @@ function renderCourse(){
       '<button class="btn xs" data-doc="'+d[0]+'">'+(has?"보기":"입력")+'</button></div>';
   }).join("")+
   '<button class="btn wide sm" id="btnSyl" style="margin-top:10px">강의계획서 분석 프롬프트</button>';
+  var cn=notesFor(c.name);
+  if(cn.length){
+    $("#cDocs").insertAdjacentHTML("beforeend",'<div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--line)"><div class="hint" style="margin-bottom:6px">정리 노트 '+cn.length+'개</div>'+cn.map(noteRowHTML).join("")+'</div>');
+    bindNoteRows($("#cDocs"));
+  }
   $$("#cDocs [data-doc]").forEach(function(b){ b.onclick=function(){ docSheet(c.id,b.dataset.doc); }; });
   $("#btnSyl").onclick=function(){ syllabusPrompt(c.id); };
 
@@ -3407,6 +3443,55 @@ function sortTasks(a,b){
   if(!!a.t.done!==!!b.t.done) return a.t.done?1:-1;
   if(!a.t.due&&!b.t.due) return 0; if(!a.t.due) return 1; if(!b.t.due) return -1;
   return a.t.due<b.t.due?-1:a.t.due>b.t.due?1:0;
+}
+
+
+/* ---------- 강의 정리 노트 (앱 내 열람) — notes/ 폴더의 HTML을 iframe으로 연다 ---------- */
+var NOTES=[
+  {course:"공업수학1",type:"정리",title:"1계 ODE 쉬운 정리 — 개념·공식·문제·풀이·교육과정",file:"notes/em-ch1-easy.html",week:1,date:"2026-09-04",sub:"Ch.1 · 용어 클릭 사전"},
+  {course:"공업수학1",type:"정리",title:"1계 ODE 정리노트 — 유형 판별 흐름",file:"notes/em-ch1-notes.html",week:1,date:"2026-09-03",sub:"Ch.1"},
+  {course:"공업수학1",type:"보강",title:"9/2 결석 보강 — 모델화부터 선형·비선형까지",file:"notes/em-0902-makeup.html",week:1,date:"2026-09-02",sub:"슬라이드 p.10–17"},
+  {course:"공업수학1",type:"과제",title:"1주차 과제 가이드 — Kreyszig 1.3 #6·7·8·16·17",file:"notes/em-hw1.html",week:1,date:"2026-09-04",sub:"제출 9/9(수) 수업 전"},
+  {course:"공업수학1",type:"교수",title:"이기영 교수 풀이 스타일·출제 방식 분석 v0.2",file:"notes/em-prof-analysis.html",week:1,date:"2026-09-04",sub:"근거 등급 표시"},
+  {course:"미분적분학2",type:"정리",title:"9/3 행렬 연산과 행렬식 + 홍순필 교수 분석 v0.1",file:"notes/calc2-0903.html",week:1,date:"2026-09-03",sub:"사루스 법칙 · 시험은 행렬식부터"},
+  {course:"아카데믹글쓰기",type:"정리",title:"9/1 OT — 글쓰기는 왜 필요한가 · 평가 규정 + 교수 분석 v0.1",file:"notes/writing-0901.html",week:1,date:"2026-09-01",sub:"기말 = 강의자료 이론"},
+  {course:"일반물리학2",type:"정리",title:"9/4 전하와 전기장 서론 — 7섹션 + 강의노트·슬라이드 + 교수 분석 v0.1",file:"notes/phys2-0904.html",week:1,date:"2026-09-04",sub:"중간 범위 27장까지"},
+  {course:"",type:"허브",title:"아토 학습 허브 — 이번 주 할 일 · 과목별 링크 · 규칙",file:"notes/hub.html",week:0,date:"2026-09-04",sub:"전체 목록"}
+];
+var NOTE_TYPE_CLS={"정리":"a","보강":"c","과제":"d","교수":"b","허브":"e"};
+function notesFor(name){ return NOTES.filter(function(n){return n.course===name;}); }
+function noteRowHTML(n){
+  return '<div class="nt-row" data-note="'+esc(n.file)+'" data-title="'+esc(n.title)+'">'+
+    '<span class="ty '+(NOTE_TYPE_CLS[n.type]||"a")+'">'+esc(n.type)+'</span>'+
+    '<div style="min-width:0"><div class="t">'+esc(n.title)+'</div><div class="s">'+(n.week?n.week+"주차 · ":"")+fmtDate(n.date)+(n.sub?" · "+esc(n.sub):"")+'</div></div>'+
+    '<span class="go">열기 →</span></div>';
+}
+function bindNoteRows(root){
+  $$(".nt-row",root).forEach(function(r){ r.onclick=function(){ openNote(r.dataset.note,r.dataset.title); }; });
+}
+function openNote(file,title){
+  var v=$("#ntv"); if(!v) return;
+  $("#ntvTitle").textContent=title||file;
+  $("#ntvOpen").href=file;
+  $("#ntvFrame").src=file;
+  v.classList.add("on"); document.body.style.overflow="hidden";
+}
+function closeNote(){
+  var v=$("#ntv"); if(!v) return;
+  v.classList.remove("on"); $("#ntvFrame").src="about:blank"; document.body.style.overflow="";
+}
+function renderNotes(){
+  var byC={}; NOTES.forEach(function(n){ (byC[n.course]=byC[n.course]||[]).push(n); });
+  var order=courses().map(function(c){return c.name;}).filter(function(nm){return byC[nm];});
+  Object.keys(byC).forEach(function(k){ if(k&&order.indexOf(k)<0) order.push(k); });
+  var h=order.map(function(nm){
+    return '<div class="nt-course"><h4>'+esc(nm)+'<span class="cnt">'+byC[nm].length+'</span></h4>'+byC[nm].map(noteRowHTML).join("")+'</div>';
+  }).join("");
+  if(byC[""]) h+='<div class="nt-course"><h4>전체<span class="cnt">'+byC[""].length+'</span></h4>'+byC[""].map(noteRowHTML).join("")+'</div>';
+  $("#ntHs").textContent=NOTES.length+"개";
+  $("#ntList").innerHTML=h||'<div class="empty"><span class="big">▤</span>아직 노트가 없습니다.</div>';
+  bindNoteRows($("#ntList"));
+  $("#btnHub").onclick=function(){ openNote("notes/hub.html","아토 학습 허브"); };
 }
 
 /* ---------- 오늘 · 하루 타임라인 ---------- */
@@ -4620,7 +4705,10 @@ function weekSheet(cid,w){
       '<div class="s">'+esc(dueLabel(t.due))+(t.due?" · "+fmtDate(t.due):"")+(t.src?" · "+esc(t.src):"")+'</div></div>'+
       '<button class="iconbtn" data-tdel="'+i+'" aria-label="삭제">✕</button></div>'; }).join("");
   var linkRows=n.links.map(function(l,i){
-    return '<div class="lrow" style="padding:5px 0"><div class="gr"><a href="'+esc(l.url)+'" target="_blank" rel="noopener" style="font-size:13.5px">'+esc(l.label||l.url)+'</a></div>'+
+    var local=/^notes\//.test(l.url||"");
+    return '<div class="lrow" style="padding:5px 0"><div class="gr">'+(local
+        ? '<button class="linkish" data-lopen="'+esc(l.url)+'" data-ltitle="'+esc(l.label||l.url)+'" style="font-size:13.5px;text-align:left">'+esc(l.label||l.url)+' <span class="hint">앱에서 열기</span></button>'
+        : '<a href="'+esc(l.url)+'" target="_blank" rel="noopener" style="font-size:13.5px">'+esc(l.label||l.url)+'</a>')+'</div>'+
       '<button class="iconbtn" data-ldel="'+i+'" aria-label="삭제">✕</button></div>'; }).join("");
   var saveWN=function(){
     n.range=$("#wn_range").value.trim(); n.summary=$("#wn_summary").value.trim();
@@ -4662,6 +4750,7 @@ function weekSheet(cid,w){
         var u=$("#wn_l_url",root).value.trim(); if(!u){ toast("링크 주소를 적어 주세요"); return; }
         n.links.push({label:$("#wn_l_label",root).value.trim(),url:u}); reopen(); };
       $$("[data-ldel]",root).forEach(function(b){ b.onclick=function(){ n.links.splice(+b.dataset.ldel,1); reopen(); }; });
+      $$("[data-lopen]",root).forEach(function(b){ b.onclick=function(){ saveWN(); closeSheet(); openNote(b.dataset.lopen,b.dataset.ltitle); }; });
     }
   });
 }
@@ -5104,7 +5193,7 @@ function serialize(){
   var clone=document.documentElement.cloneNode(true);
   clone.removeAttribute("data-theme");
   var app=clone.querySelectorAll("#gauges,#rail,#tabbar,#shelf,#courseTbl,#shelfTiles,#cHead,#cMode,"+
-    "#cCov,#cAtt,#cWeeks,#cLog,#cDocs,#brief,#todayList,#reviewList,#wkMap,#tt,"+
+    "#cCov,#cAtt,#cWeeks,#cLog,#cDocs,#brief,#todayList,#reviewList,#wkMap,#tt,#ntList,#cNotes,"+
     "#gradeTiles,#reqTbl,#histBox,#histList,#retakeBox,#gradeEmpty,#fontBox,#pendBar,#profBox,#termBox,#dataBox,#sheet,#dayLine,#dayBooks,#calBody,#calLegend");
   Array.prototype.forEach.call(app,function(el){ el.innerHTML=""; });
   var sc=clone.querySelector("#state"); if(sc) sc.textContent=JSON.stringify(S);
@@ -5136,6 +5225,7 @@ function render(){
   if(ui.view==="shelf") renderShelf();
   else if(ui.view==="course") renderCourse();
   else if(ui.view==="today") renderToday();
+  else if(ui.view==="notes") renderNotes();
   else if(ui.view==="cal") renderCal();
   else if(ui.view==="grade") renderGrade();
   else if(ui.view==="set") renderSet();
@@ -5203,11 +5293,11 @@ function boot(){
             {t:"슬라이드 p.4–5",quote:"Written test 80% (중간 40 · 기말 40). 과제 미제출 −1.0/회, 지각제출 −0.5/회(2주까지). 결석 −0.5, 지각 −0.25. 1/3 이상 결석·시험 미응시·원점수 30 미만 F.",memo:""}],
       tasks:[{id:uid(),text:"1주차 과제 Kreyszig 1.3 #6·7·8·16·17 — 수업 전 교탁 제출",due:"2026-09-09",done:false,src:"판서 9/4"},
              {id:uid(),text:"Ch.2(2계 ODE, 4~5주차) 강의자료 확보 — 중간고사 핵심 구간",due:"2026-09-16",done:false,src:"자료 점검"}],
-      links:[{label:"1계 ODE 쉬운 정리 (개념·공식·문제·풀이·교육과정)",url:"https://claude.ai/code/artifact/26569254-d9a0-4eda-9d80-60826d15c571"},
-             {label:"9/2 결석 보강 — 모델화부터 선형·비선형까지 (p.10–17)",url:"https://claude.ai/code/artifact/51f01342-e9f3-4518-b528-790809d55be6"},
-             {label:"1주차 과제 가이드 (1.3 #6·7·8·16·17)",url:"https://claude.ai/code/artifact/d4876786-444b-4966-a2f4-f78917954dca"},
-             {label:"이기영 교수 풀이 스타일·출제 분석 v0.2",url:"https://claude.ai/code/artifact/fd8a7976-13b3-4baf-a054-68fc042474a1"},
-             {label:"1계 ODE 정리노트 (판별 흐름)",url:"https://claude.ai/code/artifact/fb9470e9-8e72-4a16-bfec-f7029b8655cd"}]});
+      links:[{label:"1계 ODE 쉬운 정리 (개념·공식·문제·풀이·교육과정)",url:"notes/em-ch1-easy.html"},
+             {label:"9/2 결석 보강 — 모델화부터 선형·비선형까지 (p.10–17)",url:"notes/em-0902-makeup.html"},
+             {label:"1주차 과제 가이드 (1.3 #6·7·8·16·17)",url:"notes/em-hw1.html"},
+             {label:"이기영 교수 풀이 스타일·출제 분석 v0.2",url:"notes/em-prof-analysis.html"},
+             {label:"1계 ODE 정리노트 (판별 흐름)",url:"notes/em-ch1-notes.html"}]});
     setS(em,"2026-09-02",{status:"absent",progress:"Ch.1 p.10–17 기본개념·모델화·계·선형성",missedFrom:"결석 — 보강 노트로 대체"});
     setS(em,"2026-09-04",{status:"present",progress:"p.18–19 해의 종류·초기값 문제, Ex.4 시작 (녹음 8분 후 끊김)"});
 
@@ -5221,7 +5311,7 @@ function boot(){
             {t:"녹음 9/3 44:43",quote:"det와 세로줄은 무조건 써야 돼. 당연히 알겠지 하고 안 쓰면 감점 당해요.",memo:"표기 누락 = 감점"},
             {t:"녹음 9/3 58:40",quote:"우리는 전자계산기 손 못 대, 손으로 계산해야 돼. 손으로 풀 수 있는 건 3차까지.",memo:""}],
       tasks:[{id:uid(),text:"주말 강의자료실 업로드 연습문제(행렬·행렬식, 답안 포함) 풀어오기",due:"2026-09-08",done:false,src:"녹음 9/3 1:01:20"}],
-      links:[{label:"9/3 행렬 연산과 행렬식 정리 + 홍순필 교수 분석 v0.1",url:"https://claude.ai/code/artifact/fb3f63f5-4c44-4dba-98f3-70c6c870c652"}]});
+      links:[{label:"9/3 행렬 연산과 행렬식 정리 + 홍순필 교수 분석 v0.1",url:"notes/calc2-0903.html"}]});
     setS(ca,"2026-09-01",{status:"present",progress:"행렬의 정의와 종류 (Lecture 2-1)"});
     setS(ca,"2026-09-03",{status:"present",progress:"행렬 연산·거듭제곱·행렬식(2차, 3차 사루스), 예제 2~4"});
 
@@ -5234,7 +5324,7 @@ function boot(){
             {t:"녹음 9/1 39:10",quote:"32명 중 10명 안팎이 A. 모든 평가 항목에서 구멍이 없도록. 1점 차로 갈린다.",memo:""}],
       tasks:[{id:uid(),text:"9/8 주제문 쓰기 활동 대비 — 쓰고 싶은 주제 후보 2~3개 메모, 읽기자료 공지 확인",due:"2026-09-08",done:false,src:"녹음 9/1 43:13"},
              {id:uid(),text:"자기서사 글쓰기 (중간 대체, 8주차 제출·그 주 수업 없음) — 공지 시 마감 확정",due:"2026-10-20",done:false,src:"녹음 9/1 35:00"}],
-      links:[{label:"9/1 OT 정리 + 김혜선 교수 분석 v0.1",url:"https://claude.ai/code/artifact/36d97eea-7ecb-46f3-8e0e-ee85ea9bb8cd"}]});
+      links:[{label:"9/1 OT 정리 + 김혜선 교수 분석 v0.1",url:"notes/writing-0901.html"}]});
     setS(wr,"2026-09-01",{status:"present",progress:"OT · 글쓰기는 왜 필요한가 · 평가 규정"});
 
     wn(ph,1,{range:"21장 전하 · 22장 전기장 서론 (강의노트 Part-01·02, p.3–9)",
@@ -5251,7 +5341,7 @@ function boot(){
       tasks:[{id:uid(),text:"강의노트 p.3–9 예습 + 필수문제 1~6 직접 풀어 답 대조",due:"2026-09-09",done:false,src:"녹음 9/4"},
              {id:uid(),text:"9/2 출석 인정 정정 확인 (교수 허락받음)",due:"2026-09-09",done:false,src:"사용자 9/4"},
              {id:uid(),text:"1학기 13장 역제곱 법칙 · 벡터 성분 합 복습",due:"2026-09-11",done:false,src:"녹음 9/4 32:14"}],
-      links:[{label:"9/4 전하와 전기장 서론 (7섹션) + 김민수 교수 분석 v0.1",url:"https://claude.ai/code/artifact/ca17088c-2405-4aa5-b150-1be26a5ec736"}]});
+      links:[{label:"9/4 전하와 전기장 서론 (7섹션) + 김민수 교수 분석 v0.1",url:"notes/phys2-0904.html"}]});
     setS(ph,"2026-09-02",{status:"absent",progress:"21장 전하 (강의노트 Part-01)",memo:"출석체크 누락으로 결석 처리 → 교수 허락으로 9/9 출석 인정 예정",missedFrom:"결석 — 9/4 정리 4절(강의노트 Part-01)로 보강"});
     setS(ph,"2026-09-04",{status:"present",progress:"22장 전기장 서론: 전하·쿨롱·ε₀·μ₀·자기의 소스"});
 
@@ -5377,6 +5467,26 @@ function boot(){
     var dark=cur? cur==="dark" : matchMedia("(prefers-color-scheme: dark)").matches;
     r.setAttribute("data-theme", dark?"light":"dark");
   };
+
+  $("#ntvBack").onclick=closeNote;
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeNote(); });
+
+  /* 데이터 패치 V5 — 주차 정리의 아티팩트 링크를 앱 내부 노트 파일로 (1회) */
+  (function(){
+    var t=term(); if(t.patchWeekNotesV5) return;
+    var map={"26569254-d9a0-4eda-9d80-60826d15c571":"notes/em-ch1-easy.html","fb9470e9-8e72-4a16-bfec-f7029b8655cd":"notes/em-ch1-notes.html",
+      "51f01342-e9f3-4518-b528-790809d55be6":"notes/em-0902-makeup.html","d4876786-444b-4966-a2f4-f78917954dca":"notes/em-hw1.html",
+      "fd8a7976-13b3-4baf-a054-68fc042474a1":"notes/em-prof-analysis.html","fb3f63f5-4c44-4dba-98f3-70c6c870c652":"notes/calc2-0903.html",
+      "36d97eea-7ecb-46f3-8e0e-ee85ea9bb8cd":"notes/writing-0901.html","ca17088c-2405-4aa5-b150-1be26a5ec736":"notes/phys2-0904.html"};
+    t.courses.forEach(function(c){
+      Object.keys(c.weekNotes||{}).forEach(function(w){
+        var n=weekNote(c,+w); if(!n) return;
+        n.links.forEach(function(l){ Object.keys(map).forEach(function(id){ if((l.url||"").indexOf(id)>=0) l.url=map[id]; }); });
+      });
+    });
+    t.patchWeekNotesV5=true;
+    try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+  })();
 
   autoStartClasses();          // 부팅 시 이미 시작된 수업 반영
   go("shelf");

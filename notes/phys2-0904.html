@@ -1,0 +1,329 @@
+<title>일반물리학2 · 9/4 전하와 전기장 서론</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F4F6F7;--paper:#FFFFFF;--ink:#1A2230;--ink-2:#3E4A5A;--ink-3:#6D7988;--line:#DBE1E7;--line-2:#C3CCD5;
+  --acc:#B8501E;--acc-soft:#F9E8DF;--acc-ink:#8A3A12;--warn:#B9791A;--warn-soft:#FBF1DD;--warn-ink:#7A4E0B;
+  --ok:#3D7A4E;--ok-soft:#E5F1E7;--ok-ink:#2B5A39;--crit:#B2483F;--crit-soft:#F8E6E3;--crit-ink:#7E2F28;--ans:#EFF2F4;
+  --font-display:"Gowun Batang","Noto Serif KR",Georgia,serif;--font-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;--font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#121820;--paper:#1A222C;--ink:#E6EAF0;--ink-2:#BCC6D1;--ink-3:#8593A2;--line:#2A3542;--line-2:#3A4756;--acc:#E89468;--acc-soft:#36231A;--acc-ink:#F3B994;--warn:#D9A34A;--warn-soft:#332816;--warn-ink:#F0C87E;--ok:#7FBF8F;--ok-soft:#1B2E21;--ok-ink:#A9DDB5;--crit:#E07C72;--crit-soft:#34201E;--crit-ink:#F1B0A9;--ans:#202A35;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121820;--paper:#1A222C;--ink:#E6EAF0;--ink-2:#BCC6D1;--ink-3:#8593A2;--line:#2A3542;--line-2:#3A4756;--acc:#E89468;--acc-soft:#36231A;--acc-ink:#F3B994;--warn:#D9A34A;--warn-soft:#332816;--warn-ink:#F0C87E;--ok:#7FBF8F;--ok-soft:#1B2E21;--ok-ink:#A9DDB5;--crit:#E07C72;--crit-soft:#34201E;--crit-ink:#F1B0A9;--ans:#202A35;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere}
+mjx-container{color:inherit} mjx-container[display="true"]{margin:.5em 0 !important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px 90px}
+.head{padding:44px 0 22px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.eyebrow b{color:var(--acc);font-weight:500}
+.eyebrow .rec{background:var(--ok-soft);color:var(--ok-ink);border-radius:5px;padding:1px 8px;text-transform:none;letter-spacing:.04em}
+h1{font-family:var(--font-display);font-weight:700;font-size:clamp(28px,4.4vw,40px);line-height:1.22;margin:12px 0 10px;letter-spacing:-.01em;text-wrap:balance}
+.lede{font-size:16.5px;color:var(--ink-2);margin:0}
+/* 7섹션 상태 표시 */
+.src{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;margin:16px 0 0}
+.src a{display:block;text-decoration:none;background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:8px 10px;color:var(--ink-2);font-size:13px;line-height:1.4}
+.src a b{display:block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;color:var(--ink-3);margin-bottom:2px}
+.src a .st{display:inline-block;margin-top:4px;font-family:var(--font-mono);font-size:10.5px;border-radius:4px;padding:0 6px}
+.src a .st.y{background:var(--ok-soft);color:var(--ok-ink)} .src a .st.n{background:var(--crit-soft);color:var(--crit-ink)} .src a .st.p{background:var(--warn-soft);color:var(--warn-ink)}
+.src a.star{border-color:var(--warn)}
+section{padding:34px 0 6px} section+section{border-top:1px solid var(--line)}
+h2{font-family:var(--font-display);font-weight:700;font-size:25px;line-height:1.3;margin:0 0 8px;letter-spacing:-.005em;text-wrap:balance}
+h2 .no{font-family:var(--font-mono);font-weight:500;font-size:12px;color:var(--acc);letter-spacing:.1em;display:block;margin-bottom:6px}
+h3{font-size:17.5px;font-weight:700;margin:26px 0 8px}
+p{margin:0 0 12px} ul,ol{margin:0 0 12px;padding-left:22px} li{margin:4px 0}
+.ts{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-left:6px}
+.thesis{font-family:var(--font-display);font-size:21px;line-height:1.5;color:var(--ink);border-left:3px solid var(--acc);padding:6px 0 6px 18px;margin:14px 0}
+.thesis small{display:block;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-3);margin-top:6px;letter-spacing:.04em}
+.tw{overflow-x:auto;margin:12px 0 16px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:540px;font-size:14.5px}
+th,td{padding:9px 14px;text-align:left;vertical-align:top;border-top:1px solid var(--line)}
+thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3);font-weight:500;background:var(--ans)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0 14px}
+.card .t{font-weight:700;margin-bottom:4px} .card p:last-child{margin-bottom:0}
+.card .say{font-size:15px;color:var(--ink-2);background:var(--ans);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:8px 12px;margin:8px 0 0}
+.card .say b{color:var(--acc-ink)}
+.card .easy{font-size:15px;color:var(--ink-2);background:var(--ans);border-radius:8px;padding:8px 12px;margin:8px 0 0}
+.hs{display:inline-block;font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;background:var(--ok-soft);color:var(--ok-ink);border-radius:5px;padding:1px 7px;margin-left:4px;vertical-align:middle}
+.ev{display:inline-block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;border-radius:5px;padding:1px 7px;vertical-align:middle;margin-left:6px;white-space:nowrap}
+.ev.r{background:var(--ok-soft);color:var(--ok-ink)} .ev.q{background:var(--warn-soft);color:var(--warn-ink)} .ev.x{background:var(--crit-soft);color:var(--crit-ink)} .ev.g{background:var(--acc-soft);color:var(--acc-ink)}
+.note{border-radius:10px;padding:12px 16px;margin:14px 0 18px;font-size:15px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.note .ic{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;padding:2px 7px;border-radius:5px;margin-top:3px;white-space:nowrap;color:#fff}
+.note.exam{background:var(--warn-soft);color:var(--warn-ink)} .note.exam .ic{background:var(--warn)}
+.note.tip{background:var(--acc-soft);color:var(--acc-ink)} .note.tip .ic{background:var(--acc)}
+.note.todo{background:var(--crit-soft);color:var(--crit-ink)} .note.todo .ic{background:var(--crit)}
+.note.none{background:var(--ans);color:var(--ink-3)} .note.none .ic{background:var(--line-2);color:var(--ink-2)}
+.note p{margin:0 0 6px}.note p:last-child{margin:0}
+.exambox{border:2px solid var(--warn);border-radius:14px;padding:16px 18px;margin:12px 0 16px;background:var(--paper)}
+.exambox .q{display:grid;grid-template-columns:64px minmax(0,1fr);gap:4px 12px;padding:9px 0;border-top:1px dashed var(--line)}
+.exambox .q:first-of-type{border-top:0;padding-top:0}
+.exambox .q .t{font-family:var(--font-mono);font-size:12px;color:var(--warn-ink);padding-top:4px}
+.exambox .q .s{color:var(--ink)} .exambox .q .s b{color:var(--warn-ink)}
+.exambox .q .m{font-size:13.5px;color:var(--ink-3);margin-top:2px}
+.log{font-size:14px;color:var(--ink-2)} .log b{font-family:var(--font-mono);font-weight:500;color:var(--ink-3);margin-right:8px}
+.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+@media print{body{background:#fff}.card,.tw,.note,.exambox{break-inside:avoid}@page{size:A4;margin:14mm 12mm}}
+
+.wrap{padding-bottom:60px}
+</style>
+<div class="wrap">
+<header class="head">
+  <div class="eyebrow"><b>일반물리학2 · 김민수 교수</b><span>1주차 · 9/4(금) 2일차</span><span class="rec">녹음 60분 32초 · 강의노트 63p · 슬라이드 22p</span></div>
+  <h1>전하와 전기장 서론 — "전기와 자기는 똑같다"</h1>
+  <p class="lede">사실상 첫 강의다. 교수님은 이 학기 전체(21~33장)를 한 문장으로 요약하고 시작했다. 오늘은 계산이 아니라 <b>개념의 뼈대</b>를 세우는 시간이었고, "다다음 시간부터 전기장 계산에 치일 것"이라고 예고했다. 시험 범위는 <b>27장까지</b>.</p>
+  <div class="src">
+    <a href="#s1"><b>1 · 교재</b>전공 교재 파일<span class="st n">미보유</span></a>
+    <a href="#s2"><b>2 · 판서</b>칠판 판서 이미지<span class="st p">녹음으로 재구성</span></a>
+    <a href="#s3"><b>3 · 녹음</b>녹음본 정리<span class="st y">60분 32초</span></a>
+    <a href="#s4"><b>4 · 강의자료</b>강의노트 p.3–9 + 슬라이드 22p<span class="st y">정리 완료</span></a>
+    <a href="#s5"><b>5 · 필기</b>강의자료 위 필기<span class="st n">미보유</span></a>
+    <a href="#s6" class="star"><b>6 · ★ 시험</b>교수님 시험 언급<span class="st y">6건</span></a>
+    <a href="#s7"><b>7 · 과제</b>과제 → 할 일<span class="st y">할 일 3건</span></a>
+  </div>
+</header>
+
+<!-- 1 -->
+<section id="s1">
+  <h2><span class="no">1 · TEXTBOOK</span>전공 교재 파일 정리</h2>
+  <div class="note none"><span class="ic">미보유</span><div><p>교재 PDF가 아직 없다. 강의노트 1쪽에 참고 교재 세 권이 나온다: <b>Halliday 『일반물리학 Ⅰ』(Principles of Physics 11판, Wiley)</b>, 『대학물리학』(University Physics 8판, 북스힐), <b>Serway 『대학물리학 Ⅰ』(10판, Cengage)</b>. 교수님이 말한 "21장 전하, 22장 전기장 … 27장"은 Halliday 계열의 장 번호다. 교재 파일(또는 해당 장 사진)을 올려주면 이 섹션을 채운다.</p></div></div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2><span class="no">2 · BOARD</span>교수님 칠판 판서 정리</h2>
+  <div class="note none"><span class="ic">사진 없음</span><div><p>판서 사진이 없어서 <b>녹음에서 칠판에 적었다고 확인되는 것만</b> 순서대로 복원했다. 사진이 오면 대조해서 고친다.</p></div></div>
+  <div class="tw"><table><thead><tr><th>순서</th><th>칠판에 적은 것 (복원)</th><th>시각</th></tr></thead><tbody>
+    <tr><td>①</td><td>전기(Electric) · 자기(Magnetic) — "전기와 자기는 똑같다"</td><td>01:10</td></tr>
+    <tr><td>②</td><td>전기의 소스 = 전하(charge). \(q=ne\), \(e=1.6\times10^{-19}\) C, 양성자 \(+e\) / 전자 \(-e\)</td><td>04:08</td></tr>
+    <tr><td>③</td><td>시험 전하 = +1 C. \(1=n\times1.6\times10^{-19}\) → \(n\approx6\times10^{18}\)개 ("600경") → 전기력선 \(6\times10^{18}\)개</td><td>06:05</td></tr>
+    <tr><td>④</td><td>불연속 → Σ (점전하 · 점전하군 · 전기쌍극자) / 연속 → ∫dq (직선도선 · 원형도선 · 원판)</td><td>07:33</td></tr>
+    <tr><td>⑤</td><td>앞 세 줄 학생 20명을 \(q_1,q_2,q_3\)로 그룹핑. \(q_1\): 양성자 2 + 전자 5 → 알짜 \(-3e\), \(q_2=+9e\), \(q_3=+4e\). 전기력선 3개 in / 9개 out / 4개 out. 척력·인력 화살표</td><td>11:06</td></tr>
+    <tr><td>⑥</td><td>역제곱 법칙 (13장) \(\vec F=G\frac{Mm}{r^2}\hat r\) ↔ \(\vec F_e=k\frac{q_1q_2}{r^2}\hat r\) (쿨롱 법칙)</td><td>17:06</td></tr>
+    <tr><td>⑦</td><td>\(k=\dfrac{1}{4\pi\varepsilon_0}=9\times10^9\) N·m²/C², \(\varepsilon_0=8.854\times10^{-12}\) C²/N·m² "진공에서의 유전율"</td><td>19:02</td></tr>
+    <tr><td>⑧</td><td>誘電率 — 誘 = 유혹할 유. +극 → −극 전기력선, 매질: 진공 100% / 종이 90% / 나무·쇠 더 적게</td><td>20:33</td></tr>
+    <tr><td>⑨</td><td>\(\mu_0=4\pi\times10^{-7}\) (투자율). \(c=\dfrac{1}{\sqrt{\varepsilon_0\mu_0}}\)</td><td>26:34</td></tr>
+    <tr><td>⑩</td><td>자기의 소스: 자하(monopole) N·S → 분리 불가, \(r=0\) → 역제곱 ∞ → 대신 전류 \(I=\dfrac{dq}{dt}\) [A=C/s]. 정전기학(21~25장) / 동전기학(26장~)</td><td>49:44 · 56:00</td></tr>
+    <tr><td>⑪</td><td>인명 목록: Thomson · Hall · Biot–Savart · Ampère · Faraday · Lenz · Maxwell</td><td>52:13</td></tr>
+  </tbody></table></div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2><span class="no">3 · RECORDING</span>녹음본 정리</h2>
+  <div class="thesis">전기와 자기는 똑같다. 전기만 제대로 하면 자기는 저절로 된다.<small>01:10 · 전하(q) 자리에 전류(I)만 바꿔 넣으면 자기 파트가 된다는 뜻</small></div>
+  <p>그래서 이 과목에서 배우는 것은 결국 <b>"각 상황에서 전기장을 어떻게 계산하느냐"</b>는 도구다. 개념은 오늘 하나로 끝나고, 나머지는 그 개념을 상황별로 적분하는 연습이다. 교수님이 기계과 학생에게 강조한 이유: "기계과가 밥 먹고살 길은 <b>제어</b>이고 제어의 기초는 물리다."</p>
+
+  <h3>전기의 소스 — 전하 <span class="ts">04:08</span></h3>
+  <div class="card"><div class="t">전하량은 전자 개수로 센다: \(q = n\,e\)</div>
+    <p>\(e = 1.6\times10^{-19}\) C. 양성자는 \(+e\), 전자는 \(-e\). \(n\)은 개수.</p>
+    <div class="easy"><span class="hs">고교 연결</span> 고1 통합과학·물리학Ⅰ의 "기본 전하량"이 그 \(e\)다. 새로운 건 <b>"전하량을 보면 개수가 보여야 한다"</b>는 습관.</div></div>
+  <div class="card"><div class="t">시험 전하(test charge)는 무조건 +1 C</div>
+    <p>1 C \(= n\times1.6\times10^{-19}\) → \(n\approx6\times10^{18}\)개, 교수님 표현으로 <b>"600경 개"</b>. 양성자 하나에서 전기력선이 하나 나온다고 보면 +1 C에서는 전기력선이 \(6\times10^{18}\)개 나온다.</p>
+    <div class="say"><b>07:33</b> "그러면 <b>이 n개를 어떻게 카운트할 거냐</b>가 핵심 내용인 거예요." — 전기장 = 전기력선의 개수를 세는 문제.</div></div>
+  <div class="card"><div class="t">세는 방법은 두 가지: 합(Σ) 아니면 적분(∫)</div>
+    <div class="tw"><table><thead><tr><th>전하 분포</th><th>도구</th><th>다룰 대상</th></tr></thead><tbody>
+      <tr><td><b>불연속(점전하 몇 개)</b></td><td>\(\displaystyle\sum\)</td><td>점전하, 점전하군, <b>전기쌍극자</b></td></tr>
+      <tr><td><b>연속(균일 분포)</b></td><td>\(\displaystyle\int dq\)</td><td><b>직선 도선, 원형 도선(고리), 원판</b>의 전기장</td></tr>
+    </tbody></table></div>
+    <p>이 표가 강의노트 Part-02 "여러 가지 전기장의 표현" ①~⑥의 목차 그대로다.</p></div>
+  <div class="card"><div class="t">알짜 전하(net charge) — 앞 세 줄 학생 20명 예시 <span class="ts">11:06</span></div>
+    <p>학생 20명을 세 그룹 \(q_1,q_2,q_3\)로 묶었다. \(q_1\)에 양성자 2개 + 전자 5개가 있으면 2쌍은 중성으로 상쇄되고 <b>전자 3개만 남는다</b> → \(q_1=-3e\). \(q_2=+9e\), \(q_3=+4e\).</p>
+    <ul>
+      <li>앞으로 "전하"라고 하면 전부 <b>알짜 전하(net charge, 순전하)</b>다. 알짜 전하량 ÷ \(1.6\times10^{-19}\) = 개수.</li>
+      <li>교재가 강조하는 <b>양자화</b>는 "이렇게 덩어리로 묶여 있다"는 뜻 이상으로 의미 부여하지 말 것.</li>
+      <li>전기력선: \(-3e\)엔 3개가 <b>들어가고</b>, \(+9e\)에선 9개, \(+4e\)에선 4개가 <b>나온다</b>. 같은 부호 척력, 다른 부호 인력. 크기 3과 9가 밀면 작은 쪽이 밀려난다.</li>
+    </ul>
+    <div class="say"><b>16:16</b> "이 얘기만 딱 있으면 전기는 끝이야." 강의노트의 합력 문제는 \(\hat i,\hat j\) 성분으로 나눠 <b>벡터 합</b>하면 된다.</div></div>
+
+  <h3>쿨롱 법칙과 ε₀ <span class="ts">17:06</span></h3>
+  <div class="card"><div class="t">역제곱 법칙의 재등장 <span class="hs">1학기 13장</span></div>
+    <p>만유인력 \(\vec F=G\dfrac{Mm}{r^2}\hat r\) (\(G=6.67\times10^{-11}\))과 같은 꼴로 \[\vec F_e=k\,\frac{q_1q_2}{r^2}\,\hat r,\qquad k=\frac{1}{4\pi\varepsilon_0}=9\times10^{9}\ \mathrm{N\cdot m^2/C^2}\]</p>
+    <p>\(k\)에서 거꾸로 \(\varepsilon_0=\dfrac{1}{4\pi\cdot9\times10^9}=8.854\times10^{-12}\ \mathrm{C^2/(N\cdot m^2)}\). 이름은 <b>진공에서의 유전율</b>.</p>
+    <div class="say"><b>25:55</b> "예전에는 다 \(k\)로만 썼지만 이제는 <b>무조건 \(\dfrac{1}{4\pi\varepsilon_0}\)로 써야 돼</b>. 그게 정확하게 쓰는 거야."</div></div>
+  <div class="card"><div class="t">유전율(誘電率)의 뜻 — "전기를 꼬시는 정도" <span class="ts">20:33</span></div>
+    <p>誘는 <b>유혹할 유</b>. +극에서 −극으로 전기력선이 갈 때 매질이 그 진행을 얼마나 <b>붙잡느냐</b>를 나타낸다.</p>
+    <ul>
+      <li>매질이 <b>진공</b>이면 100% 지나간다 → 그 값이 \(\varepsilon_0\), <b>가장 작은 유전율</b>.</li>
+      <li>사이에 종이가 있으면 90%, 나무·쇠면 더 적게 → \(\varepsilon\)이 커진다 → 전기장이 <b>작아진다</b>.</li>
+      <li>\(\varepsilon_0\)가 가장 작으니 역수인 \(k\)는 가장 크다 → <b>진공에서 전기력이 가장 세다</b>. 유전체는 25장.</li>
+    </ul>
+    <div class="easy">교수님이 던진 질문: 소리의 매질은 공기, 그럼 전자기파(빛)의 매질은? — <b>진공</b>. 아무도 답을 못 해서 한참 기다리셨다.</div></div>
+  <div class="card"><div class="t">자기 쪽 짝: μ₀, 그리고 빛의 속도 <span class="ts">26:34</span></div>
+    <p>전기에 \(\varepsilon_0\)(유전율)가 있으면 자기에는 \(\mu_0=4\pi\times10^{-7}\)(<b>투자율</b>)가 있다. N극에서 S극으로 자기력선이 갈 때 진공이 가장 적게 방해하는 값.</p>
+    <p>\[c=\frac{1}{\sqrt{\varepsilon_0\,\mu_0}}\approx3\times10^{8}\ \mathrm{m/s}\] "가장 작은 값 두 개를 곱해 루트 씌우고 역수를 취했으니 <b>가장 큰 값</b>" — 빛의 속도. 맥스웰 방정식 → 전자기 파동방정식 유도는 강의노트 뒤쪽(Part-12)에 있고 마지막 시간에 보여준다.</p>
+    <div class="say"><b>31:02</b> "물리라고 하는 놈은 전부 다 <b>파동방정식</b>을 구하려고 해." 1학기 16장에서 역학적 파동·전자기 파동·물질 파동을 나눴고, 지금은 전자기 파동을 21장부터 쌓는 것.</div></div>
+
+  <h3>자기의 소스 — 왜 전류인가 <span class="ts">49:44</span></h3>
+  <div class="card"><div class="t">자하(magnetic monopole)는 쓸 수 없다</div>
+    <p>자하는 N·S 두 개뿐이고 <b>분리가 안 된다</b>. 붙어 있으면 \(r=0\) → 역제곱 법칙이 \(1/0^2=\infty\)로 터진다. 그래서 자하 대신 역제곱 법칙을 만족하는 <b>전류 \(I=\dfrac{dq}{dt}\)</b> [A = C/s]를 소스로 쓴다.</p></div>
+  <div class="tw"><table><thead><tr><th></th><th>정전기학 (static)</th><th>동전기학 (dynamic)</th></tr></thead><tbody>
+    <tr><td>소스</td><td>전하 \(q\)</td><td>전류 \(I=dq/dt\)</td></tr>
+    <tr><td>시간</td><td>무관</td><td>관련</td></tr>
+    <tr><td>장</td><td><b>21~25장</b></td><td><b>26장~</b></td></tr>
+    <tr><td>차원</td><td>—</td><td>전류는 공간을 돌아다니므로 <b>3차원 · 회전 · 벡터곱</b></td></tr>
+  </tbody></table></div>
+  <p>자기장 이론은 자하가 발견되기 전까지 발전할 게 없으므로 <b>"사람들이 어떤 실험을 했는지"</b>만 알면 끝: Thomson(비전하) → Hall(홀 효과, 사람 이름) → Biot–Savart → Ampère → Faraday · Lenz(전자기 유도) → Maxwell(집대성).</p>
+  <p class="log"><b>제외</b> 34:05~49:44 강의 평가·진로·AI·가족 이야기(여담). 요지 하나만: "질문에 대답하고 표정을 보여 달라."</p>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2><span class="no">4 · LECTURE NOTE</span>강의자료 정리 — 63쪽 강의노트 중 p.3–9 (Part-01 · 02)</h2>
+  <p>톡방으로 받은 <b>『GENERAL PHYSICS』 2학기 강의노트</b>(김민수, 63쪽). 교재 장 번호가 아니라 <b>Part</b> 단위로 짜여 있고, 각 Part 끝에 <b>&lt;필수문제&gt;가 답과 함께</b> 실려 있다. 오늘 수업은 Part-01 전체와 Part-02 앞부분에 해당한다.</p>
+
+  <div class="tw"><table><thead><tr><th>강의노트</th><th>쪽</th><th>내용</th><th>교재 장(추정)</th></tr></thead><tbody>
+    <tr><td>표지·안내</td><td class="n">1–2</td><td>참고 교재 3권. "지속적인 연습문제 업그레이드" 예고</td><td>—</td></tr>
+    <tr><td><b>Part-01</b></td><td class="n">3–4</td><td>전자기학의 집(전체 지도) · 물질의 구성 · 양자화 · 도체/부도체/절연체</td><td>21</td></tr>
+    <tr><td><b>Part-02</b></td><td class="n">5–9</td><td>쿨롱 법칙 · 전기장 정의 · 전기력선 · 전기장 표현 ①~⑥ · 쌍극자 퍼텐셜에너지 · 필수문제 1~6</td><td>21–22</td></tr>
+    <tr><td>Part-03</td><td class="n">10–12</td><td>전기선속 · 가우스면 · 가우스 법칙(원통·면·구 대칭) · 필수문제</td><td>23</td></tr>
+    <tr><td>Part-04</td><td class="n">13–16</td><td>전위(직선도선 등) · 필수문제</td><td>24</td></tr>
+    <tr><td>Part-05</td><td class="n">17–21</td><td>전기용량 · 유전체 · 축전기 연결 · 필수문제</td><td>25</td></tr>
+    <tr><td>Part-06</td><td class="n">22–23</td><td>전류 · 저항 · 필수문제</td><td>26</td></tr>
+    <tr><td>Part-07</td><td class="n">24–27</td><td>회로 · RC회로 · 필수문제</td><td>27</td></tr>
+    <tr><td>전기부분 기초문제</td><td class="n">28–32</td><td>CHAP별 기초문제 모음</td><td>21–27</td></tr>
+    <tr><td>Part-08~12</td><td class="n">33–58</td><td>자기력·Hall 효과 / 비오사바르·앙페르 / 유도·RL / 교류·RLC / 전자기파·포인팅 벡터</td><td>28–33</td></tr>
+    <tr><td>자기부분 기초문제</td><td class="n">59–63</td><td>CHAP별 기초문제 모음</td><td>28–33</td></tr>
+  </tbody></table></div>
+  <div class="note exam"><span class="ic">범위</span><div><p>중간고사 범위 "27장까지" = <b>강의노트 p.1–32</b>(Part-01~07 + 전기부분 기초문제). 필수문제와 기초문제가 모두 답과 함께 실려 있으므로 이 두 묶음이 사실상 문제은행이다. <span class="ev q">추정</span></p></div></div>
+
+  <h3>p.3 — 전자기학의 집 (오늘 수업의 원본 지도)</h3>
+  <div class="card">
+    <p><b>전기장 줄기:</b> 전하 → 전기장 → 전기퍼텐셜(전위) → 가우스 법칙 → 전기용량(C)</p>
+    <ul>
+      <li>전기장: 불연속(점전하·점전하군·전기쌍극자) / 연속(선전하 \(\lambda=dq/ds\), 원형고리 \(\sigma=dq/da\), 대전원판 \(\rho=dq/dV\))</li>
+      <li>가우스: 쿨롱 법칙(대칭성 이용), 원통·판·구 대칭, 고립도체, <b>선속(flux) 개념이 중요</b></li>
+      <li>전기용량 → 축전기(유전체). 회로: 전류밀도, Ohm 법칙, Kirchhoff 법칙 → 기전력(emf), RC 회로</li>
+    </ul>
+    <p><b>자기장 줄기:</b> 자하(→ 실제로는 <b>전류</b>) → 자기장 → 자기력 → 앙페르 법칙 → 유도용량(L)</p>
+    <ul>
+      <li>자기장: Biot–Savart, 토크, 자기쌍극자 모멘트, 두 평행전류 사이 힘 \(d\vec F=i\,d\vec l\times\vec B\)</li>
+      <li>자기력: 교차장, 전자 발견, Hall 효과, 원운동 대전입자, 사이클로트론·싱크로트론</li>
+      <li>앙페르 → Faraday 유도법칙, Lenz 법칙, 솔레노이드·토로이드 → 유도기(L), 자체·상호유도, LC·RLC 진동, 교류 강제진동 · 자성(반자성·상자성·강자성)</li>
+    </ul>
+    <p class="log">녹음 07:33~09:50에서 교수님이 말로 설명한 목차가 이 그림이다. 이 한 쪽을 프린트해 두고 진도마다 위치를 확인하면 "지금 어디 하는지"를 놓치지 않는다.</p></div>
+
+  <h3>p.4 — 물질의 구성 · 양자화 · 물체</h3>
+  <div class="card">
+    <p>물질 → 분자 → 원자 → 원자핵(양성자 p⁺, 중간자 π, 중성자 n⁰) + 전자 e⁻. <b>전자는 전기 현상(q)과 자기 현상(\(i=dq/dt\))의 주인공.</b></p>
+    <div class="tw"><table><thead><tr><th>입자</th><th>전하 q</th><th>질량 m</th></tr></thead><tbody>
+      <tr><td>전자</td><td>\(-1.602\times10^{-19}\) C = −e</td><td>\(9.109\times10^{-31}\) kg</td></tr>
+      <tr><td>양성자</td><td>\(+1.602\times10^{-19}\) C = +e</td><td>\(1.6726\times10^{-27}\) kg</td></tr>
+      <tr><td>중성자</td><td>0</td><td>\(1.6749\times10^{-27}\) kg</td></tr>
+    </tbody></table></div>
+    <p><b>양자화:</b> 전하는 정수배 \(q=\pm e,\pm2e,\dots,\pm ne\). 정수배가 아닌 \(\pm e/3,\pm2e/3\)는 <b>quark</b>. (수업: "양자화에 큰 의미 부여하지 마라")</p>
+    <p><b>물체:</b> 도체(conductor) · 부도체(nonconductor) · 절연체(insulator). 그림 (a)~(e): 중성 구 옆에 대전체를 가져가면 전하가 <b>유도</b>되어 분리되고, 접지하면 한쪽 전하가 빠져나가 <b>과잉 전하가 남는다</b>. (f) 유전체(dielectric) 안의 유도 전하.</p></div>
+
+  <h3>p.5–6 — 쿨롱 법칙 · 전기장의 정의 · 전기장 표현 ①~③</h3>
+  <div class="card">
+    <p><b>1. 전기력(쿨롱 법칙)</b> \(\vec F=\dfrac{1}{4\pi\varepsilon_0}\dfrac{q_1q_2}{r^2}\hat e_r\). 세 그림: (a) 두 전하 (b) 일직선상 세 전하 — \(q_1\) 기준 왼쪽·오른쪽 힘의 합 (c) 세 번째 전하가 각 θ에 놓일 때 x·y 성분 합력. → <b>필수문제 1·2·3의 원형.</b></p>
+    <p><b>2. 전기장의 정의</b> \(\vec E=\lim_{q_0\to0}\dfrac{\vec F}{q_0}\). 대전체와 <b>양의 시험전하 \(q_0\)</b> 사이 힘을 단위 시험전하당으로 나눈 것. "\(q_0\)는 양의 시험전하라는 것이 중요."</p>
+    <p><b>3. 전기력선</b> — 밀도는 전기장의 크기, 접선 방향은 전기장의 방향. (수업의 "전기력선 개수 세기"가 여기 연결)</p>
+    <p><b>여러 가지 전기장의 표현</b> — "시험전하를 가져왔을 때 각각의 전기장을 구하라."</p>
+    <ul>
+      <li><b>① 점전하:</b> \(\vec E=\dfrac{1}{4\pi\varepsilon_0}\dfrac{q}{r^2}\hat r\) (시험전하는 미소전하)</li>
+      <li><b>② 점전하군:</b> \(\vec E=\sum_i\vec E_i=\dfrac{1}{4\pi\varepsilon_0}\sum_i\dfrac{q_i}{r_i^2}\hat r_i\) — 중첩</li>
+      <li><b>③ 전기쌍극자:</b> +q, −q가 거리 d. 축 위 점 P에서 \(\vec E_{(+)}\)와 \(\vec E_{(-)}\)의 차. 쌍극자 모멘트 \(\vec p\)(−→+ 방향)</li>
+    </ul></div>
+
+  <h3>p.7–8 — 전기장 표현 ④~⑥ · 쌍극자의 퍼텐셜에너지 · 필수문제</h3>
+  <div class="card">
+    <ul>
+      <li><b>④ 직선도선:</b> 선전하밀도 \(\lambda\), 미소전하 \(dq=\lambda\,dx\)를 적분</li>
+      <li><b>⑤ 원호 = 원형고리:</b> 반지름 R, 축 위 높이 z의 점 P. \(dE\cos\theta\)만 살아남고 옆 성분은 대칭으로 상쇄</li>
+      <li><b>⑥ 원판:</b> 고리 \(dr\)을 r=0~R로 적분. 의미: (1) 평평한 원판 중심축의 전기장 (2) <b>\(R\to\infty\)이면 \(E=\dfrac{\sigma}{2\varepsilon_0}\) (무한 평면판)</b> (3) 유한 원판에 매우 가까운 전기장 = 무한 판의 전기장</li>
+    </ul>
+    <p><b>4. 전기장 안의 전기쌍극자</b> — 균일한 \(\vec E\) 속 쌍극자가 각 θ일 때 토크와 퍼텐셜에너지 U. (교재 22장 끝부분)</p>
+    <p class="log">④~⑥이 교수님이 "다다음 시간 치일 것"이라고 한 <b>적분 계산</b>이다. 세 경우 모두 "미소전하 dq → dE → 대칭으로 살아남는 성분만 적분"의 같은 절차.</p></div>
+
+  <div class="card"><div class="t">&lt;필수문제&gt; 1~6 (p.8–9) — 답이 실려 있다</div>
+    <div class="tw"><table><thead><tr><th>#</th><th>문제</th><th>강의노트 답</th><th>유형</th></tr></thead><tbody>
+      <tr><td>1</td><td>\(q_1=20\) C(0,0), \(q_2=-3\) C(4,0), \(q_3=-4\) C(0,3) [m]. \(q_1\)에 작용하는 알짜 전기력</td><td>\(\vec F=k_e\left(\tfrac{15}{4}\hat i+\tfrac{80}{9}\hat j\right)\)</td><td>점전하군 합력(성분)</td></tr>
+      <tr><td>2</td><td>네 전하 고정, 원점의 전하 q에 작용하는 힘</td><td>\(\vec F=k_e\dfrac{\sqrt2}{2}\dfrac{Qq}{a^2}\hat j\)</td><td>대칭 상쇄 + 합력</td></tr>
+      <tr><td>3</td><td>한 변 a인 정삼각형 꼭짓점의 세 전하 q(질량 m, 정지). 위 꼭짓점 전하가 받는 힘의 크기</td><td>\(F_e=\sqrt3\,k_e\dfrac{q^2}{a^2}\)</td><td>벡터 합(60°)</td></tr>
+      <tr><td>4</td><td>면전하밀도 \(\sigma=-1.8\ \mu\)C/m² 무한평면. ① z방향 전기장 ② z축의 입자(m=1.0×10⁻² kg, q=2.0×10⁻⁶ C) 가속도 ③ z=20 m에서 +z로 100 m/s 출발 시 최대 높이</td><td>① \(E_z=1\times10^5\) N/C ② \(\vec a=-(20\ \mathrm{m/s^2})\hat k\) ③ \(z_{max}=270\) m</td><td>\(E=\sigma/2\varepsilon_0\) + 역학</td></tr>
+      <tr><td>5</td><td>전자(m=9×10⁻³¹ kg)가 E=180 N/C 균일장에 \(v_0=2\times10^6\) m/s로 진입, 판 길이 d=0.1 m. ① 가속도 ② 빠져나오는 시간 ③ 수직 변위</td><td>① \(a_y=-3.2\times10^{13}\) m/s² ② \(t=5\times10^{-8}\) s ③ \(y=-4\times10^{-2}\) m</td><td>전기장 속 포물선 운동</td></tr>
+      <tr><td>6</td><td>\(Q_1=+4\) C(4 m, 0), \(Q_2=+3\) C(0, 3 m). ① 계의 전기적 위치에너지 U ② 원점의 전기장 크기 (k_e는 그대로 둘 것) → Part-4 문제 5와 연결</td><td>① \(U=2.4k_e\) J ② \(E=\tfrac{5}{12}k_e\) N/C</td><td>합력 + 전위(Part-4 예고)</td></tr>
+    </tbody></table></div>
+    <p>답만 있고 풀이는 없다. 교수님이 "문제는 안 푼다"고 했으니 <b>풀이 과정은 스스로 채워야 하는 구조</b>. 문제 6은 "상수 \(k_e\)를 계산하지 말고 그대로 두라"는 지시가 붙어 있다 — 답안 표기 습관의 힌트.</p></div>
+
+  <h3 style="margin-top:34px">강의자료 B — 수업 슬라이드 22p (일반물리학2 · 전하와 전기장)</h3>
+  <p>톡방으로 받은 두 번째 파일. 파일명은 "ch15"인데 이는 참고 교재 『대학물리학』(북스힐)의 <b>15장 전하와 전기장</b>을 뜻하고, Halliday 기준으로는 <b>21장 Coulomb의 법칙 + 22장 전기장</b>이다. 강의노트가 요약본이라면 이 슬라이드는 <b>수업 순서와 예제</b>가 들어 있는 본편이다.</p>
+  <div class="tw"><table><thead><tr><th>슬라이드</th><th>내용</th><th>비고</th></tr></thead><tbody>
+    <tr><td>p.1–3</td><td>참고 교재(Halliday 『일반물리학 Ⅱ』 11판, 『대학물리학』 북스힐) · Ⅱ권 목차 21~44장 · 전기/자기/광학/현대물리 장별 절 목록</td><td>p.3에 <b>동그라미 표시</b>된 절들이 있음 — 교수님이 강조하는 절로 추정 <span class="ev q">추정</span></td></tr>
+    <tr><td>p.4</td><td>"이번 학기, 우리가 던질 질문들" — PART 01 전기 / 02 자기 / 03 광학 / 04 상대론과 현대물리</td><td>학기 전체 지도</td></tr>
+    <tr><td>p.5–6</td><td><b>Q1~Q7</b> 질문 카드: 전하란(보존·양자화·기본 입자가 담고 다님) / 왜 양자화(밀리컨 기름방울, q=n·e) / 도체·부도체(자유전자) / 쿨롱 법칙(역제곱·중첩 원리) / 정전기 유도(전하 분리, 알짜 전하 불변) / 도체·부도체·반도체·초전도체 / 전기장(공간의 각 점에 놓인 단위 전하당 힘, E=F/q)</td><td>9/4 수업의 골격. Q 카드의 "핵심 방정식" 줄이 곧 공식 목록</td></tr>
+    <tr><td>p.7</td><td>Ch.21 Coulomb's Law · Ch.22 전기장 요약: 대전입자는 벡터장 E를 만든다, E는 양의 시험전하 q₀가 받는 힘/q₀, 전기장선의 밀도 ∝ 전기장 크기, 양전하에서 나와 음전하에서 끝남</td><td>= 대학물리학 15-1~15-4</td></tr>
+    <tr><td>p.8</td><td>전기 17항목 · 자기 11항목 · 유도 3항목 · Maxwell 2항목 — <b>한 학기 목차</b>(전하의 정의 → … → RC회로 / 자하 → … → LC-RLC 교류 / Faraday–Lenz·RL·RLC / Maxwell·전자기파)</td><td>중간 범위(27장)는 전기 17항목 중 회로까지</td></tr>
+    <tr><td>p.9</td><td>물질의 구조(원자핵·전자), 입자 표(e, m), 유리막대·플라스틱 막대 실험 그림, 쿨롱 법칙과 뉴턴 만유인력 병기, k=1/4πε₀=8.99×10⁹, ε₀=8.85×10⁻¹² (permittivity constant)</td><td>강의노트 p.4와 동일 + 역제곱 대비</td></tr>
+    <tr><td>p.10</td><td>정전기 유도(검전기), 전하 보존(프랭클린: 전하는 생성이 아니라 이동, 고립계 알짜 전하 일정), 도체·부도체·반도체·유전체·초전도체, 에너지 밴드 그림(전도대·가전자대·E_g), 중첩 원리 F₁,net=ΣF₁ᵢ, q=ne</td><td>Q5·Q6 상세</td></tr>
+    <tr><td>p.11–13</td><td><b>예제 01~05</b> (풀이 없음) — 아래 표</td><td>수업 중 풀거나 과제 후보 <span class="ev q">추정</span></td></tr>
+    <tr><td>p.14–15</td><td>다음 단원 목차(전기장 정의·응용·가우스·전위) · 전기장 정의 E = lim F/q, 전기력선 8가지 성질(Faraday 도입, 양→음, 접선=방향, 밀도=세기, 개수 ∝ 전하량, 전위 높→낮, 도체 내부엔 없음)</td><td>서술형 후보</td></tr>
+    <tr><td>p.16</td><td>불연속 분포: 점전하 E=(1/4πε₀)q/r², 점전하군 Σ, <b>전기쌍극자</b> 축 위 전기장 — 이항전개 근사 → E≈(1/2πε₀)·p/z³, p=qd(−q→+q). 쌍극자 장은 r³로 감소</td><td>이항전개 (1+x)ⁿ≈1+nx 사용</td></tr>
+    <tr><td>p.17</td><td>연속 분포 표기(λ, σ, ρ) · <b>유한 직선 전하</b>: E=(1/4πε₀)·Q/[a(l+a)] (끝점에서 a 떨어진 축 위)</td><td>적분 ∫dx/x²</td></tr>
+    <tr><td>p.18</td><td><b>균일 고리</b>: E_z=(1/4πε₀)·qz/(R²+z²)^{3/2} — dE cosθ만 살아남음</td><td>대칭 상쇄</td></tr>
+    <tr><td>p.19</td><td><b>대전 원판</b>: E=(σ/2ε₀)[1−z/√(z²+R²)] → R→∞이면 σ/2ε₀ (무한 평면판). "유한 원판에 매우 가까운 전기장 = 원판이 무한히 크고 유한 거리의 전기장"</td><td>고리 결과를 dr로 적분</td></tr>
+    <tr><td>p.20</td><td>전기쌍극자가 받는 힘·토크: τ = p × E, |τ| = pE sinθ</td><td>Ch.22 마무리</td></tr>
+    <tr><td>p.22</td><td>Q8 가우스 법칙 & 전위 예고: ∮E·dA = Q_enc/ε₀, V=U/q, E=−∇V</td><td>다음 주 이후</td></tr>
+  </tbody></table></div>
+
+  <div class="card"><div class="t">예제 01~05 (p.11–13) — 슬라이드에 답이 없어 노트 작성 시 직접 계산 <span class="ev q">검산용</span></div>
+    <div class="tw"><table><thead><tr><th>#</th><th>문제</th><th>풀이 요지 · 답</th></tr></thead><tbody>
+      <tr><td>01</td><td>구리 동전 1.0 g, 원자 1개당 4.6×10⁻¹⁸ C의 양·음전하(원자량 64). 총 양전하량?</td><td>원자 수 N=(1.0/64)×6.02×10²³≈9.4×10²¹ → Q=N×4.6×10⁻¹⁸≈<b>4.3×10⁴ C</b></td></tr>
+      <tr><td>02</td><td>7.0×10⁻¹⁰ m 떨어진 동일한 두 이온 사이 전기력 1.88×10⁻⁹ N. 각 이온의 전하?</td><td>q=√(F r²/k)=√(1.88×10⁻⁹·4.9×10⁻¹⁹/8.99×10⁹)≈<b>3.2×10⁻¹⁹ C = 2e</b></td></tr>
+      <tr><td>03</td><td>핵 속 두 양성자(거리 4.0×10⁻¹⁵ m) 사이 반발력</td><td>F=k e²/r²=8.99×10⁹·(1.6×10⁻¹⁹)²/(4×10⁻¹⁵)²≈<b>14 N</b> (원자핵 스케일에서 엄청난 힘 → 강한 핵력이 필요한 이유)</td></tr>
+      <tr><td>04</td><td>q₁=−1 μC, q₂=+3 μC(15 cm, 축 위), q₃=−2 μC(10 cm, ∠q₃q₁q₂=120°). q₁에 작용하는 힘</td><td>F₁₂(인력, +x)=k·3×10⁻¹²/0.15²≈1.20 N · F₁₃(척력, q₃ 반대쪽 300° 방향)=k·2×10⁻¹²/0.1²≈1.80 N → 성분 (1.20+0.90, −1.56)=(2.10, −1.56) → <b>|F|≈2.6 N, q₁q₂ 축 아래 36.6°</b></td></tr>
+      <tr><td>05</td><td>수소원자에서 양성자–전자 사이 전기력/중력 비</td><td>F_e/F_g = e²/(4πε₀ G m_p m_e) = 2.30×10⁻²⁸/1.02×10⁻⁶⁷ ≈ <b>2.3×10³⁹</b> (거리 무관)</td></tr>
+    </tbody></table></div>
+    <p>04번이 교수님이 말한 "강의노트의 벡터 합력 문제"와 같은 유형이다. 힘의 <b>방향(인력/척력)을 먼저 그림에 표시</b>하고 성분으로 나눈다.</p></div>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2><span class="no">5 · ANNOTATIONS</span>강의자료 위 필기 내용 업데이트</h2>
+  <div class="note none"><span class="ic">미보유</span><div><p>강의노트에 필기한 사진이 아직 없다. 올라오면 해당 쪽(p.3–9)의 강조·메모를 4절에 덧입히고 여기에 변경 내역을 적는다.</p></div></div>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2><span class="no">6 · ★ EXAM</span>교수님의 시험 관련 언급</h2>
+  <p>발언 원문에 가깝게 옮겼다. 교수 분석 문서에도 같은 내용이 들어간다.</p>
+  <div class="exambox">
+    <div class="q"><span class="t">54:58</span><span class="s"><b>"시험 범위는 27장까지 보게 될 거예요."</b><div class="m">계획서(7주차 = 26장)보다 한 장 더. 강의노트로는 p.1–32.</div></span></div>
+    <div class="q"><span class="t">59:19</span><span class="s"><b>"중간고사를 정말 열심히 공부하기를 바라요. 중간고사를 포기하면서 뒤에 부분을 아예 포기해 버리고…"</b><div class="m">전기 파트를 이해해야 자기 파트가 쉬워진다. 중간 포기 = 기말 포기.</div></span></div>
+    <div class="q"><span class="t">32:14</span><span class="s"><b>"다다음 시간 정도에 하는 전기장의 계산에 치일 거야. 짜증 날 거거든."</b><div class="m">9/11(금)부터 직선도선·고리·원판 적분. 계산 준비의 시작점.</div></span></div>
+    <div class="q"><span class="t">25:55</span><span class="s"><b>"예전에는 다 k로만 썼지만 이제는 무조건 \(1/4\pi\varepsilon_0\)로 써야 돼. 그게 정확하게 쓰는 거야."</b><div class="m">답안 표기 요구. 강의노트 필수문제 6도 "k_e는 계산하지 말고 그대로 두라".</div></span></div>
+    <div class="q"><span class="t">16:16</span><span class="s"><b>"강의노트에 보면 이쪽에서 오고 이쪽에서 와서 벡터 합력을 구하는 문제들이 있어. x축 y축 i, j 벡터로 해서 더해 버리면 돼."</b><div class="m">필수문제 1·2·3 유형을 직접 지목. 출제 후보.</div></span></div>
+    <div class="q"><span class="t">36:16</span><span class="s"><b>"문제를 안 풀고 계속 이론만 하잖아요."</b> (수업 방식 자인)<div class="m">시험 문제 풀이는 강의노트 필수문제·기초문제로 스스로 채워야 한다.</div></span></div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2><span class="no">7 · TASKS</span>과제 언급 → 할 일</h2>
+  <p>오늘 <b>제출 과제 언급은 없었다</b>. 수업에서 파생된 준비 사항을 <code>study-materials/_할일.md</code>에 추가했다.</p>
+  <div class="tw"><table><thead><tr><th>할 일</th><th>기한</th><th>출처</th></tr></thead><tbody>
+    <tr><td>강의노트 p.3–9 예습 + <b>필수문제 1~6 직접 풀기</b>(답과 대조)</td><td>9/9(수) 수업 전</td><td>녹음 16:16 · 32:14</td></tr>
+    <tr><td>9/2 출석 인정 정정 확인 (교수 허락받음)</td><td>9/9(수) 수업 때</td><td>사용자 9/4</td></tr>
+    <tr><td>1학기 13장 역제곱 법칙 · 벡터 성분 합 복습</td><td>9/11(금) 전</td><td>녹음 17:06 · 32:14</td></tr>
+    <tr><td>결석한 9/2 내용(21장 전하 = 강의노트 Part-01) 보강 — 이 문서 4절로 대체 가능, 동기 필기 있으면 대조</td><td>이번 주</td><td>—</td></tr>
+  </tbody></table></div>
+</section>
+
+<!-- 교수 분석 -->
+<section>
+  <h2><span class="no">PROFESSOR</span>김민수 교수 — 수업 · 출제 방식 분석 v0.1</h2>
+  <p>근거: 9/4 녹음 60분, 강의노트 63쪽. <span class="ev r">녹음</span> 직접 발언 &nbsp;<span class="ev g">강의노트</span> &nbsp;<span class="ev q">추정</span> &nbsp;<span class="ev x">미확인</span></p>
+  <div class="tw"><table><thead><tr><th>관찰</th><th>내용</th><th>근거</th></tr></thead><tbody>
+    <tr><td>수업 방식</td><td><b>판서 강의, 문제는 안 푼다.</b> 스크린 안 쓰고 얼굴 보고 계속 질문. 대답·표정 없는 것을 강하게 싫어함</td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>설명 습관</td><td>한자 풀이(誘電率), 비유(학생 20명 = 전하 그룹), 1학기 소환(13장 역제곱, 16장 파동). <b>개념 → 왜 → 전체 지도</b>. 계산은 "강의노트에 있다"</td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>강의노트 구조</td><td>Part별 이론 요약 + <b>&lt;필수문제&gt;(답만)</b> + 전기/자기 <b>기초문제</b> 묶음. 문제 6에 "상수는 그대로 두라"는 채점 힌트</td><td><span class="ev g">강의노트</span></td></tr>
+    <tr><td>표기 요구</td><td>\(k\) 대신 <b>\(1/4\pi\varepsilon_0\)</b>. 전하는 항상 알짜 전하. \(k_e\)는 숫자로 풀지 않고 기호로</td><td><span class="ev r">녹음</span> <span class="ev g">강의노트</span></td></tr>
+    <tr><td>중간고사 범위</td><td><b>21~27장</b> = 강의노트 p.1–32</td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>평가 형식</td><td>중간 45 / 기말 45 / 출석 10, 주관식 계산. 10회 결석 F, 지각 3회부터 감점</td><td><span class="ev g">계획서(앱)</span></td></tr>
+    <tr><td>예상 유형</td><td>① 점전하군 합력(성분 벡터) ② 연속 분포 전기장 적분(선·고리·원판) ③ 균일장 속 입자 운동(필수문제 4·5) ④ 개념 서술(유전율의 의미, 왜 자하 대신 전류인가, 정전기학/동전기학) ⑤ \(c=1/\sqrt{\varepsilon_0\mu_0}\)</td><td><span class="ev q">추정</span> — ①②③은 강의노트 문제, ④⑤는 강조 빈도</td></tr>
+    <tr><td>기출·과제</td><td>—</td><td><span class="ev x">미확인</span></td></tr>
+  </tbody></table></div>
+  <p class="log"><b>2026-09-04 v0.2</b> 수업 슬라이드 22p(ch15 전하와 전기장) 추가: 학기 질문 카드 Q1~Q8, 예제 01~05 답 계산, 연속 분포 공식 3종·쌍극자 토크.</p>
+  <p class="log"><b>2026-09-04 v0.1</b> 녹음 + 강의노트 p.1–10 기반. 판서·필기·교재 미보유.</p>
+  <p class="foot">출처: 클로바노트 녹음 텍스트(STT 오인식 "전화"→전하, "플롱"→쿨롱, "입실론 제로"→ε₀ 등 복원) · 김민수 『GENERAL PHYSICS』 2학기 강의노트 63p(톡방 배포, 9/4). 원본: study-materials/일반물리학2/2026-09-04/ · 강의노트: study-materials/일반물리학2/_교재/</p>
+</section>
+</div>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>

@@ -1,0 +1,236 @@
+<title>공업수학1 교수 분석</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F5F7F6; --paper:#FFFFFF; --ink:#1B2430; --ink-2:#3F4C5A; --ink-3:#6E7B88;
+  --line:#DCE2E6; --line-2:#C5CED5;
+  --acc:#0F6E8C; --acc-soft:#E3F0F4; --acc-ink:#0B5468;
+  --warn:#B9791A; --warn-soft:#FBF1DD; --warn-ink:#7A4E0B;
+  --ok:#3D7A4E; --ok-soft:#E5F1E7; --ok-ink:#2B5A39;
+  --crit:#B2483F; --crit-soft:#F8E6E3; --crit-ink:#7E2F28;
+  --ans:#F0F3F5;
+  --font-display:"Gowun Batang","Noto Serif KR",Georgia,serif;
+  --font-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121820; --paper:#1A222C; --ink:#E6EAF0; --ink-2:#BCC6D1; --ink-3:#8593A2;
+    --line:#2A3542; --line-2:#3A4756;
+    --acc:#4FB3D1; --acc-soft:#173039; --acc-ink:#8FD3E8;
+    --warn:#D9A34A; --warn-soft:#332816; --warn-ink:#F0C87E;
+    --ok:#7FBF8F; --ok-soft:#1B2E21; --ok-ink:#A9DDB5;
+    --crit:#E07C72; --crit-soft:#34201E; --crit-ink:#F1B0A9;
+    --ans:#202A35; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121820; --paper:#1A222C; --ink:#E6EAF0; --ink-2:#BCC6D1; --ink-3:#8593A2;
+  --line:#2A3542; --line-2:#3A4756;
+  --acc:#4FB3D1; --acc-soft:#173039; --acc-ink:#8FD3E8;
+  --warn:#D9A34A; --warn-soft:#332816; --warn-ink:#F0C87E;
+  --ok:#7FBF8F; --ok-soft:#1B2E21; --ok-ink:#A9DDB5;
+  --crit:#E07C72; --crit-soft:#34201E; --crit-ink:#F1B0A9;
+  --ans:#202A35; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere}
+mjx-container{color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px 90px}
+.head{padding:44px 0 22px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.eyebrow b{color:var(--acc);font-weight:500}
+.eyebrow .live{background:var(--ok-soft);color:var(--ok-ink);border-radius:5px;padding:1px 8px;text-transform:none;letter-spacing:.04em}
+h1{font-family:var(--font-display);font-weight:700;font-size:clamp(28px,4.4vw,40px);line-height:1.22;margin:12px 0 10px;letter-spacing:-.01em;text-wrap:balance}
+.lede{font-size:16.5px;color:var(--ink-2);margin:0}
+section{padding:34px 0 6px}
+section+section{border-top:1px solid var(--line)}
+h2{font-family:var(--font-display);font-weight:700;font-size:25px;line-height:1.3;margin:0 0 8px;letter-spacing:-.005em;text-wrap:balance}
+h2 .no{font-family:var(--font-mono);font-weight:500;font-size:12px;color:var(--acc);letter-spacing:.1em;display:block;margin-bottom:6px}
+h3{font-size:17.5px;font-weight:700;margin:26px 0 8px}
+p{margin:0 0 12px} ul,ol{margin:0 0 12px;padding-left:22px} li{margin:4px 0}
+.tw{overflow-x:auto;margin:12px 0 16px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px}
+th,td{padding:9px 14px;text-align:left;vertical-align:top;border-top:1px solid var(--line)}
+thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3);font-weight:500;background:var(--ans)}
+td.n{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:13.5px;text-align:right}
+.ev{display:inline-block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;border-radius:5px;padding:1px 7px;vertical-align:middle;margin-left:6px;white-space:nowrap}
+.ev.s{background:var(--acc-soft);color:var(--acc-ink)} .ev.r{background:#E4E9F8;color:#2F3E86} .ev.g{background:var(--ok-soft);color:var(--ok-ink)} .ev.q{background:var(--warn-soft);color:var(--warn-ink)} .ev.x{background:var(--crit-soft);color:var(--crit-ink)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0 14px}
+.card .t{font-weight:700;margin-bottom:4px}
+.card p:last-child{margin-bottom:0}
+.card .why{color:var(--ink-2);font-size:15px;background:var(--ans);border-radius:8px;padding:8px 12px;margin-top:6px}
+.note{border-radius:10px;padding:12px 16px;margin:14px 0 18px;font-size:15px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.note .ic{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;padding:2px 7px;border-radius:5px;margin-top:3px;white-space:nowrap;color:#fff}
+.note.exam{background:var(--warn-soft);color:var(--warn-ink)} .note.exam .ic{background:var(--warn)}
+.note.tip{background:var(--acc-soft);color:var(--acc-ink)} .note.tip .ic{background:var(--acc)}
+.note.todo{background:var(--crit-soft);color:var(--crit-ink)} .note.todo .ic{background:var(--crit)}
+.note p{margin:0 0 6px}.note p:last-child{margin:0}
+.tpl{background:var(--paper);border:1px dashed var(--line-2);border-radius:12px;padding:16px 18px;margin:12px 0 16px;font-size:15px}
+.tpl .row{display:grid;grid-template-columns:118px minmax(0,1fr);gap:6px 12px;padding:6px 0;border-top:1px solid var(--line)}
+.tpl .row:first-of-type{border-top:0}
+.tpl .k{font-family:var(--font-mono);font-size:12px;color:var(--acc);padding-top:4px}
+.chk{list-style:none;padding:0;margin:8px 0 14px}
+.chk li{padding:7px 0 7px 30px;position:relative;border-top:1px dashed var(--line)}
+.chk li:first-child{border-top:0}
+.chk li::before{content:"";position:absolute;left:2px;top:13px;width:14px;height:14px;border:1.5px solid var(--line-2);border-radius:4px}
+.log{font-size:14px;color:var(--ink-2)}
+.log b{font-family:var(--font-mono);font-weight:500;color:var(--ink-3);margin-right:8px}
+.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+@media print{body{background:#fff} .card,.tw,.note,.tpl{break-inside:avoid} @page{size:A4;margin:14mm 12mm}}
+
+.wrap{padding-bottom:60px}
+</style>
+
+<div class="wrap">
+<header class="head">
+  <div class="eyebrow"><b>공업수학1 · 이기영 교수</b><span>풀이 스타일 · 출제 방식 분석</span><span class="live">계속 갱신되는 문서 · v0.2 (2026-09-04)</span></div>
+  <h1>교수님은 어떻게 풀고, 어떻게 낼 것인가</h1>
+  <p class="lede">교재 풀이과정 · 칠판 판서 · 녹음 속 설명을 근거로 <b>풀이 습관</b>과 <b>출제 경향</b>을 따로 모아 두는 문서다. 지금은 강의 슬라이드와 강의계획서만 있으므로 그 범위에서 읽어낸 것을 적었고, 판서·녹음이 들어올 때마다 근거 표시를 갱신한다.</p>
+</header>
+
+<section>
+  <h2><span class="no">0 · EVIDENCE</span>근거 현황 — 무엇을 보고 쓴 분석인가</h2>
+  <p>각 관찰에는 근거 표시가 붙는다. <span class="ev s">슬라이드</span> 강의자료 PDF에서 직접 확인 &nbsp;<span class="ev g">계획서</span> 강의계획서·평가 규정 &nbsp;<span class="ev q">추정</span> 근거에서 합리적으로 유추 &nbsp;<span class="ev x">미확인</span> 아직 자료 없음 &nbsp;<span class="ev r">녹음</span> 9/4 수업 녹음(8분 49초)에서 직접 확인.</p>
+  <div class="tw"><table>
+    <thead><tr><th>자료</th><th>상태</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td>강의 슬라이드</td><td><span class="ev s">보유</span></td><td>Ch.1(46p) · Ch.3(18p) · Ch.4(22p) · Ch.5(23p) · Ch.6(47p). <b>Ch.2(2계 ODE, 4~5주차)는 없음</b> — 중간고사 핵심 구간이라 확보 필요</td></tr>
+      <tr><td>강의계획서 · 평가 규정</td><td><span class="ev g">보유</span></td><td>Ch.1 PDF 앞부분 p.2–7 + 포털 주별 계획</td></tr>
+      <tr><td>칠판 판서 사진</td><td><span class="ev s">1장</span></td><td>9/4 과제 공지 판서. 풀이 판서는 아직 없음</td></tr>
+      <tr><td>녹음 텍스트</td><td><span class="ev r">부분 보유</span></td><td>9/4 앞 8분 49초 (p.18–19, Ex.4 시작까지). 이후 녹음 끊김</td></tr>
+      <tr><td>과제 문제</td><td><span class="ev s">1주차 확보</span></td><td>9/4 판서: <b>1st Week H.W. — &lt;1.3&gt; 6, 7, 8, 16, 17</b>. 전부 Kreyszig 10판 <b>Problem Set 1.3</b> 번호 → 과제 출처는 교재 연습문제로 확인. 제출 9/9(수) 수업 전 교탁</td></tr>
+      <tr><td>기출 · 족보</td><td><span class="ev x">없음</span></td><td>선배·동기 통해 확보 시 가장 강한 근거</td></tr>
+    </tbody></table></div>
+</section>
+
+<section>
+  <h2><span class="no">1 · SOLVING STYLE</span>풀이 스타일 — 슬라이드에서 읽히는 습관</h2>
+
+  <div class="card"><div class="t">① 모든 풀이를 Step 1 · 2 · 3 (· 4) 골격으로 쓴다 <span class="ev s">슬라이드</span></div>
+    <p>Ch.1에서 "Step" 표기가 12회, Ch.4 6회, Ch.6 8회. 모델링 문제는 <b>Step 1 모델 → Step 2 해법 → Step 3 해석</b>, 순수 계산 문제는 <b>Step 1 판별 → Step 2 해 구하기 → Step 3 검증 (→ Step 4 특수해)</b>. 1.4 Ex.5는 Step 4까지 있다.</p>
+    <div class="why">답안을 같은 골격으로 쓰면 채점자가 기대하는 순서와 일치한다. 특히 "판별"을 첫 줄에 명시하는 습관.</div></div>
+
+  <div class="card"><div class="t">② 실패한 시도를 지우지 않고 보여 준다 <span class="ev s">슬라이드</span></div>
+    <p>1.4 Ex.5 적분인자 문제에서 \(R(x)\)를 먼저 계산해 "적용불가능"이라고 적은 뒤 \(R^*(y)\)로 넘어간다. 답만 쓰지 않고 <b>왜 그 방법을 골랐는지</b>를 과정으로 남기는 스타일.</p>
+    <div class="why">시험에서도 "\(R\) 안 됨 → \(R^*\) 시도"처럼 선택 근거를 한 줄 적는 것이 부분점수와 직결될 가능성이 크다. <span class="ev q">추정</span></div></div>
+
+  <div class="card"><div class="t">③ 검증(검산) 단계를 별도 Step으로 둔다 <span class="ev s">슬라이드</span></div>
+    <p>1.4 Ex.1은 "Step 3 검증"에서 \(u_x=M,\ u_y=N\)을 다시 확인하고, Ex.5는 "검증" 소제목 아래 완전성을 재확인한다. 방사성 붕괴 Ex.5도 "결과의 검토"가 있다.</p>
+    <div class="why">답을 구한 뒤 원식에 대입하는 한 줄이 습관화되어 있다. 답안 마지막 줄에 "검산: … ✓"를 붙일 것.</div></div>
+
+  <div class="card"><div class="t">④ 교재(Kreyszig 10판) 예제를 번호까지 그대로 쓴다 <span class="ev s">슬라이드</span></div>
+    <p>Ex.4 · Ex.5(1.1), Ex.1 · 7 · 8(1.3), Ex.1 · 3 · 5(1.4), Ex.1 · 2 · 4(1.5) — 전부 Kreyszig 본문 예제 번호와 일치. 수치·문장도 교재 번역판 그대로.</p>
+    <div class="why">교재 예제는 <b>풀이가 이미 공개된 문제</b>다. 시험은 예제 자체보다 예제의 수치·형태를 바꾼 변형이 나올 가능성이 높다. <span class="ev q">추정</span></div></div>
+
+  <div class="card"><div class="t">⑤ 각 절 끝에 "예제) … 구하시오" 1~3문항을 풀이 없이 둔다 <span class="ev s">슬라이드</span></div>
+    <p>Ch.1 7회, Ch.3 3회, Ch.4 3회, Ch.5 1회, Ch.6 12회. 슬라이드에 답이 없으므로 <b>수업 중 판서로 풀거나 과제로 낼 문제</b>다. 이 문항들은 교재 본문 예제가 아니라 별도로 고른 문제라 <b>출제 풀 1순위 후보</b>. <span class="ev q">추정</span></p>
+    <div class="why">판서 사진이 들어오면 이 문항들의 풀이 순서·강조 표기를 가장 먼저 확인한다.</div></div>
+
+  <div class="card"><div class="t">⑥ 표기 습관 <span class="ev s">슬라이드</span></div>
+    <ul>
+      <li>미분은 프라임 \(y',\ y''\) 위주. 변수분리 순간에만 \(\dfrac{dy}{dx}\)로 바꿔 쓴다.</li>
+      <li>완전미분방정식은 \(M\,dx+N\,dy=0\), 적분인자 절에서는 \(P\,dx+Q\,dy=0\)로 문자를 바꾼다 — 교재 그대로. 시험에서 \(P,Q\)로 나와도 당황하지 말 것.</li>
+      <li>선형 ODE 공식은 \(h=\int p\,dx\)를 먼저 정의하고 \(y=e^{-h}\left(\int e^{h}r\,dx+c\right)\)로 쓴다. 적분인자에 \(\mu\) 대신 \(F\)를 쓴다.</li>
+      <li>용어는 한글(영문) 병기: 완전미분방정식(Exact), 적분인자(Integrating Factors). 시험 문제도 한글 용어로 나올 가능성이 높다.</li>
+      <li>적분상수는 중간 단계에서 \(c^*\), 정리 후 \(c\)로 바꿔 쓴다(\(e^{c^*}=c\)). 답안에서 상수 이름을 바꿀 때 한 번 언급하면 좋다.</li>
+    </ul></div>
+
+  <div class="card"><div class="t">⑦ 증명보다 계산, 매 장에 모델링 <span class="ev g">계획서</span> <span class="ev s">슬라이드</span></div>
+    <p>강의계획서: "엄밀한 수학적 접근보다 계산 방법과 수리적 방법". 슬라이드 5개 장에서 "증명"이라는 단어는 Ch.6에 2회뿐. 반면 모델링 예제는 Ch.1에 3개(냉각·낙하·투사체) + Torricelli + 방사성 붕괴 + RL 회로 + 로지스틱, Ch.4에도 응용 9회 언급.</p>
+    <div class="why">정리의 증명을 외울 필요는 없다. <b>유도 재현 + 문제 반복 + 모델링 1~2문제</b>가 준비의 전부다.</div></div>
+
+  <div class="card"><div class="t">⑧ 다루지 않는다고 못 박은 것 — 특이해, 비선형 <span class="ev r">녹음 9/4</span></div>
+    <p>"특이해는 해는 해인데 <b>공학적으로 의미가 없는 해</b>. 관심 가질 해는 <b>일반해와 특수해만</b>. 특이해는 거의 안 할 거다." "선형 위주로 하고 <b>비선형은 거의 안 할 거야</b>, 특이한 경우만."</p>
+    <div class="why">시험 준비에서 특이해 유도는 제외해도 된다(용어 정의만). 비선형은 1장의 변수분리·동차·Bernoulli처럼 "선형으로 바꾸는" 특수 꼴만 준비.</div></div>
+  <div class="card"><div class="t">⑨ 개수 논리로 설명한다 <span class="ev r">녹음 9/4</span></div>
+    <p>"1계는 한 번 적분 → 적분상수 1개 → 조건 1개. 2계는 두 번 적분 → 상수 2개 → 조건 2개. 3계는 3개." 정의를 외우게 하지 않고 <b>왜 그 개수인지</b>를 계산 횟수로 설명.</p>
+    <div class="why">2계 ODE(4주차)에서 초기조건 두 개(y(0), y′(0))가 왜 필요한지 묻는 서술형이 나올 수 있다. <span class="ev q">추정</span></div></div>
+  <div class="card"><div class="t">⑩ 풀이 전 판별 질문, 뒷자리 학생 지목 <span class="ev r">녹음 9/4</span></div>
+    <p>(y′)²−xy′+y=0을 띄우고 "선형이야 비선형이야?"를 <b>뒷자리 학생 이름을 불러</b> 답하게 했다("저 뒤에 있는 학생들은 공부하기 싫구나"). 답을 받은 뒤 "멱수가 얼마야? 제곱. 도함수의 멱수가 1이어야 선형"으로 판별 근거를 확인.</p>
+    <div class="why">슬라이드 관찰 ①(판별 우선)이 실제 수업에서도 확인됨. 앞자리에 앉고, 식을 보면 <b>계·선형성을 즉답</b>할 수 있게 준비.</div></div>
+  <div class="card"><div class="t">⑪ 용어 선호 — "경계조건" <span class="ev r">녹음 9/4</span></div>
+    <p>"초기조건이라는 게 있고 경계조건이라는 게 있는데 <b>우리 쪽(공학)에서는 경계조건이라는 말을 많이 써요</b>." 초기조건은 "독립변수가 0일 때(t=0 또는 x=0)의 값". 경계조건은 2계에서 다시 나온다고 예고.</p>
+    <div class="why">문제에 "경계조건"이라고 나와도 당황하지 말 것. 1장에서는 초기조건만 쓴다.</div></div>
+  <div class="card"><div class="t">⑫ 전날 수업을 언급하며 반복 <span class="ev r">녹음 9/4</span></div>
+    <p>"어제도 얘기했지만 미분방정식은 도함수를 포함한 방정식이고, 적분하면 된다." 정의를 매 시간 한 번씩 되풀이한다.</p>
+    <div class="why">9/2 결석분(정의·모델화)은 9/4 도입부에서 요약 반복됐다. 결석해도 다음 시간 첫 5분을 놓치지 않으면 연결된다.</div></div>
+  <div class="card"><div class="t">⑬ 과제는 교재 Problem Set에서 번호로 낸다 <span class="ev s">판서 9/4</span></div>
+    <p>1주차 과제 "&lt;1.3&gt; 6, 7, 8, 16, 17" — Kreyszig 1.3 연습문제 그대로. 6(변수분리) · 7, 17(동차, y/x=u) · 8, 16(치환형, y+4x=v / x+y−2=v). <b>8번에 동그라미</b>를 치고 옆에 y′=(…)를 적어 강조했다. 16·17은 초기값 문제.</p>
+    <div class="why">교재 지시문이 "Show the steps of derivation, <b>check your answer by substitution</b>" — 과제도 검산 포함이 기본. 강조된 8번(치환형)과 같은 유형인 16번이 시험 후보 1순위. <span class="ev q">추정</span></div></div>
+</section>
+
+<section>
+  <h2><span class="no">2 · CLASS PATTERN</span>수업 운영 패턴</h2>
+  <p>슬라이드 구조로 본 한 절(section)의 진행: <b>정의(한글·영문) → 성질·정리 → 교재 Ex. 풀이(Step 골격) → "예제)" 연습 1~3문항</b>. 이 순서가 모든 장에서 반복된다.</p>
+  <div class="tw"><table>
+    <thead><tr><th>장</th><th>주차</th><th>분량</th><th>교재 Ex.</th><th>"예제)" 연습</th><th>Step 표기</th><th>읽히는 것</th></tr></thead>
+    <tbody>
+      <tr><td>Ch.1 1계 ODE</td><td>1~3주차</td><td class="n">46p</td><td class="n">13</td><td class="n">7</td><td class="n">12</td><td>가장 촘촘히 풀어 줌. 유형 판별 훈련 구간</td></tr>
+      <tr><td>Ch.2 2계 선형</td><td>4~5주차</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td><b>자료 없음.</b> 중간고사 핵심(진동·공진 모델링)</td></tr>
+      <tr><td>Ch.3 고계 선형</td><td>6~7주차</td><td class="n">18p</td><td class="n">5</td><td class="n">3</td><td class="n">3</td><td>짧다. Ch.2의 확장이라 Ch.2가 되면 자동</td></tr>
+      <tr><td>Ch.4 연립 ODE</td><td>9~10주차</td><td class="n">22p</td><td class="n">5</td><td class="n">3</td><td class="n">6</td><td>고유값·고유벡터 계산이 중심</td></tr>
+      <tr><td>Ch.5 급수해</td><td>11주차</td><td class="n">23p</td><td class="n">2</td><td class="n">1</td><td class="n">0</td><td>예제 최소. 비중 낮을 가능성 <span class="ev q">추정</span></td></tr>
+      <tr><td>Ch.6 Laplace</td><td>12~15주차</td><td class="n">47p</td><td class="n">23</td><td class="n">12</td><td class="n">8</td><td><b>예제 밀도 최고.</b> 기말의 중심</td></tr>
+    </tbody></table></div>
+  <div class="note tip"><span class="ic">READ</span><div><p>분량과 예제 수가 곧 비중이다. 중간고사는 <b>Ch.1 + Ch.2</b>가 몸통이고(Ch.3은 Ch.2의 반복), 기말은 <b>Ch.6 Laplace</b>가 몸통이다. Ch.5는 예제가 하나뿐이라 "한 문제 나오면 다행" 수준으로 잡는다. <span class="ev q">추정</span></p></div></div>
+</section>
+
+<section>
+  <h2><span class="no">3 · EXAM STYLE</span>출제 방식 — 지금까지의 추정</h2>
+  <div class="tw"><table>
+    <thead><tr><th>항목</th><th>내용</th><th>근거</th></tr></thead>
+    <tbody>
+      <tr><td>형식</td><td>Written test. 중간 40 + 기말 40 = 80%. 퀴즈 0%</td><td><span class="ev g">계획서</span></td></tr>
+      <tr><td>문항 유형</td><td>계산 서술형(풀이 과정 채점). 객관식 가능성 낮음</td><td><span class="ev q">추정</span> — 계획서 "계산 방법", 슬라이드 Step 채점 골격</td></tr>
+      <tr><td>출제 제외 (발언)</td><td><b>특이해</b>(공학적 의미 없음, 안 다룸) · <b>비선형 일반</b>(특이한 경우만)</td><td><span class="ev r">녹음 9/4</span></td></tr>
+      <tr><td>출제 풀 1순위</td><td>슬라이드 "예제)" 연습문항 (Ch.1 16문제) 및 그 수치 변형</td><td><span class="ev q">추정</span></td></tr>
+      <tr><td>출제 풀 2순위</td><td>교재 Ex. 변형 (Torricelli·RL·로지스틱 같은 모델링 포함)</td><td><span class="ev q">추정</span></td></tr>
+      <tr><td>출제 풀 3순위</td><td>매주 과제 = <b>Kreyszig Problem Set</b>(1주차: 1.3 #6·7·8·16·17). 7주치 과제가 중간고사 예상 문제집</td><td><span class="ev s">판서 9/4 확인</span></td></tr>
+      <tr><td>채점 포인트</td><td>① 유형 판별 명시 ② 방법 선택 근거 ③ 계산 ④ 검산 ⑤ 초기조건 반영</td><td><span class="ev q">추정</span> — 풀이 스타일 ①②③에서</td></tr>
+      <tr><td>중간 범위</td><td>1~7주차: Ch.1 1계 · Ch.2 2계 · Ch.3 고계</td><td><span class="ev g">계획서</span></td></tr>
+      <tr><td>기말 범위</td><td>9~15주차: Ch.4 연립 · Ch.5 급수 · Ch.6 Laplace (누적 여부 미확인)</td><td><span class="ev g">계획서</span> <span class="ev x">누적 미확인</span></td></tr>
+    </tbody></table></div>
+  <div class="note exam"><span class="ic">EXAM</span><div><p><b>Ch.1에서 나온다면 이 다섯 유형 중에서다.</b> 동차형(\(y=ux\)) · 적분인자(\(R\)→\(R^*\)) · 선형 공식 · Bernoulli 치환 · 모델링(RL 또는 로지스틱). 슬라이드 연습문항 16개 중 이 다섯 유형이 13개를 차지한다.</p></div></div>
+</section>
+
+<section>
+  <h2><span class="no">4 · ANSWER TEMPLATE</span>교수 스타일에 맞춘 답안 골격</h2>
+  <p>슬라이드의 Step 구조를 그대로 답안에 옮긴 것이다. 시험 전까지 이 틀로 손에 익힌다.</p>
+  <div class="tpl">
+    <div class="row"><span class="k">Step 1 판별</span><span>"\(M_y=\dots,\ N_x=\dots\) → 완전이 아님" / "동차: 모든 항 1차" / "표준형 \(y'+\frac2x y=\frac3x\), 선형" — <b>유형과 근거를 한 줄로</b></span></div>
+    <div class="row"><span class="k">방법 선택</span><span>적분인자면 "\(R(x)=\dots\) 는 \(y\) 포함 → 불가. \(R^*(y)=\dots=-1\) → \(F=e^{-y}\)". 실패 시도도 적는다</span></div>
+    <div class="row"><span class="k">Step 2 풀이</span><span>치환·적분 과정을 줄마다 한 동작씩. 적분상수는 \(c^*\)→\(c\) 전환을 표시</span></div>
+    <div class="row"><span class="k">Step 3 검증</span><span>"검산: \(u_x=M\) ✓" 또는 원식 대입 한 줄</span></div>
+    <div class="row"><span class="k">Step 4 조건</span><span>초기조건 대입 → 특수해. 모델링 문제면 <b>해석 한 문장</b>(수렴값·부호·단위)</span></div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="no">5 · TO VERIFY</span>판서·녹음이 들어오면 확인할 것</h2>
+  <p>아래를 확인할 때마다 위의 <span class="ev q">추정</span>이 <span class="ev s">확인</span>으로 바뀐다.</p>
+  <ul class="chk">
+    <li><b>판서 풀이 순서가 슬라이드 Step과 같은가</b> — 다르면 판서 쪽이 실제 채점 기준</li>
+    <li><b>"예제)" 연습문항을 수업 중에 푸는가, 과제로 내는가</b> — 과제라면 과제 문제가 곧 출제 풀</li>
+    <li><b>"시험에 낸다 / 중요하다 / 이건 안 낸다"</b> 발언 — 녹음 텍스트에서 시험·중요·꼭 키워드 검색</li>
+    <li><b>판서에서 생략하는 단계</b> — 생략 = 당연히 알아야 하는 것(감점 위험) 또는 안 내는 것</li>
+    <li><b>강조 표기 습관</b> — 밑줄·박스·색 분필로 무엇을 감싸는가(공식? 판별 조건? 함정?)</li>
+    <li><b>계산기·공식지 허용 여부</b>, 문항 수, 시험 시간 — 첫 시험 공지 때</li>
+    <li><b>기말 누적 여부</b> — 중간 범위가 기말에 다시 나오는지</li>
+    <li><b>Ch.2 자료</b> 확보 및 진동·공진 모델링 예제 수</li>
+  </ul>
+  <div class="note todo"><span class="ic">TODO</span><div><p>9/4(금) 수업부터 <b>칠판 사진 + 녹음 텍스트</b>를 올려 주면 이 문서 1·3절의 근거 표시를 갱신하고, 판서 풀이는 해당 날짜 정리본에 덧입힌다.</p></div></div>
+</section>
+
+<section>
+  <h2><span class="no">LOG</span>변경 기록</h2>
+  <p class="log"><b>2026-09-04 v0.2</b> 9/4 녹음(8분 49초)·과제 판서 반영: 특이해·비선형 제외 발언, 개수 논리, 판별 질문·지목, "경계조건" 용어, 전날 내용 반복, 과제 출처 = Kreyszig Problem Set — 관찰 ⑧~⑬ 추가.</p>
+  <p class="log"><b>2026-09-04 v0.1</b> 최초 작성. 근거: Ch.1·3·4·5·6 슬라이드, 강의계획서. 판서·녹음 없음. 사용자 확인: 매주 과제 출제.</p>
+  <p class="foot">이 문서는 학생 개인의 학습 전략용 분석이며, 교수의 실제 출제 의도와 다를 수 있다. 근거 표시가 "추정"인 항목은 그대로 믿지 말고 판서·녹음·과제로 확인한 뒤 사용할 것.</p>
+</section>
+</div>
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>

@@ -1,0 +1,143 @@
+<title>공업수학1 1주차 과제 가이드</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F5F7F6;--paper:#FFFFFF;--ink:#1B2430;--ink-2:#3F4C5A;--ink-3:#6E7B88;--line:#DCE2E6;--line-2:#C5CED5;
+  --acc:#0F6E8C;--acc-soft:#E3F0F4;--acc-ink:#0B5468;--warn:#B9791A;--warn-soft:#FBF1DD;--warn-ink:#7A4E0B;
+  --ok:#3D7A4E;--ok-soft:#E5F1E7;--ok-ink:#2B5A39;--crit:#B2483F;--crit-soft:#F8E6E3;--crit-ink:#7E2F28;--ans:#F0F3F5;
+  --font-display:"Gowun Batang","Noto Serif KR",Georgia,serif;--font-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;--font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#121820;--paper:#1A222C;--ink:#E6EAF0;--ink-2:#BCC6D1;--ink-3:#8593A2;--line:#2A3542;--line-2:#3A4756;--acc:#4FB3D1;--acc-soft:#173039;--acc-ink:#8FD3E8;--warn:#D9A34A;--warn-soft:#332816;--warn-ink:#F0C87E;--ok:#7FBF8F;--ok-soft:#1B2E21;--ok-ink:#A9DDB5;--crit:#E07C72;--crit-soft:#34201E;--crit-ink:#F1B0A9;--ans:#202A35;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121820;--paper:#1A222C;--ink:#E6EAF0;--ink-2:#BCC6D1;--ink-3:#8593A2;--line:#2A3542;--line-2:#3A4756;--acc:#4FB3D1;--acc-soft:#173039;--acc-ink:#8FD3E8;--warn:#D9A34A;--warn-soft:#332816;--warn-ink:#F0C87E;--ok:#7FBF8F;--ok-soft:#1B2E21;--ok-ink:#A9DDB5;--crit:#E07C72;--crit-soft:#34201E;--crit-ink:#F1B0A9;--ans:#202A35;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere}
+mjx-container{color:inherit} mjx-container[display="true"]{margin:.5em 0 !important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 90px}
+.head{padding:44px 0 22px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.eyebrow b{color:var(--acc);font-weight:500}
+.eyebrow .due{background:var(--crit-soft);color:var(--crit-ink);border-radius:5px;padding:1px 8px;text-transform:none;letter-spacing:.04em}
+h1{font-family:var(--font-display);font-weight:700;font-size:clamp(28px,4.4vw,40px);line-height:1.22;margin:12px 0 10px;letter-spacing:-.01em;text-wrap:balance}
+.lede{font-size:16.5px;color:var(--ink-2);margin:0}
+section{padding:30px 0 6px} section+section{border-top:1px solid var(--line)}
+h2{font-family:var(--font-display);font-weight:700;font-size:24px;line-height:1.3;margin:0 0 8px;letter-spacing:-.005em;text-wrap:balance}
+h2 .no{font-family:var(--font-mono);font-weight:500;font-size:12px;color:var(--acc);letter-spacing:.1em;display:block;margin-bottom:6px}
+p{margin:0 0 12px} ul,ol{margin:0 0 12px;padding-left:22px} li{margin:4px 0}
+.board{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:12px 0 16px;font-family:var(--font-mono);font-size:15px;line-height:1.7}
+.board .cap{font-family:var(--font-body);font-size:13px;color:var(--ink-3);margin-top:6px}
+.tw{overflow-x:auto;margin:12px 0 16px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px}
+th,td{padding:9px 14px;text-align:left;vertical-align:top;border-top:1px solid var(--line)}
+thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3);font-weight:500;background:var(--ans)}
+.pr{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0 14px}
+.pr .h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px}
+.pr .h .no{font-family:var(--font-mono);font-size:13px;color:var(--acc);font-weight:500}
+.pr .h .type{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;color:var(--acc-ink);background:var(--acc-soft);border-radius:6px;padding:2px 8px}
+.pr .h .star{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;color:var(--warn-ink);background:var(--warn-soft);border-radius:6px;padding:2px 8px}
+.pr .q{font-size:16px;margin-bottom:6px}
+.pr .hint{font-size:15px;color:var(--ink-2);background:var(--ans);border-radius:8px;padding:8px 12px;margin:6px 0}
+.pr details{margin-top:6px}
+.pr summary{cursor:pointer;font-size:13.5px;color:var(--acc-ink);list-style:none;display:inline-flex;gap:6px;align-items:center}
+.pr summary::-webkit-details-marker{display:none} .pr summary::before{content:"▸";font-size:11px}
+.pr details[open] summary::before{content:"▾"}
+.pr summary:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:4px}
+.pr .sol{margin-top:8px;font-size:15px;color:var(--ink-2)}
+.pr .sol .stp{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:baseline}
+.pr .sol .k{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);white-space:nowrap;padding-top:4px}
+.pr .res{margin-top:8px;padding:8px 12px;border-radius:8px;background:var(--ans);border-left:3px solid var(--acc);color:var(--ink)}
+.pr .res .k{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--acc);margin-bottom:2px}
+.note{border-radius:10px;padding:12px 16px;margin:14px 0 18px;font-size:15px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.note .ic{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;padding:2px 7px;border-radius:5px;margin-top:3px;white-space:nowrap;color:#fff}
+.note.exam{background:var(--warn-soft);color:var(--warn-ink)} .note.exam .ic{background:var(--warn)}
+.note.tip{background:var(--acc-soft);color:var(--acc-ink)} .note.tip .ic{background:var(--acc)}
+.note.todo{background:var(--crit-soft);color:var(--crit-ink)} .note.todo .ic{background:var(--crit)}
+.note p{margin:0 0 6px}.note p:last-child{margin:0}
+.tpl{background:var(--paper);border:1px dashed var(--line-2);border-radius:12px;padding:14px 18px;margin:12px 0 16px;font-size:15px}
+.tpl .row{display:grid;grid-template-columns:110px minmax(0,1fr);gap:6px 12px;padding:5px 0;border-top:1px solid var(--line)}
+.tpl .row:first-of-type{border-top:0}
+.tpl .k{font-family:var(--font-mono);font-size:12px;color:var(--acc);padding-top:4px}
+.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+@media print{body{background:#fff}.pr,.tw,.note,.tpl,.board{break-inside:avoid}@page{size:A4;margin:14mm 12mm}}
+
+.wrap{padding-bottom:60px}
+</style>
+<div class="wrap">
+<header class="head">
+  <div class="eyebrow"><b>공업수학1 · 이기영 교수</b><span>1st Week H.W. Assignment</span><span class="due">제출 9/9(수) 09:00 수업 전 · 교탁</span></div>
+  <h1>1주차 과제 가이드 — Kreyszig 1.3 연습문제 6 · 7 · 8 · 16 · 17</h1>
+  <p class="lede">9/4 칠판에 적힌 과제다. 다섯 문제 모두 1.3절(변수분리형과 그 확장)에서 나왔고, 유형은 <b>변수분리 1 · 동차 2 · 치환형 2</b>. 이 가이드는 유형 판별과 힌트, 자기 검산용 답을 담았다. <b>제출 답안은 직접 손으로 유도</b>해야 하고, 교재 지시문대로 검산 줄까지 적는다.</p>
+</header>
+
+<section>
+  <h2><span class="no">BOARD</span>판서 내용</h2>
+  <div class="board">1st Week. H.W. Assignment<br>&lt;1.3&gt;. &nbsp;6, 7, ⑧ = (판독 불명)<br>&nbsp;&nbsp;&nbsp;&nbsp;16, 17.<br><span style="color:var(--ink-3)">(오른쪽 위) y′ = (… — 8번 식의 시작으로 보임</span>
+    <div class="cap">8번에 동그라미가 쳐져 있고 옆에 단어 하나가 있는데 사진으로는 읽히지 않는다(학생 이름? "잘 풀어"?). 8번을 특별히 강조했다는 점만 확실하다.</div></div>
+  <div class="note tip"><span class="ic">규정</span><div><p>제출: 다음 주차 수업 시작 전 교탁. <b>미제출 −1.0점/회, 지각 제출 −0.5점/회</b>(2주 후까지만 인정). 결석 1회(−0.5)보다 과제 미제출이 더 크다.</p></div></div>
+</section>
+
+<section>
+  <h2><span class="no">MAP</span>다섯 문제 한눈에</h2>
+  <p>문제 원문은 Kreyszig 10판 Problem Set 1.3 기준으로 옮겼다. <b>배부된 문제와 수치가 같은지 먼저 대조</b>할 것(한국어판은 번호가 같지만 표기가 다를 수 있다).</p>
+  <div class="tw"><table><thead><tr><th>번호</th><th>문제</th><th>유형</th><th>핵심 한 수</th></tr></thead><tbody>
+    <tr><td>6</td><td>\(y'=e^{2x-1}y^2\)</td><td>변수분리</td><td>\(\int y^{-2}dy=-1/y\)</td></tr>
+    <tr><td>7</td><td>\(xy'=y+2x^3\sin^2\!\frac yx\)</td><td>동차 (교재 힌트: \(y/x=u\))</td><td>\(\int\frac{du}{\sin^2u}=-\cot u\)</td></tr>
+    <tr><td>8 ★</td><td>\(y'=(y+4x)^2\)</td><td>치환형 (교재 힌트: \(y+4x=v\))</td><td>\(v'=y'+4\), \(\int\frac{dv}{v^2+4}=\tfrac12\arctan\frac v2\)</td></tr>
+    <tr><td>16</td><td>\(y'=(x+y-2)^2,\quad y(0)=2\)</td><td>치환형 + 초기값</td><td>\(v=x+y-2\), \(v'=1+v^2\)</td></tr>
+    <tr><td>17</td><td>\(xy'=y+3x^4\cos^2\!\frac yx,\quad y(1)=0\)</td><td>동차 + 초기값</td><td>\(\int\frac{du}{\cos^2u}=\tan u\)</td></tr>
+  </tbody></table></div>
+  <div class="note exam"><span class="ic">EXAM</span><div><p>8번과 16번이 같은 유형(치환형)이고 8번에 동그라미가 있다. 슬라이드의 "베르누이 예제" (2)(3)도 치환형이었다. <b>치환형 \(y'=f(ax+by+c)\)</b>는 이 교수님이 반복해서 고르는 문제라 중간고사 후보로 본다.</p></div></div>
+</section>
+
+<section>
+  <h2><span class="no">GUIDE</span>문제별 힌트와 검산용 답</h2>
+  <p>힌트까지만 보고 스스로 풀어 본 뒤, 답을 펼쳐 맞춰 보라. 답이 다르면 대개 적분상수 처리나 부호에서 갈린다.</p>
+
+  <div class="pr"><div class="h"><span class="no">6</span><span class="type">변수분리</span><span class="q">\(y'=e^{2x-1}\,y^2\)</span></div>
+    <div class="hint">\(y\)를 왼쪽으로: \(\dfrac{dy}{y^2}=e^{2x-1}dx\). 양변 적분. \(y=0\)도 해임을 한 줄 언급.</div>
+    <details><summary>답 · 검산</summary><div class="sol">
+      <div class="stp"><span class="k">적분</span><span>\(-\dfrac1y=\dfrac12e^{2x-1}+c^*\)</span><span class="k">정리</span><span>\(y=-\dfrac{1}{\frac12e^{2x-1}+c^*}=-\dfrac{2}{e^{2x-1}+c}\) &nbsp;(\(c=2c^*\))</span></div>
+      <div class="res"><div class="k">일반해</div>\(y=-\dfrac{2}{e^{2x-1}+c}\) &nbsp;(+ 상수해 \(y=0\))</div>
+      <p style="margin-top:8px">검산: \(y'=\dfrac{2\cdot2e^{2x-1}}{(e^{2x-1}+c)^2}=e^{2x-1}\cdot\dfrac{4}{(e^{2x-1}+c)^2}=e^{2x-1}y^2\) ✓</p></div></details></div>
+
+  <div class="pr"><div class="h"><span class="no">7</span><span class="type">동차</span><span class="q">\(xy'=y+2x^3\sin^2\dfrac yx\)</span></div>
+    <div class="hint">\(y=ux\), \(y'=u'x+u\) 대입하면 \(u\)가 상쇄되고 \(xu'x=2x^3\sin^2u\) → \(u'=2x\sin^2u\). 갈라서 \(\dfrac{du}{\sin^2u}=2x\,dx\).</div>
+    <details><summary>답 · 검산</summary><div class="sol">
+      <div class="stp"><span class="k">치환</span><span>\(u'x+u=u+2x^2\sin^2u\ \Rightarrow\ \dfrac{du}{\sin^2u}=2x\,dx\)</span><span class="k">적분</span><span>\(-\cot u=x^2+c^*\ \Rightarrow\ \cot u=c-x^2\)</span><span class="k">복원</span><span>\(u=\operatorname{arccot}(c-x^2)\)</span></div>
+      <div class="res"><div class="k">일반해</div>\(y=x\,\operatorname{arccot}(c-x^2)\)</div>
+      <p style="margin-top:8px">검산은 \(\cot\dfrac yx=c-x^2\)를 \(x\)로 음함수 미분: \(-\csc^2\!\frac yx\cdot\dfrac{xy'-y}{x^2}=-2x\) → \(xy'-y=2x^3\sin^2\frac yx\) ✓</p></div></details></div>
+
+  <div class="pr"><div class="h"><span class="no">8</span><span class="type">치환형</span><span class="star">교수 강조</span><span class="q">\(y'=(y+4x)^2\)</span></div>
+    <div class="hint">\(v=y+4x\)로 두면 \(v'=y'+4=v^2+4\). 변수분리: \(\dfrac{dv}{v^2+4}=dx\). \(\int\dfrac{dv}{v^2+a^2}=\dfrac1a\arctan\dfrac va\).</div>
+    <details><summary>답 · 검산</summary><div class="sol">
+      <div class="stp"><span class="k">적분</span><span>\(\dfrac12\arctan\dfrac v2=x+c^*\ \Rightarrow\ v=2\tan(2x+c)\)</span><span class="k">복원</span><span>\(y=v-4x\)</span></div>
+      <div class="res"><div class="k">일반해</div>\(y=2\tan(2x+c)-4x\)</div>
+      <p style="margin-top:8px">검산: \(y'=4\sec^2(2x+c)-4=4\tan^2(2x+c)=(2\tan(2x+c))^2=(y+4x)^2\) ✓</p></div></details></div>
+
+  <div class="pr"><div class="h"><span class="no">16</span><span class="type">치환형 · IVP</span><span class="q">\(y'=(x+y-2)^2,\quad y(0)=2\)</span></div>
+    <div class="hint">\(v=x+y-2\), \(v'=1+y'=1+v^2\). 8번과 같은 흐름. 초기조건은 \(v\)로 바꿔서: \(v(0)=0+2-2=0\).</div>
+    <details><summary>답 · 검산</summary><div class="sol">
+      <div class="stp"><span class="k">적분</span><span>\(\arctan v=x+c\)</span><span class="k">조건</span><span>\(v(0)=0\Rightarrow c=0\), \(v=\tan x\)</span><span class="k">복원</span><span>\(y=v-x+2\)</span></div>
+      <div class="res"><div class="k">특수해</div>\(y=\tan x-x+2\)</div>
+      <p style="margin-top:8px">검산: \(y(0)=0-0+2=2\) ✓, \(y'=\sec^2x-1=\tan^2x=(x+y-2)^2\) ✓</p></div></details></div>
+
+  <div class="pr"><div class="h"><span class="no">17</span><span class="type">동차 · IVP</span><span class="q">\(xy'=y+3x^4\cos^2\dfrac yx,\quad y(1)=0\)</span></div>
+    <div class="hint">7번과 쌍둥이. \(y=ux\) → \(u'=3x^2\cos^2u\) → \(\dfrac{du}{\cos^2u}=3x^2dx\). 초기조건 \(u(1)=y(1)/1=0\).</div>
+    <details><summary>답 · 검산</summary><div class="sol">
+      <div class="stp"><span class="k">적분</span><span>\(\tan u=x^3+c\)</span><span class="k">조건</span><span>\(\tan0=1+c\Rightarrow c=-1\)</span><span class="k">복원</span><span>\(u=\arctan(x^3-1)\)</span></div>
+      <div class="res"><div class="k">특수해</div>\(y=x\arctan(x^3-1)\)</div>
+      <p style="margin-top:8px">검산: \(y(1)=1\cdot\arctan0=0\) ✓. \(\tan\frac yx=x^3-1\)을 미분하면 \(\sec^2\!\frac yx\cdot\dfrac{xy'-y}{x^2}=3x^2\) → \(xy'-y=3x^4\cos^2\frac yx\) ✓</p></div></details></div>
+</section>
+
+<section>
+  <h2><span class="no">FORMAT</span>답안 쓰는 순서 — 교수님 슬라이드 골격 그대로</h2>
+  <div class="tpl">
+    <div class="row"><span class="k">문제 번호</span><span>&lt;1.3&gt; 8. 문제 식을 다시 적는다</span></div>
+    <div class="row"><span class="k">Step 1 판별</span><span>"\(x,y\)가 \(y+4x\) 덩어리로만 등장 → 치환형. \(v=y+4x\)" 처럼 <b>유형과 이유 한 줄</b></span></div>
+    <div class="row"><span class="k">Step 2 풀이</span><span>치환 → 변수분리 → 적분 → 되돌리기. 한 줄에 한 동작. 적분상수 \(c^*\)를 \(c\)로 바꿀 때 표시</span></div>
+    <div class="row"><span class="k">Step 3 검산</span><span>얻은 \(y\)를 원식에 대입해 등호 확인 — 교재 지시문 "check your answer by substitution"</span></div>
+    <div class="row"><span class="k">Step 4 조건</span><span>16·17번은 초기조건 대입 → 특수해. 조건도 검산(\(y(0)=2\) ✓)</span></div>
+  </div>
+  <div class="note todo"><span class="ic">TODO</span><div><p>① 배부된 문제지(또는 교재)와 위 다섯 식 대조 ② 9/8(월)까지 손으로 풀고 검산 ③ 9/9(수) 09:00 전 교탁 제출. 풀다 막힌 문제는 사진으로 보내 주면 어느 단계에서 막혔는지 짚어 준다.</p></div></div>
+  <p class="foot">문제 출처: Kreyszig, Advanced Engineering Mathematics 10th ed., Problem Set 1.3 (#6, 7, 8, 16, 17). 답은 노트 작성 시 직접 풀어 검산했다. 판서 사진: study-materials/공업수학1/2026-09-04/과제_1주차_판서.jpg</p>
+</section>
+</div>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>

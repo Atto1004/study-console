@@ -1,0 +1,153 @@
+<title>아카데믹 글쓰기 · 9/1 OT</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F7F6F3;--paper:#FFFFFF;--ink:#221F1A;--ink-2:#4A453C;--ink-3:#7A7468;--line:#E3DFD7;--line-2:#CCC6BA;
+  --acc:#8A5A2B;--acc-soft:#F3EADF;--acc-ink:#5F3C17;--warn:#B9791A;--warn-soft:#FBF1DD;--warn-ink:#7A4E0B;
+  --ok:#3D7A4E;--ok-soft:#E5F1E7;--ok-ink:#2B5A39;--crit:#B2483F;--crit-soft:#F8E6E3;--crit-ink:#7E2F28;--ans:#F1EEE8;
+  --font-display:"Gowun Batang","Noto Serif KR",Georgia,serif;--font-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;--font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#17150F;--paper:#201D16;--ink:#EDE8DE;--ink-2:#C9C2B4;--ink-3:#948C7C;--line:#332E24;--line-2:#453E31;--acc:#D2A26F;--acc-soft:#33271A;--acc-ink:#E8C9A4;--warn:#D9A34A;--warn-soft:#332816;--warn-ink:#F0C87E;--ok:#7FBF8F;--ok-soft:#1B2E21;--ok-ink:#A9DDB5;--crit:#E07C72;--crit-soft:#34201E;--crit-ink:#F1B0A9;--ans:#2A261E;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17150F;--paper:#201D16;--ink:#EDE8DE;--ink-2:#C9C2B4;--ink-3:#948C7C;--line:#332E24;--line-2:#453E31;--acc:#D2A26F;--acc-soft:#33271A;--acc-ink:#E8C9A4;--warn:#D9A34A;--warn-soft:#332816;--warn-ink:#F0C87E;--ok:#7FBF8F;--ok-soft:#1B2E21;--ok-ink:#A9DDB5;--crit:#E07C72;--crit-soft:#34201E;--crit-ink:#F1B0A9;--ans:#2A261E;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.85;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 90px}
+.head{padding:44px 0 22px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.eyebrow b{color:var(--acc);font-weight:500}
+.eyebrow .rec{background:var(--ok-soft);color:var(--ok-ink);border-radius:5px;padding:1px 8px;text-transform:none;letter-spacing:.04em}
+h1{font-family:var(--font-display);font-weight:700;font-size:clamp(28px,4.4vw,40px);line-height:1.22;margin:12px 0 10px;letter-spacing:-.01em;text-wrap:balance}
+.lede{font-size:16.5px;color:var(--ink-2);margin:0}
+section{padding:34px 0 6px} section+section{border-top:1px solid var(--line)}
+h2{font-family:var(--font-display);font-weight:700;font-size:25px;line-height:1.3;margin:0 0 8px;letter-spacing:-.005em;text-wrap:balance}
+h2 .no{font-family:var(--font-mono);font-weight:500;font-size:12px;color:var(--acc);letter-spacing:.1em;display:block;margin-bottom:6px}
+h3{font-size:17.5px;font-weight:700;margin:26px 0 8px}
+p{margin:0 0 12px} ul,ol{margin:0 0 12px;padding-left:22px} li{margin:4px 0}
+.ts{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-left:6px}
+.tw{overflow-x:auto;margin:12px 0 16px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:14.5px}
+th,td{padding:9px 14px;text-align:left;vertical-align:top;border-top:1px solid var(--line)}
+thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3);font-weight:500;background:var(--ans)}
+td.n{font-family:var(--font-mono);font-variant-numeric:tabular-nums;text-align:right}
+.quote{font-family:var(--font-display);font-size:19px;line-height:1.6;color:var(--ink);border-left:3px solid var(--acc);padding:6px 0 6px 18px;margin:16px 0}
+.quote small{display:block;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-3);margin-top:6px;letter-spacing:.04em}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0 14px}
+.card .t{font-weight:700;margin-bottom:4px} .card p:last-child{margin-bottom:0}
+.card .say{font-size:15px;color:var(--ink-2);background:var(--ans);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:8px 12px;margin:8px 0 0}
+.card .say b{color:var(--acc-ink)}
+.kw{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:12px 0 16px}
+.kw div{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kw .k{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--acc);margin-bottom:3px}
+.kw b{display:block;margin-bottom:3px}
+.kw span{font-size:14.5px;color:var(--ink-2)}
+.grade{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:12px 0}
+.grade div{background:var(--paper);padding:12px 14px}
+.grade .k{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3)}
+.grade .v{font-family:var(--font-display);font-size:26px;font-weight:700;line-height:1.1;margin-top:2px}
+.grade .v small{font-size:13px;color:var(--ink-3);font-family:var(--font-body);margin-left:2px}
+@media (max-width:560px){.grade{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ev{display:inline-block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;border-radius:5px;padding:1px 7px;vertical-align:middle;margin-left:6px;white-space:nowrap}
+.ev.r{background:var(--ok-soft);color:var(--ok-ink)} .ev.g{background:var(--acc-soft);color:var(--acc-ink)} .ev.q{background:var(--warn-soft);color:var(--warn-ink)} .ev.x{background:var(--crit-soft);color:var(--crit-ink)}
+.note{border-radius:10px;padding:12px 16px;margin:14px 0 18px;font-size:15px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.note .ic{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;padding:2px 7px;border-radius:5px;margin-top:3px;white-space:nowrap;color:#fff}
+.note.exam{background:var(--warn-soft);color:var(--warn-ink)} .note.exam .ic{background:var(--warn)}
+.note.tip{background:var(--acc-soft);color:var(--acc-ink)} .note.tip .ic{background:var(--acc)}
+.note.todo{background:var(--crit-soft);color:var(--crit-ink)} .note.todo .ic{background:var(--crit)}
+.note p{margin:0 0 6px}.note p:last-child{margin:0}
+.log{font-size:14px;color:var(--ink-2)} .log b{font-family:var(--font-mono);font-weight:500;color:var(--ink-3);margin-right:8px}
+.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+@media print{body{background:#fff}.card,.tw,.note,.kw,.grade{break-inside:avoid}@page{size:A4;margin:14mm 12mm}}
+
+.wrap{padding-bottom:60px}
+</style>
+<div class="wrap">
+<header class="head">
+  <div class="eyebrow"><b>아카데믹 글쓰기 · 김혜선 교수</b><span>1주차 · 9/1(화) 1일차 OT</span><span class="rec">녹음 44분 14초 정리</span></div>
+  <h1>글쓰기는 왜 필요한가 — 첫 시간과 평가 규정</h1>
+  <p class="lede">첫 시간은 강의 소개와 운영 방식이었다. 내용은 "왜 글쓰기를 배우는가"라는 한 가지 질문과, 학점을 결정하는 <b>평가 규정</b> 두 덩어리다. 기말시험이 강의자료의 이론 키워드에서 나온다고 했으므로, 이날 나온 개념도 시험 범위로 취급한다.</p>
+</header>
+
+<section>
+  <h2><span class="no">1 · CLASS</span>수업 내용 정리</h2>
+
+  <h3>출석 방식 <span class="ts">00:02</span></h3>
+  <p>전자출결(수강 출결) 원칙. 스마트 출결을 쓰더라도 <b>인증번호 공유는 부정 출석</b>으로 본다. 이름을 익히기 위해 호명한다.</p>
+
+  <h3>글쓰기는 왜 필요한가 <span class="ts">01:33</span></h3>
+  <p>못 써도 사는 데 지장은 없고 AI가 대신 써 주는 시대다. 그럼에도 세계의 대학이 1학년 <b>교양 필수</b>로 글쓰기를 두는 이유를 학생에게 물었다. 학생 답 "의사 전달을 확실히 하기 위해" → 교수 확장: <b>말은 상황 의존적, 글은 상황에서 독립적</b>이라 더 정교하게 전달할 수 있다.</p>
+  <div class="quote">우리는 언어적 존재입니다. 사고 과정 자체가 언어적으로 구성되어 돌아갑니다. "코끼리를 생각하지 마세요"라고 하면 코끼리가 떠오르죠. 언어가 생각을 활성화하는 도구이자 수단입니다.<small>05:38 · 기말 이론 키워드 후보: 언어적 존재, 사고의 언어적 구성</small></div>
+
+  <h3>교재의 글쓰기 정의 — 키워드 세 개 <span class="ts">07:02</span></h3>
+  <div class="quote">글을 쓴다는 건 자신의 생각과 느낌을 문자 언어로 표현하여 사회 구성원들끼리 소통하도록 하는 의사소통 행위이다.<small>『아카데믹 글쓰기』(한양대학교출판부) · 교수가 "가장 중요한 키워드가 뭐죠?"라고 물은 문장</small></div>
+  <div class="kw">
+    <div><div class="k">KEYWORD 1</div><b>문자 언어로 표현한다</b><span>생각을 밖으로 꺼내 시각화. 더 정확하게 <b>나를 언어화하는 기술</b>. 김영하 작가의 예: "짜증 나"로 뭉뚱그리지 말고 생일을 잊은 엄마에겐 <b>서운하다</b>, 휴지 없는 화장실엔 <b>난감하다·당황스럽다</b>.</span></div>
+    <div><div class="k">KEYWORD 2</div><b>사회 구성원들끼리 소통한다</b><span>글쓰기는 가장 사적인 행위이면서 사회적 소통 행위. 일기조차 <b>가상의 독자</b>를 상정한다. 타인·공동체의 이해와 공감 가능성을 염두에 두고 구성하게 된다.</span></div>
+    <div><div class="k">KEYWORD 3</div><b>의사소통 행위</b><span>앞의 둘을 잇는 전체 과정. <b>나 – 타인 – 공동체</b>를 이어주는 의사소통 실천.</span></div>
+  </div>
+
+  <h3>대학에서 새로 익혀야 하는 의사소통 <span class="ts">12:44</span></h3>
+  <p>대학 = <b>학문 공동체</b>(지식을 생산·공유하는 장). 고교까지의 암기·문제풀이와 달리 <b>주체적인 읽기와 쓰기</b>가 필요하다. 근거·논리·토론에 기반한 학문적 소통 방식.</p>
+  <ul>
+    <li><b>판단</b> — 무엇이 중요한지 스스로 판단하는 의견. 사고의 출발점.</li>
+    <li><b>자료 선별</b> — 텍스트에서 자료를 고르는 능력. 자료는 곧 내 생각의 <b>근거</b>.</li>
+    <li><b>논리 전개</b> — 근거를 어떻게 배치·배열·해석하는가가 글쓰기의 핵심. 논리적 언어는 학문 공동체의 기본 언어.</li>
+    <li><b>토론</b> — 논리를 타인과 공유하며 검증. 질문과 반론으로 논리가 정교해진다.</li>
+  </ul>
+  <p>이 역량은 사회(직장)에서 보고서·기획안·이메일 등 <b>공식 의사소통</b>으로 이어진다. 요리사·사육사·공무원 출신 유튜버가 책을 낸 예 → 글쓰기는 작가가 되려는 게 아니라 <b>삶의 아이템</b>. "가장 가성비 있는 궁극의 자기계발서" — 돈이 안 든다, 메모장만 켜면 시작.</p>
+
+  <h3>어떻게 잘 쓸 수 있을까 <span class="ts">21:17</span></h3>
+  <div class="quote">처음부터 잘 쓰는 사람은 없습니다.<small>이다혜 작가 · "우리 수업의 기본값"</small></div>
+  <ul>
+    <li>글쓰기는 타고난 재능이 아니라 <b>연마 가능한 능력</b>(유시민: 여러 능력 중 하나 / 린다 플라워: 잘 조직된 <b>문제 해결 과정</b>). 좋은 글은 평범한 사람의 <b>반복 훈련</b>의 결과.</li>
+    <li>챗GPT는 한 번에 매끄러운 글을 주지만 <b>과정이 빠져 있다</b>. 이 수업은 고치고 생각하는 과정으로 사고를 정교하게 만드는 <b>과정 중심</b>.</li>
+    <li>글쓰기 능력의 세 기둥: <b>사고력 · 표현력 · 구성력</b>. 구성력 = 주제를 가장 잘 전달하도록 글을 체계적으로 조직하는 능력.</li>
+    <li>가장 정직한 방법은 <b>매일 쓰기</b>. "로또에 당첨되려면 로또를 사야 한다. 글쓰기는 돈도 안 든다."</li>
+  </ul>
+
+  <h3>운영 방식 <span class="ts">26:35</span></h3>
+  <ul>
+    <li>매주 <b>이론 + 글쓰기 활동</b> 병행. 후반부엔 활동만 있는 주차도 있음.</li>
+    <li>교재 『아카데믹 글쓰기』는 <b>안 사도 됨</b>. 교수가 만든 강의자료로 진행.</li>
+    <li><b>읽기 자료</b>가 나오는 주차는 사전 공지 → 반드시 읽어올 것.</li>
+    <li><b>강의자료는 수업 후</b> LMS에 업로드. 미리 열면 "정답처럼 느껴져 생각을 안 하기 때문". 기말 공부용.</li>
+    <li>큰 글쓰기 활동 두 개: <b>자기서사 글쓰기</b>(중간고사 대체, 8주차 제출, 8주차 수업 없음) · <b>비평적 글쓰기</b>(후반부, <b>합평</b> 진행 — 발표가 두려우면 안 해도 됨, 하지만 모두 참여 원칙).</li>
+    <li>주차별 세부 글쓰기 활동 1~2점씩 → 참여도 점수. "비행기 마일리지처럼 쌓인다."</li>
+  </ul>
+
+  <h3>평가 규정 <span class="ts">33:42</span></h3>
+  <div class="grade">
+    <div><div class="k">출석</div><div class="v">20</div></div>
+    <div><div class="k">과제</div><div class="v">45<small>자기서사 20 + 비평 25</small></div></div>
+    <div><div class="k">기말시험</div><div class="v">20</div></div>
+    <div><div class="k">수업 참여도</div><div class="v">15</div></div>
+  </div>
+  <div class="tw"><table><thead><tr><th>항목</th><th>규정</th></tr></thead><tbody>
+    <tr><td>지각 / 결석</td><td>−1점 / −2점 (15주 기준)</td></tr>
+    <tr><td>결석 6회</td><td>학교 규정상 자동 F</td></tr>
+    <tr><td>대리·부정 출석</td><td>−3점</td></tr>
+    <tr><td>수업 종료 전 무단 이탈</td><td>발각 시 −2점. 사정을 미리 말하면 20분 정도는 용인</td></tr>
+    <tr><td>공결</td><td>시스템 자동 반영. 누락 시 서류를 <b>1회</b> 예외 제출</td></tr>
+    <tr><td>기말시험</td><td>한 학기 <b>글쓰기 이론</b> 중심, <b>교수 강의자료에서 출제</b>. 주요 이론은 많지 않고, <b>수업 중간중간 힌트</b>를 줌</td></tr>
+    <tr><td>상대평가</td><td>32명 중 <b>약 10명</b>이 A/A+. "모든 평가 항목에서 구멍 없이" — 1점 차로 갈린 사례 많음</td></tr>
+  </tbody></table></div>
+
+  <h3>다음 주 <span class="ts">43:13</span></h3>
+  <p><b>9/8(화): 글에 담는 내 생각 — 주제 설정.</b> 첫 글쓰기 활동 <b>주제문 쓰기</b>. 준비물은 "잘 쓰고 싶다는 마음". 늦지 말 것(지각 −1).</p>
+</section>
+
+<section>
+  <h2><span class="no">2 · PROFESSOR</span>김혜선 교수 — 수업 · 출제 방식 분석 v0.1</h2>
+  <p>근거: 9/1 녹음 44분, 강의계획서. <span class="ev r">녹음</span> 직접 발언 &nbsp;<span class="ev g">계획서</span> &nbsp;<span class="ev q">추정</span> &nbsp;<span class="ev x">미확인</span></p>
+  <div class="tw"><table><thead><tr><th>관찰</th><th>내용</th><th>근거</th></tr></thead><tbody>
+    <tr><td>수업 방식</td><td>질문 → 학생 답 → 교수가 받아서 확장. 일방 강의가 아니라 <b>질문·토론형</b>. 그래서 강의자료를 미리 안 준다</td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>설명 습관</td><td>인용과 사례가 많다(김영하·이다혜·유시민·린다 플라워·유튜버 저자). "이 문장에서 가장 중요한 키워드가 뭐죠?"로 <b>정의문의 키워드를 뽑게 함</b></td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>기말 출제</td><td>강의자료의 <b>이론 키워드</b> 중심. "주요 내용은 얼마 없다", "수업 중간중간 힌트" → 힌트 발언을 녹음에서 추적하면 시험 범위가 좁혀진다</td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>기말 예상 형식</td><td>정의·키워드 서술형 (예: 글쓰기의 정의와 세 키워드, 글쓰기 능력의 세 요소, 대학이 요구하는 소통 방식)</td><td><span class="ev q">추정</span></td></tr>
+    <tr><td>성적의 몸통</td><td>과제 45점(자기서사 20 + 비평 25)이 시험 20점보다 크다. <b>과정 중심</b> 평가, 합평 참여·피드백도 참여도에 반영</td><td><span class="ev r">녹음</span> <span class="ev g">계획서</span></td></tr>
+    <tr><td>A의 조건</td><td>상대평가 ~10/32. 전 항목 만점 지향. 출석 감점이 가장 피하기 쉬운 손실</td><td><span class="ev r">녹음</span></td></tr>
+    <tr><td>과제 채점 기준</td><td>—</td><td><span class="ev x">미확인</span> — 자기서사 과제 공지 시 확인</td></tr>
+  </tbody></table></div>
+  <div class="note exam"><span class="ic">EXAM</span><div><p>이날 나온 이론 키워드(기말 후보): <b>언어적 존재 · 글쓰기의 정의 3키워드(표현·소통·의사소통 행위) · 학문 공동체 · 주체적 읽기와 쓰기 · 근거/논리/토론 · 사고력/표현력/구성력 · 과정 중심 · "처음부터 잘 쓰는 사람은 없다"</b>. 매주 이 목록에 추가한다.</p></div></div>
+  <div class="note todo"><span class="ic">TODO</span><div><p>9/8 전: 주제문 쓰기 활동이 있으니 "내가 쓰고 싶은 주제" 후보를 두세 개 적어 갈 것. 읽기 자료 공지가 뜨면 반드시 읽고 갈 것(수업이 질문형이라 안 읽으면 답을 못 한다).</p></div></div>
+  <p class="log"><b>2026-09-04 v0.1</b> 9/1 녹음 기반 최초 작성.</p>
+  <p class="foot">출처: 클로바노트 녹음 텍스트 · 2026-2 강의계획서(김혜선, 화 11:00–13:00, 제1공학관 301). 원본·정리 파일: study-materials/아카데믹글쓰기/2026-09-01/</p>
+</section>
+</div>
