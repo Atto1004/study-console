@@ -46,6 +46,24 @@ JS는 그 아래 한 덩어리:
 - **시트** — `openSheet()` 기반 모달 (모바일에선 바텀시트)
 - **시드** — `seedEngMath()` 등 과목별 강의계획서 데이터
 
+
+### 주차별 수업 정리 (weekNotes)
+
+과목 화면의 **주차 타임라인**에서 주를 누르면(또는 「이번 주 정리」) 그 주의 수업 정리를 7개 섹션으로 적는다.
+`course.weekNotes[w] = {range, summary, textbook, board, recording, material, notes, exam:[{t,quote,memo}], tasks:[{id,text,due,done,src}], links:[{label,url}], updatedAt}`
+
+| 섹션 | 뜻 |
+|---|---|
+| ① textbook | 전공 교재 파일 정리 |
+| ② board | 칠판 판서 이미지 → 텍스트 |
+| ③ recording | 녹음본 정리 |
+| ④ material | 강의자료(슬라이드·강의노트) 정리 |
+| ⑤ notes | 강의자료 위 필기 업데이트 |
+| ⑥ exam ★ | 교수님의 시험 관련 언급 (출처·시각 + 원문) |
+| ⑦ tasks | 과제·할 일 — 마감 7일 이내 항목은 **오늘 브리핑**에 자동 표시 |
+
+주차 타임라인에서 정리가 있는 주는 번호 옆에 점(•)이 붙는다. 시드 패치 `patchWeekNotesV1`이 2026-2 W1 내용을 1회 채운다.
+
 ### 3. 데이터 저장
 
 ```

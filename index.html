@@ -814,6 +814,14 @@ th{font-size:clamp(9.5px,0.2vw + 9px,10.5px)}
 .wk.now .lb{color:var(--accent);font-weight:600}
 .wk .ex{position:absolute;inset:0;display:grid;place-items:center;font-size:11px;color:#fff;z-index:2}
 .wk.exam .bar{background:var(--crit)}
+.wk.noted .lb::after{content:"•";color:var(--accent);margin-left:1px}
+.wn-row{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:8px 10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.wn-row:first-child{border-top:0}
+.wn-row .w{font-family:var(--font-num);font-size:12px;color:var(--accent);font-weight:600}
+.wn-row .t{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wn-row .s{font-size:12px;color:var(--ink-3);display:flex;gap:8px;flex-wrap:wrap}
+.wn-ex{border-left:3px solid var(--warn);background:var(--warn-soft);border-radius:0 8px 8px 0;padding:6px 10px;margin:4px 0;font-size:13px}
+.wn-ex b{color:var(--warn);font-family:var(--font-num);font-size:11px;margin-right:6px}
 .wk:hover .bar{filter:brightness(1.08)}
 .wklegend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--ink-3);margin-top:8px}
 .wklegend span{display:inline-flex;align-items:center;gap:5px}
@@ -1500,6 +1508,12 @@ p,.hint,.step,.empty,.md{text-indent:0}
             <div class="card">
               <div class="card-h"><h3>주차 타임라인</h3><span class="hs" id="cWkHs"></span></div>
               <div class="card-b" id="cWeeks"></div>
+            </div>
+            <div class="card">
+              <div class="card-h"><h3>주차별 수업 정리</h3><span class="hs" id="cNotesHs"></span>
+                <div class="ha"><button class="btn xs" id="btnWeekNote">이번 주 정리</button></div>
+              </div>
+              <div class="card-b tight"><div class="scrollbox" id="cNotes"></div></div>
             </div>
             <div class="card">
               <div class="card-h"><h3>회차 로그</h3><span class="hs" id="cLogHs"></span>
@@ -3184,6 +3198,24 @@ function renderCourse(){
   $("#cWeeks").innerHTML=weeksHTML(c)+wkLegend();
   $$("#cWeeks .wk").forEach(function(b){ b.onclick=function(){ weekSheet(c.id,+b.dataset.w); }; });
 
+  /* 주차별 수업 정리 목록 */
+  var wks=Object.keys(c.weekNotes||{}).map(Number).filter(function(w){return weekNoteHas(c,w);}).sort(function(a,b){return b-a;});
+  var exN=0, openT=0;
+  wks.forEach(function(w){ var n=weekNote(c,w); exN+=n.exam.length; openT+=n.tasks.filter(function(t){return !t.done;}).length; });
+  $("#cNotesHs").textContent= wks.length? (wks.length+"주 정리 · ★"+exN+(openT?" · 할 일 "+openT:"")) : "";
+  $("#cNotes").innerHTML= wks.length? wks.map(function(w){
+      var n=weekNote(c,w), f=weekNoteFilled(c,w), ot=n.tasks.filter(function(t){return !t.done;}).length;
+      return '<div class="wn-row"><span class="w">W'+w+'</span><div style="min-width:0">'+
+        '<div class="t">'+esc(n.summary||n.range||"정리 없음")+'</div>'+
+        '<div class="s">'+(n.range&&n.summary?'<span>'+esc(n.range)+'</span>':"")+
+          '<span>섹션 '+f+'/5</span>'+(n.exam.length?'<span style="color:var(--warn)">★ 시험 언급 '+n.exam.length+'</span>':"")+
+          (ot?'<span style="color:var(--crit)">할 일 '+ot+'</span>':"")+(n.links.length?'<span>링크 '+n.links.length+'</span>':"")+'</div>'+
+        (n.exam.length?'<div class="wn-ex"><b>'+esc(n.exam[0].t||"")+'</b>'+esc(n.exam[0].quote)+(n.exam.length>1?' <span style="color:var(--ink-3)">외 '+(n.exam.length-1)+'건</span>':"")+'</div>':"")+
+        '</div><button class="btn xs" data-wn="'+w+'">열기</button></div>';
+    }).join("") : '<div class="empty"><span class="big">▤</span>아직 정리된 주차가 없습니다.<br><span class="hint">주차 타임라인의 주를 누르거나 「이번 주 정리」로 시작하세요.</span></div>';
+  $$("#cNotes [data-wn]").forEach(function(b){ b.onclick=function(){ weekSheet(c.id,+b.dataset.wn); }; });
+  $("#btnWeekNote").onclick=function(){ weekSheet(c.id, currentWeek()||1); };
+
   var pl=planned(c), td=today();
   var pastPl=pl.filter(function(p){return diffDays(p.date,td)>=0;}).reverse();
   $("#cLogHs").textContent=sessions(c.id).length+" / "+pl.length+"회";
@@ -3236,6 +3268,7 @@ function weeksHTML(c){
     else if(st==="part") cls.push("part");
     if(w===cw) cls.push("now");
     if(exW[w]) cls.push("exam");
+    if(c&&weekNoteFilled(c,w)) cls.push("noted");
     var fill= st==="full"?100 : st==="part"?52 : st==="gap"?14 : 0;
     h+='<button class="'+cls.join(" ")+'" data-c="'+(c?c.id:"")+'" data-w="'+w+'" title="W'+w+'"><span class="bar">'+
       '<i style="height:'+fill+'%"></i>'+(exW[w]?'<span class="ex">⚑</span>':"")+
@@ -3250,6 +3283,49 @@ function wkLegend(){
     '<span><i style="background:var(--crit)"></i>결손</span>'+
     '<span><i style="background:var(--surface-3);border:1px dashed var(--line-2)"></i>미래</span>'+
     '<span><i style="background:var(--accent)"></i>이번 주</span></div>';
+}
+
+
+/* ---------- 주차별 수업 정리 (7섹션: 교재·판서·녹음·강의자료·필기·★시험 언급·과제) ---------- */
+var WN_SEC=[["textbook","① 전공 교재 파일 정리","교재(PDF)에서 이 주 범위 요약. 없으면 비워 둔다"],
+  ["board","② 칠판 판서 정리","판서 사진을 텍스트로 옮긴 것 · 풀이 순서 보존"],
+  ["recording","③ 녹음본 정리","녹음(STT) 교정 + 교수님 설명 기준 중요도 재구성"],
+  ["material","④ 강의자료 정리","교수 배포 슬라이드·강의노트의 해당 쪽 요약"],
+  ["notes","⑤ 필기 업데이트","강의자료 위에 적은 강조·메모"]];
+function weekNote(c,w,create){
+  if(!c) return null;
+  if(!c.weekNotes||typeof c.weekNotes!=="object") c.weekNotes={};
+  var n=c.weekNotes[w];
+  if(!n&&create){ n=c.weekNotes[w]={range:"",summary:"",textbook:"",board:"",recording:"",material:"",notes:"",exam:[],tasks:[],links:[],updatedAt:0}; }
+  if(n){ ["exam","tasks","links"].forEach(function(k){ if(!Array.isArray(n[k])) n[k]=[]; }); }
+  return n||null;
+}
+function weekNoteFilled(c,w){
+  var n=weekNote(c,w); if(!n) return 0; var k=0;
+  WN_SEC.forEach(function(x){ if((n[x[0]]||"").trim()) k++; });
+  return k;
+}
+function weekNoteHas(c,w){ var n=weekNote(c,w); if(!n) return false;
+  return weekNoteFilled(c,w)>0||n.exam.length>0||n.tasks.length>0||n.links.length>0||!!(n.summary||"").trim(); }
+function allTasks(){
+  var out=[];
+  courses().forEach(function(c){
+    Object.keys(c.weekNotes||{}).forEach(function(w){
+      var n=weekNote(c,+w); if(!n) return;
+      n.tasks.forEach(function(t){ out.push({c:c,w:+w,t:t}); });
+    });
+  });
+  return out;
+}
+function dueLabel(due){
+  if(!due) return "기한 없음";
+  var d=diffDays(today(),due);
+  return d<0?(-d)+"일 지남":d===0?"오늘":d===1?"내일":"D-"+d;
+}
+function sortTasks(a,b){
+  if(!!a.t.done!==!!b.t.done) return a.t.done?1:-1;
+  if(!a.t.due&&!b.t.due) return 0; if(!a.t.due) return 1; if(!b.t.due) return -1;
+  return a.t.due<b.t.due?-1:a.t.due>b.t.due?1:0;
 }
 
 /* ---------- 오늘 · 하루 타임라인 ---------- */
@@ -3511,6 +3587,12 @@ function renderToday(){
     if(weak.length) lines.push("<b>이해도 45% 미만</b> — "+weak.map(function(c){return c.name;}).join(", "));
     if(!lines.length) lines.push("특이사항 없음. 오늘 수업 기록부터 하라.");
   }
+  /* 과제·할 일 (주차별 수업 정리 ⑦) — 마감 7일 이내·지난 것 */
+  var tks=allTasks().filter(function(x){return !x.t.done && x.t.due && diffDays(td,x.t.due)<=7;}).sort(sortTasks);
+  if(tks.length) lines.push('<b>과제·할 일 '+tks.length+'건</b> — '+tks.slice(0,5).map(function(x){
+      var dd=diffDays(td,x.t.due);
+      return '<span style="'+(dd<0?'color:var(--crit)':dd<=1?'color:var(--warn)':'')+'">'+esc(x.c.name)+': '+esc(x.t.text)+' ('+esc(dueLabel(x.t.due))+')</span>';
+    }).join(' · ')+(tks.length>5?' 외 '+(tks.length-5)+'건':''));
   $("#brief").innerHTML='<div class="steps">'+lines.map(function(l){
     return '<div class="step">'+l+'</div>';}).join("")+'</div>';
   $$("#brief [data-go2]").forEach(function(b){ b.onclick=function(){ go(b.dataset.go2); }; });
@@ -4434,24 +4516,71 @@ function autoPlan(){
   toast(added? added+"개를 배치했습니다 (총 "+(used/60).toFixed(1)+"h)" : "배치할 것이 없습니다");
 }
 
-/* ---------- 주차 시트 ---------- */
+/* ---------- 주차 시트 = 주차별 수업 정리 (7섹션) ---------- */
 function weekSheet(cid,w){
-  var c=course(cid);
+  var c=course(cid), n=weekNote(c,w,true);
   var pl=planned(c).filter(function(p){return p.week===w;});
+  var sess= pl.length? pl.map(function(p){
+      var s=sessionOn(cid,p.date);
+      var f=0; if(s&&s.slots) ["pre","note","rec","notice"].forEach(function(k){ if(s.slots[k]) f++; });
+      return '<div class="lrow" style="padding:6px 0"><div class="gr"><div class="t" style="font-size:13.5px">'+fmtDate(p.date)+' '+esc(p.slot.s)+'–'+esc(p.slot.e)+
+        (s&&s.progress?' <span style="font-weight:400;color:var(--ink-3)">'+esc(s.progress)+'</span>':"")+'</div>'+
+        '<div class="s">'+(s?((ATT[s.status]?ATT[s.status].n:"출결 미기록")+" · 자료 "+f+"/4"+(s.reviewed?" · 복습 완료":"")):"기록 없음")+'</div></div>'+
+        '<button class="btn xs" data-w="'+p.date+'">회차 기록</button></div>';
+    }).join("") : '<div class="hint">이 주에는 수업이 없습니다.</div>';
+  var ta=function(k,ph,val){ return '<textarea class="ta" id="wn_'+k+'" style="min-height:64px" placeholder="'+esc(ph)+'">'+esc(val||"")+'</textarea>'; };
+  var examRows=n.exam.map(function(e,i){
+    return '<div class="lrow" style="padding:6px 0"><span class="chip warn" style="flex:0 0 auto">★ '+esc(e.t||"")+'</span>'+
+      '<div class="gr"><div class="t" style="font-size:13.5px">'+esc(e.quote)+'</div>'+(e.memo?'<div class="s">'+esc(e.memo)+'</div>':"")+'</div>'+
+      '<button class="iconbtn" data-exdel="'+i+'" aria-label="삭제">✕</button></div>'; }).join("");
+  var taskRows=n.tasks.map(function(t,i){
+    return '<div class="lrow" style="padding:6px 0"><input type="checkbox" data-tdone="'+i+'"'+(t.done?" checked":"")+' aria-label="완료">'+
+      '<div class="gr"><div class="t" style="font-size:13.5px'+(t.done?';text-decoration:line-through;color:var(--ink-3)':'')+'">'+esc(t.text)+'</div>'+
+      '<div class="s">'+esc(dueLabel(t.due))+(t.due?" · "+fmtDate(t.due):"")+(t.src?" · "+esc(t.src):"")+'</div></div>'+
+      '<button class="iconbtn" data-tdel="'+i+'" aria-label="삭제">✕</button></div>'; }).join("");
+  var linkRows=n.links.map(function(l,i){
+    return '<div class="lrow" style="padding:5px 0"><div class="gr"><a href="'+esc(l.url)+'" target="_blank" rel="noopener" style="font-size:13.5px">'+esc(l.label||l.url)+'</a></div>'+
+      '<button class="iconbtn" data-ldel="'+i+'" aria-label="삭제">✕</button></div>'; }).join("");
+  var saveWN=function(){
+    n.range=$("#wn_range").value.trim(); n.summary=$("#wn_summary").value.trim();
+    WN_SEC.forEach(function(x){ n[x[0]]=$("#wn_"+x[0]).value; });
+    n.updatedAt=Date.now(); persist();
+  };
+  var reopen=function(){ saveWN(); closeSheet(); weekSheet(cid,w); };
   openSheet({
-    title:c.name+" · W"+w+" ("+fmtDate(weekStart(w))+" 주)",
-    body: pl.length? pl.map(function(p){
-        var s=sessionOn(cid,p.date);
-        var f=0; if(s&&s.slots) ["pre","note","rec","notice"].forEach(function(k){ if(s.slots[k]) f++; });
-        return '<div class="lrow" style="border:1px solid var(--line);border-radius:8px;margin-bottom:8px">'+
-          '<div class="gr"><div class="t">'+fmtDate(p.date)+' '+esc(p.slot.s)+'–'+esc(p.slot.e)+'</div>'+
-          '<div class="s">'+(s?((ATT[s.status]?ATT[s.status].n:"출결 미기록")+" · 자료 "+f+"/4"+(s.reviewed?" · 복습 완료":"")):"기록 없음")+'</div></div>'+
-          '<button class="btn xs a" data-w="'+p.date+'">기록</button></div>';
-      }).join("") : '<div class="empty">이 주에는 수업이 없습니다.</div>',
-    actions:[{label:"닫기",fn:closeSheet}],
+    wide:true,
+    title:c.name+" · W"+w+" 수업 정리 ("+fmtDate(weekStart(w))+" 주)",
+    body:
+      '<div class="field"><label>이 주 회차</label>'+sess+'</div>'+
+      '<div class="row" style="margin-top:8px"><div class="field" style="flex:1 1 180px"><label>진도 범위</label><input class="input" id="wn_range" value="'+esc(n.range)+'" placeholder="예: Ch.1 p.10–19"></div>'+
+      '<div class="field" style="flex:2 1 260px"><label>한 줄 요약</label><input class="input" id="wn_summary" value="'+esc(n.summary)+'" placeholder="이 주에 배운 것 한 문장"></div></div>'+
+      WN_SEC.map(function(x){ return '<div class="field" style="margin-top:11px"><label>'+esc(x[1])+'</label>'+ta(x[0],x[2],n[x[0]])+'</div>'; }).join("")+
+      '<div class="field" style="margin-top:14px"><label>⑥ ★ 교수님 시험 관련 언급 <span style="color:var(--warn)">(아주 중요)</span></label>'+
+        '<div id="wn_exam">'+(examRows||'<div class="hint">아직 없음</div>')+'</div>'+
+        '<div class="row tightg" style="margin-top:8px"><input class="input mono" id="wn_ex_t" placeholder="출처·시각 (예: 녹음 54:58)" style="flex:0 0 170px"><input class="input" id="wn_ex_q" placeholder="발언 원문에 가깝게"><button class="btn sm" id="wn_ex_add" style="flex:0 0 auto">추가</button></div></div>'+
+      '<div class="field" style="margin-top:14px"><label>⑦ 과제 · 할 일 <span class="hint">(과제 언급은 여기에 — 오늘 브리핑에 마감순으로 뜹니다)</span></label>'+
+        '<div id="wn_tasks">'+(taskRows||'<div class="hint">아직 없음</div>')+'</div>'+
+        '<div class="row tightg" style="margin-top:8px"><input class="input" id="wn_t_text" placeholder="할 일"><input class="input mono" id="wn_t_due" type="date" style="flex:0 0 150px"><button class="btn sm" id="wn_t_add" style="flex:0 0 auto">추가</button></div></div>'+
+      '<div class="field" style="margin-top:14px"><label>정리본 링크</label>'+
+        '<div id="wn_links">'+(linkRows||'<div class="hint">아직 없음</div>')+'</div>'+
+        '<div class="row tightg" style="margin-top:8px"><input class="input" id="wn_l_label" placeholder="이름" style="flex:0 0 160px"><input class="input mono" id="wn_l_url" placeholder="https://…"><button class="btn sm" id="wn_l_add" style="flex:0 0 auto">추가</button></div></div>'+
+      (n.updatedAt?'<div class="hint" style="margin-top:10px">마지막 수정 '+new Date(n.updatedAt).toLocaleString("ko-KR")+'</div>':""),
+    actions:[{label:"닫기",fn:closeSheet},{label:"저장",cls:"a",fn:function(){ saveWN(); closeSheet(); render(); toast("주차 정리를 저장했습니다"); }}],
     mount:function(root){
-      $$("[data-w]",root).forEach(function(b){ b.onclick=function(){
-        closeSheet(); logSheet(cid,b.dataset.w); }; });
+      $$("[data-w]",root).forEach(function(b){ b.onclick=function(){ saveWN(); closeSheet(); logSheet(cid,b.dataset.w); }; });
+      $("#wn_ex_add",root).onclick=function(){
+        var q=$("#wn_ex_q",root).value.trim(); if(!q){ toast("발언 내용을 적어 주세요"); return; }
+        n.exam.push({t:$("#wn_ex_t",root).value.trim(),quote:q,memo:""}); reopen(); };
+      $$("[data-exdel]",root).forEach(function(b){ b.onclick=function(){ n.exam.splice(+b.dataset.exdel,1); reopen(); }; });
+      $("#wn_t_add",root).onclick=function(){
+        var tx=$("#wn_t_text",root).value.trim(); if(!tx){ toast("할 일을 적어 주세요"); return; }
+        n.tasks.push({id:uid(),text:tx,due:$("#wn_t_due",root).value||"",done:false,src:"W"+w}); reopen(); };
+      $$("[data-tdone]",root).forEach(function(b){ b.onclick=function(){ var t=n.tasks[+b.dataset.tdone]; if(t){ t.done=b.checked; if(t.done) addXP(10); persist(); } }; });
+      $$("[data-tdel]",root).forEach(function(b){ b.onclick=function(){ n.tasks.splice(+b.dataset.tdel,1); reopen(); }; });
+      $("#wn_l_add",root).onclick=function(){
+        var u=$("#wn_l_url",root).value.trim(); if(!u){ toast("링크 주소를 적어 주세요"); return; }
+        n.links.push({label:$("#wn_l_label",root).value.trim(),url:u}); reopen(); };
+      $$("[data-ldel]",root).forEach(function(b){ b.onclick=function(){ n.links.splice(+b.dataset.ldel,1); reopen(); }; });
     }
   });
 }
@@ -4958,6 +5087,97 @@ function boot(){
         cad.profStyle+="\n\n[중간고사 — 암기 전략]\n- 중간고사(W10)는 이론 기반, 암기 위주. 제도 규칙·기호·치수·공차의 명칭·조건·기입법을 정확히 암기.\n- 중간 이후 W13~W16은 팀프로젝트로 전환 — 산출물 마감.";
     }
     t.patchCADDv1=true;
+    try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+  })();
+
+  /* 데이터 패치 — 2026-2 W1 주차별 수업 정리 시드 (9/1~9/4 업로드 자료 반영, 1회) */
+  (function(){
+    var t=term(); if(t.patchWeekNotesV1) return;
+    var byName=function(nm){ return t.courses.filter(function(c){return c.name===nm;})[0]; };
+    var setS=function(c,date,patch){
+      if(!c) return;
+      var s=t.sessions.filter(function(x){return x.courseId===c.id&&x.date===date;})[0];
+      if(!s){ s={id:uid(),courseId:c.id,date:date,week:weekOf(date),status:null,progress:"",und:null,reviewed:false,memo:"",
+                 slots:{pre:"",note:"",rec:"",notice:""},startedAt:"",endedAt:"",knew:"",stuck:"",learned:"",missedFrom:"",timeline:[]}; t.sessions.push(s); }
+      Object.keys(patch).forEach(function(k){ if(!s[k]) s[k]=patch[k]; });
+    };
+    var wn=function(c,w,data){
+      if(!c) return; var n=weekNote(c,w,true);
+      Object.keys(data).forEach(function(k){
+        if(Array.isArray(data[k])){ if(!n[k].length) n[k]=data[k]; }
+        else if(!(n[k]||"").trim()) n[k]=data[k];
+      });
+      n.updatedAt=Date.now();
+    };
+    var em=byName("공업수학1"), ca=byName("미분적분학2"), wr=byName("아카데믹글쓰기"), ph=byName("일반물리학2"), cd=byName("CADD");
+
+    wn(em,1,{range:"Ch.1 p.10–19 · 1.1 기본개념·모델화·계·선형성 → 해의 종류·초기값 문제 (Ex.4 시작)",
+      summary:"미분방정식의 정의·분류와 해의 3종류. 9/2 결석, 9/4는 녹음 8분만 남음",
+      textbook:"Kreyszig 10판 1.1 (교재 PDF 미보유 — 강의자료 슬라이드로 대체)",
+      board:"9/4 과제 판서: 1st Week H.W. <1.3> 6, 7, ⑧(동그라미 강조), 16, 17. 풀이 판서 사진은 없음.",
+      recording:"9/4 08:49 (이후 끊김) — 해 = n차 도함수가 존재하고 식을 만족하는 함수. 일반해(적분상수 c 포함) / 특수해(초기·경계조건으로 c 결정) / 특이해(일반해로 안 나옴 → 공학적 의미 없어 거의 안 다룸). 초기조건 = 독립변수가 0일 때의 값, 공학에서는 '경계조건'이라는 말을 많이 씀. 1계→적분 1번→상수 1개→조건 1개, 2계→2개, 3계→3개. (y')²−xy'+y=0은 멱이 2라 비선형(뒷자리 학생 지목해 질문). 선형 위주로 하고 비선형은 특이한 경우만. Ex.4 y'=3y: y는 y끼리 x는 x끼리 → dy/y=3dx.",
+      material:"슬라이드 Ch.1 p.10–19 — 모델화 3단계(Step1 모델 → Step2 해법 → Step3 해석), 모델 3종(Newton 냉각·낙하+공기저항·투사체), DE/ODE/PDE 정의, 계(order: (dy/dx)³은 1계), 양함수 y'=f(x,y) / 음함수 F(x,y,y')=0, 선형 조건 2개(y와 도함수의 멱 1 · 계수는 x만의 함수), 예제 (1) 1계 비선형 (2) 3계 선형 비제차 (3) 2계 선형 제차, 비선형 예 3개, 해의 3종류(연습 1.1-16: y=cx−c² / y=2x−4 / y=x²/4), IVP Ex.4 y=5.7e^{3x}, Ex.5 방사성 붕괴 y=0.5e^{−kt}",
+      exam:[{t:"녹음 9/4 04:06",quote:"특이해는 해는 해인데 공학적으로 의미가 없는 해. 관심 가질 해는 일반해와 특수해만. 특이해는 거의 안 할 거다.",memo:"특이해 유도는 제외, 정의만"},
+            {t:"녹음 9/4 04:06",quote:"선형 위주로 할 거고 비선형은 거의 안 할 거야. 비선형은 특이한 경우만.",memo:"1장의 변수분리·동차·Bernoulli처럼 선형으로 바꾸는 꼴만"},
+            {t:"슬라이드 p.4–5",quote:"Written test 80% (중간 40 · 기말 40). 과제 미제출 −1.0/회, 지각제출 −0.5/회(2주까지). 결석 −0.5, 지각 −0.25. 1/3 이상 결석·시험 미응시·원점수 30 미만 F.",memo:""}],
+      tasks:[{id:uid(),text:"1주차 과제 Kreyszig 1.3 #6·7·8·16·17 — 수업 전 교탁 제출",due:"2026-09-09",done:false,src:"판서 9/4"},
+             {id:uid(),text:"Ch.2(2계 ODE, W4–5) 강의자료 확보 — 중간고사 핵심 구간",due:"2026-09-16",done:false,src:"자료 점검"}],
+      links:[{label:"1계 ODE 쉬운 정리 (개념·공식·문제·풀이·교육과정)",url:"https://claude.ai/code/artifact/26569254-d9a0-4eda-9d80-60826d15c571"},
+             {label:"9/2 결석 보강 — 모델화부터 선형·비선형까지 (p.10–17)",url:"https://claude.ai/code/artifact/51f01342-e9f3-4518-b528-790809d55be6"},
+             {label:"1주차 과제 가이드 (1.3 #6·7·8·16·17)",url:"https://claude.ai/code/artifact/d4876786-444b-4966-a2f4-f78917954dca"},
+             {label:"이기영 교수 풀이 스타일·출제 분석 v0.2",url:"https://claude.ai/code/artifact/fd8a7976-13b3-4baf-a054-68fc042474a1"},
+             {label:"1계 ODE 정리노트 (판별 흐름)",url:"https://claude.ai/code/artifact/fb9470e9-8e72-4a16-bfec-f7029b8655cd"}]});
+    setS(em,"2026-09-02",{status:"absent",progress:"Ch.1 p.10–17 기본개념·모델화·계·선형성",missedFrom:"결석 — 보강 노트로 대체"});
+    setS(em,"2026-09-04",{status:"present",progress:"p.18–19 해의 종류·초기값 문제, Ex.4 시작 (녹음 8분 후 끊김)"});
+
+    wn(ca,1,{range:"학습지 Lecture 2-1 · 행렬의 정의·종류 → 연산·거듭제곱 → 행렬식(2차 ad−bc, 3차 사루스)",
+      summary:"행렬 도입부터 행렬식까지. 시험 문제는 행렬식부터 나온다",
+      recording:"9/1 35분 — 행렬 정의(m×n, 성분 a_ij: i행 j열, 행렬은 대문자·성분은 소문자), 정사각·단위(I)·영(O)·전치(Aᵀ)·대칭행렬. 9/3 62분 — 덧셈·뺄셈·실수배는 같은 꼴끼리, 나눗셈 없음. 곱셈은 (m×n)(n×r)=m×r, 앞 열=뒤 행, AB≠BA. c_ij=Σ_k a_ik b_kj (교재의 r 대신 k로 통일, 고교 시그마와 맞춤). 거듭제곱 Aⁿ, A^r·A^s=A^{r+s}. 행렬 곱에 × 기호 금지. 예제2 (1)~(5): (3) A−2B는 수능 2점, (4) 3×2와 3×2는 곱 불가 → 전치로 꼴 맞춤, (5) 0 아닌 3차 행렬의 제곱이 O. 행렬식은 '값'(행렬 아님), det A 표기 권장(|A|는 절댓값 아님). 2차 ad−bc(고1 유리함수 역함수와 같은 꼴), 3차 사루스(+ 대각 3개 − 반대각 3개, 그림보다 '3개씩 곱한다'). 예제3 det=0 → x²−5x+6=0 → x=2,3. 예제4 det B=−60. 다음: 소행렬식·여인수 전개(문자·큰 수일 때).",
+      material:"학습지 Lecture 2-1 행렬과 행렬식 (14p, 9/1)",
+      exam:[{t:"녹음 9/3 30:54",quote:"시험 문제는 행렬식부터 이제 나올 건데, 머릿속에 암기를 해야죠.",memo:""},
+            {t:"녹음 9/3 32:00",quote:"중간고사에 관련된 문제 두 문제나 세 문제를 낼 예정인데 이 행렬식을 가지고 문제 나오는 파트가 있다.",memo:""},
+            {t:"녹음 9/3 24:05",quote:"(행렬의 덧셈·실수배) 이거는 시험 문제 안 나온다.",memo:""},
+            {t:"녹음 9/3 44:43",quote:"det와 세로줄은 무조건 써야 돼. 당연히 알겠지 하고 안 쓰면 감점 당해요.",memo:"표기 누락 = 감점"},
+            {t:"녹음 9/3 58:40",quote:"우리는 전자계산기 손 못 대, 손으로 계산해야 돼. 손으로 풀 수 있는 건 3차까지.",memo:""}],
+      tasks:[{id:uid(),text:"주말 강의자료실 업로드 연습문제(행렬·행렬식, 답안 포함) 풀어오기",due:"2026-09-08",done:false,src:"녹음 9/3 1:01:20"}],
+      links:[{label:"9/3 행렬 연산과 행렬식 정리 + 홍순필 교수 분석 v0.1",url:"https://claude.ai/code/artifact/fb3f63f5-4c44-4dba-98f3-70c6c870c652"}]});
+    setS(ca,"2026-09-01",{status:"present",progress:"행렬의 정의와 종류 (Lecture 2-1)"});
+    setS(ca,"2026-09-03",{status:"present",progress:"행렬 연산·거듭제곱·행렬식(2차, 3차 사루스), 예제 2~4"});
+
+    wn(wr,1,{range:"OT · 글쓰기는 왜 필요한가 · 운영 방식 · 평가 규정",
+      summary:"글쓰기 정의의 키워드 3개(표현·소통·의사소통 행위), 과정 중심 수업, 평가 규정",
+      recording:"9/1 44분 — 우리는 언어적 존재(사고가 언어로 구성). 교재 정의: 자신의 생각과 느낌을 문자 언어로 표현하여 사회 구성원들끼리 소통하도록 하는 의사소통 행위 → 키워드 ①문자 언어로 표현(더 정확한 언어화: 짜증→서운/난감) ②사회 구성원 소통(일기도 가상의 독자) ③의사소통 행위(나–타인–공동체). 대학=학문 공동체 → 주체적 읽기·쓰기(판단·자료 선별·논리 전개·토론). 처음부터 잘 쓰는 사람은 없다(이다혜), 연마 가능한 능력(유시민·린다 플라워), 챗GPT는 과정이 없다 → 과정 중심. 글쓰기 능력 = 사고력·표현력·구성력. 매일 쓰기. 운영: 이론+활동, 교재 안 사도 됨, 읽기자료 미리, 강의자료는 수업 후 LMS, 자기서사(8주차, 중간 대체) + 비평적 글쓰기(후반, 합평).",
+      material:"강의계획서 2026-2 (김혜선, 화 11:00–13:00, 1공 301). 교재 『아카데믹 글쓰기』(한양대출판부) 구매 불필요.",
+      exam:[{t:"녹음 9/1 36:33",quote:"기말시험은 한 학기 동안 배운 글쓰기 이론 중심, 교수자 강의자료에서 출제. 주요 내용은 사실 얼마 없고, 수업 중간중간 힌트를 드릴 예정.",memo:"수업 중 '힌트' 발언 추적"},
+            {t:"녹음 9/1 33:42",quote:"출석 20 · 과제 45(자기서사 20, 비평 25) · 기말 20 · 참여 15. 지각 −1, 결석 −2, 대리출석 −3, 무단이탈 −2. 결석 6회부터 F.",memo:""},
+            {t:"녹음 9/1 39:10",quote:"32명 중 10명 안팎이 A. 모든 평가 항목에서 구멍이 없도록. 1점 차로 갈린다.",memo:""}],
+      tasks:[{id:uid(),text:"9/8 주제문 쓰기 활동 대비 — 쓰고 싶은 주제 후보 2~3개 메모, 읽기자료 공지 확인",due:"2026-09-08",done:false,src:"녹음 9/1 43:13"},
+             {id:uid(),text:"자기서사 글쓰기 (중간 대체, 8주차 제출·그 주 수업 없음) — 공지 시 마감 확정",due:"2026-10-20",done:false,src:"녹음 9/1 35:00"}],
+      links:[{label:"9/1 OT 정리 + 김혜선 교수 분석 v0.1",url:"https://claude.ai/code/artifact/36d97eea-7ecb-46f3-8e0e-ee85ea9bb8cd"}]});
+    setS(wr,"2026-09-01",{status:"present",progress:"OT · 글쓰기는 왜 필요한가 · 평가 규정"});
+
+    wn(ph,1,{range:"21장 전하 · 22장 전기장 서론 (강의노트 Part-01·02, p.3–9)",
+      summary:"전기와 자기는 똑같다 — 전하 q=ne, 시험전하 +1C, Σ/∫로 전기장 세기, 쿨롱·ε₀·μ₀·c, 자기 소스는 전류",
+      textbook:"Halliday 계열 21·22장 (교재 PDF 미보유)",
+      board:"판서 사진 없음. 녹음으로 복원: q=ne, e=1.6×10⁻¹⁹ C / 시험전하 +1C → n≈6×10¹⁸ / 불연속 Σ(점전하·점전하군·쌍극자) · 연속 ∫(직선·원형·원판) / 학생 20명 그룹 q₁=−3e, q₂=+9e, q₃=+4e / F=kq₁q₂/r² r̂, k=1/4πε₀=9×10⁹, ε₀=8.854×10⁻¹² / μ₀=4π×10⁻⁷, c=1/√(ε₀μ₀) / 자하 분리 불가 → 전류 I=dq/dt / 정전기학 21–25장, 동전기학 26장~ / Thomson·Hall·Biot-Savart·Ampère·Faraday·Lenz·Maxwell",
+      recording:"9/4 60분 — 전기의 소스는 전하. 시험전하는 무조건 +1C(양성자 6×10¹⁸개=전기력선 개수). 전기장 = 전기력선 n개를 어떻게 셀 것인가: 불연속이면 Σ, 연속이면 ∫dq. 알짜 전하(net charge)만 센다, 양자화는 '덩어리로 묶였다' 이상 의미 두지 말 것. 쿨롱 법칙은 13장 역제곱 법칙과 같은 꼴. 유전율(誘: 꼬시는 정도): 진공 ε₀가 가장 작아 100% 통과 → k 최대 → 진공에서 전기력 최대, 유전체는 25장. 자기의 μ₀(투자율). c=1/√(ε₀μ₀): 가장 작은 둘을 곱해 역수 → 가장 큰 값 = 빛의 속도. 물리는 결국 파동방정식을 구하는 학문(16장 파동의 연장). 자기의 소스는 자하여야 하지만 N/S 분리 불가(r=0 → ∞) → 전류 I=dq/dt로 대체. 정전기학(21–25) vs 동전기학(26~), 자기장은 3차원·회전·벡터곱. 자기 파트는 실험한 사람들(Thomson·Hall·Biot-Savart·Ampère·Faraday·Lenz·Maxwell)이 뭘 했는지만 알면 끝. 34:05~49:44 여담(강의평가·진로·AI).",
+      material:"강의노트 63p(톡방) p.3–9 — p.3 전자기학의 집(전하→전기장→전위→가우스→전기용량 / 전류→자기장→자기력→앙페르→유도용량), p.4 물질의 구성(e, m 표)·양자화(quark ±e/3)·도체/부도체/절연체·유도, p.5 쿨롱 법칙 3배치·전기장 정의 E=lim F/q₀·전기력선, p.6–8 전기장 표현 ①점전하 ②점전하군 ③쌍극자 ④직선도선(λ) ⑤원형고리 ⑥원판(R→∞: σ/2ε₀)·쌍극자 퍼텐셜에너지, p.8–9 필수문제 1~6(답 수록: F=k(15/4 i+80/9 j) / k√2/2·Qq/a² j / √3kq²/a² / E=1×10⁵, a=−20k, z=270 / a=−3.2×10¹³, t=5×10⁻⁸, y=−0.04 / U=2.4k, E=5/12 k). 중간 범위 27장 = 강의노트 p.1–32.",
+      exam:[{t:"녹음 9/4 54:58",quote:"시험 범위는 27장까지 보게 될 거예요.",memo:"계획서 W7(26장)보다 한 장 더 · 강의노트 p.1–32"},
+            {t:"녹음 9/4 59:19",quote:"중간고사를 정말 열심히 공부하기를 바라요. 중간고사를 포기하면서 뒤에 부분을 아예 포기해 버리고…",memo:"전기 파트를 알아야 자기 파트가 쉬움"},
+            {t:"녹음 9/4 32:14",quote:"다다음 시간 정도에 하는 전기장의 계산에 치일 거야. 짜증 날 거거든.",memo:"9/11부터 직선·고리·원판 적분"},
+            {t:"녹음 9/4 25:55",quote:"예전에는 다 k로만 썼지만 이제는 무조건 1/(4πε₀)로 써야 돼. 그게 정확하게 쓰는 거야.",memo:"답안 표기"},
+            {t:"녹음 9/4 16:16",quote:"강의노트에 보면 벡터 합력을 구하는 문제들이 있어. x축 y축 i, j 벡터로 해서 더해 버리면 돼.",memo:"필수문제 1·2·3"}],
+      tasks:[{id:uid(),text:"강의노트 p.3–9 예습 + 필수문제 1~6 직접 풀어 답 대조",due:"2026-09-09",done:false,src:"녹음 9/4"},
+             {id:uid(),text:"9/2 출석 인정 정정 확인 (교수 허락받음)",due:"2026-09-09",done:false,src:"사용자 9/4"},
+             {id:uid(),text:"1학기 13장 역제곱 법칙 · 벡터 성분 합 복습",due:"2026-09-11",done:false,src:"녹음 9/4 32:14"}],
+      links:[{label:"9/4 전하와 전기장 서론 (7섹션) + 김민수 교수 분석 v0.1",url:"https://claude.ai/code/artifact/ca17088c-2405-4aa5-b150-1be26a5ec736"}]});
+    setS(ph,"2026-09-02",{status:"absent",progress:"21장 전하 (강의노트 Part-01)",memo:"출석체크 누락으로 결석 처리 → 교수 허락으로 9/9 출석 인정 예정",missedFrom:"결석 — 9/4 정리 4절(강의노트 Part-01)로 보강"});
+    setS(ph,"2026-09-04",{status:"present",progress:"22장 전기장 서론: 전하·쿨롱·ε₀·μ₀·자기의 소스"});
+
+    wn(cd,1,{summary:"운영: 매주 월요일 LMS 개념 영상 → 화요일 수업 → 일요일 시청 마감(이후 지각 처리)",
+      tasks:[{id:uid(),text:"이번 주 LMS 개념 영상 시청 (일요일 마감, 이후 지각 처리)",due:"2026-09-07",done:false,src:"사용자 9/4"}]});
+
+    t.patchWeekNotesV1=true;
     try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   })();
   applyFont();
