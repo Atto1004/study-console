@@ -3287,19 +3287,30 @@ function renderCourse(){
   $("#btnWeekNote").onclick=function(){ weekSheet(c.id, currentWeek()||1); };
 
   var pl=planned(c), td=today();
-  var pastPl=pl.filter(function(p){return diffDays(p.date,td)>=0;}).reverse();
-  $("#cLogHs").textContent=sessions(c.id).length+" / "+pl.length+"회";
-  $("#cLog").innerHTML= pastPl.length? pastPl.slice(0,40).map(function(p){
-      var s=sessionOn(c.id,p.date);
-      var st=s?s.status:null;
-      return '<div class="lrow"><span class="swatch" style="background:'+
-        (st==="present"?"var(--ok)":st==="late"?"var(--warn)":st==="ghost"?"var(--info)":st==="absent"?"var(--crit)":"var(--line-2)")+'"></span>'+
-        '<div class="gr"><div class="t">'+p.week+'주차 · '+fmtDate(p.date)+
-          (s&&s.progress?' <span style="font-weight:400;color:var(--ink-3)">'+esc(s.progress)+'</span>':"")+'</div>'+
-        '<div class="s">'+(s?(ATT[st]?ATT[st].n:"—")+
-          (typeof s.und==="number"?" · 이해도 "+s.und+"/5":"")+
-          (s.reviewed?" · 복습 완료":" · 미복습"):"기록 없음")+'</div></div>'+
-        '<button class="btn xs" data-log="'+p.date+'">'+(s?"수정":"기록")+'</button></div>';
+  /* 회차 로그 — 주차별로 묶고, 요일마다 한 줄 (주 2회 과목은 두 줄). 이번 주는 예정 회차까지 표시 */
+  var cw=currentWeek()||1;
+  var shown=pl.filter(function(p){ return diffDays(p.date,td)>=0 || p.week===cw; });
+  var byWeek={}; shown.forEach(function(p){ (byWeek[p.week]=byWeek[p.week]||[]).push(p); });
+  var weeksDesc=Object.keys(byWeek).map(Number).sort(function(a,b){return b-a;});
+  $("#cLogHs").textContent=sessions(c.id).filter(function(s){return !!s.status;}).length+" / "+pl.length+"회";
+  $("#cLog").innerHTML= weeksDesc.length? weeksDesc.slice(0,12).map(function(w){
+      var rows=byWeek[w].sort(function(a,b){return a.date<b.date?-1:1;}).map(function(p){
+        var s=sessionOn(c.id,p.date), st=s?s.status:null, dow=DAY[D(p.date).getDay()];
+        var future=diffDays(td,p.date)>0, cancelled=!!(s&&s.cancelled);
+        var col= cancelled?"var(--line-2)" : st==="present"?"var(--ok)":st==="late"?"var(--warn)":st==="ghost"?"var(--info)":st==="absent"?"var(--crit)":"var(--line-2)";
+        var f=0; if(s&&s.slots) ["pre","note","rec","notice"].forEach(function(k){ if(s.slots[k]) f++; });
+        f += (s&&Array.isArray(s.timeline)?s.timeline.length:0) + (s&&+s.matCount||0);
+        var sub = cancelled ? (s.memo||"휴강 · 계산 제외")
+          : future ? "예정 · "+esc(p.slot.s)+"–"+esc(p.slot.e)+(p.slot.room?" · "+esc(p.slot.room):"")
+          : s ? (ATT[st]?ATT[st].n:"출결 미기록")+(typeof s.und==="number"?" · 이해도 "+s.und+"/5":"")+" · 자료 "+f+(s.reviewed?" · 복습 완료":" · 미복습")
+          : "기록 없음 · "+esc(p.slot.s)+"–"+esc(p.slot.e);
+        return '<div class="lrow'+(future?' future':'')+'" style="padding:8px 0'+(future?';opacity:.6':'')+'"><span class="swatch" style="background:'+col+'"></span>'+
+          '<div class="gr"><div class="t"><span class="chip mut" style="margin-right:6px">'+dow+'</span>'+fmtDate(p.date)+
+            (s&&s.progress?' <span style="font-weight:400;color:var(--ink-3)">'+esc(s.progress)+'</span>':"")+'</div>'+
+          '<div class="s">'+sub+'</div></div>'+
+          '<button class="btn xs" data-log="'+p.date+'">'+(s&&(s.status||s.progress)?"수정":"기록")+'</button></div>';
+      }).join("");
+      return '<div style="margin-bottom:6px"><div style="font-family:var(--font-num);font-size:11px;letter-spacing:.06em;color:var(--accent);padding:8px 0 2px;border-bottom:1px solid var(--line)">'+w+'주차 · '+fmtDate(weekStart(w))+' 주'+(w===cw?' · 이번 주':'')+' · '+byWeek[w].length+'회</div>'+rows+'</div>';
     }).join("") : '<div class="empty"><span class="big">◷</span>아직 지난 수업이 없습니다.</div>';
   $$("#cLog [data-log]").forEach(function(b){ b.onclick=function(){ logSheet(c.id,b.dataset.log); }; });
 
