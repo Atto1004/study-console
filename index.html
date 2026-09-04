@@ -2287,21 +2287,91 @@ var ST_NOTE=
 "벡터(고교) · 뉴턴 운동 3법칙(고교) · 자유물체도 · 평형방정식 · 도심과 단면 2차 모멘트\n"+
 "★ 미분적분학2 W4~W6(벡터와 공간 · 내적 · 벡터곱)이 정확히 정역학의 선수지식이다.\n"+
 "  같은 학기에 듣고 있으므로 묶어서 보면 양쪽 다 이득이다.";
+
+/* 정역학 — 강의계획서(포털 캡처 4장) + W1 오리엔테이션 슬라이드(강석경 교수, 9/2) 실물 반영 */
+var STA_SYLLABUS=
+"정역학 / Engineering Mechanics: Statics\n"+
+"학수번호 COE2003 · 수업코드 24814 (202620HY24814)\n"+
+"2026학년도 2학기 · 기계공학과 · 과목구분 전공핵심 · 3학점(강의 3 / 실습 0) · 이수단위 C-한양핵심역량\n"+
+"담당 강석경(Sukkyung Kang) · 기계공학과 · skkang00@hanyang.ac.kr\n"+
+"강의시간 월 15:00–16:30 제1공학관 409 / 수 15:00–16:30 제1공학관 503\n"+
+"수업진행형태 일반수업 · 강의평가유형 강의중심 · SDG 9\n"+
+"교재 Engineering Mechanics: Statics, 5th ed., A. Bedford & W. Fowler, Pearson Prentice Hall (부교재 없음)\n\n"+
+"[교과목 개요]\n"+
+"정지 또는 등속 병진운동 상태에 있는 물체에 작용하는 힘과 모멘트의 평형을 다루는 기초 역학 과목.\n"+
+"벡터, 힘계, 모멘트, 자유물체도, 평형 조건, 구조물 해석, 도심과 질량중심, 관성모멘트의 기본 개념과 공학 문제 적용.\n\n"+
+"[수업 목표]\n"+
+"힘과 모멘트가 작용하는 공학 시스템을 자유물체도와 평형 방정식으로 해석하는 능력. 이론 설명 + 문제 해결 연습 중심.\n"+
+"세부목표 1 벡터·힘·모멘트·작용선·반력·평형의 기본 개념과 용어\n"+
+"세부목표 2 자유물체도 작성과 2차원·3차원 평형방정식을 이용한 힘·모멘트 해석\n"+
+"세부목표 3 트러스·프레임·분포하중·도심·질량중심·관성모멘트\n"+
+"선수과목 요구 없음. 미적분학·일반물리학·벡터·삼각함수의 기본 이해 필요.\n"+
+"유의사항 총 수업시간의 2/3 이상 출석해야 시험 응시 가능. 부정행위 시 성적 취소.\n\n"+
+"[평가 — 합계 100%]\n"+
+"출석 10% · 과제 10% · 중간고사 30% · 기말고사 50%  (퀴즈·토론·팀프로젝트·학습참여도 0%)\n\n"+
+"[수업 운영 — W1 오리엔테이션 슬라이드 (9/2)]\n"+
+"- 영어 강의: 영어로 설명한 뒤 한국어로 짧게 요약. 영어 기반이라 채점은 비교적 유연.\n"+
+"- 과제·시험 답안은 원칙적으로 영어. 서술형은 한국어 가능하나 핵심 용어는 영어로 기억할 것.\n"+
+"- 출석: 결석 1회당 −2점.\n"+
+"- 과제: 손글씨로 작성해 LMS에 제출. 기한 내 제출하면 만점 — 완성도 기준, 정답 여부는 채점하지 않음.\n"+
+"- ★ 과제 문제 중 1~2문제가 시험에 그대로 출제. 단, 틀리면 부분점수 없음.\n"+
+"- 중간고사 30% = Ch.3·4·5 (10/19 월) · 기말고사 50% = Ch.6·7·8 (12/14 월). 절대평가.\n"+
+"- 시험 중 화장실 이용 불가. 부정행위 엄금.\n"+
+"- 초청강연 등 일정으로 온라인 강의가 몇 차례 있을 예정 (사전 공지).\n\n"+
+"[16주 진도 — 오리엔테이션 슬라이드 일정표 (날짜 기준, 진도에 따라 변경 가능)]\n"+
+"W1  9/2  오리엔테이션\n"+
+"W2  9/7 Ch.1 Introduction · Ch.2 Vectors / 9/9 Ch.2\n"+
+"W3  9/14 · 9/16 Ch.2 Vectors\n"+
+"W4  9/21 · 9/23 Ch.3 Forces\n"+
+"W5  9/28 · 9/30 Ch.4 Systems of Forces and Moments\n"+
+"W6  10/5 ⚠ 개천절 대체공휴일 / 10/7 Ch.5 Objects in Equilibrium\n"+
+"W7  10/12 · 10/14 Ch.5\n"+
+"W8  10/19 ★ 중간고사 (Ch.3–5) / 10/21 Grading buffer\n"+
+"W9  10/26 · 10/28 Ch.6 Structures in Equilibrium\n"+
+"W10 11/2 · 11/4 Ch.6\n"+
+"W11 11/9 · 11/11 Ch.7 Centroids and Centers of Mass\n"+
+"W12 11/16 · 11/18 Ch.7\n"+
+"W13 11/23 Ch.7 / 11/25 Ch.8 Moments of Inertia\n"+
+"W14 11/30 · 12/2 Ch.8\n"+
+"W15 12/7 · 12/9 Ch.8\n"+
+"W16 12/14 ★ 기말고사 (Ch.6–8) / 12/16 Grading buffer\n"+
+"※ 포털 주별계획(W1 Ch.1 … W5 Ch.4 … W7 Ch.5 … W14–15 Ch.8)은 장 단위라 슬라이드 날짜표와 1주 정도 어긋남. 슬라이드가 최신.";
+var STA_STYLE=
+"[강의계획서·오리엔테이션에서 읽히는 것]\n"+
+"- 기말 50% > 중간 30%. 기말(Ch.6–8: 구조물·도심·관성모멘트)이 성적의 절반. 중간(Ch.3–5)과 범위가 분리돼 있다.\n"+
+"- 절대평가 → 남과 경쟁이 아니라 기준점 넘기기. 과제 완성 제출(10%)과 출석(10%)은 무조건 확보하는 점수.\n"+
+"- ★ 과제 1~2문제가 시험에 그대로 나오고 부분점수가 없다.\n"+
+"  → 과제는 '풀어 본 것'이 아니라 '틀리지 않고 다시 풀 수 있는 것'으로 만들어야 한다. 과제 오답노트 = 시험 대비.\n"+
+"- 영어 강의 + 영어 답안 → 장마다 용어 영·한 대조표를 만든다 (force, moment, couple, free-body diagram,\n"+
+"  equilibrium, support reaction, truss, frame, centroid, center of mass, moment of inertia).\n"+
+"- 개요가 '이론 설명 + 문제 해결 연습'. 교재 Bedford & Fowler 5판의 예제·연습문제가 과제·출제 풀.\n"+
+"- 온라인 강의 회차가 몇 번 있다 — 공지를 놓치면 결석(−2점) 처리될 수 있다.\n\n"+
+"[선수지식 — 지금 볼 것]\n"+
+"벡터(성분·내적·외적) · 뉴턴 운동 3법칙 · 자유물체도 · 삼각함수 · 단위(N, N·m).\n"+
+"★ 미분적분학2 W4~W6(벡터와 공간 · 내적 · 벡터곱)이 Ch.2 Vectors와 정확히 겹친다. 같은 학기라 묶어서 보면 양쪽 다 이득.\n\n"+
+"[일정]\n"+
+"- 월·수 15:00–16:30. 월요일은 창업(11:00–13:00) 뒤, 수요일은 공업수학1·일반물리학2 뒤 세 번째 수업.\n"+
+"- 10/5(월) 개천절 대체공휴일 휴강. 중간 10/19(월) · 기말 12/14(월). 시험 다음 수업은 Grading buffer(수업 없음 가능성).";
 function seedStatics(){
   var t=term();
   var c=t.courses.filter(function(x){return x.name==="정역학";})[0];
   if(!c) return;
-  c.status="enrolled";             /* 수강정정으로 확보 예정 — 일단 확정으로 */
-  c.bucket="전공필수";
-  c.profStyle=ST_NOTE;
+  c.status="enrolled";
+  c.bucket="전공필수";                 /* 포털 구분은 '전공핵심' */
+  c.code="COE2003";
+  c.prof="강석경";
+  c.evalMix={mid:30,fin:50,hw:10,quiz:0,att:10,proj:0,quizCycle:""};
+  c.examForm=["주관식 계산","영어 답안"];
+  c.syllabus=STA_SYLLABUS;
+  c.profStyle=STA_STYLE;
 
   var pl=planned(c);
   var midWeek=pl.filter(function(p){return p.week===8;})[0];
   var finWeek=pl.filter(function(p){return p.week===16;})[0]||pl[pl.length-1];
   if(midWeek) t.exams.push({id:uid(),courseId:c.id,kind:"중간",date:midWeek.date,time:"15:00",
-    scope:"(추정) 강의계획서 확인 필요 — 보통 힘·모멘트 · 자유물체도 · 평형방정식 · 트러스 · 마찰",weight:0});
+    scope:"Ch.3 Forces · Ch.4 Systems of Forces and Moments · Ch.5 Objects in Equilibrium — 과제 1~2문제 그대로 출제(부분점수 없음), 영어 답안, 절대평가",weight:30});
   if(finWeek) t.exams.push({id:uid(),courseId:c.id,kind:"기말",date:finWeek.date,time:"15:00",
-    scope:"(추정) 강의계획서 확인 필요 — 보통 도심 · 단면 2차 모멘트 · 분포하중 · 가상일",weight:0});
+    scope:"Ch.6 Structures in Equilibrium · Ch.7 Centroids and Centers of Mass · Ch.8 Moments of Inertia — 중간 범위 제외, 성적의 50%",weight:50});
 }
 
 /* 창업아이디어탐색 — 강의계획서(한용석 교수) 실물 반영 */
@@ -5178,6 +5248,53 @@ function boot(){
       tasks:[{id:uid(),text:"이번 주 LMS 개념 영상 시청 (일요일 마감, 이후 지각 처리)",due:"2026-09-07",done:false,src:"사용자 9/4"}]});
 
     t.patchWeekNotesV1=true;
+    try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+  })();
+
+  /* 데이터 패치 V2 — 정역학 강의계획서·OT 반영 + 아카데믹글쓰기 1주차 강의자료 (1회) */
+  (function(){
+    var t=term(); if(t.patchWeekNotesV2) return;
+    var st=t.courses.filter(function(c){return c.name==="정역학";})[0];
+    if(st){
+      if(!(st.syllabus||"").trim()) st.syllabus=STA_SYLLABUS;
+      if(!(st.profStyle||"").trim() || st.profStyle===ST_NOTE) st.profStyle=STA_STYLE;
+      if(!st.prof) st.prof="강석경";
+      if(!st.code) st.code="COE2003";
+      if(!st.evalMix||st.evalMix.mid==null) st.evalMix={mid:30,fin:50,hw:10,quiz:0,att:10,proj:0,quizCycle:""};
+      if(!Array.isArray(st.examForm)||!st.examForm.length) st.examForm=["주관식 계산","영어 답안"];
+      t.exams.filter(function(e){return e.courseId===st.id;}).forEach(function(e){
+        if(/^\(추정\)/.test(e.scope||"")||!(e.scope||"").trim()){
+          if(e.kind==="중간"){ e.scope="Ch.3 Forces · Ch.4 Systems of Forces and Moments · Ch.5 Objects in Equilibrium — 과제 1~2문제 그대로 출제(부분점수 없음), 영어 답안, 절대평가"; e.weight=30; }
+          if(e.kind==="기말"){ e.scope="Ch.6 Structures in Equilibrium · Ch.7 Centroids and Centers of Mass · Ch.8 Moments of Inertia — 중간 범위 제외, 성적의 50%"; e.weight=50; }
+        }
+      });
+      var n=weekNote(st,1,true);
+      if(!(n.summary||"").trim()){
+        n.range="W1 9/2 오리엔테이션 (Ch.1 Introduction은 9/7부터)";
+        n.summary="영어 강의 · 과제는 손글씨 LMS 제출(완성도 기준 만점) · 과제 1~2문제 시험에 그대로 · 중간 Ch.3–5 30%, 기말 Ch.6–8 50% · 절대평가";
+        n.material="OT 슬라이드 8p(Statics_2026F_W1_Orientation) — 과목 개요(정지·등속 물체의 힘·모멘트 평형: 벡터·힘계·모멘트·자유물체도·평형·구조물·도심·관성모멘트), 강의실(월 409·수 503), 운영(영어 설명 후 한국어 요약, 답안 영어 원칙), 16주 날짜별 일정표(중간 10/19 Ch.3–5, 기말 12/14 Ch.6–8, 10/5 휴강, 시험 다음 수업은 grading buffer, 온라인 강의 몇 회 예정), 교재 Bedford & Fowler 5판, 평가(출석10 −2/결석 · 과제10 · 중간30 · 기말50).";
+        n.textbook="Engineering Mechanics: Statics 5th ed. (Bedford & Fowler) — PDF 미보유. 9/7 Ch.1 Introduction, Ch.2 Vectors부터.";
+        n.exam=[{t:"OT 슬라이드 p.8",quote:"1-2 homework problems will appear exactly as given on the exam. No partial credit will be given for these problems. (과제 문제 중 1~2문제는 그대로 출제, 틀리면 부분점수 없음)",memo:"과제 오답노트가 곧 시험 대비"},
+                {t:"OT 슬라이드 p.8",quote:"Midterm exam 30% (Chapter 3, 4, 5) · Final exam 50% (Chapter 6, 7, 8) · Absolute grading will be applied.",memo:"중간·기말 범위 분리, 절대평가"},
+                {t:"OT 슬라이드 p.8",quote:"Homework must be handwritten and submitted in LMS. Graded based on completion, not correctness. Full credit if submitted by the deadline.",memo:"기한만 지키면 10% 확보"},
+                {t:"OT 슬라이드 p.5",quote:"Homework and exam answers should generally be written in English. Korean may be used for descriptive responses.",memo:"핵심 용어는 영어로"},
+                {t:"OT 슬라이드 p.8",quote:"Attendance 10%: -2 pt per one absence. Restroom use is strictly prohibited during the exam.",memo:""}];
+        n.tasks=[{id:uid(),text:"Ch.1 Introduction · Ch.2 Vectors 예습 — 벡터 성분·내적·외적 (미적2 벡터 단원과 병행)",due:"2026-09-07",done:false,src:"OT 일정표"},
+                 {id:uid(),text:"정역학 과제 공지 확인 → 손글씨로 풀어 LMS 기한 내 제출 (매 과제)",due:"",done:false,src:"OT p.8"}];
+        n.updatedAt=Date.now();
+      }
+      var s92=t.sessions.filter(function(x){return x.courseId===st.id&&x.date==="2026-09-02";})[0];
+      if(s92&&!s92.progress) s92.progress="오리엔테이션 (Lecture Orientation)";
+    }
+    var wr=t.courses.filter(function(c){return c.name==="아카데믹글쓰기";})[0];
+    if(wr){
+      var m=weekNote(wr,1,true);
+      if((m.material||"").indexOf("1주차 강의자료")<0){
+        m.material=(m.material?m.material+"\n\n":"")+"1주차 강의자료 PDF 21p(교과목 소개 및 강의 운영 방식) — ①글쓰기는 왜 필요한가: 언어적으로 구성된 존재, 교재 13쪽 정의(표현·소통·의사소통 행위 3키워드), 대학=학문 공동체 → 주체적 읽기·쓰기 4훈련(판단·자료 선별·논리 전개·토론), 대학→사회 확장 4역량(회의·문서·비판적 사고·가치 창출), 글쓰기는 삶의 아이템. ②어떻게 잘 쓸까: '처음부터 잘 쓰는 사람은 없다'(기본값), 교재 14쪽(연마 가능한 능력·유시민·린다 플라워) · 16쪽(사고력·언어 표현력·구성력). 운영: 이론+활동, 교재 기반 PPT, 읽기자료 사전 공지, 강의자료는 수업 후 LMS 주차학습 업로드. 활동: 자기 서사(중간 대체) + 비평적 글쓰기(전체 합평). 평가표(출석20/과제45/기말20/참여15, 기말은 교수자 제공 강의자료 PDF에서 출제). 준비물: 잘 쓰고 싶다는 마음. 2주차(9/8) 예고: 글감과 주제 설정 + 글쓰기 활동① 주제문 쓰기(참여도 점수).";
+        m.updatedAt=Date.now();
+      }
+    }
+    t.patchWeekNotesV2=true;
     try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   })();
   applyFont();
