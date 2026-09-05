@@ -1832,6 +1832,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
+var BUILD="2026-09-05.1";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -2994,6 +2995,7 @@ function renderGauges(){
   var t=term(), ph=phase(), w=currentWeek(), ex=heroExam();
   var _tt=$("#todayTag"); if(_tt) _tt.textContent=todayLabel();
   $("#termTag").textContent=t.label+(t.compressed?" 압축":"")+" · "+PHASE[ph].n;
+  $("#termTag").title="빌드 "+BUILD;
   var g=[];
   if(ex){
     var dd=diffDays(today(),ex.date);
@@ -4185,6 +4187,7 @@ function renderSet(){
     toast(fontDef().n+"(으)로 바꿨습니다"); }; });
 
   $("#dataBox").innerHTML=
+    '<div class="hint" style="margin-bottom:8px">앱 빌드 <b class="mono">'+BUILD+'</b> — 새 기능이 안 보이면 이 번호를 확인하고 새로고침(홈 화면 앱은 완전히 닫았다 열기)</div>'+
     '<div class="row"><button class="btn" id="dExp">JSON 내보내기</button>'+
     '<button class="btn" id="dImp">JSON 가져오기</button>'+
     '<button class="btn dgr" id="dReset">전체 초기화</button></div>'+
