@@ -1877,7 +1877,9 @@ var MODES={
   M6:{n:"M6 출석유지형",d:"학습 큐에서 제외한다. 출결만 지키면 된다.",
       mix:[["출결 유지",100]]},
   M7:{n:"M7 수시평가형",d:"매주 고정 슬롯. 한 번 밀리면 복구가 안 된다.",
-      mix:[["주간 퀴즈 대비",60],["누적 복습",40]]}
+      mix:[["주간 퀴즈 대비",60],["누적 복습",40]]},
+  M8:{n:"M8 과제제출형",d:"시험 없이 매주 산출물 제출. 표지 루틴 픽토그램을 매주 다 채우면 된다.",
+      mix:[["산출물 제작",70],["제출·보고",30]]}
 };
 var BUCKETS=["전공필수","전공기초","전공선택","MSC","교양필수","교양선택","일반교양","기타"];
 
@@ -1935,7 +1937,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-07.11";
+var BUILD="2026-09-07.12";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -2832,18 +2834,19 @@ function studyMode(c){
   var e=c.evalMix;
   var sub=null;
   if(!e){
-    var g={CALC:"M1",CONCEPT:"M2",MEMO:"M3",LANG:"M3",WRITE:"M4",MAKE:"M5",SUBMIT:"M6",NONE:"M6"}[c.typeA]||"M1";
+    var g={CALC:"M1",CONCEPT:"M2",MEMO:"M3",LANG:"M3",WRITE:"M4",MAKE:"M5",SUBMIT:"M8",NONE:"M6"}[c.typeA]||"M1";
     return {key:g,sub:null,why:"평가 구성 미입력 — 과목 성격만으로 잡은 가설",guess:true};
   }
   var n=function(x){return +x||0;};
   var exam=n(e.mid)+n(e.fin);
   if(n(e.quiz)>0 || e.quizCycle==="매주" || e.quizCycle==="격주") sub="M7";
   var key,why;
-  if(n(e.att)>=50 && exam===0){ key="M6"; why="출석·참여 "+n(e.att)+"% · 시험 없음"; }
+  if(c.typeA==="SUBMIT"){ key="M8"; why="과제 제출형 · 매주 루틴으로 관리"; }
+  else if(n(e.att)>=50 && exam===0){ key="M6"; why="출석·참여 "+n(e.att)+"% · 시험 없음"; }
   else if(n(e.proj)>=40){ key="M5"; why="실습·산출물 "+n(e.proj)+"%"; }
   else if(n(e.hw)>=40){ key="M4"; why="과제 "+n(e.hw)+"%"; }
   else if(exam>=50){
-    key={CALC:"M1",CONCEPT:"M2",MEMO:"M3",LANG:"M3",WRITE:"M4",MAKE:"M5",SUBMIT:"M6",NONE:"M6"}[c.typeA]||"M1";
+    key={CALC:"M1",CONCEPT:"M2",MEMO:"M3",LANG:"M3",WRITE:"M4",MAKE:"M5",SUBMIT:"M8",NONE:"M6"}[c.typeA]||"M1";
     why="시험 "+exam+"% · "+(TYPES[c.typeA]||TYPES.CALC).n;
   } else {
     var arr=[["M1",exam],["M4",n(e.hw)],["M5",n(e.proj)],["M6",n(e.att)],["M7",n(e.quiz)]]
@@ -3910,6 +3913,7 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-07.12",d:"09-07",items:["과목 현황 학습모드에 「M8 과제제출형」 추가 — 사회봉사는 출석유지형 대신 이걸로"]},
   {v:"2026-09-07.11",d:"09-07",items:["과목 유형 「과제 제출형」 추가 — 사회봉사에 적용(과목 현황·표지 문구)","할 일 탭: 묶음별 / 과목별 / 주차별 보기 전환(선택 기억)","할 일 탭 글자 잘림 수정(시간표용 .tt 클래스 충돌)","설정에 패치 노트 카드 · 저장소에 CHANGELOG.md"]},
   {v:"2026-09-07.10",d:"09-07",items:["과목별 매주 루틴: 표지·과목 화면 픽토그램(회색→채움, 마감 지나면 빨간 테두리), 탭으로 완료","루틴 ↔ 할 일 양방향 동기화, 과목별 기본값(사회봉사·창업·CADD·공업수학1·미적2·물리2)","설정의 CADD·카드뉴스 규칙은 루틴으로 이관"]},
   {v:"2026-09-07.9",d:"09-07",items:["「할 일」 탭 신설: 이번 주 할 일 + 과제·할 일 전체(마감순)","오늘 탭은 할 일 요약 한 줄만"]},
