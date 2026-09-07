@@ -484,7 +484,7 @@ td.n,th.n{text-align:right;font-family:var(--font-num);font-variant-numeric:tabu
   font-weight:700;letter-spacing:-.035em;line-height:1.2;
   display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.bk-rule{display:block;width:26px;height:2px;background:currentColor;opacity:.6;margin:8px 0 7px;border-radius:2px}
+.bk-rule{display:block;width:26px;height:2px;background:currentColor;opacity:.6;margin:6px 0 5px;border-radius:2px}
 .bk-en{
   font-family:var(--font-num);font-size:clamp(7.5px,1.05vw,9px);letter-spacing:.12em;
   text-transform:uppercase;opacity:.82;line-height:1.35;
@@ -525,7 +525,7 @@ td.n,th.n{text-align:right;font-family:var(--font-num);font-variant-numeric:tabu
 .shelf.spine .bk-exam{display:none}
 /* 주간 루틴 픽토그램 — 표지 */
 .bk-rt{display:flex;gap:7px;flex-wrap:wrap;align-items:center;min-width:0;margin-bottom:1px}
-.bk-rt .rg{display:inline-flex;gap:3px;align-items:center;padding:2px 5px;border-radius:999px;background:color-mix(in srgb,currentColor 14%,transparent)}
+.bk-rt .rg{display:inline-flex;flex-direction:row;gap:3px;align-items:center;padding:2px 5px;border-radius:999px;background:color-mix(in srgb,currentColor 14%,transparent)} /* 오늘 화면의 .rg(column)와 이름 충돌 → row 명시 */
 .bk-rt .pi{display:inline-flex;width:15px;height:15px;border-radius:5px;align-items:center;justify-content:center;opacity:.42;cursor:pointer;transition:opacity .12s,transform .12s}
 .bk-rt .pi svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
 .bk-rt .pi.on{opacity:1;background:#fff;color:var(--tcv,#333);box-shadow:0 1px 3px rgba(0,0,0,.3)}
@@ -536,13 +536,16 @@ td.n,th.n{text-align:right;font-family:var(--font-num);font-variant-numeric:tabu
 /* 표지 세로 배분 — 고정 높이 안에서 픽토그램·배지 줄이 늘어나도 제목은 줄지 않는다.
    엠블럼·제목·구분선·발치는 flex-shrink 0, 영문 부제(.bk-en)가 먼저 접힌다. 픽토그램은 한 줄 고정. */
 .bk-em,.bk-t,.bk-rule,.bk-foot{flex-shrink:0}
+/* 표지 높이는 최소값 — 배지가 세 줄(요일·재수강·중간·기말)이면 같은 줄의 표지가 함께 조금 길어진다. 책등 보기는 고정 */
+.book{height:auto;min-height:var(--bkH)}
+.shelf.spine .book{height:var(--bkH);min-height:0}
 .bk-en{flex:0 100 auto;min-height:0}
 .bk-rt{flex-wrap:nowrap;overflow:hidden}
 .bk-rt .rg{flex:0 1 auto;min-width:0;overflow:hidden}
 .shelf.spine .bk-t{flex:1 1 auto}
 /* 과목 상세 상단 루틴 띠 */
 .rt-strip{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px;flex:1 1 100%}
-.rt-strip .rg{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:12.5px}
+.rt-strip .rg{display:inline-flex;flex-direction:row;gap:8px;align-items:center;padding:6px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:12.5px}
 .rt-strip .rg .lb{font-weight:600}
 .rt-strip .pi{display:inline-flex;width:26px;height:26px;border-radius:8px;align-items:center;justify-content:center;border:1.5px solid var(--line);color:var(--ink-3);cursor:pointer;background:none;padding:0}
 .rt-strip .pi svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -2017,7 +2020,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-07.18";
+var BUILD="2026-09-07.19";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4350,6 +4353,7 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-07.19",d:"09-07",items:["표지 루틴 픽토그램이 세로로 쌓이던 문제 수정 — 오늘 화면용 .rg 클래스(세로)와 이름이 겹쳐 방향이 바뀌던 것, 표지·과목 화면 모두 가로 한 줄로","표지 높이를 최소값으로 — 배지가 세 줄인 과목(재수강 등)이 있으면 같은 줄 표지가 함께 조금 길어져 게이지까지 다 보임(책등 보기는 고정)"]},
   {v:"2026-09-07.18",d:"09-07",items:["표지 제목 잘림 수정 — 루틴 픽토그램·배지 줄이 늘어나도 제목·엠블럼은 줄지 않고 영문 부제가 먼저 접힘, 픽토그램은 한 줄 고정, 휴대폰 표지 높이 소폭 확대","할 일 탭 주차별 보기: 1주차부터 오름차순(지난 주 미완 항목이 이번 주 위에), 지난 주는 미완이 남은 묶음만 펼침","사회봉사 규정 반영: 봉사 30시간(9/2~11/29)·소감문 보고서 포털 입력(9/9~11/30, 3,000byte)·체리 회차 5개 마감·평가간담회를 과제·할 일과 과목 자료(강의계획서)에 추가","상단 D-day 라벨에서 「(고정)」 표시 제거"]},
   {v:"2026-09-07.17",d:"09-07",items:["책장을 「학교 수업」과 「개인 공부」 두 책장으로 분리(상단 세그먼트, 마지막 선택 기억)","개인 책장: 자격증·독학·프로젝트·어학·기타 종류, 목표 한 줄·목표일 D-day·진도(직접 입력 또는 단계 완료율 자동)·학습 기록(분 단위 누적·이번 주)·메모·링크","개인 공부에도 매주 루틴 — 표지 픽토그램·할 일 탭에 학교 과목 다음 순서로 포함, 완료 처리하면 책장·할 일에서 빠짐","개인 책장은 학점 계산·출결·시험·복습 큐에서 제외"]},
   {v:"2026-09-07.16",d:"09-07",items:["정역학 9/2(수) 회차: 출석 인정 어렵다는 답변에 따라 「출결 제외」 → 「결석」으로 계산"]},
