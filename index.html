@@ -1,5 +1,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>aTTo 학습앱</title>
+<meta name="theme-color" content="#4F9A35">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-title" content="aTTo 학습앱">
@@ -1168,7 +1169,7 @@ th{font-size:clamp(9.5px,0.2vw + 9px,10.5px)}
   --surface:#FFFFFF; --surface-2:#F2F2F7; --surface-3:#E5E5EA;
   --ink:#000000; --ink-2:#6E6E73; --ink-3:#8E8E93;
   --line:rgba(60,60,67,.13); --line-2:rgba(60,60,67,.24);
-  --accent:#007AFF; --accent-ink:#0062CC; --accent-soft:#E8F1FF; --accent-line:#B9D8FF;
+  --accent:#4F9A35; --accent-ink:#2F6F22; --accent-soft:#E7F2E1; --accent-line:#BFDDB3;   /* 알파인 그린 (아토 2026-09-08) */
   --ok:#248A3D;   --ok-soft:#E3F6E9;
   --warn:#B35300; --warn-soft:#FFEEDC;
   --crit:#C7261B; --crit-soft:#FFE6E4;
@@ -1183,7 +1184,7 @@ th{font-size:clamp(9.5px,0.2vw + 9px,10.5px)}
     --surface:#1C1C1E; --surface-2:#2C2C2E; --surface-3:#3A3A3C;
     --ink:#FFFFFF; --ink-2:#AEAEB2; --ink-3:#8E8E93;
     --line:rgba(84,84,88,.42); --line-2:rgba(84,84,88,.62);
-    --accent:#0A84FF; --accent-ink:#6FB6FF; --accent-soft:rgba(10,132,255,.18); --accent-line:rgba(10,132,255,.42);
+    --accent:#5CAB3F; --accent-ink:#8FD07A; --accent-soft:rgba(92,171,63,.18); --accent-line:rgba(92,171,63,.42);
     --ok:#30D158;   --ok-soft:rgba(48,209,88,.16);
     --warn:#FF9F0A; --warn-soft:rgba(255,159,10,.16);
     --crit:#FF453A; --crit-soft:rgba(255,69,58,.16);
@@ -1197,7 +1198,7 @@ th{font-size:clamp(9.5px,0.2vw + 9px,10.5px)}
   --surface:#1C1C1E; --surface-2:#2C2C2E; --surface-3:#3A3A3C;
   --ink:#FFFFFF; --ink-2:#AEAEB2; --ink-3:#8E8E93;
   --line:rgba(84,84,88,.42); --line-2:rgba(84,84,88,.62);
-  --accent:#0A84FF; --accent-ink:#6FB6FF; --accent-soft:rgba(10,132,255,.18); --accent-line:rgba(10,132,255,.42);
+  --accent:#5CAB3F; --accent-ink:#8FD07A; --accent-soft:rgba(92,171,63,.18); --accent-line:rgba(92,171,63,.42);
   --ok:#30D158;   --ok-soft:rgba(48,209,88,.16);
   --warn:#FF9F0A; --warn-soft:rgba(255,159,10,.16);
   --crit:#FF453A; --crit-soft:rgba(255,69,58,.16);
@@ -2078,7 +2079,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-08.23";
+var BUILD="2026-09-08.24";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4582,6 +4583,7 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-08.24",d:"09-08",items:["강조색을 파랑에서 알파인 그린(#4F9A35, 다크 #5CAB3F)으로 — 버튼·탭·타일·게이지·로고 배경·파비콘·홈 화면 아이콘. 과목 표지 색(유형별)은 그대로"]},
   {v:"2026-09-08.23",d:"09-08",items:["사이트 이름 「기계공학 학습 관제탑」 → 「aTTo 학습앱」(브라우저 탭 제목·iPad 홈 화면 이름·README·허브)"]},
   {v:"2026-09-08.22",d:"09-08",items:["로고 교체: 글자 기호(◎) 대신 책 위에 선 관제탑(신호 호) 선형 아이콘. 상단 마크·브라우저 탭 파비콘(icon.svg)·iPad 홈 화면 아이콘(icon-180.png) 통일"]},
   {v:"2026-09-08.21",d:"09-08",items:["「학습」 탭 신설(노트 탭을 흡수): 학습 큐에 과목×주차 단원이 복습 예정 순으로 뜨고, 단원을 열면 시험 언급 ★ → 5섹션 정리 → 회차 기록(진도·타임라인·이해 상태) → 정리 노트 링크를 한 화면에서 읽음","「떠올리기」 모드: 섹션 제목만 보고 내용을 떠올린 뒤 펼쳐서 확인","학습 마무리: 메모 + 다시/어려움/보통/쉬움 채점 → 그 주 회차들의 FSRS 복습 주기에 반영, 공부 시간 자동 기록(학습 탭 상단 오늘·이번 주 합계)","과목 화면 주차 정리 목록과 오늘 탭 복습 큐에 「학습」 버튼"]},
