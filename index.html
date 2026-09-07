@@ -1,5 +1,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>기계공학 학습 관제탑</title>
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-title" content="학습 관제탑">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap">
@@ -1213,6 +1218,7 @@ h1,h2,h3,h4{letter-spacing:-.022em}
   border-bottom:1px solid var(--line);
 }
 .brand-mark{border-radius:9px;border:0;background:var(--accent);color:#fff;font-weight:700}
+.brand-mark svg{width:62%;height:62%;display:block}
 .brand-t{font-weight:600;letter-spacing:-.02em}
 .brand-s{text-transform:none;letter-spacing:-.005em;color:var(--ink-3)}
 .gauge{border-right:1px solid var(--line)}
@@ -1577,7 +1583,7 @@ p,.hint,.step,.empty,.md{text-indent:0}
   <header class="topbar">
     <div class="topbar-in">
       <div class="brand">
-        <div class="brand-mark">◎</div>
+        <div class="brand-mark" aria-label="학습 관제탑"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 15c2.8-1.2 5.7-1.2 8.5 0 2.8-1.2 5.7-1.2 8.5 0v5c-2.8-1.2-5.7-1.2-8.5 0-2.8-1.2-5.7-1.2-8.5 0z"/><path d="M12 15v5"/><path d="M12 14.5V8.5"/><path d="M9.2 6.2a4 4 0 0 1 5.6 0"/><path d="M6.9 3.9a7.2 7.2 0 0 1 10.2 0"/><circle cx="12" cy="8.5" r="1.4" fill="currentColor" stroke="none"/></svg></div>
         <div style="min-width:0">
           <div class="brand-t" id="todayTag">—</div>
           <div class="brand-s" id="termTag">—</div>
@@ -2072,7 +2078,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-08.21";
+var BUILD="2026-09-08.22";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4576,6 +4582,7 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-08.22",d:"09-08",items:["로고 교체: 글자 기호(◎) 대신 책 위에 선 관제탑(신호 호) 선형 아이콘. 상단 마크·브라우저 탭 파비콘(icon.svg)·iPad 홈 화면 아이콘(icon-180.png) 통일"]},
   {v:"2026-09-08.21",d:"09-08",items:["「학습」 탭 신설(노트 탭을 흡수): 학습 큐에 과목×주차 단원이 복습 예정 순으로 뜨고, 단원을 열면 시험 언급 ★ → 5섹션 정리 → 회차 기록(진도·타임라인·이해 상태) → 정리 노트 링크를 한 화면에서 읽음","「떠올리기」 모드: 섹션 제목만 보고 내용을 떠올린 뒤 펼쳐서 확인","학습 마무리: 메모 + 다시/어려움/보통/쉬움 채점 → 그 주 회차들의 FSRS 복습 주기에 반영, 공부 시간 자동 기록(학습 탭 상단 오늘·이번 주 합계)","과목 화면 주차 정리 목록과 오늘 탭 복습 큐에 「학습」 버튼"]},
   {v:"2026-09-08.20",d:"09-08",items:["할 일 주차별 보기: 각 주차 안에서 과목을 수업 요일 순(월→일, 같은 요일은 시작 시각 순)으로 배치, 수업 없는 과목 → 개인 공부 → 공통 순. 과목 옆에 요일 칩","주차 제목에 날짜 범위(월~일)와 「지남 n」 배지, 과목 묶음에도 지남 배지, 다 한 묶음은 흐리게","항목 줄 정리: 요일 중복 표기 제거(「수 9/2(수)」 → 「9/2(수)」), 출처는 흐리게, 삭제 ✕는 올렸을 때만 진하게"]},
   {v:"2026-09-07.19",d:"09-07",items:["표지 루틴 픽토그램이 세로로 쌓이던 문제 수정 — 오늘 화면용 .rg 클래스(세로)와 이름이 겹쳐 방향이 바뀌던 것, 표지·과목 화면 모두 가로 한 줄로","표지 높이를 최소값으로 — 배지가 세 줄인 과목(재수강 등)이 있으면 같은 줄 표지가 함께 조금 길어져 게이지까지 다 보임(책등 보기는 고정)"]},
