@@ -489,6 +489,25 @@ td.n,th.n{text-align:right;font-family:var(--font-num);font-variant-numeric:tabu
 .shelf.spine .bk-fav{top:3px;left:3px;width:19px;height:19px;font-size:10.5px}
 .shelf.spine .bk-tags{justify-content:center}
 .shelf.spine .bk-exam{display:none}
+/* 주간 루틴 픽토그램 — 표지 */
+.bk-rt{display:flex;gap:7px;flex-wrap:wrap;align-items:center;min-width:0;margin-bottom:1px}
+.bk-rt .rg{display:inline-flex;gap:3px;align-items:center;padding:2px 5px;border-radius:999px;background:color-mix(in srgb,currentColor 14%,transparent)}
+.bk-rt .pi{display:inline-flex;width:15px;height:15px;border-radius:5px;align-items:center;justify-content:center;opacity:.42;cursor:pointer;transition:opacity .12s,transform .12s}
+.bk-rt .pi svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+.bk-rt .pi.on{opacity:1;background:#fff;color:var(--tcv,#333);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.bk-rt .pi.on svg{fill:currentColor;stroke:currentColor;fill-opacity:.18}
+.bk-rt .pi.late{opacity:.9;box-shadow:inset 0 0 0 1.6px #FF5A4E}
+.bk-rt .pi:hover{transform:scale(1.15);opacity:1}
+.shelf.spine .bk-rt{display:none}
+/* 과목 상세 상단 루틴 띠 */
+.rt-strip{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px;flex:1 1 100%}
+.rt-strip .rg{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:12.5px}
+.rt-strip .rg .lb{font-weight:600}
+.rt-strip .pi{display:inline-flex;width:26px;height:26px;border-radius:8px;align-items:center;justify-content:center;border:1.5px solid var(--line);color:var(--ink-3);cursor:pointer;background:none;padding:0}
+.rt-strip .pi svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rt-strip .pi.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.rt-strip .pi.late{border-color:var(--crit);color:var(--crit)}
+.rt-strip .n{font-family:var(--font-num);color:var(--ink-3);font-size:11.5px}
 .bk-meta{
   font-family:var(--font-num);font-size:clamp(8px,1.05vw,9.5px);letter-spacing:.04em;opacity:.88;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
@@ -1891,7 +1910,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-07.9";
+var BUILD="2026-09-07.10";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -3104,6 +3123,78 @@ function tickDday(){
 /* ---------- 책장 ---------- */
 var EMBLEM={CALC:"∫",CONCEPT:"◎",MEMO:"▤",LANG:"文",WRITE:"¶",MAKE:"◈",NONE:"○"};
 /* 시험 구성 — "중간·기말" / "중간만" / "기말만" / "" */
+/* ---------- 주간 루틴 (과목별 매주 반복 할 일 · 표지 픽토그램) ----------
+   c.routines=[{id,label,icon,count,dow,cat}]  · 완료 기록 c.rlog[월요일ISO][id]=횟수 */
+var RT_ICON={
+  upload:'<svg viewBox="0 0 24 24"><path d="M12 16V5M7 10l5-5 5 5"/><path d="M4 18.5v1.2h16v-1.2"/></svg>',
+  doc:'<svg viewBox="0 0 24 24"><path d="M7 3.5h7l4 4V20.5H7z"/><path d="M14 3.5v4h4M9.5 12.5h5M9.5 16h5"/></svg>',
+  play:'<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="13" rx="2.5"/><path d="M10.5 9v5l4-2.5z"/></svg>',
+  loop:'<svg viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 0 1 13-5.2L19.5 9"/><path d="M19.5 4.5V9H15"/><path d="M19.5 12a7.5 7.5 0 0 1-13 5.2L4.5 15"/><path d="M4.5 19.5V15H9"/></svg>',
+  pencil:'<svg viewBox="0 0 24 24"><path d="M4.5 19.5l1-4.2L16.2 4.6a1.6 1.6 0 0 1 2.3 0l1 1a1.6 1.6 0 0 1 0 2.3L8.8 18.5z"/><path d="M14.5 6.3l3.2 3.2"/></svg>'
+};
+var RT_ICONS=[["upload","업로드"],["doc","제출·문서"],["play","영상 시청"],["loop","복습"],["pencil","정리"]];
+function routineDefaults(name){
+  var R=function(l,i,n,d,cat){ return {id:uid(),label:l,icon:i,count:n,dow:d,cat:cat||"hw"}; };
+  switch(name){
+    case "사회봉사": return [R("카드뉴스 업로드","upload",2,0),R("보고서 제출","doc",1,0)];
+    case "창업아이디어탐색": return [R("수업 후 과제","doc",1,0)];
+    case "CADD": return [R("강의영상 시청 (월 업로드 → 수요일 전)","play",1,2)];
+    case "공업수학1": return [R("문제풀이 과제 제출","doc",1,3)];
+    case "미분적분학2": return [R("수업 복습","loop",2,0,"review")];
+    case "일반물리학2": return [R("수업 내용 정리","pencil",2,0,"review")];
+    default: return [];
+  }
+}
+function rtDone(c,r,mon){ var L=c.rlog&&c.rlog[mon]; return L&&L[r.id]?Math.min(+L[r.id]||0,r.count):0; }
+function rtSet(c,r,mon,n){ if(!c.rlog) c.rlog={}; if(!c.rlog[mon]) c.rlog[mon]={}; c.rlog[mon][r.id]=clamp(n,0,r.count); }
+function rtDue(mon,dow){ dow=+dow; return dow===0?addDays(mon,6):addDays(mon,dow-1); }
+function rtLate(r,mon){ var d=rtDue(mon,r.dow); return diffDays(d,today())>0; }
+/* 표지/상세에서 한 칸 누르면: 그 칸까지 채움, 이미 채워진 마지막 칸을 누르면 한 칸 비움 */
+function rtTap(c,r,mon,idx){ var n=rtDone(c,r,mon); rtSet(c,r,mon, idx+1===n ? n-1 : idx+1); rtSyncWeekly(c,r,mon); if(rtDone(c,r,mon)>n){ addXP(8); bumpStreak(); } persist(); }
+/* 이번 주 할 일과 양방향 동기화 */
+function rtSyncWeekly(c,r,mon){ var e=S.weekly&&S.weekly[mon]; if(!e) return; var n=rtDone(c,r,mon);
+  e.items.forEach(function(it){ var m=/^rt:([^:]+):([^:]+):(\d+)$/.exec(it.key||""); if(m&&m[1]===c.id&&m[2]===r.id) it.done=(+m[3])<=n; }); }
+function rtFromWeekly(mon){ var e=S.weekly&&S.weekly[mon]; if(!e) return;
+  courses().forEach(function(c){ (c.routines||[]).forEach(function(r){
+    var k=e.items.filter(function(it){ return it.done && (it.key||"").indexOf("rt:"+c.id+":"+r.id+":")===0; }).length;
+    if(e.items.some(function(it){ return (it.key||"").indexOf("rt:"+c.id+":"+r.id+":")===0; })) rtSet(c,r,mon,k); }); }); }
+function rtHTML(c,cls){
+  var rs=c.routines||[]; if(!rs.length) return "";
+  var mon=weeklyKey(today());
+  return '<span class="'+cls+'">'+rs.map(function(r){ var n=rtDone(c,r,mon), late=n<r.count&&rtLate(r,mon), arr=[];
+    for(var i=0;i<r.count;i++) arr.push('<span class="pi'+(i<n?" on":"")+(late&&i>=n?" late":"")+'" data-rt="'+c.id+'|'+r.id+'|'+i+'" role="button" tabindex="0" title="'+esc(r.label)+' '+(i+1)+'/'+r.count+(late?" · 마감 지남":"")+'">'+(RT_ICON[r.icon]||RT_ICON.doc)+'</span>');
+    return '<span class="rg" title="'+esc(r.label)+' · '+(r.dow==0?"일":WK_DOW[r.dow])+'요일까지">'+arr.join("")+'</span>'; }).join("")+'</span>';
+}
+function bindRt(root,after){
+  $$("[data-rt]",root).forEach(function(el){
+    var h=function(ev){ ev.stopPropagation(); ev.preventDefault(); var p=el.dataset.rt.split("|"), c=course(p[0]); if(!c) return;
+      var r=(c.routines||[]).filter(function(x){return x.id===p[1];})[0]; if(!r) return; rtTap(c,r,weeklyKey(today()),+p[2]); after(); };
+    el.onclick=h; el.onkeydown=function(ev){ if(ev.key==="Enter"||ev.key===" ") h(ev); };
+  });
+}
+function routineSheet(cid){
+  var c=course(cid); if(!c) return; c.routines=c.routines||[];
+  var body=function(){ return (c.routines.length? c.routines.map(function(r){
+      return '<div class="rule"><span class="chip mut">'+esc((RT_ICONS.filter(function(x){return x[0]===r.icon;})[0]||RT_ICONS[1])[1])+'</span><span>'+esc(r.label)+' <b>×'+r.count+'</b></span>'+
+        '<span class="chip acc">'+(r.dow==0?"일":WK_DOW[r.dow])+'요일까지 · '+(r.cat==="review"?"복습":r.cat==="study"?"예습":"과제")+'</span><button class="iconbtn" data-rdel2="'+r.id+'" aria-label="삭제">✕</button></div>'; }).join("")
+      : '<div class="hint">아직 루틴이 없습니다.</div>')+
+    '<div class="field" style="margin-top:12px"><label>새 루틴</label><input class="input" id="rtL" placeholder="예: 카드뉴스 업로드"></div>'+
+    '<div class="row" style="margin-top:8px;gap:8px;flex-wrap:wrap">'+
+      '<div class="field" style="flex:1 1 120px"><label>픽토그램</label><select class="select" id="rtI">'+RT_ICONS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>';}).join("")+'</select></div>'+
+      '<div class="field" style="flex:0 0 80px"><label>주당 횟수</label><input class="input mono" id="rtN" type="number" min="1" max="7" value="1"></div>'+
+      '<div class="field" style="flex:0 0 110px"><label>마감 요일</label><select class="select" id="rtD">'+[1,2,3,4,5,6,0].map(function(d){return '<option value="'+d+'"'+(d===0?" selected":"")+'>'+WK_DOW[d]+'요일</option>';}).join("")+'</select></div>'+
+      '<div class="field" style="flex:0 0 100px"><label>묶음</label><select class="select" id="rtC"><option value="hw">과제</option><option value="review">복습</option><option value="study">예습</option></select></div></div>'+
+    '<div class="hint" style="margin-top:8px">표지와 과목 화면에 픽토그램으로 뜨고, 매주 월요일 「할 일」에 자동으로 들어갑니다. 어느 쪽에서 체크해도 같이 채워집니다.</div>'; };
+  var open=function(){ openSheet({title:c.name+" · 매주 루틴",body:body(),actions:[{label:"닫기",fn:function(){ closeSheet(); render(); }},{label:"추가",cls:"a",fn:function(){
+      var l=$("#rtL").value.trim(); if(!l){ toast("루틴 이름을 적어 주세요"); return; }
+      c.routines.push({id:uid(),label:l,icon:$("#rtI").value,count:clamp(+$("#rtN").value||1,1,7),dow:+$("#rtD").value,cat:$("#rtC").value});
+      var mon=weeklyKey(today()); if(S.weekly[mon]) generateWeekly(mon);
+      persist(); open(); }}]});
+    $$("[data-rdel2]").forEach(function(b){ b.onclick=function(){ c.routines=c.routines.filter(function(r){return r.id!==b.dataset.rdel2;});
+      Object.keys(S.weekly||{}).forEach(function(k){ S.weekly[k].items=S.weekly[k].items.filter(function(it){ return (it.key||"").indexOf("rt:"+c.id+":"+b.dataset.rdel2+":")!==0; }); });
+      persist(); open(); }; }); };
+  open();
+}
 function examBadge(c){
   if(c.coverTag) return c.coverTag;            /* 시험이 없는 과목의 표지 문구 (예: 사회봉사 → 주2회 카드뉴스 업로드) */
   var es=exams(c.id);
@@ -3144,6 +3235,7 @@ function bookHTML(c){
     '<span class="bk-rule"></span>'+
     '<span class="bk-en">'+esc(c.en||(TYPES[c.typeA]||TYPES.NONE).n)+'</span>'+
     '<span class="bk-foot">'+
+      rtHTML(c,"bk-rt")+
       '<span class="bk-tags">'+
         (dayLabel(c)?'<span class="bk-days">'+esc(dayLabel(c))+'</span>':"")+
         (c.isRetake?'<span class="bk-retake">재수강'+(c.maxGrade?" 최대 "+esc(c.maxGrade):"")+'</span>':"")+
@@ -3191,6 +3283,7 @@ function renderShelf(){
     ["pointerup","pointerleave","pointercancel"].forEach(function(ev){ b.addEventListener(ev,cancel); });
     b.addEventListener("contextmenu",function(e){ e.preventDefault(); longed=true; bookMenu(b.dataset.c); });
   });
+  bindRt($("#shelf"),function(){ renderShelf(); });
   $$("#shelf [data-fav]").forEach(function(s){
     var toggle=function(ev){
       ev.stopPropagation(); ev.preventDefault();
@@ -3317,11 +3410,17 @@ function renderCourse(){
     '<button class="btn sm'+(c.fav?" a":"")+'" id="btnFavCourse">'+(c.fav?"★ 즐겨찾기":"☆ 즐겨찾기")+'</button>'+
     '<button class="btn sm" id="btnHideCourse">'+(c.hidden?"다시 보이기":"숨기기")+'</button>'+
     '<button class="btn sm" id="btnEditCourse">편집</button>'+
-    '<button class="btn sm" id="btnAddExam">시험 추가</button></div>';
+    '<button class="btn sm" id="btnAddExam">시험 추가</button>'+
+    '<button class="btn sm" id="btnRoutine">매주 루틴</button></div>'+
+    ((c.routines||[]).length? '<div class="rt-strip">'+c.routines.map(function(r){ var mon=weeklyKey(today()), n=rtDone(c,r,mon), late=n<r.count&&rtLate(r,mon), arr=[];
+        for(var i=0;i<r.count;i++) arr.push('<button class="pi'+(i<n?" on":"")+(late&&i>=n?" late":"")+'" data-rt="'+c.id+'|'+r.id+'|'+i+'" aria-label="'+esc(r.label)+' '+(i+1)+'/'+r.count+'">'+(RT_ICON[r.icon]||RT_ICON.doc)+'</button>');
+        return '<span class="rg"><span class="lb">'+esc(r.label)+'</span>'+arr.join("")+'<span class="n">'+n+'/'+r.count+' · '+(r.dow==0?"일":WK_DOW[r.dow])+'요일까지'+(late?' <span style="color:var(--crit)">지남</span>':"")+'</span></span>'; }).join("")+'</div>' : "");
   $("#btnFavCourse").onclick=function(){
     c.fav=!c.fav; persist(); render();
     toast(c.fav?"즐겨찾기에 넣었습니다":"즐겨찾기를 해제했습니다"); };
   $("#btnEditCourse").onclick=function(){ editCourse(c.id); };
+  $("#btnRoutine").onclick=function(){ routineSheet(c.id); };
+  bindRt($("#cHead"),function(){ renderCourse(); });
   $("#btnAddExam").onclick=function(){ addExam(c.id); };
   $("#btnHideCourse").onclick=function(){
     c.hidden=!c.hidden; persist();
@@ -3592,6 +3691,12 @@ function generateWeekly(mon){
   e.items.forEach(function(it){ if(it.key) have[it.key]=1; });
   var push=function(key,cat,text,due,src){ if(have[key]) return; have[key]=1; e.items.push({id:uid(),key:key,cat:cat,text:text,due:due||"",done:false,src:src||"자동"}); };
   var w=weekOf(mon)||currentWeek()||1, sun=addDays(mon,6);
+  /* ⓪ 과목별 매주 루틴 (표지 픽토그램과 동기화) */
+  courses().filter(isActive).forEach(function(c){
+    (c.routines||[]).forEach(function(r){ var n=rtDone(c,r,mon);
+      for(var i=1;i<=r.count;i++){ var key="rt:"+c.id+":"+r.id+":"+i; if(have[key]) continue; have[key]=1;
+        e.items.push({id:uid(),key:key,cat:r.cat||"hw",text:c.name+" · "+r.label+(r.count>1?" ("+i+"/"+r.count+")":""),due:rtDue(mon,r.dow),done:i<=n,src:"매주 루틴"}); } });
+  });
   /* ① 규칙 */
   (S.profile.weeklyRules||[]).forEach(function(r){
     var dow=+r.dow; var due= dow===0 ? sun : addDays(mon, dow-1);
@@ -3631,6 +3736,7 @@ function renderWeekly(){
   /* 주차 정리 할 일과 동기화: 원본이 완료되면 여기서도 완료 */
   var taskMap={}; allTasks().forEach(function(x){ taskMap[x.t.id]=x.t; });
   e.items.forEach(function(it){ if(it.key&&it.key.indexOf("task:")===0){ var t=taskMap[it.key.slice(5)]; if(t) it.done=!!t.done; } });
+  courses().forEach(function(c){ (c.routines||[]).forEach(function(r){ rtSyncWeekly(c,r,mon); }); });
   var total=e.items.length, done=e.items.filter(function(i){return i.done;}).length;
   $("#wkTodoT").textContent=(weekOf(mon)||"-")+"주차 할 일 · "+fmtDate(mon)+" 주";
   $("#wkTodoHs").textContent=total?done+"/"+total+" 완료":"";
@@ -3653,6 +3759,7 @@ function renderWeekly(){
     var it=e.items.filter(function(i){return i.id===cb.dataset.wk;})[0]; if(!it) return;
     it.done=cb.checked;
     if(it.key&&it.key.indexOf("task:")===0){ var t=taskMap[it.key.slice(5)]; if(t) t.done=it.done; }
+    if(it.key&&it.key.indexOf("rt:")===0) rtFromWeekly(mon);
     if(it.done){ addXP(10); bumpStreak(); }
     persist(); renderWeekly(); }; });
   $$("[data-wkdel]",box).forEach(function(b){ b.onclick=function(){ e.items=e.items.filter(function(i){return i.id!==b.dataset.wkdel;}); persist(); renderWeekly(); }; });
@@ -3715,7 +3822,7 @@ function renderRules(){
       '<input class="input" id="rText" placeholder="매주 할 일 (예: CADD 강의영상 시청)">'+
       '<select class="select" id="rDow" style="flex:0 0 110px">'+[1,2,3,4,5,6,0].map(function(d){return '<option value="'+d+'"'+(d===0?" selected":"")+'>'+WK_DOW[d]+'요일</option>';}).join("")+'</select>'+
       '<button class="btn sm" id="rAdd" style="flex:0 0 auto">추가</button></div>'+
-    '<div class="hint" style="margin-top:8px">매주 월요일 「이번 주 할 일」에 자동으로 들어갑니다. 마감 요일은 그 주 안의 요일입니다.</div>';
+    '<div class="hint" style="margin-top:8px">과목과 무관한 매주 규칙만 여기에 둡니다. 과목별 매주 루틴(카드뉴스 업로드, CADD 영상, 공업수학 과제 등)은 과목 화면 → 「매주 루틴」에서 관리하고 표지에 픽토그램으로 뜹니다.</div>';
   $$("[data-rdel]",box).forEach(function(b){ b.onclick=function(){ S.profile.weeklyRules=rules.filter(function(r){return r.id!==b.dataset.rdel;}); persist(); renderRules(); }; });
   $("#rAdd").onclick=function(){
     var tx=$("#rText").value.trim(); if(!tx){ toast("내용을 적어 주세요"); return; }
@@ -5863,6 +5970,13 @@ function boot(){
     if(!Array.isArray(S.futureTerms)||!S.futureTerms.length||_untouched) S.futureTerms=futureDefaults();
     var _sv2=term().courses.filter(function(c){return c.name==="사회봉사";})[0]; if(_sv2){ _sv2.passFail=true; if(_sv2.letter&&_sv2.letter!=="P"&&_sv2.letter!=="NP") _sv2.letter=""; }
     S.patchFutureV2=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+  }
+  if(!S.patchRoutineV1){
+    term().courses.forEach(function(c){ if(!Array.isArray(c.routines)||!c.routines.length) c.routines=routineDefaults(c.name); if(!c.rlog) c.rlog={}; });
+    S.profile.weeklyRules=(S.profile.weeklyRules||[]).filter(function(r){ return r.id!=="r1"&&r.id!=="r2"; });
+    Object.keys(S.weekly||{}).forEach(function(k){ S.weekly[k].items=S.weekly[k].items.filter(function(it){ return it.key!=="rule:r1"&&it.key!=="rule:r2"; }); });
+    var _mon=weeklyKey(today()); if(S.weekly&&S.weekly[_mon]) generateWeekly(_mon);
+    S.patchRoutineV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   }
   if(!S.patchFutureV1){ if(!Array.isArray(S.futureTerms)||!S.futureTerms.length) S.futureTerms=futureDefaults(); S.grad={total:130}; S.patchFutureV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
   if(!S.patchHistoryV2){
