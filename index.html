@@ -1860,7 +1860,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-07.3";
+var BUILD="2026-09-07.4";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -2737,6 +2737,11 @@ function nextExam(){
 /* 상단 D-day 기준 — 가장 빠른 '중간고사'. 없으면 다가오는 아무 시험으로 폴백. */
 function heroExam(){
   var td=today();
+  var dd=S.profile.dday;
+  if(dd&&dd.date&&diffDays(td,dd.date)>=0){
+    var same=exams().filter(function(e){return e.date===dd.date;})[0];
+    return {kind:dd.label||"중간",date:dd.date,time:(same&&same.time)||dd.time||"09:00",courseId:same?same.courseId:null,pinned:true};
+  }
   var mid=exams().filter(function(e){return e.kind==="중간" && diffDays(td,e.date)>=0;})[0];
   return mid || nextExam();
 }
@@ -3033,7 +3038,7 @@ function renderGauges(){
   var g=[];
   if(ex){
     var dd=diffDays(today(),ex.date);
-    g.push({l:(ex.kind==="중간"?"중간고사":ex.kind==="기말"?"기말고사":ex.kind),v:"D-"+dd,
+    g.push({l:(ex.kind==="중간"?"중간고사":ex.kind==="기말"?"기말고사":ex.kind)+(ex.pinned?" (고정)":""),v:"D-"+dd,
       s:fmtDate(ex.date),cls:(dd<=7?"hot":dd<=14?"near":"calm")+" hero",id:"gDday"});
   } else {
     g.push({l:"다가오는 시험",v:"미등록",s:"시험을 추가하세요",cls:"calm hero"});
@@ -4328,6 +4333,9 @@ function renderSet(){
     '<div class="row" style="margin-top:11px"><div class="field"><label>개강일</label><input class="input mono" id="tStart" type="date" value="'+t.startDate+'"></div>'+
     '<div class="field"><label>종강일</label><input class="input mono" id="tEnd" type="date" value="'+t.endDate+'"></div>'+
     '<div class="field"><label>주차 수</label><input class="input mono" id="tWeeks" type="number" min="1" max="20" value="'+t.weeks+'"></div></div>'+
+    '<div class="row" style="margin-top:11px"><div class="field"><label>상단 D-day 기준일</label><input class="input mono" id="tDday" type="date" value="'+esc((S.profile.dday&&S.profile.dday.date)||"")+'"></div>'+
+    '<div class="field"><label>D-day 이름</label><input class="input" id="tDdayL" value="'+esc((S.profile.dday&&S.profile.dday.label)||"중간")+'" placeholder="중간"></div></div>'+
+    '<div class="hint">비우면 가장 빠른 중간고사가 자동으로 잡힙니다.</div>'+
     '<button class="btn a sm wide" id="tSave" style="margin-top:13px">저장</button>'+
     '<div class="hint" style="margin-top:9px">개강일·종강일이 정확해야 주차 계산과 모드 전환이 맞습니다.</div>'+
     '<hr class="divider" style="margin:14px 0">'+
@@ -4348,6 +4356,7 @@ function renderSet(){
     t.label=$("#tLabel").value.trim()||t.label; t.kind=$("#tKind").value;
     t.startDate=$("#tStart").value||t.startDate; t.endDate=$("#tEnd").value||t.endDate;
     t.weeks=+$("#tWeeks").value||16; t.compressed=(t.kind==="계절");
+    var dv=$("#tDday").value; S.profile.dday = dv? {date:dv,label:($("#tDdayL").value.trim()||"중간")} : null;
     persist(); render(); toast("학기 정보를 저장했습니다");
   };
   $$("#termBox [data-delhol]").forEach(function(b){ b.onclick=function(){
@@ -5692,6 +5701,7 @@ function boot(){
     try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   })();
 
+  if(!S.patchDdayV1){ if(!S.profile.dday) S.profile.dday={date:"2026-10-19",label:"중간"}; S.patchDdayV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
   ensureWeekly();              // 매주 월요일 할 일 생성 (없으면 지금)
 
   /* 데이터 패치 V6 — 지난 학기(2026-1 · 2026 여름) 수강 과목 추가 (1회, 같은 이름 학기가 없을 때만) */
