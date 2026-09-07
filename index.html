@@ -849,6 +849,7 @@ th{font-size:clamp(9.5px,0.2vw + 9px,10.5px)}
 .tka .sub2{font-size:12px;color:var(--ink-3);margin-top:2px;word-break:keep-all;overflow-wrap:anywhere;display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center}
 .tka .sub2.over{color:var(--crit)} .tka .sub2.soon{color:var(--warn)}
 .wkt{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px}
+.wkt.one{grid-template-columns:1fr}
 .wkt .g{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
 .wkt .g h4{margin:0 0 6px;font-size:13px;display:flex;align-items:center;gap:8px}
 .wkt .g h4 .dot{width:9px;height:9px;border-radius:3px;display:inline-block}
@@ -1677,10 +1678,15 @@ p,.hint,.step,.empty,.md{text-indent:0}
         <div class="vh">
           <h1>할 일</h1>
           <div class="sub" id="todoSub"></div>
-          <div class="sp"><div class="seg" id="todoSeg">
+          <div class="sp" style="display:flex;gap:8px;flex-wrap:wrap"><div class="seg" id="todoSeg">
             <button data-tm="cat">묶음별</button>
             <button data-tm="course">과목별</button>
             <button data-tm="week">주차별</button>
+          </div><div class="seg" id="catSeg">
+            <button data-tc="all">전체</button>
+            <button data-tc="hw">과제·제출</button>
+            <button data-tc="review">복습</button>
+            <button data-tc="study">예습</button>
           </div></div>
         </div>
         <div class="card">
@@ -1937,7 +1943,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-07.13";
+var BUILD="2026-09-07.14";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -3785,18 +3791,21 @@ function syncWeeklyEntry(mon,e,taskMap){
 }
 function renderWeekly(){
   var box=$("#weeklyBox"); if(!box) return;
-  var mode=ui.todoMode||"cat";
+  var mode=ui.todoMode||"cat", tcat=ui.todoCat||"all";
+  var inCat=function(it){ return tcat==="all"||it.cat===tcat; };
   var mon=weeklyKey(today()), e=weeklyEntry(mon,true), td=today();
   var taskMap={}, taskCourse={}; allTasks().forEach(function(x){ taskMap[x.t.id]=x.t; taskCourse[x.t.id]=x.c.id; });
   syncWeeklyEntry(mon,e,taskMap);
   var total=e.items.length, done=e.items.filter(function(i){return i.done;}).length;
   $("#wkTodoHs").textContent=total?done+"/"+total+" 완료":"";
   $$("#todoSeg button").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.tm===mode?"true":"false"); });
-  var tac=$("#taskAllCard"); if(tac) tac.hidden=(mode!=="cat");
+  $$("#catSeg button").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.tc===tcat?"true":"false"); });
+  var catName={hw:"과제·제출",review:"복습",study:"예습"}[tcat]||"";
+  var tac=$("#taskAllCard"); if(tac) tac.hidden=(mode!=="cat"||(tcat!=="all"&&tcat!=="hw"));
   var html="";
   if(mode==="cat"){
-    $("#wkTodoT").textContent=(weekOf(mon)||"-")+"주차 할 일 · "+fmtDate(mon)+" 주";
-    html='<div class="wkt">'+WK_CATS.map(function(cat){
+    $("#wkTodoT").textContent=(weekOf(mon)||"-")+"주차 할 일 · "+fmtDate(mon)+" 주"+(catName?" · "+catName:"");
+    html='<div class="wkt'+(tcat!=="all"?' one':'')+'">'+WK_CATS.filter(function(cat){ return tcat==="all"||cat[0]===tcat; }).map(function(cat){
       var its=e.items.filter(function(i){return i.cat===cat[0];}).sort(sortWk);
       return '<div class="g"><h4><span class="dot" style="background:'+cat[2]+'"></span>'+cat[1]+'<span class="n">'+its.filter(function(i){return i.done;}).length+'/'+its.length+'</span></h4>'+
         (its.length? its.map(function(it){ return wkItemHTML(it,mon,td); }).join("") : '<div class="hint">없음</div>')+
@@ -3805,9 +3814,9 @@ function renderWeekly(){
     }).join("")+'</div>'+
     '<div class="hint" style="margin-top:8px"><b>우선순위: 과제 ≫ 복습 &gt; 예습.</b> 과제 묶음을 먼저 비우고 복습, 그다음 예습 순으로. 매주 월요일에 자동으로 만들어지고, 과목별 루틴은 과목 화면 → 「매주 루틴」, 공통 규칙은 설정에서 바꿉니다.</div>';
   } else if(mode==="course"){
-    $("#wkTodoT").textContent=(weekOf(mon)||"-")+"주차 할 일 · 과목별";
+    $("#wkTodoT").textContent=(weekOf(mon)||"-")+"주차 할 일 · 과목별"+(catName?" · "+catName:"");
     var groups={}, order=[];
-    e.items.forEach(function(it){ var cid=itemCid(it,taskCourse)||"_"; if(!groups[cid]){ groups[cid]=[]; order.push(cid); } groups[cid].push(it); });
+    e.items.filter(inCat).forEach(function(it){ var cid=itemCid(it,taskCourse)||"_"; if(!groups[cid]){ groups[cid]=[]; order.push(cid); } groups[cid].push(it); });
     /* 책장 순서대로, 공통은 맨 뒤 */
     var cs=courses().filter(function(c){return groups[c.id];});
     var blocks=cs.map(function(c){ return {id:c.id,name:c.name,cls:"t-"+c.typeA,its:groups[c.id]}; });
@@ -3820,15 +3829,16 @@ function renderWeekly(){
     }).join("")+'</div>';
     if(!blocks.length) html='<div class="hint">이번 주 항목이 없습니다.</div>';
   } else {
-    $("#wkTodoT").textContent="주차별 할 일 · 전체";
+    $("#wkTodoT").textContent="주차별 할 일"+(catName?" · "+catName:" · 전체");
     /* 주차 = 이번 주 할 일(월요일 키) + 주차 정리 ⑦ 과제(주차 번호) */
     var weeks={};
     var addW=function(w,item){ if(!weeks[w]) weeks[w]={mon:null,items:[]}; weeks[w].items.push(item); };
     Object.keys(S.weekly||{}).forEach(function(k){ var w=weekOf(k)||0, en=S.weekly[k]; syncWeeklyEntry(k,en,taskMap);
       if(!weeks[w]) weeks[w]={mon:k,items:[]}; else weeks[w].mon=k;
-      en.items.forEach(function(it){ weeks[w].items.push({kind:"wk",mon:k,it:it,cid:itemCid(it,taskCourse)}); }); });
+      en.items.filter(inCat).forEach(function(it){ weeks[w].items.push({kind:"wk",mon:k,it:it,cid:itemCid(it,taskCourse)}); }); });
     var seen={}; Object.keys(weeks).forEach(function(w){ weeks[w].items.forEach(function(x){ if(x.it.key&&x.it.key.indexOf("task:")===0) seen[x.it.key.slice(5)]=1; }); });
-    allTasks().forEach(function(x){ if(seen[x.t.id]) return; addW(x.w,{kind:"task",c:x.c,w:x.w,t:x.t,cid:x.c.id}); });
+    if(tcat==="all"||tcat==="hw") allTasks().forEach(function(x){ if(seen[x.t.id]) return; addW(x.w,{kind:"task",c:x.c,w:x.w,t:x.t,cid:x.c.id}); });
+    Object.keys(weeks).forEach(function(w){ if(!weeks[w].items.length) delete weeks[w]; });
     var cw=currentWeek()||1, ws=Object.keys(weeks).map(Number).sort(function(a,b){return b-a;});
     if(!ws.length) html='<div class="hint">아직 항목이 없습니다.</div>';
     html+=ws.map(function(w){
@@ -3868,6 +3878,7 @@ function renderWeekly(){
   $$("[data-tao2]",box).forEach(function(b){ b.onclick=function(){ var p=b.dataset.tao2.split("|"); weekSheet(p[0],+p[1]); }; });
   $("#btnWkRegen").onclick=function(){ generateWeekly(mon); persist(); renderWeekly(); toast("이번 주 항목을 다시 만들었습니다 (완료 표시는 유지)"); };
   $$("#todoSeg button").forEach(function(b){ b.onclick=function(){ ui.todoMode=b.dataset.tm; try{ localStorage.setItem("mc-todoMode",ui.todoMode); }catch(e){} renderWeekly(); }; });
+  $$("#catSeg button").forEach(function(b){ b.onclick=function(){ ui.todoCat=b.dataset.tc; try{ localStorage.setItem("mc-todoCat",ui.todoCat); }catch(e){} renderWeekly(); }; });
 }
 function renderTodoMini(){
   var box=$("#wkTodoMini"); if(!box) return;
@@ -3887,6 +3898,7 @@ function renderTodoMini(){
 }
 function renderTodo(){
   if(!ui.todoMode){ try{ ui.todoMode=localStorage.getItem("mc-todoMode")||"cat"; }catch(e){ ui.todoMode="cat"; } }
+  if(!ui.todoCat){ try{ ui.todoCat=localStorage.getItem("mc-todoCat")||"all"; }catch(e){ ui.todoCat="all"; } }
   ensureWeekly(); renderWeekly(); renderTaskAll();
   var mon=weeklyKey(today()), e=weeklyEntry(mon,true), open=e.items.filter(function(i){return !i.done;}).length;
   $("#todoSub").textContent=(weekOf(mon)||"-")+"주차 · 미완 "+open+"건 · 우선순위 과제 ≫ 복습 > 예습";
@@ -3913,6 +3925,7 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-07.14",d:"09-07",items:["할 일 탭에 전체 / 과제·제출 / 복습 / 예습 선택 탭 — 세 보기(묶음별·과목별·주차별) 모두에 적용, 선택 기억"]},
   {v:"2026-09-07.13",d:"09-07",items:["공업수학1 과제 주기 확정: 금요일 출제 → 수요일 제출(루틴 라벨). 1주차 과제만 예외로 9/11(금) 수업 시간 제출 — 할 일·주차 정리 마감 갱신"]},
   {v:"2026-09-07.12",d:"09-07",items:["과목 현황 학습모드에 「M8 과제제출형」 추가 — 사회봉사는 출석유지형 대신 이걸로"]},
   {v:"2026-09-07.11",d:"09-07",items:["과목 유형 「과제 제출형」 추가 — 사회봉사에 적용(과목 현황·표지 문구)","할 일 탭: 묶음별 / 과목별 / 주차별 보기 전환(선택 기억)","할 일 탭 글자 잘림 수정(시간표용 .tt 클래스 충돌)","설정에 패치 노트 카드 · 저장소에 CHANGELOG.md"]},
