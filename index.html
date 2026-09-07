@@ -799,7 +799,7 @@ th{font-size:clamp(9.5px,0.2vw + 9px,10.5px)}
 /* ============ 주차 타임라인 ============ */
 .weeks{display:flex;gap:3px;overflow-x:auto;padding:2px 0 6px;-webkit-overflow-scrolling:touch}
 .wk{
-  flex:1 1 0;min-width:26px;border:0;background:none;cursor:pointer;padding:0;
+  flex:1 1 0;min-width:40px;border:0;background:none;cursor:pointer;padding:0;
   display:flex;flex-direction:column;align-items:center;gap:4px;
 }
 .wk .bar{width:100%;height:34px;border-radius:4px;background:var(--surface-3);position:relative;overflow:hidden;
@@ -810,7 +810,8 @@ th{font-size:clamp(9.5px,0.2vw + 9px,10.5px)}
 .wk.gap .bar > i{background:var(--crit)}
 .wk.future .bar{background:var(--surface-2);border:1px dashed var(--line-2)}
 .wk.now .bar{outline:2px solid var(--accent);outline-offset:1px}
-.wk .lb{font-family:var(--font-num);font-size:9px;color:var(--ink-3);letter-spacing:.02em}
+.wk .lb{font-family:var(--font-num);font-size:9px;color:var(--ink-3);letter-spacing:0;white-space:nowrap;text-align:center;line-height:1.15}
+.wk.exam .lb{color:var(--crit);font-weight:600}
 .wk.now .lb{color:var(--accent);font-weight:600}
 .wk .ex{position:absolute;inset:0;display:grid;place-items:center;font-size:11px;color:#fff;z-index:2}
 .wk.exam .bar{background:var(--crit)}
@@ -1701,7 +1702,7 @@ p,.hint,.step,.empty,.md{text-indent:0}
         </div>
         <div class="card">
           <div class="card-h"><h3>앞으로의 학기 · 졸업까지</h3><span class="hs" id="futHs"></span>
-            <div class="ha"><button class="btn xs" id="btnAddSeason">계절학기 추가</button></div>
+            <div class="ha"><button class="btn xs" id="btnAddSeason">학기 추가</button></div>
           </div>
           <div class="card-b tight" id="futureBox"></div>
         </div>
@@ -1866,7 +1867,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-07.7";
+var BUILD="2026-09-07.8";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -1903,7 +1904,7 @@ function seedTerm(){
        slots:[{d:2,s:"13:00",e:"19:00",room:"1공 306 CAD실"}]}),
     C({name:"창업아이디어탐색",en:"Startup Ideation",credits:2,bucket:"교양선택",typeA:"MAKE",
        slots:[{d:1,s:"11:00",e:"13:00",room:"해동부스트업룸"}]}),
-    C({name:"사회봉사",en:"Community Service",credits:1,bucket:"기타",typeA:"NONE",slots:[],coverTag:"주2회 카드뉴스 업로드"})
+    C({name:"사회봉사",en:"Community Service",credits:1,bucket:"기타",typeA:"NONE",slots:[],coverTag:"주2회 카드뉴스 업로드",passFail:true})
   ];
   t.seedV=1;
   return t;
@@ -2898,8 +2899,10 @@ function pastCourses(){
   return out;
 }
 function curCredits(){ return term().courses.filter(isActive).reduce(function(a,b){return a+(+b.credits||0);},0); }
+/* GPA 역산용 학점 — P/F(패스) 과목은 평점에 안 들어가므로 제외 */
+function gpaCredits(){ return term().courses.filter(function(c){return isActive(c)&&!c.passFail;}).reduce(function(a,b){return a+(+b.credits||0);},0); }
 function required(){
-  var h=histAgg(), cc=curCredits();
+  var h=histAgg(), cc=gpaCredits();
   if(!cc) return null;
   var T=+S.profile.targetGPA||3.5;
   return {need:(T*(h.cr+cc)-h.pt)/cc, cc:cc, pastCr:h.cr, target:T, cur:h.gpa};
@@ -3439,7 +3442,7 @@ function weeksHTML(c){
     var fill= st==="full"?100 : st==="part"?52 : st==="gap"?14 : 0;
     h+='<button class="'+cls.join(" ")+'" data-c="'+(c?c.id:"")+'" data-w="'+w+'" title="'+w+'주차"><span class="bar">'+
       '<i style="height:'+fill+'%"></i>'+(exW[w]?'<span class="ex">⚑</span>':"")+
-      '</span><span class="lb">'+w+'</span></button>';
+      '</span><span class="lb">'+w+'주차'+(exW[w]?'<br>('+esc(exW[w])+')':"")+'</span></button>';
   }
   return '<div class="weeks">'+h+'</div>';
 }
@@ -3655,52 +3658,73 @@ function renderRules(){
 }
 
 
-/* ---------- 앞으로의 학기 (현재 학기 → 졸업) ---------- */
+/* ---------- 앞으로의 학기 (현재 학기 → 졸업) — 학기별 과목 계획 ---------- */
 function futureDefaults(){
+  var C=function(n,cr,b){ return {id:uid(),name:n,credits:cr,bucket:b||"전공필수"}; };
   return [
-    {id:uid(),name:"2027-1학기",grade:"2학년 1학기",credits:18,note:"고체역학 · 동역학 · 공업수학2 · 기계공학입문설계 (정역학·공업수학1·CADD 다음 단계) + 교양"},
-    {id:uid(),name:"2027-2학기",grade:"2학년 2학기",credits:18,note:"열역학 · 유체역학 · 기계진동학 · 기계설계 · 공업수학3"},
-    {id:uid(),name:"2028-1학기",grade:"3학년 1학기",credits:18,note:"고체역학응용설계 · 기계역학 · 기계요소설계 · 캡스톤디자인1"},
-    {id:uid(),name:"2028-2학기",grade:"3학년 2학기",credits:18,note:"자동제어 · 응용유한요소해석 · 설계방법론 · 캡스톤디자인2"},
-    {id:uid(),name:"2029-1학기",grade:"4학년 1학기",credits:15,note:"탄성학개론 · 컴퓨터지원설계 · 캡스톤디자인3(졸업작품) · 영어전용강좌"},
-    {id:uid(),name:"2029-2학기",grade:"4학년 2학기",credits:3,note:"잔여 요건 마무리 (졸업논문/시험/작품 · 산학협력영역)"}
+    {id:uid(),name:"2026 겨울학기",grade:"계절",season:true,courses:[C("교양선택 (계절 개설 과목)",3,"교양선택")],note:"교양선택 잔여 7학점 중 3"},
+    {id:uid(),name:"2027-1학기",grade:"2학년 1학기",courses:[C("고체역학",3),C("동역학",3),C("공업수학2",3,"전공기초"),C("기계공학입문설계",3),C("영어전용강좌 (교양)",2,"교양필수"),C("교양선택",3,"교양선택")],note:"정역학 → 고체·동역학, 공업수학1 → 공업수학2, CADD → 입문설계"},
+    {id:uid(),name:"2027 여름학기",grade:"계절",season:true,courses:[C("교양선택 (계절)",3,"교양선택")],note:""},
+    {id:uid(),name:"2027-2학기",grade:"2학년 2학기",courses:[C("열역학",3),C("유체역학",3),C("기계진동학",3),C("기계설계",3),C("공업수학3",3,"전공기초"),C("산학협력영역 과목",3,"교양선택")],note:"일반물리학2 → 열·유체 계열, 기계설계는 입문설계 다음"},
+    {id:uid(),name:"2027 겨울학기",grade:"계절",season:true,courses:[C("일반교양 (계절)",3,"일반교양")],note:""},
+    {id:uid(),name:"2028-1학기",grade:"3학년 1학기",courses:[C("고체역학응용설계",3,"전공선택"),C("기계역학",3),C("기계요소설계",3),C("캡스톤디자인1",3),C("전공선택 (트랙)",3,"전공선택"),C("산학협력영역 과목",3,"교양선택")],note:"트랙(설계·생산·고체·동제어·열·유체) 결정"},
+    {id:uid(),name:"2028 여름학기",grade:"계절",season:true,courses:[C("전공선택 (계절)",3,"전공선택")],note:""},
+    {id:uid(),name:"2028-2학기",grade:"3학년 2학기",courses:[C("자동제어",3),C("응용유한요소해석",3,"전공선택"),C("설계방법론",3),C("캡스톤디자인2",3),C("전공선택 (트랙)",3,"전공선택")],note:""},
+    {id:uid(),name:"2028 겨울학기",grade:"계절",season:true,courses:[C("교양선택 (계절)",3,"교양선택")],note:""},
+    {id:uid(),name:"2029-1학기",grade:"4학년 1학기",courses:[C("탄성학개론",3,"전공선택"),C("컴퓨터지원설계",3,"전공선택"),C("캡스톤디자인3 (졸업작품)",3),C("영어전용강좌 (전공)",3,"전공선택")],note:"졸업논문/시험/작품 요건"},
+    {id:uid(),name:"2029 여름학기",grade:"계절",season:true,courses:[],note:"필요 시"},
+    {id:uid(),name:"2029-2학기",grade:"4학년 2학기",courses:[C("잔여 요건 과목",3,"기타")],note:"8학기 이상 + 전 요건 충족 → 졸업"}
   ];
 }
+function futCredits(r){ if(Array.isArray(r.courses)&&r.courses.length) return r.courses.reduce(function(a,c){return a+(+c.credits||0);},0); return +r.credits||0; }
 function renderFuture(){
   var box=$("#futureBox"); if(!box) return;
   var t=term(), total=+S.grad.total||130;
   var past=S.history.reduce(function(a,h){ var g=semAgg(h); return a+(g.crAll!=null?g.crAll:g.cr); },0);
   var cur=curCredits();
-  var rows=S.futureTerms, planned=rows.reduce(function(a,r){return a+(+r.credits||0);},0);
+  var rows=S.futureTerms; rows.forEach(function(r){ if(!Array.isArray(r.courses)) r.courses=[]; });
+  var planned=rows.reduce(function(a,r){return a+futCredits(r);},0);
   var remainAfterCur=Math.max(0,total-past-cur), gap=remainAfterCur-planned;
+  var majorPlanned=rows.reduce(function(a,r){return a+r.courses.filter(function(c){return /^전공/.test(c.bucket||"");}).reduce(function(x,c){return x+(+c.credits||0);},0);},0);
+  var majorCur=courses().filter(function(c){return isActive(c)&&/^전공/.test(c.bucket||"");}).reduce(function(a,c){return a+(+c.credits||0);},0);
   $("#futHs").textContent=total+"학점 중 취득 "+past+" · 수강중 "+cur+" · 잔여 "+remainAfterCur;
   var cum=past+cur;
-  var html='<div class="tw"><table><thead><tr><th>학기</th><th>학년</th><th class="n">계획 학점</th><th class="n">누적</th><th>계획 · 메모</th><th></th></tr></thead><tbody>'+
-    '<tr style="background:var(--accent-soft)"><td><b>'+esc(t.label)+'</b> <span class="chip acc">현재</span></td><td>1학년 2학기</td><td class="n">'+cur+'</td><td class="n">'+cum+'</td><td>'+esc(courses().filter(isActive).map(function(c){return c.name;}).join(" · "))+'</td><td></td></tr>'+
-    rows.map(function(r){ cum+=(+r.credits||0);
-      return '<tr><td><b>'+esc(r.name)+'</b></td><td>'+esc(r.grade||"")+'</td>'+
-        '<td class="n"><input class="input mono" data-fc="'+r.id+'" type="number" min="0" max="24" value="'+(+r.credits||0)+'" style="width:64px;padding:4px 6px;text-align:right"></td>'+
+  var chips=function(r){ return r.courses.map(function(c){
+      return '<span class="chip '+(/^전공/.test(c.bucket||"")?"acc":"mut")+'" style="margin:2px 3px 2px 0">'+esc(c.name)+' <span class="mono" style="opacity:.7">'+(+c.credits||0)+'</span><button class="iconbtn" data-fcdel="'+r.id+'|'+c.id+'" aria-label="삭제" style="width:16px;height:16px;font-size:10px;margin-left:3px">✕</button></span>'; }).join(""); };
+  var html='<div class="tw"><table><thead><tr><th style="min-width:120px">학기</th><th class="n">학점</th><th class="n">누적</th><th style="min-width:280px">계획 과목</th><th style="min-width:160px">메모</th><th></th></tr></thead><tbody>'+
+    '<tr style="background:var(--accent-soft)"><td><b>'+esc(t.label)+'</b><br><span class="hint">1학년 2학기 · 현재</span></td><td class="n">'+cur+'</td><td class="n">'+cum+'</td><td>'+courses().filter(isActive).map(function(c){return '<span class="chip '+(/^전공/.test(c.bucket||"")?"acc":"mut")+'" style="margin:2px 3px 2px 0">'+esc(c.name)+' <span class="mono" style="opacity:.7">'+c.credits+'</span></span>';}).join("")+'</td><td><span class="hint">수강 중</span></td><td></td></tr>'+
+    rows.map(function(r){ var cr=futCredits(r); cum+=cr;
+      return '<tr'+(r.season?' style="background:var(--surface-2)"':'')+'><td><b>'+esc(r.name)+'</b><br><span class="hint">'+esc(r.grade||"")+'</span></td>'+
+        '<td class="n">'+(r.courses.length? cr : '<input class="input mono" data-fc="'+r.id+'" type="number" min="0" max="24" value="'+(+r.credits||0)+'" style="width:58px;padding:3px 6px;text-align:right">')+'</td>'+
         '<td class="n'+(cum>=total?'" style="color:var(--ok);font-weight:600':'')+'">'+cum+'</td>'+
-        '<td><input class="input" data-fn="'+r.id+'" value="'+esc(r.note||"")+'" placeholder="들을 과목 · 메모" style="padding:4px 8px"></td>'+
-        '<td><button class="iconbtn" data-fdel="'+r.id+'" aria-label="삭제">✕</button></td></tr>'; }).join("")+
+        '<td>'+chips(r)+'<button class="btn xs" data-fadd="'+r.id+'" style="margin:2px 0">＋ 과목</button></td>'+
+        '<td><input class="input" data-fn="'+r.id+'" value="'+esc(r.note||"")+'" placeholder="메모" style="padding:4px 8px;font-size:12.5px"></td>'+
+        '<td><button class="iconbtn" data-fdel="'+r.id+'" aria-label="학기 삭제">✕</button></td></tr>'; }).join("")+
     '</tbody></table></div>'+
-    '<div class="hint" style="padding:10px 14px">'+(gap>0?'<span style="color:var(--crit)">계획 합계가 잔여 학점보다 '+gap+'학점 부족</span>':gap<0?'계획 합계가 잔여보다 '+(-gap)+'학점 많음 (여유)':'계획 합계 = 잔여 학점 ✓')+
-    ' · 졸업요건: 전공 36(전공핵심 30) · 영어전용 2 · 산학협력 6 · PBL 4 · 교양선택 10 · 8학기 이상 + 졸업논문/시험/작품. 학점은 칸에서 바로 고칠 수 있습니다.</div>';
+    '<div class="hint" style="padding:10px 14px">'+(gap>0?'<span style="color:var(--crit)">계획 합계가 잔여 학점보다 '+gap+'학점 부족</span>':gap<0?'계획 합계가 잔여보다 '+(-gap)+'학점 많음 (여유 '+(-gap)+')':'계획 합계 = 잔여 학점 ✓')+
+    ' · 전공 계획 '+(majorCur+majorPlanned)+'/36 (전공핵심 30 포함 여부는 과목별 확인) · 영어전용 2 · 산학협력 6 · PBL 4 · 교양선택 10 · 8학기 이상 · 졸업논문/시험/작품. 계절학기는 학기당 최대 6학점 기준으로 잡았습니다.</div>';
   box.innerHTML=html;
-  $$("[data-fc]",box).forEach(function(inp){ inp.onchange=function(){ var r=rows.filter(function(x){return x.id===inp.dataset.fc;})[0]; if(r){ r.credits=+inp.value||0; persist(); renderFuture(); } }; });
-  $$("[data-fn]",box).forEach(function(inp){ inp.onchange=function(){ var r=rows.filter(function(x){return x.id===inp.dataset.fn;})[0]; if(r){ r.note=inp.value; persist(); } }; });
+  var find=function(id){ return rows.filter(function(x){return x.id===id;})[0]; };
+  $$("[data-fc]",box).forEach(function(inp){ inp.onchange=function(){ var r=find(inp.dataset.fc); if(r){ r.credits=+inp.value||0; persist(); renderFuture(); } }; });
+  $$("[data-fn]",box).forEach(function(inp){ inp.onchange=function(){ var r=find(inp.dataset.fn); if(r){ r.note=inp.value; persist(); } }; });
   $$("[data-fdel]",box).forEach(function(b){ b.onclick=function(){ S.futureTerms=rows.filter(function(x){return x.id!==b.dataset.fdel;}); persist(); renderFuture(); }; });
+  $$("[data-fcdel]",box).forEach(function(b){ b.onclick=function(){ var p=b.dataset.fcdel.split("|"), r=find(p[0]); if(r){ r.courses=r.courses.filter(function(c){return c.id!==p[1];}); persist(); renderFuture(); } }; });
+  $$("[data-fadd]",box).forEach(function(b){ b.onclick=function(){ var r=find(b.dataset.fadd); if(!r) return;
+    openSheet({title:r.name+" · 과목 추가",body:'<div class="field"><label>과목명</label><input class="input" id="fpName" placeholder="예: 고체역학"></div>'+
+      '<div class="row" style="margin-top:10px"><div class="field"><label>학점</label><input class="input mono" id="fpCr" type="number" min="0" max="6" value="3"></div>'+
+      '<div class="field"><label>구분</label><select class="select" id="fpB">'+BUCKETS.map(function(B){return '<option'+(B==="전공필수"?" selected":"")+'>'+B+'</option>';}).join("")+'</select></div></div>',
+      actions:[{label:"취소",fn:closeSheet},{label:"추가",cls:"a",fn:function(){ var nm=$("#fpName").value.trim(); if(!nm){ toast("과목명을 적어 주세요"); return; }
+        r.courses.push({id:uid(),name:nm,credits:+$("#fpCr").value||0,bucket:$("#fpB").value}); persist(); closeSheet(); renderFuture(); }}]}); }; });
   $("#btnAddSeason").onclick=function(){
-    var last=rows[rows.length-1], base=last?last.name.slice(0,4):"2027";
-    openSheet({title:"계절학기 추가",body:'<div class="field"><label>이름</label><input class="input" id="fsName" value="'+esc(base+" 겨울학기")+'"></div>'+
-      '<div class="row" style="margin-top:10px"><div class="field"><label>계획 학점</label><input class="input mono" id="fsCr" type="number" min="0" max="9" value="3"></div>'+
-      '<div class="field"><label>어느 학기 뒤에</label><select class="select" id="fsAfter"><option value="">맨 뒤</option>'+rows.map(function(r){return '<option value="'+r.id+'">'+esc(r.name)+' 뒤</option>';}).join("")+'</select></div></div>'+
-      '<div class="field" style="margin-top:10px"><label>메모</label><input class="input" id="fsNote" placeholder="예: 공업수학2 선이수"></div>',
+    openSheet({title:"학기 추가",body:'<div class="field"><label>이름</label><input class="input" id="fsName" placeholder="예: 2029 여름학기"></div>'+
+      '<div class="row" style="margin-top:10px"><div class="field"><label>구분</label><select class="select" id="fsKind"><option value="season">계절학기</option><option value="regular">정규학기</option></select></div>'+
+      '<div class="field"><label>어느 학기 뒤에</label><select class="select" id="fsAfter"><option value="">맨 뒤</option>'+rows.map(function(r){return '<option value="'+r.id+'">'+esc(r.name)+' 뒤</option>';}).join("")+'</select></div></div>',
       actions:[{label:"취소",fn:closeSheet},{label:"추가",cls:"a",fn:function(){
-        var item={id:uid(),name:$("#fsName").value.trim()||"계절학기",grade:"계절",credits:+$("#fsCr").value||0,note:$("#fsNote").value.trim(),season:true};
+        var kind=$("#fsKind").value;
+        var item={id:uid(),name:$("#fsName").value.trim()||(kind==="season"?"계절학기":"학기"),grade:kind==="season"?"계절":"",season:kind==="season",courses:[],credits:0,note:""};
         var after=$("#fsAfter").value, idx=rows.findIndex(function(r){return r.id===after;});
         if(idx<0) rows.push(item); else rows.splice(idx+1,0,item);
-        persist(); closeSheet(); renderFuture(); toast("계절학기를 추가했습니다"); }}]});
+        persist(); closeSheet(); renderFuture(); toast("학기를 추가했습니다 — ＋ 과목으로 계획을 채우세요"); }}]});
   };
 }
 
@@ -4293,6 +4317,12 @@ function renderGrade(){
     coursesAll().map(function(c){
       var cap=c.maxGrade?GP[c.maxGrade]:4.5;         /* 재수강이면 취득 상한이 있다 */
       var lv="—", over=false;
+      if(c.passFail){
+        return "<tr><td><b>"+esc(c.name)+"</b> <span class='chip mut'>P/F</span></td><td class='n'>"+c.credits+"</td>"+
+          "<td><span class='chip ok'>P (통과)</span> <span class='hint'>평점 미산입</span></td>"+
+          "<td><select class='select' data-g='"+c.id+"' style='padding:3px 24px 3px 7px;font-size:12.5px;min-height:0'><option value=''>—</option>"+
+          ["P","NP"].map(function(L){return '<option'+(c.letter===L?" selected":"")+'>'+L+'</option>';}).join("")+"</select></td></tr>";
+      }
       if(need!==null){
         if(need>cap) over=true;
         var ok=LETTERS.filter(function(L){return GP[L]>=need && GP[L]<=cap;});
@@ -5761,6 +5791,12 @@ function boot(){
     try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   })();
 
+  if(!S.patchFutureV2){
+    var _untouched=Array.isArray(S.futureTerms)&&S.futureTerms.length&&S.futureTerms.every(function(r){return !Array.isArray(r.courses)||!r.courses.length;});
+    if(!Array.isArray(S.futureTerms)||!S.futureTerms.length||_untouched) S.futureTerms=futureDefaults();
+    var _sv2=term().courses.filter(function(c){return c.name==="사회봉사";})[0]; if(_sv2){ _sv2.passFail=true; if(_sv2.letter&&_sv2.letter!=="P"&&_sv2.letter!=="NP") _sv2.letter=""; }
+    S.patchFutureV2=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+  }
   if(!S.patchFutureV1){ if(!Array.isArray(S.futureTerms)||!S.futureTerms.length) S.futureTerms=futureDefaults(); S.grad={total:130}; S.patchFutureV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
   if(!S.patchHistoryV2){
     var _h=S.history.filter(function(h){return h.name==="2026 여름학기";})[0];
