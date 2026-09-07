@@ -1860,7 +1860,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-07.1";
+var BUILD="2026-09-07.3";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -3532,7 +3532,8 @@ function renderNotes(){
 
 
 /* ---------- 이번 주 할 일 (매주 월요일 자동 생성: 공부 / 과제 / 복습) ---------- */
-var WK_CATS=[["study","공부해야 할 것","var(--info)"],["hw","과제·제출","var(--crit)"],["review","복습","var(--ok)"]];
+/* 우선순위: 과제 ≫ 복습 > 예습 (사용자 규칙 9/7) — 표시 순서도 이 순서 */
+var WK_CATS=[["hw","① 과제·제출","var(--crit)"],["review","② 복습","var(--ok)"],["study","③ 예습·공부","var(--info)"]];
 var WK_DOW=["일","월","화","수","목","금","토"];
 function mondayOf(dateStr){ var d=D(dateStr); return addDays(dateStr, -((d.getDay()+6)%7)); }
 function weeklyKey(dateStr){ return mondayOf(dateStr||today()); }
@@ -3605,7 +3606,7 @@ function renderWeekly(){
       '<div class="add"><input class="input" data-wkadd-text="'+cat[0]+'" placeholder="추가…"><input class="input mono" type="date" data-wkadd-due="'+cat[0]+'" style="flex:0 0 132px"><button class="btn xs" data-wkadd="'+cat[0]+'">＋</button></div>'+
       '</div>';
   }).join("")+'</div>'+
-  '<div class="hint" style="margin-top:8px">매주 월요일에 자동으로 만들어집니다. 규칙(CADD 영상, 카드뉴스 등)은 설정 → 매주 월요일 규칙에서 바꿉니다.</div>';
+  '<div class="hint" style="margin-top:8px"><b>우선순위: 과제 ≫ 복습 &gt; 예습.</b> 과제 묶음을 먼저 비우고 복습, 그다음 예습 순으로. 매주 월요일에 자동으로 만들어지고, 규칙(CADD 영상, 카드뉴스 등)은 설정 → 매주 월요일 규칙에서 바꿉니다.</div>';
   $$("[data-wk]",box).forEach(function(cb){ cb.onchange=function(){
     var it=e.items.filter(function(i){return i.id===cb.dataset.wk;})[0]; if(!it) return;
     it.done=cb.checked;
@@ -3623,11 +3624,11 @@ function renderRules(){
   var rules=S.profile.weeklyRules||(S.profile.weeklyRules=[]);
   box.innerHTML=(rules.length? rules.map(function(r){
       var cat=WK_CATS.filter(function(c){return c[0]===r.cat;})[0]||WK_CATS[1];
-      return '<div class="rule"><span class="chip mut">'+esc(cat[1].split("·")[0])+'</span><span>'+esc(r.text)+'</span>'+
+      return '<div class="rule"><span class="chip mut">'+esc(cat[1].replace(/^[①②③] /,'').split("·")[0])+'</span><span>'+esc(r.text)+'</span>'+
         '<span class="chip acc">'+(r.dow==0?"일요일":WK_DOW[r.dow]+"요일")+' 마감</span><button class="iconbtn" data-rdel="'+esc(r.id)+'" aria-label="삭제">✕</button></div>';
     }).join("") : '<div class="hint">규칙이 없습니다.</div>')+
     '<div class="row tightg" style="margin-top:10px">'+
-      '<select class="select" id="rCat" style="flex:0 0 120px">'+WK_CATS.map(function(c){return '<option value="'+c[0]+'">'+c[1].split("·")[0]+'</option>';}).join("")+'</select>'+
+      '<select class="select" id="rCat" style="flex:0 0 120px">'+WK_CATS.map(function(c){return '<option value="'+c[0]+'">'+c[1].replace(/^[①②③] /,'').split("·")[0]+'</option>';}).join("")+'</select>'+
       '<input class="input" id="rText" placeholder="매주 할 일 (예: CADD 강의영상 시청)">'+
       '<select class="select" id="rDow" style="flex:0 0 110px">'+[1,2,3,4,5,6,0].map(function(d){return '<option value="'+d+'"'+(d===0?" selected":"")+'>'+WK_DOW[d]+'요일</option>';}).join("")+'</select>'+
       '<button class="btn sm" id="rAdd" style="flex:0 0 auto">추가</button></div>'+
@@ -3667,12 +3668,48 @@ function classesOn(date){
 }
 /* 하루 항목을 시간순으로 + 빈 구간 계산 */
 function dayItems(date){
-  var items=classesOn(date).concat(plansOn(date).map(function(p){
+  var items=classesOn(date).map(function(x){
+    /* 수업을 예정보다 일찍 끝내고 「종료」를 눌렀으면 실제 종료 시각까지만 차지 → 다음 수업까지가 빈 시간이 된다 */
+    var ss=sessionOn(x.c.id,date);
+    if(ss&&ss.endedAt&&!ss.cancelled&&toMin(ss.endedAt)>toMin(x.s)&&toMin(ss.endedAt)<toMin(x.e)){
+      x.e=ss.endedAt; x.early=true; x.planEnd=x.sl.e;
+    }
+    return x;
+  }).concat(plansOn(date).map(function(p){
     return {type:"plan",p:p,s:p.s,e:p.e};
+  })).concat(gcalOn(date).map(function(ev){
+    return {type:"gcal",ev:ev,s:ev.start,e:ev.end};
   }));
   items.sort(function(a,b){ return toMin(a.s)-toMin(b.s) || toMin(a.e)-toMin(b.e); });
   return items;
 }
+
+/* ---------- 구글 캘린더 일정 (얼라이브위크 웹훅 GET ?action=events) ---------- */
+var gcalCache={};
+function fetchGcal(date){
+  var url=(S.profile.awHook||"").trim(); if(!url) return;
+  var c=gcalCache[date];
+  if(c&&(c.loading || Date.now()-c.at<5*60*1000)) return;
+  gcalCache[date]={at:Date.now(),loading:true,events:c?c.events:[]};
+  var q=url+(url.indexOf("?")>=0?"&":"?")+"action=events&date="+date;
+  try{
+    fetch(q).then(function(r){ return r.json(); }).then(function(j){
+      gcalCache[date]={at:Date.now(),events:(j&&Array.isArray(j.events))?j.events:[]};
+      if(ui.view==="today"&&(ui.day||today())===date) renderToday();
+    }).catch(function(){ gcalCache[date]={at:Date.now(),events:(c&&c.events)||[],err:true}; });
+  }catch(e){ gcalCache[date]={at:Date.now(),events:[],err:true}; }
+}
+/* 시간표에 이미 있는 수업 블록(과목명으로 시작)과 종일 일정은 제외 */
+function gcalOn(date){
+  var c=gcalCache[date]; if(!c||!c.events) return [];
+  var names=courses().map(function(x){return x.name;});
+  return c.events.filter(function(ev){
+    if(!ev||ev.allDay||!ev.start||!ev.end) return false;
+    var t=String(ev.title||"");
+    return !names.some(function(n){ return t===n || t.indexOf(n)===0; });
+  });
+}
+function gcalAllDay(date){ var c=gcalCache[date]; return (c&&c.events||[]).filter(function(ev){return ev&&ev.allDay;}); }
 function renderToday(){
   var date=ui.day||today(), isToday=(date===today()), ph=phase();
   var tt=$("#todayTitle");
@@ -3751,6 +3788,7 @@ function renderToday(){
     b.setAttribute("aria-pressed","true"); setCondition(date,{drankPrev:b.dataset.v==="1"}); }; });
   $("#condNote").onchange=function(){ setCondition(date,{note:this.value}); };
 
+  fetchGcal(date);
   var items=dayItems(date);
   var plans=plansOn(date);
   var studyPlans=plans.filter(function(p){return !p.activity;});
@@ -3810,6 +3848,7 @@ function renderToday(){
         '<div class="und" data-c="'+it.c.id+'">'+[0,1,2,3,4,5].map(function(n){
           return '<button data-u="'+n+'" aria-pressed="'+(ss.und===n)+'">'+n+'</button>';}).join("")+'</div>'+
         '<div class="hint">이해도 0(백지) ~ 5(설명 가능)</div>'+
+        (it.early?'<div class="hint" style="color:var(--ok)">예정 '+esc(it.planEnd)+' → 실제 '+esc(it.e)+' 종료 · 남는 시간은 아래 빈 구간으로</div>':"")+
         '<div class="row tightg" style="margin-top:2px">'+
           '<button class="btn xs" data-cs="'+it.c.id+'">▶ 시작'+(ss.startedAt?" "+esc(ss.startedAt):"")+'</button>'+
           '<button class="btn xs" data-ce="'+it.c.id+'">■ 종료'+(ss.endedAt?" "+esc(ss.endedAt):"")+'</button>'+
@@ -3819,6 +3858,12 @@ function renderToday(){
         '<button class="btn sm wide" data-open="'+it.c.id+'">진도 · 자료 기록 →</button>'+
         '</div></div>';
       }
+    } else if(it.type==="gcal"){
+      var ev=it.ev;
+      body='<div class="tl-plan" style="border-style:dashed"><span style="width:16px;flex:0 0 16px;text-align:center;color:var(--ink-3)">▣</span>'+
+        '<div class="pg"><div class="tl-head"><span class="tl-name">'+esc(ev.title||"일정")+'</span><span class="chip mut">캘린더</span></div>'+
+        (ev.location?'<div class="pn">'+esc(ev.location)+'</div>':"")+'</div>'+
+        '<div class="px"><button class="iconbtn" data-gplan="'+esc(it.s)+'|'+esc(it.e)+'|'+esc(ev.title||"")+'" aria-label="이 시간에 학습 넣기" title="이 시간에 학습 넣기">＋</button></div></div>';
     } else {
       var p=it.p, pc=p.courseId?course(p.courseId):null;
       body='<div class="tl-plan'+(p.done?" ok":"")+'">'+
@@ -3851,6 +3896,8 @@ function renderToday(){
       '<span>하루 목표 <b>'+(cap/60).toFixed(1)+'</b>h</span>'+
       (planMin>cap?'<span class="chip warn">목표 초과</span>':"")+
       (!isToday&&classesOn(date).length?'<span class="chip acc">미리 지정 — 결석 예정·휴강을 앞당겨 정할 수 있어요</span>':"")+
+      gcalAllDay(date).map(function(ev){ return '<span class="chip mut" title="구글 캘린더 종일 일정">▣ '+esc(ev.title||"")+'</span>'; }).join("")+
+      ((S.profile.awHook||"").trim()? (gcalCache[date]&&gcalCache[date].err?'<span class="chip warn" title="웹훅 GET 실패 — Apps Script 새 버전 배포 필요">캘린더 연결 안 됨</span>':"") : '<span class="hint">설정에 얼라이브위크 웹훅을 넣으면 구글 캘린더 일정이 빈 시간에 표시됩니다</span>')+
     '</div>'+
     '<div class="tl">'+(rows.length?rows.join(""):'<div class="empty"><span class="big">◌</span>이 날은 비어 있습니다.</div>')+'</div>';
 
@@ -3869,6 +3916,7 @@ function renderToday(){
     setSession(b.dataset.cancel,date,{cancelled:true,status:null,startedAt:"",endedAt:""}); renderToday(); renderGauges(); toast("휴강 처리 — 계산에서 빠집니다"); }; });
   $$("#dayLine [data-uncancel]").forEach(function(b){ b.onclick=function(){
     setSession(b.dataset.uncancel,date,{cancelled:false}); renderToday(); renderGauges(); toast("휴강 해제"); }; });
+  $$("#dayLine [data-gplan]").forEach(function(b){ b.onclick=function(){ var a=b.dataset.gplan.split("|"); planSheet(null,date,a[0],a[1]); }; });
   $$("#dayLine .tl-gap").forEach(function(b){ b.onclick=function(){
     planSheet(null,date,b.dataset.gs,b.dataset.ge); }; });
   $$("#dayLine [data-pd]").forEach(function(b){ b.onclick=function(){
@@ -4263,7 +4311,7 @@ function renderSet(){
     '<div class="row" style="margin-top:11px"><div class="field"><label>지각 N회 = 결석 1회</label><input class="input mono" id="pLate" type="number" min="1" max="10" value="'+p.lateToAbsent+'"></div>'+
     '<div class="field"><label>결석 한도 비율</label><input class="input mono" id="pAbs" type="number" step="0.05" min="0.05" max="0.5" value="'+p.absentLimitRatio+'"></div></div>'+
     '<div class="field" style="margin-top:11px"><label>얼라이브위크 웹훅 URL</label><input class="input mono" id="pHook" placeholder="https://script.google.com/macros/s/…/exec" value="'+esc(p.awHook||"")+'">'+
-    '<div class="hint">출결·수업시각을 구글 캘린더에 자동 반영합니다. 비워두면 꺼짐. 배포법: 저장소 docs/aliveweek-webhook.md</div></div>'+
+    '<div class="hint">출결·수업시각을 구글 캘린더에 자동 반영하고, 캘린더 일정을 오늘 화면 빈 시간에 불러옵니다(GET ?action=events). 비워두면 꺼짐. 배포법: 저장소 docs/aliveweek-webhook.md</div></div>'+
     '<button class="btn a sm wide" id="pSave" style="margin-top:13px">저장</button>';
   $("#pSave").onclick=function(){
     p.name=$("#pName").value.trim(); p.school=$("#pSchool").value.trim(); p.major=$("#pMajor").value.trim();

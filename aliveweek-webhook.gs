@@ -80,9 +80,33 @@ function doPost(e) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-/** 배포 확인용 — 웹 앱 URL을 브라우저로 열면 상태가 보인다 */
-function doGet() {
-  return ContentService.createTextOutput(
-    JSON.stringify({ ok: true, service: 'aliveweek-webhook', calendar: CAL_ID })
-  ).setMimeType(ContentService.MimeType.JSON);
+/**
+ * GET
+ *  - (기본) 배포 확인: {"ok":true,"service":"aliveweek-webhook"}
+ *  - ?action=events&date=YYYY-MM-DD : 그날 캘린더 일정 목록 → 학습앱 오늘 화면의 빈 시간에 표시
+ *    응답: {ok, date, events:[{id,title,start:"HH:MM",end:"HH:MM",allDay,location,color}]}
+ */
+function doGet(e) {
+  var p = (e && e.parameter) || {};
+  var out;
+  if (p.action === 'events') {
+    try {
+      var date = p.date || Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd');
+      var day = new Date(date + 'T00:00:00+09:00');
+      var evs = CalendarApp.getCalendarById(CAL_ID).getEventsForDay(day);
+      var fmt = function (d) { return Utilities.formatDate(d, 'Asia/Seoul', 'HH:mm'); };
+      out = { ok: true, date: date, events: evs.map(function (ev) {
+        var allDay = ev.isAllDayEvent();
+        return {
+          id: ev.getId(), title: ev.getTitle(), allDay: allDay,
+          start: allDay ? '' : fmt(ev.getStartTime()),
+          end: allDay ? '' : fmt(ev.getEndTime()),
+          location: ev.getLocation() || '', color: ev.getColor() || ''
+        };
+      }) };
+    } catch (err) { out = { ok: false, error: String(err), events: [] }; }
+  } else {
+    out = { ok: true, service: 'aliveweek-webhook', calendar: CAL_ID, actions: ['events'] };
+  }
+  return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
 }
