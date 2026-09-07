@@ -406,6 +406,37 @@ td.n,th.n{text-align:right;font-family:var(--font-num);font-variant-numeric:tabu
 :root[data-theme="dark"] .t-SUBMIT{--tc:#7FB0D4;--tcs:#14222E}
 :root[data-theme="dark"] .t-NONE{--tc:#8A93A3;--tcs:#1C222B}
 
+/* 개인 책장 색 (자격증·독학·프로젝트·어학·기타) */
+.t-PCERT{--tc:#8A5A1E;--tcs:#F3E7D6;--tcv:#9C6A22;--tcOn:#fff}
+.t-PSELF{--tc:#3F7A5A;--tcs:#DDEEE4;--tcv:#2F7A56;--tcOn:#fff}
+.t-PPROJ{--tc:#6B4FA6;--tcs:#E7E0F5;--tcv:#6446B3;--tcOn:#fff}
+.t-PLANG{--tc:#A8474E;--tcs:#F5DEE0;--tcv:#B23F49;--tcOn:#fff}
+.t-PETC{--tc:#5E6B7A;--tcs:#E1E6EC;--tcv:#566575;--tcOn:#fff}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .t-PCERT{--tc:#D9A860;--tcs:#2A2114}
+  :root:not([data-theme="light"]) .t-PSELF{--tc:#7FC39E;--tcs:#14261C}
+  :root:not([data-theme="light"]) .t-PPROJ{--tc:#B39CE6;--tcs:#201833}
+  :root:not([data-theme="light"]) .t-PLANG{--tc:#E48A91;--tcs:#2E181A}
+  :root:not([data-theme="light"]) .t-PETC{--tc:#9AA6B5;--tcs:#1B2129}
+}
+:root[data-theme="dark"] .t-PCERT{--tc:#D9A860;--tcs:#2A2114}
+:root[data-theme="dark"] .t-PSELF{--tc:#7FC39E;--tcs:#14261C}
+:root[data-theme="dark"] .t-PPROJ{--tc:#B39CE6;--tcs:#201833}
+:root[data-theme="dark"] .t-PLANG{--tc:#E48A91;--tcs:#2E181A}
+:root[data-theme="dark"] .t-PETC{--tc:#9AA6B5;--tcs:#1B2129}
+/* 개인 공부 상세 */
+.pc-ms{display:flex;flex-direction:column;margin-top:10px}
+.pc-ms .it{display:flex;align-items:center;gap:9px;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px;cursor:pointer;word-break:keep-all}
+.pc-ms .it .tx{flex:1 1 auto;min-width:0}
+.pc-ms .it .tx.done{text-decoration:line-through;color:var(--ink-3)}
+.pc-range{width:100%;margin:10px 0 8px;accent-color:var(--accent)}
+.pc-logrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:8px 10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:13px}
+.pc-logrow .m{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink-2)}
+.pc-linkrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}
+.pc-linkrow a{color:var(--accent-ink);text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.pc-linkrow a:hover{text-decoration:underline}
+.pc-goal{font-size:13.5px;color:var(--ink-2);margin-top:8px;line-height:1.55;word-break:keep-all}
+
 /* ============ 책장 (표지) ============ */
 .shelf-wrap{padding:6px 0 0}
 .shelf{
@@ -1539,6 +1570,10 @@ p,.hint,.step,.empty,.md{text-indent:0}
         <div class="vh">
           <h1 id="shelfTitle">수강과목</h1>
           <div class="sub" id="shelfSub"></div>
+          <div class="seg" id="shelfKind" aria-label="책장 종류">
+            <button data-k="school">학교 수업</button>
+            <button data-k="personal">개인 공부</button>
+          </div>
           <div id="pendBar" style="flex:1 1 100%;order:4"></div>
           <div class="sp">
             <button class="btn sm" id="btnImportTT">시간표 등록</button>
@@ -1546,7 +1581,7 @@ p,.hint,.step,.empty,.md{text-indent:0}
           </div>
         </div>
         <div class="card">
-          <div class="card-h"><h3>이번 학기</h3><span class="hs" id="shelfHs"></span>
+          <div class="card-h"><h3 id="shelfCardT">이번 학기</h3><span class="hs" id="shelfHs"></span>
             <div class="ha">
               <span class="kbdhint shelf-note">길게 누르면 메뉴 · ★→학점순</span>
               <div class="seg" id="shelfView">
@@ -1563,7 +1598,7 @@ p,.hint,.step,.empty,.md{text-indent:0}
         </div>
         <div class="grid g4" id="shelfTiles"></div>
         <div class="card">
-          <div class="card-h"><h3>과목 현황</h3><span class="hs">STATUS</span></div>
+          <div class="card-h"><h3 id="stTblT">과목 현황</h3><span class="hs" id="stTblHs">STATUS</span></div>
           <div class="card-b tight"><div class="tw"><table id="courseTbl"></table></div></div>
         </div>
       </section>
@@ -1609,6 +1644,38 @@ p,.hint,.step,.empty,.md{text-indent:0}
             <div class="card">
               <div class="card-h"><h3>과목 자료</h3><span class="hs">SYLLABUS</span></div>
               <div class="card-b" id="cDocs"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== 개인 공부 상세 ========== -->
+      <section class="view" id="v-pc">
+        <div><button class="btn sm q" id="pcBack">← 개인 책장</button></div>
+        <div class="chead" id="pHead"></div>
+        <div class="grid g-a">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="card-h"><h3>목표 · 진도</h3><span class="hs" id="pProgHs"></span>
+                <div class="ha"><button class="btn xs" id="pMsAdd">단계 추가</button></div>
+              </div>
+              <div class="card-b" id="pProg"></div>
+            </div>
+            <div class="card">
+              <div class="card-h"><h3>학습 기록</h3><span class="hs" id="pLogHs"></span></div>
+              <div class="card-b" id="pLog"></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="card-h"><h3>매주 루틴</h3><span class="hs">ROUTINE</span>
+                <div class="ha"><button class="btn xs" id="pRoutine">편집</button></div>
+              </div>
+              <div class="card-b" id="pRt"></div>
+            </div>
+            <div class="card">
+              <div class="card-h"><h3>메모 · 링크</h3><span class="hs">NOTE</span></div>
+              <div class="card-b" id="pMemo"></div>
             </div>
           </div>
         </div>
@@ -1943,7 +2010,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-07.16";
+var BUILD="2026-09-07.17";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -2629,7 +2696,7 @@ function blank(){
              retakeEligibleMax:"B0",retakeMaxGrade:"A0",font:"system",
              weeklyRules:[{id:"r1",cat:"hw",text:"CADD 강의영상 시청 (수요일 전)",dow:2},
                           {id:"r2",cat:"hw",text:"사회봉사 카드뉴스 2개 제작",dow:0}]},
-    weekly:{},
+    weekly:{}, personal:[],
     activeTermId:t.id, terms:[t], history:[], knowledge:{},
     game:{xp:0,streak:0,lastActive:""}};
 }
@@ -2643,6 +2710,12 @@ function migrate(o){
   if(!s.knowledge||typeof s.knowledge!=="object") s.knowledge={};
   if(!s.weekly||typeof s.weekly!=="object") s.weekly={};
   if(!Array.isArray(s.futureTerms)) s.futureTerms=[];
+  if(!Array.isArray(s.personal)) s.personal=[];
+  s.personal.forEach(function(p){
+    p.shelf="personal";
+    ["routines","log","milestones","links"].forEach(function(k){ if(!Array.isArray(p[k])) p[k]=[]; });
+    if(!p.rlog||typeof p.rlog!=="object") p.rlog={};
+  });
   if(!s.grad||typeof s.grad!=="object") s.grad={total:130,earned:0};
   if(!Array.isArray(s.profile.weeklyRules)) s.profile.weeklyRules=b.profile.weeklyRules;
   s.terms.forEach(function(t){
@@ -2749,7 +2822,45 @@ function pendingCourses(){ return term().courses.filter(function(c){return c.sta
 function pendingCredits(){
   return pendingCourses().reduce(function(a,b){return a+(+b.credits||0);},0);
 }
-function course(id){ return term().courses.filter(function(c){return c.id===id;})[0]; }
+function course(id){ return term().courses.filter(function(c){return c.id===id;})[0] || personal(id); }
+
+/* ---------- 개인 책장 (비교과·개인 공부 — 자격증·독학·프로젝트·어학) ----------
+   S.personal=[{id,shelf:"personal",name,en,kind,goal,progress,deadline,memo,fav,done,
+                routines,rlog,log:[{id,d,min,memo}],milestones:[{id,t,done}],links:[{t,u}],createdAt}]
+   학기·학점·출결·시험과 무관. 루틴(routines/rlog)은 수강 과목과 같은 구조라 표지 픽토그램·할 일 탭을 공유한다. */
+var PKINDS=[["cert","자격증"],["self","독학"],["proj","프로젝트"],["lang","어학"],["etc","기타"]];
+var PEMBLEM={cert:"✦",self:"✎",proj:"⚙",lang:"文",etc:"○"};
+function pKindName(k){ var h=PKINDS.filter(function(x){return x[0]===k;})[0]; return h?h[1]:"기타"; }
+function pCls(p){ var k=PKINDS.some(function(x){return x[0]===p.kind;})?p.kind:"etc"; return "t-P"+k.toUpperCase(); }
+function isPersonal(c){ return !!c && c.shelf==="personal"; }
+function personal(id){ return (S&&S.personal||[]).filter(function(p){return p.id===id;})[0]; }
+function sortPersonal(a,b){
+  if(!!b.fav!==!!a.fav) return (b.fav?1:0)-(a.fav?1:0);
+  var da=a.deadline||"9999-99-99", db=b.deadline||"9999-99-99";
+  if(da!==db) return da<db?-1:1;
+  return (a.createdAt||0)-(b.createdAt||0);
+}
+function personalsAll(){ return (S.personal||[]).slice().sort(sortPersonal); }
+function personals(){ return personalsAll().filter(function(p){return !p.done;}); }
+function pProgress(p){
+  var ms=p.milestones||[];
+  if(ms.length) return Math.round(ms.filter(function(m){return m.done;}).length*100/ms.length);
+  return clamp(Math.round(+p.progress||0),0,100);
+}
+function pMinutes(p,from,to){
+  return (p.log||[]).filter(function(l){ return (!from||l.d>=from)&&(!to||l.d<=to); })
+    .reduce(function(a,l){return a+(+l.min||0);},0);
+}
+function fmtMin(m){ m=Math.round(m||0); var h=Math.floor(m/60), r=m%60; return h?(h+"시간"+(r?" "+r+"분":"")):(r+"분"); }
+function pLastStudy(p){ var l=(p.log||[]).slice().sort(function(a,b){return a.d<b.d?1:-1;})[0]; return l?l.d:""; }
+function shelfKind(){
+  if(!ui.shelfKind){ try{ ui.shelfKind=localStorage.getItem("mc-shelfKind")||"school"; }catch(e){ ui.shelfKind="school"; } }
+  return ui.shelfKind==="personal"?"personal":"school";
+}
+function setShelfKind(k,silent){
+  ui.shelfKind=k; try{ localStorage.setItem("mc-shelfKind",k); }catch(e){}
+  if(!silent) renderShelf();
+}
 function sessions(cid){ return term().sessions.filter(function(s){return s.courseId===cid;}); }
 function exams(cid){ return term().exams.filter(function(e){return !cid||e.courseId===cid;})
   .sort(function(a,b){return a.date<b.date?-1:1;}); }
@@ -3198,7 +3309,7 @@ function rtTap(c,r,mon,idx){ var n=rtDone(c,r,mon); rtSet(c,r,mon, idx+1===n ? n
 function rtSyncWeekly(c,r,mon){ var e=S.weekly&&S.weekly[mon]; if(!e) return; var n=rtDone(c,r,mon);
   e.items.forEach(function(it){ var m=/^rt:([^:]+):([^:]+):(\d+)$/.exec(it.key||""); if(m&&m[1]===c.id&&m[2]===r.id) it.done=(+m[3])<=n; }); }
 function rtFromWeekly(mon){ var e=S.weekly&&S.weekly[mon]; if(!e) return;
-  courses().forEach(function(c){ (c.routines||[]).forEach(function(r){
+  courses().concat(personals()).forEach(function(c){ (c.routines||[]).forEach(function(r){
     var k=e.items.filter(function(it){ return it.done && (it.key||"").indexOf("rt:"+c.id+":"+r.id+":")===0; }).length;
     if(e.items.some(function(it){ return (it.key||"").indexOf("rt:"+c.id+":"+r.id+":")===0; })) rtSet(c,r,mon,k); }); }); }
 function rtHTML(c,cls){
@@ -3207,6 +3318,20 @@ function rtHTML(c,cls){
   return '<span class="'+cls+'">'+rs.map(function(r){ var n=rtDone(c,r,mon), late=n<r.count&&rtLate(r,mon), arr=[];
     for(var i=0;i<r.count;i++) arr.push('<span class="pi'+(i<n?" on":"")+(late&&i>=n?" late":"")+'" data-rt="'+c.id+'|'+r.id+'|'+i+'" role="button" tabindex="0" title="'+esc(r.label)+' '+(i+1)+'/'+r.count+(late?" · 마감 지남":"")+'">'+(RT_ICON[r.icon]||RT_ICON.doc)+'</span>');
     return '<span class="rg" title="'+esc(r.label)+' · '+(r.dow==0?"일":WK_DOW[r.dow])+'요일까지">'+arr.join("")+'</span>'; }).join("")+'</span>';
+}
+/* 과목 화면·개인 공부 화면 공용 루틴 띠 (픽토그램 + 이번 주 없음 토글) */
+function rtStripHTML(c){
+  if(!(c.routines||[]).length) return "";
+  return '<div class="rt-strip">'+c.routines.map(function(r){ var mon=weeklyKey(today()), n=rtDone(c,r,mon), late=n<r.count&&rtLate(r,mon), arr=[];
+        if(rtSkipped(r,mon)) return '<span class="rg" style="opacity:.75"><span class="lb">'+esc(r.label)+'</span><span class="chip mut">이번 주 없음</span><button class="btn xs" data-rtskip="'+c.id+'|'+r.id+'">이번 주 있음으로</button></span>';
+        for(var i=0;i<r.count;i++) arr.push('<button class="pi'+(i<n?" on":"")+(late&&i>=n?" late":"")+'" data-rt="'+c.id+'|'+r.id+'|'+i+'" aria-label="'+esc(r.label)+' '+(i+1)+'/'+r.count+'">'+(RT_ICON[r.icon]||RT_ICON.doc)+'</button>');
+        return '<span class="rg"><span class="lb">'+esc(r.label)+'</span>'+arr.join("")+'<span class="n">'+n+'/'+r.count+' · '+(r.dow==0?"일":WK_DOW[r.dow])+'요일까지'+(late?' <span style="color:var(--crit)">지남</span>':"")+'</span><button class="iconbtn" data-rtskip="'+c.id+'|'+r.id+'" title="이번 주는 없음" aria-label="이번 주는 없음" style="width:20px;height:20px;font-size:11px">–</button></span>'; }).join("")+'</div>';
+}
+function bindRtSkip(root,c,after){
+  $$("[data-rtskip]",root).forEach(function(b){ b.onclick=function(){
+    var p=b.dataset.rtskip.split("|"), r=(c.routines||[]).filter(function(x){return x.id===p[1];})[0]; if(!r) return;
+    var mon=weeklyKey(today()); rtToggleSkip(c,r,mon); after();
+    toast(rtSkipped(r,mon)?"이번 주는 건너뜁니다 — 표지·할 일에서 빠집니다":"이번 주 항목을 다시 넣었습니다"); }; });
 }
 function bindRt(root,after){
   $$("[data-rt]",root).forEach(function(el){
@@ -3292,6 +3417,13 @@ function bookHTML(c){
     '</button>';
 }
 function renderShelf(){
+  var kind=shelfKind();
+  $$("#shelfKind button").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.k===kind?"true":"false"); });
+  $("#btnImportTT").style.display = kind==="personal"?"none":"";
+  $("#btnAddCourse").textContent = kind==="personal"?"공부 추가":"과목 추가";
+  $("#shelf").classList.toggle("personal", kind==="personal");
+  if(kind==="personal"){ renderPersonalShelf(); return; }
+  $("#shelfCardT").textContent="이번 학기"; $("#stTblT").textContent="과목 현황"; $("#stTblHs").textContent="STATUS";
   var cs=courses(), ph=phase();
   var hid=hiddenCount();
   var nm=(S.profile.name||"").trim();
@@ -3387,6 +3519,275 @@ function renderShelf(){
     }).join("")+"</tbody>";
   $$("#courseTbl tbody tr").forEach(function(r){ r.onclick=function(){ go("course",r.dataset.c); }; });
 }
+/* ---------- 개인 책장 렌더 ---------- */
+function pBookHTML(p){
+  var pr=pProgress(p), dd=p.deadline?diffDays(today(),p.deadline):null;
+  var n=(p.name||"").replace(/\s/g,"").length;
+  var ts=n<=3?19:n<=4?18:n<=5?17:n<=6?15.5:n<=7?14:n<=9?12.5:11.5;
+  return '<button class="book '+pCls(p)+(dd!==null&&dd<=14&&dd>=0&&!p.done?" hot":"")+(p.done?" pending":"")+
+    '" data-c="'+p.id+'" style="--ts:'+ts+'px;--cr:3" title="'+esc(p.name)+'">'+
+    '<span class="bk-spine"></span>'+
+    '<span class="bk-fav'+(p.fav?" on":"")+'" data-fav="'+p.id+'" role="button" tabindex="0" '+
+      'aria-label="즐겨찾기" aria-pressed="'+(!!p.fav)+'">'+(p.fav?"★":"☆")+'</span>'+
+    (p.done?'<span class="bk-pending">완료</span>':"")+
+    (dd!==null&&dd>=0&&dd<=21&&!p.done?'<span class="bk-dday'+(dd>7?" soon":"")+'">D-'+dd+'</span>':"")+
+    '<span class="bk-em">'+(PEMBLEM[p.kind]||"○")+'</span>'+
+    '<span class="bk-t">'+esc(p.name)+'</span>'+
+    '<span class="bk-rule"></span>'+
+    '<span class="bk-en">'+esc(p.en||pKindName(p.kind))+'</span>'+
+    '<span class="bk-foot">'+
+      rtHTML(p,"bk-rt")+
+      '<span class="bk-tags"><span class="bk-days">'+esc(pKindName(p.kind))+'</span>'+
+        (p.deadline?'<span class="bk-exam">'+esc(fmtDate(p.deadline))+'</span>':"")+'</span>'+
+      '<span class="bk-meta">'+esc(p.goal||"목표 미정")+'</span>'+
+      '<span class="bk-gaugerow"><span class="bk-gauge"><i style="width:'+pr+'%"></i></span>'+
+      '<span class="bk-pct">'+pr+'%</span></span>'+
+    '</span></button>';
+}
+function renderPersonalShelf(){
+  var ps=personals(), all=personalsAll(), doneN=all.length-ps.length, nm=(S.profile.name||"").trim();
+  var mon=weeklyKey(today()), sun=addDays(mon,6), td=today();
+  var wkMin=ps.reduce(function(a,p){return a+pMinutes(p,mon,sun);},0);
+  $("#shelfTitle").textContent= nm? nm+"님의 개인 공부" : "개인 공부";
+  $("#shelfSub").textContent= ps.length
+    ? ps.length+"개 진행 중 · 이번 주 "+fmtMin(wkMin)+(doneN?" · 완료 "+doneN:"")+" · 학점 계산 제외"
+    : "자격증·독학·프로젝트처럼 학교 수업 밖의 공부를 꽂아 두는 책장";
+  $("#pendBar").innerHTML="";
+  $("#shelfCardT").textContent="개인 책장";
+  $("#shelfHs").innerHTML="PERSONAL"+(doneN?' <button class="btn xs" id="btnShowDone" style="margin-left:6px">'+
+    (ui.showDone?"완료 감추기":"완료 "+doneN+"개 보기")+'</button>':"");
+  var list= ui.showDone? all : ps;
+  $("#shelf").innerHTML= list.length ? list.map(pBookHTML).join("")
+    : '<div class="shelf-empty">아직 책이 없습니다.<br>「공부 추가」로 자격증·독학·프로젝트를 꽂아 두세요.<br>'+
+      '<span class="hint">학점 계산에는 들어가지 않고, 매주 루틴은 「할 일」 탭에 학교 과목 다음으로 나옵니다.</span></div>';
+  $$("#shelf .book").forEach(function(b){
+    var timer=null, longed=false;
+    var open=function(){ if(!longed) go("pc",b.dataset.c); longed=false; };
+    var start=function(){ longed=false; clearTimeout(timer);
+      timer=setTimeout(function(){ longed=true; pBookMenu(b.dataset.c); },520); };
+    var cancel=function(){ clearTimeout(timer); };
+    b.onclick=open;
+    b.addEventListener("pointerdown",start);
+    ["pointerup","pointerleave","pointercancel"].forEach(function(ev){ b.addEventListener(ev,cancel); });
+    b.addEventListener("contextmenu",function(e){ e.preventDefault(); longed=true; pBookMenu(b.dataset.c); });
+  });
+  bindRt($("#shelf"),function(){ renderShelf(); });
+  $$("#shelf [data-fav]").forEach(function(s){
+    var toggle=function(ev){
+      ev.stopPropagation(); ev.preventDefault();
+      var p=personal(s.dataset.fav); if(!p) return;
+      p.fav=!p.fav; persist(); renderShelf();
+      toast(p.fav?"즐겨찾기에 넣었습니다 — 책장 맨 앞으로":"즐겨찾기를 해제했습니다");
+    };
+    s.onclick=toggle;
+    s.onkeydown=function(ev){ if(ev.key==="Enter"||ev.key===" ") toggle(ev); };
+  });
+  if($("#btnShowDone")) $("#btnShowDone").onclick=function(){ ui.showDone=!ui.showDone; renderShelf(); };
+  applyShelfView();
+
+  var avg=ps.length?Math.round(ps.reduce(function(a,p){return a+pProgress(p);},0)/ps.length):0;
+  var soon=null, soonDd=null;
+  ps.forEach(function(p){ if(!p.deadline) return; var dd=diffDays(td,p.deadline); if(dd<0) return; if(soonDd===null||dd<soonDd){ soon=p; soonDd=dd; } });
+  var recent=ps.filter(function(p){ var l=pLastStudy(p); return l&&diffDays(l,td)<=7; }).length;
+  $("#shelfTiles").innerHTML=[
+    tile("진행 중",ps.length+"개",doneN?"완료 "+doneN+"개":"개인 공부",ps.length?"acc":""),
+    tile("평균 진도",avg+"%",ps.length?"단계 완료율 · 직접 입력":"—",avg>=50?"ok":""),
+    tile("이번 주 공부",fmtMin(wkMin),recent?("최근 7일 손댄 것 "+recent+"개"):"학습 기록 합계",wkMin?"ok":""),
+    tile("목표일 임박",soon?"D-"+soonDd:"없음",soon?(soon.name+" · "+fmtDate(soon.deadline)):"목표일이 있으면 표시",soon&&soonDd<=7?"warn":"")
+  ].join("");
+
+  $("#stTblT").textContent="개인 공부 현황"; $("#stTblHs").textContent="PERSONAL";
+  $("#courseTbl").innerHTML=
+    "<thead><tr><th>공부</th><th>종류</th><th>목표</th><th class='n'>진도</th><th>목표일</th><th class='n'>이번 주</th><th>최근 학습</th></tr></thead><tbody>"+
+    (list.length? list.map(function(p){
+      var pr=pProgress(p), dd=p.deadline?diffDays(td,p.deadline):null, last=pLastStudy(p);
+      return "<tr data-c='"+p.id+"' style='cursor:pointer"+(p.done?";opacity:.6":"")+"'>"+
+        "<td><b>"+esc(p.name)+"</b>"+(p.done?" <span class='chip ok'>완료</span>":"")+"</td>"+
+        "<td><span class='chip mut'>"+esc(pKindName(p.kind))+"</span></td>"+
+        "<td style='max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'>"+esc(p.goal||"—")+"</td>"+
+        "<td class='n'>"+pr+"%</td>"+
+        "<td>"+(p.deadline?fmtDate(p.deadline)+(dd!==null?(dd>=0?" <span class='chip "+(dd<=7?"warn":"mut")+"'>D-"+dd+"</span>":" <span class='chip crit'>지남</span>"):""):"<span style='color:var(--ink-3)'>—</span>")+"</td>"+
+        "<td class='n'>"+fmtMin(pMinutes(p,mon,sun))+"</td>"+
+        "<td>"+(last?fmtDate(last):"<span style='color:var(--ink-3)'>—</span>")+"</td></tr>";
+    }).join("") : "<tr><td colspan='7' style='color:var(--ink-3)'>아직 없음</td></tr>")+"</tbody>";
+  $$("#courseTbl tbody tr[data-c]").forEach(function(r){ r.onclick=function(){ go("pc",r.dataset.c); }; });
+}
+/* 개인 공부 표지 롱프레스 메뉴 */
+function pBookMenu(pid){
+  var p=personal(pid); if(!p) return;
+  openSheet({
+    title:p.name,
+    body:'<div style="display:flex;flex-direction:column;gap:8px">'+
+        '<button class="btn wide" id="pmOpen">열기</button>'+
+        '<button class="btn wide'+(p.fav?" a":"")+'" id="pmFav">'+(p.fav?"★ 즐겨찾기 해제":"☆ 즐겨찾기에 넣기")+'</button>'+
+        '<button class="btn wide" id="pmDone">'+(p.done?"다시 진행":"완료 처리")+'</button>'+
+        '<button class="btn wide" id="pmEdit">편집</button>'+
+      '</div>'+
+      '<div class="hint">완료한 공부는 책장에서 빠지고 「완료 보기」로 다시 볼 수 있습니다.</div>',
+    actions:[{label:"닫기",fn:closeSheet}],
+    mount:function(root){
+      $("#pmOpen",root).onclick=function(){ closeSheet(); go("pc",pid); };
+      $("#pmFav",root).onclick=function(){ p.fav=!p.fav; persist(); closeSheet(); renderShelf(); toast(p.fav?"즐겨찾기에 넣었습니다":"즐겨찾기를 해제했습니다"); };
+      $("#pmDone",root).onclick=function(){ pToggleDone(p); closeSheet(); renderShelf(); };
+      $("#pmEdit",root).onclick=function(){ closeSheet(); editPersonal(pid); };
+    }
+  });
+}
+function pToggleDone(p){
+  p.done=!p.done; if(p.done) p.doneAt=today();
+  var mon=weeklyKey(today());
+  if(S.weekly&&S.weekly[mon]){
+    if(p.done) S.weekly[mon].items=S.weekly[mon].items.filter(function(it){ return (it.key||"").indexOf("rt:"+p.id+":")!==0; });
+    else generateWeekly(mon);
+  }
+  persist();
+  toast(p.done?"완료 처리했습니다 — 책장에서 빠지고 루틴도 멈춥니다":"다시 진행 중으로 돌렸습니다");
+}
+/* ---------- 개인 공부 상세 ---------- */
+function renderPersonal(){
+  var p=personal(ui.course);
+  if(!p){ setShelfKind("personal",true); go("shelf"); return; }
+  var pr=pProgress(p), td=today(), dd=p.deadline?diffDays(td,p.deadline):null;
+  var mon=weeklyKey(td), sun=addDays(mon,6);
+
+  $("#pHead").className="chead "+pCls(p);
+  $("#pHead").innerHTML='<div class="cmark"></div><div style="flex:1 1 240px;min-width:0">'+
+    '<h1>'+esc(p.name)+'</h1><div class="cm">'+
+    '<span class="chip acc">'+esc(pKindName(p.kind))+'</span>'+
+    (p.en?'<span class="chip mut">'+esc(p.en)+'</span>':"")+
+    (p.deadline?'<span class="chip '+(dd!==null&&dd>=0&&dd<=7?"warn":dd!==null&&dd<0?"crit":"mut")+'">목표일 '+esc(fmtDate(p.deadline))+
+      (dd!==null?(dd>=0?" · D-"+dd:" · "+(-dd)+"일 지남"):"")+'</span>':"")+
+    (p.done?'<span class="chip ok">완료'+(p.doneAt?" "+esc(fmtDate(p.doneAt)):"")+'</span>':"")+
+    '<span class="chip mut">개인 책장 · 학점 계산 제외</span>'+
+    '</div>'+(p.goal?'<div class="pc-goal">목표 — '+esc(p.goal)+'</div>':'<div class="pc-goal hint">목표가 비어 있습니다. 「편집」에서 한 줄로 적어 두세요.</div>')+'</div>'+
+    '<div style="display:flex;gap:7px;align-self:center;flex-wrap:wrap">'+
+    '<button class="btn sm'+(p.fav?" a":"")+'" id="pFav">'+(p.fav?"★ 즐겨찾기":"☆ 즐겨찾기")+'</button>'+
+    '<button class="btn sm" id="pEdit">편집</button>'+
+    '<button class="btn sm" id="pDone">'+(p.done?"다시 진행":"완료 처리")+'</button></div>';
+  $("#pFav").onclick=function(){ p.fav=!p.fav; persist(); renderPersonal(); toast(p.fav?"즐겨찾기에 넣었습니다":"즐겨찾기를 해제했습니다"); };
+  $("#pEdit").onclick=function(){ editPersonal(p.id); };
+  $("#pDone").onclick=function(){ pToggleDone(p); renderPersonal(); };
+
+  /* 목표·진도 — 단계가 있으면 완료율 자동, 없으면 직접 입력 */
+  var ms=p.milestones||[], msDone=ms.filter(function(m){return m.done;}).length;
+  $("#pProgHs").textContent= ms.length? msDone+"/"+ms.length+" 단계" : "직접 입력";
+  $("#pProg").innerHTML=
+    '<div class="barlab"><span>'+(ms.length?"단계 완료율":"진도")+'</span><b>'+pr+'%</b></div>'+
+    '<div class="bar '+(pr>=100?"ok":pr<25?"warn":"")+'"><i style="width:'+pr+'%"></i></div>'+
+    (ms.length
+      ? '<div class="pc-ms">'+ms.map(function(m){
+          return '<label class="it"><input type="checkbox" data-ms="'+m.id+'"'+(m.done?" checked":"")+' aria-label="완료">'+
+            '<span class="tx'+(m.done?" done":"")+'">'+esc(m.t)+'</span>'+
+            '<button class="iconbtn" data-msdel="'+m.id+'" aria-label="삭제">✕</button></label>'; }).join("")+'</div>'+
+        '<div class="hint" style="margin-top:8px">단계를 모두 지우면 다시 직접 입력으로 돌아갑니다.</div>'
+      : '<input type="range" class="pc-range" id="pRange" min="0" max="100" step="5" value="'+pr+'" aria-label="진도">'+
+        '<div class="row" style="gap:6px">'+[-10,-5,5,10].map(function(d){ return '<button class="btn xs" data-pd="'+d+'">'+(d>0?"+":"−")+Math.abs(d)+'</button>'; }).join("")+
+        '<span class="hint" style="align-self:center">5% 단위</span></div>'+
+        '<div class="hint" style="margin-top:8px">「단계 추가」로 챕터·시험·산출물 같은 단계를 넣으면 진도는 단계 완료율로 자동 계산됩니다.</div>');
+  $$("#pProg [data-ms]").forEach(function(cb){ cb.onchange=function(){
+    var m=ms.filter(function(x){return x.id===cb.dataset.ms;})[0]; if(!m) return;
+    m.done=cb.checked; if(m.done){ addXP(8); bumpStreak(); } persist(); renderPersonal(); }; });
+  $$("#pProg [data-msdel]").forEach(function(b){ b.onclick=function(ev){ ev.preventDefault();
+    p.milestones=ms.filter(function(x){return x.id!==b.dataset.msdel;}); persist(); renderPersonal(); }; });
+  if($("#pRange")) $("#pRange").onchange=function(){ p.progress=clamp(+this.value||0,0,100); persist(); renderPersonal(); };
+  $$("#pProg [data-pd]").forEach(function(b){ b.onclick=function(){
+    var before=pProgress(p); p.progress=clamp(before+(+b.dataset.pd),0,100);
+    if(p.progress>before) addXP(4); persist(); renderPersonal(); }; });
+  $("#pMsAdd").onclick=function(){
+    openSheet({title:p.name+" · 단계 추가",
+      body:'<div class="field"><label>단계 이름</label><input class="input" id="msT" placeholder="예: 3장 끝 · 모의고사 1회 · 프로토타입 완성"></div>'+
+        '<div class="hint" style="margin-top:8px">한 줄에 하나씩 여러 줄을 붙여 넣어도 됩니다.</div>'+
+        '<textarea class="ta" id="msMulti" style="min-height:70px;margin-top:6px" placeholder="여러 단계를 한 번에 (줄바꿈으로 구분)"></textarea>',
+      actions:[{label:"취소",fn:closeSheet},{label:"추가",cls:"a",fn:function(){
+        var one=$("#msT").value.trim(), many=$("#msMulti").value.split(/\n/).map(function(x){return x.trim();}).filter(Boolean);
+        var arr=(one?[one]:[]).concat(many); if(!arr.length){ toast("단계 이름을 적어 주세요"); return; }
+        p.milestones=(p.milestones||[]).concat(arr.map(function(t){ return {id:uid(),t:t,done:false}; }));
+        persist(); closeSheet(); renderPersonal(); toast(arr.length+"개 단계를 넣었습니다"); }}]});
+  };
+
+  /* 학습 기록 */
+  var log=(p.log||[]).slice().sort(function(a,b){ return a.d<b.d?1:a.d>b.d?-1:(b.at||0)-(a.at||0); });
+  var total=pMinutes(p), wk=pMinutes(p,mon,sun);
+  $("#pLogHs").textContent="누적 "+fmtMin(total)+" · 이번 주 "+fmtMin(wk);
+  $("#pLog").innerHTML=
+    '<div class="row" style="gap:8px;align-items:flex-end">'+
+      '<div class="field" style="flex:0 0 150px"><label>날짜</label><input class="input mono" id="plD" type="date" value="'+td+'"></div>'+
+      '<div class="field" style="flex:0 0 96px"><label>분</label><input class="input mono" id="plM" type="number" min="5" max="720" step="5" value="60"></div>'+
+      '<div class="field" style="flex:1 1 160px"><label>무엇을 했나 (선택)</label><input class="input" id="plT" placeholder="예: 4장 문제풀이"></div>'+
+      '<button class="btn sm a" id="plAdd" style="flex:0 0 auto">기록</button></div>'+
+    '<div class="hint" style="margin-top:6px">분 단위로 적습니다. 학습 타이머가 붙으면 여기로 자동 기록됩니다.</div>'+
+    (log.length
+      ? '<div class="scrollbox" style="margin-top:8px">'+log.slice(0,40).map(function(l){
+          return '<div class="pc-logrow"><span class="mono">'+esc(fmtDate(l.d))+'</span><span class="m">'+esc(l.memo||"")+'</span>'+
+            '<b class="mono">'+fmtMin(l.min)+'</b><button class="iconbtn" data-pldel="'+l.id+'" aria-label="삭제">✕</button></div>'; }).join("")+'</div>'
+      : '<div class="empty" style="padding:14px 8px">아직 기록이 없습니다.</div>');
+  $("#plAdd").onclick=function(){
+    var d=$("#plD").value||td, m=clamp(+$("#plM").value||0,0,720);
+    if(!m){ toast("분을 넣어 주세요"); return; }
+    p.log=p.log||[]; p.log.push({id:uid(),d:d,min:m,memo:$("#plT").value.trim(),at:Date.now()});
+    addXP(Math.min(20,Math.round(m/10))); bumpStreak(); persist(); renderPersonal(); toast(fmtMin(m)+" 기록했습니다"); };
+  $$("#pLog [data-pldel]").forEach(function(b){ b.onclick=function(){
+    p.log=(p.log||[]).filter(function(l){return l.id!==b.dataset.pldel;}); persist(); renderPersonal(); }; });
+
+  /* 매주 루틴 */
+  $("#pRt").innerHTML= (p.routines||[]).length
+    ? rtStripHTML(p)+'<div class="hint" style="margin-top:8px">표지 픽토그램·「할 일」 탭과 같이 채워집니다. 학교 과목 다음 순서로 나옵니다.</div>'
+    : '<div class="empty" style="padding:14px 8px">아직 루틴이 없습니다.<br><span class="hint">「편집」으로 매주 반복할 일(예: 기출 1회분 · 강의 2편)을 넣으면 표지와 할 일 탭에 나옵니다.</span></div>';
+  bindRt($("#pRt"),function(){ renderPersonal(); });
+  bindRtSkip($("#pRt"),p,function(){ renderPersonal(); });
+  $("#pRoutine").onclick=function(){ routineSheet(p.id); };
+
+  /* 메모·링크 */
+  var links=p.links||[];
+  $("#pMemo").innerHTML=
+    '<textarea class="ta" id="pMemoTa" style="min-height:90px" placeholder="교재·강의·시험 일정·공부 방법 메모">'+esc(p.memo||"")+'</textarea>'+
+    '<div class="hint" style="margin-top:4px">입력하면 바로 저장됩니다.</div>'+
+    '<div class="field" style="margin-top:12px"><label>링크</label>'+
+      (links.length? links.map(function(l){
+        return '<div class="pc-linkrow"><a href="'+esc(l.u)+'" target="_blank" rel="noopener">'+esc(l.t||l.u)+'</a>'+
+          '<button class="iconbtn" data-pldl="'+l.id+'" aria-label="삭제">✕</button></div>'; }).join("") : '<div class="hint">아직 없음</div>')+
+      '<div class="row" style="gap:6px;margin-top:8px"><input class="input" id="plkT" placeholder="이름" style="flex:1 1 90px">'+
+      '<input class="input" id="plkU" placeholder="https://" style="flex:2 1 160px"><button class="btn xs" id="plkAdd" style="flex:0 0 auto">추가</button></div></div>';
+  $("#pMemoTa").onchange=function(){ p.memo=this.value; persist(); markSave(); };
+  $("#plkAdd").onclick=function(){
+    var u=$("#plkU").value.trim(); if(!u){ toast("주소를 넣어 주세요"); return; }
+    if(!/^https?:\/\//i.test(u)&&!/^notes\//.test(u)) u="https://"+u;
+    p.links=(p.links||[]).concat([{id:uid(),t:$("#plkT").value.trim(),u:u}]); persist(); renderPersonal(); };
+  $$("#pMemo [data-pldl]").forEach(function(b){ b.onclick=function(){
+    p.links=(p.links||[]).filter(function(l){return l.id!==b.dataset.pldl;}); persist(); renderPersonal(); }; });
+}
+/* 개인 공부 추가·편집 */
+function editPersonal(pid){
+  var p=pid?personal(pid):null, isNew=!p;
+  if(isNew) p={id:uid(),shelf:"personal",name:"",en:"",kind:"cert",goal:"",progress:0,deadline:"",memo:"",fav:false,done:false,
+    routines:[],rlog:{},log:[],milestones:[],links:[],createdAt:Date.now()};
+  openSheet({
+    wide:true,title:isNew?"개인 공부 추가":"개인 공부 편집",
+    body:'<div class="row"><div class="field" style="flex:2 1 220px"><label>이름</label>'+
+        '<input class="input" id="epName" value="'+esc(p.name)+'" placeholder="예: 일반기계기사 · 토익 · 아두이노 로봇"></div>'+
+      '<div class="field"><label>종류</label><select class="select" id="epKind">'+
+        PKINDS.map(function(k){ return '<option value="'+k[0]+'"'+(p.kind===k[0]?" selected":"")+'>'+k[1]+'</option>'; }).join("")+'</select></div></div>'+
+      '<div class="field" style="margin-top:11px"><label>목표 (한 줄)</label>'+
+        '<input class="input" id="epGoal" value="'+esc(p.goal||"")+'" placeholder="예: 2027년 1회차 필기 합격 · 850점 · 시연 가능한 프로토타입"></div>'+
+      '<div class="row" style="margin-top:11px"><div class="field"><label>목표일 (선택)</label>'+
+        '<input class="input mono" id="epDue" type="date" value="'+esc(p.deadline||"")+'"></div>'+
+      '<div class="field"><label>표지 영문명 (선택)</label><input class="input" id="epEn" value="'+esc(p.en||"")+'" placeholder="예: Engineer Exam"></div></div>'+
+      '<div class="hint" style="margin-top:12px">개인 책장은 학기·학점·출결·시험과 무관합니다. 진도는 상세 화면에서 직접 올리거나 단계를 넣어 자동 계산하고, 매주 루틴은 상세 화면 → 「매주 루틴 · 편집」에서 넣습니다.</div>',
+    actions:(isNew?[]:[{label:"삭제",cls:"dgr",fn:function(){
+        S.personal=(S.personal||[]).filter(function(x){return x.id!==p.id;});
+        Object.keys(S.weekly||{}).forEach(function(k){ S.weekly[k].items=S.weekly[k].items.filter(function(it){ return (it.key||"").indexOf("rt:"+p.id+":")!==0; }); });
+        persist(); closeSheet(); setShelfKind("personal",true); go("shelf"); toast("삭제했습니다"); }}])
+      .concat([{label:"취소",fn:closeSheet},{label:"저장",cls:"a",fn:function(){
+        p.name=$("#epName").value.trim()||"이름 없음";
+        p.kind=$("#epKind").value; p.goal=$("#epGoal").value.trim();
+        p.deadline=$("#epDue").value||""; p.en=$("#epEn").value.trim();
+        if(isNew){ S.personal=S.personal||[]; S.personal.push(p); }
+        persist(); closeSheet();
+        if(isNew){ setShelfKind("personal",true); go("pc",p.id); } else render();
+        toast(isNew?"개인 책장에 꽂았습니다":"저장했습니다"); }}]),
+    mount:function(root){ var el=$("#epName",root); if(el&&isNew) setTimeout(function(){ try{ el.focus(); }catch(e){} },30); }
+  });
+}
 /* 책 표지 롱프레스 메뉴 */
 function bookMenu(cid){
   var c=course(cid); if(!c) return;
@@ -3435,6 +3836,7 @@ function tile(l,v,n,cls){
 function renderCourse(){
   var c=course(ui.course);
   if(!c){ go("shelf"); return; }
+  if(isPersonal(c)){ go("pc",c.id); return; }
   var cv=coverage(c), sm=studyMode(c), at=attStats(c), md=MODES[sm.key];
 
   $("#cHead").className="chead t-"+c.typeA;
@@ -3455,16 +3857,13 @@ function renderCourse(){
     '<button class="btn sm" id="btnEditCourse">편집</button>'+
     '<button class="btn sm" id="btnAddExam">시험 추가</button>'+
     '<button class="btn sm" id="btnRoutine">매주 루틴</button></div>'+
-    ((c.routines||[]).length? '<div class="rt-strip">'+c.routines.map(function(r){ var mon=weeklyKey(today()), n=rtDone(c,r,mon), late=n<r.count&&rtLate(r,mon), arr=[];
-        if(rtSkipped(r,mon)) return '<span class="rg" style="opacity:.75"><span class="lb">'+esc(r.label)+'</span><span class="chip mut">이번 주 없음</span><button class="btn xs" data-rtskip="'+c.id+'|'+r.id+'">이번 주 있음으로</button></span>';
-        for(var i=0;i<r.count;i++) arr.push('<button class="pi'+(i<n?" on":"")+(late&&i>=n?" late":"")+'" data-rt="'+c.id+'|'+r.id+'|'+i+'" aria-label="'+esc(r.label)+' '+(i+1)+'/'+r.count+'">'+(RT_ICON[r.icon]||RT_ICON.doc)+'</button>');
-        return '<span class="rg"><span class="lb">'+esc(r.label)+'</span>'+arr.join("")+'<span class="n">'+n+'/'+r.count+' · '+(r.dow==0?"일":WK_DOW[r.dow])+'요일까지'+(late?' <span style="color:var(--crit)">지남</span>':"")+'</span><button class="iconbtn" data-rtskip="'+c.id+'|'+r.id+'" title="이번 주는 없음" aria-label="이번 주는 없음" style="width:20px;height:20px;font-size:11px">–</button></span>'; }).join("")+'</div>' : "");
+    rtStripHTML(c);
   $("#btnFavCourse").onclick=function(){
     c.fav=!c.fav; persist(); render();
     toast(c.fav?"즐겨찾기에 넣었습니다":"즐겨찾기를 해제했습니다"); };
   $("#btnEditCourse").onclick=function(){ editCourse(c.id); };
   $("#btnRoutine").onclick=function(){ routineSheet(c.id); };
-  $$("#cHead [data-rtskip]").forEach(function(b){ b.onclick=function(){ var p=b.dataset.rtskip.split("|"), r=(c.routines||[]).filter(function(x){return x.id===p[1];})[0]; if(!r) return; var mon=weeklyKey(today()); rtToggleSkip(c,r,mon); renderCourse(); toast(rtSkipped(r,mon)?"이번 주는 건너뜁니다 — 표지·할 일에서 빠집니다":"이번 주 항목을 다시 넣었습니다"); }; });
+  bindRtSkip($("#cHead"),c,function(){ renderCourse(); });
   bindRt($("#cHead"),function(){ renderCourse(); });
   $("#btnAddExam").onclick=function(){ addExam(c.id); };
   $("#btnHideCourse").onclick=function(){
@@ -3736,12 +4135,14 @@ function generateWeekly(mon){
   e.items.forEach(function(it){ if(it.key) have[it.key]=1; });
   var push=function(key,cat,text,due,src){ if(have[key]) return; have[key]=1; e.items.push({id:uid(),key:key,cat:cat,text:text,due:due||"",done:false,src:src||"자동"}); };
   var w=weekOf(mon)||currentWeek()||1, sun=addDays(mon,6);
-  /* ⓪ 과목별 매주 루틴 (표지 픽토그램과 동기화) */
-  courses().filter(isActive).forEach(function(c){
+  /* ⓪ 과목별 매주 루틴 (표지 픽토그램과 동기화) — 학교 과목 먼저, 개인 공부는 뒤에 */
+  var rtGen=function(c,src){
     (c.routines||[]).forEach(function(r){ var n=rtDone(c,r,mon); if(rtSkipped(r,mon)) return;
       for(var i=1;i<=r.count;i++){ var key="rt:"+c.id+":"+r.id+":"+i; if(have[key]) continue; have[key]=1;
-        e.items.push({id:uid(),key:key,cat:r.cat||"hw",text:c.name+" · "+r.label+(r.count>1?" ("+i+"/"+r.count+")":""),due:rtDue(mon,r.dow),done:i<=n,src:"매주 루틴"}); } });
-  });
+        e.items.push({id:uid(),key:key,cat:r.cat||"hw",text:c.name+" · "+r.label+(r.count>1?" ("+i+"/"+r.count+")":""),due:rtDue(mon,r.dow),done:i<=n,src:src}); } });
+  };
+  courses().filter(isActive).forEach(function(c){ rtGen(c,"매주 루틴"); });
+  personals().forEach(function(p){ rtGen(p,"개인 루틴"); });
   /* ① 규칙 */
   (S.profile.weeklyRules||[]).forEach(function(r){
     var dow=+r.dow; var due= dow===0 ? sun : addDays(mon, dow-1);
@@ -3831,6 +4232,7 @@ function renderWeekly(){
     /* 책장 순서대로, 공통은 맨 뒤 */
     var cs=courses().filter(function(c){return groups[c.id];});
     var blocks=cs.map(function(c){ return {id:c.id,name:c.name,cls:"t-"+c.typeA,its:groups[c.id]}; });
+    personalsAll().filter(function(p){return groups[p.id];}).forEach(function(p){ blocks.push({id:p.id,name:p.name,cls:pCls(p),its:groups[p.id]}); });
     if(groups._) blocks.push({id:"_",name:"공통",cls:"",its:groups._});
     html='<div class="wkt">'+blocks.map(function(g){
       var its=g.its.sort(sortWk), dn=its.filter(function(i){return i.done;}).length;
@@ -3855,7 +4257,9 @@ function renderWeekly(){
     html+=ws.map(function(w){
       var W=weeks[w], its=W.items, dn=its.filter(function(x){ return x.kind==="wk"?x.it.done:x.t.done; }).length;
       var byC={}, ord=[]; its.forEach(function(x){ var k=x.cid||"_"; if(!byC[k]){ byC[k]=[]; ord.push(k); } byC[k].push(x); });
-      var cs=courses().filter(function(c){return byC[c.id];}).map(function(c){return {id:c.id,name:c.name,cls:"t-"+c.typeA};}); if(byC._) cs.push({id:"_",name:"공통",cls:""});
+      var cs=courses().filter(function(c){return byC[c.id];}).map(function(c){return {id:c.id,name:c.name,cls:"t-"+c.typeA};});
+      personalsAll().filter(function(p){return byC[p.id];}).forEach(function(p){ cs.push({id:p.id,name:p.name,cls:pCls(p)}); });
+      if(byC._) cs.push({id:"_",name:"공통",cls:""});
       var open=(w===cw);
       return '<div class="wkweek"><h3>'+(w?w+"주차":"주차 미정")+(w===cw?' <span class="chip acc">이번 주</span>':"")+'<span class="n">'+(W.mon?fmtDate(W.mon)+" 주 · ":"")+dn+'/'+its.length+' 완료</span></h3>'+
         '<div class="wkt">'+cs.map(function(g){
@@ -3936,6 +4340,7 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-07.17",d:"09-07",items:["책장을 「학교 수업」과 「개인 공부」 두 책장으로 분리(상단 세그먼트, 마지막 선택 기억)","개인 책장: 자격증·독학·프로젝트·어학·기타 종류, 목표 한 줄·목표일 D-day·진도(직접 입력 또는 단계 완료율 자동)·학습 기록(분 단위 누적·이번 주)·메모·링크","개인 공부에도 매주 루틴 — 표지 픽토그램·할 일 탭에 학교 과목 다음 순서로 포함, 완료 처리하면 책장·할 일에서 빠짐","개인 책장은 학점 계산·출결·시험·복습 큐에서 제외"]},
   {v:"2026-09-07.16",d:"09-07",items:["정역학 9/2(수) 회차: 출석 인정 어렵다는 답변에 따라 「출결 제외」 → 「결석」으로 계산"]},
   {v:"2026-09-07.15",d:"09-07",items:["정역학 루틴 「과제 제출 ×1(수요일)」 추가 — 이번 주(9/7 주)는 없음으로 표시","루틴마다 「이번 주 없음」 토글(과목 화면 – 버튼): 그 주만 표지·할 일에서 빠지고 다음 주 자동 복귀"]},
   {v:"2026-09-07.14",d:"09-07",items:["할 일 탭에 전체 / 과제·제출 / 복습 / 예습 선택 탭 — 세 보기(묶음별·과목별·주차별) 모두에 적용, 선택 기억"]},
@@ -5845,6 +6250,7 @@ function render(){
   renderGauges(); tickDday();
   if(ui.view==="shelf") renderShelf();
   else if(ui.view==="course") renderCourse();
+  else if(ui.view==="pc") renderPersonal();
   else if(ui.view==="today") renderToday();
   else if(ui.view==="todo") renderTodo();
   else if(ui.view==="notes") renderNotes();
@@ -6055,6 +6461,8 @@ function boot(){
   $$("[data-go]").forEach(function(b){ b.onclick=function(){ go(b.dataset.go); }; });
 
   $$("#shelfView button").forEach(function(b){ b.onclick=function(){ setShelfView(b.dataset.v); }; });
+  $$("#shelfKind button").forEach(function(b){ b.onclick=function(){ setShelfKind(b.dataset.k); }; });
+  $("#pcBack").onclick=function(){ setShelfKind("personal",true); go("shelf"); };
 
   ui.day=today();
   $$("#weekNav button").forEach(function(b){ b.onclick=function(){
@@ -6079,7 +6487,7 @@ function boot(){
   $("#calAdd").onclick=function(){ planSheet(null, ui.calDate||today()); };
 
   $("#btnImportTT").onclick=importTT;
-  $("#btnAddCourse").onclick=function(){ editCourse(null); };
+  $("#btnAddCourse").onclick=function(){ if(shelfKind()==="personal") editPersonal(null); else editCourse(null); };
   $("#btnAddHist").onclick=function(){ histSheet(null); };
   $("#btnGradePrompt").onclick=gradePrompt;
   $("#btnRetakeRule").onclick=retakeRuleSheet;
