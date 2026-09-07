@@ -1860,7 +1860,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-07.5";
+var BUILD="2026-09-07.6";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -5702,6 +5702,14 @@ function boot(){
     try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   })();
 
+  if(!S.patchHistoryV2){
+    var _h=S.history.filter(function(h){return h.name==="2026 여름학기";})[0];
+    if(_h){ _h.courses.forEach(function(c){ if(c.name.indexOf("행복한금융생활")===0&&!c.letter) c.letter="B+"; if(c.name.indexOf("미분적분학2")===0){ if(!c.letter) c.letter="D+"; c.retake=true; } });
+      var _a=semAgg(_h); _h.credits=_a.cr; _h.gpa=_a.gpa; }
+    var _cur=term().courses.filter(function(c){return c.name==="미분적분학2";})[0];
+    if(_cur){ _cur.isRetake=true; if(!_cur.maxGrade) _cur.maxGrade=S.profile.retakeMaxGrade||"A0"; }
+    S.patchHistoryV2=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+  }
   if(!S.patchCoverV1){ var _sv=term().courses.filter(function(c){return c.name==="사회봉사";})[0]; if(_sv){ _sv.coverTag="주2회 카드뉴스 업로드"; term().exams=term().exams.filter(function(e){return e.courseId!==_sv.id;}); } S.patchCoverV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
   if(!S.patchDdayV1){ if(!S.profile.dday) S.profile.dday={date:"2026-10-19",label:"중간"}; S.patchDdayV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
   ensureWeekly();              // 매주 월요일 할 일 생성 (없으면 지금)
@@ -5720,7 +5728,7 @@ function boot(){
     }
     if(!has("2026 여름학기")){
       var h2={id:uid(),name:"2026 여름학기",courses:[
-        C("행복한금융생활",3,"","교양선택"), C("미분적분학2 (계절, 장우성)",3,"","MSC")]};
+        C("행복한금융생활",3,"B+","교양선택"), C("미분적분학2 (계절, 장우성)",3,"D+","MSC",true)]};
       var a2=semAgg(h2); h2.credits=a2.cr; h2.gpa=a2.gpa; S.history.push(h2);
     }
     S.patchHistoryV1=true;
