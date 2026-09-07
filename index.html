@@ -1860,7 +1860,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-07.4";
+var BUILD="2026-09-07.5";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -1897,7 +1897,7 @@ function seedTerm(){
        slots:[{d:2,s:"13:00",e:"19:00",room:"1공 306 CAD실"}]}),
     C({name:"창업아이디어탐색",en:"Startup Ideation",credits:2,bucket:"교양선택",typeA:"MAKE",
        slots:[{d:1,s:"11:00",e:"13:00",room:"해동부스트업룸"}]}),
-    C({name:"사회봉사",en:"Community Service",credits:1,bucket:"기타",typeA:"NONE",slots:[]})
+    C({name:"사회봉사",en:"Community Service",credits:1,bucket:"기타",typeA:"NONE",slots:[],coverTag:"주2회 카드뉴스 업로드"})
   ];
   t.seedV=1;
   return t;
@@ -3069,6 +3069,7 @@ function tickDday(){
 var EMBLEM={CALC:"∫",CONCEPT:"◎",MEMO:"▤",LANG:"文",WRITE:"¶",MAKE:"◈",NONE:"○"};
 /* 시험 구성 — "중간·기말" / "중간만" / "기말만" / "" */
 function examBadge(c){
+  if(c.coverTag) return c.coverTag;            /* 시험이 없는 과목의 표지 문구 (예: 사회봉사 → 주2회 카드뉴스 업로드) */
   var es=exams(c.id);
   var mid=false, fin=false;
   es.forEach(function(e){ if(e.kind==="중간") mid=true; if(e.kind==="기말") fin=true; });
@@ -5701,6 +5702,7 @@ function boot(){
     try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   })();
 
+  if(!S.patchCoverV1){ var _sv=term().courses.filter(function(c){return c.name==="사회봉사";})[0]; if(_sv){ _sv.coverTag="주2회 카드뉴스 업로드"; term().exams=term().exams.filter(function(e){return e.courseId!==_sv.id;}); } S.patchCoverV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
   if(!S.patchDdayV1){ if(!S.profile.dday) S.profile.dday={date:"2026-10-19",label:"중간"}; S.patchDdayV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
   ensureWeekly();              // 매주 월요일 할 일 생성 (없으면 지금)
 
