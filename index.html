@@ -1937,7 +1937,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-07.12";
+var BUILD="2026-09-07.13";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -3167,7 +3167,7 @@ function routineDefaults(name){
     case "사회봉사": return [R("카드뉴스 업로드","upload",2,0),R("보고서 제출","doc",1,0)];
     case "창업아이디어탐색": return [R("수업 후 과제","doc",1,0)];
     case "CADD": return [R("강의영상 시청 (월 업로드 → 수요일 전)","play",1,2)];
-    case "공업수학1": return [R("문제풀이 과제 제출","doc",1,3)];
+    case "공업수학1": return [R("문제풀이 과제 제출 (금 출제 → 수 제출)","doc",1,3)];
     case "미분적분학2": return [R("수업 복습","loop",2,0,"review")];
     case "일반물리학2": return [R("수업 내용 정리","pencil",2,0,"review")];
     default: return [];
@@ -3913,6 +3913,7 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-07.13",d:"09-07",items:["공업수학1 과제 주기 확정: 금요일 출제 → 수요일 제출(루틴 라벨). 1주차 과제만 예외로 9/11(금) 수업 시간 제출 — 할 일·주차 정리 마감 갱신"]},
   {v:"2026-09-07.12",d:"09-07",items:["과목 현황 학습모드에 「M8 과제제출형」 추가 — 사회봉사는 출석유지형 대신 이걸로"]},
   {v:"2026-09-07.11",d:"09-07",items:["과목 유형 「과제 제출형」 추가 — 사회봉사에 적용(과목 현황·표지 문구)","할 일 탭: 묶음별 / 과목별 / 주차별 보기 전환(선택 기억)","할 일 탭 글자 잘림 수정(시간표용 .tt 클래스 충돌)","설정에 패치 노트 카드 · 저장소에 CHANGELOG.md"]},
   {v:"2026-09-07.10",d:"09-07",items:["과목별 매주 루틴: 표지·과목 화면 픽토그램(회색→채움, 마감 지나면 빨간 테두리), 탭으로 완료","루틴 ↔ 할 일 양방향 동기화, 과목별 기본값(사회봉사·창업·CADD·공업수학1·미적2·물리2)","설정의 CADD·카드뉴스 규칙은 루틴으로 이관"]},
@@ -5886,7 +5887,7 @@ function boot(){
       exam:[{t:"녹음 9/4 04:06",quote:"특이해는 해는 해인데 공학적으로 의미가 없는 해. 관심 가질 해는 일반해와 특수해만. 특이해는 거의 안 할 거다.",memo:"특이해 유도는 제외, 정의만"},
             {t:"녹음 9/4 04:06",quote:"선형 위주로 할 거고 비선형은 거의 안 할 거야. 비선형은 특이한 경우만.",memo:"1장의 변수분리·동차·Bernoulli처럼 선형으로 바꾸는 꼴만"},
             {t:"슬라이드 p.4–5",quote:"Written test 80% (중간 40 · 기말 40). 과제 미제출 −1.0/회, 지각제출 −0.5/회(2주까지). 결석 −0.5, 지각 −0.25. 1/3 이상 결석·시험 미응시·원점수 30 미만 F.",memo:""}],
-      tasks:[{id:uid(),text:"1주차 과제 Kreyszig 1.3 #6·7·8·16·17 — 수업 전 교탁 제출",due:"2026-09-09",done:false,src:"판서 9/4"},
+      tasks:[{id:uid(),text:"1주차 과제 Kreyszig 1.3 #6·7·8·16·17 — 이번 주만 금요일 수업 시간 제출 (평소는 금요일 출제 → 수요일 제출)",due:"2026-09-11",done:false,src:"판서 9/4"},
              {id:uid(),text:"Ch.2(2계 ODE, 4~5주차) 강의자료 확보 — 중간고사 핵심 구간",due:"2026-09-16",done:false,src:"자료 점검"}],
       links:[{label:"1계 ODE 쉬운 정리 (개념·공식·문제·풀이·교육과정)",url:"notes/em-ch1-easy.html"},
              {label:"9/2 결석 보강 — 모델화부터 선형·비선형까지 (p.10–17)",url:"notes/em-0902-makeup.html"},
@@ -6100,6 +6101,18 @@ function boot(){
     Object.keys(S.weekly||{}).forEach(function(k){ S.weekly[k].items=S.weekly[k].items.filter(function(it){ return it.key!=="rule:r1"&&it.key!=="rule:r2"; }); });
     var _mon=weeklyKey(today()); if(S.weekly&&S.weekly[_mon]) generateWeekly(_mon);
     S.patchRoutineV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+  }
+  if(!S.patchEmHwV1){
+    /* 공업수학1 1주차 과제: 이번 주(9/7 주)만 금요일 9/11 수업 시간 제출 예외 */
+    var _em=term().courses.filter(function(c){return c.name==="공업수학1";})[0];
+    if(_em){
+      var _n1=_em.weekNotes&&_em.weekNotes[1]; if(_n1&&_n1.tasks) _n1.tasks.forEach(function(t){ if(/^1주차 과제 Kreyszig/.test(t.text||"")){ t.due="2026-09-11"; t.text="1주차 과제 Kreyszig 1.3 #6·7·8·16·17 — 이번 주만 금요일 수업 시간 제출 (평소는 금요일 출제 → 수요일 제출)"; } });
+      (_em.routines||[]).forEach(function(r){ if(r.icon==="doc") r.label="문제풀이 과제 제출 (금 출제 → 수 제출)"; });
+      var _wk=S.weekly&&S.weekly["2026-09-07"]; if(_wk) _wk.items.forEach(function(it){ var k=it.key||"";
+        if(k.indexOf("rt:"+_em.id+":")===0){ it.due="2026-09-11"; it.text=it.text.replace(/\s*\(\d\/\d\)$/,"")+" — 이번 주만 금요일 수업 제출"; }
+        if(k.indexOf("task:")===0&&/^공업수학1 · 1주차 과제 Kreyszig/.test(it.text||"")){ it.due="2026-09-11"; it.text="공업수학1 · 1주차 과제 Kreyszig 1.3 #6·7·8·16·17 — 이번 주만 금요일 수업 시간 제출"; } });
+    }
+    S.patchEmHwV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   }
   if(!S.patchSubmitV1){ var _sv3=term().courses.filter(function(c){return c.name==="사회봉사";})[0]; if(_sv3&&_sv3.typeA==="NONE") _sv3.typeA="SUBMIT"; S.patchSubmitV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
   if(!S.patchFutureV1){ if(!Array.isArray(S.futureTerms)||!S.futureTerms.length) S.futureTerms=futureDefaults(); S.grad={total:130}; S.patchFutureV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
