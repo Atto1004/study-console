@@ -533,6 +533,13 @@ td.n,th.n{text-align:right;font-family:var(--font-num);font-variant-numeric:tabu
 .bk-rt .pi.late{opacity:.9;box-shadow:inset 0 0 0 1.6px #FF5A4E}
 .bk-rt .pi:hover{transform:scale(1.15);opacity:1}
 .shelf.spine .bk-rt{display:none}
+/* 표지 세로 배분 — 고정 높이 안에서 픽토그램·배지 줄이 늘어나도 제목은 줄지 않는다.
+   엠블럼·제목·구분선·발치는 flex-shrink 0, 영문 부제(.bk-en)가 먼저 접힌다. 픽토그램은 한 줄 고정. */
+.bk-em,.bk-t,.bk-rule,.bk-foot{flex-shrink:0}
+.bk-en{flex:0 100 auto;min-height:0}
+.bk-rt{flex-wrap:nowrap;overflow:hidden}
+.bk-rt .rg{flex:0 1 auto;min-width:0;overflow:hidden}
+.shelf.spine .bk-t{flex:1 1 auto}
 /* 과목 상세 상단 루틴 띠 */
 .rt-strip{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px;flex:1 1 100%}
 .rt-strip .rg{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:12.5px}
@@ -822,7 +829,7 @@ th{font-size:clamp(9.5px,0.2vw + 9px,10.5px)}
   .sheet-b .grid.g3{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:420px){
-  .shelf{--bkH:172px;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:22px 10px}
+  .shelf{--bkH:182px;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:22px 10px}
   .gauge{padding:7px 10px}
   .main{padding:12px 10px 96px}
   .card-b{padding:12px}
@@ -2010,7 +2017,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-07.17";
+var BUILD="2026-09-07.18";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -3238,7 +3245,7 @@ function renderGauges(){
   var g=[];
   if(ex){
     var dd=diffDays(today(),ex.date);
-    g.push({l:(ex.kind==="중간"?"중간고사":ex.kind==="기말"?"기말고사":ex.kind)+(ex.pinned?" (고정)":""),v:"D-"+dd,
+    g.push({l:(ex.kind==="중간"?"중간고사":ex.kind==="기말"?"기말고사":ex.kind),v:"D-"+dd,
       s:fmtDate(ex.date),cls:(dd<=7?"hot":dd<=14?"near":"calm")+" hero",id:"gDday"});
   } else {
     g.push({l:"다가오는 시험",v:"미등록",s:"시험을 추가하세요",cls:"calm hero"});
@@ -4252,7 +4259,8 @@ function renderWeekly(){
     var seen={}; Object.keys(weeks).forEach(function(w){ weeks[w].items.forEach(function(x){ if(x.it.key&&x.it.key.indexOf("task:")===0) seen[x.it.key.slice(5)]=1; }); });
     if(tcat==="all"||tcat==="hw") allTasks().forEach(function(x){ if(seen[x.t.id]) return; addW(x.w,{kind:"task",c:x.c,w:x.w,t:x.t,cid:x.c.id}); });
     Object.keys(weeks).forEach(function(w){ if(!weeks[w].items.length) delete weeks[w]; });
-    var cw=currentWeek()||1, ws=Object.keys(weeks).map(Number).sort(function(a,b){return b-a;});
+    /* 주차 오름차순(1주차가 위) — 지난 주에 안 한 것이 이번 주보다 먼저 보이도록. 주차 미정(0)은 맨 뒤 */
+    var cw=currentWeek()||1, ws=Object.keys(weeks).map(Number).sort(function(a,b){ if(!a!==!b) return a?-1:1; return a-b; });
     if(!ws.length) html='<div class="hint">아직 항목이 없습니다.</div>';
     html+=ws.map(function(w){
       var W=weeks[w], its=W.items, dn=its.filter(function(x){ return x.kind==="wk"?x.it.done:x.t.done; }).length;
@@ -4264,7 +4272,9 @@ function renderWeekly(){
       return '<div class="wkweek"><h3>'+(w?w+"주차":"주차 미정")+(w===cw?' <span class="chip acc">이번 주</span>':"")+'<span class="n">'+(W.mon?fmtDate(W.mon)+" 주 · ":"")+dn+'/'+its.length+' 완료</span></h3>'+
         '<div class="wkt">'+cs.map(function(g){
           var arr=byC[g.id], d2=arr.filter(function(x){ return x.kind==="wk"?x.it.done:x.t.done; }).length;
-          return '<details class="g '+g.cls+'"'+(open?" open":"")+'><summary><h4 style="margin:0"><span class="cchip">'+esc(g.name)+'</span><span class="n">'+d2+'/'+arr.length+'</span></h4></summary>'+
+          /* 이번 주는 펼침, 지난 주는 미완 항목이 남은 묶음만 펼침 */
+          var openG=open||(w&&w<cw&&d2<arr.length);
+          return '<details class="g '+g.cls+'"'+(openG?" open":"")+'><summary><h4 style="margin:0"><span class="cchip">'+esc(g.name)+'</span><span class="n">'+d2+'/'+arr.length+'</span></h4></summary>'+
             arr.sort(function(p,q){ var A=p.kind==="wk"?p.it:{done:p.t.done,due:p.t.due}, B=q.kind==="wk"?q.it:{done:q.t.done,due:q.t.due}; return sortWk(A,B); }).map(function(x){
               if(x.kind==="wk") return wkItemHTML(x.it,x.mon,td,{showCat:true,stripCourse:true,cname:g.name});
               var t=x.t, dd=t.due?diffDays(td,t.due):null, cls=dd===null?"":dd<0?"over":dd<=1?"soon":"";
@@ -4340,6 +4350,7 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-07.18",d:"09-07",items:["표지 제목 잘림 수정 — 루틴 픽토그램·배지 줄이 늘어나도 제목·엠블럼은 줄지 않고 영문 부제가 먼저 접힘, 픽토그램은 한 줄 고정, 휴대폰 표지 높이 소폭 확대","할 일 탭 주차별 보기: 1주차부터 오름차순(지난 주 미완 항목이 이번 주 위에), 지난 주는 미완이 남은 묶음만 펼침","사회봉사 규정 반영: 봉사 30시간(9/2~11/29)·소감문 보고서 포털 입력(9/9~11/30, 3,000byte)·체리 회차 5개 마감·평가간담회를 과제·할 일과 과목 자료(강의계획서)에 추가","상단 D-day 라벨에서 「(고정)」 표시 제거"]},
   {v:"2026-09-07.17",d:"09-07",items:["책장을 「학교 수업」과 「개인 공부」 두 책장으로 분리(상단 세그먼트, 마지막 선택 기억)","개인 책장: 자격증·독학·프로젝트·어학·기타 종류, 목표 한 줄·목표일 D-day·진도(직접 입력 또는 단계 완료율 자동)·학습 기록(분 단위 누적·이번 주)·메모·링크","개인 공부에도 매주 루틴 — 표지 픽토그램·할 일 탭에 학교 과목 다음 순서로 포함, 완료 처리하면 책장·할 일에서 빠짐","개인 책장은 학점 계산·출결·시험·복습 큐에서 제외"]},
   {v:"2026-09-07.16",d:"09-07",items:["정역학 9/2(수) 회차: 출석 인정 어렵다는 답변에 따라 「출결 제외」 → 「결석」으로 계산"]},
   {v:"2026-09-07.15",d:"09-07",items:["정역학 루틴 「과제 제출 ×1(수요일)」 추가 — 이번 주(9/7 주)는 없음으로 표시","루틴마다 「이번 주 없음」 토글(과목 화면 – 버튼): 그 주만 표지·할 일에서 빠지고 다음 주 자동 복귀"]},
@@ -6559,6 +6570,46 @@ function boot(){
     if(_st2){ var _ss=term().sessions.filter(function(x){return x.courseId===_st2.id&&x.date==="2026-09-02";})[0];
       if(_ss&&_ss.cancelled&&!_ss.status){ _ss.cancelled=false; _ss.status="absent"; _ss.memo="결석 — 수강정정 전(9/3 신청)이라 출석 인정 요청했으나 9/7 「인정 어렵다」 답변. 내용은 오리엔테이션(OT 슬라이드로 대체)"; } }
     S.patchStaticsAttV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+  }
+  if(!S.patchSvStepsV1){
+    /* 사회봉사 2·3단계 규정(2026-09-07 사용자 전달): 봉사활동 30시간(9/2~11/29) + 소감문 보고서 포털 입력(9/9~11/30) */
+    var _sv4=term().courses.filter(function(c){return c.name==="사회봉사";})[0];
+    if(_sv4){
+      if(!(_sv4.syllabus||"").trim()) _sv4.syllabus=
+        "[1단계] 사회봉사단 소양교육 — LMS(2026-09-01 이후 닫힘). 기간 내 이수해야 2단계 시작 가능.\n\n"+
+        "[2단계] 봉사활동 30시간 — 2026-09-02(수) ~ 11-29(일)\n"+
+        "- 수강신청한 봉사기관(수강신청내역)에서 진행. 기관 오리엔테이션 완료 후 봉사활동 시작.\n"+
+        "- 기간 내 반드시 30시간 이상 이수.\n\n"+
+        "[3단계] 사회봉사 보고서(소감문) — 포털 입력 2026-09-09(수) ~ 11-30(월)\n"+
+        "- 한양인 포털 → 수업 → 사회봉사 → 사회봉사보고서제출: 기관평가/자기평가 후 소감문 보고서 입력.\n"+
+        "- 봉사활동 전반 소감을 에세이 형식으로 3,000byte 이상. 과도한 띄어쓰기·공란·단락(엔터) 없이.\n"+
+        "- 저장 클릭 후 버튼이 「수정」으로 바뀌는지 본인이 확인(최종 입력 확인 필수).\n\n"+
+        "━━ 체리 기부 플랫폼 봉사활동 안내(2학기 ERICA) ━━\n"+
+        "- 회차: 1회차 9/7~9/20 · 2회차 9/21~10/4 · 3회차 10/5~10/18 · 4회차 10/19~11/1 · 5회차 11/2~11/15. 회차마다 콘텐츠 제작·SNS 게시 2회 + 결과보고서(콘텐츠 1건당 1개) 체리플랫폼 제출. 몰아서 제출 불가, 회차 일정 미준수 시 참여 불가.\n"+
+        "- 시간 인정: 카드뉴스(6컷 이상) 1개 3시간 · 동영상(30초 이상) 1개 5시간. 캠페인당 1가지 유형 1개만. 학기 30시간 = 카드뉴스 10건(회차당 2건, 여유 없음).\n"+
+        "- 검토: 제출 주의 다음 주 수요일까지 승인/반려. 반려 건은 수시 재제출.\n"+
+        "- 게시: 본인 SNS(인스타·트위터·페북·유튜브·네이버 블로그만, 팔로워 30명 이상). 필수 해시태그 #(단체명) #(학교명) #온라인봉사학교 #체리스쿨 #체리플랫폼 #기부좋은날체리 #블록체인기부. 인스타는 캡션+댓글에 나눠 전부 기재.\n"+
+        "- 결과보고서(docx 양식 → PDF, 파일명 [한양대 ERICA]_[본인이름]_봉사활동결과보고서.pdf): 성명·학교명·학번·연락처·단체명·캠페인명·활동일(시~분, 총 시간)·활동내용(시간대별 과정 상세)·느낀 점·증빙(본인 얼굴+작업 화면 사진 1장, 결과물 게시글 캡처 1장, 게시글 URL).\n"+
+        "- 주의: 1365·VMS에 반영 안 됨(증빙은 성적표). 온라인 강의 수강 시간은 봉사시간 아님. 캠페인 단순 복사·캡처 금지, 저작권·초상권 주의. 11/26(목) 14시 ZOOM 평가간담회.\n"+
+        "- 문의: 체리 yoonju.lee@cherrycorp.io / 02-565-8606";
+      [[3,"1회차",'9/7~9/20',"2026-09-20"],[5,"2회차",'9/21~10/4',"2026-10-04"],[7,"3회차",'10/5~10/18',"2026-10-18"],[9,"4회차",'10/19~11/1',"2026-11-01"],[11,"5회차",'11/2~11/15',"2026-11-15"]].forEach(function(r){
+        var _n=weekNote(_sv4,r[0],true);
+        if(!_n.tasks.some(function(t){return (t.text||"").indexOf(r[1])===0;}))
+          _n.tasks.push({id:uid(),text:r[1]+" 콘텐츠 2건 SNS 게시 + 결과보고서 2건 체리플랫폼 제출 ("+r[2]+")",due:r[3],done:false,src:"체리 회차 일정"});
+        if(!_n.summary) _n.summary="체리 "+r[1]+" 마감 ("+r[2]+")";
+      });
+      var _n13=weekNote(_sv4,13,true);
+      if(!_n13.tasks.some(function(t){return /평가간담회/.test(t.text||"");}))
+        _n13.tasks.push({id:uid(),text:"체리 ZOOM 평가간담회 참석 — 11/26(목) 14시",due:"2026-11-26",done:false,src:"체리 회차 일정"});
+      if(!_n13.tasks.some(function(t){return /30시간/.test(t.text||"");}))
+        _n13.tasks.push({id:uid(),text:"봉사활동 30시간 이수 완료 — 9/2~11/29, 기관 OT 후 시작 (2단계)",due:"2026-11-29",done:false,src:"사회봉사 규정"});
+      var _n14=weekNote(_sv4,14,true);
+      if(!_n14.tasks.some(function(t){return /소감문/.test(t.text||"");}))
+        _n14.tasks.push({id:uid(),text:"소감문 보고서 포털 입력 — 9/9부터 가능, 기관평가/자기평가 후 3,000byte 이상, 띄어쓰기·공란·단락 없이, 저장→「수정」 버튼 확인 (3단계)",due:"2026-11-30",done:false,src:"사회봉사 규정"});
+      if(!_n13.summary) _n13.summary="봉사활동 마감 주 (30시간 이수 11/29까지)";
+      if(!_n14.summary) _n14.summary="소감문 보고서 입력 마감 (11/30)";
+    }
+    S.patchSvStepsV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   }
   if(!S.patchSubmitV1){ var _sv3=term().courses.filter(function(c){return c.name==="사회봉사";})[0]; if(_sv3&&_sv3.typeA==="NONE") _sv3.typeA="SUBMIT"; S.patchSubmitV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
   if(!S.patchFutureV1){ if(!Array.isArray(S.futureTerms)||!S.futureTerms.length) S.futureTerms=futureDefaults(); S.grad={total:130}; S.patchFutureV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
