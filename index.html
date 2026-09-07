@@ -1943,7 +1943,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-07.14";
+var BUILD="2026-09-07.15";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -3174,10 +3174,19 @@ function routineDefaults(name){
     case "창업아이디어탐색": return [R("수업 후 과제","doc",1,0)];
     case "CADD": return [R("강의영상 시청 (월 업로드 → 수요일 전)","play",1,2)];
     case "공업수학1": return [R("문제풀이 과제 제출 (금 출제 → 수 제출)","doc",1,3)];
+    case "정역학": { var st=R("과제 제출","doc",1,3); st.skip=["2026-09-07"]; return [st]; }
     case "미분적분학2": return [R("수업 복습","loop",2,0,"review")];
     case "일반물리학2": return [R("수업 내용 정리","pencil",2,0,"review")];
     default: return [];
   }
+}
+function rtSkipped(r,mon){ return Array.isArray(r.skip)&&r.skip.indexOf(mon)>=0; }
+function rtToggleSkip(c,r,mon){
+  r.skip=Array.isArray(r.skip)?r.skip:[];
+  var i=r.skip.indexOf(mon);
+  if(i<0){ r.skip.push(mon); if(S.weekly&&S.weekly[mon]) S.weekly[mon].items=S.weekly[mon].items.filter(function(it){ return (it.key||"").indexOf("rt:"+c.id+":"+r.id+":")!==0; }); }
+  else { r.skip.splice(i,1); if(S.weekly&&S.weekly[mon]) generateWeekly(mon); }
+  persist();
 }
 function rtDone(c,r,mon){ var L=c.rlog&&c.rlog[mon]; return L&&L[r.id]?Math.min(+L[r.id]||0,r.count):0; }
 function rtSet(c,r,mon,n){ if(!c.rlog) c.rlog={}; if(!c.rlog[mon]) c.rlog[mon]={}; c.rlog[mon][r.id]=clamp(n,0,r.count); }
@@ -3193,8 +3202,8 @@ function rtFromWeekly(mon){ var e=S.weekly&&S.weekly[mon]; if(!e) return;
     var k=e.items.filter(function(it){ return it.done && (it.key||"").indexOf("rt:"+c.id+":"+r.id+":")===0; }).length;
     if(e.items.some(function(it){ return (it.key||"").indexOf("rt:"+c.id+":"+r.id+":")===0; })) rtSet(c,r,mon,k); }); }); }
 function rtHTML(c,cls){
-  var rs=c.routines||[]; if(!rs.length) return "";
   var mon=weeklyKey(today());
+  var rs=(c.routines||[]).filter(function(r){ return !rtSkipped(r,mon); }); if(!rs.length) return "";
   return '<span class="'+cls+'">'+rs.map(function(r){ var n=rtDone(c,r,mon), late=n<r.count&&rtLate(r,mon), arr=[];
     for(var i=0;i<r.count;i++) arr.push('<span class="pi'+(i<n?" on":"")+(late&&i>=n?" late":"")+'" data-rt="'+c.id+'|'+r.id+'|'+i+'" role="button" tabindex="0" title="'+esc(r.label)+' '+(i+1)+'/'+r.count+(late?" · 마감 지남":"")+'">'+(RT_ICON[r.icon]||RT_ICON.doc)+'</span>');
     return '<span class="rg" title="'+esc(r.label)+' · '+(r.dow==0?"일":WK_DOW[r.dow])+'요일까지">'+arr.join("")+'</span>'; }).join("")+'</span>';
@@ -3447,13 +3456,15 @@ function renderCourse(){
     '<button class="btn sm" id="btnAddExam">시험 추가</button>'+
     '<button class="btn sm" id="btnRoutine">매주 루틴</button></div>'+
     ((c.routines||[]).length? '<div class="rt-strip">'+c.routines.map(function(r){ var mon=weeklyKey(today()), n=rtDone(c,r,mon), late=n<r.count&&rtLate(r,mon), arr=[];
+        if(rtSkipped(r,mon)) return '<span class="rg" style="opacity:.75"><span class="lb">'+esc(r.label)+'</span><span class="chip mut">이번 주 없음</span><button class="btn xs" data-rtskip="'+c.id+'|'+r.id+'">이번 주 있음으로</button></span>';
         for(var i=0;i<r.count;i++) arr.push('<button class="pi'+(i<n?" on":"")+(late&&i>=n?" late":"")+'" data-rt="'+c.id+'|'+r.id+'|'+i+'" aria-label="'+esc(r.label)+' '+(i+1)+'/'+r.count+'">'+(RT_ICON[r.icon]||RT_ICON.doc)+'</button>');
-        return '<span class="rg"><span class="lb">'+esc(r.label)+'</span>'+arr.join("")+'<span class="n">'+n+'/'+r.count+' · '+(r.dow==0?"일":WK_DOW[r.dow])+'요일까지'+(late?' <span style="color:var(--crit)">지남</span>':"")+'</span></span>'; }).join("")+'</div>' : "");
+        return '<span class="rg"><span class="lb">'+esc(r.label)+'</span>'+arr.join("")+'<span class="n">'+n+'/'+r.count+' · '+(r.dow==0?"일":WK_DOW[r.dow])+'요일까지'+(late?' <span style="color:var(--crit)">지남</span>':"")+'</span><button class="iconbtn" data-rtskip="'+c.id+'|'+r.id+'" title="이번 주는 없음" aria-label="이번 주는 없음" style="width:20px;height:20px;font-size:11px">–</button></span>'; }).join("")+'</div>' : "");
   $("#btnFavCourse").onclick=function(){
     c.fav=!c.fav; persist(); render();
     toast(c.fav?"즐겨찾기에 넣었습니다":"즐겨찾기를 해제했습니다"); };
   $("#btnEditCourse").onclick=function(){ editCourse(c.id); };
   $("#btnRoutine").onclick=function(){ routineSheet(c.id); };
+  $$("#cHead [data-rtskip]").forEach(function(b){ b.onclick=function(){ var p=b.dataset.rtskip.split("|"), r=(c.routines||[]).filter(function(x){return x.id===p[1];})[0]; if(!r) return; var mon=weeklyKey(today()); rtToggleSkip(c,r,mon); renderCourse(); toast(rtSkipped(r,mon)?"이번 주는 건너뜁니다 — 표지·할 일에서 빠집니다":"이번 주 항목을 다시 넣었습니다"); }; });
   bindRt($("#cHead"),function(){ renderCourse(); });
   $("#btnAddExam").onclick=function(){ addExam(c.id); };
   $("#btnHideCourse").onclick=function(){
@@ -3727,7 +3738,7 @@ function generateWeekly(mon){
   var w=weekOf(mon)||currentWeek()||1, sun=addDays(mon,6);
   /* ⓪ 과목별 매주 루틴 (표지 픽토그램과 동기화) */
   courses().filter(isActive).forEach(function(c){
-    (c.routines||[]).forEach(function(r){ var n=rtDone(c,r,mon);
+    (c.routines||[]).forEach(function(r){ var n=rtDone(c,r,mon); if(rtSkipped(r,mon)) return;
       for(var i=1;i<=r.count;i++){ var key="rt:"+c.id+":"+r.id+":"+i; if(have[key]) continue; have[key]=1;
         e.items.push({id:uid(),key:key,cat:r.cat||"hw",text:c.name+" · "+r.label+(r.count>1?" ("+i+"/"+r.count+")":""),due:rtDue(mon,r.dow),done:i<=n,src:"매주 루틴"}); } });
   });
@@ -3925,6 +3936,7 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-07.15",d:"09-07",items:["정역학 루틴 「과제 제출 ×1(수요일)」 추가 — 이번 주(9/7 주)는 없음으로 표시","루틴마다 「이번 주 없음」 토글(과목 화면 – 버튼): 그 주만 표지·할 일에서 빠지고 다음 주 자동 복귀"]},
   {v:"2026-09-07.14",d:"09-07",items:["할 일 탭에 전체 / 과제·제출 / 복습 / 예습 선택 탭 — 세 보기(묶음별·과목별·주차별) 모두에 적용, 선택 기억"]},
   {v:"2026-09-07.13",d:"09-07",items:["공업수학1 과제 주기 확정: 금요일 출제 → 수요일 제출(루틴 라벨). 1주차 과제만 예외로 9/11(금) 수업 시간 제출 — 할 일·주차 정리 마감 갱신"]},
   {v:"2026-09-07.12",d:"09-07",items:["과목 현황 학습모드에 「M8 과제제출형」 추가 — 사회봉사는 출석유지형 대신 이걸로"]},
@@ -6126,6 +6138,11 @@ function boot(){
         if(k.indexOf("task:")===0&&/^공업수학1 · 1주차 과제 Kreyszig/.test(it.text||"")){ it.due="2026-09-11"; it.text="공업수학1 · 1주차 과제 Kreyszig 1.3 #6·7·8·16·17 — 이번 주만 금요일 수업 시간 제출"; } });
     }
     S.patchEmHwV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+  }
+  if(!S.patchStaticsHwV1){
+    var _st=term().courses.filter(function(c){return c.name==="정역학";})[0];
+    if(_st&&!(_st.routines||[]).length) _st.routines=routineDefaults("정역학");
+    S.patchStaticsHwV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   }
   if(!S.patchSubmitV1){ var _sv3=term().courses.filter(function(c){return c.name==="사회봉사";})[0]; if(_sv3&&_sv3.typeA==="NONE") _sv3.typeA="SUBMIT"; S.patchSubmitV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
   if(!S.patchFutureV1){ if(!Array.isArray(S.futureTerms)||!S.futureTerms.length) S.futureTerms=futureDefaults(); S.grad={total:130}; S.patchFutureV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
