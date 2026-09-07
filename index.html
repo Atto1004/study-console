@@ -1943,7 +1943,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-07.15";
+var BUILD="2026-09-07.16";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -3936,6 +3936,7 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-07.16",d:"09-07",items:["정역학 9/2(수) 회차: 출석 인정 어렵다는 답변에 따라 「출결 제외」 → 「결석」으로 계산"]},
   {v:"2026-09-07.15",d:"09-07",items:["정역학 루틴 「과제 제출 ×1(수요일)」 추가 — 이번 주(9/7 주)는 없음으로 표시","루틴마다 「이번 주 없음」 토글(과목 화면 – 버튼): 그 주만 표지·할 일에서 빠지고 다음 주 자동 복귀"]},
   {v:"2026-09-07.14",d:"09-07",items:["할 일 탭에 전체 / 과제·제출 / 복습 / 예습 선택 탭 — 세 보기(묶음별·과목별·주차별) 모두에 적용, 선택 기억"]},
   {v:"2026-09-07.13",d:"09-07",items:["공업수학1 과제 주기 확정: 금요일 출제 → 수요일 제출(루틴 라벨). 1주차 과제만 예외로 9/11(금) 수업 시간 제출 — 할 일·주차 정리 마감 갱신"]},
@@ -6143,6 +6144,13 @@ function boot(){
     var _st=term().courses.filter(function(c){return c.name==="정역학";})[0];
     if(_st&&!(_st.routines||[]).length) _st.routines=routineDefaults("정역학");
     S.patchStaticsHwV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+  }
+  if(!S.patchStaticsAttV1){
+    /* 정역학 9/2(수): 수강정정 전이라 제외했던 회차 → 교수 답변(9/7) "출석 인정 어렵다" → 결석으로 계산 */
+    var _st2=term().courses.filter(function(c){return c.name==="정역학";})[0];
+    if(_st2){ var _ss=term().sessions.filter(function(x){return x.courseId===_st2.id&&x.date==="2026-09-02";})[0];
+      if(_ss&&_ss.cancelled&&!_ss.status){ _ss.cancelled=false; _ss.status="absent"; _ss.memo="결석 — 수강정정 전(9/3 신청)이라 출석 인정 요청했으나 9/7 「인정 어렵다」 답변. 내용은 오리엔테이션(OT 슬라이드로 대체)"; } }
+    S.patchStaticsAttV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   }
   if(!S.patchSubmitV1){ var _sv3=term().courses.filter(function(c){return c.name==="사회봉사";})[0]; if(_sv3&&_sv3.typeA==="NONE") _sv3.typeA="SUBMIT"; S.patchSubmitV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
   if(!S.patchFutureV1){ if(!Array.isArray(S.futureTerms)||!S.futureTerms.length) S.futureTerms=futureDefaults(); S.grad={total:130}; S.patchFutureV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
