@@ -815,6 +815,23 @@ th{font-size:clamp(9.5px,0.2vw + 9px,10.5px)}
 .wk .ex{position:absolute;inset:0;display:grid;place-items:center;font-size:11px;color:#fff;z-index:2}
 .wk.exam .bar{background:var(--crit)}
 .wk.noted .lb::after{content:"•";color:var(--accent);margin-left:1px}
+/* 이번 주 할 일 */
+.wkt{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.wkt .g{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+.wkt .g h4{margin:0 0 6px;font-size:13px;display:flex;align-items:center;gap:8px}
+.wkt .g h4 .dot{width:9px;height:9px;border-radius:3px;display:inline-block}
+.wkt .g h4 .n{font-family:var(--font-num);font-size:11px;color:var(--ink-3);margin-left:auto}
+.wkt .it{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:start;padding:6px 0;border-top:1px dashed var(--line)}
+.wkt .it:first-of-type{border-top:0}
+.wkt .it input[type=checkbox]{margin-top:4px}
+.wkt .it .t{font-size:13.5px;line-height:1.4}
+.wkt .it .t.done{text-decoration:line-through;color:var(--ink-3)}
+.wkt .it .s{font-size:11.5px;color:var(--ink-3)}
+.wkt .it .s.over{color:var(--crit)} .wkt .it .s.soon{color:var(--warn)}
+.wkt .add{display:flex;gap:6px;margin-top:8px}
+.wkt .add input{flex:1 1 auto;min-width:0}
+.rule{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}
+.rule:first-child{border-top:0}
 /* 노트 라이브러리 · 앱 내 열람 */
 .nt-course{margin:0 0 14px}
 .nt-course h4{margin:0 0 6px;font-size:14px;color:var(--ink-2);display:flex;align-items:center;gap:8px}
@@ -1464,6 +1481,7 @@ p,.hint,.step,.empty,.md{text-indent:0}
       </div>
       <div class="topact">
         <button class="btn sm" id="btnSave" title="다른 기기에서도 열리도록 저장">저장</button>
+        <button class="iconbtn" id="btnReload" title="새로고침 (최신 버전 불러오기)" aria-label="새로고침">↻</button>
         <button class="iconbtn" id="btnTheme" title="테마 전환" aria-label="테마 전환">◐</button>
       </div>
       <div class="gauges" id="gauges"></div>
@@ -1590,6 +1608,12 @@ p,.hint,.step,.empty,.md{text-indent:0}
           <div class="card-b tight"><div class="daybooks" id="dayBooks"></div></div>
         </div>
         <div class="card">
+          <div class="card-h"><h3 id="wkTodoT">이번 주 할 일</h3><span class="hs" id="wkTodoHs"></span>
+            <div class="ha"><button class="btn xs" id="btnWkRegen">다시 생성</button></div>
+          </div>
+          <div class="card-b" id="weeklyBox"></div>
+        </div>
+        <div class="card">
           <div class="card-h"><h3 id="condT">오늘 컨디션</h3><span class="hs">CONDITION</span></div>
           <div class="card-b" id="condBox"></div>
         </div>
@@ -1689,6 +1713,10 @@ p,.hint,.step,.empty,.md{text-indent:0}
             <div class="card-h"><h3>학기</h3><span class="hs">TERM</span></div>
             <div class="card-b" id="termBox"></div>
           </div>
+        </div>
+        <div class="card">
+          <div class="card-h"><h3>매주 월요일 규칙</h3><span class="hs">WEEKLY</span></div>
+          <div class="card-b" id="rulesBox"></div>
         </div>
         <div class="card">
           <div class="card-h"><h3>글꼴</h3><span class="hs">TYPEFACE</span></div>
@@ -1832,7 +1860,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-05.1";
+var BUILD="2026-09-07.1";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -2515,7 +2543,10 @@ function blank(){
   return {v:2,updatedAt:Date.now(),
     profile:{name:"",school:"한양대학교",major:"기계공학과",targetGPA:3.5,dailyCap:4,
              lateToAbsent:3,absentLimitRatio:1/3,shelfView:"cover",
-             retakeEligibleMax:"B0",retakeMaxGrade:"A0",font:"system"},
+             retakeEligibleMax:"B0",retakeMaxGrade:"A0",font:"system",
+             weeklyRules:[{id:"r1",cat:"hw",text:"CADD 강의영상 시청 (수요일 전)",dow:2},
+                          {id:"r2",cat:"hw",text:"사회봉사 카드뉴스 2개 제작",dow:0}]},
+    weekly:{},
     activeTermId:t.id, terms:[t], history:[], knowledge:{},
     game:{xp:0,streak:0,lastActive:""}};
 }
@@ -2527,6 +2558,8 @@ function migrate(o){
   s.game=Object.assign(b.game,o.game||{});
   if(!Array.isArray(s.history)) s.history=[];
   if(!s.knowledge||typeof s.knowledge!=="object") s.knowledge={};
+  if(!s.weekly||typeof s.weekly!=="object") s.weekly={};
+  if(!Array.isArray(s.profile.weeklyRules)) s.profile.weeklyRules=b.profile.weeklyRules;
   s.terms.forEach(function(t){
     ["courses","sessions","exams","plans","holidays"].forEach(function(k){ if(!Array.isArray(t[k])) t[k]=[]; });
     if(!t.conditions||typeof t.conditions!=="object") t.conditions={};
@@ -2826,13 +2859,14 @@ function weekState(c,w){
 /* 지난 학기: 과목 단위가 있으면 그것을, 없으면 학기 평점을 쓴다 */
 function semAgg(h){
   if(Array.isArray(h.courses)&&h.courses.length){
-    var cr=0,pt=0;
+    var cr=0,pt=0,all=0;
     h.courses.forEach(function(c){
       if(c.retaken) return;              /* 이미 재수강 중/완료 — 성적이 대체되므로 제외 */
       var g=GP[c.letter], k=+c.credits||0;
       if(g!=null&&k>0){ cr+=k; pt+=k*g; }
+      if(k>0&&c.letter&&c.letter!=="F"&&c.letter!=="NP") all+=k;   /* P 과목 포함 이수학점 */
     });
-    return {cr:cr,pt:pt,gpa:cr?pt/cr:null};
+    return {cr:cr,pt:pt,gpa:cr?pt/cr:null,crAll:all};
   }
   var c2=+h.credits||0, g2=+h.gpa;
   if(c2>0&&!isNaN(g2)) return {cr:c2,pt:c2*g2,gpa:g2};
@@ -3496,6 +3530,115 @@ function renderNotes(){
   $("#btnHub").onclick=function(){ openNote("notes/hub.html","아토 학습 허브"); };
 }
 
+
+/* ---------- 이번 주 할 일 (매주 월요일 자동 생성: 공부 / 과제 / 복습) ---------- */
+var WK_CATS=[["study","공부해야 할 것","var(--info)"],["hw","과제·제출","var(--crit)"],["review","복습","var(--ok)"]];
+var WK_DOW=["일","월","화","수","목","금","토"];
+function mondayOf(dateStr){ var d=D(dateStr); return addDays(dateStr, -((d.getDay()+6)%7)); }
+function weeklyKey(dateStr){ return mondayOf(dateStr||today()); }
+function weeklyEntry(key,create){
+  if(!S.weekly||typeof S.weekly!=="object") S.weekly={};
+  var e=S.weekly[key];
+  if(!e&&create){ e=S.weekly[key]={items:[],createdAt:Date.now()}; }
+  if(e&&!Array.isArray(e.items)) e.items=[];
+  return e||null;
+}
+/* 규칙 + 수업 데이터로 이번 주 항목을 만든다. 이미 있는 항목(같은 key)은 건드리지 않는다 */
+function generateWeekly(mon){
+  var e=weeklyEntry(mon,true), have={};
+  e.items.forEach(function(it){ if(it.key) have[it.key]=1; });
+  var push=function(key,cat,text,due,src){ if(have[key]) return; have[key]=1; e.items.push({id:uid(),key:key,cat:cat,text:text,due:due||"",done:false,src:src||"자동"}); };
+  var w=weekOf(mon)||currentWeek()||1, sun=addDays(mon,6);
+  /* ① 규칙 */
+  (S.profile.weeklyRules||[]).forEach(function(r){
+    var dow=+r.dow; var due= dow===0 ? sun : addDays(mon, dow-1);
+    push("rule:"+r.id, r.cat||"hw", r.text, due, "매주 규칙");
+  });
+  /* ② 과제 — 주차 정리 ⑦에 적힌 할 일 중 이번 주 마감(지난 것 포함) */
+  allTasks().forEach(function(x){
+    if(x.t.done||!x.t.due) return;
+    if(diffDays(x.t.due,sun)<0) return;               /* 이번 주 일요일 이후 마감은 제외 */
+    push("task:"+x.t.id,"hw",x.c.name+" · "+x.t.text,x.t.due,x.t.src||"주차 정리");
+  });
+  /* ③ 공부 — 이번 주 수업이 있는 과목의 예습·정리 */
+  courses().filter(isActive).forEach(function(c){
+    if(c.typeA==="NONE"||!c.slots.length) return;
+    var first=planned(c).filter(function(p){return p.week===w;})[0]; if(!first) return;
+    push("study:"+c.id+":"+w,"study",c.name+" "+w+"주차 예습 · 수업 정리 채우기",first.date,"수업");
+  });
+  /* ④ 복습 — 지난주 회차 중 복습 안 한 것 + 복습 큐 */
+  var prevMon=addDays(mon,-7), prevSun=addDays(mon,-1);
+  courses().filter(isActive).forEach(function(c){
+    if(c.typeA==="NONE") return;
+    var k=sessions(c.id).filter(function(s){ return s.date>=prevMon && s.date<=prevSun && !s.cancelled && s.status!=="absent" && !s.reviewed; }).length;
+    var miss=sessions(c.id).filter(function(s){ return s.date>=prevMon && s.date<=prevSun && s.status==="absent"; }).length;
+    if(k) push("review:"+c.id+":"+prevMon,"review",c.name+" 지난주 회차 "+k+"건 복습",addDays(mon,2),"회차 로그");
+    if(miss) push("makeup:"+c.id+":"+prevMon,"review",c.name+" 결석 "+miss+"회 보강 (자료·필기 확보)",addDays(mon,3),"출결");
+  });
+  e.generatedAt=Date.now();
+  return e;
+}
+function ensureWeekly(){
+  var mon=weeklyKey(today());
+  if(!S.weekly[mon]){ generateWeekly(mon); persist(); }
+}
+function renderWeekly(){
+  var box=$("#weeklyBox"); if(!box) return;
+  var mon=weeklyKey(today()), e=weeklyEntry(mon,true), td=today();
+  /* 주차 정리 할 일과 동기화: 원본이 완료되면 여기서도 완료 */
+  var taskMap={}; allTasks().forEach(function(x){ taskMap[x.t.id]=x.t; });
+  e.items.forEach(function(it){ if(it.key&&it.key.indexOf("task:")===0){ var t=taskMap[it.key.slice(5)]; if(t) it.done=!!t.done; } });
+  var total=e.items.length, done=e.items.filter(function(i){return i.done;}).length;
+  $("#wkTodoT").textContent=(weekOf(mon)||"-")+"주차 할 일 · "+fmtDate(mon)+" 주";
+  $("#wkTodoHs").textContent=total?done+"/"+total+" 완료":"";
+  box.innerHTML='<div class="wkt">'+WK_CATS.map(function(cat){
+    var its=e.items.filter(function(i){return i.cat===cat[0];}).sort(function(a,b){ if(!!a.done!==!!b.done) return a.done?1:-1; return (a.due||"9")<(b.due||"9")?-1:1; });
+    return '<div class="g"><h4><span class="dot" style="background:'+cat[2]+'"></span>'+cat[1]+'<span class="n">'+its.filter(function(i){return i.done;}).length+'/'+its.length+'</span></h4>'+
+      (its.length? its.map(function(it){
+        var dd=it.due?diffDays(td,it.due):null;
+        var cls= dd===null?"" : dd<0?"over" : dd<=1?"soon":"";
+        return '<div class="it"><input type="checkbox" data-wk="'+it.id+'"'+(it.done?" checked":"")+' aria-label="완료">'+
+          '<div><div class="t'+(it.done?" done":"")+'">'+esc(it.text)+'</div>'+
+          '<div class="s '+cls+'">'+(it.due?WK_DOW[D(it.due).getDay()]+" "+fmtDate(it.due)+" · "+dueLabel(it.due):"기한 없음")+(it.src?" · "+esc(it.src):"")+'</div></div>'+
+          '<button class="iconbtn" data-wkdel="'+it.id+'" aria-label="삭제">✕</button></div>';
+      }).join("") : '<div class="hint">없음</div>')+
+      '<div class="add"><input class="input" data-wkadd-text="'+cat[0]+'" placeholder="추가…"><input class="input mono" type="date" data-wkadd-due="'+cat[0]+'" style="flex:0 0 132px"><button class="btn xs" data-wkadd="'+cat[0]+'">＋</button></div>'+
+      '</div>';
+  }).join("")+'</div>'+
+  '<div class="hint" style="margin-top:8px">매주 월요일에 자동으로 만들어집니다. 규칙(CADD 영상, 카드뉴스 등)은 설정 → 매주 월요일 규칙에서 바꿉니다.</div>';
+  $$("[data-wk]",box).forEach(function(cb){ cb.onchange=function(){
+    var it=e.items.filter(function(i){return i.id===cb.dataset.wk;})[0]; if(!it) return;
+    it.done=cb.checked;
+    if(it.key&&it.key.indexOf("task:")===0){ var t=taskMap[it.key.slice(5)]; if(t) t.done=it.done; }
+    if(it.done){ addXP(10); bumpStreak(); }
+    persist(); renderWeekly(); }; });
+  $$("[data-wkdel]",box).forEach(function(b){ b.onclick=function(){ e.items=e.items.filter(function(i){return i.id!==b.dataset.wkdel;}); persist(); renderWeekly(); }; });
+  $$("[data-wkadd]",box).forEach(function(b){ b.onclick=function(){
+    var cat=b.dataset.wkadd, tx=$('[data-wkadd-text="'+cat+'"]',box).value.trim(); if(!tx){ toast("내용을 적어 주세요"); return; }
+    e.items.push({id:uid(),key:"",cat:cat,text:tx,due:$('[data-wkadd-due="'+cat+'"]',box).value||"",done:false,src:"직접"}); persist(); renderWeekly(); }; });
+  $("#btnWkRegen").onclick=function(){ generateWeekly(mon); persist(); renderWeekly(); toast("이번 주 항목을 다시 만들었습니다 (완료 표시는 유지)"); };
+}
+function renderRules(){
+  var box=$("#rulesBox"); if(!box) return;
+  var rules=S.profile.weeklyRules||(S.profile.weeklyRules=[]);
+  box.innerHTML=(rules.length? rules.map(function(r){
+      var cat=WK_CATS.filter(function(c){return c[0]===r.cat;})[0]||WK_CATS[1];
+      return '<div class="rule"><span class="chip mut">'+esc(cat[1].split("·")[0])+'</span><span>'+esc(r.text)+'</span>'+
+        '<span class="chip acc">'+(r.dow==0?"일요일":WK_DOW[r.dow]+"요일")+' 마감</span><button class="iconbtn" data-rdel="'+esc(r.id)+'" aria-label="삭제">✕</button></div>';
+    }).join("") : '<div class="hint">규칙이 없습니다.</div>')+
+    '<div class="row tightg" style="margin-top:10px">'+
+      '<select class="select" id="rCat" style="flex:0 0 120px">'+WK_CATS.map(function(c){return '<option value="'+c[0]+'">'+c[1].split("·")[0]+'</option>';}).join("")+'</select>'+
+      '<input class="input" id="rText" placeholder="매주 할 일 (예: CADD 강의영상 시청)">'+
+      '<select class="select" id="rDow" style="flex:0 0 110px">'+[1,2,3,4,5,6,0].map(function(d){return '<option value="'+d+'"'+(d===0?" selected":"")+'>'+WK_DOW[d]+'요일</option>';}).join("")+'</select>'+
+      '<button class="btn sm" id="rAdd" style="flex:0 0 auto">추가</button></div>'+
+    '<div class="hint" style="margin-top:8px">매주 월요일 「이번 주 할 일」에 자동으로 들어갑니다. 마감 요일은 그 주 안의 요일입니다.</div>';
+  $$("[data-rdel]",box).forEach(function(b){ b.onclick=function(){ S.profile.weeklyRules=rules.filter(function(r){return r.id!==b.dataset.rdel;}); persist(); renderRules(); }; });
+  $("#rAdd").onclick=function(){
+    var tx=$("#rText").value.trim(); if(!tx){ toast("내용을 적어 주세요"); return; }
+    rules.push({id:uid(),cat:$("#rCat").value,text:tx,dow:+$("#rDow").value}); persist(); renderRules(); toast("규칙을 추가했습니다 — 다음 월요일부터 적용, 이번 주는 「다시 생성」");
+  };
+}
+
 /* ---------- 오늘 · 하루 타임라인 ---------- */
 function nowMin(){ var d=new Date(); return d.getHours()*60+d.getMinutes(); }
 /* 이 회차가 실제로 끝났는가 — 복습 큐에는 끝난 수업만 들어간다 */
@@ -3582,6 +3725,9 @@ function renderToday(){
         ? "⚠ "+esc(holidayOn(date).name)+" — 휴강입니다."
         : "이 날은 수업이 없습니다.")+'</div>';
   $$("#dayBooks .dbook").forEach(function(b){ b.onclick=function(){ go("course",b.dataset.c); }; });
+
+  /* ---- 이번 주 할 일 (월요일 자동 생성) ---- */
+  ensureWeekly(); renderWeekly();
 
   /* ---- 오늘 컨디션 ---- */
   var cond=conditionOf(date);
@@ -4081,7 +4227,7 @@ function renderGrade(){
         var a=semAgg(x), det=Array.isArray(x.courses)&&x.courses.length;
         return '<details class="kgroup" style="border-bottom:1px solid var(--line)">'+
           '<summary><span class="caret">▶</span>'+esc(x.name)+
-            '<span class="kstat"><span class="chip mut">'+a.cr+'학점</span>'+
+            '<span class="kstat"><span class="chip mut">'+(a.crAll!=null?a.crAll:a.cr)+'학점</span>'+
             '<span class="chip '+(a.gpa>=3.5?"ok":a.gpa>=3?"warn":"crit")+'">'+
               (a.gpa!=null?a.gpa.toFixed(2):"—")+'</span></span></summary>'+
           '<div class="kbody">'+
@@ -4166,6 +4312,8 @@ function renderSet(){
     t.holidays.push({date:d,name:n||"휴강"});
     persist(); render(); toast("휴일을 추가했습니다");
   };
+
+  renderRules();
 
   /* ---- 글꼴 ---- */
   loadFontPreviews();
@@ -5196,7 +5344,7 @@ function serialize(){
   var clone=document.documentElement.cloneNode(true);
   clone.removeAttribute("data-theme");
   var app=clone.querySelectorAll("#gauges,#rail,#tabbar,#shelf,#courseTbl,#shelfTiles,#cHead,#cMode,"+
-    "#cCov,#cAtt,#cWeeks,#cLog,#cDocs,#brief,#todayList,#reviewList,#wkMap,#tt,#ntList,#cNotes,"+
+    "#cCov,#cAtt,#cWeeks,#cLog,#cDocs,#brief,#todayList,#reviewList,#wkMap,#tt,#ntList,#cNotes,#weeklyBox,#rulesBox,"+
     "#gradeTiles,#reqTbl,#histBox,#histList,#retakeBox,#gradeEmpty,#fontBox,#pendBar,#profBox,#termBox,#dataBox,#sheet,#dayLine,#dayBooks,#calBody,#calLegend");
   Array.prototype.forEach.call(app,function(el){ el.innerHTML=""; });
   var sc=clone.querySelector("#state"); if(sc) sc.textContent=JSON.stringify(S);
@@ -5465,6 +5613,11 @@ function boot(){
   $("#btnGradePrompt").onclick=gradePrompt;
   $("#btnRetakeRule").onclick=retakeRuleSheet;
   $("#btnSave").onclick=cloudSave;
+  $("#btnReload").onclick=function(){
+    persist();
+    var u=location.pathname+"?r="+Date.now()+location.hash;
+    location.replace(u);
+  };
   $("#btnTheme").onclick=function(){
     var r=document.documentElement, cur=r.getAttribute("data-theme");
     var dark=cur? cur==="dark" : matchMedia("(prefers-color-scheme: dark)").matches;
@@ -5488,6 +5641,29 @@ function boot(){
       });
     });
     t.patchWeekNotesV5=true;
+    try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+  })();
+
+  ensureWeekly();              // 매주 월요일 할 일 생성 (없으면 지금)
+
+  /* 데이터 패치 V6 — 지난 학기(2026-1 · 2026 여름) 수강 과목 추가 (1회, 같은 이름 학기가 없을 때만) */
+  (function(){
+    if(S.patchHistoryV1) return;
+    var has=function(nm){ return S.history.some(function(h){return h.name===nm;}); };
+    var C=function(name,credits,letter,bucket,retake){ return {id:uid(),name:name,credits:credits,letter:letter,bucket:bucket,retake:!!retake}; };
+    if(!has("2026-1학기")){
+      var h1={id:uid(),name:"2026-1학기",courses:[
+        C("미분적분학1",3,"C0","MSC"), C("일반물리학1",3,"C+","MSC"), C("일반물리학실험1",1,"A+","MSC"),
+        C("일반화학1",3,"C+","MSC"), C("기계공학개론",2,"B+","전공기초"), C("파이썬과인공지능(s)",3,"C+","교양필수"),
+        C("IC-PBL과비전설계",1,"P","교양필수"), C("ESG와SDGs이해",2,"P","교양선택"), C("AI리터러시",2,"P","교양필수")]};
+      var a1=semAgg(h1); h1.credits=a1.cr; h1.gpa=a1.gpa; S.history.push(h1);
+    }
+    if(!has("2026 여름학기")){
+      var h2={id:uid(),name:"2026 여름학기",courses:[
+        C("행복한금융생활",3,"","교양선택"), C("미분적분학2 (계절, 장우성)",3,"","MSC")]};
+      var a2=semAgg(h2); h2.credits=a2.cr; h2.gpa=a2.gpa; S.history.push(h2);
+    }
+    S.patchHistoryV1=true;
     try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   })();
 
