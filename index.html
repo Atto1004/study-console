@@ -889,7 +889,7 @@ th{font-size:clamp(9.5px,0.2vw + 9px,10.5px)}
 .tka .tx.done{text-decoration:line-through;color:var(--ink-3)}
 .tka .sub2{font-size:12px;color:var(--ink-3);margin-top:2px;word-break:keep-all;overflow-wrap:anywhere;display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center}
 .tka .sub2.over{color:var(--crit)} .tka .sub2.soon{color:var(--warn)}
-.wkt{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px}
+.wkt{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px;align-items:start}
 .wkt.one{grid-template-columns:1fr}
 .wkt .g{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
 .wkt .g h4{margin:0 0 6px;font-size:13px;display:flex;align-items:center;gap:8px}
@@ -910,6 +910,13 @@ th{font-size:clamp(9.5px,0.2vw + 9px,10.5px)}
 .wkweek>h3{margin:0 0 8px;font-size:14px;display:flex;align-items:center;gap:8px}
 .wkweek>h3 .n{font-family:var(--font-num);font-size:11.5px;color:var(--ink-3);font-weight:400}
 .wkt .it .s.over{color:var(--crit)} .wkt .it .s.soon{color:var(--warn)}
+/* 주차별 보기 가독성: 요일 칩·지남 배지·출처 흐리게·삭제 버튼은 올렸을 때만 진하게·다 한 묶음은 흐리게 */
+.wkt .g h4 .wkd{font-family:var(--font-num);font-size:10.5px;font-weight:600;color:var(--ink-3);padding:1px 7px;border-radius:999px;background:var(--surface-2);white-space:nowrap}
+.wkt .g h4 .wkl{font-family:var(--font-num);font-size:10.5px;font-weight:700;color:var(--crit);padding:1px 7px;border-radius:999px;background:color-mix(in srgb,var(--crit) 12%,transparent);white-space:nowrap}
+.wkt .it .s .src{opacity:.7}
+.wkt .it .iconbtn{opacity:.35} .wkt .it:hover .iconbtn,.wkt .it .iconbtn:focus-visible{opacity:1}
+.wkt .g.alldone{opacity:.62}
+.wkt .g.alldone[open]{opacity:.85}
 .wkt .add{display:flex;gap:6px;margin-top:8px}
 .wkt .add input{flex:1 1 auto;min-width:0}
 .rule{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}
@@ -2020,7 +2027,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-07.19";
+var BUILD="2026-09-08.20";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -3383,6 +3390,13 @@ function examBadge(c){
   if(fin) return "기말만";
   return "";
 }
+/* 첫 수업 요일 순서 키 (월=1 … 일=7, 수업 없으면 8; 같은 요일이면 시작 시각 순) — 할 일 주차별 보기의 과목 배치용 */
+function courseDowKey(c){
+  var sl=(c&&c.slots)||[]; if(!sl.length) return 8;
+  var best=null;
+  sl.forEach(function(s){ var d=(+s.d===0?7:+s.d)+(s.s?toMin(s.s)/1440:0); if(best===null||d<best) best=d; });
+  return best;
+}
 /* 수강 요일 — "월·수" 형태 */
 function dayLabel(c){
   if(!c.slots||!c.slots.length) return "";
@@ -4203,7 +4217,7 @@ function wkItemHTML(it,mon,td,opts){
   return '<div class="it"><input type="checkbox" data-wk="'+it.id+'" data-mon="'+mon+'"'+(it.done?" checked":"")+' aria-label="완료">'+
     '<div><div class="t'+(it.done?" done":"")+'">'+text+'</div>'+
     '<div class="s '+cls+'">'+(opts.showCat&&cat?'<span class="dot" style="display:inline-block;width:7px;height:7px;border-radius:2px;background:'+cat[2]+';margin-right:4px"></span>'+cat[1].replace(/^[①②③] /,'').split("·")[0]+" · ":"")+
-    (it.due?WK_DOW[D(it.due).getDay()]+" "+fmtDate(it.due)+" · "+dueLabel(it.due):"기한 없음")+(it.src?" · "+esc(it.src):"")+'</div></div>'+
+    (it.due?fmtDate(it.due)+" · "+dueLabel(it.due):"기한 없음")+(it.src?' <span class="src">· '+esc(it.src)+'</span>':"")+'</div></div>'+
     '<button class="iconbtn" data-wkdel="'+it.id+'" data-mon="'+mon+'" aria-label="삭제">✕</button></div>';
 }
 function sortWk(a,b){ if(!!a.done!==!!b.done) return a.done?1:-1; return (a.due||"9")<(b.due||"9")?-1:1; }
@@ -4268,21 +4282,29 @@ function renderWeekly(){
     html+=ws.map(function(w){
       var W=weeks[w], its=W.items, dn=its.filter(function(x){ return x.kind==="wk"?x.it.done:x.t.done; }).length;
       var byC={}, ord=[]; its.forEach(function(x){ var k=x.cid||"_"; if(!byC[k]){ byC[k]=[]; ord.push(k); } byC[k].push(x); });
-      var cs=courses().filter(function(c){return byC[c.id];}).map(function(c){return {id:c.id,name:c.name,cls:"t-"+c.typeA};});
-      personalsAll().filter(function(p){return byC[p.id];}).forEach(function(p){ cs.push({id:p.id,name:p.name,cls:pCls(p)}); });
-      if(byC._) cs.push({id:"_",name:"공통",cls:""});
+      /* 과목은 수업 요일 순(월→일, 같은 요일은 시작 시각 순), 수업 없는 과목 → 개인 공부 → 공통 */
+      var cs=courses().filter(function(c){return byC[c.id];}).sort(function(a,b){ return courseDowKey(a)-courseDowKey(b); })
+        .map(function(c){return {id:c.id,name:c.name,cls:"t-"+c.typeA,days:dayLabel(c)};});
+      personalsAll().filter(function(p){return byC[p.id];}).forEach(function(p){ cs.push({id:p.id,name:p.name,cls:pCls(p),days:"개인"}); });
+      if(byC._) cs.push({id:"_",name:"공통",cls:"",days:""});
       var open=(w===cw);
-      return '<div class="wkweek"><h3>'+(w?w+"주차":"주차 미정")+(w===cw?' <span class="chip acc">이번 주</span>':"")+'<span class="n">'+(W.mon?fmtDate(W.mon)+" 주 · ":"")+dn+'/'+its.length+' 완료</span></h3>'+
+      var lateW=its.filter(function(x){ var it=x.kind==="wk"?x.it:x.t; return !it.done&&it.due&&diffDays(td,it.due)<0; }).length;
+      return '<div class="wkweek"><h3>'+(w?w+"주차":"주차 미정")+(w===cw?' <span class="chip acc">이번 주</span>':"")+
+          (lateW?' <span class="chip crit">지남 '+lateW+'</span>':"")+
+          '<span class="n">'+(W.mon?fmtDate(W.mon)+"~"+fmtDate(addDays(W.mon,6))+" · ":"")+dn+'/'+its.length+' 완료</span></h3>'+
         '<div class="wkt">'+cs.map(function(g){
           var arr=byC[g.id], d2=arr.filter(function(x){ return x.kind==="wk"?x.it.done:x.t.done; }).length;
+          var lateG=arr.filter(function(x){ var it=x.kind==="wk"?x.it:x.t; return !it.done&&it.due&&diffDays(td,it.due)<0; }).length;
           /* 이번 주는 펼침, 지난 주는 미완 항목이 남은 묶음만 펼침 */
           var openG=open||(w&&w<cw&&d2<arr.length);
-          return '<details class="g '+g.cls+'"'+(openG?" open":"")+'><summary><h4 style="margin:0"><span class="cchip">'+esc(g.name)+'</span><span class="n">'+d2+'/'+arr.length+'</span></h4></summary>'+
+          return '<details class="g '+g.cls+(d2===arr.length?" alldone":"")+'"'+(openG?" open":"")+'><summary><h4 style="margin:0"><span class="cchip">'+esc(g.name)+'</span>'+
+            (g.days?'<span class="wkd">'+esc(g.days)+'</span>':"")+(lateG?'<span class="wkl">지남 '+lateG+'</span>':"")+
+            '<span class="n">'+d2+'/'+arr.length+'</span></h4></summary>'+
             arr.sort(function(p,q){ var A=p.kind==="wk"?p.it:{done:p.t.done,due:p.t.due}, B=q.kind==="wk"?q.it:{done:q.t.done,due:q.t.due}; return sortWk(A,B); }).map(function(x){
               if(x.kind==="wk") return wkItemHTML(x.it,x.mon,td,{showCat:true,stripCourse:true,cname:g.name});
               var t=x.t, dd=t.due?diffDays(td,t.due):null, cls=dd===null?"":dd<0?"over":dd<=1?"soon":"";
               return '<div class="it"><input type="checkbox" data-ta2="'+x.c.id+'|'+x.w+'|'+t.id+'"'+(t.done?" checked":"")+' aria-label="완료"><div><div class="t'+(t.done?" done":"")+'">'+esc(t.text||"")+'</div>'+
-                '<div class="s '+cls+'">과제 · '+(t.due?WK_DOW[D(t.due).getDay()]+" "+fmtDate(t.due)+" · "+dueLabel(t.due):"기한 없음")+' · 주차 정리</div></div><button class="btn xs" data-tao2="'+x.c.id+'|'+x.w+'">정리</button></div>';
+                '<div class="s '+cls+'"><span class="dot" style="display:inline-block;width:7px;height:7px;border-radius:2px;background:var(--crit);margin-right:4px"></span>과제 · '+(t.due?fmtDate(t.due)+" · "+dueLabel(t.due):"기한 없음")+' <span class="src">· 주차 정리</span></div></div><button class="btn xs" data-tao2="'+x.c.id+'|'+x.w+'">정리</button></div>';
             }).join("")+'</details>';
         }).join("")+'</div></div>';
     }).join("");
@@ -4353,6 +4375,7 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-08.20",d:"09-08",items:["할 일 주차별 보기: 각 주차 안에서 과목을 수업 요일 순(월→일, 같은 요일은 시작 시각 순)으로 배치, 수업 없는 과목 → 개인 공부 → 공통 순. 과목 옆에 요일 칩","주차 제목에 날짜 범위(월~일)와 「지남 n」 배지, 과목 묶음에도 지남 배지, 다 한 묶음은 흐리게","항목 줄 정리: 요일 중복 표기 제거(「수 9/2(수)」 → 「9/2(수)」), 출처는 흐리게, 삭제 ✕는 올렸을 때만 진하게"]},
   {v:"2026-09-07.19",d:"09-07",items:["표지 루틴 픽토그램이 세로로 쌓이던 문제 수정 — 오늘 화면용 .rg 클래스(세로)와 이름이 겹쳐 방향이 바뀌던 것, 표지·과목 화면 모두 가로 한 줄로","표지 높이를 최소값으로 — 배지가 세 줄인 과목(재수강 등)이 있으면 같은 줄 표지가 함께 조금 길어져 게이지까지 다 보임(책등 보기는 고정)"]},
   {v:"2026-09-07.18",d:"09-07",items:["표지 제목 잘림 수정 — 루틴 픽토그램·배지 줄이 늘어나도 제목·엠블럼은 줄지 않고 영문 부제가 먼저 접힘, 픽토그램은 한 줄 고정, 휴대폰 표지 높이 소폭 확대","할 일 탭 주차별 보기: 1주차부터 오름차순(지난 주 미완 항목이 이번 주 위에), 지난 주는 미완이 남은 묶음만 펼침","사회봉사 규정 반영: 봉사 30시간(9/2~11/29)·소감문 보고서 포털 입력(9/9~11/30, 3,000byte)·체리 회차 5개 마감·평가간담회를 과제·할 일과 과목 자료(강의계획서)에 추가","상단 D-day 라벨에서 「(고정)」 표시 제거"]},
   {v:"2026-09-07.17",d:"09-07",items:["책장을 「학교 수업」과 「개인 공부」 두 책장으로 분리(상단 세그먼트, 마지막 선택 기억)","개인 책장: 자격증·독학·프로젝트·어학·기타 종류, 목표 한 줄·목표일 D-day·진도(직접 입력 또는 단계 완료율 자동)·학습 기록(분 단위 누적·이번 주)·메모·링크","개인 공부에도 매주 루틴 — 표지 픽토그램·할 일 탭에 학교 과목 다음 순서로 포함, 완료 처리하면 책장·할 일에서 빠짐","개인 책장은 학점 계산·출결·시험·복습 큐에서 제외"]},
