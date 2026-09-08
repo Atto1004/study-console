@@ -1,0 +1,73 @@
+{
+ "id": "cad.tool",
+ "easy": "CATIA 는 '스케치(2D) → 살 붙이기(3D)' 순서다. 종이에 윤곽을 그리고, 그걸 두께만큼 밀어 올리면 부품이 된다.",
+ "core": "작업대(Workbench): Sketcher(2D 스케치) · Part Design(3D 부품) · Assembly Design(조립) · Drafting(도면).\nSketcher: 기준 평면(xy·yz·zx) 하나를 골라 들어간다 → 선·원·호·직사각형을 그리고 구속을 준다 → 나온다(Exit workbench).\nPart Design: Pad(스케치를 밀어 올려 살 붙임) · Pocket(파냄) · Groove(회전 파냄) · Rib/Slot(경로 따라 살/홈).\n시점: 마우스 가운데 버튼 드래그 = 이동, 가운데+왼쪽 = 회전, 휠 = 확대. 컴퍼스로 축 정렬.\n트리(Specification tree): 왼쪽에 작업 순서가 기록된다. 더블클릭하면 수정.\n강의계획서(포털): 1주차 설치·Option 설정 → 2주차 toolbar → 3주차 Sketch(Trim) → 4주차 Pad/Pocket.",
+ "example": {
+  "q": "50×30×10 mm 직육면체 블록 만들기",
+  "steps": [
+   "Part Design 에서 xy 평면을 고르고 Sketcher 진입",
+   "Rectangle 으로 대략 그린 뒤 치수 구속으로 50, 30 을 입력 → 원점에 모서리 일치 구속",
+   "Exit workbench → Pad, Length 10 mm → OK",
+   "트리에 Sketch.1 · Pad.1 이 생긴 것을 확인"
+  ]
+ },
+ "pitfall": "스케치가 '완전 구속'(초록)이 되기 전에 Pad 하면 나중에 치수 하나 바꿀 때 모양이 틀어진다.",
+ "quiz": [
+  {
+   "q": "2D 윤곽을 그리는 작업대는?",
+   "options": [
+    "Part Design",
+    "Sketcher",
+    "Assembly Design",
+    "Drafting"
+   ],
+   "answer": 1,
+   "why": "스케치는 Sketcher."
+  },
+  {
+   "q": "스케치를 밀어 올려 3D 살을 붙이는 명령은?",
+   "options": [
+    "Pocket",
+    "Pad",
+    "Trim",
+    "Groove"
+   ],
+   "answer": 1,
+   "why": "Pad = 돌출, Pocket = 파냄."
+  },
+  {
+   "q": "Pocket 은?",
+   "options": [
+    "살을 붙인다",
+    "파낸다",
+    "회전시킨다",
+    "치수를 기입한다"
+   ],
+   "answer": 1,
+   "why": "스케치 모양대로 제거."
+  },
+  {
+   "q": "작업 순서가 기록되는 곳은?",
+   "options": [
+    "툴바",
+    "Specification tree",
+    "컴퍼스",
+    "상태 바"
+   ],
+   "answer": 1,
+   "why": "왼쪽 트리에서 더블클릭해 수정."
+  },
+  {
+   "q": "Sketcher 진입 전에 먼저 고르는 것은?",
+   "options": [
+    "색",
+    "기준 평면(xy·yz·zx)",
+    "재질",
+    "단위"
+   ],
+   "answer": 1,
+   "why": "어느 평면에 그릴지 정한다."
+  }
+ ],
+ "src": "study-console CADD_SYLLABUS(포털 주별 계획) · 일반 지식(표준 정의) — 교재·강의자료 미확인(결재 #9)"
+}
