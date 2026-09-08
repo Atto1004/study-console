@@ -1,0 +1,1505 @@
+{
+ "version": 1,
+ "updated": "2026-09-09",
+ "levels": [
+  "중등",
+  "고교",
+  "대학기초",
+  "전공"
+ ],
+ "subjects": [
+  "공통",
+  "공업수학1",
+  "미분적분학2",
+  "일반물리학2",
+  "정역학",
+  "CADD"
+ ],
+ "note": "id 접두어: alg 대수 · geo 기하 · trig 삼각 · vec 벡터 · calc 미적분 · lin 선형대수 · ode 미분방정식 · phys 물리기초 · mech 역학 · em 전자기 · cad CAD. src 가 '일반 지식'이면 표준 정의만 담았고 수업 자료 근거는 없다. 그 외 src 는 study-materials/ 아래 경로.",
+ "nodes": [
+  {
+   "id": "alg.integer_fraction",
+   "name": "정수·유리수 계산",
+   "level": "중등",
+   "subject": "공통",
+   "hours": 1,
+   "prereq": [],
+   "tags": [
+    "대수"
+   ],
+   "desc": "음수·분수·소수의 사칙연산과 부호 규칙",
+   "src": "일반 지식"
+  },
+  {
+   "id": "alg.ratio",
+   "name": "비와 비율",
+   "level": "중등",
+   "subject": "공통",
+   "hours": 1,
+   "prereq": [],
+   "tags": [
+    "대수"
+   ],
+   "desc": "비·비율·비례식, 단위당 양(속력·밀도) 계산",
+   "src": "일반 지식"
+  },
+  {
+   "id": "alg.expression",
+   "name": "문자와 식",
+   "level": "중등",
+   "subject": "공통",
+   "hours": 1,
+   "prereq": [
+    "alg.integer_fraction"
+   ],
+   "tags": [
+    "대수"
+   ],
+   "desc": "문자로 식 세우기, 동류항 정리, 대입",
+   "src": "일반 지식"
+  },
+  {
+   "id": "alg.exponent_rules",
+   "name": "지수법칙",
+   "level": "중등",
+   "subject": "공통",
+   "hours": 1,
+   "prereq": [
+    "alg.expression"
+   ],
+   "tags": [
+    "대수"
+   ],
+   "desc": "aᵐ·aⁿ=aᵐ⁺ⁿ, (aᵐ)ⁿ, 음의 지수·분수 지수",
+   "src": "일반 지식"
+  },
+  {
+   "id": "alg.sqrt",
+   "name": "제곱근과 무리수",
+   "level": "중등",
+   "subject": "공통",
+   "hours": 1,
+   "prereq": [
+    "alg.exponent_rules"
+   ],
+   "tags": [
+    "대수"
+   ],
+   "desc": "√의 뜻, 제곱근의 계산·유리화",
+   "src": "일반 지식"
+  },
+  {
+   "id": "alg.linear_eq",
+   "name": "일차방정식",
+   "level": "중등",
+   "subject": "공통",
+   "hours": 1,
+   "prereq": [
+    "alg.expression"
+   ],
+   "tags": [
+    "대수"
+   ],
+   "desc": "이항·양변 나누기로 미지수 하나 풀기",
+   "src": "일반 지식"
+  },
+  {
+   "id": "alg.simul_eq",
+   "name": "연립일차방정식",
+   "level": "중등",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "alg.linear_eq"
+   ],
+   "tags": [
+    "대수"
+   ],
+   "desc": "가감법·대입법으로 미지수 2~3개 풀기",
+   "src": "일반 지식"
+  },
+  {
+   "id": "alg.linear_func",
+   "name": "일차함수와 그래프",
+   "level": "중등",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "alg.linear_eq"
+   ],
+   "tags": [
+    "대수",
+    "함수"
+   ],
+   "desc": "y=ax+b, 기울기와 절편, 직선의 방정식",
+   "src": "일반 지식"
+  },
+  {
+   "id": "alg.factoring",
+   "name": "전개와 인수분해",
+   "level": "중등",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "alg.expression"
+   ],
+   "tags": [
+    "대수"
+   ],
+   "desc": "곱셈공식, 공통인수·완전제곱·합차 인수분해",
+   "src": "일반 지식"
+  },
+  {
+   "id": "alg.quadratic_eq",
+   "name": "이차방정식",
+   "level": "중등",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "alg.factoring",
+    "alg.sqrt"
+   ],
+   "tags": [
+    "대수"
+   ],
+   "desc": "인수분해·근의 공식·판별식",
+   "src": "일반 지식"
+  },
+  {
+   "id": "alg.quadratic_func",
+   "name": "이차함수",
+   "level": "중등",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "alg.quadratic_eq",
+    "alg.linear_func"
+   ],
+   "tags": [
+    "대수",
+    "함수"
+   ],
+   "desc": "y=ax²+bx+c 그래프, 꼭짓점, 최대·최소",
+   "src": "일반 지식"
+  },
+  {
+   "id": "geo.angle",
+   "name": "각과 평행선·삼각형의 성질",
+   "level": "중등",
+   "subject": "공통",
+   "hours": 1,
+   "prereq": [],
+   "tags": [
+    "기하"
+   ],
+   "desc": "동위각·엇각, 삼각형 내각의 합 180°",
+   "src": "일반 지식"
+  },
+  {
+   "id": "geo.similarity",
+   "name": "도형의 닮음",
+   "level": "중등",
+   "subject": "공통",
+   "hours": 1,
+   "prereq": [
+    "geo.angle",
+    "alg.ratio"
+   ],
+   "tags": [
+    "기하"
+   ],
+   "desc": "닮은 삼각형의 대응변 비, 축척",
+   "src": "일반 지식"
+  },
+  {
+   "id": "geo.pythagoras",
+   "name": "피타고라스 정리",
+   "level": "중등",
+   "subject": "공통",
+   "hours": 1,
+   "prereq": [
+    "alg.sqrt",
+    "geo.angle"
+   ],
+   "tags": [
+    "기하"
+   ],
+   "desc": "a²+b²=c², 직각삼각형 빗변·거리 계산",
+   "src": "일반 지식"
+  },
+  {
+   "id": "geo.solid",
+   "name": "입체도형과 전개도",
+   "level": "중등",
+   "subject": "공통",
+   "hours": 1,
+   "prereq": [
+    "geo.angle"
+   ],
+   "tags": [
+    "기하"
+   ],
+   "desc": "기둥·뿔·구의 모양, 전개도·단면, 겉넓이·부피",
+   "src": "일반 지식"
+  },
+  {
+   "id": "alg.function",
+   "name": "함수의 개념·합성·역함수",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "alg.quadratic_func"
+   ],
+   "tags": [
+    "대수",
+    "함수"
+   ],
+   "desc": "정의역·치역, 합성함수, 역함수, 그래프 이동",
+   "src": "일반 지식"
+  },
+  {
+   "id": "alg.polynomial",
+   "name": "다항식의 연산·항등식",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "alg.factoring"
+   ],
+   "tags": [
+    "대수"
+   ],
+   "desc": "다항식 나눗셈, 나머지정리, 항등식의 계수 비교",
+   "src": "일반 지식"
+  },
+  {
+   "id": "alg.rational_func",
+   "name": "유리식과 부분분수",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "alg.polynomial"
+   ],
+   "tags": [
+    "대수"
+   ],
+   "desc": "분수식 통분·약분, A/(x−a)+B/(x−b) 꼴로 쪼개기",
+   "src": "일반 지식"
+  },
+  {
+   "id": "alg.exp_log",
+   "name": "지수함수·로그함수",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "alg.exponent_rules",
+    "alg.function"
+   ],
+   "tags": [
+    "대수",
+    "함수"
+   ],
+   "desc": "eˣ와 ln x, 로그의 성질, 지수·로그 방정식",
+   "src": "일반 지식"
+  },
+  {
+   "id": "alg.inverse_square",
+   "name": "역제곱 관계",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 0.5,
+   "prereq": [
+    "alg.ratio",
+    "alg.exponent_rules"
+   ],
+   "tags": [
+    "대수",
+    "물리"
+   ],
+   "desc": "F ∝ 1/r²: 거리 2배면 1/4, 그래프 모양과 계산",
+   "src": "일반 지식"
+  },
+  {
+   "id": "alg.sequence",
+   "name": "수열과 급수",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "alg.function"
+   ],
+   "tags": [
+    "대수"
+   ],
+   "desc": "등차·등비수열, Σ 기호, 무한급수의 합",
+   "src": "일반 지식"
+  },
+  {
+   "id": "trig.ratio",
+   "name": "삼각비 (sin·cos·tan)",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "geo.pythagoras",
+    "geo.similarity"
+   ],
+   "tags": [
+    "삼각"
+   ],
+   "desc": "직각삼각형에서 변의 비, 특수각 값 30°·45°·60°",
+   "src": "일반 지식"
+  },
+  {
+   "id": "trig.radian",
+   "name": "호도법과 일반각",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 1,
+   "prereq": [
+    "trig.ratio"
+   ],
+   "tags": [
+    "삼각"
+   ],
+   "desc": "π rad = 180°, 각의 부호와 사분면",
+   "src": "일반 지식"
+  },
+  {
+   "id": "trig.function",
+   "name": "삼각함수와 그래프",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "trig.radian",
+    "alg.function"
+   ],
+   "tags": [
+    "삼각",
+    "함수"
+   ],
+   "desc": "sin·cos·tan의 그래프, 주기·진폭, 단위원 정의",
+   "src": "일반 지식"
+  },
+  {
+   "id": "trig.identity",
+   "name": "삼각함수 항등식·덧셈정리",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "trig.function"
+   ],
+   "tags": [
+    "삼각"
+   ],
+   "desc": "sin²+cos²=1, 덧셈·배각·반각 공식",
+   "src": "일반 지식"
+  },
+  {
+   "id": "trig.law",
+   "name": "사인법칙·코사인법칙",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "trig.ratio"
+   ],
+   "tags": [
+    "삼각",
+    "기하"
+   ],
+   "desc": "일반 삼각형에서 변·각 구하기 (힘의 평행사변형에 쓰임)",
+   "src": "일반 지식"
+  },
+  {
+   "id": "vec.basic",
+   "name": "벡터의 뜻·덧셈·실수배",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "alg.expression",
+    "geo.pythagoras"
+   ],
+   "tags": [
+    "벡터"
+   ],
+   "desc": "크기와 방향, 화살표 덧셈(삼각형·평행사변형), 스칼라배",
+   "src": "일반 지식"
+  },
+  {
+   "id": "vec.components",
+   "name": "벡터의 성분 분해",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "vec.basic",
+    "trig.ratio"
+   ],
+   "tags": [
+    "벡터"
+   ],
+   "desc": "Fx=F cosθ, Fy=F sinθ, 성분끼리 더해 합벡터, 크기=√(x²+y²)",
+   "src": "일반 지식"
+  },
+  {
+   "id": "vec.unit",
+   "name": "단위벡터와 방향코사인",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 1,
+   "prereq": [
+    "vec.components"
+   ],
+   "tags": [
+    "벡터"
+   ],
+   "desc": "i, j, k 표기, 크기 1로 나누기, 방향각 cosα·cosβ·cosγ",
+   "src": "일반 지식"
+  },
+  {
+   "id": "vec.3d",
+   "name": "3차원 벡터와 공간좌표",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "vec.components"
+   ],
+   "tags": [
+    "벡터"
+   ],
+   "desc": "(x,y,z) 성분, 공간에서 크기·거리·중점",
+   "src": "일반 지식"
+  },
+  {
+   "id": "vec.dot",
+   "name": "벡터의 내적",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "vec.components",
+    "trig.function"
+   ],
+   "tags": [
+    "벡터"
+   ],
+   "desc": "A·B=|A||B|cosθ=AxBx+AyBy+AzBz, 두 벡터 사이 각·정사영",
+   "src": "일반 지식"
+  },
+  {
+   "id": "calc.limit",
+   "name": "극한",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "alg.function"
+   ],
+   "tags": [
+    "미적분"
+   ],
+   "desc": "x→a 일 때 함수값이 다가가는 값, 좌·우극한, ∞ 극한",
+   "src": "일반 지식"
+  },
+  {
+   "id": "calc.continuity",
+   "name": "연속",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 1,
+   "prereq": [
+    "calc.limit"
+   ],
+   "tags": [
+    "미적분"
+   ],
+   "desc": "극한값 = 함수값이면 연속, 불연속점 판정",
+   "src": "일반 지식"
+  },
+  {
+   "id": "calc.derivative",
+   "name": "미분계수와 도함수",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "calc.limit"
+   ],
+   "tags": [
+    "미적분"
+   ],
+   "desc": "순간변화율 = 접선 기울기, f′(x)=lim Δy/Δx",
+   "src": "일반 지식"
+  },
+  {
+   "id": "calc.diff_rules",
+   "name": "미분법 (곱·몫·연쇄)",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "calc.derivative",
+    "alg.polynomial"
+   ],
+   "tags": [
+    "미적분"
+   ],
+   "desc": "(fg)′=f′g+fg′, (f/g)′, 합성함수 연쇄법칙",
+   "src": "일반 지식"
+  },
+  {
+   "id": "calc.trans_diff",
+   "name": "초월함수의 미분",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "calc.diff_rules",
+    "alg.exp_log",
+    "trig.function"
+   ],
+   "tags": [
+    "미적분"
+   ],
+   "desc": "(eˣ)′=eˣ, (ln x)′=1/x, (sin x)′=cos x, (cos x)′=−sin x",
+   "src": "일반 지식"
+  },
+  {
+   "id": "calc.implicit",
+   "name": "음함수 미분",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "calc.diff_rules"
+   ],
+   "tags": [
+    "미적분"
+   ],
+   "desc": "F(x,y)=0 을 x 로 미분해 dy/dx 구하기 (y 를 x 의 함수로 보고 연쇄법칙)",
+   "src": "일반 지식"
+  },
+  {
+   "id": "calc.integral",
+   "name": "부정적분·적분법",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "calc.diff_rules"
+   ],
+   "tags": [
+    "미적분"
+   ],
+   "desc": "미분의 역연산, ∫xⁿdx, ∫eˣdx, ∫(1/x)dx=ln|x|+C, 적분상수",
+   "src": "일반 지식"
+  },
+  {
+   "id": "calc.definite",
+   "name": "정적분과 넓이",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "calc.integral"
+   ],
+   "tags": [
+    "미적분"
+   ],
+   "desc": "∫ₐᵇ f dx = F(b)−F(a), 넓이·누적량 계산, 무한소 dx 로 쪼개 더하기",
+   "src": "일반 지식"
+  },
+  {
+   "id": "calc.substitution",
+   "name": "치환적분",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "calc.integral"
+   ],
+   "tags": [
+    "미적분"
+   ],
+   "desc": "u=g(x) 로 바꿔 ∫f(g(x))g′(x)dx=∫f(u)du",
+   "src": "일반 지식"
+  },
+  {
+   "id": "calc.by_parts",
+   "name": "부분적분",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "calc.substitution",
+    "calc.trans_diff"
+   ],
+   "tags": [
+    "미적분"
+   ],
+   "desc": "∫u dv = uv − ∫v du, x·eˣ·삼각 곱 적분",
+   "src": "일반 지식"
+  },
+  {
+   "id": "calc.partial_fraction_int",
+   "name": "부분분수 적분",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "calc.integral",
+    "alg.rational_func"
+   ],
+   "tags": [
+    "미적분"
+   ],
+   "desc": "∫1/((x−a)(x−b)) 를 쪼개 ln 으로 적분 (로지스틱·분리형 ODE 에 필수)",
+   "src": "일반 지식"
+  },
+  {
+   "id": "phys.units",
+   "name": "단위·차원·유효숫자",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 1,
+   "prereq": [
+    "alg.ratio"
+   ],
+   "tags": [
+    "물리"
+   ],
+   "desc": "SI 기본단위(m·kg·s·A), 접두어(k·m·μ·n), 단위 환산과 차원 확인",
+   "src": "일반 지식"
+  },
+  {
+   "id": "phys.scalar_vector",
+   "name": "스칼라와 벡터 물리량",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 0.5,
+   "prereq": [
+    "vec.basic",
+    "phys.units"
+   ],
+   "tags": [
+    "물리",
+    "벡터"
+   ],
+   "desc": "크기만 있는 양(질량·에너지) vs 방향도 있는 양(힘·속도·전기장)",
+   "src": "일반 지식"
+  },
+  {
+   "id": "mech.kinematics",
+   "name": "운동학 (위치·속도·가속도)",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "calc.derivative",
+    "phys.units"
+   ],
+   "tags": [
+    "역학"
+   ],
+   "desc": "v=dx/dt, a=dv/dt, 등가속도 공식, 그래프 해석",
+   "src": "일반 지식"
+  },
+  {
+   "id": "mech.newton",
+   "name": "뉴턴 운동 법칙",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "mech.kinematics",
+    "vec.components"
+   ],
+   "tags": [
+    "역학"
+   ],
+   "desc": "1법칙 관성, 2법칙 ΣF=ma, 3법칙 작용·반작용, 벡터 방정식",
+   "src": "일반 지식"
+  },
+  {
+   "id": "mech.force_types",
+   "name": "힘의 종류",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "mech.newton"
+   ],
+   "tags": [
+    "역학"
+   ],
+   "desc": "중력 mg, 수직항력, 마찰력 μN, 장력, 탄성력 kx",
+   "src": "일반 지식"
+  },
+  {
+   "id": "mech.fbd",
+   "name": "자유물체도 (FBD)",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "mech.force_types"
+   ],
+   "tags": [
+    "역학"
+   ],
+   "desc": "물체 하나만 떼어 작용하는 힘을 전부 화살표로 그리기",
+   "src": "일반 지식"
+  },
+  {
+   "id": "mech.energy",
+   "name": "일과 에너지",
+   "level": "고교",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "mech.newton",
+    "calc.definite"
+   ],
+   "tags": [
+    "역학"
+   ],
+   "desc": "W=∫F·dx, 운동·위치에너지, 에너지 보존",
+   "src": "일반 지식"
+  },
+  {
+   "id": "em.charge",
+   "name": "전하와 전하량 보존·양자화",
+   "level": "고교",
+   "subject": "일반물리학2",
+   "hours": 1,
+   "prereq": [
+    "phys.units"
+   ],
+   "tags": [
+    "전자기"
+   ],
+   "desc": "전기의 소스 = 전하, q=ne (e=1.6×10⁻¹⁹ C), 마찰·유도·알짜 전하 세기",
+   "src": "일반물리학2/2026-09-04/정리.md"
+  },
+  {
+   "id": "em.coulomb",
+   "name": "쿨롱 법칙",
+   "level": "고교",
+   "subject": "일반물리학2",
+   "hours": 2,
+   "prereq": [
+    "em.charge",
+    "vec.components",
+    "alg.inverse_square"
+   ],
+   "tags": [
+    "전자기"
+   ],
+   "desc": "F=k q₁q₂/r², k=1/4πε₀≈9×10⁹, 인력·척력 방향은 두 전하를 잇는 직선",
+   "src": "일반물리학2/_정리노트/2026-09-04_전하와전기장서론.html"
+  },
+  {
+   "id": "lin.matrix",
+   "name": "행렬의 정의와 종류",
+   "level": "대학기초",
+   "subject": "미분적분학2",
+   "hours": 1.5,
+   "prereq": [
+    "alg.simul_eq",
+    "alg.expression"
+   ],
+   "tags": [
+    "선형대수"
+   ],
+   "desc": "m×n 행렬, 성분 aᵢⱼ, 정사각·단위(I)·영(O)·전치(Aᵀ)·대칭행렬",
+   "src": "미분적분학2/2026-09-01/학습지_정리.md"
+  },
+  {
+   "id": "lin.matrix_ops",
+   "name": "행렬의 연산",
+   "level": "대학기초",
+   "subject": "미분적분학2",
+   "hours": 2,
+   "prereq": [
+    "lin.matrix"
+   ],
+   "tags": [
+    "선형대수"
+   ],
+   "desc": "상등·합차·실수배·곱(m×n · n×p → m×p, 앞 열 수 = 뒤 행 수)·거듭제곱, AB≠BA",
+   "src": "미분적분학2/2026-09-03/정리.md"
+  },
+  {
+   "id": "lin.det2",
+   "name": "2차 행렬식",
+   "level": "대학기초",
+   "subject": "미분적분학2",
+   "hours": 1,
+   "prereq": [
+    "lin.matrix_ops"
+   ],
+   "tags": [
+    "선형대수"
+   ],
+   "desc": "det A = ad − bc, 표기 |A| (세로줄), det=0 이면 특이행렬",
+   "src": "미분적분학2/2026-09-03/정리.md"
+  },
+  {
+   "id": "lin.det3",
+   "name": "3차 행렬식·사루스 법칙",
+   "level": "대학기초",
+   "subject": "미분적분학2",
+   "hours": 1.5,
+   "prereq": [
+    "lin.det2"
+   ],
+   "tags": [
+    "선형대수"
+   ],
+   "desc": "↘ 3개 곱의 합 − ↙ 3개 곱의 합, 손계산 3차까지",
+   "src": "미분적분학2/2026-09-03/정리.md"
+  },
+  {
+   "id": "lin.cofactor",
+   "name": "소행렬식과 여인수 전개",
+   "level": "대학기초",
+   "subject": "미분적분학2",
+   "hours": 2,
+   "prereq": [
+    "lin.det3"
+   ],
+   "tags": [
+    "선형대수"
+   ],
+   "desc": "Mᵢⱼ 소행렬식, Cᵢⱼ=(−1)ⁱ⁺ʲMᵢⱼ, 임의 행·열로 전개해 n차 행렬식",
+   "src": "미분적분학2/2026-09-01/학습지_정리.md"
+  },
+  {
+   "id": "lin.det_props",
+   "name": "행렬식의 성질",
+   "level": "대학기초",
+   "subject": "미분적분학2",
+   "hours": 1.5,
+   "prereq": [
+    "lin.cofactor"
+   ],
+   "tags": [
+    "선형대수"
+   ],
+   "desc": "행 교환 부호 반전, 실수배, 두 행 같으면 0, det(AB)=det A·det B",
+   "src": "일반 지식"
+  },
+  {
+   "id": "lin.inverse",
+   "name": "역행렬",
+   "level": "대학기초",
+   "subject": "미분적분학2",
+   "hours": 2,
+   "prereq": [
+    "lin.det_props",
+    "lin.cofactor"
+   ],
+   "tags": [
+    "선형대수"
+   ],
+   "desc": "존재 조건 det A≠0, A⁻¹=adj A/det A, 2차 공식, AA⁻¹=I",
+   "src": "미분적분학2/2026-09-01/학습지_정리.md"
+  },
+  {
+   "id": "lin.linear_system",
+   "name": "연립1차방정식의 행렬 표현",
+   "level": "대학기초",
+   "subject": "미분적분학2",
+   "hours": 1.5,
+   "prereq": [
+    "lin.matrix_ops",
+    "alg.simul_eq"
+   ],
+   "tags": [
+    "선형대수"
+   ],
+   "desc": "Ax=b 로 쓰기, 계수행렬·상수벡터, 해의 존재와 det",
+   "src": "일반 지식"
+  },
+  {
+   "id": "lin.cramer",
+   "name": "크래머 법칙",
+   "level": "대학기초",
+   "subject": "미분적분학2",
+   "hours": 1.5,
+   "prereq": [
+    "lin.inverse",
+    "lin.linear_system"
+   ],
+   "tags": [
+    "선형대수"
+   ],
+   "desc": "xᵢ = det(Aᵢ)/det(A), Aᵢ 는 i열을 상수항으로 교체",
+   "src": "미분적분학2/2026-09-01/학습지_정리.md"
+  },
+  {
+   "id": "vec.cross",
+   "name": "벡터의 외적",
+   "level": "대학기초",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "vec.dot",
+    "lin.det3"
+   ],
+   "tags": [
+    "벡터",
+    "선형대수"
+   ],
+   "desc": "A×B = |A||B|sinθ n̂, 3×3 행렬식으로 계산, 오른손 법칙",
+   "src": "일반 지식"
+  },
+  {
+   "id": "calc.multivar",
+   "name": "다변수 함수와 편미분",
+   "level": "대학기초",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "calc.trans_diff",
+    "vec.3d"
+   ],
+   "tags": [
+    "미적분"
+   ],
+   "desc": "z=f(x,y), ∂f/∂x 는 y 를 상수로 보고 미분, 혼합 편도함수 fxy=fyx",
+   "src": "일반 지식"
+  },
+  {
+   "id": "calc.total_diff",
+   "name": "전미분과 다변수 연쇄법칙",
+   "level": "대학기초",
+   "subject": "공통",
+   "hours": 1.5,
+   "prereq": [
+    "calc.multivar"
+   ],
+   "tags": [
+    "미적분"
+   ],
+   "desc": "du = uₓdx + u_y dy, 매개변수 t 에 대한 미분",
+   "src": "일반 지식"
+  },
+  {
+   "id": "calc.taylor",
+   "name": "테일러·매클로린 급수",
+   "level": "대학기초",
+   "subject": "공통",
+   "hours": 2,
+   "prereq": [
+    "calc.trans_diff",
+    "alg.sequence"
+   ],
+   "tags": [
+    "미적분"
+   ],
+   "desc": "f(x)=Σ f⁽ⁿ⁾(a)(x−a)ⁿ/n!, eˣ·sin·cos 전개, 근사",
+   "src": "일반 지식"
+  },
+  {
+   "id": "ode.concept",
+   "name": "미분방정식의 개념·계·ODE/PDE",
+   "level": "대학기초",
+   "subject": "공업수학1",
+   "hours": 1.5,
+   "prereq": [
+    "calc.derivative",
+    "calc.integral"
+   ],
+   "tags": [
+    "미분방정식"
+   ],
+   "desc": "미지 함수의 도함수가 든 식, 상미분(변수 1개) vs 편미분, 계 = 최고 도함수 차수 ((dy/dx)³ 은 1계)",
+   "src": "공업수학1/2026-09-02/정리.md"
+  },
+  {
+   "id": "ode.modeling",
+   "name": "수학적 모델화 3단계",
+   "level": "대학기초",
+   "subject": "공업수학1",
+   "hours": 1.5,
+   "prereq": [
+    "ode.concept",
+    "mech.newton"
+   ],
+   "tags": [
+    "미분방정식",
+    "모델링"
+   ],
+   "desc": "물리 상황 → 미분방정식 세우기 → 풀기 → 해석. 예: 뉴턴 냉각, 공기저항 낙하, 투사체",
+   "src": "공업수학1/2026-09-02/정리.md"
+  },
+  {
+   "id": "ode.linearity",
+   "name": "선형·비선형 판별",
+   "level": "대학기초",
+   "subject": "공업수학1",
+   "hours": 1,
+   "prereq": [
+    "ode.concept"
+   ],
+   "tags": [
+    "미분방정식"
+   ],
+   "desc": "y 와 그 도함수가 1차이고 계수가 x 만의 함수면 선형. y², yy′, sin y 는 비선형",
+   "src": "공업수학1/2026-09-02/정리.md"
+  },
+  {
+   "id": "ode.solution",
+   "name": "해의 종류 (일반해·특수해·특이해)",
+   "level": "대학기초",
+   "subject": "공업수학1",
+   "hours": 1,
+   "prereq": [
+    "ode.concept"
+   ],
+   "tags": [
+    "미분방정식"
+   ],
+   "desc": "일반해 = 적분상수 c 포함, 특수해 = c 결정, 특이해는 공학에서 거의 안 다룸. n계 → 상수 n개",
+   "src": "공업수학1/2026-09-04/정리.md"
+  },
+  {
+   "id": "ode.ivp",
+   "name": "초기값 문제",
+   "level": "대학기초",
+   "subject": "공업수학1",
+   "hours": 1,
+   "prereq": [
+    "ode.solution"
+   ],
+   "tags": [
+    "미분방정식"
+   ],
+   "desc": "y(x₀)=y₀ 조건으로 c 결정. 초기조건(독립변수 0) vs 경계조건. Ex.4 y′=3y",
+   "src": "공업수학1/2026-09-04/정리.md"
+  },
+  {
+   "id": "ode.direction_field",
+   "name": "방향장과 오일러 방법",
+   "level": "대학기초",
+   "subject": "공업수학1",
+   "hours": 1.5,
+   "prereq": [
+    "ode.solution",
+    "alg.linear_func"
+   ],
+   "tags": [
+    "미분방정식"
+   ],
+   "desc": "각 점에서 기울기 y′=f(x,y) 를 짧은 선분으로 그려 해 곡선 모양 보기, 등경사선, 수치해 y₁=y₀+hf",
+   "src": "공업수학1/_정리노트/Ch1_1계상미분방정식_정리노트.html"
+  },
+  {
+   "id": "ode.separable",
+   "name": "변수분리형 ODE",
+   "level": "대학기초",
+   "subject": "공업수학1",
+   "hours": 2,
+   "prereq": [
+    "ode.ivp",
+    "calc.integral",
+    "alg.exp_log"
+   ],
+   "tags": [
+    "미분방정식"
+   ],
+   "desc": "g(y)dy = f(x)dx 로 갈라 양변 적분. ln 이 나오면 e 로 벗겨 y 정리",
+   "src": "공업수학1/_정리노트/Ch1_1계상미분방정식_정리노트.html"
+  },
+  {
+   "id": "ode.homogeneous",
+   "name": "동차형 (y=ux 치환)",
+   "level": "대학기초",
+   "subject": "공업수학1",
+   "hours": 1.5,
+   "prereq": [
+    "ode.separable"
+   ],
+   "tags": [
+    "미분방정식"
+   ],
+   "desc": "y′=f(y/x) 꼴은 y=ux 로 두면 변수분리형이 된다 (1.3 확장)",
+   "src": "공업수학1/_정리노트/Ch1_1계상미분방정식_정리노트.html"
+  },
+  {
+   "id": "ode.exact",
+   "name": "완전미분방정식",
+   "level": "대학기초",
+   "subject": "공업수학1",
+   "hours": 2,
+   "prereq": [
+    "ode.separable",
+    "calc.multivar"
+   ],
+   "tags": [
+    "미분방정식"
+   ],
+   "desc": "M dx + N dy = 0, ∂M/∂y=∂N/∂x 이면 완전. u(x,y)=c 를 적분으로 복원",
+   "src": "공업수학1/_정리노트/Ch1_1계상미분방정식_정리노트.html"
+  },
+  {
+   "id": "ode.integrating_factor",
+   "name": "적분인자",
+   "level": "대학기초",
+   "subject": "공업수학1",
+   "hours": 1.5,
+   "prereq": [
+    "ode.exact"
+   ],
+   "tags": [
+    "미분방정식"
+   ],
+   "desc": "완전하지 않으면 F=e^{∫R dx} 를 곱해 완전하게 만든다",
+   "src": "공업수학1/_정리노트/Ch1_1계상미분방정식_정리노트.html"
+  },
+  {
+   "id": "ode.linear1",
+   "name": "1계 선형 ODE",
+   "level": "대학기초",
+   "subject": "공업수학1",
+   "hours": 2,
+   "prereq": [
+    "ode.integrating_factor",
+    "calc.by_parts"
+   ],
+   "tags": [
+    "미분방정식"
+   ],
+   "desc": "y′+p(x)y=r(x), 적분인자 e^{∫p dx} 곱해 (e^{∫p}y)′=e^{∫p}r → 공식 한 방",
+   "src": "공업수학1/_정리노트/Ch1_1계상미분방정식_정리노트.html"
+  },
+  {
+   "id": "ode.bernoulli",
+   "name": "베르누이 방정식",
+   "level": "대학기초",
+   "subject": "공업수학1",
+   "hours": 1.5,
+   "prereq": [
+    "ode.linear1"
+   ],
+   "tags": [
+    "미분방정식"
+   ],
+   "desc": "y′+py=gyᵃ 는 u=y^{1−a} 치환으로 선형이 된다",
+   "src": "공업수학1/_정리노트/Ch1_1계상미분방정식_정리노트.html"
+  },
+  {
+   "id": "ode.exp_model",
+   "name": "지수 성장·감쇠 모델",
+   "level": "대학기초",
+   "subject": "공업수학1",
+   "hours": 1,
+   "prereq": [
+    "ode.separable",
+    "ode.modeling"
+   ],
+   "tags": [
+    "미분방정식",
+    "모델링"
+   ],
+   "desc": "y′=ky → y=ce^{kx}. 뉴턴 냉각·방사성 붕괴·인구 모델",
+   "src": "공업수학1/_정리노트/Ch1_1계상미분방정식_정리노트.html"
+  },
+  {
+   "id": "ode.second_order",
+   "name": "2계 선형 ODE 개요",
+   "level": "전공",
+   "subject": "공업수학1",
+   "hours": 3,
+   "prereq": [
+    "ode.linear1",
+    "lin.det2"
+   ],
+   "tags": [
+    "미분방정식"
+   ],
+   "desc": "y″+py′+qy=r, 동차해·특수해, 특성방정식 (Ch.2, 4~5주차 예정)",
+   "src": "일반 지식"
+  },
+  {
+   "id": "em.field",
+   "name": "전기장의 정의·점전하의 전기장",
+   "level": "전공",
+   "subject": "일반물리학2",
+   "hours": 2,
+   "prereq": [
+    "em.coulomb"
+   ],
+   "tags": [
+    "전자기"
+   ],
+   "desc": "E = F/q₀ (시험전하 +1 C 가 받는 힘), 점전하 E=kq/r², 방향은 +전하에서 밖으로",
+   "src": "일반물리학2/_정리노트/2026-09-04_전하와전기장서론.html"
+  },
+  {
+   "id": "em.superposition",
+   "name": "전기장의 중첩 (벡터 합)",
+   "level": "전공",
+   "subject": "일반물리학2",
+   "hours": 2,
+   "prereq": [
+    "em.field",
+    "vec.components"
+   ],
+   "tags": [
+    "전자기"
+   ],
+   "desc": "여러 전하의 E 를 성분으로 나눠 더한다. 불연속 Σ, 연속 ∫",
+   "src": "일반물리학2/_정리노트/2026-09-04_전하와전기장서론.html"
+  },
+  {
+   "id": "em.field_lines",
+   "name": "전기력선",
+   "level": "전공",
+   "subject": "일반물리학2",
+   "hours": 1,
+   "prereq": [
+    "em.field"
+   ],
+   "tags": [
+    "전자기"
+   ],
+   "desc": "+에서 −로, 밀도 ∝ 세기, 교차하지 않음. 전기장 = 전기력선 개수 세기",
+   "src": "일반물리학2/2026-09-04/정리.md"
+  },
+  {
+   "id": "em.constants",
+   "name": "ε₀·μ₀·c 의 관계",
+   "level": "전공",
+   "subject": "일반물리학2",
+   "hours": 0.5,
+   "prereq": [
+    "em.coulomb"
+   ],
+   "tags": [
+    "전자기"
+   ],
+   "desc": "ε₀=8.854×10⁻¹² 진공 유전율, μ₀=4π×10⁻⁷ 투자율, c=1/√(ε₀μ₀)",
+   "src": "일반물리학2/2026-09-04/정리.md"
+  },
+  {
+   "id": "em.continuous",
+   "name": "연속 전하분포의 전기장",
+   "level": "전공",
+   "subject": "일반물리학2",
+   "hours": 3,
+   "prereq": [
+    "em.superposition",
+    "calc.definite",
+    "trig.ratio"
+   ],
+   "tags": [
+    "전자기"
+   ],
+   "desc": "선·고리·원판 전하: dq=λdl 로 쪼개 dE 적분, 대칭으로 성분 소거",
+   "src": "일반물리학2/_정리노트/2026-09-04_전하와전기장서론.html"
+  },
+  {
+   "id": "em.dipole",
+   "name": "전기 쌍극자와 토크",
+   "level": "전공",
+   "subject": "일반물리학2",
+   "hours": 1.5,
+   "prereq": [
+    "em.field",
+    "vec.cross"
+   ],
+   "tags": [
+    "전자기"
+   ],
+   "desc": "p=qd, 균일 전기장 속 토크 τ=p×E, 쌍극자 축 위 전기장",
+   "src": "일반물리학2/_정리노트/2026-09-04_전하와전기장서론.html"
+  },
+  {
+   "id": "mech.statics_intro",
+   "name": "정역학 개요·단위계",
+   "level": "전공",
+   "subject": "정역학",
+   "hours": 1,
+   "prereq": [
+    "phys.units",
+    "mech.newton"
+   ],
+   "tags": [
+    "역학"
+   ],
+   "desc": "평형 상태의 힘 해석, SI/US 단위계, 뉴턴 3법칙 재정리, 유효숫자 (Ch.1)",
+   "src": "정역학/2026-09-02/정리.md"
+  },
+  {
+   "id": "mech.force_vector",
+   "name": "힘의 벡터 표현과 합력",
+   "level": "전공",
+   "subject": "정역학",
+   "hours": 2,
+   "prereq": [
+    "vec.components",
+    "trig.law"
+   ],
+   "tags": [
+    "역학",
+    "벡터"
+   ],
+   "desc": "힘 = 벡터, 평행사변형 법칙, 직각성분으로 합력 R=ΣF, 방향각 (Ch.2)",
+   "src": "정역학/2026-09-02/정리.md"
+  },
+  {
+   "id": "mech.force_3d",
+   "name": "3차원 힘과 방향코사인",
+   "level": "전공",
+   "subject": "정역학",
+   "hours": 2,
+   "prereq": [
+    "mech.force_vector",
+    "vec.unit",
+    "vec.3d"
+   ],
+   "tags": [
+    "역학",
+    "벡터"
+   ],
+   "desc": "F=F(cosα i+cosβ j+cosγ k), 두 점을 잇는 단위벡터로 힘 표현 (Ch.2)",
+   "src": "정역학/2026-09-02/정리.md"
+  },
+  {
+   "id": "mech.dot_apps",
+   "name": "내적의 응용 (성분·사이각)",
+   "level": "전공",
+   "subject": "정역학",
+   "hours": 1.5,
+   "prereq": [
+    "vec.dot",
+    "mech.force_vector"
+   ],
+   "tags": [
+    "역학",
+    "벡터"
+   ],
+   "desc": "어떤 방향으로의 힘 성분 = F·u, 두 힘 사이 각 (Ch.2)",
+   "src": "정역학/2026-09-02/정리.md"
+  },
+  {
+   "id": "mech.cross_apps",
+   "name": "외적과 모멘트 개념",
+   "level": "전공",
+   "subject": "정역학",
+   "hours": 2,
+   "prereq": [
+    "vec.cross",
+    "mech.force_vector"
+   ],
+   "tags": [
+    "역학",
+    "벡터"
+   ],
+   "desc": "r×F 로 회전 효과, 방향은 오른손 법칙 (Ch.2 도입, Ch.4 본격)",
+   "src": "정역학/2026-09-02/정리.md"
+  },
+  {
+   "id": "mech.equilibrium_particle",
+   "name": "질점의 평형",
+   "level": "전공",
+   "subject": "정역학",
+   "hours": 2,
+   "prereq": [
+    "mech.fbd",
+    "mech.force_vector"
+   ],
+   "tags": [
+    "역학"
+   ],
+   "desc": "ΣF=0 → 성분별 방정식, 장력·스프링 문제 (Ch.3, 중간 범위)",
+   "src": "정역학/2026-09-02/정리.md"
+  },
+  {
+   "id": "mech.moment",
+   "name": "힘의 모멘트",
+   "level": "전공",
+   "subject": "정역학",
+   "hours": 2,
+   "prereq": [
+    "mech.cross_apps"
+   ],
+   "tags": [
+    "역학"
+   ],
+   "desc": "M=r×F, 2차원은 M=Fd, 우력 (Ch.4, 중간 범위)",
+   "src": "정역학/2026-09-02/정리.md"
+  },
+  {
+   "id": "cad.orthographic",
+   "name": "정투상법 (제3각법)",
+   "level": "전공",
+   "subject": "CADD",
+   "hours": 2,
+   "prereq": [
+    "geo.solid"
+   ],
+   "tags": [
+    "CAD",
+    "제도"
+   ],
+   "desc": "정면·평면·측면도 배치, 숨은선·중심선 규칙 (KS/ISO)",
+   "src": "일반 지식"
+  },
+  {
+   "id": "cad.dimensioning",
+   "name": "치수 기입",
+   "level": "전공",
+   "subject": "CADD",
+   "hours": 1.5,
+   "prereq": [
+    "cad.orthographic"
+   ],
+   "tags": [
+    "CAD",
+    "제도"
+   ],
+   "desc": "치수선·치수보조선·화살표, 지름 φ·반지름 R, 중복 치수 금지 (KS 제도 규칙)",
+   "src": "일반 지식"
+  },
+  {
+   "id": "cad.sketch_constraints",
+   "name": "스케치 구속 (기하·치수)",
+   "level": "전공",
+   "subject": "CADD",
+   "hours": 2,
+   "prereq": [
+    "cad.dimensioning",
+    "geo.angle"
+   ],
+   "tags": [
+    "CAD"
+   ],
+   "desc": "수평·수직·일치·접선·동심 구속과 치수 구속으로 스케치를 완전 정의",
+   "src": "일반 지식"
+  },
+  {
+   "id": "cad.tool",
+   "name": "CATIA 기본 조작",
+   "level": "전공",
+   "subject": "CADD",
+   "hours": 2,
+   "prereq": [],
+   "tags": [
+    "CAD"
+   ],
+   "desc": "작업대(Sketcher·Part Design), 스케치 → 패드/포켓, 시점·선택 (강의계획서: CATIA 사용)",
+   "src": "study-console index.html CADD_SYLLABUS"
+  }
+ ]
+}
