@@ -1,0 +1,73 @@
+{
+ "id": "calc.integral",
+ "easy": "미분의 되감기. '미분하면 이게 되는 함수'를 찾는 것. 되감을 때마다 상수 C 가 따라온다.",
+ "core": "∫f(x) dx = F(x) + C  ⇔  F′(x) = f(x)\n∫xⁿ dx = xⁿ⁺¹/(n+1) + C (n ≠ −1)\n∫(1/x) dx = ln|x| + C\n∫eˣ dx = eˣ + C,  ∫e^(kx) dx = e^(kx)/k + C\n∫sin x dx = −cos x + C,  ∫cos x dx = sin x + C\n∫1/(1+x²) dx = arctan x + C\n선형성: ∫(af + bg) = a∫f + b∫g",
+ "example": {
+  "q": "∫(3x² − 2/x + e^(2x)) dx",
+  "steps": [
+   "항별로: ∫3x² dx = x³",
+   "∫(−2/x) dx = −2 ln|x|",
+   "∫e^(2x) dx = e^(2x)/2",
+   "합: x³ − 2 ln|x| + e^(2x)/2 + C"
+  ]
+ },
+ "pitfall": "∫(1/x) dx 를 x⁰/0 으로 쓰는 것(n = −1 은 ln). 그리고 + C 를 빼먹는 것 — ODE 에선 이 C 가 일반해의 핵심.",
+ "quiz": [
+  {
+   "q": "∫x³ dx 는?",
+   "options": [
+    "3x²",
+    "x⁴/4 + C",
+    "x⁴",
+    "4x³ + C"
+   ],
+   "answer": 1,
+   "why": "지수를 하나 올리고 그 수로 나눈다."
+  },
+  {
+   "q": "∫(1/x) dx 는?",
+   "options": [
+    "ln|x| + C",
+    "x⁰/0",
+    "−1/x² + C",
+    "1/x + C"
+   ],
+   "answer": 0,
+   "why": "(ln|x|)′ = 1/x."
+  },
+  {
+   "q": "∫e^(3x) dx 는?",
+   "options": [
+    "e^(3x) + C",
+    "3e^(3x) + C",
+    "e^(3x)/3 + C",
+    "e^(x)/3 + C"
+   ],
+   "answer": 2,
+   "why": "미분하면 3 이 튀어나오므로 3 으로 나눠 둔다."
+  },
+  {
+   "q": "∫1/(1+y²) dy 는?",
+   "options": [
+    "ln(1+y²)",
+    "arctan y + C",
+    "−1/(1+y²)",
+    "y/(1+y²)"
+   ],
+   "answer": 1,
+   "why": "(arctan y)′ = 1/(1+y²)."
+  },
+  {
+   "q": "∫sin x dx 는?",
+   "options": [
+    "cos x + C",
+    "−cos x + C",
+    "sin x + C",
+    "−sin x + C"
+   ],
+   "answer": 1,
+   "why": "(−cos x)′ = sin x."
+  }
+ ],
+ "src": "일반 지식(표준 정의)"
+}

@@ -1,0 +1,73 @@
+{
+ "id": "ode.exact",
+ "easy": "미분된 조각 M, N 을 보고 원래 함수 u(x,y) 를 '복원'하는 퍼즐. 먼저 조각이 진짜 한 함수에서 나왔는지(M_y = N_x) 확인.",
+ "core": "꼴: M(x,y) dx + N(x,y) dy = 0\n완전 판별: ∂M/∂y = ∂N/∂x  (M 은 y 로, N 은 x 로 — 서로 반대 변수)\n이유: u_xy = u_yx (편미분 순서 무관)\n해: u(x,y) = c, 여기서 u = ∫M dx + k(y), 그다음 ∂u/∂y = N 으로 k′(y) 결정\n(또는 u = ∫N dy + l(x), u_x = M 으로 l′(x)) — 적분이 쉬운 쪽을 고른다.\n검산: u_x = M, u_y = N.",
+ "example": {
+  "q": "cos(x+y) dx + (3y² + 2y + cos(x+y)) dy = 0  (Kreyszig 1.4 Ex.1)",
+  "steps": [
+   "M = cos(x+y), N = 3y² + 2y + cos(x+y). M_y = −sin(x+y), N_x = −sin(x+y) → 완전 ✓",
+   "u = ∫M dx = sin(x+y) + k(y)",
+   "u_y = cos(x+y) + k′(y) = N → k′(y) = 3y² + 2y → k = y³ + y²",
+   "해: sin(x+y) + y³ + y² = c"
+  ]
+ },
+ "pitfall": "x 로 적분할 때 '상수'는 숫자가 아니라 y 만의 함수 k(y) 다. 또 M 을 x 로, N 을 y 로 잘못 미분하는 실수.",
+ "quiz": [
+  {
+   "q": "M dx + N dy = 0 이 완전일 조건은?",
+   "options": [
+    "M_x = N_y",
+    "M_y = N_x",
+    "M = N",
+    "M_x + N_y = 0"
+   ],
+   "answer": 1,
+   "why": "서로 반대 변수로 편미분한 값이 같아야 한다."
+  },
+  {
+   "q": "완전 ODE 의 해 형태는?",
+   "options": [
+    "y = f(x)",
+    "u(x,y) = c",
+    "y′ = 0",
+    "M = N"
+   ],
+   "answer": 1,
+   "why": "du = 0 이므로 u 는 상수."
+  },
+  {
+   "q": "u = ∫M dx 를 할 때 붙는 '상수'는?",
+   "options": [
+    "숫자 c",
+    "y 만의 함수 k(y)",
+    "x 만의 함수",
+    "0"
+   ],
+   "answer": 1,
+   "why": "x 로 적분하면 y 는 상수 취급이라 k(y) 가 남는다."
+  },
+  {
+   "q": "M = cos(x+y) 일 때 M_y 는?",
+   "options": [
+    "sin(x+y)",
+    "−sin(x+y)",
+    "cos(x+y)",
+    "0"
+   ],
+   "answer": 1,
+   "why": "∂/∂y cos(x+y) = −sin(x+y)."
+  },
+  {
+   "q": "완전성 조건의 근거는?",
+   "options": [
+    "u_x = u_y",
+    "u_xy = u_yx",
+    "u = 0",
+    "M = N"
+   ],
+   "answer": 1,
+   "why": "편미분 순서를 바꿔도 같기 때문."
+  }
+ ],
+ "src": "study-materials/공업수학1/_정리노트/Ch1_쉬운정리_개념공식문제풀이.html · _과제/1주차_과제가이드.html · Kreyszig 10판 Ch.1"
+}

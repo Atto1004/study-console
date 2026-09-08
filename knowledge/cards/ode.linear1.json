@@ -1,0 +1,74 @@
+{
+ "id": "ode.linear1",
+ "easy": "y′ + p(x)y = r(x) 는 e^(∫p) 를 곱하면 좌변이 한 덩어리 미분으로 뭉쳐진다. 그 뒤 양변 적분 — 공식 한 방.",
+ "core": "표준형: y′ + p(x) y = r(x)  (y′ 의 계수를 1 로 만든 뒤 p, r 을 읽는다)\nr = 0 이면 제차: y = c e^(−∫p dx)\n비제차: h = ∫p dx,  y = e^(−h) ( ∫e^h r dx + c )\n원리: e^h 를 곱하면 (e^h y)′ = e^h r.\n공학 해석: r(x) = 입력(힘·전압), y(x) = 출력(변위·전류).",
+ "example": {
+  "q": "y′ + y tan x = sin 2x, y(0) = 1  (Kreyszig 1.5 Ex.1)",
+  "steps": [
+   "p = tan x, r = sin 2x = 2 sin x cos x",
+   "h = ∫tan x dx = −ln|cos x| → e^h = 1/cos x = sec x",
+   "∫e^h r dx = ∫2 sin x dx = −2 cos x",
+   "y = cos x (−2 cos x + c) = c cos x − 2cos²x. y(0)=1 → c − 2 = 1 → c = 3",
+   "특수해: y = 3 cos x − 2 cos²x"
+  ]
+ },
+ "pitfall": "xy′ + 2y = 3 을 표준형으로 안 나누고 p = 2 라고 읽는 것. 먼저 x 로 나눠 p = 2/x, r = 3/x.",
+ "quiz": [
+  {
+   "q": "1계 선형 ODE 의 표준형은?",
+   "options": [
+    "y′ = f(y/x)",
+    "y′ + p(x)y = r(x)",
+    "M dx + N dy = 0",
+    "y′ = g(y)f(x)"
+   ],
+   "answer": 1,
+   "why": "y′ 의 계수가 1 인 모양."
+  },
+  {
+   "q": "xy′ + 2y = 3 에서 p(x) 는?",
+   "options": [
+    "2",
+    "2/x",
+    "3",
+    "x"
+   ],
+   "answer": 1,
+   "why": "x 로 나눠 y′ + (2/x)y = 3/x."
+  },
+  {
+   "q": "y′ + py = 0 (제차) 의 해는?",
+   "options": [
+    "y = ce^(∫p dx)",
+    "y = ce^(−∫p dx)",
+    "y = p",
+    "y = c"
+   ],
+   "answer": 1,
+   "why": "dy/y = −p dx 로 변수분리."
+  },
+  {
+   "q": "적분인자 e^h 를 곱하면 좌변은?",
+   "options": [
+    "(e^h y)′",
+    "e^h y′",
+    "h′y",
+    "0"
+   ],
+   "answer": 0,
+   "why": "곱의 미분 (e^h y)′ = e^h y′ + h′e^h y = e^h(y′ + py)."
+  },
+  {
+   "q": "y′ + y tan x = sin 2x 에서 e^h 는?",
+   "options": [
+    "cos x",
+    "sec x",
+    "sin x",
+    "tan x"
+   ],
+   "answer": 1,
+   "why": "∫tan x dx = −ln|cos x| → e^h = 1/cos x."
+  }
+ ],
+ "src": "study-materials/공업수학1/_정리노트/Ch1_쉬운정리_개념공식문제풀이.html · _과제/1주차_과제가이드.html · Kreyszig 10판 Ch.1"
+}

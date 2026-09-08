@@ -1,0 +1,72 @@
+{
+ "id": "alg.exp_log",
+ "easy": "e^x 는 '미분해도 자기 자신'인 유일한 함수, ln 은 그 되감기. ODE 답에 e 가 자꾸 나오는 이유.",
+ "core": "지수법칙: e^a·e^b = e^(a+b), (e^a)^b = e^(ab), e^0 = 1\n로그: ln(ab) = ln a + ln b, ln(a/b) = ln a − ln b, ln(aᵏ) = k ln a, ln e = 1, ln 1 = 0\ne^(ln x) = x, ln(e^x) = x (서로 역함수)\n방정식: e^x = 5 → x = ln 5;  ln|y| = 3x + c → |y| = e^c·e^(3x)\n(e^x)′ = e^x, (ln x)′ = 1/x",
+ "example": {
+  "q": "ln|y| = −kt + c* 를 y 에 대해 풀어라",
+  "steps": [
+   "양변에 e: |y| = e^(−kt + c*) = e^(c*)·e^(−kt)",
+   "e^(c*) 는 양의 상수, ± 를 흡수해 C 로: y = Ce^(−kt)",
+   "40 = 70e^(−10k) 같은 식은 양변을 70 으로 나누고 ln: −10k = ln(4/7) → k = ln(7/4)/10"
+  ]
+ },
+ "pitfall": "ln(a + b) 를 ln a + ln b 로 쪼개는 것(틀림). 곱은 쪼개지지만 합은 안 된다.",
+ "quiz": [
+  {
+   "q": "e^(3x)·e^(x) 는?",
+   "options": [
+    "e^(3x²)",
+    "e^(4x)",
+    "e^(3x)+e^x",
+    "3e^(2x)"
+   ],
+   "answer": 1,
+   "why": "지수끼리 더한다."
+  },
+  {
+   "q": "ln(ab) 는?",
+   "options": [
+    "ln a · ln b",
+    "ln a + ln b",
+    "ln(a+b)",
+    "a ln b"
+   ],
+   "answer": 1,
+   "why": "곱은 로그의 합."
+  },
+  {
+   "q": "ln|y| = 3x + c 에서 y 는?",
+   "options": [
+    "3x + e^c",
+    "Ce^(3x)",
+    "ln(3x)",
+    "e^(3x) + c"
+   ],
+   "answer": 1,
+   "why": "양변에 e 를 씌우고 e^c 를 새 상수 C 로."
+  },
+  {
+   "q": "(ln x)′ 는?",
+   "options": [
+    "ln x",
+    "1/x",
+    "x",
+    "e^x"
+   ],
+   "answer": 1,
+   "why": "로그의 도함수는 1/x."
+  },
+  {
+   "q": "다음 중 틀린 것은?",
+   "options": [
+    "ln(a/b) = ln a − ln b",
+    "ln(aᵏ) = k ln a",
+    "ln(a+b) = ln a + ln b",
+    "e^(ln x) = x"
+   ],
+   "answer": 2,
+   "why": "합의 로그는 쪼개지지 않는다."
+  }
+ ],
+ "src": "일반 지식(표준 정의)"
+}

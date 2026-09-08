@@ -1,0 +1,71 @@
+{
+ "id": "trig.identity",
+ "easy": "sin·cos 사이의 '환전 규칙'. ODE 적분에서 sin 2x, sin²x 를 다룰 때 이 규칙으로 모양을 바꾼다.",
+ "core": "sin²x + cos²x = 1,  1 + tan²x = sec²x\n덧셈정리: sin(a±b) = sin a cos b ± cos a sin b,  cos(a±b) = cos a cos b ∓ sin a sin b\n배각: sin 2x = 2 sin x cos x,  cos 2x = cos²x − sin²x = 1 − 2sin²x = 2cos²x − 1\n반각(차수 내리기): sin²x = (1 − cos 2x)/2,  cos²x = (1 + cos 2x)/2\n(tan x)′ = sec²x,  (cot x)′ = −csc²x  → ∫du/sin²u = −cot u, ∫du/cos²u = tan u",
+ "example": {
+  "q": "∫sin²x dx",
+  "steps": [
+   "차수 내리기: sin²x = (1 − cos 2x)/2",
+   "∫(1/2 − cos 2x/2) dx = x/2 − sin 2x/4 + C"
+  ]
+ },
+ "pitfall": "sin 2x 를 2 sin x 로 쓰는 것. sin 2x = 2 sin x cos x.",
+ "quiz": [
+  {
+   "q": "sin 2x 는?",
+   "options": [
+    "2 sin x",
+    "2 sin x cos x",
+    "sin²x",
+    "sin x + sin x"
+   ],
+   "answer": 1,
+   "why": "배각 공식."
+  },
+  {
+   "q": "sin²x + cos²x 는?",
+   "options": [
+    "0",
+    "1",
+    "2",
+    "sin 2x"
+   ],
+   "answer": 1,
+   "why": "단위원의 피타고라스."
+  },
+  {
+   "q": "sin²x 를 차수 내리면?",
+   "options": [
+    "(1 + cos 2x)/2",
+    "(1 − cos 2x)/2",
+    "1 − cos x",
+    "cos 2x/2"
+   ],
+   "answer": 1,
+   "why": "cos 2x = 1 − 2sin²x 를 정리."
+  },
+  {
+   "q": "∫du/sin²u 는?",
+   "options": [
+    "tan u",
+    "−cot u",
+    "cot u",
+    "−tan u"
+   ],
+   "answer": 1,
+   "why": "(cot u)′ = −csc²u = −1/sin²u."
+  },
+  {
+   "q": "1 + tan²x 는?",
+   "options": [
+    "sec²x",
+    "csc²x",
+    "cos²x",
+    "1"
+   ],
+   "answer": 0,
+   "why": "sin²+cos² = 1 을 cos² 으로 나눈 것."
+  }
+ ],
+ "src": "일반 지식(표준 정의)"
+}
