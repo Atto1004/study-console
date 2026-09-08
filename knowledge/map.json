@@ -1,0 +1,119 @@
+{
+ "_meta": {
+  "version": 1,
+  "updated": "2026-09-09",
+  "week_rule": "1주차 = 2026-08-30(일)~09-05, 2주차 = 09-06~09-12. 학습앱 기준.",
+  "note": "planned=true 인 주차는 아직 수업 자료(정리.md)가 없어 이전 수업의 예고·OT 일정표로 채운 것. materials 는 study-materials/ 아래 경로. 문제는 _과제·_할일.md·정리노트에 실제로 있는 것만."
+ },
+ "공업수학1": {
+  "weeks": {
+   "1": {
+    "title": "Ch.1 1계 ODE — 1.1 모델화·분류, 해의 종류·초기값 문제 (9/2 결석·9/4)",
+    "dates": ["2026-09-02", "2026-09-04"],
+    "nodes": ["ode.concept", "ode.modeling", "ode.linearity", "ode.solution", "ode.ivp", "ode.exp_model"],
+    "materials": ["공업수학1/2026-09-02/정리.md", "공업수학1/2026-09-04/정리.md", "공업수학1/_정리노트/2026-09-02_결석보강_모델화_선형성.html", "공업수학1/_정리노트/Ch1_1계상미분방정식_정리노트.html", "공업수학1/_정리노트/Ch1_쉬운정리_개념공식문제풀이.html"]
+   },
+   "2": {
+    "title": "Ch.1 1.2 방향장 · 1.3 변수분리형(+동차·치환) · 1.4 완전 ODE (9/9 결석 — 예상 범위, 자료 없음)",
+    "dates": ["2026-09-09", "2026-09-11"],
+    "planned": true,
+    "nodes": ["ode.direction_field", "ode.separable", "ode.homogeneous", "ode.exact", "ode.integrating_factor"],
+    "materials": ["공업수학1/_정리노트/Ch1_1계상미분방정식_정리노트.html", "공업수학1/_과제/1주차_과제가이드.html"]
+   }
+  },
+  "problems": [
+   {"ref": "Kreyszig 1.3 #6", "desc": "y′ = e^{2x−1} y² — 변수분리", "nodes": ["ode.separable", "calc.integral", "alg.exp_log"], "src": "1주차 과제가이드", "due": "2026-09-11"},
+   {"ref": "Kreyszig 1.3 #7", "desc": "xy′ = y + 2x³ sin²(y/x) — 동차(y=ux)", "nodes": ["ode.homogeneous", "ode.separable", "trig.identity", "calc.integral"], "src": "1주차 과제가이드", "due": "2026-09-11"},
+   {"ref": "Kreyszig 1.3 #8 ★", "desc": "y′ = (y+4x)² — 치환형 v=y+4x (교수 강조)", "nodes": ["ode.separable", "calc.substitution", "calc.integral"], "src": "1주차 과제가이드", "due": "2026-09-11"},
+   {"ref": "Kreyszig 1.3 #16", "desc": "y′ = (x+y−2)², y(0)=2 — 치환형 + 초기값", "nodes": ["ode.ivp", "ode.separable", "calc.substitution"], "src": "1주차 과제가이드", "due": "2026-09-11"},
+   {"ref": "Kreyszig 1.3 #17", "desc": "xy′ = y + 3x⁴ cos²(y/x), y(1)=0 — 동차 + 초기값", "nodes": ["ode.homogeneous", "ode.ivp", "trig.identity", "calc.integral"], "src": "1주차 과제가이드", "due": "2026-09-11"}
+  ]
+ },
+ "미분적분학2": {
+  "weeks": {
+   "1": {
+    "title": "학습지 Lecture 2-1 (1) 행렬의 정의 · (2) 연산 · (3) 행렬식 (9/1·9/3)",
+    "dates": ["2026-09-01", "2026-09-03"],
+    "nodes": ["lin.matrix", "lin.matrix_ops", "lin.det2", "lin.det3"],
+    "materials": ["미분적분학2/2026-09-01/정리.md", "미분적분학2/2026-09-01/학습지_정리.md", "미분적분학2/2026-09-03/정리.md", "미분적분학2/_정리노트/2026-09-03_행렬연산_행렬식.html"]
+   },
+   "2": {
+    "title": "(4)(5) 소행렬식·여인수 전개 → (6) 역행렬 · (7) 크래머 법칙 (9/8 결석 — 9/3 예고 기준, 자료 없음)",
+    "dates": ["2026-09-08", "2026-09-10"],
+    "planned": true,
+    "nodes": ["lin.cofactor", "lin.det_props", "lin.inverse", "lin.linear_system", "lin.cramer"],
+    "materials": ["미분적분학2/2026-09-01/학습지_정리.md"]
+   }
+  },
+  "problems": [
+   {"ref": "강의자료실 연습문제 (행렬·행렬식, 답안 포함)", "desc": "주말 업로드분 — 9/10(목) 수업 전까지", "nodes": ["lin.matrix_ops", "lin.det2", "lin.det3"], "src": "_할일.md (9/3 녹음 1:01:20)", "due": "2026-09-10"},
+   {"ref": "학습지 Ex01 (1)~(4)", "desc": "정사각행렬 차수·전치행렬·대칭 판정", "nodes": ["lin.matrix"], "src": "학습지_정리.md"},
+   {"ref": "학습지 Ex02 (1)~(5)", "desc": "합·실수배·곱·거듭제곱", "nodes": ["lin.matrix_ops"], "src": "학습지_정리.md"},
+   {"ref": "9/3 예제 3·4", "desc": "det=0 → x=2,3 · det B=−60 (사루스)", "nodes": ["lin.det2", "lin.det3", "alg.quadratic_eq"], "src": "2026-09-03/정리.md"},
+   {"ref": "학습지 Ex9", "desc": "역행렬로 연립1차방정식 풀기", "nodes": ["lin.inverse", "lin.linear_system"], "src": "학습지_정리.md"},
+   {"ref": "학습지 Ex10", "desc": "크래머 법칙으로 연립1차방정식 풀기", "nodes": ["lin.cramer", "lin.det3"], "src": "학습지_정리.md"}
+  ]
+ },
+ "일반물리학2": {
+  "weeks": {
+   "1": {
+    "title": "Ch.21~22 전하 · 쿨롱 법칙 · 전기장 서론 (9/2 OT · 9/4 첫 강의)",
+    "dates": ["2026-09-02", "2026-09-04"],
+    "nodes": ["em.charge", "em.coulomb", "em.constants", "em.field", "em.field_lines", "em.superposition", "em.continuous", "em.dipole"],
+    "materials": ["일반물리학2/2026-09-02/정리.md", "일반물리학2/2026-09-04/정리.md", "일반물리학2/_정리노트/2026-09-04_전하와전기장서론.html"]
+   },
+   "2": {
+    "title": "전기장 계산 (점전하군·연속 분포) — 9/9 결석, 9/11 예정 (9/4 예고 기준, 자료 없음)",
+    "dates": ["2026-09-09", "2026-09-11"],
+    "planned": true,
+    "nodes": ["em.superposition", "em.continuous", "em.dipole", "vec.components", "calc.definite"],
+    "materials": ["일반물리학2/_정리노트/2026-09-04_전하와전기장서론.html"]
+   }
+  },
+  "problems": [
+   {"ref": "강의노트 p.8–9 필수문제 1~6", "desc": "9/11(금) 전까지 직접 풀어 답 대조 (문제 본문은 강의노트에만 있음)", "nodes": ["em.charge", "em.coulomb", "vec.components"], "src": "_할일.md (9/4 녹음 16:16·32:14)", "due": "2026-09-11"},
+   {"ref": "슬라이드 예제 01", "desc": "구리 동전 1.0 g 의 총 양전하량 (≈4.3×10⁴ C)", "nodes": ["em.charge", "phys.units", "alg.ratio"], "src": "정리노트 2026-09-04"},
+   {"ref": "슬라이드 예제 02", "desc": "두 이온 사이 힘 1.88×10⁻⁹ N → 전하 2e", "nodes": ["em.coulomb", "alg.sqrt"], "src": "정리노트 2026-09-04"},
+   {"ref": "슬라이드 예제 03", "desc": "핵 속 두 양성자 사이 반발력 ≈14 N", "nodes": ["em.coulomb"], "src": "정리노트 2026-09-04"},
+   {"ref": "슬라이드 예제 04", "desc": "세 전하, q₁에 작용하는 알짜 힘 ≈2.6 N (120° 배치, 성분 합)", "nodes": ["em.coulomb", "vec.components", "trig.ratio"], "src": "정리노트 2026-09-04"},
+   {"ref": "슬라이드 예제 05", "desc": "수소원자 전기력/중력 비 ≈2.3×10³⁹", "nodes": ["em.coulomb", "alg.inverse_square", "alg.exponent_rules"], "src": "정리노트 2026-09-04"}
+  ]
+ },
+ "정역학": {
+  "weeks": {
+   "1": {
+    "title": "Lecture Orientation — 과목 개요·평가·일정 (9/2, 수강정정 전)",
+    "dates": ["2026-09-02"],
+    "nodes": ["mech.statics_intro"],
+    "materials": ["정역학/2026-09-02/정리.md"]
+   },
+   "2": {
+    "title": "Ch.1 Introduction · Ch.2 Vectors — 단위계·벡터 성분·내적·외적·합력 (9/7 · 9/9 결석 — OT 일정표 기준, 정리 자료 없음)",
+    "dates": ["2026-09-07", "2026-09-09"],
+    "planned": true,
+    "nodes": ["mech.statics_intro", "mech.force_vector", "mech.force_3d", "mech.dot_apps", "mech.cross_apps"],
+    "materials": ["정역학/2026-09-02/정리.md"]
+   }
+  },
+  "problems": []
+ },
+ "CADD": {
+  "weeks": {
+   "1": {
+    "title": "OT · LMS 개념 영상 (9/1 — 수업 정리 자료 없음, 강의계획서 기준)",
+    "dates": ["2026-09-01"],
+    "planned": true,
+    "nodes": ["cad.tool"],
+    "materials": []
+   },
+   "2": {
+    "title": "정투상·스케치 기초 (9/8 결석 — 자료 없음, 일반적 진도 추정)",
+    "dates": ["2026-09-08"],
+    "planned": true,
+    "nodes": ["cad.orthographic", "cad.sketch_constraints"],
+    "materials": []
+   }
+  },
+  "problems": []
+ }
+}
