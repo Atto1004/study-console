@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>진도 입력 현황 — aTTo 학습앱</title>
+<link rel="icon" href="icon.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+/* Atom Green — learn.html 과 같은 변수 (DESIGN.md 크기 사다리 12/14/16/20, 라운드 8/12/16) */
+:root{--bg:#F4F7F4;--card:#FFFFFF;--ink:#111814;--sub:#6B7570;--line:#E1E7E2;--acc:#4F9A35;--acc-soft:#E8F3E3;
+ --ok:#30B457;--part:#E0A100;--gap:#E5484D;--none:#D8DED9;--sh:0 1px 2px rgba(0,0,0,.05)}
+@media (prefers-color-scheme:dark){:root{--bg:#0A0F0C;--card:#141B16;--ink:#F1F6F2;--sub:#9AA59E;--line:#263129;--acc:#5CAB3F;--acc-soft:#173019;
+ --ok:#4ADE80;--part:#FBBF24;--gap:#FF6B6B;--none:#2C352E;--sh:none}}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Malgun Gothic",sans-serif;font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+a{color:var(--acc);text-decoration:none}
+.wrap{max-width:860px;margin:0 auto;padding:0 14px 40px}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 0 8px;display:flex;align-items:center;gap:10px}
+header h1{font-size:20px;font-weight:700;margin:0;flex:1;letter-spacing:-.01em}
+header .back{font-size:14px;color:var(--sub)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--sh)}
+.card h2{font-size:16px;margin:0 0 8px;font-weight:700}
+.lead{font-size:12px;color:var(--sub);margin:0 0 10px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--sub);margin-bottom:10px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.legend i.hol{background:repeating-linear-gradient(45deg,var(--none),var(--none) 3px,var(--line) 3px,var(--line) 6px)}
+.scroll{overflow-x:auto;scrollbar-width:thin}
+table.grid{border-collapse:separate;border-spacing:3px;font-size:12px}
+table.grid th{font-weight:600;color:var(--sub);font-size:11px;text-align:center;padding:0 2px;white-space:nowrap}
+table.grid th.sub{text-align:left;position:sticky;left:0;background:var(--card);z-index:2;color:var(--ink);font-size:12px;padding-right:8px}
+table.grid td{padding:0}
+.cell{width:26px;height:26px;border-radius:6px;background:var(--none);display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:600}
+.cell.ok{background:var(--ok)}.cell.part{background:var(--part)}.cell.gap{background:var(--gap)}
+.cell.none{background:var(--none);color:transparent}
+.cell.hol{background:repeating-linear-gradient(45deg,var(--none),var(--none) 3px,var(--line) 3px,var(--line) 6px);color:transparent}
+.wk{font-size:10px;color:var(--sub);text-align:center}
+ul.gaps{margin:6px 0 0;padding-left:18px}ul.gaps li{margin:3px 0}
+ul.gaps b{color:var(--gap)}
+.last{display:flex;flex-wrap:wrap;gap:6px}
+.last span{border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:12px;color:var(--sub)}
+.last span b{color:var(--ink);font-weight:600}
+.none-msg{color:var(--sub);font-size:13px}
+code{background:var(--acc-soft);border-radius:4px;padding:1px 5px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1>진도 입력 현황</h1><a class="back" href="./">학습앱</a></header>
+  <p class="lead" id="lead">불러오는 중…</p>
+
+  <div class="card">
+    <div class="legend">
+      <span><i style="background:var(--ok)"></i>정리 있음</span>
+      <span><i style="background:var(--part)"></i>자료만 (정리.md 없음)</span>
+      <span><i style="background:var(--gap)"></i>빈칸 — 채워야 함</span>
+      <span><i style="background:var(--none)"></i>수업 없음</span>
+      <span><i class="hol"></i>휴강</span>
+    </div>
+    <div class="scroll"><table class="grid" id="grid"></table></div>
+  </div>
+
+  <div class="card"><h2>과목별 마지막 입력</h2><div class="last" id="last"></div></div>
+  <div class="card"><h2 id="gapsH">채워야 할 빈칸</h2><ul class="gaps" id="gaps"></ul></div>
+  <p class="lead">이 표는 <code>study-materials</code> 폴더를 실제로 훑어 만든다. 갱신: <code>python _진도커버리지.py</code></p>
+</div>
+<script>
+"use strict";
+var $=function(s){return document.querySelector(s)};
+var WD="월화수목금토일";
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+var CLS={"정리":"ok","자료":"part","빈칸":"gap","수업없음":"none","휴강":"hol"};
+var TXT={"정리":"O","자료":"-","빈칸":"!","수업없음":"","휴강":""};
+function week(dstr,start){var a=new Date(dstr+"T00:00:00"),b=new Date(start+"T00:00:00");return Math.floor((a-b)/864e5/7)+1}
+
+fetch("knowledge/coverage.json").then(function(r){return r.ok?r.json():null}).then(function(d){
+  if(!d){$("#lead").textContent="coverage.json 이 없습니다. study-materials 폴더에서 python _진도커버리지.py 를 한 번 돌리세요.";return}
+  var dates=d.dates||[],rows=d.rows||[];
+  $("#lead").innerHTML="개강 "+esc(d.termStart)+" ~ "+esc(d.asOf)+" · 과목 "+rows.length+"개 · 날짜 "+dates.length+"일 · 빈칸 <b>"+(d.missing||[]).length+"개</b>";
+
+  var h="<tr><th class='sub'>과목</th>";
+  dates.forEach(function(x){var dt=new Date(x+"T00:00:00");h+="<th>"+(dt.getMonth()+1)+"/"+dt.getDate()+"<div class='wk'>"+WD[(dt.getDay()+6)%7]+"</div></th>"});
+  h+="</tr>";
+  rows.forEach(function(r){
+    h+="<tr><th class='sub'>"+esc(r.subject)+"</th>";
+    (r.cells||[]).forEach(function(c){
+      var t=c.state==="자료"&&c.files?String(c.files):TXT[c.state];
+      h+="<td><div class='cell "+CLS[c.state]+"' title='"+esc(r.subject+" "+c.date+" · "+c.state)+"'>"+esc(t)+"</div></td>"});
+    h+="</tr>"});
+  $("#grid").innerHTML=h;
+
+  $("#last").innerHTML=rows.map(function(r){
+    var g=(r.cells||[]).filter(function(c){return c.state==="빈칸"}).length;
+    return "<span><b>"+esc(r.subject)+"</b> "+(r.last?esc(r.last.slice(5).replace("-","/")):"없음")+(g?" · 빈칸 "+g:"")+"</span>"}).join("");
+
+  var m=d.missing||[];
+  $("#gapsH").textContent="채워야 할 빈칸 "+m.length+"개";
+  $("#gaps").innerHTML=m.length?m.map(function(x){
+    var dt=new Date(x.date+"T00:00:00");
+    return "<li><b>"+esc(x.subject)+"</b> "+(dt.getMonth()+1)+"/"+dt.getDate()+"("+WD[(dt.getDay()+6)%7]+") — "+week(x.date,"2026-08-30")+"주차</li>"}).join("")
+    :"<li class='none-msg'>없음. 전부 들어와 있습니다.</li>";
+}).catch(function(e){$("#lead").textContent="불러오지 못했습니다: "+e});
+</script>
+</body>
+</html>
