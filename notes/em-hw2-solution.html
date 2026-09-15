@@ -22,8 +22,10 @@ mjx-container[display="true"]>svg{margin:0!important}
  font-family:"IBM Plex Mono",monospace;letter-spacing:.04em;padding:5px 2px 0}
 .sec{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;color:var(--navy-ink);
  background:var(--navy-soft);border-radius:5px;padding:7px 14px;display:inline-block;margin:26px 0 4px}
-.q{margin:0 0 6px;padding:14px 0 12px;border-bottom:1px dashed var(--line);
- page-break-inside:avoid;break-inside:avoid}
+.q{margin:0 0 6px;padding:14px 0 12px;border-bottom:1px dashed var(--line)}
+/* 인쇄: 문제 전체를 한 장에 가두지 않는다(아래 여백 원인). 머리·답·검산·그래프 같은 작은 덩어리만 안 자른다 */
+.qh,.ans,.chk,.graph,.line{page-break-inside:avoid;break-inside:avoid}
+.sec,.qh,.note{page-break-after:avoid;break-after:avoid}
 .q:last-of-type{border-bottom:0}
 .qh{display:flex;align-items:center;gap:12px;margin:0 0 10px}
 .qh .no{flex:none;background:var(--navy);color:#fff;font-family:"IBM Plex Mono",monospace;
@@ -41,7 +43,8 @@ mjx-container[display="true"]>svg{margin:0!important}
 .ans mjx-container{margin:0!important}
 .chk{margin:9px 0 0;padding:7px 0 0 12px;border-left:2px solid var(--line);color:var(--ink-2)}
 .chk .line{font-size:13.5px}
-.graph{display:block;max-width:100%;height:auto;border:1px solid var(--line);border-radius:6px;margin:6px 0 2px}
+.graph{display:block;width:340px;max-width:100%;height:auto;border:1px solid var(--line);border-radius:6px;margin:4px 0 0}
+.chk{margin-top:6px}
 @page{size:A4;margin:13mm}
 @media print{body{font-size:13.5px}}
 </style>
