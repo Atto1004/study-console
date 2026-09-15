@@ -1,0 +1,143 @@
+<title>공업수학1 2주차 과제 가이드</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F5F7F6;--paper:#FFFFFF;--ink:#1B2430;--ink-2:#3F4C5A;--ink-3:#6E7B88;--line:#DCE2E6;--line-2:#C5CED5;
+  --acc:#0F6E8C;--acc-soft:#E3F0F4;--acc-ink:#0B5468;--warn:#B9791A;--warn-soft:#FBF1DD;--warn-ink:#7A4E0B;
+  --ok:#3D7A4E;--ok-soft:#E5F1E7;--ok-ink:#2B5A39;--crit:#B2483F;--crit-soft:#F8E6E3;--crit-ink:#7E2F28;--ans:#F0F3F5;
+  --font-display:"Gowun Batang","Noto Serif KR",Georgia,serif;--font-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;--font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;color-scheme:light}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#121820;--paper:#1A222C;--ink:#E6EAF0;--ink-2:#BCC6D1;--ink-3:#8593A2;--line:#2A3542;--line-2:#3A4756;--acc:#4FB3D1;--acc-soft:#173039;--acc-ink:#8FD3E8;--warn:#D9A34A;--warn-soft:#332816;--warn-ink:#F0C87E;--ok:#7FBF8F;--ok-soft:#1B2E21;--ok-ink:#A9DDB5;--crit:#E07C72;--crit-soft:#34201E;--crit-ink:#F1B0A9;--ans:#202A35;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121820;--paper:#1A222C;--ink:#E6EAF0;--ink-2:#BCC6D1;--ink-3:#8593A2;--line:#2A3542;--line-2:#3A4756;--acc:#4FB3D1;--acc-soft:#173039;--acc-ink:#8FD3E8;--warn:#D9A34A;--warn-soft:#332816;--warn-ink:#F0C87E;--ok:#7FBF8F;--ok-soft:#1B2E21;--ok-ink:#A9DDB5;--crit:#E07C72;--crit-soft:#34201E;--crit-ink:#F1B0A9;--ans:#202A35;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere}
+mjx-container{color:inherit} mjx-container[display="true"]{margin:.5em 0 !important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 90px}
+.head{padding:44px 0 22px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.eyebrow b{color:var(--acc);font-weight:500}
+.eyebrow .due{background:var(--crit-soft);color:var(--crit-ink);border-radius:5px;padding:1px 8px;text-transform:none;letter-spacing:.04em}
+h1{font-family:var(--font-display);font-weight:700;font-size:clamp(28px,4.4vw,40px);line-height:1.22;margin:12px 0 10px;letter-spacing:-.01em;text-wrap:balance}
+.lede{font-size:16.5px;color:var(--ink-2);margin:0}
+section{padding:30px 0 6px} section+section{border-top:1px solid var(--line)}
+h2{font-family:var(--font-display);font-weight:700;font-size:24px;line-height:1.3;margin:0 0 8px;letter-spacing:-.005em;text-wrap:balance}
+h2 .no{font-family:var(--font-mono);font-weight:500;font-size:12px;color:var(--acc);letter-spacing:.1em;display:block;margin-bottom:6px}
+p{margin:0 0 12px} ul,ol{margin:0 0 12px;padding-left:22px} li{margin:4px 0}
+.board{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:12px 0 16px;font-family:var(--font-mono);font-size:15px;line-height:1.7}
+.board .cap{font-family:var(--font-body);font-size:13px;color:var(--ink-3);margin-top:6px}
+.tw{overflow-x:auto;margin:12px 0 16px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px}
+th,td{padding:9px 14px;text-align:left;vertical-align:top;border-top:1px solid var(--line)}
+thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3);font-weight:500;background:var(--ans)}
+.pr{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0 14px}
+.pr .h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px}
+.pr .h .no{font-family:var(--font-mono);font-size:13px;color:var(--acc);font-weight:500}
+.pr .h .type{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;color:var(--acc-ink);background:var(--acc-soft);border-radius:6px;padding:2px 8px}
+.pr .h .star{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;color:var(--warn-ink);background:var(--warn-soft);border-radius:6px;padding:2px 8px}
+.pr .q{font-size:16px;margin-bottom:6px}
+.pr .hint{font-size:15px;color:var(--ink-2);background:var(--ans);border-radius:8px;padding:8px 12px;margin:6px 0}
+.pr details{margin-top:6px}
+.pr summary{cursor:pointer;font-size:13.5px;color:var(--acc-ink);list-style:none;display:inline-flex;gap:6px;align-items:center}
+.pr summary::-webkit-details-marker{display:none} .pr summary::before{content:"▸";font-size:11px}
+.pr details[open] summary::before{content:"▾"}
+.pr summary:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:4px}
+.pr .sol{margin-top:8px;font-size:15px;color:var(--ink-2)}
+.pr .sol .stp{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:baseline}
+.pr .sol .k{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);white-space:nowrap;padding-top:4px}
+.pr .res{margin-top:8px;padding:8px 12px;border-radius:8px;background:var(--ans);border-left:3px solid var(--acc);color:var(--ink)}
+.pr .res .k{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--acc);margin-bottom:2px}
+.note{border-radius:10px;padding:12px 16px;margin:14px 0 18px;font-size:15px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.note .ic{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;padding:2px 7px;border-radius:5px;margin-top:3px;white-space:nowrap;color:#fff}
+.note.exam{background:var(--warn-soft);color:var(--warn-ink)} .note.exam .ic{background:var(--warn)}
+.note.tip{background:var(--acc-soft);color:var(--acc-ink)} .note.tip .ic{background:var(--acc)}
+.note.todo{background:var(--crit-soft);color:var(--crit-ink)} .note.todo .ic{background:var(--crit)}
+.note p{margin:0 0 6px}.note p:last-child{margin:0}
+.tpl{background:var(--paper);border:1px dashed var(--line-2);border-radius:12px;padding:14px 18px;margin:12px 0 16px;font-size:15px}
+.tpl .row{display:grid;grid-template-columns:110px minmax(0,1fr);gap:6px 12px;padding:5px 0;border-top:1px solid var(--line)}
+.tpl .row:first-of-type{border-top:0}
+.tpl .k{font-family:var(--font-mono);font-size:12px;color:var(--acc);padding-top:4px}
+.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+@media print{body{background:#fff}.pr,.tw,.note,.tpl,.board{break-inside:avoid}@page{size:A4;margin:14mm 12mm}}
+.tw td:first-child{white-space:nowrap}
+</style>
+<div class="wrap">
+<header class="head">
+  <div class="eyebrow"><b>공업수학1 · 이기영 교수</b><span>2nd Week H.W. Assignment</span><span class="due">제출 9/16(수) 09:00 수업 시간 · 교탁</span></div>
+  <h1>2주차 과제 가이드 — Kreyszig 1.4 연습문제 4 · 11 · 12, 1.5 연습문제 9 · 12</h1>
+  <p class="lede">9/9(수) 판서에 「H.W &lt;1.4&gt; 4, 11, 12」, 9/11(금) 판서에 「2nd Week H.W. Assignment &lt;1.5&gt;. 9, 12」. 두 묶음 모두 <b>9/16(수) 09:00</b>에 낸다(아토 확정 9/11). 유형은 <b>완전미분 2 · 적분인자 1 · 선형 비제차 초기값 2</b>. 이 가이드는 유형 판별과 힌트, 자기 검산용 답을 담았다. <b>제출 답안은 직접 손으로 유도</b>하고, 교재 지시문대로 검산 줄과 (1.5는) 해의 개형까지 적는다.</p>
+</header>
+
+<section>
+  <h2><span class="no">BOARD</span>판서 내용</h2>
+  <div class="board">9/9 &nbsp;H.W &nbsp;&lt;1.4&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4, 11, 12<br><br>2nd Week. H.W. Assignment<br>&lt;1.5&gt;. &nbsp;9, 12
+    <div class="cap">9/9분은 판서 사진 <code>2026-09-09/과제_1.4_판서.jpg</code>, 9/11분은 판서 사진과 녹음(클로바노트 54분)으로 확인. 문제 원문은 교재(Kreyszig 10판 한국어판) p.30 · p.38 사진과 대조했다 — 아래 다섯 식은 교재와 같다.</div></div>
+  <div class="note tip"><span class="ic">규정</span><div><p>제출: 다음 주차 수업 시작 전 교탁. <b>미제출 −1.0점/회, 지각 제출 −0.5점/회</b>(2주 후까지만 인정). 손글씨 제출을 요구하는지는 <b>확인 못 함</b> — 1주차와 같이 손으로 옮겨 적어 내는 것을 권한다.</p></div></div>
+  <div class="note exam"><span class="ic">9/11</span><div><p>교수님이 지난 시간 판서를 직접 정정했다: 적분인자 공식에서 <b>y만의 함수일 때 분모는 p가 아니라 q</b>. 이번 11번은 <b>x만의 함수</b>라 교재 정리 1의 \(R(x)=\frac1Q\left(P_y-Q_x\right)\)를 그대로 쓴다(분모 Q). 정정 내용은 녹음 기준이라, 필기가 있으면 판서 사진으로 한 번 더 대조할 것.</p></div></div>
+</section>
+
+<section>
+  <h2><span class="no">MAP</span>다섯 문제 한눈에</h2>
+  <p>교재 지시문 — 1.4(1~14): <b>완전미분방정식인지 검사</b>하고, 완전이면 풀고 아니면 적분인자를 구해 풀어라. 초기조건이 있으면 특수해까지. 1.5(3~13): <b>일반해</b>를 구하고, 초기조건이 있으면 특수해와 <b>해의 개형 또는 그래프</b>를 그려라. 자세한 풀이 과정을 보여라.</p>
+  <div class="tw"><table><thead><tr><th>번호</th><th>문제</th><th>유형</th><th>핵심 한 수</th></tr></thead><tbody>
+    <tr><td>1.4 · 4</td><td>\(e^{3\theta}(dr+3r\,d\theta)=0\)</td><td>완전미분</td><td>\(M_\theta=N_r=3e^{3\theta}\) → \(u=re^{3\theta}\)</td></tr>
+    <tr><td>1.4 · 11</td><td>\(2\cosh x\cos y\,dx=\sinh x\sin y\,dy\)</td><td>비완전 → 적분인자 \(F(x)\)</td><td>\(R=\coth x\) → \(F=\sinh x\)</td></tr>
+    <tr><td>1.4 · 12</td><td>\((2xy\,dx+dy)\,e^{x^2}=0,\quad y(0)=2\)</td><td>완전미분 + 초기값</td><td>\(u=ye^{x^2}\), \(c=2\)</td></tr>
+    <tr><td>1.5 · 9</td><td>\(y'+y\sin x=e^{\cos x},\quad y(0)=-2.5\)</td><td>선형 비제차 + 초기값</td><td>\(h=-\cos x\), \(e^{h}r=1\)</td></tr>
+    <tr><td>1.5 · 12</td><td>\(xy'+4y=8x^4,\quad y(1)=2\)</td><td>선형 비제차 + 초기값 (표준형 먼저)</td><td>\(h=4\ln x\), \(e^{h}=x^4\)</td></tr>
+  </tbody></table></div>
+  <div class="note exam"><span class="ic">수업</span><div><p>9/11 수업에서 교수님이 반복해 강조한 것: <b>표준형 \(y'+p(x)y=r(x)\)</b>, <b>\(h=\int p\,dx\)</b>, <b>\(y=e^{-h}\left[\int e^{h}r\,dx+c\right]\)</b> 세 줄은 외워야 하고, 문제를 보면 "완전미분이냐 → 동차냐 → 적분인자냐 → 선형이냐" 순서로 판별하는 <b>플로차트</b>를 머리에 그리라고 했다(녹음 기준). 이번 과제 다섯 문제가 그 플로차트의 앞뒤 가지 하나씩이다.</p></div></div>
+</section>
+
+<section>
+  <h2><span class="no">GUIDE</span>문제별 힌트와 검산용 답</h2>
+  <p>힌트까지만 보고 스스로 풀어 본 뒤, 답을 펼쳐 맞춰 보라. 답이 다르면 대개 편미분 변수 착각(어느 변수로 미분하는지)이나 적분인자 부호에서 갈린다.</p>
+
+  <div class="pr"><div class="h"><span class="no">1.4 · 4</span><span class="type">완전미분</span><span class="q">\(e^{3\theta}(dr+3r\,d\theta)=0\)</span></div>
+    <div class="hint">변수가 \(r,\theta\)다. 펼쳐서 \(M\,dr+N\,d\theta=0\) 꼴로 두고 \(\partial M/\partial\theta\)와 \(\partial N/\partial r\)을 비교. 같으면 \(u=\int M\,dr\)부터.</div>
+    <details><summary>답 · 검산</summary><div class="sol">
+      <div class="stp"><span class="k">검사</span><span>\(M=e^{3\theta},\ N=3re^{3\theta}\) → \(M_\theta=3e^{3\theta}=N_r\) ✓ 완전</span><span class="k">적분</span><span>\(u=\int e^{3\theta}dr=re^{3\theta}+\phi(\theta)\), \(u_\theta=3re^{3\theta}+\phi'=N\) → \(\phi'=0\)</span></div>
+      <div class="res"><div class="k">일반해</div>\(re^{3\theta}=c\) &nbsp;(즉 \(r=ce^{-3\theta}\))</div>
+      <p style="margin-top:8px">검산: \(d(re^{3\theta})=e^{3\theta}dr+3re^{3\theta}d\theta=e^{3\theta}(dr+3r\,d\theta)\) ✓</p></div></details></div>
+
+  <div class="pr"><div class="h"><span class="no">1.4 · 11</span><span class="type">적분인자 F(x)</span><span class="q">\(2\cosh x\cos y\,dx=\sinh x\sin y\,dy\)</span></div>
+    <div class="hint">우변을 넘겨 \(P\,dx+Q\,dy=0\) (\(Q=-\sinh x\sin y\)). \(P_y\ne Q_x\)라 비완전. \(R=\frac1Q(P_y-Q_x)\)를 계산하면 \(\sin y\)가 약분되어 <b>x만의 함수</b>가 남는다 → \(F=e^{\int R\,dx}\). 그 \(F\)를 양변에 곱한 뒤 다시 완전미분으로.</div>
+    <details><summary>답 · 검산</summary><div class="sol">
+      <div class="stp"><span class="k">검사</span><span>\(P_y=-2\cosh x\sin y,\ Q_x=-\cosh x\sin y\) → 다름</span><span class="k">인자</span><span>\(R=\dfrac{-\cosh x\sin y}{-\sinh x\sin y}=\coth x\) → \(F=e^{\ln\sinh x}=\sinh x\)</span><span class="k">적분</span><span>\(2\sinh x\cosh x\cos y\,dx-\sinh^2x\sin y\,dy=0\) → \(u=\sinh^2x\cos y\)</span></div>
+      <div class="res"><div class="k">일반해</div>\(\sinh^2x\cos y=c\)</div>
+      <p style="margin-top:8px">검산: \(u_x=2\sinh x\cosh x\cos y\), \(u_y=-\sinh^2x\sin y\) — 곱한 식의 \(P,Q\)와 일치 ✓. \(\cos y=0\)인 상수해는 \(c=0\)에 들어 있다. 솔루션 매뉴얼 답과 같음.</p></div></details></div>
+
+  <div class="pr"><div class="h"><span class="no">1.4 · 12</span><span class="type">완전미분 · IVP</span><span class="q">\((2xy\,dx+dy)\,e^{x^2}=0,\quad y(0)=2\)</span></div>
+    <div class="hint">\(e^{x^2}\)을 분배해 \(M=2xye^{x^2},\ N=e^{x^2}\). \(M_y=N_x=2xe^{x^2}\) → 완전. \(u=\int M\,dx\)는 \(ye^{x^2}\) (안쪽 \(x^2\) 미분이 \(2x\)라 딱 떨어진다). 초기조건은 \(u=c\)에 넣는다.</div>
+    <details><summary>답 · 검산</summary><div class="sol">
+      <div class="stp"><span class="k">적분</span><span>\(u=ye^{x^2}+\phi(y)\), \(u_y=e^{x^2}+\phi'=N\) → \(\phi'=0\)</span><span class="k">조건</span><span>\(2e^{0}=c\) → \(c=2\)</span></div>
+      <div class="res"><div class="k">특수해</div>\(ye^{x^2}=2\), 즉 \(y=2e^{-x^2}\)</div>
+      <p style="margin-top:8px">검산: \(y'=-4xe^{-x^2}\), \(2xy=4xe^{-x^2}\) → \(y'+2xy=0\) ✓, \(y(0)=2\) ✓</p></div></details></div>
+
+  <div class="pr"><div class="h"><span class="no">1.5 · 9</span><span class="type">선형 비제차 · IVP</span><span class="star">9/11 판서</span><span class="q">\(y'+y\sin x=e^{\cos x},\quad y(0)=-2.5\)</span></div>
+    <div class="hint">이미 표준형. \(p=\sin x,\ r=e^{\cos x}\). \(h=\int\sin x\,dx=-\cos x\). 공식에 넣으면 \(e^{h}r=e^{-\cos x}e^{\cos x}=1\)이라 적분이 그냥 \(x\)가 된다. 이 문제는 "공식을 외웠는가"만 묻는다.</div>
+    <details><summary>답 · 검산</summary><div class="sol">
+      <div class="stp"><span class="k">공식</span><span>\(y=e^{\cos x}\left[\int 1\,dx+c\right]=(x+c)e^{\cos x}\)</span><span class="k">조건</span><span>\(y(0)=ce=-2.5\) → \(c=-2.5/e\)</span></div>
+      <div class="res"><div class="k">특수해</div>\(y=\left(x-\dfrac{2.5}{e}\right)e^{\cos x}\)</div>
+      <p style="margin-top:8px">검산: \(y'=e^{\cos x}-(x+c)\sin x\,e^{\cos x}\) → \(y'+y\sin x=e^{\cos x}\) ✓. <b>그래프</b>: \(e^{\cos x}\)가 \(1/e\)~\(e\) 사이를 진동하고 앞의 직선 \((x-0.92)\)가 곱해져, \(x\)가 커질수록 진폭이 커지는 진동. \((0,-2.5)\)를 지난다.</p></div></details></div>
+
+  <div class="pr"><div class="h"><span class="no">1.5 · 12</span><span class="type">선형 비제차 · IVP</span><span class="star">9/11 판서</span><span class="q">\(xy'+4y=8x^4,\quad y(1)=2\)</span></div>
+    <div class="hint"><b>먼저 \(x\)로 나눠 표준형</b> \(y'+\frac4xy=8x^3\) (\(x\ne0\); 초기점이 \(x=1\)이니 \(x>0\)). \(h=4\ln x\), \(e^{h}=x^4\). 9/11 연습 1번(\(x\,dy/dx+2y=3\))과 같은 골격이다.</div>
+    <details><summary>답 · 검산</summary><div class="sol">
+      <div class="stp"><span class="k">공식</span><span>\(y=x^{-4}\left[\int x^4\cdot8x^3dx+c\right]=x^{-4}(x^8+c)=x^4+cx^{-4}\)</span><span class="k">조건</span><span>\(y(1)=1+c=2\) → \(c=1\)</span></div>
+      <div class="res"><div class="k">특수해</div>\(y=x^4+x^{-4}\quad(x>0)\)</div>
+      <p style="margin-top:8px">검산: \(xy'+4y=(4x^4-4x^{-4})+(4x^4+4x^{-4})=8x^4\) ✓, \(y(1)=2\) ✓. <b>그래프</b>: \(x=1\)에서 최소 2, 양쪽으로 급히 올라간다(\(x\to0^+\)에서 발산).</p></div></details></div>
+</section>
+
+<section>
+  <h2><span class="no">FORMAT</span>답안 쓰는 순서 — 교수님 슬라이드 골격 그대로</h2>
+  <div class="tpl">
+    <div class="row"><span class="k">문제 번호</span><span>&lt;1.4&gt; 11. 문제 식을 다시 적는다</span></div>
+    <div class="row"><span class="k">Step 1 판별</span><span>"\(P_y\ne Q_x\) → 비완전. \(R\)이 x만의 함수 → 적분인자 \(F(x)\)" 처럼 <b>유형과 이유 한 줄</b>. 1.5는 "표준형 \(y'+py=r\), \(p=\dots,\ r=\dots\)"</span></div>
+    <div class="row"><span class="k">Step 2 풀이</span><span>완전미분: \(u=\int M\,dx\) → \(u_y=N\)으로 \(\phi\) 결정. 선형: \(h\) → 공식 대입. 한 줄에 한 동작</span></div>
+    <div class="row"><span class="k">Step 3 검산</span><span>얻은 해를 원식에 대입해 등호 확인 — 1.4는 \(du\)가 원식과 같은지, 1.5는 \(y'+py\)가 \(r\)이 되는지</span></div>
+    <div class="row"><span class="k">Step 4 조건</span><span>12 · 9 · 12번은 초기조건 대입 → 특수해. 조건도 검산. <b>1.5 두 문제는 해의 개형(그래프)까지</b> — 교재 지시문</span></div>
+  </div>
+  <div class="note todo"><span class="ic">TODO</span><div><p>① 교재와 다섯 식 대조(이미 사진으로 확인, 배부물이 따로 있으면 그것과) ② <b>오늘(9/15 화) 안에</b> 손으로 풀고 검산 ③ 1.5 · 9, 12는 그래프 스케치 ④ <b>9/16(수) 09:00 수업 시간</b>에 교탁 제출. 풀다 막힌 문제는 사진으로 보내 주면 어느 단계에서 막혔는지 짚어 준다.</p></div></div>
+  <p class="foot">문제 출처: Kreyszig, Advanced Engineering Mathematics 10th ed., Problem Set 1.4 (#4, 11, 12) · 1.5 (#9, 12). 답은 직접 풀어 검산했고 솔루션 매뉴얼과 대조했다(일치). 판서 사진: study-materials/공업수학1/2026-09-09/과제_1.4_판서.jpg · 2026-09-11/ 판서 일괄. 제출용 수식 답안은 「2주차_과제_제출용.pdf」, 원리 해설은 「2주차_과제_이해용.pdf」.</p>
+</section>
+</div>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>

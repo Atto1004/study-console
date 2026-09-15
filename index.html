@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-11.30";
+var BUILD="2026-09-15.31";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4405,6 +4405,9 @@ var NOTES=[
   {course:"공업수학1",type:"과제",title:"1주차 과제 가이드 — Kreyszig 1.3 #6·7·8·16·17",file:"notes/em-hw1.html",week:1,date:"2026-09-04",sub:"제출 9/11(금) 09:00 교탁 · 유형 판별과 힌트"},
   {course:"공업수학1",type:"과제",title:"1주차 과제 해답지 — 제출용 (수식 전개만)",file:"notes/em-hw1-solution.html",week:1,date:"2026-09-11",sub:"제출 9/11(금) 09:00 · 오타 검증 GREEN · 손으로 옮겨 적을 것"},
   {course:"공업수학1",type:"과제",title:"1주차 과제 해설 — 왜 이렇게 푸는지",file:"notes/em-hw1-explain.html",week:1,date:"2026-09-11",sub:"변수분리 · u=y/x 치환 · v 치환 세 유형"},
+  {course:"공업수학1",type:"과제",title:"2주차 과제 가이드 — Kreyszig 1.4 #4·11·12 · 1.5 #9·12",file:"notes/em-hw2-guide.html",week:2,date:"2026-09-15",sub:"제출 9/16(수) 09:00 교탁 · 유형 판별과 힌트 · 교재 원문 대조 완료"},
+  {course:"공업수학1",type:"과제",title:"2주차 과제 해답지 — 제출용 (수식 전개만)",file:"notes/em-hw2-solution.html",week:2,date:"2026-09-15",sub:"제출 9/16(수) 09:00 · 오타 GREEN(3차) · 1.5 두 문제 그래프 포함 · 손으로 옮겨 적을 것"},
+  {course:"공업수학1",type:"과제",title:"2주차 과제 해설 — 왜 이렇게 푸는지",file:"notes/em-hw2-explain.html",week:2,date:"2026-09-15",sub:"완전미분 · 적분인자 F(x) · 선형 공식 유도 · 9/11 플로차트"},
   {course:"미분적분학2",type:"정리",title:"9/3 행렬 연산과 행렬식 + 홍순필 교수 분석 v0.1",file:"notes/calc2-0903.html",week:1,date:"2026-09-03",sub:"사루스 법칙 · 시험은 행렬식부터"},
   {course:"아카데믹글쓰기",type:"정리",title:"9/1 OT — 글쓰기는 왜 필요한가 · 평가 규정 + 교수 분석 v0.1",file:"notes/writing-0901.html",week:1,date:"2026-09-01",sub:"기말 = 강의자료 이론"},
   {course:"아카데믹글쓰기",type:"과제",title:"주제문 초안 — 《체인징 배터리》(2013)",file:"notes/writing-thesis1.html",week:2,date:"2026-09-11",sub:"주제문 3판 · 근거 3 · 구성 · 반론 대응 · 영상 대조 3줄 미확인"},
@@ -4781,8 +4784,8 @@ function renderWeekly(){
     persist(); renderWeekly(); }; });
   $$("[data-wkdel]",box).forEach(function(b){ b.onclick=function(){ var m=b.dataset.mon||mon, en=entryOf(m); en.items=en.items.filter(function(i){return i.id!==b.dataset.wkdel;}); persist(); renderWeekly(); }; });
   $$("[data-wkadd]",box).forEach(function(b){ b.onclick=function(){
-    var cat=b.dataset.wkadd, tx=$('[data-wkadd-text="'+cat+'"]',box).value.trim(); if(!tx){ toast("내용을 적어 주세요"); return; }
-    e.items.push({id:uid(),key:"",cat:cat,text:tx,due:$('[data-wkadd-due="'+cat+'"]',box).value||"",done:false,src:"직접"}); persist(); renderWeekly(); }; });
+    var cat=b.dataset.wkadd, inp=$('[data-wkadd-text="'+cat+'"]',box), tx=inp?inp.value.trim():""; if(!tx){ toast("내용을 적어 주세요"); return; }
+    e.items.push({id:uid(),key:"",cat:cat,text:tx,due:($('[data-wkadd-due="'+cat+'"]',box)||{}).value||"",done:false,src:"직접"}); persist(); renderWeekly(); }; });
   $$("[data-gocourse]",box).forEach(function(b){ b.onclick=function(){ go("course",b.dataset.gocourse); }; });
   $$("[data-ta2]",box).forEach(function(cb){ cb.onchange=function(){ var p=cb.dataset.ta2.split("|"), c=course(p[0]), n=c&&weekNote(c,+p[1]); if(!n) return;
     var t=n.tasks.filter(function(q){return q.id===p[2];})[0]; if(!t) return; t.done=cb.checked; if(t.done){ addXP(10); bumpStreak(); } persist(); renderWeekly(); }; });
@@ -4836,6 +4839,13 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-15.31",d:"09-15",items:[
+    "공업수학1 2주차 과제 로그 — 가이드(유형 판별·힌트·검산용 답) · 제출용 해답지(수식 전개 + 1.5 두 문제 그래프) · 이해용 해설 3종을 과목 화면 「과제」 노트와 2주차 정리 링크에 올림. 오타 검증 3차 GREEN",
+    "2주차 과제 할 일 문구 정정 — 교재 p.30·p.38 원문 대조 완료(9/15), 두 묶음 다 9/16(수) 09:00 교탁",
+    "복습 채점이 저장되지 않던 문제 수정 — .25부터 오늘 탭 복습 큐의 다시/어려움/보통/쉬움 버튼과 학습 마무리 채점이 오류로 멈췄음(출결 저장 래퍼가 값을 돌려주지 않은 탓). 이제 정상 저장",
+    "주간 할 일 직접 추가에서 입력칸이 없는 화면(개강 전)에서 오류 나던 것 방지",
+    "패치 노트 전체 기록(CHANGELOG)에 .26~.30 누락분 보충"
+  ]},
   {v:"2026-09-11.30",d:"09-11",items:[
     "주차별 수업 정리도 1주차부터 내려오게 정렬 (회차 로그에 이어서)"
   ]},
@@ -7528,12 +7538,13 @@ var V25={};
   var _setSession=setSession;
   setSession=function(cid,date,patch){
     var before=sessionOn(cid,date); var was=before?before.status:null;
-    _setSession(cid,date,patch);
+    var s=_setSession(cid,date,patch);   /* .31: 반환값을 돌려준다 — .25부터 undefined 가 돌아가 gradeReview(복습 채점)가 s.srs 에서 죽었음 */
     if(ATOM_HOSTED&&patch&&patch.status==="absent"&&was!=="absent"){
-      var c=course(cid); if(!c) return; var dow=D(date).getDay(); var sl=(c.slots||[]).filter(function(x){return x.d===dow;})[0];
+      var c=course(cid); if(!c) return s; var dow=D(date).getDay(); var sl=(c.slots||[]).filter(function(x){return x.d===dow;})[0];
       fetch("/api/absent",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({course:c.name,date:date,start:sl?sl.s:"",end:sl?sl.e:"",reason:diffDays(today(),date)>0?"사전 지정":"결석"})})
         .then(function(r){return r.json();}).then(function(j){ toast(j&&j.ok?"아톰이 캘린더 블록을 결석(토마토)으로 표시합니다":"아톰 요청 실패"); })["catch"](function(){});
     }
+    return s;
   };
 
   /* ---------- LMS(Canvas): atom /api/lms/state ---------- */
@@ -7655,7 +7666,10 @@ var V27={};
   V27.LOG=[
     ["공업수학1",1,[["1주차 과제 해답지 — 제출용 (수식 전개만)","notes/em-hw1-solution.html"],
                    ["1주차 과제 해설 — 왜 이렇게 푸는지","notes/em-hw1-explain.html"]]],
-    ["아카데믹글쓰기",2,[["주제문 초안 — 《체인징 배터리》(2013)","notes/writing-thesis1.html"]]]
+    ["아카데믹글쓰기",2,[["주제문 초안 — 《체인징 배터리》(2013)","notes/writing-thesis1.html"]]],
+    ["공업수학1",2,[["2주차 과제 가이드 — 유형 판별 · 힌트","notes/em-hw2-guide.html"],
+                   ["2주차 과제 해답지 — 제출용 (수식 전개만)","notes/em-hw2-solution.html"],
+                   ["2주차 과제 해설 — 왜 이렇게 푸는지","notes/em-hw2-explain.html"]]]
   ];
   V27.patch=function(){
     var t=term(), changed=false;
@@ -7711,6 +7725,31 @@ var V27={};
     if(changed) persist();
   };
   var _boot=boot; boot=function(){ _boot(); try{ V27.patch(); }catch(e){} };
+})();
+
+/* ============================================================
+   V31 LAYER — 공업수학1 2주차 과제 로그 (BUILD 2026-09-15.31)
+   9/9·9/11 판서로 등록했던 두 할 일의 「교재 문제 원문 미확인」을 지운다 — 9/15 교재 p.30·p.38 사진으로 대조 완료.
+   산출물 링크는 V27.LOG 로 올라간다. 위 코드는 건드리지 않는다.
+   ============================================================ */
+var V31={};
+(function(){
+  V31.patch=function(){
+    /* V27.patch 는 2주차 노트를 만들기 전에 링크 루프를 돌아, 첫 부팅(빈 데이터)에서는 링크가 안 실린다 — 한 번 더 돌린다 (멱등) */
+    try{ V27.patch(); }catch(e){}
+    var t=term(), changed=false;
+    var em=t.courses.filter(function(x){return x.name==="공업수학1";})[0];
+    var w2=em&&em.weekNotes&&em.weekNotes[2]; if(!w2||!Array.isArray(w2.tasks)) return;
+    w2.tasks.forEach(function(k){
+      if(/2주차 과제 Kreyszig 1\.5/.test(k.text||"") && /원문 미확인/.test(k.text)){
+        k.text="2주차 과제 Kreyszig 1.5 #9·12 (선형 비제차 IVP) — 9/16(수) 09:00 교탁. 교재 원문 확인(9/15) · 해답지·가이드·해설은 주차 링크"; changed=true; }
+      if(/Kreyszig 1\.4/.test(k.text||"") && /원문 미확인/.test(k.text)){
+        k.text="공수 과제 Kreyszig 1.4 #4·11·12 (완전미분방정식·적분인자) — 9/16(수) 09:00 교탁. 교재 원문 확인(9/15) · 해답지·가이드·해설은 주차 링크"; changed=true; }
+      if(/Kreyszig 1\.[45]/.test(k.text||"") && k.due!=="2026-09-16"){ k.due="2026-09-16"; changed=true; }
+    });
+    if(changed) persist();
+  };
+  var _boot=boot; boot=function(){ _boot(); try{ V31.patch(); }catch(e){} };
 })();
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start);
 else start();
