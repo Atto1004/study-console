@@ -1,0 +1,180 @@
+<title>공업수학1 1주차 과제 — 해답지</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ink:#1C2430; --ink-2:#4A5666; --ink-3:#8A94A2; --line:#D8DEE6; --line-2:#EDF0F4;
+  --navy:#3E5C8A; --navy-d:#2F4870; --navy-soft:#EDF2F9; --navy-ink:#24395C;
+  --paper:#FFFFFF; --box:#F4F6F9;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);
+  font-family:"Noto Sans KR",system-ui,sans-serif;font-size:14.5px;line-height:1.7;
+  -webkit-font-smoothing:antialiased;word-break:keep-all}
+mjx-container{color:inherit}
+mjx-container[display="true"]{margin:.16em 0!important;text-align:left!important}
+mjx-container[display="true"] > svg{margin:0!important}
+
+.sheet{max-width:780px;margin:0 auto;padding:0 22px 44px}
+
+/* ── 머리말 ── */
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;padding:26px 0 14px}
+.top .l,.top .r{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--ink-3);line-height:1.9}
+.top .r{text-align:right;padding-left:18px;border-left:1px solid var(--line)}
+.top .c{text-align:center}
+.top .c h1{font-family:"Gowun Batang",serif;font-size:31px;font-weight:700;margin:0;letter-spacing:.04em}
+.top .c .sub{font-size:12.5px;color:var(--ink-2);margin-top:2px}
+.rule{height:2px;background:var(--navy);margin:6px 0 4px}
+.rule.thin{height:1px;background:var(--line);margin:0 0 22px}
+.who{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-3);
+  font-family:"IBM Plex Mono",monospace;letter-spacing:.04em;padding:5px 2px 0}
+
+/* ── 문제 블록 ── */
+.q{margin:0 0 6px;padding:14px 0 12px;border-bottom:1px dashed var(--line);
+  page-break-inside:avoid;break-inside:avoid}
+.q:last-of-type{border-bottom:0}
+.qh{display:flex;align-items:center;gap:12px;margin:0 0 10px}
+.qh .no{flex:none;background:var(--navy);color:#fff;font-family:"IBM Plex Mono",monospace;
+  font-size:14px;font-weight:500;letter-spacing:.04em;padding:5px 12px;border-radius:5px;min-width:44px;text-align:center}
+.qh .qq{flex:1;background:var(--box);border-radius:5px;padding:6px 14px;min-width:0;overflow-x:auto}
+.qh .qq mjx-container{margin:0!important}
+.tag{flex:none;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.09em;
+  color:var(--navy-ink);background:var(--navy-soft);border-radius:999px;padding:3px 10px}
+.tag.hot{color:#7A4E0B;background:#FBF1DD}
+
+.body{padding-left:16px}
+.line{margin:0 0 1px;overflow-x:auto}
+.note{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.09em;
+  color:var(--ink-3);margin:9px 0 2px;text-transform:uppercase}
+
+/* ── 답 박스 ── */
+.ans{display:inline-block;background:var(--navy-soft);border:1px solid #C6D6EA;border-radius:6px;
+  padding:5px 18px;margin:8px 0 2px 4px}
+.ans mjx-container{margin:0!important}
+.also{font-size:12.5px;color:var(--ink-2);margin:2px 0 0 8px}
+
+/* ── 검산 ── */
+.chk{margin:9px 0 0;padding:7px 0 0 12px;border-left:2px solid var(--line);color:var(--ink-2)}
+.chk .line{font-size:13.5px}
+
+@page{size:A4;margin:13mm}
+@media print{body{font-size:13.5px}}
+</style>
+<div class="sheet">
+
+<div class="top">
+  <div class="l">MATHEMATICS<br>SOLUTION</div>
+  <div class="c">
+    <h1>수학 해답지</h1>
+    <div class="sub">공업수학1 · 1주차 과제 · 문제별 풀이과정 (수식 전개만)</div>
+  </div>
+  <div class="r">KREYSZIG<br>PROBLEM SET 1.3</div>
+</div>
+<div class="rule"></div><div class="rule thin"></div>
+<div class="who"><span>기계공학과 김아토 · 2022049607</span><span>2026-09-11 (금) 제출</span></div>
+
+<div class="q">
+  <div class="qh"><span class="no">06</span><span class="qq">\(y'=e^{2x-1}y^{2}\)</span><span class="tag">변수분리</span></div>
+  <div class="body">
+    <div class="line">\[\frac{dy}{dx}=e^{2x-1}y^{2}\]</div>
+    <div class="line">\[y^{-2}\,dy=e^{2x-1}\,dx\]</div>
+    <div class="line">\[\int y^{-2}\,dy=\int e^{2x-1}\,dx\]</div>
+    <div class="line">\[-\frac{1}{y}=\frac{1}{2}e^{2x-1}+c^{*}\]</div>
+    <div class="line">\[y=\frac{-1}{\tfrac12 e^{2x-1}+c^{*}}=\frac{-2}{e^{2x-1}+c}\qquad(c=2c^{*})\]</div>
+    <div class="ans">\(y=-\dfrac{2}{e^{2x-1}+c}\)</div>
+    <div class="also">also \(y\equiv 0\)</div>
+    <div class="chk"><div class="note">check</div>
+      <div class="line">\[y'=\frac{4e^{2x-1}}{\left(e^{2x-1}+c\right)^{2}}\]</div>
+      <div class="line">\[e^{2x-1}y^{2}=e^{2x-1}\cdot\frac{4}{\left(e^{2x-1}+c\right)^{2}}=y'\quad\checkmark\]</div>
+    </div>
+  </div>
+</div>
+
+<div class="q">
+  <div class="qh"><span class="no">07</span><span class="qq">\(xy'=y+2x^{3}\sin^{2}\dfrac{y}{x}\)</span><span class="tag">u=y/x 치환</span></div>
+  <div class="body">
+    <div class="line">\[y=ux,\qquad y'=u'x+u\]</div>
+    <div class="line">\[x\left(u'x+u\right)=ux+2x^{3}\sin^{2}u\]</div>
+    <div class="line">\[u'x^{2}=2x^{3}\sin^{2}u\]</div>
+    <div class="line">\[u'=2x\sin^{2}u\]</div>
+    <div class="line">\[\frac{du}{\sin^{2}u}=2x\,dx\]</div>
+    <div class="line">\[\int\csc^{2}u\,du=\int 2x\,dx\]</div>
+    <div class="line">\[-\cot u=x^{2}+c^{*}\]</div>
+    <div class="line">\[\cot u=c-x^{2}\qquad(c=-c^{*})\]</div>
+    <div class="line">\[u=\operatorname{arccot}\left(c-x^{2}\right)+k\pi\qquad(k\in\mathbb{Z})\]</div>
+    <div class="ans">\(\cot\dfrac{y}{x}=c-x^{2}\)</div>
+    <div class="also">also \(y=k\pi x\quad(\sin^{2}u=0)\)</div>
+    <div class="chk"><div class="note">check</div>
+      <div class="line">\[\cot\frac{y}{x}=c-x^{2}\ \xrightarrow{\ d/dx\ }\ -\csc^{2}\frac{y}{x}\cdot\frac{xy'-y}{x^{2}}=-2x\]</div>
+      <div class="line">\[xy'-y=2x^{3}\sin^{2}\frac{y}{x}\quad\checkmark\]</div>
+    </div>
+  </div>
+</div>
+
+<div class="q">
+  <div class="qh"><span class="no">08</span><span class="qq">\(y'=(y+4x)^{2}\)</span><span class="tag hot">치환형 · 교수 강조</span></div>
+  <div class="body">
+    <div class="line">\[v=y+4x\]</div>
+    <div class="line">\[v'=y'+4\ \Longrightarrow\ y'=v'-4\]</div>
+    <div class="line">\[v'-4=v^{2}\ \Longrightarrow\ v'=v^{2}+4\]</div>
+    <div class="line">\[\frac{dv}{v^{2}+2^{2}}=dx\]</div>
+    <div class="line">\[\int\frac{dv}{v^{2}+2^{2}}=\int dx\]</div>
+    <div class="line">\[\frac{1}{2}\arctan\frac{v}{2}=x+c^{*}\]</div>
+    <div class="line">\[\arctan\frac{v}{2}=2x+c\qquad(c=2c^{*})\]</div>
+    <div class="line">\[v=2\tan\left(2x+c\right)\]</div>
+    <div class="line">\[y=v-4x\]</div>
+    <div class="ans">\(y=2\tan\left(2x+c\right)-4x\)</div>
+    <div class="chk"><div class="note">check</div>
+      <div class="line">\[y'=4\sec^{2}(2x+c)-4=4\tan^{2}(2x+c)\]</div>
+      <div class="line">\[=\left[2\tan(2x+c)\right]^{2}=(y+4x)^{2}\quad\checkmark\]</div>
+    </div>
+  </div>
+</div>
+
+<div class="q">
+  <div class="qh"><span class="no">16</span><span class="qq">\(y'=(x+y-2)^{2},\quad y(0)=2\)</span><span class="tag">치환형 · IVP</span></div>
+  <div class="body">
+    <div class="line">\[v=x+y-2\]</div>
+    <div class="line">\[v'=1+y'\ \Longrightarrow\ y'=v'-1\]</div>
+    <div class="line">\[v'-1=v^{2}\ \Longrightarrow\ v'=1+v^{2}\]</div>
+    <div class="line">\[\frac{dv}{1+v^{2}}=dx\]</div>
+    <div class="line">\[\arctan v=x+c\]</div>
+    <div class="note">initial condition</div>
+    <div class="line">\[x=0,\ y=2\ \Longrightarrow\ v=0+2-2=0\]</div>
+    <div class="line">\[\arctan 0=0+c\ \Longrightarrow\ c=0\]</div>
+    <div class="line">\[v=\tan x,\qquad y=v-x+2\]</div>
+    <div class="ans">\(y=\tan x-x+2\)</div>
+    <div class="chk"><div class="note">check</div>
+      <div class="line">\[y(0)=0-0+2=2\quad\checkmark\]</div>
+      <div class="line">\[y'=\sec^{2}x-1=\tan^{2}x=(x+y-2)^{2}\quad\checkmark\]</div>
+    </div>
+  </div>
+</div>
+
+<div class="q">
+  <div class="qh"><span class="no">17</span><span class="qq">\(xy'=y+3x^{4}\cos^{2}\dfrac{y}{x},\quad y(1)=0\)</span><span class="tag">u=y/x 치환 · IVP</span></div>
+  <div class="body">
+    <div class="line">\[y=ux,\qquad y'=u'x+u\]</div>
+    <div class="line">\[x\left(u'x+u\right)=ux+3x^{4}\cos^{2}u\]</div>
+    <div class="line">\[u'x^{2}=3x^{4}\cos^{2}u\]</div>
+    <div class="line">\[u'=3x^{2}\cos^{2}u\]</div>
+    <div class="line">\[\frac{du}{\cos^{2}u}=3x^{2}\,dx\]</div>
+    <div class="line">\[\int\sec^{2}u\,du=\int 3x^{2}\,dx\]</div>
+    <div class="line">\[\tan u=x^{3}+c\]</div>
+    <div class="note">initial condition</div>
+    <div class="line">\[x=1,\ y=0\ \Longrightarrow\ u=\tfrac{0}{1}=0\]</div>
+    <div class="line">\[\tan 0=1+c\ \Longrightarrow\ c=-1\]</div>
+    <div class="line">\[\tan u=x^{3}-1,\quad u(1)=0\ \Longrightarrow\ u=\arctan\left(x^{3}-1\right)\]</div>
+    <div class="line">\[\cos^{2}u=0:\ y=\left(\tfrac{\pi}{2}+k\pi\right)x\ \Longrightarrow\ y(1)\neq 0\ \ (\times)\]</div>
+    <div class="ans">\(y=x\arctan\left(x^{3}-1\right)\)</div>
+    <div class="chk"><div class="note">check</div>
+      <div class="line">\[y(1)=1\cdot\arctan 0=0\quad\checkmark\]</div>
+      <div class="line">\[\tan\frac{y}{x}=x^{3}-1\ \xrightarrow{\ d/dx\ }\ \sec^{2}\frac{y}{x}\cdot\frac{xy'-y}{x^{2}}=3x^{2}\]</div>
+      <div class="line">\[xy'-y=3x^{4}\cos^{2}\frac{y}{x}\quad\checkmark\]</div>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'},options:{renderActions:{addMenu:[]}}};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>

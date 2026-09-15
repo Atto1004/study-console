@@ -21,6 +21,8 @@
  */
 
 var CAL_ID = 'rladkxh1004@hanyang.ac.kr';
+// atom 비서앱 주간 탭(일·주·월)이 읽는 캘린더 — 한양 + attoyd 둘 다 (attoyd 는 한양 계정에 공유돼 있어야 읽힌다)
+var READ_CALS = ['rladkxh1004@hanyang.ac.kr', 'attoyd1004@gmail.com'];
 var COLOR = { present: '9', late: '5', ghost: '6', absent: '11' };
 var LABEL = { present: '출석', late: '지각', ghost: '출튀', absent: '결석' };
 var MARK = '[얼라이브위크]';
@@ -86,10 +88,43 @@ function doPost(e) {
  *  - ?action=events&date=YYYY-MM-DD : 그날 캘린더 일정 목록 → 학습앱 오늘 화면의 빈 시간에 표시
  *    응답: {ok, date, events:[{id,title,start:"HH:MM",end:"HH:MM",allDay,location,color}]}
  */
+function readDay(date) {
+  var day = new Date(date + 'T00:00:00+09:00');
+  var fmt = function (d) { return Utilities.formatDate(d, 'Asia/Seoul', 'HH:mm'); };
+  var all = [];
+  READ_CALS.forEach(function (cid) {
+    var cal = null;
+    try { cal = CalendarApp.getCalendarById(cid); } catch (err) {}
+    if (!cal) return;
+    cal.getEventsForDay(day).forEach(function (ev) {
+      var allDay = ev.isAllDayEvent();
+      all.push({
+        id: ev.getId(), title: ev.getTitle(), allDay: allDay,
+        start: allDay ? '' : fmt(ev.getStartTime()), end: allDay ? '' : fmt(ev.getEndTime()),
+        location: ev.getLocation() || '', color: ev.getColor() || '',
+        cal: cid === CAL_ID ? '한양' : 'attoyd'
+      });
+    });
+  });
+  return all;
+}
+
 function doGet(e) {
   var p = (e && e.parameter) || {};
   var out;
-  if (p.action === 'events') {
+  if (p.action === 'range') {
+    // atom 주간 탭: ?action=range&from=YYYY-MM-DD&to=YYYY-MM-DD (최대 62일) → {ok, days:{date:[events]}}
+    try {
+      var s = new Date(p.from + 'T00:00:00+09:00'), t = new Date(p.to + 'T00:00:00+09:00');
+      if (isNaN(s) || isNaN(t) || t < s || (t - s) / 86400000 > 62) throw new Error('from/to 범위 오류');
+      var days = {};
+      for (var d = new Date(s); d <= t; d.setDate(d.getDate() + 1)) {
+        var k = Utilities.formatDate(d, 'Asia/Seoul', 'yyyy-MM-dd');
+        days[k] = readDay(k);
+      }
+      out = { ok: true, from: p.from, to: p.to, days: days };
+    } catch (err) { out = { ok: false, error: String(err), days: {} }; }
+  } else if (p.action === 'events') {
     try {
       var date = p.date || Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd');
       var day = new Date(date + 'T00:00:00+09:00');
@@ -106,7 +141,7 @@ function doGet(e) {
       }) };
     } catch (err) { out = { ok: false, error: String(err), events: [] }; }
   } else {
-    out = { ok: true, service: 'aliveweek-webhook', calendar: CAL_ID, actions: ['events'] };
+    out = { ok: true, service: 'aliveweek-webhook', calendar: CAL_ID, actions: ['events', 'range'] };
   }
   return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
 }

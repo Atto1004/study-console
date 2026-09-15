@@ -1,0 +1,198 @@
+<title>공업수학1 1주차 과제 — 왜 이렇게 푸는지</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#FAFBFC;--paper:#FFF;--ink:#1B2430;--ink-2:#3F4C5A;--ink-3:#6E7B88;--line:#D8DEE6;
+  --acc:#3E5C8A;--acc-soft:#EDF2F9;--acc-ink:#24395C;--warn:#B9791A;--warn-soft:#FCF3E2;--warn-ink:#7A4E0B;
+  --ok:#3D7A4E;--ok-soft:#E9F3EB;--ok-ink:#2B5A39;--box:#F4F6F9;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR",system-ui,sans-serif;font-size:15.5px;line-height:1.85;word-break:keep-all;overflow-wrap:anywhere}
+mjx-container{color:inherit}mjx-container[display="true"]{margin:.4em 0!important;overflow-x:auto;overflow-y:hidden}
+.wrap{max-width:700px;margin:0 auto;padding:0 20px 60px}
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;padding:26px 0 14px}
+.top .l,.top .r{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--ink-3);line-height:1.9}
+.top .r{text-align:right;padding-left:18px;border-left:1px solid var(--line)}
+.top .c{text-align:center}
+.top .c h1{font-family:"Gowun Batang",serif;font-size:31px;font-weight:700;margin:0;letter-spacing:.04em;line-height:1.3}
+.top .c .sub{font-size:12.5px;color:var(--ink-2);margin-top:2px}
+.rule{height:2px;background:var(--acc);margin:6px 0 4px}
+.rule.thin{height:1px;background:var(--line);margin:0 0 10px}
+.head{padding:0 0 16px;margin-bottom:6px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3)}
+h1{font-family:"Gowun Batang",serif;font-weight:700;font-size:29px;line-height:1.28;margin:10px 0 8px;letter-spacing:-.01em}
+.lede{font-size:16px;color:var(--ink-2);margin:0}
+h2{font-family:"Gowun Batang",serif;font-size:22px;margin:32px 0 6px;padding-top:22px;border-top:1px solid var(--line);line-height:1.35}
+h2:first-of-type{border-top:0}
+h2 .n{font-family:"IBM Plex Mono",monospace;font-size:11px;color:#fff;background:var(--acc);letter-spacing:.08em;display:inline-block;padding:3px 11px;border-radius:5px;margin:0 10px 0 0;vertical-align:.22em}
+h3{font-size:16px;margin:18px 0 5px;color:var(--acc-ink)}
+p{margin:0 0 11px}
+.q{background:var(--box);border:0;border-radius:5px;padding:8px 16px;margin:10px 0 14px}
+.q .lb{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.09em;color:var(--ink-3);text-transform:uppercase;display:block}
+.why{background:var(--acc-soft);border-radius:10px;padding:12px 16px;margin:12px 0;font-size:15px}
+.why b{color:var(--acc-ink)}
+.step{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:4px 16px 10px;margin:12px 0}
+.step .t{font-weight:700;font-size:14.5px;margin:12px 0 2px;color:var(--ink)}
+.step .t .num{font-family:"IBM Plex Mono",monospace;color:var(--acc);margin-right:7px}
+.step p{font-size:14.5px;color:var(--ink-2);margin:0 0 6px}
+.ans{background:var(--acc-soft);border:1px solid #C6D6EA;border-radius:6px;padding:8px 18px;margin:12px 0}
+.ans .lb{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.09em;color:var(--acc-ink);text-transform:uppercase;display:block}
+.tip{background:var(--warn-soft);border-left:3px solid var(--warn);padding:9px 15px;margin:12px 0;font-size:14.5px;color:var(--warn-ink)}
+.tip b{color:#5E3B06}
+.word{border:1px dashed var(--line);border-radius:8px;padding:9px 14px;margin:10px 0;font-size:14px;background:var(--box)}
+.word b{color:var(--acc-ink)}
+.foot{margin-top:30px;font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--line);padding-top:12px}
+@page{size:A4;margin:14mm}
+h2,.step,.ans{page-break-inside:avoid;break-inside:avoid}
+</style>
+<div class="wrap">
+<div class="top">
+  <div class="l">MATHEMATICS<br>SOLUTION</div>
+  <div class="c">
+    <h1>왜 이렇게 푸는지</h1>
+    <div class="sub">공업수학1 · 1주차 과제 · 풀이 원리 해설</div>
+  </div>
+  <div class="r">KREYSZIG<br>PROBLEM SET 1.3</div>
+</div>
+<div class="rule"></div><div class="rule thin"></div>
+<div class="head">
+  <p class="lede">제출용 답안은 수식만 적지만, 그 수식이 왜 그렇게 흘러가는지는 따로 알아야 시험장에서 혼자 풀 수 있다. 이 문서는 그 이유를 중학교 수학 수준의 말로 풀어 쓴 것이다.</p>
+</div>
+
+<h2><span class="n">먼저</span>이 다섯 문제는 결국 한 가지를 한다</h2>
+<p>미분방정식은 <b>“기울기를 알려줄 테니 원래 함수를 찾아라”</b>는 문제다. \(y'\)은 기울기고 \(y\)가 찾으려는 함수다.</p>
+<div class="why">
+  <p><b>푸는 방법은 딱 하나다.</b> \(x\)가 든 것은 전부 오른쪽으로, \(y\)가 든 것은 전부 왼쪽으로 몰아놓고 양쪽을 적분한다. 이걸 <b>변수분리</b>라고 한다.</p>
+  <p>문제는 대부분 그렇게 안 갈라진다는 것이다. 그래서 <b>갈라지게 만드는 재주</b>가 필요하고, 이번 과제의 다섯 문제가 바로 그 재주 세 가지다.</p>
+</div>
+<div class="word">
+  <p><b>변수분리형</b> — 이미 갈라져 있다. 바로 적분. (6번)</p>
+  <p><b>\(u=y/x\) 치환형</b> — \(\frac{y}{x}\) 덩어리가 보인다. 그 덩어리를 \(u\)로 이름 붙이면 갈라진다. (7번, 17번)</p>
+  <p><b>치환형</b> — \((y+4x)\)처럼 <b>괄호 안 덩어리</b>가 보인다. 그 덩어리를 \(v\)로 이름 붙이면 갈라진다. (8번, 16번)</p>
+</div>
+<p>교수님이 8번에 동그라미를 치고 “치환형”이라고 적어 주신 것도 이 이유다. 방법을 알면 1분, 모르면 못 푼다.</p>
+
+<h2><span class="n">6번 · 변수분리</span>이미 갈라져 있는 경우</h2>
+<div class="q"><span class="lb">문제</span> \[y'=e^{2x-1}y^{2}\]</div>
+<div class="why"><b>왜 쉬운가.</b> 오른쪽이 \(\left(x\text{만 있는 것}\right)\times\left(y\text{만 있는 것}\right)\) 모양이다. 곱하기로 나뉘어 있으니 나누기만 하면 갈라진다.</div>
+<div class="step">
+  <div class="t"><span class="num">1</span>\(y'\)을 분수로 되돌린다</div>
+  <p>\(y'\)은 사실 \(\dfrac{dy}{dx}\)의 줄임말이다. 분수로 쓰면 옮길 수 있다.</p>
+  \[\frac{dy}{dx}=e^{2x-1}y^{2}\]
+  <div class="t"><span class="num">2</span>\(y\)를 왼쪽, \(x\)를 오른쪽으로</div>
+  <p>양변을 \(y^{2}\)으로 나누고 \(dx\)를 곱한다. 저울 양쪽에 같은 것을 하면 등호가 유지되는 것과 같다.</p>
+  \[y^{-2}\,dy=e^{2x-1}\,dx\]
+  <div class="t"><span class="num">3</span>양쪽에 적분 기호를 붙인다</div>
+  <p>미분의 반대가 적분이다. 기울기에서 원래 함수로 돌아가는 단계다.</p>
+  \[\int y^{-2}\,dy=\int e^{2x-1}\,dx\ \Longrightarrow\ -\frac1y=\frac12 e^{2x-1}+c^{*}\]
+  <p>왼쪽은 지수를 1 올리고 그 수로 나눈다(\(y^{-1}/(-1)\)). 오른쪽 \(e^{2x-1}\)은 안쪽 \(2x-1\)을 미분하면 2가 나오니, 적분할 때는 2로 나눈다.</p>
+  <div class="t"><span class="num">4</span>\(y=\)꼴로 정리</div>
+  \[y=\frac{-1}{\tfrac12 e^{2x-1}+c^{*}}=\frac{-2}{e^{2x-1}+c}\]
+  <p>분모의 \(\tfrac12\)을 없애려고 위아래에 2를 곱했다. 그러면 상수도 두 배가 되는데, 어차피 이름 없는 상수라 \(c=2c^{*}\)로 새로 부르면 된다.</p>
+</div>
+<div class="ans"><span class="lb">답</span>\[y=-\frac{2}{e^{2x-1}+c}\qquad\text{그리고}\qquad y\equiv 0\]</div>
+<div class="tip"><b>\(y=0\)을 빼먹으면 전체 해를 담지 못한다.</b> 2단계에서 \(y^{2}\)으로 나눴는데, 0으로는 나눌 수 없다. 그래서 \(y=0\)인 경우를 따로 확인해야 한다. 넣어 보면 \(0=0\)이라 이것도 답이다. 이런 해를 <b>특이해</b>라고 하고, 나눗셈을 한 문제에서는 항상 한 줄 적어 준다.</div>
+
+<h2><span class="n">7번 · u=y/x 치환</span>\(\frac{y}{x}\) 덩어리를 이름 붙이기</h2>
+<div class="q"><span class="lb">문제</span> \[xy'=y+2x^{3}\sin^{2}\frac{y}{x}\]</div>
+<div class="why"><b>왜 그냥은 안 되나.</b> \(\sin^{2}\frac{y}{x}\) 안에 \(x\)와 \(y\)가 같이 갇혀 있다. 이건 나누기로 떼어낼 수 없다. <b>그러면 갇힌 덩어리에 새 이름을 준다.</b></div>
+<div class="step">
+  <div class="t"><span class="num">1</span>\(\frac{y}{x}=u\)로 두고, \(y=ux\)로 바꿔 쓴다</div>
+  <p>\(u\)는 \(x\)에 따라 변하는 새 함수다. 곱의 미분법을 쓰면</p>
+  \[y'=u'x+u\]
+  <p>(앞을 미분하고 뒤는 그대로, 앞은 그대로 두고 뒤를 미분해서 더한 것.)</p>
+  <div class="t"><span class="num">2</span>원래 식에 통째로 넣는다</div>
+  \[x\left(u'x+u\right)=ux+2x^{3}\sin^{2}u\]
+  \[u'x^{2}+ux=ux+2x^{3}\sin^{2}u\]
+  <p>양쪽에 \(ux\)가 똑같이 있으니 지운다. 오른쪽 첫 항이 \(y\)인 문제는 <b>이 항이 반드시 상쇄된다.</b> 안 지워지면 치환이나 계산이 틀린 것이다.</p>
+  <div class="word"><p><b>“동차형”이라고 부르지 말 것.</b> 진짜 동차형은 \(y'=F\!\left(\frac yx\right)\), 즉 오른쪽이 \(\frac yx\) <b>하나만</b>으로 쓰이는 경우다. 이 문제는 \(y'=\frac yx+2x^{2}\sin^{2}\frac yx\)라서 \(x\)가 따로 남는다. 치환 도구만 같고 유형은 다르다.</p></div>
+  \[u'x^{2}=2x^{3}\sin^{2}u\ \Longrightarrow\ u'=2x\sin^{2}u\]
+  <div class="t"><span class="num">3</span>이제 갈라진다</div>
+  \[\frac{du}{\sin^{2}u}=2x\,dx\]
+  <div class="t"><span class="num">4</span>적분</div>
+  <p>\(\dfrac{1}{\sin^{2}u}\)는 \(\csc^{2}u\)라고도 쓴다. 이건 \(-\cot u\)를 미분하면 나오는 모양이라, 거꾸로 적분하면 \(-\cot u\)다.</p>
+  \[-\cot u=x^{2}+c^{*}\ \Longrightarrow\ \cot u=c-x^{2}\]
+  <div class="t"><span class="num">5</span>이름을 원래대로 되돌린다</div>
+  \[u=\operatorname{arccot}\left(c-x^{2}\right)+k\pi,\qquad y=ux\]
+  <p>\(\cot\)은 \(\pi\)마다 같은 값을 되풀이한다. \(\operatorname{arccot}\)이 돌려주는 것은 \(0\)과 \(\pi\) 사이 하나뿐이라, 나머지 답을 담으려면 \(k\pi\)를 붙이거나 아예 \(\cot\frac yx=c-x^{2}\) 꼴로 두면 된다.</p>
+</div>
+<div class="ans"><span class="lb">답</span>\[\cot\frac{y}{x}=c-x^{2}\qquad\text{즉}\qquad y=x\left[\operatorname{arccot}\left(c-x^{2}\right)+k\pi\right]\]</div>
+<div class="tip"><b>여기서도 나눗셈으로 해를 하나 잃었다.</b> 3단계에서 \(\sin^{2}u\)로 나눴으니 \(\sin u=0\), 곧 \(u=k\pi\)인 경우를 따로 봐야 한다. 되돌리면 \(y=k\pi x\)라는 <b>직선</b>이고, 넣어 보면 \(xy'=k\pi x=y\)에 \(\sin^{2}(k\pi)=0\)이라 실제로 답이다. 6번의 \(y=0\)과 같은 이유로 빠뜨리기 쉽다.</div>
+<div class="tip"><b>마지막에 되돌리는 걸 잊지 말 것.</b> \(u\)로 답을 적고 끝내면 틀린 답이다. 문제는 \(y\)를 물었다.</div>
+
+<h2><span class="n">8번 · 치환형</span>교수님이 동그라미 친 문제</h2>
+<div class="q"><span class="lb">문제</span> \[y'=(y+4x)^{2}\]</div>
+<div class="why"><b>눈에 띄는 것.</b> 괄호 안 \(y+4x\)가 통째로 하나처럼 움직인다. <b>그러면 그 괄호에 이름을 준다.</b> \(v=y+4x\).</div>
+<div class="step">
+  <div class="t"><span class="num">1</span>이름을 붙이고 미분한다</div>
+  \[v=y+4x\ \Longrightarrow\ v'=y'+4\ \Longrightarrow\ y'=v'-4\]
+  <p>\(4x\)를 미분하면 4다. 이 4가 뒤에서 열쇠가 된다.</p>
+  <div class="t"><span class="num">2</span>원래 식에 넣는다</div>
+  \[v'-4=v^{2}\ \Longrightarrow\ v'=v^{2}+4\]
+  <p>\(x\)와 \(y\)가 사라지고 \(v\)만 남았다. 이제 갈라진다.</p>
+  <div class="t"><span class="num">3</span>갈라서 적분</div>
+  \[\frac{dv}{v^{2}+4}=dx\]
+  <p>여기서 공식 하나가 필요하다.</p>
+  \[\int\frac{dv}{v^{2}+a^{2}}=\frac1a\arctan\frac va+C\]
+  <p>지금은 \(4=2^{2}\)이니 \(a=2\)다.</p>
+  \[\frac12\arctan\frac v2=x+c^{*}\]
+  <div class="t"><span class="num">4</span>\(v\)를 풀어내고 되돌린다</div>
+  \[\arctan\frac v2=2x+c\ \Longrightarrow\ v=2\tan(2x+c)\]
+  \[y=v-4x\]
+</div>
+<div class="ans"><span class="lb">답</span>\[y=2\tan\left(2x+c\right)-4x\]</div>
+<div class="tip"><b>교수님이 짚은 유형.</b> \(y'=f(ax+by+c)\) 모양이 보이면 <b>괄호 전체를 \(v\)로</b> 놓는다. 판서에서 8번에 동그라미를 치고 “치환형”이라 적으셨고, 과제 안에 16번도 같은 유형으로 들어와 있다. 시험 출제 여부는 확인된 바 없지만, 강조된 유형인 것은 분명하다.</div>
+
+<h2><span class="n">16번 · 치환형 + 초기값</span>답이 하나로 정해지는 경우</h2>
+<div class="q"><span class="lb">문제</span> \[y'=(x+y-2)^{2},\qquad y(0)=2\]</div>
+<div class="why"><b>8번과 똑같다.</b> 다른 점은 \(y(0)=2\)라는 조건이 붙은 것뿐이다. 이 조건이 상수 \(c\)를 하나로 못박는다. 지금까지는 답이 무수히 많았는데(\(c\) 자리에 아무 수나 들어가니까), 이제 딱 하나가 된다.</div>
+<div class="step">
+  <div class="t"><span class="num">1</span>괄호에 이름</div>
+  \[v=x+y-2\ \Longrightarrow\ v'=1+y'\ \Longrightarrow\ y'=v'-1\]
+  <p>이번엔 \(x\)를 미분한 1이 나온다. 8번의 4 자리에 1이 온 것뿐이다.</p>
+  <div class="t"><span class="num">2</span>넣고 갈라서 적분</div>
+  \[v'-1=v^{2}\ \Longrightarrow\ v'=1+v^{2}\ \Longrightarrow\ \frac{dv}{1+v^{2}}=dx\]
+  \[\arctan v=x+c\]
+  <div class="t"><span class="num">3</span>조건을 \(v\)의 말로 바꾼다</div>
+  <p>여기서 실수가 많이 난다. 조건은 \(y\)에 대한 것인데 지금 식은 \(v\)로 되어 있다. <b>조건도 같이 번역해야 한다.</b></p>
+  \[x=0,\ y=2\ \Longrightarrow\ v=0+2-2=0\]
+  \[\arctan 0=0+c\ \Longrightarrow\ c=0\]
+  <div class="t"><span class="num">4</span>되돌린다</div>
+  \[\arctan v=x\ \Longrightarrow\ v=\tan x\ \Longrightarrow\ y=v-x+2\]
+</div>
+<div class="ans"><span class="lb">답</span>\[y=\tan x-x+2\]</div>
+<div class="tip"><b>검산은 두 개다.</b> 식이 맞는지(\(y'\)이 원래 식과 같은지)와 조건이 맞는지(\(y(0)=2\)인지) 둘 다 확인한다. \(y(0)=0-0+2=2\) ✓</div>
+
+<h2><span class="n">17번 · u=y/x 치환 + 초기값</span>7번과 같은 방법</h2>
+<div class="q"><span class="lb">문제</span> \[xy'=y+3x^{4}\cos^{2}\frac{y}{x},\qquad y(1)=0\]</div>
+<div class="why"><b>7번과 판박이다.</b> \(\sin\)이 \(\cos\)으로, \(2x^{3}\)이 \(3x^{4}\)으로 바뀐 것뿐이다. 조건 \(y(1)=0\)이 붙었다.</div>
+<div class="step">
+  <div class="t"><span class="num">1</span>\(y=ux\)로 두고 넣는다</div>
+  \[x\left(u'x+u\right)=ux+3x^{4}\cos^{2}u\]
+  \[u'x^{2}=3x^{4}\cos^{2}u\ \Longrightarrow\ u'=3x^{2}\cos^{2}u\]
+  <div class="t"><span class="num">2</span>갈라서 적분</div>
+  <p>\(\dfrac{1}{\cos^{2}u}=\sec^{2}u\)이고, 이건 \(\tan u\)를 미분한 모양이다. 그래서 적분하면 \(\tan u\).</p>
+  \[\frac{du}{\cos^{2}u}=3x^{2}\,dx\ \Longrightarrow\ \tan u=x^{3}+c\]
+  <div class="t"><span class="num">3</span>조건을 \(u\)의 말로</div>
+  \[x=1,\ y=0\ \Longrightarrow\ u=\frac{y}{x}=\frac01=0\]
+  \[\tan 0=1^{3}+c\ \Longrightarrow\ 0=1+c\ \Longrightarrow\ c=-1\]
+  <div class="t"><span class="num">4</span>되돌린다</div>
+  \[\tan u=x^{3}-1\ \Longrightarrow\ u=\arctan\left(x^{3}-1\right),\qquad y=ux\]
+</div>
+<div class="ans"><span class="lb">답</span>\[y=x\arctan\left(x^{3}-1\right)\]</div>
+<div class="tip"><b>여기서 버린 해는 답이 아니다.</b> \(\cos^{2}u\)로 나눴으니 \(\cos u=0\), 곧 \(u=\frac\pi2+k\pi\)인 직선 \(y=\left(\frac\pi2+k\pi\right)x\)도 원래 식의 해다. 그런데 \(y(1)=\frac\pi2+k\pi\)라서 \(0\)이 될 수 없다. <b>초기조건이 걸러 준다.</b> 7번처럼 일반해를 구하는 문제였다면 이것도 답에 넣어야 했다.</div>
+<div class="tip"><b>7번과 17번의 차이는 삼각함수 하나뿐이다.</b> \(\sin^{2}\)이면 \(-\cot\), \(\cos^{2}\)이면 \(+\tan\). 부호가 반대라는 것만 외워 두면 둘 다 풀린다.</div>
+
+<h2><span class="n">정리</span>시험장에서 30초 안에 판별하는 법</h2>
+<div class="step">
+  <div class="t"><span class="num">1</span>\(x\)만 있는 것과 \(y\)만 있는 것이 곱으로 나뉘나?</div>
+  <p>→ 그렇다면 <b>변수분리</b>. 바로 나눠서 적분. (6번)</p>
+  <div class="t"><span class="num">2</span>\(\frac{y}{x}\)가 보이나?</div>
+  <p>→ <b>\(u=y/x\) 치환형</b>. \(y=ux\)로 둔다. 이번 과제처럼 \(xy'=y+\cdots\) 꼴이면 \(ux\)가 상쇄되고, 그렇지 않으면(예: \(y'=(y/x)^{2}\)) 남은 \(u\)까지 안고 갈라야 한다. (7번, 17번)</p>
+  <div class="t"><span class="num">3</span>괄호 안에 \(ax+by+c\) 덩어리가 통째로 있나?</div>
+  <p>→ <b>치환형</b>. 괄호 전체를 \(v\)로. \(v'\)에서 나오는 상수가 열쇠다. (8번, 16번)</p>
+</div>
+<div class="tip"><b>답안에 반드시 들어가야 하는 세 줄.</b> ① 무엇을 무엇으로 치환했는지 ② 나눗셈을 했다면 그때 버린 해(\(y=0\) 같은 것) ③ 검산. 교재 지시문이 검산을 요구하므로, 답만 적으면 과정 점수를 받기 어렵다.</div>
+
+<p class="foot">문제 출처: Kreyszig, <i>Advanced Engineering Mathematics</i> 10th ed., Problem Set 1.3 (#6, 7, 8, 16, 17). 제출용 수식 답안은 「1주차_과제_제출용.pdf」에 따로 있다.</p>
+</div>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>

@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 
 <style>
 /* ============ tokens ============ */
@@ -485,6 +486,17 @@ td.n,th.n{text-align:right;font-family:var(--font-num);font-variant-numeric:tabu
   box-shadow:0 2px 5px rgba(0,0,0,.18), 0 9px 16px -9px rgba(0,0,0,.34);
 }
 .book:hover{transform:translateY(-6px);box-shadow:0 9px 24px rgba(0,0,0,.30)}
+/* 실제 교재 표지 사진 (아토 2026-09-11) */
+.bk-cv{position:absolute;inset:0;z-index:0;background-image:var(--cv);
+  background-size:cover;background-position:center top;background-repeat:no-repeat}
+.bk-scrim{position:absolute;left:0;right:0;bottom:0;height:46%;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.30) 42%,rgba(0,0,0,.80) 100%)}
+.book.hascv{padding-left:clamp(13px,1.7vw,17px)}
+.book.hascv .bk-em,.book.hascv .bk-t,.book.hascv .bk-rule,.book.hascv .bk-en{display:none}
+.book.hascv .bk-foot{position:relative;z-index:2;margin-top:auto;color:#fff;
+  text-shadow:0 1px 3px rgba(0,0,0,.75)}
+.book.hascv .bk-fav,.book.hascv .bk-dday,.book.hascv .bk-fold,.book.hascv .bk-pending{z-index:4}
+.book.hascv .bk-fav{text-shadow:0 1px 3px rgba(0,0,0,.8)}
 .book.hot{transform:translateY(-9px)}
 .book.hot:hover{transform:translateY(-15px)}
 /* 책등 */
@@ -953,6 +965,40 @@ th{font-size:clamp(9.5px,0.2vw + 9px,10.5px)}
 .nt-row .t{font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nt-row .s{font-size:12px;color:var(--ink-3)}
 .nt-row .go{font-size:12px;color:var(--ink-3)}
+/* 수업 후 필수 3종 (아토 2026-09-11) */
+.mustbox{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface);margin-bottom:10px}
+.musth{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:9px 13px;font-size:12.5px;font-weight:600;
+  background:var(--line-2);border-bottom:1px solid var(--line)}
+.musth .mh{font-weight:500;font-family:var(--font-num);font-size:11.5px;padding:2px 9px;border-radius:999px;
+  background:var(--surface);color:var(--ink-2)}
+.musth .mh.bad{background:var(--crit);color:#fff}
+.musth .mh.good{background:var(--ok);color:#fff}
+.musth .mh.warn{background:var(--warn);color:#fff}
+.sumrow.must{align-items:center}
+.sumrow.miss{background:rgba(200,50,50,.05)}
+.sdot.no{background:var(--crit)}
+.sno{color:var(--crit)}
+/* 회차 요약 패널 (아토 2026-09-11) */
+.sumbox{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.sumrow{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;border-bottom:1px solid var(--line-2)}
+.sumrow:last-child{border-bottom:0}
+.sdot{flex:0 0 auto;width:8px;height:8px;border-radius:50%;margin-top:7px;background:var(--line-2)}
+.sdot.on{background:var(--ok)}
+.sdot.unk{background:transparent;box-shadow:inset 0 0 0 2px var(--warn)}
+.sumrow .sk{flex:0 0 76px;font-size:12.5px;color:var(--ink-3);padding-top:1px}
+.sumrow .sv{flex:1 1 auto;min-width:0;font-size:13.5px;line-height:1.55;word-break:break-all}
+.sumrow .ss{font-size:11.5px;color:var(--ink-3);margin-top:2px;line-height:1.5}
+.sumrow .smut{color:var(--ink-3)}
+.sumrow .btn.xs{flex:0 0 auto;align-self:center}
+.schip{display:inline-block;font-family:var(--font-num);font-size:10.5px;padding:1px 7px;border-radius:999px;
+  background:var(--line-2);color:var(--ink-2);margin-left:5px;vertical-align:1px}
+.schips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.schipb{display:inline-block;font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);
+  background:var(--bg);color:var(--accent);cursor:pointer;text-decoration:none;max-width:100%;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.schipb.ty{border-style:dashed}
+.sumcx{padding:8px 13px;font-size:12.5px;background:var(--line-2);color:var(--ink-2);border-bottom:1px solid var(--line-2)}
+.sumcx.warn{background:#FBF1DD;color:#7A4E0B}
 .ntv{position:fixed;inset:0;z-index:70;background:var(--bg);display:none;flex-direction:column}
 .ntv.on{display:flex}
 .ntv .ntv-h{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--surface);flex:0 0 auto}
@@ -1576,6 +1622,140 @@ p,.hint,.step,.empty,.md{text-indent:0}
 .wday.on:not(.today) .wn{box-shadow:inset 0 0 0 2px var(--accent);color:var(--accent);font-weight:700}
 .wday.today .wn{background:var(--accent);color:#fff;font-weight:700}   /* 오늘 = 동그라미 */
 .wday .whol{position:absolute;bottom:0;width:4px;height:4px;border-radius:99px;background:var(--warn)}
+
+/* ==========================================================
+   ATOM GREEN LAYER — atom 비서앱(본사\atom\DESIGN.md)과 같은 토큰·치수. 맨 마지막에 로드되어 위 두 층을 덮는다 (아토 2026-09-08)
+   ========================================================== */
+:root{
+  --font-body:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+  --font-num:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --bg:#FFFFFF; --surface:#FFFFFF; --surface-2:#EEF4EF; --surface-3:#DCE5DF;
+  --ink:#0B1A11; --ink-2:#6B7A70; --ink-3:#8A978F;
+  --line:#DCE5DF; --line-2:#C9D3CC;
+  --accent:#15803D; --accent-ink:#14532D; --accent-soft:#DCFCE7; --accent-line:#A7D9B4; --on-accent:#FFFFFF;
+  --ok:#15803D; --ok-soft:#DCFCE7; --crit:#DC2626; --crit-soft:#FEE2E2; --warn:#B45309; --warn-soft:#FEF3C7; --info:#0F766E; --info-soft:#CCFBF1;
+  --shadow:none; --r:12px; --r-s:8px; --r-pill:999px; --thumb:#FFFFFF;
+  --glass:rgba(255,255,255,.58); --glass-line:rgba(255,255,255,.75); --glass-hi:rgba(255,255,255,.9); --glass-on:rgba(11,26,17,.08);
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A0F0C; --surface:#16201A; --surface-2:#1C2820; --surface-3:#263129;
+    --ink:#F1F6F2; --ink-2:#9BAA9F; --ink-3:#7F8C84;
+    --line:#263129; --line-2:#35423A;
+    --accent:#4ADE80; --accent-ink:#DCFCE7; --accent-soft:#14532D; --accent-line:#1F6B3A; --on-accent:#052E16;
+    --ok:#4ADE80; --ok-soft:#14532D; --crit:#F87171; --crit-soft:#3B1515; --warn:#FBBF24; --warn-soft:#3A2A0A; --info:#5EEAD4; --info-soft:#0F3B36;
+    --shadow:none; --thumb:#263129;
+    --glass:rgba(24,30,26,.55); --glass-line:rgba(255,255,255,.10); --glass-hi:rgba(255,255,255,.14); --glass-on:rgba(255,255,255,.12);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A0F0C; --surface:#16201A; --surface-2:#1C2820; --surface-3:#263129;
+  --ink:#F1F6F2; --ink-2:#9BAA9F; --ink-3:#7F8C84;
+  --line:#263129; --line-2:#35423A;
+  --accent:#4ADE80; --accent-ink:#DCFCE7; --accent-soft:#14532D; --accent-line:#1F6B3A; --on-accent:#052E16;
+  --ok:#4ADE80; --ok-soft:#14532D; --crit:#F87171; --crit-soft:#3B1515; --warn:#FBBF24; --warn-soft:#3A2A0A; --info:#5EEAD4; --info-soft:#0F3B36;
+  --shadow:none; --thumb:#263129;
+  --glass:rgba(24,30,26,.55); --glass-line:rgba(255,255,255,.10); --glass-hi:rgba(255,255,255,.14); --glass-on:rgba(255,255,255,.12);
+}
+body{font-family:var(--font-body);font-size:14px;line-height:1.45;letter-spacing:0}
+h1,h2,h3,h4{letter-spacing:0;font-weight:600}
+b,strong{font-weight:600}
+/* 상단바·레일: 평면, 1px 구분선, 활성은 색만 */
+.topbar{background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:1px solid var(--line)}
+.brand-mark{border-radius:8px;background:var(--accent);color:var(--on-accent);font-weight:600}
+.gauge-l{font-size:12px;font-weight:400}
+.gauge-v{font-weight:600;letter-spacing:0;font-size:16px}
+.gauge.hero .gauge-v{font-weight:600;font-size:16px}
+.rail{padding:12px}
+.navb{border-radius:8px;font-weight:400;color:var(--ink);padding:0 12px;min-height:44px;font-size:14px}
+.navb:hover{background:var(--surface-2);color:var(--ink)}
+.navb[aria-current="true"]{background:transparent;border-color:transparent;color:var(--accent);font-weight:600}
+.rail-sec{font-size:12px;font-weight:600;letter-spacing:0}
+/* 제목·카드 */
+.vh h1{font-size:20px;line-height:25px;font-weight:600;letter-spacing:0}
+.vh .sub{font-size:12px;color:var(--ink-2)}
+.card,.tile,.modebar{border:1px solid var(--line);border-radius:12px;box-shadow:none;background:var(--surface)}
+.card-h{padding:12px 16px}
+.card-h h3{font-size:14px;font-weight:600;letter-spacing:0}
+.tile-v{font-weight:600;letter-spacing:0;font-size:20px}
+.tile-l{font-size:12px}
+/* 버튼 32px·8px */
+.btn{border-radius:8px;min-height:32px;padding:6px 16px;font-weight:600;font-size:14px;letter-spacing:0;background:var(--surface-2);color:var(--ink);border:0}
+.btn:hover{background:var(--surface-3)}
+.btn.sm{min-height:28px;padding:4px 12px;font-size:12px}
+.btn.xs{min-height:24px;padding:2px 8px;font-size:12px;border-radius:6px}
+.btn.a{background:var(--accent);color:var(--on-accent)}
+.btn.a:hover{filter:brightness(.94)}
+:root[data-theme="dark"] .btn.a{color:var(--on-accent)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.a{color:var(--on-accent)}}
+.btn.q{background:transparent;color:var(--accent)}
+.btn.q:hover{background:var(--accent-soft);color:var(--accent-ink)}
+.btn.dgr{background:var(--crit-soft);color:var(--crit)}
+.iconbtn{border-radius:8px;color:var(--ink-2)}
+.iconbtn:hover{background:var(--surface-2);color:var(--ink)}
+/* 세그먼트·칩·입력 */
+.seg{background:var(--surface-2);border:0;border-radius:8px;padding:2px;gap:2px}
+.seg button{border-radius:6px;font-weight:400;color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:0 0 0 1px var(--line)}
+.chip{border-radius:999px;font-weight:600;font-size:12px;padding:3px 10px;letter-spacing:0}
+.chip.mut{background:var(--surface-2);color:var(--ink-2)}
+.input,.select,.ta{background:var(--bg);border:1px solid var(--line);border-radius:8px;box-shadow:none}
+.input:focus,.select:focus,.ta:focus{background:var(--bg);box-shadow:none;border-color:var(--accent);outline:none}
+.field > label{font-weight:600;font-size:12px;color:var(--ink-2);letter-spacing:0}
+th{font-weight:600;font-size:12px;letter-spacing:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* 시트·토스트·막대 */
+.sheet{border:1px solid var(--line);border-radius:16px;box-shadow:0 4px 12px rgba(5,20,10,.08)}
+.scrim{background:rgba(5,20,10,.65)}
+.toast{border-radius:999px;box-shadow:0 4px 12px rgba(5,20,10,.2)}
+.bar{background:var(--surface-3)}.bar > i{background:var(--accent)}
+.tl-plan{border-left:3px solid var(--accent);border-radius:8px}
+.tl-gap,.slotb{border-radius:8px}
+.promptbox,.qopt,.fp,.attq button,.und button{border-radius:8px}
+/* 폰: 글자 한 단계 키움 · 하단 = atom 과 같은 리퀴드 글라스 알약 · 입력창 16px(확대 방지) */
+@media(max-width:859px){
+  body{font-size:15px;line-height:1.45}
+  .input,.select,.ta{font-size:16px}
+  .tabbar{bottom:max(6px, calc(env(safe-area-inset-bottom) - 6px));max-width:calc(100% - 32px);border:1px solid var(--glass-line);border-radius:999px;
+    background:var(--glass);-webkit-backdrop-filter:blur(28px) saturate(170%);backdrop-filter:blur(28px) saturate(170%);
+    box-shadow:0 12px 32px rgba(0,0,0,.28),0 1px 0 var(--glass-hi) inset;padding:6px;gap:4px}
+  .tabb{color:var(--ink);font-weight:400;min-height:52px;border-radius:999px;font-size:0;gap:0;padding:0 4px;flex:1 1 0;min-width:0}   /* 탭 7개: 아이콘만 (atom 하단 바처럼) */
+  .tabb .ic{font-size:20px;line-height:1}
+  .tabb[aria-current="true"]{background:var(--glass-on);color:var(--ink);font-weight:600}
+  .tabbar{display:flex;width:calc(100% - 32px)}
+}
+/* atom 안(/study/)에서 열렸을 때: 로고 줄은 atom 이 이미 보여 주니 감춤 */
+.atom-hosted .brand{display:none}
+.atom-hosted #btnTheme{display:none}   /* 테마는 atom 프로필에서만 바꾼다 */
+/* ---------- V25: 시험 모드 보드 · 타이머 · LMS ---------- */
+.exboard .exsum{display:flex;gap:16px;flex-wrap:wrap;font-size:14px;margin-bottom:4px}
+.exrow{border-top:1px solid var(--line);padding:10px 0 6px}
+.exhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.exscope{margin:4px 0 6px}
+.exchips{display:flex;flex-wrap:wrap;gap:6px}
+.chip.exu{cursor:pointer;border:1px solid var(--line)}
+.chip.exu.ok{background:var(--accent-soft);color:var(--accent-ink);border-color:transparent}
+.chip.exu.half{background:var(--surface-2);color:var(--ink)}
+.chip.exu.mut{background:transparent;color:var(--ink-3)}
+.chip.crit{background:var(--crit-soft);color:var(--crit)}.chip.warn{background:var(--warn-soft);color:var(--warn)}.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.tmchips{display:flex;flex-wrap:wrap;gap:6px}
+#tmClock{font-variant-numeric:tabular-nums;min-width:86px;text-align:center}
+#tmClock.on{background:var(--accent);color:var(--on-accent)}
+@media(max-width:859px){
+  /* atom 안 폰: 상단 저장·새로고침 줄과 게이지 줄을 한 줄로 */
+  .atom-hosted .topbar-in{display:flex;flex-wrap:nowrap;align-items:stretch;min-height:52px}
+  .atom-hosted .gauges{order:1;flex:1 1 auto;border-top:0;overflow-x:auto}
+  .atom-hosted .gauge{padding:6px 10px}
+  .atom-hosted .gauge-v{font-size:15px}
+  .atom-hosted .topact{order:2;margin-left:auto;padding:4px 8px;border-left:1px solid var(--line);flex:0 0 auto;align-items:center}
+  .atom-hosted .topact .btn{height:28px;padding:0 10px;font-size:12px}
+}
+
+/* atom 폰 안: atom 하단 바(64px) 위에 학습앱 탭바를 얹고, 본문은 그만큼 더 내려 스크롤 */
+@media(max-width:859px){
+  .atom-hosted .tabbar{bottom:calc(78px + env(safe-area-inset-bottom))}
+  .atom-hosted .main{padding-bottom:calc(150px + env(safe-area-inset-bottom))}
+}
 </style>
 
 <script type="application/json" id="state">null</script>
@@ -2079,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-08.24";
+var BUILD="2026-09-11.30";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -2800,9 +2980,30 @@ function migrate(o){
   if(!s.terms.some(function(t){return t.id===s.activeTermId;})) s.activeTermId=s.terms[0].id;
   return s;
 }
+/* ---------- atom 비서앱 안에서 열렸을 때 (같은 주소 /study/ 로 서빙) — 상태를 atom 서버(kv)에 두어 폰·PC가 같은 데이터를 본다 ---------- */
+var ATOM_HOSTED=(location.pathname.indexOf("/study/")===0);
+if(ATOM_HOSTED) document.documentElement.classList.add("atom-hosted");
+/* atom 안에서는 테마를 atom 이 정한다 — 처음엔 ?theme=, 바뀌면 postMessage {atomTheme} (아토 2026-09-08 통일) */
+(function(){
+  var q=null; try{ q=new URLSearchParams(location.search).get("theme"); }catch(e){}
+  if(q==="dark"||q==="light") document.documentElement.setAttribute("data-theme",q);
+  window.addEventListener("message",function(e){
+    var t=e&&e.data&&e.data.atomTheme; if(t==="dark"||t==="light") document.documentElement.setAttribute("data-theme",t);
+  });
+})();
+var atomState=null, atomPushT=null, atomClient=Math.random().toString(36).slice(2);
+function atomPush(){
+  if(!ATOM_HOSTED) return;
+  clearTimeout(atomPushT);
+  atomPushT=setTimeout(function(){
+    try{ fetch("/api/study/state",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({state:S,client:atomClient})})
+      .then(function(r){ if(r.ok){ ui.dirty=false; markSave(); } })["catch"](function(){}); }catch(e){}
+  },700);
+}
 function load(){
   var emb=null, loc=null;
   try{ var t=$("#state").textContent.trim(); if(t&&t!=="null") emb=JSON.parse(t); }catch(e){}
+  if(atomState&&typeof atomState==="object") emb=atomState;
   try{ var l=localStorage.getItem(KEY); if(l) loc=JSON.parse(l); }catch(e){}
   var pick=(emb&&loc) ? ((loc.updatedAt||0)>=(emb.updatedAt||0)?loc:emb) : (loc||emb);
   S=migrate(pick);
@@ -2811,6 +3012,7 @@ function persist(){
   S.updatedAt=Date.now(); ui.dirty=true;
   try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   markSave();
+  atomPush();
 }
 
 /* ---------- 첨부 저장소 (IndexedDB — 사진·파일은 용량 때문에 상태 JSON 밖에 보관) ----------
@@ -2839,8 +3041,21 @@ var idb=(function(){
     if(!db) return null; try{ return db.transaction(STORE,mode).objectStore(STORE); }catch(e){ return null; } }); }
   return {
     ok:!!ok,
-    put:function(att){ return store("readwrite").then(function(os){ if(!os) return null;
-      return new Promise(function(res){ var r=os.put(att); r.onsuccess=function(){res(att);}; r.onerror=function(){res(null);}; }); }); },
+    /* 요청 성공만으로는 저장이 확정되지 않는다 — 트랜잭션 완료에서만 성공시킨다 (오타 검토 2026-09-11) */
+    put:function(att){ return open().then(function(db){
+      if(!db) return null;
+      return new Promise(function(res){
+        var done=false, okReq=false;
+        var fin=function(v){ if(!done){ done=true; res(v); } };
+        try{
+          var tx=db.transaction(STORE,"readwrite");
+          tx.onabort=function(){ fin(null); }; tx.onerror=function(){ fin(null); };
+          tx.oncomplete=function(){ fin(okReq?att:null); };
+          var r=tx.objectStore(STORE).put(att);
+          r.onsuccess=function(){ okReq=true; }; r.onerror=function(){ fin(null); };
+        }catch(e){ fin(null); }
+      });
+    }).catch(function(){ return null; }); },
     get:function(id){ return store("readonly").then(function(os){ if(!os) return null;
       return new Promise(function(res){ var r=os.get(id); r.onsuccess=function(){res(r.result||null);}; r.onerror=function(){res(null);}; }); }); },
     allFor:function(sessionKey){ return store("readonly").then(function(os){ if(!os) return [];
@@ -2849,6 +3064,28 @@ var idb=(function(){
           rq.onsuccess=function(e){ var cur=e.target.result; if(cur){ out.push(cur.value); cur.continue(); } else res(out); };
           rq.onerror=function(){ res(out); };
         }catch(e){ res(out); } }); }); },
+    /* allFor 와 달리 실패를 숨기지 않는다 — {ok:true,list} 또는 {ok:false}.
+       성공은 트랜잭션 oncomplete 에서만 확정한다 (오타 검토 2026-09-11). */
+    allForSafe:function(sessionKey){
+      return open().then(function(db){
+        if(!db) return {ok:false};
+        return new Promise(function(res){
+          var done=false, out=[], tx;
+          var fail=function(){ if(!done){ done=true; res({ok:false}); } };
+          try{
+            tx=db.transaction(STORE,"readonly");
+            tx.onabort=fail; tx.onerror=fail;
+            tx.oncomplete=function(){ if(!done){ done=true; res({ok:true,list:out}); } };
+            var rq=tx.objectStore(STORE).index("byKey").openCursor(IDBKeyRange.only(sessionKey));
+            rq.onerror=fail;
+            rq.onsuccess=function(e){
+              try{ var cur=e.target.result; if(cur){ out.push(cur.value); cur.continue(); } }
+              catch(err){ fail(); }
+            };
+          }catch(e){ fail(); }
+        });
+      }).catch(function(){ return {ok:false}; });
+    },
     del:function(id){ return store("readwrite").then(function(os){ if(!os) return false;
       return new Promise(function(res){ var r=os.delete(id); r.onsuccess=function(){res(true);}; r.onerror=function(){res(false);}; }); }); }
   };
@@ -3459,6 +3696,17 @@ function dayLabel(c){
   ds.sort(function(a,b){return a-b;});
   return ds.map(function(d){return DAY[d];}).join("·");
 }
+/* 실제 교재 표지 사진 (아토 2026-09-11 제공 · covers/ 폴더).
+   과목 이름으로 찾는다. 없는 과목은 기존 색 표지를 그대로 쓴다. */
+var COVERS={
+  "공업수학1":"covers/em1.jpg",
+  "미분적분학2":"covers/calc2.jpg",
+  "일반물리학2":"covers/phys2.jpg",
+  "정역학":"covers/statics.jpg",
+  "아카데믹글쓰기":"covers/writing.jpg"
+};
+function coverOf(c){ return (c&&COVERS[c.name])||""; }
+
 function bookHTML(c){
   var cov=coverage(c), att=attStats(c);
   var ex=exams(c.id)[0];
@@ -3467,9 +3715,12 @@ function bookHTML(c){
   var n=(c.name||"").replace(/\s/g,"").length;
   var ts=n<=3?19:n<=4?18:n<=5?17:n<=6?15.5:n<=7?14:n<=9?12.5:11.5;
   var pending=(c.status==="pending");
+  var cvUrl=coverOf(c);
   return '<button class="book t-'+esc(c.typeA)+(dd!==null&&dd<=14&&dd>=0&&!pending?" hot":"")+
-    (pending?" pending":"")+'" data-c="'+c.id+'" '+
-    'style="--ts:'+ts+'px;--cr:'+clamp(c.credits||1,1,5)+'" title="'+esc(c.name)+'">'+
+    (pending?" pending":"")+(cvUrl?" hascv":"")+'" data-c="'+c.id+'" '+
+    'style="--ts:'+ts+'px;--cr:'+clamp(c.credits||1,1,5)+
+      (cvUrl?";--cv:url("+cvUrl+")":"")+'" title="'+esc(c.name)+'">'+
+    (cvUrl?'<span class="bk-cv"></span><span class="bk-scrim"></span>':"")+
     '<span class="bk-spine"></span>'+
     '<span class="bk-fav'+(c.fav?" on":"")+'" data-fav="'+c.id+'" role="button" tabindex="0" '+
       'aria-label="즐겨찾기" aria-pressed="'+(!!c.fav)+'">'+(c.fav?"★":"☆")+'</span>'+
@@ -3999,7 +4250,7 @@ function renderCourse(){
   $$("#cWeeks .wk").forEach(function(b){ b.onclick=function(){ weekSheet(c.id,+b.dataset.w); }; });
 
   /* 주차별 수업 정리 목록 */
-  var wks=Object.keys(c.weekNotes||{}).map(Number).filter(function(w){return weekNoteHas(c,w);}).sort(function(a,b){return b-a;});
+  var wks=Object.keys(c.weekNotes||{}).map(Number).filter(function(w){return weekNoteHas(c,w);}).sort(function(a,b){return a-b;});   /* 1주차부터 내려온다 (아토 2026-09-11) */
   var exN=0, openT=0;
   wks.forEach(function(w){ var n=weekNote(c,w); exN+=n.exam.length; openT+=n.tasks.filter(function(t){return !t.done;}).length; });
   $("#cNotesHs").textContent= wks.length? (wks.length+"주 정리 · ★"+exN+(openT?" · 할 일 "+openT:"")) : "";
@@ -4022,9 +4273,9 @@ function renderCourse(){
   var cw=currentWeek()||1;
   var shown=pl.filter(function(p){ return diffDays(p.date,td)>=0 || p.week===cw; });
   var byWeek={}; shown.forEach(function(p){ (byWeek[p.week]=byWeek[p.week]||[]).push(p); });
-  var weeksDesc=Object.keys(byWeek).map(Number).sort(function(a,b){return b-a;});
+  var weeksAsc=Object.keys(byWeek).map(Number).sort(function(a,b){return a-b;});   /* 1주차부터 (아토 2026-09-11) */
   $("#cLogHs").textContent=sessions(c.id).filter(function(s){return !!s.status;}).length+" / "+pl.length+"회";
-  $("#cLog").innerHTML= weeksDesc.length? weeksDesc.slice(0,12).map(function(w){
+  $("#cLog").innerHTML= weeksAsc.length? weeksAsc.map(function(w){
       var rows=byWeek[w].sort(function(a,b){return a.date<b.date?-1:1;}).map(function(p){
         var s=sessionOn(c.id,p.date), st=s?s.status:null, dow=DAY[D(p.date).getDay()];
         var future=diffDays(td,p.date)>0, cancelled=!!(s&&s.cancelled);
@@ -4151,10 +4402,12 @@ var NOTES=[
   {course:"공업수학1",type:"정리",title:"1계 ODE 쉬운 정리 — 개념·공식·문제·풀이·교육과정",file:"notes/em-ch1-easy.html",week:1,date:"2026-09-04",sub:"Ch.1 · 용어 클릭 사전"},
   {course:"공업수학1",type:"정리",title:"1계 ODE 정리노트 — 유형 판별 흐름",file:"notes/em-ch1-notes.html",week:1,date:"2026-09-03",sub:"Ch.1"},
   {course:"공업수학1",type:"보강",title:"9/2 결석 보강 — 모델화부터 선형·비선형까지",file:"notes/em-0902-makeup.html",week:1,date:"2026-09-02",sub:"슬라이드 p.10–17"},
-  {course:"공업수학1",type:"과제",title:"1주차 과제 가이드 — Kreyszig 1.3 #6·7·8·16·17",file:"notes/em-hw1.html",week:1,date:"2026-09-04",sub:"제출 9/9(수) 수업 전"},
-  {course:"공업수학1",type:"교수",title:"이기영 교수 풀이 스타일·출제 방식 분석 v0.2",file:"notes/em-prof-analysis.html",week:1,date:"2026-09-04",sub:"근거 등급 표시"},
+  {course:"공업수학1",type:"과제",title:"1주차 과제 가이드 — Kreyszig 1.3 #6·7·8·16·17",file:"notes/em-hw1.html",week:1,date:"2026-09-04",sub:"제출 9/11(금) 09:00 교탁 · 유형 판별과 힌트"},
+  {course:"공업수학1",type:"과제",title:"1주차 과제 해답지 — 제출용 (수식 전개만)",file:"notes/em-hw1-solution.html",week:1,date:"2026-09-11",sub:"제출 9/11(금) 09:00 · 오타 검증 GREEN · 손으로 옮겨 적을 것"},
+  {course:"공업수학1",type:"과제",title:"1주차 과제 해설 — 왜 이렇게 푸는지",file:"notes/em-hw1-explain.html",week:1,date:"2026-09-11",sub:"변수분리 · u=y/x 치환 · v 치환 세 유형"},
   {course:"미분적분학2",type:"정리",title:"9/3 행렬 연산과 행렬식 + 홍순필 교수 분석 v0.1",file:"notes/calc2-0903.html",week:1,date:"2026-09-03",sub:"사루스 법칙 · 시험은 행렬식부터"},
   {course:"아카데믹글쓰기",type:"정리",title:"9/1 OT — 글쓰기는 왜 필요한가 · 평가 규정 + 교수 분석 v0.1",file:"notes/writing-0901.html",week:1,date:"2026-09-01",sub:"기말 = 강의자료 이론"},
+  {course:"아카데믹글쓰기",type:"과제",title:"주제문 초안 — 《체인징 배터리》(2013)",file:"notes/writing-thesis1.html",week:2,date:"2026-09-11",sub:"주제문 3판 · 근거 3 · 구성 · 반론 대응 · 영상 대조 3줄 미확인"},
   {course:"일반물리학2",type:"정리",title:"9/4 전하와 전기장 서론 — 7섹션 + 강의노트·슬라이드 + 교수 분석 v0.1",file:"notes/phys2-0904.html",week:1,date:"2026-09-04",sub:"중간 범위 27장까지"},
   {course:"",type:"허브",title:"아토 학습 허브 — 이번 주 할 일 · 과목별 링크 · 규칙",file:"notes/hub.html",week:0,date:"2026-09-04",sub:"전체 목록"}
 ];
@@ -4583,6 +4836,33 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-11.30",d:"09-11",items:[
+    "주차별 수업 정리도 1주차부터 내려오게 정렬 (회차 로그에 이어서)"
+  ]},
+  {v:"2026-09-11.29",d:"09-11",items:[
+    "책장 표지에 실제 교재 표지 사진 — 공업수학1(Kreyszig 10판) · 미분적분학2(Stewart Calculus 9E) · 일반물리학2(Halliday 11판) · 정역학(Pytel & Kiusalaas 4판) · 아카데믹글쓰기(한양대 출판부). 표지가 있는 책은 제목 글씨 대신 사진이 깔리고, 아래쪽에 진도·출결 정보가 그대로 보입니다",
+    "교재 없는 과목(CADD 등)은 기존 색 표지 유지"
+  ]},
+  {v:"2026-09-11.28",d:"09-11",items:[
+    "회차 로그를 1주차부터 내려오게 바꿈 (전에는 최근 주차가 위, 12주까지만 보였음)",
+    "회차를 누르면 맨 위에 「수업 후 올릴 것」 — 녹음본 · 교재 · 필기본 3종을 올렸는지 안 올렸는지 한눈에. 빠진 것은 빨갛게 이름이 뜨고 「올리기」를 누르면 바로 그 자리로 (교재·필기본은 파일 선택, 녹음본은 녹취 텍스트)",
+    "그 아래 이 회차 요약 — 진도 범위(없으면 주차 공통 범위) · 과제(미완료·최임박 마감) · 정리 요약본(주차 한 줄 요약 + 노트 칩). 휴강·학기 밖 날짜는 따로 표시",
+    "첨부를 못 읽으면 「없음」이 아니라 「못 읽음」으로 구분해 표시 (전에는 실패와 0건이 같아 보였음)"
+  ]},
+  {v:"2026-09-11.27",d:"09-11",items:[
+    "과제 로그: 과제를 만들면 산출물(제출용 해답지 · 이해용 해설)이 과목 화면 「과제」 노트와 주차 정리 링크에 자동으로 올라간다. 공업수학1 1주차분 반영",
+    "1주차 과제 마감 정정 — 9/9(수)가 아니라 9/11(금) 09:00 교탁",
+    "아카데믹글쓰기 주제문 초안(《체인징 배터리》) 과제 노트 등록 · 2주차 할 일 추가",
+    "공업수학1 2주차 과제 등록 — Kreyszig 1.5 #9·12(9/11 출제) · 1.4 #4·11·12(9/9 출제), 둘 다 9/16(수) 기준. 1주차 과제는 제출 완료 처리"
+  ]},
+  {v:"2026-09-08.25",d:"09-08",items:[
+    "시험 모드 패키지: 상단 게이지에 「가용 공부」(시험까지 수업·캘린더 일정·수면·생활 여유를 뺀 순수 시간) · 학습 탭 맨 위 「시험 모드」 보드(과목별 D-day·시험 범위 주차 칩 ✓정리·미정리, 필요 시간 vs 가용 시간 판정, D-day 순 전략) · 오늘 브리핑에 시험 모드 한 줄",
+    "공부 타이머: 오늘 탭 「공부 타이머」 — 과목 고르고 시작/종료하면 공부 시간이 기록되고(학습 탭 누적과 합산) 오늘 과목별 합계 표시. 새로고침해도 이어짐",
+    "atom 연동: atom 안에서는 웹훅 없이도 atom 캘린더로 오늘 화면 빈 시간·가용 시간 계산 · 결석 표시하면 아톰이 캘린더 블록을 토마토로 · atom 홈·브리핑이 학습앱 시험 D-day와 시험 모드를 그대로 씀",
+    "LMS(Canvas) 연동: atom에 LMS 토큰을 넣으면 할 일 탭 「LMS 과제」 카드(미제출·마감·제출 상태·링크), 과목 화면 「LMS」 카드(과제·공지·이번 주 모듈 자료), 오늘 브리핑 미제출 한 줄",
+    "정책 반영(아토 2026-09-08): 시험 모드 D-14 · 시험 모드 중 학습 큐는 시험 가까운 과목부터 · 중간고사 미정 과목은 8주차로 가정(CADD 10주차 → 8주차, 정역학만 확정) · 공개 노트에서 교수 성향 분석 제거(비공개 폴더로 이동)",
+    "폰(atom 안): 상단 저장·새로고침 줄과 D-day 게이지 줄을 한 줄로"
+  ]},
   {v:"2026-09-08.24",d:"09-08",items:["강조색을 파랑에서 알파인 그린(#4F9A35, 다크 #5CAB3F)으로 — 버튼·탭·타일·게이지·로고 배경·파비콘·홈 화면 아이콘. 과목 표지 색(유형별)은 그대로"]},
   {v:"2026-09-08.23",d:"09-08",items:["사이트 이름 「기계공학 학습 관제탑」 → 「aTTo 학습앱」(브라우저 탭 제목·iPad 홈 화면 이름·README·허브)"]},
   {v:"2026-09-08.22",d:"09-08",items:["로고 교체: 글자 기호(◎) 대신 책 위에 선 관제탑(신호 호) 선형 아이콘. 상단 마크·브라우저 탭 파비콘(icon.svg)·iPad 홈 화면 아이콘(icon-180.png) 통일"]},
@@ -5654,6 +5934,140 @@ function captureLog(cid,date){
     memo:v("lqM"),reviewed:$("#lqR")?$("#lqR").checked:false});
   awSync(cid,date);
 }
+/* ---------- 회차 요약 패널 (아토 2026-09-11) ----------
+   "일차별로 눌렀을때 해당일자의 학습자료 진도나간범위 녹음본 업로드 여부, 과제여부, 그리고 정리 요약본"
+   새 저장 필드를 만들지 않는다 — session / weekNotes / NOTES 에서 읽기만 한다 (헌법 원칙 1). */
+
+/* weekNote() 는 없으면 null 이고 읽기만 해도 배열을 보정한다. 여기서는 원본을 건드리지 않는다. */
+function wnRead(c,w){
+  var raw=(c&&c.weekNotes&&c.weekNotes[w])||null;
+  return {
+    summary: (raw&&typeof raw.summary==="string")?raw.summary:"",
+    range:   (raw&&typeof raw.range==="string")?raw.range:"",
+    tasks:   (raw&&Array.isArray(raw.tasks))?raw.tasks:[],
+    links:   (raw&&Array.isArray(raw.links))?raw.links:[]
+  };
+}
+/* 정규식만으로는 2026-02-31 이 통과한다. KST 자정이 UTC 전날이 되므로 Z 를 붙여 UTC 끼리 본다. */
+function realDate(x){
+  if(typeof x!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(x)) return false;
+  var d=new Date(x+"T00:00:00Z");
+  if(isNaN(d.getTime())) return false;
+  return d.toISOString().slice(0,10)===x;
+}
+/* 수업 후 반드시 올려야 하는 것 3종 (아토 2026-09-11).
+   각 항목은 [텍스트 슬롯] 또는 [해당 종류 첨부] 중 하나라도 있으면 올린 것으로 본다.
+   counts 가 null 이면 첨부를 아직 못 읽은 상태, {ok:false} 면 읽기 실패. */
+var MUST=[
+  {k:"rec",  kinds:["녹음"], icon:"🎙", n:"녹음본", how:"클로바노트 텍스트를 붙여넣기 (음성 파일 업로드는 아직 없음)"},
+  {k:"pre",  kinds:["자료"], icon:"📘", n:"교재",   how:"강의자료·교재 PDF 를 첨부"},
+  {k:"note", kinds:["판서"], icon:"✍️", n:"필기본", how:"교재에 추가로 쓴 필기를 사진으로 첨부"}
+];
+function mustHTML(sl,counts){
+  var str=function(x){ return typeof x==="string"?x.trim():""; };
+  var rows="", miss=[], done=0, unknown=false;
+  MUST.forEach(function(m){
+    var txt=str(sl[m.k]);
+    var na=null;
+    if(counts&&counts.ok){ na=0; m.kinds.forEach(function(kd){ na+=(counts.map[kd]||0); }); }
+    else if(counts&&!counts.ok) unknown=true;
+    var has = !!txt || (na>0);
+    var pending = (na===null && !txt);          /* 첨부를 아직 못 읽었고 텍스트도 없음 → 판정 보류 */
+    if(has) done++; else if(!pending) miss.push(m.n);
+    var bits=[];
+    if(txt) bits.push("텍스트 "+txt.length+"자");
+    if(na>0) bits.push("첨부 "+na+"개");
+    /* 올린 것은 '보기'(텍스트면 슬롯, 첨부면 첨부 칸), 안 올린 것은 '올리기' */
+    var act = has ? (txt?"seeText":"seeAtt") : (m.k==="rec"?"putText":"putFile");
+    var warn = (na>0 && m.k!=="rec" && counts && counts.ok && (counts.map["_none"]||0)>0)
+      ? '<div class="ss">종류가 안 적힌 첨부가 '+counts.map["_none"]+'개 있습니다 — 아래 첨부 칸에서 확인하세요</div>' : "";
+    rows+='<div class="sumrow must'+(has?"":(pending?" pend":" miss"))+'">'+
+      '<span class="sdot '+(has?"on":(pending?"unk":"no"))+'"></span>'+
+      '<div class="sk">'+m.icon+' '+m.n+'</div>'+
+      '<div class="sv">'+(has? bits.join(" · ")
+          : pending? '<span class="smut">확인 중…</span>'
+          : '<b class="sno">안 올림</b>')+
+        (has?warn:'<div class="ss">'+esc(m.how)+'</div>')+'</div>'+
+      '<button class="btn xs'+(has?"":" a")+'" data-must="'+m.k+'" data-act="'+act+'">'+(has?"보기":"올리기")+'</button></div>';
+  });
+  var head = unknown? '<span class="mh warn">첨부를 못 읽어 정확하지 않습니다</span>'
+    : miss.length? '<span class="mh bad">'+done+' / 3 — '+esc(miss.join(" · "))+' 빠짐</span>'
+    : (done===3? '<span class="mh good">3 / 3 — 다 올렸습니다</span>'
+               : '<span class="mh">'+done+' / 3 확인 중…</span>');
+  return '<div class="mustbox"><div class="musth">수업 후 올릴 것 '+head+'</div>'+rows+'</div>';
+}
+function sumRow(state,k,v,sub,btn){
+  return '<div class="sumrow"><span class="sdot '+state+'"></span>'+
+    '<div class="sk">'+esc(k)+'</div>'+
+    '<div class="sv">'+v+(sub?'<div class="ss">'+sub+'</div>':"")+'</div>'+
+    (btn||'<span></span>')+'</div>';
+}
+function logSummaryHTML(cid,date){
+  var c=course(cid), s=sessionOn(cid,date), t=term();
+  var sl=(s&&s.slots&&typeof s.slots==="object")?s.slots:{};
+  var str=function(x){ return typeof x==="string"?x.trim():""; };
+  var cut=function(x,n){ x=str(x); return x.length>n?x.slice(0,n)+"…":x; };
+  var inTerm=(diffDays(t.startDate,date)>=0 && diffDays(date,t.endDate)>=0);
+  var w=inTerm?weekOf(date):0;
+  var wn=inTerm?wnRead(c,w):null;
+  var out="";
+
+  if(s&&s.cancelled) out+='<div class="sumcx">휴강 · 출결 계산에서 빠집니다'+(str(s.memo)?' — '+esc(cut(s.memo,60)):"")+'</div>';
+  if(!inTerm) out+='<div class="sumcx warn">학기 밖 날짜입니다 (개강 '+fmtDate(t.startDate)+' ~ 종강 '+fmtDate(t.endDate)+') — 주차 자료는 연결하지 않습니다</div>';
+
+  /* ① 수업 후 필수 3종 — 아토가 지정한 것. 첨부 개수는 비동기라 mount 에서 확정한다 */
+  out+='<div id="lqSumMust">'+mustHTML(sl,null)+'</div>';
+
+  /* ② 진도 범위 — 회차 우선, 없으면 주차 공통 */
+  var prog=str(s&&s.progress);
+  if(prog) out+=sumRow("on","진도 범위",esc(prog),"","");
+  else if(wn&&str(wn.range)) out+=sumRow("unk","진도 범위",'<span class="smut">'+esc(wn.range)+'</span>','주차 공통 · 이 회차 진도는 안 적힘',"");
+  else out+=sumRow("off","진도 범위",'<span class="smut">없음</span>',"","");
+
+  /* ③ 녹취는 위 필수 3종의 「녹음본」 줄이 대신한다 — 중복 제거 (2026-09-11) */
+
+  /* ④ 과제 — 주차 단위 */
+  if(!inTerm) out+=sumRow("off","과제",'<span class="smut">학기 밖</span>',"","");
+  else{
+    var ts=wn.tasks, open=ts.filter(function(k){ return !k.done; });
+    if(!ts.length) out+=sumRow("off","과제",'<span class="smut">없음</span>','주차 공통',"");
+    else{
+      var dued=open.filter(function(k){ return realDate(k.due); })
+                   .sort(function(a,b){ return a.due<b.due?-1:a.due>b.due?1:0; });
+      var head=dued.length? esc(cut(dued[0].text,40))+' <span class="schip">'+esc(dueLabel(dued[0].due))+'</span>'
+             : open.length? esc(cut(open[0].text,40))+' <span class="schip">마감 미정</span>'
+             : '<span class="smut">모두 완료</span>';
+      out+=sumRow(open.length?"on":"off","과제",head,
+            '주차 공통 · 전체 '+ts.length+'건 중 미완료 '+open.length+'건',
+            '<button class="btn xs" id="lqSumWk">주차 정리</button>');
+    }
+  }
+
+  /* ⑤ 정리 요약본 — 주차 한 줄 요약 + 주차 링크 + NOTES 등록분 */
+  if(!inTerm) out+=sumRow("off","정리 요약본",'<span class="smut">학기 밖</span>',"","");
+  else{
+    var notes=NOTES.filter(function(x){ return x.course===c.name && x.week===w; });
+    var chips=wn.links.map(function(l){
+        var u=str(l.url); if(!u) return "";
+        var lab=esc(cut(l.label||u,22));
+        return /^notes\//.test(u)? '<button class="schipb" data-sopen="'+esc(u)+'" data-stitle="'+esc(l.label||u)+'">'+lab+'</button>'
+             : '<a class="schipb" href="'+esc(u)+'" target="_blank" rel="noopener">'+lab+'</a>';
+      }).join("")+
+      notes.map(function(x){
+        return '<button class="schipb ty" data-sopen="'+esc(x.file)+'" data-stitle="'+esc(x.title)+'">'+
+               esc(x.type)+' · '+esc(cut(x.title,20))+'</button>';
+      }).join("");
+    var sm=str(wn.summary);
+    var body=sm? esc(sm) : (chips? '<span class="smut">한 줄 요약 없음</span>' : '<span class="smut">없음</span>');
+    out+=sumRow((sm||chips)?"on":"off","정리 요약본",body,
+          chips?'<div class="schips">'+chips+'</div>':"",
+          '<button class="btn xs" id="lqSumWk2">주차 정리</button>');
+  }
+
+  return '<div class="field" id="lqSum" data-sk="'+esc(sessKey(cid,date))+'">'+
+    '<label>이 회차 한눈에</label><div class="sumbox">'+out+'</div></div>';
+}
+
 function logSheet(cid,date){
   var c=course(cid), s=sessionOn(cid,date)||{status:null,und:null,reviewed:false,progress:"",memo:"",slots:{},
     timeline:[],startedAt:"",endedAt:"",knew:"",stuck:"",learned:"",missedFrom:""};
@@ -5666,6 +6080,7 @@ function logSheet(cid,date){
     wide:true,
     title:c.name+" · "+fmtDate(date),
     body:
+      logSummaryHTML(cid,date)+
       '<div class="field"><label>출결 · 수업 시각</label><div class="attq" id="lqA">'+
         Object.keys(ATT).map(function(k){ return '<button data-s="'+k+'" aria-pressed="'+(s.status===k)+'">'+ATT[k].n+'<span class="sh">'+ATT[k].sh+'</span></button>'; }).join("")+'</div>'+
         '<div class="row tightg" style="margin-top:8px">'+
@@ -5707,6 +6122,56 @@ function logSheet(cid,date){
       persist(); closeSheet(); render(); toast("기록했습니다");
     }}],
     mount:function(root){
+      /* ── 요약 패널 ── */
+      (function(){
+        var panel=$("#lqSum",root); if(!panel) return;
+        var key=sessKey(cid,date);
+        /* 첨부 개수는 IndexedDB 라 비동기다. 응답이 늦게 와도 엉뚱한 회차를 고치지 않도록 네 가지를 본다. */
+        var live=function(){
+          return panel===document.getElementById("lqSum")
+              && panel.isConnected
+              && panel.dataset.sk===key
+              && $("#scrim").classList.contains("on");
+        };
+        var sl=(function(){ var s0=sessionOn(cid,date); return (s0&&s0.slots&&typeof s0.slots==="object")?s0.slots:{}; })();
+        var bindMust=function(){
+          $$("[data-must]",root).forEach(function(b){ b.onclick=function(){
+            var k=b.dataset.must, act=b.dataset.act;
+            if(act==="seeText"||act==="putText"){ captureLog(cid,date); slotSheet(cid,date,k,reopen); return; }
+            var att=$("#lqAtt",root);
+            if(att&&att.scrollIntoView) att.scrollIntoView({block:"center"});
+            if(act==="seeAtt") return;                      /* 이미 올린 첨부는 보여주기만 한다 */
+            var kindSel=$("#lqAttKind",root), fb=$("#lqFileBtn",root);
+            if(kindSel&&fb){ kindSel.value=(k==="pre"?"자료":"판서"); fb.click(); return; }
+            captureLog(cid,date); slotSheet(cid,date,k,reopen); }; });
+        };
+        bindMust();
+        idb.allForSafe(key).then(function(r){
+          if(!live()) return;
+          var box=$("#lqSumMust",root); if(!box) return;
+          var counts={ok:r.ok,map:{}};
+          if(r.ok) r.list.forEach(function(a){ if(a.tl) return;
+            var k=(typeof a.kind==="string"&&a.kind)?a.kind:"_none";
+            counts.map[k]=(counts.map[k]||0)+1; });
+          box.innerHTML=mustHTML(sl,counts);
+          bindMust();
+        });
+        /* 녹취 — 기존 슬롯 버튼과 같은 경로. captureLog 를 먼저 불러 입력을 보존하고 reopen 으로 돌아온다 */
+        var rb=$("#lqSumRec",root);
+        if(rb) rb.onclick=function(){ captureLog(cid,date); slotSheet(cid,date,"rec",reopen); };
+        /* 주차 정리 */
+        ["#lqSumWk","#lqSumWk2"].forEach(function(sel){
+          var b=$(sel,root); if(!b) return;
+          b.onclick=function(){
+            var t=term(), inTerm=(diffDays(t.startDate,date)>=0 && diffDays(date,t.endDate)>=0);
+            if(!inTerm){ toast("학기 밖 날짜입니다"); return; }
+            captureLog(cid,date); closeSheet(); weekSheet(cid,weekOf(date));
+          };
+        });
+        /* 정리본 칩 — 첫 노트를 임의로 열지 않고 고른 것을 연다 */
+        $$("[data-sopen]",root).forEach(function(b){ b.onclick=function(){
+          captureLog(cid,date); closeSheet(); openNote(b.dataset.sopen,b.dataset.stitle); }; });
+      })();
       var single=function(sel){ $$(sel+" button",root).forEach(function(b){ b.onclick=function(){
         var on=b.getAttribute("aria-pressed")==="true";
         $$(sel+" button",root).forEach(function(x){x.setAttribute("aria-pressed","false");});
@@ -5730,8 +6195,17 @@ function logSheet(cid,date){
         Promise.all(files.map(function(f){
           return fileToDataURL(f).then(function(url){
             return idb.put({id:uid(),sessionKey:key,courseId:cid,date:date,kind:kind,t:nowHM(),
-              name:f.name,mime:f.type,dataURL:url,createdAt:Date.now(),tl:""}); }); }))
-        .then(function(){ var cur=sessionOn(cid,date); setSession(cid,date,{matCount:(cur&&cur.matCount||0)+files.length}); toast(files.length+"개 첨부"); reopen(); },function(){ toast("첨부 실패"); reopen(); });
+              name:f.name,mime:f.type,dataURL:url,createdAt:Date.now(),tl:""}); })
+            .catch(function(){ return null; }); }))
+        .then(function(res){
+          /* idb.put 은 실패를 null 로 돌려준다. 성공한 것만 센다 (오타 검토 2026-09-11) */
+          var ok=res.filter(function(x){ return !!x; }).length, bad=files.length-ok;
+          var cur=sessionOn(cid,date);
+          if(ok) setSession(cid,date,{matCount:(cur&&cur.matCount||0)+ok});
+          toast(bad? (ok?ok+"개 첨부 · "+bad+"개 실패 (저장 공간을 확인하세요)":files.length+"개 모두 실패 — 저장 공간을 확인하세요")
+                   : ok+"개 첨부");
+          reopen();
+        },function(){ toast("첨부 실패"); reopen(); });
       };
       idb.allFor(key).then(function(atts){
         var box=$("#lqAtt",root); if(!box) return;
@@ -6480,6 +6954,13 @@ function serialize(){
   return "<!doctype html>\n<html lang=\"ko\">"+clone.innerHTML+"</html>";
 }
 function cloudSave(){
+  if(ATOM_HOSTED){
+    var b0=$("#btnSave"); b0.disabled=true; b0.textContent="저장 중…";
+    fetch("/api/study/state",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({state:S,client:atomClient})})
+      .then(function(r){ if(!r.ok) throw new Error("http"); ui.dirty=false; b0.disabled=false; markSave(); toast("아톰에 저장했습니다 — 폰·PC 어디서든 같은 데이터로 열립니다"); })
+      ["catch"](function(){ b0.disabled=false; markSave(); toast("아톰 저장 실패 — 연결을 확인하세요"); });
+    return;
+  }
   if(!window.claude||!claude.use){
     toast("이 화면에서는 클라우드 저장을 쓸 수 없습니다 — JSON 백업을 이용하세요"); return;
   }
@@ -6577,7 +7058,6 @@ function boot(){
       links:[{label:"1계 ODE 쉬운 정리 (개념·공식·문제·풀이·교육과정)",url:"notes/em-ch1-easy.html"},
              {label:"9/2 결석 보강 — 모델화부터 선형·비선형까지 (p.10–17)",url:"notes/em-0902-makeup.html"},
              {label:"1주차 과제 가이드 (1.3 #6·7·8·16·17)",url:"notes/em-hw1.html"},
-             {label:"이기영 교수 풀이 스타일·출제 분석 v0.2",url:"notes/em-prof-analysis.html"},
              {label:"1계 ODE 정리노트 (판별 흐름)",url:"notes/em-ch1-notes.html"}]});
     setS(em,"2026-09-02",{status:"absent",progress:"Ch.1 p.10–17 기본개념·모델화·계·선형성",missedFrom:"결석 — 보강 노트로 대체"});
     setS(em,"2026-09-04",{status:"present",progress:"p.18–19 해의 종류·초기값 문제, Ex.4 시작 (녹음 8분 후 끊김)"});
@@ -6892,11 +7372,346 @@ function boot(){
   go("shelf");
   setInterval(function(){
     try{ tickStudy(); }catch(e){}
+    try{ if(window.V25) V25.tickTimer(); }catch(e){}
     tickDday();
     if(autoStartClasses() && ui.view==="today"){ renderToday(); renderGauges(); }
   },1000);
   ui.dirty=false; markSave();
 }
-if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",boot);
-else boot();
+function start(){
+  if(!ATOM_HOSTED){ boot(); return; }
+  var done=false, go=function(){ if(done) return; done=true; boot(); if(!atomState||(S.updatedAt||0)>(atomState.updatedAt||0)) atomPush(); };
+  fetch("/api/study/state").then(function(r){ return r.json(); }).then(function(j){ atomState=(j&&j.state)||null; go(); })["catch"](go);
+  setTimeout(go,4000);
+}
+
+/* ============================================================
+   V25 LAYER — 시험 모드 · 공부 타이머 · atom/LMS 연동 (BUILD 2026-09-08.25)
+   기존 함수를 감싸는 방식(래핑)이라 위 코드는 건드리지 않는다. 정책 출처: 아토 2026-09-08 판단 기준 답.
+   ============================================================ */
+var V25={};
+(function(){
+  function prof(k,def){ var v=S&&S.profile?S.profile[k]:null; return (v==null||v==="")?def:+v; }
+  function h1(x){ return Math.round(x*10)/10; }
+  function hm(x){ var m=Math.round(x*60); return fmtMin(m); }
+
+  /* ---------- atom 캘린더: 같은 주소 /api/cal — 웹훅 없이도 오늘 화면·가용시간 ---------- */
+  var calCache={};   /* date -> {at,events} */
+  V25.atomCal=function(from,to,cb){
+    if(!ATOM_HOSTED){ cb&&cb(false); return; }
+    var need=[], d=from; while(d<=to){ var c=calCache[d]; if(!c||Date.now()-c.at>5*60*1000) need.push(d); d=addDays(d,1); if(need.length>70) break; }
+    if(!need.length){ cb&&cb(false); return; }
+    fetch("/api/cal?from="+need[0]+"&to="+need[need.length-1]).then(function(r){return r.json();}).then(function(j){
+      var days=(j&&j.days)||{}, x=need[0];
+      while(x<=need[need.length-1]){ calCache[x]={at:Date.now(),events:days[x]||[]}; if(!(S.profile.awHook||"").trim()) gcalCache[x]={at:Date.now(),events:days[x]||[]}; x=addDays(x,1); }
+      cb&&cb(true, !!(j&&j.refreshing));
+    }).catch(function(){ cb&&cb(false); });
+  };
+  var _fetchGcal=fetchGcal;
+  fetchGcal=function(date){
+    if((S.profile.awHook||"").trim()) return _fetchGcal(date);
+    if(!ATOM_HOSTED) return;
+    V25.atomCal(date,date,function(fresh){ if(fresh&&ui.view==="today"&&(ui.day||today())===date) renderToday(); });
+  };
+  function evMin(d){ return (gcalOn(d)||[]).reduce(function(a,e){return a+Math.max(0,toMin(e.end)-toMin(e.start));},0); }
+
+  /* ---------- 순수 가용 공부시간 (시험 시각까지: 수업·캘린더 일정·활동 블록·수면·생활 여유 제외) ---------- */
+  V25.availableHours=function(date,time){
+    var td=today(), sleep=prof("sleepH",7), buf=prof("dayBuffer",3), days=diffDays(td,date), total=0, nowM=nowMin(), br=[];
+    if(days<0) return {h:0,days:[]};
+    for(var i=0;i<=days;i++){
+      var d=addDays(td,i), hol=holidayOn(d), free;
+      var cls=hol?0:classesOn(d).reduce(function(a,x){ var ss=sessionOn(x.c.id,d); if(ss&&ss.cancelled) return a;
+        var e=toMin(x.e), st=toMin(x.s); if(i===0){ if(e<=nowM) return a; st=Math.max(st,nowM); } return a+Math.max(0,e-st); },0)/60;
+      var ev=(gcalOn(d)||[]).reduce(function(a,e){ var en=toMin(e.end), st=toMin(e.start); if(i===0){ if(en<=nowM) return a; st=Math.max(st,nowM); } return a+Math.max(0,en-st); },0)/60;
+      var pl=plansOn(d).filter(function(p){return p.activity;}).reduce(function(a,p){ var en=toMin(p.e), st=toMin(p.s); if(i===0){ if(en<=nowM) return a; st=Math.max(st,nowM); } return a+Math.max(0,en-st); },0)/60;
+      if(i===0&&days===0){ free=Math.max(0,toMin(time)-nowM)/60-cls-ev-pl; }
+      else if(i===0){ var left=24-nowM/60; free=left-Math.min(sleep,left)-buf*Math.min(1,left/16)-cls-ev-pl; }
+      else if(i===days){ free=toMin(time)/60-buf*0.5-cls-ev-pl; }
+      else { free=24-sleep-buf-cls-ev-pl; }
+      free=Math.max(0,free); total+=free; br.push({d:d,h:h1(free)});
+    }
+    return {h:h1(total),days:br};
+  };
+
+  /* ---------- 시험 범위 주차 · 단원 상태 · 계획 ---------- */
+  V25.examWeeks=function(ex,cw){
+    var m=/(\d+)\s*[~∼–-]\s*(\d+)\s*주차/.exec(ex.scope||""), a,b;
+    if(m){ a=+m[1]; b=+m[2]; } else if(ex.kind==="기말"){ a=9; b=cw; } else { a=1; b=Math.min(cw,7); }
+    b=Math.min(b,Math.max(cw,a)); var out=[]; for(var w=a;w<=b;w++) out.push(w); return out;
+  };
+  V25.unitState=function(c,w){
+    var n=weekNote(c,w), ss=studySessionsOf(c,w);
+    var studied=(ss.length>0&&ss.every(function(x){return x.reviewed;}))||(S.studyLog||[]).some(function(l){return l.cid===c.id&&l.w===w&&(+l.min||0)>=20;});
+    var filled=n?WN_SEC.filter(function(x){return (n[x[0]]||"").trim();}).length:0;
+    return {w:w,studied:studied,filled:filled,has:filled>0||ss.length>0};
+  };
+  V25.plan=function(){
+    var td=today(), cw=currentWeek()||1;
+    var ups=exams().filter(function(e){ var d=diffDays(td,e.date); return d>=0&&d<=14; });
+    if(!ups.length) return null;
+    var hpu=prof("hoursPerUnit",2), items=[], needed=0;
+    ups.forEach(function(e){ var c=course(e.courseId); if(!c||noStudyType(c)) return;
+      var ws=V25.examWeeks(e,cw).map(function(w){return V25.unitState(c,w);});
+      var un=ws.filter(function(u){return !u.studied;}).length, st=ws.length-un, need=un*hpu+st*0.5;
+      needed+=need; items.push({e:e,c:c,dday:diffDays(td,e.date),weeks:ws,need:h1(need),un:un,st:st}); });
+    if(!items.length) return null;
+    items.sort(function(a,b){return a.dday-b.dday||a.c.name.localeCompare(b.c.name);});
+    var last=items[items.length-1], av=V25.availableHours(last.e.date,last.e.time||"09:00");
+    return {items:items,needed:h1(needed),avail:av.h,gap:h1(av.h-needed),days:av.days,hpu:hpu};
+  };
+
+  /* ---------- 상단 게이지: 가용 공부 ---------- */
+  var _renderGauges=renderGauges;
+  renderGauges=function(){
+    _renderGauges();
+    var p=V25.plan(); if(!p) return;
+    var g=document.createElement("div"); g.className="gauge "+(p.gap<0?"hot":"calm"); g.id="gAvail";
+    g.innerHTML='<div class="gauge-l">가용 공부</div><div class="gauge-v">'+h1(p.avail)+'h<small>필요 '+h1(p.needed)+'h'+(p.gap<0?" · "+h1(-p.gap)+"h 부족":" · 여유 "+h1(p.gap)+"h")+'</small></div>';
+    var box=$("#gauges"); var hero=$("#gDday"); if(hero&&hero.nextSibling) box.insertBefore(g,hero.nextSibling); else box.appendChild(g);
+  };
+
+  /* ---------- 학습 탭: 시험 모드 보드 ---------- */
+  function ensureBoard(){ var v=$("#v-study"); if(!v) return null; var b=$("#examBoard"); if(!b){ b=document.createElement("div"); b.id="examBoard"; var first=v.querySelector(".card"); v.insertBefore(b,first); } return b; }
+  V25.renderExamBoard=function(){
+    var b=ensureBoard(); if(!b) return; var p=V25.plan();
+    if(!p){ var nx=nextExam(); b.innerHTML=nx?'<div class="hint" style="margin:-4px 0 8px">다음 시험 '+esc(course(nx.courseId)?course(nx.courseId).name:"")+' '+fmtDate(nx.date)+' (D-'+diffDays(today(),nx.date)+') · 시험 모드는 D-14부터 켜집니다</div>':""; return; }
+    var strat=p.items.map(function(it){return esc(it.c.name)+' '+h1(it.need)+'h';}).join(' → ');
+    var rows=p.items.map(function(it){
+      var chips=it.weeks.map(function(u){ return '<button class="chip exu '+(u.studied?"ok":u.has?"half":"mut")+'" data-stu="'+it.c.id+'|'+u.w+'" title="'+(u.studied?"공부함":u.has?"정리만 있음":"정리 없음")+'">'+u.w+'주차'+(u.studied?" ✓":u.has?" ▤":"")+'</button>'; }).join("");
+      var pct=it.weeks.length?Math.round((it.weeks.length-it.un)/it.weeks.length*100):0;
+      return '<div class="exrow"><div class="exhead"><b>'+esc(it.c.name)+'</b><span class="chip '+(it.dday<=3?"crit":it.dday<=7?"warn":"mut")+'">D-'+it.dday+'</span><span class="hint">'+esc(it.e.kind)+' '+fmtDate(it.e.date)+' '+esc(it.e.time||"")+(it.e.assumed?" · 가정":"")+'</span><span class="hint" style="margin-left:auto">공부 '+pct+'% · 필요 '+h1(it.need)+'h</span></div>'+
+        (it.e.scope?'<div class="hint exscope">'+esc(it.e.scope)+'</div>':"")+'<div class="exchips">'+chips+'</div></div>';
+    }).join("");
+    b.innerHTML='<div class="card exboard"><div class="card-h"><h3>시험 모드 · D-'+p.items[0].dday+'</h3><span class="hs">EXAM</span><div class="ha"><span class="chip '+(p.gap<0?"crit":"ok")+'">'+(p.gap<0?h1(-p.gap)+"h 부족":"여유 "+h1(p.gap)+"h")+'</span></div></div>'+
+      '<div class="card-b"><div class="exsum"><span>필요 <b>'+h1(p.needed)+'h</b></span><span>가용 <b>'+h1(p.avail)+'h</b> <span class="hint">(수업·일정·수면 '+prof("sleepH",7)+'h·생활 '+prof("dayBuffer",3)+'h 제외)</span></span><span>단원당 <b>'+p.hpu+'h</b></span></div>'+
+      '<div class="hint" style="margin:4px 0 10px">전략(시험 가까운 순): '+strat+(p.gap<0?' — 부족하면 배점 낮은 범위부터 줄인다':'')+'</div>'+rows+'</div></div>';
+    $$("#examBoard [data-stu]").forEach(function(x){ x.onclick=function(){ var q=x.dataset.stu.split("|"); openStudy(q[0],+q[1]); }; });
+  };
+  var _renderStudy=renderStudy;
+  renderStudy=function(){ _renderStudy(); try{ V25.renderExamBoard(); }catch(e){} };
+
+  /* ---------- 학습 큐: 시험 모드에서는 시험 가까운 과목부터 (아토: 과목 가중 없이 D-day만) ---------- */
+  var _studyUnits=studyUnits;
+  studyUnits=function(){
+    var out=_studyUnits(); if(phase()!=="EXAM") return out;
+    var td=today(), dd={}; exams().forEach(function(e){ var d=diffDays(td,e.date); if(d>=0&&(dd[e.courseId]==null||d<dd[e.courseId])) dd[e.courseId]=d; });
+    return out.map(function(u,i){return {u:u,i:i};}).sort(function(a,b){ var x=dd[a.u.c.id]==null?99:dd[a.u.c.id], y=dd[b.u.c.id]==null?99:dd[b.u.c.id]; return x-y||a.i-b.i; }).map(function(x){return x.u;});
+  };
+
+  /* ---------- 공부 타이머 (오늘 탭) ---------- */
+  var T=null; try{ T=JSON.parse(localStorage.getItem("mc-timer")||"null"); }catch(e){}
+  function saveT(){ try{ if(T) localStorage.setItem("mc-timer",JSON.stringify(T)); else localStorage.removeItem("mc-timer"); }catch(e){} }
+  function ensureTimerCard(){ var v=$("#v-today"); if(!v) return null; var c=$("#timerCard"); if(!c){ c=document.createElement("div"); c.className="card"; c.id="timerCard";
+      c.innerHTML='<div class="card-h"><h3>공부 타이머</h3><span class="hs" id="tmHs"></span><div class="ha"><span class="chip acc mono" id="tmClock">00:00:00</span></div></div><div class="card-b" id="tmBody"></div>';
+      var after=$("#dayBooks"); var card=after?after.closest(".card"):null; if(card&&card.nextSibling) v.insertBefore(c,card.nextSibling); else v.appendChild(c); } return c; }
+  function fmtClock(sec){ return pad(Math.floor(sec/3600))+":"+pad(Math.floor(sec/60)%60)+":"+pad(sec%60); }
+  V25.tickTimer=function(){ var el=$("#tmClock"); if(!el) return; if(T&&T.start){ el.textContent=fmtClock(Math.floor((Date.now()-T.start)/1000)); el.classList.add("on"); } else { el.textContent="00:00:00"; el.classList.remove("on"); } };
+  V25.renderTimer=function(){
+    var c=ensureTimerCard(); if(!c) return; var td=today();
+    var list=courses().filter(function(x){return isActive(x)&&!noStudyType(x);});
+    var sel=T?T.cid:(V25.plan()&&V25.plan().items[0]?V25.plan().items[0].c.id:(list[0]&&list[0].id));
+    var per={}; (S.studyLog||[]).filter(function(l){return l.d===td;}).forEach(function(l){ per[l.cid]=(per[l.cid]||0)+(+l.min||0); });
+    var tot=Object.keys(per).reduce(function(a,k){return a+per[k];},0);
+    $("#tmHs").textContent="오늘 "+fmtMin(tot);
+    $("#tmBody").innerHTML='<div class="tmchips">'+list.map(function(x){ return '<button class="chip '+(x.id===sel?"acc":"mut")+'" data-tc="'+x.id+'"'+(T?' disabled':'')+'>'+esc(x.name)+(per[x.id]?' <span class="mono">'+fmtMin(per[x.id])+'</span>':'')+'</button>'; }).join("")+'</div>'+
+      '<div class="row" style="margin-top:10px;align-items:center;gap:8px">'+(T?'<button class="btn a" id="tmStop">■ 종료하고 기록</button><span class="hint">'+esc((course(T.cid)||{}).name||"")+' 공부 중 · '+fmtDate(T.d)+' '+esc(T.hm||"")+' 시작</span>':'<button class="btn a" id="tmStart">▶ 시작</button><span class="hint">종료하면 과목 공부 시간에 기록되고 시험 모드 계산에 반영됩니다</span>')+'</div>';
+    $$("#tmBody [data-tc]").forEach(function(b){ b.onclick=function(){ if(T) return; sel=b.dataset.tc; $$("#tmBody [data-tc]").forEach(function(x){ x.className="chip "+(x.dataset.tc===sel?"acc":"mut"); }); }; });
+    var st=$("#tmStart"); if(st) st.onclick=function(){ if(!sel){ toast("과목을 먼저 고르세요"); return; } T={cid:sel,start:Date.now(),d:today(),hm:nowHM()}; saveT(); V25.renderTimer(); V25.tickTimer(); toast((course(sel)||{}).name+" 공부 시작"); };
+    var sp=$("#tmStop"); if(sp) sp.onclick=function(){ if(!T) return; var min=Math.max(1,Math.round((Date.now()-T.start)/60000)); var cc=course(T.cid);
+      S.studyLog=S.studyLog||[]; S.studyLog.push({id:uid(),d:T.d||today(),cid:T.cid,w:currentWeek()||1,min:min,grade:"timer",at:Date.now()});
+      T=null; saveT(); persist(); V25.renderTimer(); V25.tickTimer(); renderGauges(); toast((cc?cc.name:"")+" "+fmtMin(min)+" 기록"); };
+    V25.tickTimer();
+  };
+
+  /* ---------- 결석 표시 → atom(아톰)이 캘린더 블록을 토마토로 ---------- */
+  var _setSession=setSession;
+  setSession=function(cid,date,patch){
+    var before=sessionOn(cid,date); var was=before?before.status:null;
+    _setSession(cid,date,patch);
+    if(ATOM_HOSTED&&patch&&patch.status==="absent"&&was!=="absent"){
+      var c=course(cid); if(!c) return; var dow=D(date).getDay(); var sl=(c.slots||[]).filter(function(x){return x.d===dow;})[0];
+      fetch("/api/absent",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({course:c.name,date:date,start:sl?sl.s:"",end:sl?sl.e:"",reason:diffDays(today(),date)>0?"사전 지정":"결석"})})
+        .then(function(r){return r.json();}).then(function(j){ toast(j&&j.ok?"아톰이 캘린더 블록을 결석(토마토)으로 표시합니다":"아톰 요청 실패"); })["catch"](function(){});
+    }
+  };
+
+  /* ---------- LMS(Canvas): atom /api/lms/state ---------- */
+  var L={at:0,state:null};
+  V25.lms=function(cb){
+    if(!ATOM_HOSTED){ cb(null); return; }
+    if(L.state&&Date.now()-L.at<10*60*1000){ cb(L.state); return; }
+    fetch("/api/lms/state").then(function(r){ return r.ok?r.json():null; }).then(function(j){ L={at:Date.now(),state:(j&&j.synced)?j:null}; cb(L.state); })["catch"](function(){ cb(null); });
+  };
+  function norm(x){ return String(x||"").replace(/[\s()\[\]·•\-_/]/g,"").toLowerCase(); }
+  V25.lmsCourse=function(c,st){ if(!st||!c) return null; var n=norm(c.name), en=norm(c.en);
+    return (st.courses||[]).filter(function(l){ var ln=norm(l.name); return ln.indexOf(n)>=0||(n.length>=3&&n.indexOf(ln)>=0)||(en&&en.length>=4&&ln.indexOf(en)>=0); })[0]||null; };
+  function ddayOf(iso){ return iso?diffDays(today(),iso.slice(0,10)):null; }
+  function lmsRowsAssign(list){
+    return list.map(function(a){ var dd=ddayOf(a.due); var st=a.submitted?'<span class="chip ok">제출</span>':(dd!=null&&dd<0)?'<span class="chip crit">지남 '+(-dd)+'일</span>':'<span class="chip warn">미제출'+(dd!=null?' · '+(dd===0?"오늘":"D-"+dd):'')+'</span>';
+      return '<div class="lrow"><div class="gr"><div class="t"><span class="cchip">'+esc(a.course||"")+'</span> '+esc(a.name)+'</div><div class="s">'+(a.due?'마감 '+esc(a.due):'기한 없음')+(a.points?' · '+a.points+'점':'')+(a.kind==="quiz"?' · 퀴즈':a.kind==="discussion"?' · 토론':'')+'</div></div>'+st+(a.url?'<a class="btn xs" href="'+esc(a.url)+'" target="_blank" rel="noopener">열기</a>':'')+'</div>'; }).join("");
+  }
+  function lmsEmpty(st){ return st?'':'<div class="hint">atom 홈의 「LMS 과제 · 공지」 카드에서 액세스 토큰을 한 번 넣으면 여기에 과제·공지·모듈이 자동으로 들어옵니다.</div>'; }
+  V25.renderLmsTodo=function(){
+    var v=$("#v-todo"); if(!v) return; var c=$("#lmsTodoCard"); if(!c){ c=document.createElement("div"); c.className="card"; c.id="lmsTodoCard"; c.innerHTML='<div class="card-h"><h3>LMS 과제</h3><span class="hs" id="lmsTodoHs">CANVAS</span><div class="ha"><span class="kbdhint" id="lmsTodoMeta"></span></div></div><div class="card-b tight" id="lmsTodoBox"></div>'; v.appendChild(c); }
+    V25.lms(function(st){ if(!st){ $("#lmsTodoBox").innerHTML=lmsEmpty(null)||'<div class="hint">LMS 미연결</div>'; return; }
+      var td=today(), list=(st.assignments||[]).filter(function(a){ var dd=ddayOf(a.due); return !a.submitted&&(dd==null||dd>=-14); });
+      $("#lmsTodoMeta").textContent=(st.synced||"")+" 동기화"; $("#lmsTodoHs").textContent=list.length+"건 미제출";
+      var ann=(st.announcements||[]).slice(0,5);
+      $("#lmsTodoBox").innerHTML=(list.length?lmsRowsAssign(list):'<div class="empty"><span class="big">✓</span>미제출 과제가 없습니다.</div>')+
+        (ann.length?'<div class="hint" style="margin:10px 0 4px">최근 공지</div>'+ann.map(function(a){ return '<div class="lrow"><div class="gr"><div class="t"><span class="cchip">'+esc(a.course||"")+'</span> '+esc(a.title)+'</div><div class="s">'+esc((a.posted||"").slice(0,16))+(a.body?' · '+esc(a.body.slice(0,90)):'')+'</div></div>'+(a.url?'<a class="btn xs" href="'+esc(a.url)+'" target="_blank" rel="noopener">열기</a>':'')+'</div>'; }).join(""):"");
+    });
+  };
+  V25.renderLmsCourse=function(){
+    var v=$("#v-course"), c=ui.course&&course(ui.course); if(!v||!c) return;
+    var card=$("#lmsCourseCard"); if(!card){ card=document.createElement("div"); card.className="card"; card.id="lmsCourseCard"; card.innerHTML='<div class="card-h"><h3>LMS</h3><span class="hs">CANVAS</span><div class="ha"><span class="kbdhint" id="lmsCourseMeta"></span></div></div><div class="card-b tight" id="lmsCourseBox"></div>'; v.appendChild(card); }
+    V25.lms(function(st){ var lc=V25.lmsCourse(c,st);
+      if(!st||!lc){ $("#lmsCourseMeta").textContent=""; $("#lmsCourseBox").innerHTML=st?'<div class="hint">LMS에서 「'+esc(c.name)+'」과 이름이 맞는 과목을 못 찾았습니다. LMS 과목명: '+esc((st.courses||[]).map(function(x){return x.name;}).join(", ")||"없음")+'</div>':lmsEmpty(null); return; }
+      var as=(st.assignments||[]).filter(function(a){return a.course_id===lc.id;}), an=(st.announcements||[]).filter(function(a){return a.course_id===lc.id;}).slice(0,4);
+      var mods=(st.modules||{})[String(lc.id)]||[], cw=currentWeek()||1, items=[];
+      mods.forEach(function(m){ var wk=/(\d+)\s*주/.exec(m.name||""); if(!wk||Math.abs(+wk[1]-cw)<=1) (m.items||[]).forEach(function(it){ items.push({m:m.name,it:it}); }); });
+      items=items.slice(0,12);
+      $("#lmsCourseMeta").textContent=esc(lc.name)+(lc.grade?" · "+lc.grade:lc.score!=null?" · "+lc.score+"점":"");
+      $("#lmsCourseBox").innerHTML=(as.length?'<div class="hint" style="margin:6px 0 4px">과제 '+as.length+'</div>'+lmsRowsAssign(as):'<div class="hint" style="padding:6px 0">등록된 과제 없음</div>')+
+        (items.length?'<div class="hint" style="margin:10px 0 4px">이번 주 모듈 자료</div>'+items.map(function(x){ return '<div class="lrow"><div class="gr"><div class="t">'+esc(x.it.title)+'</div><div class="s">'+esc(x.m)+' · '+esc(x.it.type||"")+(x.it.due?' · 마감 '+esc(x.it.due):'')+(x.it.done===true?' · 완료':x.it.done===false?' · 미완료':'')+'</div></div>'+(x.it.url?'<a class="btn xs" href="'+esc(x.it.url)+'" target="_blank" rel="noopener">열기</a>':'')+'</div>'; }).join(""):"")+
+        (an.length?'<div class="hint" style="margin:10px 0 4px">공지</div>'+an.map(function(a){ return '<div class="lrow"><div class="gr"><div class="t">'+esc(a.title)+'</div><div class="s">'+esc((a.posted||"").slice(0,16))+(a.body?' · '+esc(a.body.slice(0,120)):'')+'</div></div>'+(a.url?'<a class="btn xs" href="'+esc(a.url)+'" target="_blank" rel="noopener">열기</a>':'')+'</div>'; }).join(""):"");
+    });
+  };
+  var _renderTodo=renderTodo; renderTodo=function(){ _renderTodo(); try{ V25.renderLmsTodo(); }catch(e){} };
+  var _renderCourse=renderCourse; renderCourse=function(){ _renderCourse(); try{ V25.renderLmsCourse(); }catch(e){} };
+
+  /* ---------- 오늘 탭: 타이머 카드 + 브리핑 줄(시험 모드 · LMS) ---------- */
+  var _renderToday=renderToday;
+  renderToday=function(){
+    _renderToday();
+    try{ V25.renderTimer(); }catch(e){}
+    try{
+      var steps=$("#brief .steps"); if(!steps) return;
+      var p=V25.plan();
+      if(p){ var el=document.createElement("div"); el.className="step"; el.innerHTML='<b>시험 모드 D-'+p.items[0].dday+'</b> — 필요 '+h1(p.needed)+'h / 가용 '+h1(p.avail)+'h → '+(p.gap<0?'<span style="color:var(--crit)">'+h1(-p.gap)+'h 부족</span>':'여유 '+h1(p.gap)+'h')+' · 오늘 목표 '+hm(p.days[0]?p.days[0].h:0)+' · 순서: '+p.items.map(function(i){return esc(i.c.name);}).join(" → ")+' <button class="linkish" data-go2="study">시험 보드 →</button>'; steps.insertBefore(el,steps.firstChild);
+        $$("#brief [data-go2]").forEach(function(b){ b.onclick=function(){ go(b.dataset.go2); }; }); }
+      V25.lms(function(st){ if(!st) return; var list=(st.assignments||[]).filter(function(a){ var dd=ddayOf(a.due); return !a.submitted&&dd!=null&&dd<=7&&dd>=-14; }); if(!list.length) return; var st2=$("#brief .steps"); if(!st2||$("#briefLms")) return;
+        var el2=document.createElement("div"); el2.className="step"; el2.id="briefLms"; el2.innerHTML='<b>LMS 미제출 '+list.length+'건</b> — '+list.slice(0,4).map(function(a){ var dd=ddayOf(a.due); return '<span style="'+(dd<0?'color:var(--crit)':dd<=1?'color:var(--warn)':'')+'">'+esc(a.course||"")+': '+esc(a.name)+' ('+(dd<0?(-dd)+"일 지남":dd===0?"오늘":"D-"+dd)+')</span>'; }).join(' · ')+(list.length>4?' 외 '+(list.length-4)+'건':'')+' <button class="linkish" data-go2="todo">할 일 →</button>'; st2.appendChild(el2);
+        $$("#briefLms [data-go2]").forEach(function(b){ b.onclick=function(){ go(b.dataset.go2); }; }); });
+    }catch(e){}
+  };
+
+  /* ---------- 데이터 패치 (1회) — 아토 2026-09-08 결정 ---------- */
+  V25.patch=function(){
+    var t=term(), changed=false;
+    if(!t.patchV25a){   /* 중간고사: 정역학만 확정, 나머지는 8주차 가정 (CADD 10주차 → 8주차) */
+      t.exams.forEach(function(e){ var c=course(e.courseId); if(e.kind!=="중간"||!c) return;
+        if(/정역학/.test(c.name)){ e.assumed=false; return; }
+        e.assumed=true;
+        if(/CADD/i.test(c.name)){ var w8=planned(c).filter(function(p){return p.week===8;})[0]; if(w8){ e.date=w8.date; } } });
+      t.patchV25a=true; changed=true;
+    }
+    if(!t.patchV25b){   /* 공개 노트에서 교수 성향 분석 링크 제거 */
+      t.courses.forEach(function(c){ Object.keys(c.weekNotes||{}).forEach(function(w){ var n=c.weekNotes[w]; if(n&&n.links) n.links=n.links.filter(function(l){ return !/em-prof-analysis/.test(l.url||""); }); }); });
+      t.patchV25b=true; changed=true;
+    }
+    if(changed) persist();
+  };
+  var _boot=boot; boot=function(){ _boot(); try{ V25.patch(); renderGauges(); }catch(e){} };
+})();
+
+/* ============================================================
+   V26 LAYER — 지식맵 진입 (BUILD 2026-09-09.26, 야간 작업 항목 4)
+   학습 탭 상단에 「지식맵 · 이걸 이해하려면」 버튼 하나. learn.html?subject=<과목명> 으로 간다.
+   renderStudy 를 감싸기만 하고 위 코드는 건드리지 않는다.
+   ============================================================ */
+var V26={};
+(function(){
+  var SUBJ_RE=/공업수학1|미분적분학2|일반물리학2|정역학|CADD/;
+  V26.subject=function(){
+    try{
+      var units=studyUnits(), due=units.filter(function(u){return u.due;}), pick=(due[0]||units[0]);
+      if(pick&&pick.c&&SUBJ_RE.test(pick.c.name)) return pick.c.name.match(SUBJ_RE)[0];
+      var cs=term().courses.filter(function(c){return SUBJ_RE.test(c.name);});
+      return cs.length? cs[0].name.match(SUBJ_RE)[0] : "";
+    }catch(e){ return ""; }
+  };
+  V26.render=function(){
+    var vh=document.querySelector("#v-study .vh"); if(!vh) return;
+    var el=document.getElementById("kmapEntry");
+    if(!el){ el=document.createElement("div"); el.id="kmapEntry"; el.style.cssText="margin:10px 0 2px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"; vh.appendChild(el); }
+    var s=V26.subject(), href="learn.html"+(s?"?subject="+encodeURIComponent(s):"");
+    el.innerHTML='<a class="btn a" href="'+href+'" style="text-decoration:none">🧭 지식맵 · 이걸 이해하려면</a>'+
+      '<span class="hint" style="color:var(--ink-2);font-size:12px">'+(s?esc(s)+' 부터 — ':'')+'주차·과제를 고르면 필요한 선수 지식을 트리로 보여줍니다</span>';
+  };
+  var _renderStudy=renderStudy;
+  renderStudy=function(){ _renderStudy(); try{ V26.render(); }catch(e){} };
+})();
+
+
+/* ============================================================
+   V27 LAYER — 과제 로그 (BUILD 2026-09-11.27)
+   과제 산출물을 해당 과목·주차 정리의 링크로 올린다. 저장소를 새로 만들지 않고
+   기존 weekNotes[N].links 를 쓴다 (헌법 원칙 1 · 학습시스템 지침 §8.3).
+   ============================================================ */
+var V27={};
+(function(){
+  /* [과목명, 주차, [[표시이름, notes/ 경로], …]] */
+  V27.LOG=[
+    ["공업수학1",1,[["1주차 과제 해답지 — 제출용 (수식 전개만)","notes/em-hw1-solution.html"],
+                   ["1주차 과제 해설 — 왜 이렇게 푸는지","notes/em-hw1-explain.html"]]],
+    ["아카데믹글쓰기",2,[["주제문 초안 — 《체인징 배터리》(2013)","notes/writing-thesis1.html"]]]
+  ];
+  V27.patch=function(){
+    var t=term(), changed=false;
+    V27.LOG.forEach(function(r){
+      var c=t.courses.filter(function(x){return x.name===r[0];})[0]; if(!c) return;
+      var n=c.weekNotes&&c.weekNotes[r[1]]; if(!n) return;
+      if(!Array.isArray(n.links)) n.links=[];
+      r[2].forEach(function(l){
+        if(n.links.some(function(x){return (x.url||"")===l[1];})) return;
+        n.links.push({label:l[0],url:l[1]}); changed=true;
+      });
+    });
+    /* 아카데믹글쓰기 2주차 노트가 없으면 만든다 — 링크를 걸 자리가 필요하다 */
+    (function(){
+      var w=t.courses.filter(function(x){return x.name==="아카데믹글쓰기";})[0]; if(!w) return;
+      if(!w.weekNotes) w.weekNotes={};
+      if(!w.weekNotes[2]){ w.weekNotes[2]={range:"",summary:"",textbook:"",board:"",recording:"",material:"",notes:"",exam:[],tasks:[],links:[],updatedAt:0}; changed=true; }
+      var n2=w.weekNotes[2];
+      if(!Array.isArray(n2.tasks)) n2.tasks=[];
+      if(!n2.tasks.some(function(k){return /주제문/.test(k.text||"");})){
+        n2.tasks.push({id:uid(),text:"주제문 쓰기 활동 — 《체인징 배터리》(2013) 감상 후 주제문 제출. 초안 있음, 영상 대조 3줄 미확인",due:"",done:false,src:"과제 안내"});
+        changed=true;
+      }
+    })();
+    /* 2주차 과제 — 9/11(금) 판서 「2nd Week H.W. Assignment <1.5>. 9, 12」, 마감 9/16(수) (아토 2026-09-11) */
+    (function(){
+      var em2=t.courses.filter(function(x){return x.name==="공업수학1";})[0]; if(!em2) return;
+      if(!em2.weekNotes) em2.weekNotes={};
+      if(!em2.weekNotes[2]){ em2.weekNotes[2]={range:"",summary:"",textbook:"",board:"",recording:"",material:"",notes:"",exam:[],tasks:[],links:[],updatedAt:0}; changed=true; }
+      var w2=em2.weekNotes[2];
+      if(!Array.isArray(w2.tasks)) w2.tasks=[];
+      if(!w2.tasks.some(function(k){return /2주차 과제 Kreyszig 1\.5/.test(k.text||"");})){
+        w2.tasks.push({id:uid(),text:"2주차 과제 Kreyszig 1.5 #9·12 (선형 비제차) — 수요일 수업 전 제출. 교재 문제 원문 미확인(판서에 번호만)",
+          due:"2026-09-16",done:false,src:"판서 9/11(금)"});
+        changed=true;
+      }
+      /* 9/9(수) 출제분 — 완전미분방정식·적분인자. 마감일 아토 확인 필요 */
+      if(!w2.tasks.some(function(k){return /Kreyszig 1\.4/.test(k.text||"");})){
+        w2.tasks.push({id:uid(),text:"공수 과제 Kreyszig 1.4 #4·11·12 (완전미분방정식·적분인자) — 9/16(수) 마감 확정(아토 2026-09-11). 교재 문제 원문 미확인",
+          due:"2026-09-16",done:false,src:"판서 9/9(수)"});
+        changed=true;
+      }
+    })();
+    /* 1주차 과제 마감은 9/11(금) 09:00 교탁 */
+    var em=t.courses.filter(function(x){return x.name==="공업수학1";})[0];
+    var n1=em&&em.weekNotes&&em.weekNotes[1];
+    if(n1&&Array.isArray(n1.tasks)) n1.tasks.forEach(function(k){
+      if(/^1주차 과제 Kreyszig/.test(k.text||"")){
+        if(k.due!=="2026-09-11"){ k.due="2026-09-11"; changed=true; }
+        if(!k.done){ k.done=true; changed=true; }   /* 아토 2026-09-11 "과제는 다했어" */
+      }
+    });
+    if(changed) persist();
+  };
+  var _boot=boot; boot=function(){ _boot(); try{ V27.patch(); }catch(e){} };
+})();
+if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start);
+else start();
 </script>
