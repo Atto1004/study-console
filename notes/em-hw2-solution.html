@@ -22,10 +22,10 @@ mjx-container[display="true"]>svg{margin:0!important}
  font-family:"IBM Plex Mono",monospace;letter-spacing:.04em;padding:5px 2px 0}
 .sec{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;color:var(--navy-ink);
  background:var(--navy-soft);border-radius:5px;padding:7px 14px;display:inline-block;margin:26px 0 4px}
-.q{margin:0 0 6px;padding:14px 0 12px;border-bottom:1px dashed var(--line)}
-/* 인쇄: 문제 전체를 한 장에 가두지 않는다(아래 여백 원인). 머리·답·검산·그래프 같은 작은 덩어리만 안 자른다 */
-.qh,.ans,.chk,.graph,.line{page-break-inside:avoid;break-inside:avoid}
-.sec,.qh,.note{page-break-after:avoid;break-after:avoid}
+.q{margin:0 0 4px;padding:10px 0 8px;border-bottom:1px dashed var(--line);page-break-inside:avoid;break-inside:avoid}
+/* 인쇄: 문제 하나는 한 장 안에(아토 9/15). 대신 전체를 조금 줄여 한 장에 두 문제가 들어가게 한다 */
+.sec{page-break-after:avoid;break-after:avoid}
+@media print{.sheet{zoom:.9}.top{padding:12px 0 8px}.rule.thin{margin:0 0 12px}.sec{margin:14px 0 2px}.chk{margin-top:5px}}
 .q:last-of-type{border-bottom:0}
 .qh{display:flex;align-items:center;gap:12px;margin:0 0 10px}
 .qh .no{flex:none;background:var(--navy);color:#fff;font-family:"IBM Plex Mono",monospace;
