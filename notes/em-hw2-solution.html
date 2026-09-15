@@ -25,7 +25,7 @@ mjx-container[display="true"]>svg{margin:0!important}
 .q{margin:0 0 4px;padding:10px 0 8px;border-bottom:1px dashed var(--line);page-break-inside:avoid;break-inside:avoid}
 /* 인쇄: 문제 하나는 한 장 안에(아토 9/15). 대신 전체를 조금 줄여 한 장에 두 문제가 들어가게 한다 */
 .sec{page-break-after:avoid;break-after:avoid}
-@media print{.sheet{zoom:.9}.top{padding:12px 0 8px}.rule.thin{margin:0 0 12px}.sec{margin:14px 0 2px}.chk{margin-top:5px}}
+@media print{.sheet{zoom:.8}.top{padding:12px 0 8px}.rule.thin{margin:0 0 12px}.sec{margin:14px 0 2px}.chk{margin-top:5px}}
 .q:last-of-type{border-bottom:0}
 .qh{display:flex;align-items:center;gap:12px;margin:0 0 10px}
 .qh .no{flex:none;background:var(--navy);color:#fff;font-family:"IBM Plex Mono",monospace;
@@ -45,6 +45,20 @@ mjx-container[display="true"]>svg{margin:0!important}
 .chk .line{font-size:13.5px}
 .graph{display:block;width:340px;max-width:100%;height:auto;border:1px solid var(--line);border-radius:6px;margin:4px 0 0}
 .chk{margin-top:6px}
+.stp{font-weight:700;color:#B2483F;font-size:13px;margin:9px 0 1px}
+.stp:first-child{margin-top:2px}
+.sub{font-size:13px;color:var(--ink-2);margin:2px 0 0}
+.ans .lb{font-family:"Noto Sans KR",sans-serif;font-size:12.5px;color:var(--ink-2);margin-right:8px}
+/* STEP-CSS */
+.stp{font-weight:700;color:#B2483F;font-size:13px;margin:7px 0 0}
+.stp:first-child{margin-top:2px}
+.sub{font-size:13px;color:var(--ink-2);margin:2px 0 0}
+.ans .lb{font-family:"Noto Sans KR",sans-serif;font-size:12.5px;color:var(--ink-2);margin-right:8px}
+.q{padding:8px 0 6px}.ans{margin:6px 0 0 4px}.chk{margin-top:4px}
+.two{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}.two>div{flex:1 1 300px;min-width:0}
+.two .graph{width:300px;margin-top:2px}
+@media print{.top{padding:8px 0 4px}.top .c h1{font-size:26px}.rule.thin{margin:0 0 8px}.who{padding-top:2px}.sec{margin:10px 0 0}}
+/* /STEP-CSS */
 @page{size:A4;margin:13mm}
 @media print{body{font-size:13.5px}}
 </style>
@@ -54,27 +68,30 @@ mjx-container[display="true"]>svg{margin:0!important}
   <div class="l">MATHEMATICS<br>SOLUTION</div>
   <div class="c">
     <h1>수학 해답지</h1>
-    <div class="sub">공업수학1 · 2주차 과제 · 문제별 풀이과정 (수식 전개만)</div>
+    <div class="sub">공업수학1 · 2주차 과제 · 문제별 풀이과정</div>
   </div>
   <div class="r">KREYSZIG<br>SET 1.4 &amp; 1.5</div>
 </div>
 <div class="rule"></div><div class="rule thin"></div>
 <div class="who"><span>기계공학과 김아토 · 2022049607</span><span>2026-09-16 (수) 제출</span></div>
 
-<div class="sec">EXERCISE 1.4 — EXACT ODEs. INTEGRATING FACTORS</div>
+<div class="sec">연습문제 1.4 — 완전상미분방정식, 적분인자</div>
 
 <div class="q">
   <div class="qh"><span class="no">04</span><span class="qq">\(e^{3\theta}\left(dr+3r\,d\theta\right)=0\)</span><span class="tag">완전미분</span></div>
   <div class="body">
-    <div class="line">\[e^{3\theta}\,dr+3re^{3\theta}\,d\theta=0\]</div>
-    <div class="line">\[M=e^{3\theta},\qquad N=3re^{3\theta}\]</div>
-    <div class="line">\[\frac{\partial M}{\partial\theta}=3e^{3\theta}=\frac{\partial N}{\partial r}\quad\Longrightarrow\quad\text{exact}\]</div>
-    <div class="line">\[u=\int M\,dr=re^{3\theta}+\phi(\theta)\]</div>
-    <div class="line">\[\frac{\partial u}{\partial\theta}=3re^{3\theta}+\phi'(\theta)=N=3re^{3\theta}\]</div>
-    <div class="line">\[\phi'(\theta)=0\ \Longrightarrow\ \phi(\theta)=c\]</div>
-    <div class="ans">\(re^{3\theta}=c\)</div>
-    <div class="chk"><div class="note">check</div>
-      <div class="line">\[d\!\left(re^{3\theta}\right)=e^{3\theta}dr+3re^{3\theta}d\theta=0\quad\checkmark\]</div>
+    <div class="stp">Step 1 완전미분방정식인지 판별</div>
+    <div class="line">\[e^{3\theta}\,dr+3re^{3\theta}\,d\theta=0\qquad M=e^{3\theta},\quad N=3re^{3\theta}\]</div>
+    <div class="line">\[\frac{\partial M}{\partial\theta}=3e^{3\theta},\qquad \frac{\partial N}{\partial r}=3e^{3\theta}\quad\Longrightarrow\quad \frac{\partial M}{\partial\theta}=\frac{\partial N}{\partial r}\ :\ \text{완전미분방정식 (exact)}\]</div>
+    <div class="stp">Step 2 미분방정식의 해를 구함</div>
+    <div class="line">\[u=\int M\,dr+k(\theta)=re^{3\theta}+k(\theta)\]</div>
+    <div class="sub">\(k(\theta)\)를 구하기 위하여</div>
+    <div class="line">\[\frac{\partial u}{\partial\theta}=3re^{3\theta}+k'(\theta)=N=3re^{3\theta}\ \Longrightarrow\ k'(\theta)=0\ \Longrightarrow\ k(\theta)=c^{*}\]</div>
+    <div class="ans"><span class="lb">∴ 일반해:</span>\(re^{3\theta}=c\)</div>
+    <div class="stp">Step 3 검증</div>
+    <div class="chk">
+    <div class="line">\[\frac{\partial u}{\partial r}=e^{3\theta}=M,\qquad \frac{\partial u}{\partial\theta}=3re^{3\theta}=N\]</div>
+    <div class="line">\[du=e^{3\theta}dr+3re^{3\theta}d\theta=e^{3\theta}\left(dr+3r\,d\theta\right)=0\quad\checkmark\]</div>
     </div>
   </div>
 </div>
@@ -82,59 +99,77 @@ mjx-container[display="true"]>svg{margin:0!important}
 <div class="q">
   <div class="qh"><span class="no">11</span><span class="qq">\(2\cosh x\cos y\,dx=\sinh x\sin y\,dy\)</span><span class="tag">적분인자 F(x)</span></div>
   <div class="body">
-    <div class="line">\[2\cosh x\cos y\,dx-\sinh x\sin y\,dy=0\]</div>
-    <div class="line">\[P=2\cosh x\cos y,\qquad Q=-\sinh x\sin y\]</div>
-    <div class="line">\[P_{y}=-2\cosh x\sin y,\qquad Q_{x}=-\cosh x\sin y\ \Longrightarrow\ P_{y}\neq Q_{x}\]</div>
-    <div class="note">integrating factor</div>
-    <div class="line">\[R(x)=\frac{1}{Q}\left(P_{y}-Q_{x}\right)=\frac{-\cosh x\sin y}{-\sinh x\sin y}=\coth x\]</div>
-    <div class="line">\[\frac{F'}{F}=R(x)=\coth x\ \Longrightarrow\ F=\sinh x\qquad(x\neq 0)\]</div>
-    <div class="line">\[2\sinh x\cosh x\cos y\,dx-\sinh^{2}x\sin y\,dy=0\]</div>
-    <div class="line">\[u=\int 2\sinh x\cosh x\cos y\,dx=\sinh^{2}x\cos y+\phi(y)\]</div>
-    <div class="line">\[\frac{\partial u}{\partial y}=-\sinh^{2}x\sin y+\phi'(y)=-\sinh^{2}x\sin y\ \Longrightarrow\ \phi(y)=c\]</div>
-    <div class="ans">\(\sinh^{2}x\cos y=c\)</div>
-    <div class="chk"><div class="note">check</div>
-      <div class="line">\[\frac{\partial}{\partial x}\!\left(\sinh^{2}x\cos y\right)=2\sinh x\cosh x\cos y\quad\checkmark\]</div>
-      <div class="line">\[\frac{\partial}{\partial y}\!\left(\sinh^{2}x\cos y\right)=-\sinh^{2}x\sin y\quad\checkmark\]</div>
+    <div class="stp">Step 1 완전미분방정식인지 판별</div>
+    <div class="line">\[2\cosh x\cos y\,dx-\sinh x\sin y\,dy=0\qquad P=2\cosh x\cos y,\quad Q=-\sinh x\sin y\]</div>
+    <div class="line">\[\frac{\partial P}{\partial y}=-2\cosh x\sin y,\qquad \frac{\partial Q}{\partial x}=-\cosh x\sin y\]</div>
+    <div class="line">\[\Longrightarrow\quad \frac{\partial P}{\partial y}\neq\frac{\partial Q}{\partial x}\ :\ \text{완전미분방정식이 아님 (not exact)}\]</div>
+    <div class="stp">Step 2 적분인자 구하기 (정리 1)</div>
+    <div class="line">\[R(x)=\frac{1}{Q}\left(\frac{\partial P}{\partial y}-\frac{\partial Q}{\partial x}\right)=\frac{-2\cosh x\sin y+\cosh x\sin y}{-\sinh x\sin y}=\frac{\cosh x}{\sinh x}=\coth x\]</div>
+    <div class="line">\[\int R(x)\,dx=\int\coth x\,dx=\ln|\sinh x|,\qquad F(x)=e^{\ln|\sinh x|}=|\sinh x|=\pm\sinh x\]</div>
+    <div class="line">\[\Longrightarrow\ F(x)=\sinh x\qquad(x\neq 0)\]</div>
+    <div class="line">\[\therefore\ 2\sinh x\cosh x\cos y\,dx-\sinh^{2}x\sin y\,dy=0\]</div>
+    <div class="sub">검증</div>
+    <div class="line">\[\frac{\partial}{\partial y}\!\left(2\sinh x\cosh x\cos y\right)=-2\sinh x\cosh x\sin y=\frac{\partial}{\partial x}\!\left(-\sinh^{2}x\sin y\right)\ :\ \text{완전미분방정식}\]</div>
+    <div class="stp">Step 3 일반해 구하기</div>
+    <div class="line">\[\frac{\partial u}{\partial x}=2\sinh x\cosh x\cos y\ \Longrightarrow\ u=\int 2\sinh x\cosh x\cos y\,dx+k(y)=\sinh^{2}x\cos y+k(y)\]</div>
+    <div class="line">\[\frac{\partial u}{\partial y}=-\sinh^{2}x\sin y+k'(y)=-\sinh^{2}x\sin y\ \Longrightarrow\ k'(y)=0\ \Longrightarrow\ k(y)=c^{*}\]</div>
+    <div class="ans"><span class="lb">∴ 일반해:</span>\(\sinh^{2}x\cos y=c\)</div>
+    <div class="stp">Step 4 검증</div>
+    <div class="chk">
+    <div class="line">\[d\!\left(\sinh^{2}x\cos y\right)=2\sinh x\cosh x\cos y\,dx-\sinh^{2}x\sin y\,dy=0\]</div>
+    <div class="line">\[\div\ \sinh x\ (x\neq 0):\quad 2\cosh x\cos y\,dx-\sinh x\sin y\,dy=0\quad\checkmark\]</div>
     </div>
   </div>
 </div>
 
 <div class="q">
-  <div class="qh"><span class="no">12</span><span class="qq">\(\left(2xy\,dx+dy\right)e^{x^{2}}=0,\quad y(0)=2\)</span><span class="tag">완전미분 · IVP</span></div>
+  <div class="qh"><span class="no">12</span><span class="qq">\(\left(2xy\,dx+dy\right)e^{x^{2}}=0,\quad y(0)=2\)</span><span class="tag">완전미분 · 초기값</span></div>
   <div class="body">
-    <div class="line">\[2xye^{x^{2}}dx+e^{x^{2}}dy=0\]</div>
-    <div class="line">\[M=2xye^{x^{2}},\qquad N=e^{x^{2}}\]</div>
-    <div class="line">\[M_{y}=2xe^{x^{2}}=N_{x}\quad\Longrightarrow\quad\text{exact}\]</div>
-    <div class="line">\[u=\int 2xye^{x^{2}}dx=ye^{x^{2}}+\phi(y)\]</div>
-    <div class="line">\[\frac{\partial u}{\partial y}=e^{x^{2}}+\phi'(y)=N=e^{x^{2}}\ \Longrightarrow\ \phi(y)=c\]</div>
-    <div class="line">\[ye^{x^{2}}=c\]</div>
-    <div class="note">initial condition</div>
-    <div class="line">\[x=0,\ y=2:\quad 2e^{0}=2\ \Longrightarrow\ c=2\]</div>
-    <div class="ans">\(y=2e^{-x^{2}}\)</div>
-    <div class="chk"><div class="note">check</div>
-      <div class="line">\[y(0)=2e^{0}=2\quad\checkmark\]</div>
-      <div class="line">\[y'=-4xe^{-x^{2}},\qquad 2xy=4xe^{-x^{2}}\ \Longrightarrow\ y'+2xy=0\quad\checkmark\]</div>
+    <div class="stp">Step 1 완전미분방정식인지 판별</div>
+    <div class="line">\[2xye^{x^{2}}dx+e^{x^{2}}dy=0\qquad M=2xye^{x^{2}},\quad N=e^{x^{2}}\]</div>
+    <div class="line">\[\frac{\partial M}{\partial y}=2xe^{x^{2}},\qquad \frac{\partial N}{\partial x}=2xe^{x^{2}}\quad\Longrightarrow\quad \frac{\partial M}{\partial y}=\frac{\partial N}{\partial x}\ :\ \text{완전미분방정식 (exact)}\]</div>
+    <div class="stp">Step 2 미분방정식의 해를 구함</div>
+    <div class="line">\[u=\int M\,dx+k(y)=\int 2xye^{x^{2}}dx+k(y)=ye^{x^{2}}+k(y)\]</div>
+    <div class="sub">\(k(y)\)를 구하기 위하여</div>
+    <div class="line">\[\frac{\partial u}{\partial y}=e^{x^{2}}+k'(y)=N=e^{x^{2}}\ \Longrightarrow\ k'(y)=0\ \Longrightarrow\ k(y)=c^{*}\]</div>
+    <div class="ans"><span class="lb">∴ 일반해:</span>\(ye^{x^{2}}=c\)</div>
+    <div class="stp">Step 3 특수해 구하기</div>
+    <div class="sub">초기조건 적용</div>
+    <div class="line">\[y(0)=2\ \Longrightarrow\ u(0,2)=2e^{0}=2\ \Longrightarrow\ c=2\]</div>
+    <div class="ans"><span class="lb">특수해:</span>\(ye^{x^{2}}=2,\qquad y=2e^{-x^{2}}\)</div>
+    <div class="stp">Step 4 검증</div>
+    <div class="chk">
+    <div class="line">\[y(0)=2e^{0}=2\quad\checkmark\]</div>
+    <div class="line">\[y'=-4xe^{-x^{2}},\qquad 2xy=4xe^{-x^{2}}\ \Longrightarrow\ 2xy+y'=0\quad\checkmark\]</div>
     </div>
   </div>
 </div>
 
-<div class="sec">EXERCISE 1.5 — LINEAR ODEs</div>
+<div class="sec">연습문제 1.5 — 선형상미분방정식</div>
 
 <div class="q">
-  <div class="qh"><span class="no">09</span><span class="qq">\(y'+y\sin x=e^{\cos x},\quad y(0)=-2.5\)</span><span class="tag">선형 비제차 · IVP</span></div>
+  <div class="qh"><span class="no">09</span><span class="qq">\(y'+y\sin x=e^{\cos x},\quad y(0)=-2.5\)</span><span class="tag">선형 비제차 · 초기값</span></div>
   <div class="body">
-    <div class="line">\[p(x)=\sin x,\qquad r(x)=e^{\cos x}\]</div>
-    <div class="line">\[h=\int p\,dx=\int\sin x\,dx=-\cos x\]</div>
-    <div class="line">\[y=e^{-h}\left[\int e^{h}r\,dx+c\right]=e^{\cos x}\left[\int e^{-\cos x}e^{\cos x}dx+c\right]\]</div>
-    <div class="line">\[=e^{\cos x}\left[\int dx+c\right]=(x+c)\,e^{\cos x}\]</div>
-    <div class="note">initial condition</div>
-    <div class="line">\[y(0)=(0+c)e^{\cos 0}=ce=-2.5\ \Longrightarrow\ c=-\frac{2.5}{e}\]</div>
-    <div class="ans">\(y=\left(x-\dfrac{2.5}{e}\right)e^{\cos x}\)</div>
-    <div class="chk"><div class="note">check</div>
-      <div class="line">\[y'=e^{\cos x}-(x+c)\sin x\,e^{\cos x}\]</div>
-      <div class="line">\[y'+y\sin x=e^{\cos x}\quad\checkmark\]</div>
+    <div class="stp">Step 1 표준형으로 정리 (선형 미분방정식인지 판별)</div>
+    <div class="line">\[y'+p(x)\,y=r(x)\qquad p(x)=\sin x,\quad r(x)=e^{\cos x}\neq 0\ :\ \text{선형 비제차}\]</div>
+    <div class="stp">Step 2 일반해 구하기</div>
+    <div class="line">\[h=\int p(x)\,dx=\int\sin x\,dx=-\cos x\]</div>
+    <div class="line">\[y=e^{-h}\left[\int e^{h}\,r\,dx+c\right]=e^{\cos x}\left[\int e^{-\cos x}e^{\cos x}dx+c\right]=e^{\cos x}\left[\int dx+c\right]\]</div>
+    <div class="ans"><span class="lb">∴ 일반해:</span>\(y=(x+c)\,e^{\cos x}\)</div>
+    <div class="stp">Step 3 특수해 구하기</div>
+    <div class="sub">초기조건 적용</div>
+    <div class="line">\[y(0)=(0+c)\,e^{\cos 0}=ce=-2.5\ \Longrightarrow\ c=-\frac{2.5}{e}\]</div>
+    <div class="ans"><span class="lb">특수해:</span>\(y=\left(x-\dfrac{2.5}{e}\right)e^{\cos x}\)</div>
+    <div class="two"><div>
+    <div class="stp">Step 4 검증</div>
+    <div class="chk">
+    <div class="line">\[y'=e^{\cos x}-(x+c)\sin x\,e^{\cos x}\]</div>
+    <div class="line">\[y'+y\sin x=e^{\cos x}-(x+c)\sin x\,e^{\cos x}\]</div>
+    <div class="line">\[\qquad\qquad+(x+c)\sin x\,e^{\cos x}=e^{\cos x}\quad\checkmark\]</div>
+    <div class="line">\[y(0)=\left(0-\tfrac{2.5}{e}\right)e=-2.5\quad\checkmark\]</div>
     </div>
-    <div class="note">graph — particular solution, initial point (0, -2.5)</div>
+    </div><div>
+    <div class="stp">해의 그래프 — 특수해, 초기점 (0, −2.5)</div>
     <svg class="graph" viewBox="0 0 420 200" width="420" height="200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="y = (x - 2.5/e) e^cos x">
 <rect x="0" y="0" width="420" height="200" fill="#fff"/>
 <line x1="34.0" y1="10.0" x2="34.0" y2="178.0" stroke="#EDF0F4" stroke-width="1"/>
@@ -162,25 +197,33 @@ mjx-container[display="true"]>svg{margin:0!important}
 <defs><clipPath id="clip55988"><rect x="34" y="10" width="376" height="168"/></clipPath></defs>
 <path d="M34.0 107.2 L34.5 107.0 L34.9 106.8 L35.4 106.6 L35.9 106.5 L36.4 106.3 L36.8 106.1 L37.3 106.0 L37.8 105.8 L38.2 105.7 L38.7 105.6 L39.2 105.5 L39.6 105.4 L40.1 105.3 L40.6 105.2 L41.0 105.1 L41.5 105.0 L42.0 104.9 L42.5 104.9 L42.9 104.8 L43.4 104.8 L43.9 104.7 L44.3 104.7 L44.8 104.7 L45.3 104.6 L45.8 104.6 L46.2 104.6 L46.7 104.6 L47.2 104.6 L47.6 104.6 L48.1 104.6 L48.6 104.7 L49.0 104.7 L49.5 104.7 L50.0 104.8 L50.5 104.8 L50.9 104.9 L51.4 104.9 L51.9 105.0 L52.3 105.1 L52.8 105.2 L53.3 105.3 L53.7 105.4 L54.2 105.5 L54.7 105.6 L55.2 105.7 L55.6 105.8 L56.1 106.0 L56.6 106.1 L57.0 106.2 L57.5 106.4 L58.0 106.6 L58.4 106.7 L58.9 106.9 L59.4 107.1 L59.9 107.3 L60.3 107.5 L60.8 107.7 L61.3 108.0 L61.7 108.2 L62.2 108.4 L62.7 108.7 L63.1 109.0 L63.6 109.2 L64.1 109.5 L64.5 109.8 L65.0 110.1 L65.5 110.4 L66.0 110.8 L66.4 111.1 L66.9 111.5 L67.4 111.8 L67.8 112.2 L68.3 112.6 L68.8 113.0 L69.2 113.4 L69.7 113.8 L70.2 114.2 L70.7 114.7 L71.1 115.1 L71.6 115.6 L72.1 116.1 L72.5 116.6 L73.0 117.1 L73.5 117.6 L73.9 118.1 L74.4 118.7 L74.9 119.2 L75.4 119.8 L75.8 120.3 L76.3 120.9 L76.8 121.5 L77.2 122.1 L77.7 122.8 L78.2 123.4 L78.7 124.0 L79.1 124.7 L79.6 125.3 L80.1 126.0 L80.5 126.7 L81.0 127.3 L81.5 128.0 L81.9 128.7 L82.4 129.4 L82.9 130.1 L83.3 130.8 L83.8 131.5 L84.3 132.2 L84.8 132.9 L85.2 133.7 L85.7 134.4 L86.2 135.1 L86.6 135.8 L87.1 136.5 L87.6 137.2 L88.0 137.8 L88.5 138.5 L89.0 139.2 L89.5 139.9 L89.9 140.5 L90.4 141.1 L90.9 141.7 L91.3 142.3 L91.8 142.9 L92.3 143.5 L92.8 144.0 L93.2 144.6 L93.7 145.1 L94.2 145.6 L94.6 146.0 L95.1 146.5 L95.6 146.9 L96.0 147.2 L96.5 147.6 L97.0 147.9 L97.5 148.2 L97.9 148.5 L98.4 148.7 L98.9 148.9 L99.3 149.0 L99.8 149.2 L100.3 149.3 L100.7 149.3 L101.2 149.3 L101.7 149.3 L102.1 149.3 L102.6 149.2 L103.1 149.1 L103.6 148.9 L104.0 148.8 L104.5 148.5 L105.0 148.3 L105.4 148.0 L105.9 147.7 L106.4 147.3 L106.9 147.0 L107.3 146.5 L107.8 146.1 L108.3 145.6 L108.7 145.1 L109.2 144.6 L109.7 144.1 L110.1 143.5 L110.6 142.9 L111.1 142.3 L111.5 141.6 L112.0 141.0 L112.5 140.3 L113.0 139.6 L113.4 138.9 L113.9 138.2 L114.4 137.5 L114.8 136.7 L115.3 136.0 L115.8 135.2 L116.2 134.4 L116.7 133.6 L117.2 132.9 L117.7 132.1 L118.1 131.3 L118.6 130.5 L119.1 129.7 L119.5 128.9 L120.0 128.2 L120.5 127.4 L121.0 126.6 L121.4 125.8 L121.9 125.1 L122.4 124.3 L122.8 123.6 L123.3 122.8 L123.8 122.1 L124.2 121.4 L124.7 120.7 L125.2 120.0 L125.6 119.3 L126.1 118.6 L126.6 117.9 L127.1 117.3 L127.5 116.6 L128.0 116.0 L128.5 115.4 L128.9 114.8 L129.4 114.2 L129.9 113.6 L130.3 113.1 L130.8 112.5 L131.3 112.0 L131.8 111.5 L132.2 111.0 L132.7 110.5 L133.2 110.0 L133.6 109.5 L134.1 109.1 L134.6 108.7 L135.1 108.2 L135.5 107.8 L136.0 107.4 L136.5 107.0 L136.9 106.7 L137.4 106.3 L137.9 105.9 L138.3 105.6 L138.8 105.3 L139.3 105.0 L139.8 104.6 L140.2 104.4 L140.7 104.1 L141.2 103.8 L141.6 103.5 L142.1 103.3 L142.6 103.0 L143.0 102.8 L143.5 102.5 L144.0 102.3 L144.4 102.1 L144.9 101.9 L145.4 101.7 L145.9 101.5 L146.3 101.3 L146.8 101.2 L147.3 101.0 L147.7 100.8 L148.2 100.7 L148.7 100.5 L149.2 100.4 L149.6 100.2 L150.1 100.1 L150.6 100.0 L151.0 99.9 L151.5 99.8 L152.0 99.6 L152.4 99.5 L152.9 99.4 L153.4 99.3 L153.8 99.2 L154.3 99.2 L154.8 99.1 L155.3 99.0 L155.7 98.9 L156.2 98.9 L156.7 98.8 L157.1 98.7 L157.6 98.7 L158.1 98.6 L158.6 98.5 L159.0 98.5 L159.5 98.4 L160.0 98.4 L160.4 98.4 L160.9 98.3 L161.4 98.3 L161.8 98.3 L162.3 98.2 L162.8 98.2 L163.2 98.2 L163.7 98.1 L164.2 98.1 L164.7 98.1 L165.1 98.1 L165.6 98.1 L166.1 98.1 L166.5 98.1 L167.0 98.1 L167.5 98.1 L168.0 98.0 L168.4 98.1 L168.9 98.1 L169.4 98.1 L169.8 98.1 L170.3 98.1 L170.8 98.1 L171.2 98.1 L171.7 98.1 L172.2 98.1 L172.7 98.2 L173.1 98.2 L173.6 98.2 L174.1 98.2 L174.5 98.3 L175.0 98.3 L175.5 98.3 L175.9 98.4 L176.4 98.4 L176.9 98.4 L177.3 98.5 L177.8 98.5 L178.3 98.6 L178.8 98.6 L179.2 98.7 L179.7 98.7 L180.2 98.8 L180.6 98.8 L181.1 98.9 L181.6 99.0 L182.0 99.0 L182.5 99.1 L183.0 99.2 L183.5 99.2 L183.9 99.3 L184.4 99.4 L184.9 99.5 L185.3 99.5 L185.8 99.6 L186.3 99.7 L186.8 99.8 L187.2 99.9 L187.7 100.0 L188.2 100.1 L188.6 100.2 L189.1 100.3 L189.6 100.4 L190.0 100.4 L190.5 100.5 L191.0 100.6 L191.5 100.7 L191.9 100.9 L192.4 101.0 L192.9 101.1 L193.3 101.2 L193.8 101.3 L194.3 101.4 L194.7 101.5 L195.2 101.6 L195.7 101.7 L196.2 101.8 L196.6 101.9 L197.1 102.0 L197.6 102.1 L198.0 102.2 L198.5 102.3 L199.0 102.4 L199.4 102.5 L199.9 102.6 L200.4 102.7 L200.8 102.8 L201.3 102.9 L201.8 103.0 L202.3 103.1 L202.7 103.2 L203.2 103.2 L203.7 103.3 L204.1 103.4 L204.6 103.4 L205.1 103.5 L205.5 103.5 L206.0 103.6 L206.5 103.6 L207.0 103.7 L207.4 103.7 L207.9 103.7 L208.4 103.7 L208.8 103.7 L209.3 103.7 L209.8 103.7 L210.2 103.7 L210.7 103.7 L211.2 103.7 L211.7 103.7 L212.1 103.6 L212.6 103.6 L213.1 103.5 L213.5 103.4 L214.0 103.4 L214.5 103.3 L215.0 103.2 L215.4 103.1 L215.9 103.0 L216.4 102.9 L216.8 102.8 L217.3 102.6 L217.8 102.5 L218.2 102.4 L218.7 102.2 L219.2 102.1 L219.7 101.9 L220.1 101.7 L220.6 101.5 L221.1 101.4 L221.5 101.2 L222.0 101.0 L222.5 100.8 L222.9 100.6 L223.4 100.4 L223.9 100.2 L224.3 100.0 L224.8 99.8 L225.3 99.6 L225.8 99.4 L226.2 99.2 L226.7 98.9 L227.2 98.7 L227.6 98.5 L228.1 98.3 L228.6 98.1 L229.1 97.9 L229.5 97.7 L230.0 97.4 L230.5 97.2 L230.9 97.0 L231.4 96.8 L231.9 96.6 L232.3 96.4 L232.8 96.2 L233.3 96.0 L233.8 95.9 L234.2 95.7 L234.7 95.5 L235.2 95.3 L235.6 95.2 L236.1 95.0 L236.6 94.8 L237.0 94.7 L237.5 94.5 L238.0 94.4 L238.4 94.2 L238.9 94.1 L239.4 94.0 L239.9 93.8 L240.3 93.7 L240.8 93.6 L241.3 93.5 L241.7 93.4 L242.2 93.3 L242.7 93.2 L243.2 93.1 L243.6 93.0 L244.1 92.9 L244.6 92.9 L245.0 92.8 L245.5 92.7 L246.0 92.7 L246.4 92.6 L246.9 92.6 L247.4 92.5 L247.8 92.5 L248.3 92.4 L248.8 92.4 L249.3 92.3 L249.7 92.3 L250.2 92.3 L250.7 92.2 L251.1 92.2 L251.6 92.2 L252.1 92.1 L252.6 92.1 L253.0 92.1 L253.5 92.1 L254.0 92.1 L254.4 92.1 L254.9 92.1 L255.4 92.0 L255.8 92.0 L256.3 92.0 L256.8 92.0 L257.2 92.0 L257.7 92.0 L258.2 92.0 L258.7 92.0 L259.1 92.0 L259.6 92.0 L260.1 92.0 L260.5 92.0 L261.0 92.0 L261.5 92.0 L261.9 92.0 L262.4 92.0 L262.9 92.0 L263.4 92.0 L263.8 92.0 L264.3 92.0 L264.8 92.0 L265.2 92.0 L265.7 92.0 L266.2 92.0 L266.6 92.0 L267.1 92.0 L267.6 92.0 L268.1 92.0 L268.5 92.0 L269.0 92.0 L269.5 92.0 L269.9 92.0 L270.4 92.0 L270.9 92.0 L271.4 92.0 L271.8 92.0 L272.3 92.0 L272.8 92.0 L273.2 92.0 L273.7 92.0 L274.2 92.0 L274.6 91.9 L275.1 91.9 L275.6 91.9 L276.1 91.9 L276.5 91.9 L277.0 91.9 L277.5 91.9 L277.9 91.9 L278.4 91.8 L278.9 91.8 L279.3 91.8 L279.8 91.8 L280.3 91.8 L280.8 91.7 L281.2 91.7 L281.7 91.7 L282.2 91.6 L282.6 91.6 L283.1 91.6 L283.6 91.6 L284.0 91.5 L284.5 91.5 L285.0 91.4 L285.4 91.4 L285.9 91.4 L286.4 91.3 L286.9 91.3 L287.3 91.2 L287.8 91.2 L288.3 91.1 L288.7 91.1 L289.2 91.0 L289.7 90.9 L290.2 90.9 L290.6 90.8 L291.1 90.7 L291.6 90.7 L292.0 90.6 L292.5 90.5 L293.0 90.4 L293.4 90.3 L293.9 90.3 L294.4 90.2 L294.8 90.1 L295.3 90.0 L295.8 89.9 L296.3 89.7 L296.7 89.6 L297.2 89.5 L297.7 89.4 L298.1 89.3 L298.6 89.1 L299.1 89.0 L299.6 88.8 L300.0 88.7 L300.5 88.5 L301.0 88.4 L301.4 88.2 L301.9 88.0 L302.4 87.8 L302.8 87.7 L303.3 87.5 L303.8 87.3 L304.2 87.1 L304.7 86.8 L305.2 86.6 L305.7 86.4 L306.1 86.1 L306.6 85.9 L307.1 85.6 L307.5 85.4 L308.0 85.1 L308.5 84.8 L308.9 84.5 L309.4 84.2 L309.9 83.9 L310.4 83.5 L310.8 83.2 L311.3 82.9 L311.8 82.5 L312.2 82.1 L312.7 81.8 L313.2 81.4 L313.7 81.0 L314.1 80.6 L314.6 80.2 L315.1 79.7 L315.5 79.3 L316.0 78.8 L316.5 78.4 L316.9 77.9 L317.4 77.4 L317.9 76.9 L318.3 76.4 L318.8 75.9 L319.3 75.4 L319.8 74.9 L320.2 74.3 L320.7 73.8 L321.2 73.2 L321.6 72.6 L322.1 72.1 L322.6 71.5 L323.1 70.9 L323.5 70.3 L324.0 69.7 L324.5 69.1 L324.9 68.5 L325.4 67.9 L325.9 67.3 L326.3 66.7 L326.8 66.1 L327.3 65.5 L327.8 64.9 L328.2 64.3 L328.7 63.7 L329.2 63.2 L329.6 62.6 L330.1 62.0 L330.6 61.4 L331.0 60.9 L331.5 60.3 L332.0 59.8 L332.4 59.3 L332.9 58.7 L333.4 58.2 L333.9 57.8 L334.3 57.3 L334.8 56.8 L335.3 56.4 L335.7 56.0 L336.2 55.6 L336.7 55.2 L337.2 54.9 L337.6 54.5 L338.1 54.2 L338.6 53.9 L339.0 53.7 L339.5 53.5 L340.0 53.2 L340.4 53.1 L340.9 52.9 L341.4 52.8 L341.8 52.7 L342.3 52.6 L342.8 52.5 L343.3 52.5 L343.7 52.5 L344.2 52.5 L344.7 52.6 L345.1 52.6 L345.6 52.7 L346.1 52.9 L346.6 53.0 L347.0 53.2 L347.5 53.4 L348.0 53.6 L348.4 53.9 L348.9 54.1 L349.4 54.4 L349.8 54.7 L350.3 55.1 L350.8 55.4 L351.2 55.8 L351.7 56.1 L352.2 56.5 L352.7 57.0 L353.1 57.4 L353.6 57.8 L354.1 58.3 L354.5 58.7 L355.0 59.2 L355.5 59.7 L355.9 60.2 L356.4 60.7 L356.9 61.2 L357.4 61.7 L357.8 62.2 L358.3 62.7 L358.8 63.2 L359.2 63.8 L359.7 64.3 L360.2 64.8 L360.7 65.3 L361.1 65.9 L361.6 66.4 L362.1 66.9 L362.5 67.4 L363.0 67.9 L363.5 68.5 L363.9 69.0 L364.4 69.5 L364.9 70.0 L365.3 70.4 L365.8 70.9 L366.3 71.4 L366.8 71.9 L367.2 72.3 L367.7 72.8 L368.2 73.2 L368.6 73.7 L369.1 74.1 L369.6 74.5 L370.1 74.9 L370.5 75.3 L371.0 75.7 L371.5 76.1 L371.9 76.5 L372.4 76.9 L372.9 77.2 L373.3 77.6 L373.8 77.9 L374.3 78.2 L374.8 78.6 L375.2 78.9 L375.7 79.2 L376.2 79.5 L376.6 79.8 L377.1 80.0 L377.6 80.3 L378.0 80.6 L378.5 80.8 L379.0 81.1 L379.4 81.3 L379.9 81.5 L380.4 81.8 L380.9 82.0 L381.3 82.2 L381.8 82.4 L382.3 82.6 L382.7 82.7 L383.2 82.9 L383.7 83.1 L384.2 83.3 L384.6 83.4 L385.1 83.6 L385.6 83.7 L386.0 83.8 L386.5 84.0 L387.0 84.1 L387.4 84.2 L387.9 84.3 L388.4 84.4 L388.8 84.5 L389.3 84.6 L389.8 84.7 L390.3 84.8 L390.7 84.8 L391.2 84.9 L391.7 85.0 L392.1 85.0 L392.6 85.1 L393.1 85.1 L393.6 85.2 L394.0 85.2 L394.5 85.2 L395.0 85.3 L395.4 85.3 L395.9 85.3 L396.4 85.3 L396.8 85.3 L397.3 85.3 L397.8 85.3 L398.2 85.3 L398.7 85.3 L399.2 85.2 L399.7 85.2 L400.1 85.2 L400.6 85.1 L401.1 85.1 L401.5 85.0 L402.0 85.0 L402.5 84.9 L402.9 84.9 L403.4 84.8 L403.9 84.7 L404.4 84.6 L404.8 84.5 L405.3 84.4 L405.8 84.3 L406.2 84.2 L406.7 84.1 L407.2 83.9 L407.7 83.8 L408.1 83.7 L408.6 83.5 L409.1 83.4 L409.5 83.2 L410.0 83.0" fill="none" stroke="#3E5C8A" stroke-width="1.6" clip-path="url(#clip55988)"/>
 <circle cx="222.0" cy="101.0" r="3" fill="#B2483F"/><text x="228.0" y="113.0" font-size="9" fill="#B2483F" font-family="IBM Plex Mono,monospace">(0, -2.5)</text></svg>
+    </div></div>
   </div>
 </div>
 
 <div class="q">
-  <div class="qh"><span class="no">12</span><span class="qq">\(xy'+4y=8x^{4},\quad y(1)=2\)</span><span class="tag">선형 비제차 · IVP</span></div>
+  <div class="qh"><span class="no">12</span><span class="qq">\(xy'+4y=8x^{4},\quad y(1)=2\)</span><span class="tag">선형 비제차 · 초기값</span></div>
   <div class="body">
-    <div class="line">\[y'+\frac{4}{x}\,y=8x^{3}\qquad\text{(standard form)}\]</div>
-    <div class="line">\[p(x)=\frac{4}{x},\qquad r(x)=8x^{3}\]</div>
-    <div class="line">\[h=\int\frac{4}{x}dx=4\ln x,\qquad e^{h}=x^{4},\qquad e^{-h}=x^{-4}\]</div>
-    <div class="line">\[y=x^{-4}\left[\int x^{4}\cdot 8x^{3}dx+c\right]=x^{-4}\left[\int 8x^{7}dx+c\right]\]</div>
-    <div class="line">\[=x^{-4}\left(x^{8}+c\right)=x^{4}+cx^{-4}\]</div>
-    <div class="note">initial condition</div>
+    <div class="stp">Step 1 표준형으로 정리 (선형 미분방정식인지 판별)</div>
+    <div class="line">\[y'+\frac{4}{x}\,y=8x^{3}\qquad(x>0)\qquad p(x)=\frac{4}{x},\quad r(x)=8x^{3}\neq 0\ :\ \text{선형 비제차}\]</div>
+    <div class="stp">Step 2 일반해 구하기</div>
+    <div class="line">\[h=\int\frac{4}{x}\,dx=4\ln x,\qquad e^{h}=e^{4\ln x}=x^{4},\qquad e^{-h}=x^{-4}\]</div>
+    <div class="line">\[y=e^{-h}\left[\int e^{h}\,r\,dx+c\right]=x^{-4}\left[\int x^{4}\cdot 8x^{3}\,dx+c\right]=x^{-4}\left[\int 8x^{7}\,dx+c\right]=x^{-4}\left(x^{8}+c\right)\]</div>
+    <div class="ans"><span class="lb">∴ 일반해:</span>\(y=x^{4}+cx^{-4}\)</div>
+    <div class="stp">Step 3 특수해 구하기</div>
+    <div class="sub">초기조건 적용</div>
     <div class="line">\[y(1)=1+c=2\ \Longrightarrow\ c=1\]</div>
-    <div class="ans">\(y=x^{4}+x^{-4}\qquad(x>0)\)</div>
-    <div class="chk"><div class="note">check</div>
-      <div class="line">\[y(1)=1+1=2\quad\checkmark\]</div>
-      <div class="line">\[y'=4x^{3}-4x^{-5},\qquad xy'+4y=4x^{4}-4x^{-4}+4x^{4}+4x^{-4}=8x^{4}\quad\checkmark\]</div>
+    <div class="ans"><span class="lb">특수해:</span>\(y=x^{4}+x^{-4}\qquad(x>0)\)</div>
+    <div class="two"><div>
+    <div class="stp">Step 4 검증</div>
+    <div class="chk">
+    <div class="line">\[y(1)=1+1=2\quad\checkmark\]</div>
+    <div class="line">\[y'=4x^{3}-4x^{-5}\]</div>
+    <div class="line">\[xy'+4y=\left(4x^{4}-4x^{-4}\right)+\left(4x^{4}+4x^{-4}\right)\]</div>
+    <div class="line">\[\qquad\qquad=8x^{4}\quad\checkmark\]</div>
     </div>
-    <div class="note">graph — particular solution on x &gt; 0, initial point (1, 2)</div>
+    </div><div>
+    <div class="stp">해의 그래프 — 특수해 (x > 0), 초기점 (1, 2)</div>
     <svg class="graph" viewBox="0 0 420 200" width="420" height="200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="y = x^4 + x^-4 (x>0)">
 <rect x="0" y="0" width="420" height="200" fill="#fff"/>
 <line x1="34.0" y1="10.0" x2="34.0" y2="178.0" stroke="#EDF0F4" stroke-width="1"/>
@@ -212,6 +255,7 @@ mjx-container[display="true"]>svg{margin:0!important}
 <defs><clipPath id="clip96939"><rect x="34" y="10" width="376" height="168"/></clipPath></defs>
 <path d="M59.1 -872.0 L59.7 -773.3 L60.3 -685.8 L60.9 -608.2 L61.6 -539.2 L62.2 -477.5 L62.8 -422.3 L63.5 -372.9 L64.1 -328.4 L64.7 -288.3 L65.3 -252.1 L66.0 -219.3 L66.6 -189.6 L67.2 -162.7 L67.8 -138.1 L68.5 -115.8 L69.1 -95.3 L69.7 -76.7 L70.3 -59.5 L71.0 -43.8 L71.6 -29.4 L72.2 -16.2 L72.9 -3.9 L73.5 7.3 L74.1 17.8 L74.7 27.4 L75.4 36.3 L76.0 44.6 L76.6 52.3 L77.2 59.4 L77.9 66.0 L78.5 72.2 L79.1 77.9 L79.7 83.3 L80.4 88.3 L81.0 93.0 L81.6 97.4 L82.3 101.5 L82.9 105.3 L83.5 108.9 L84.1 112.3 L84.8 115.5 L85.4 118.5 L86.0 121.3 L86.6 124.0 L87.3 126.5 L87.9 128.8 L88.5 131.0 L89.1 133.1 L89.8 135.1 L90.4 137.0 L91.0 138.7 L91.7 140.4 L92.3 142.0 L92.9 143.5 L93.5 144.9 L94.2 146.3 L94.8 147.5 L95.4 148.8 L96.0 149.9 L96.7 151.0 L97.3 152.1 L97.9 153.1 L98.5 154.0 L99.2 154.9 L99.8 155.8 L100.4 156.6 L101.1 157.4 L101.7 158.1 L102.3 158.8 L102.9 159.5 L103.6 160.1 L104.2 160.8 L104.8 161.3 L105.4 161.9 L106.1 162.4 L106.7 163.0 L107.3 163.5 L107.9 163.9 L108.6 164.4 L109.2 164.8 L109.8 165.2 L110.5 165.6 L111.1 166.0 L111.7 166.4 L112.3 166.7 L113.0 167.1 L113.6 167.4 L114.2 167.7 L114.8 168.0 L115.5 168.3 L116.1 168.6 L116.7 168.8 L117.3 169.1 L118.0 169.3 L118.6 169.6 L119.2 169.8 L119.9 170.0 L120.5 170.2 L121.1 170.4 L121.7 170.6 L122.4 170.8 L123.0 171.0 L123.6 171.1 L124.2 171.3 L124.9 171.5 L125.5 171.6 L126.1 171.8 L126.7 171.9 L127.4 172.0 L128.0 172.2 L128.6 172.3 L129.3 172.4 L129.9 172.5 L130.5 172.6 L131.1 172.7 L131.8 172.8 L132.4 172.9 L133.0 173.0 L133.6 173.1 L134.3 173.2 L134.9 173.3 L135.5 173.4 L136.1 173.5 L136.8 173.5 L137.4 173.6 L138.0 173.7 L138.7 173.7 L139.3 173.8 L139.9 173.8 L140.5 173.9 L141.2 174.0 L141.8 174.0 L142.4 174.1 L143.0 174.1 L143.7 174.1 L144.3 174.2 L144.9 174.2 L145.5 174.3 L146.2 174.3 L146.8 174.3 L147.4 174.4 L148.1 174.4 L148.7 174.4 L149.3 174.5 L149.9 174.5 L150.6 174.5 L151.2 174.5 L151.8 174.5 L152.4 174.6 L153.1 174.6 L153.7 174.6 L154.3 174.6 L154.9 174.6 L155.6 174.6 L156.2 174.6 L156.8 174.6 L157.5 174.6 L158.1 174.6 L158.7 174.6 L159.3 174.6 L160.0 174.6 L160.6 174.6 L161.2 174.6 L161.8 174.6 L162.5 174.6 L163.1 174.6 L163.7 174.6 L164.3 174.6 L165.0 174.6 L165.6 174.6 L166.2 174.6 L166.9 174.5 L167.5 174.5 L168.1 174.5 L168.7 174.5 L169.4 174.5 L170.0 174.5 L170.6 174.4 L171.2 174.4 L171.9 174.4 L172.5 174.4 L173.1 174.3 L173.7 174.3 L174.4 174.3 L175.0 174.3 L175.6 174.2 L176.3 174.2 L176.9 174.2 L177.5 174.1 L178.1 174.1 L178.8 174.1 L179.4 174.0 L180.0 174.0 L180.6 174.0 L181.3 173.9 L181.9 173.9 L182.5 173.8 L183.1 173.8 L183.8 173.8 L184.4 173.7 L185.0 173.7 L185.7 173.6 L186.3 173.6 L186.9 173.5 L187.5 173.5 L188.2 173.4 L188.8 173.4 L189.4 173.3 L190.0 173.3 L190.7 173.2 L191.3 173.2 L191.9 173.1 L192.5 173.0 L193.2 173.0 L193.8 172.9 L194.4 172.9 L195.1 172.8 L195.7 172.7 L196.3 172.7 L196.9 172.6 L197.6 172.5 L198.2 172.5 L198.8 172.4 L199.4 172.3 L200.1 172.3 L200.7 172.2 L201.3 172.1 L201.9 172.1 L202.6 172.0 L203.2 171.9 L203.8 171.8 L204.5 171.8 L205.1 171.7 L205.7 171.6 L206.3 171.5 L207.0 171.4 L207.6 171.4 L208.2 171.3 L208.8 171.2 L209.5 171.1 L210.1 171.0 L210.7 170.9 L211.3 170.8 L212.0 170.8 L212.6 170.7 L213.2 170.6 L213.9 170.5 L214.5 170.4 L215.1 170.3 L215.7 170.2 L216.4 170.1 L217.0 170.0 L217.6 169.9 L218.2 169.8 L218.9 169.7 L219.5 169.6 L220.1 169.5 L220.7 169.4 L221.4 169.3 L222.0 169.2 L222.6 169.1 L223.3 168.9 L223.9 168.8 L224.5 168.7 L225.1 168.6 L225.8 168.5 L226.4 168.4 L227.0 168.3 L227.6 168.1 L228.3 168.0 L228.9 167.9 L229.5 167.8 L230.1 167.6 L230.8 167.5 L231.4 167.4 L232.0 167.3 L232.7 167.1 L233.3 167.0 L233.9 166.9 L234.5 166.7 L235.2 166.6 L235.8 166.5 L236.4 166.3 L237.0 166.2 L237.7 166.0 L238.3 165.9 L238.9 165.8 L239.5 165.6 L240.2 165.5 L240.8 165.3 L241.4 165.2 L242.1 165.0 L242.7 164.9 L243.3 164.7 L243.9 164.6 L244.6 164.4 L245.2 164.2 L245.8 164.1 L246.4 163.9 L247.1 163.8 L247.7 163.6 L248.3 163.4 L248.9 163.3 L249.6 163.1 L250.2 162.9 L250.8 162.8 L251.5 162.6 L252.1 162.4 L252.7 162.2 L253.3 162.1 L254.0 161.9 L254.6 161.7 L255.2 161.5 L255.8 161.3 L256.5 161.2 L257.1 161.0 L257.7 160.8 L258.3 160.6 L259.0 160.4 L259.6 160.2 L260.2 160.0 L260.9 159.8 L261.5 159.6 L262.1 159.4 L262.7 159.2 L263.4 159.0 L264.0 158.8 L264.6 158.6 L265.2 158.4 L265.9 158.2 L266.5 158.0 L267.1 157.8 L267.7 157.5 L268.4 157.3 L269.0 157.1 L269.6 156.9 L270.3 156.7 L270.9 156.4 L271.5 156.2 L272.1 156.0 L272.8 155.7 L273.4 155.5 L274.0 155.3 L274.6 155.0 L275.3 154.8 L275.9 154.6 L276.5 154.3 L277.1 154.1 L277.8 153.8 L278.4 153.6 L279.0 153.3 L279.7 153.1 L280.3 152.8 L280.9 152.6 L281.5 152.3 L282.2 152.1 L282.8 151.8 L283.4 151.5 L284.0 151.3 L284.7 151.0 L285.3 150.7 L285.9 150.5 L286.5 150.2 L287.2 149.9 L287.8 149.7 L288.4 149.4 L289.1 149.1 L289.7 148.8 L290.3 148.5 L290.9 148.2 L291.6 147.9 L292.2 147.7 L292.8 147.4 L293.4 147.1 L294.1 146.8 L294.7 146.5 L295.3 146.2 L295.9 145.9 L296.6 145.6 L297.2 145.2 L297.8 144.9 L298.5 144.6 L299.1 144.3 L299.7 144.0 L300.3 143.7 L301.0 143.3 L301.6 143.0 L302.2 142.7 L302.8 142.4 L303.5 142.0 L304.1 141.7 L304.7 141.4 L305.3 141.0 L306.0 140.7 L306.6 140.3 L307.2 140.0 L307.9 139.6 L308.5 139.3 L309.1 138.9 L309.7 138.6 L310.4 138.2 L311.0 137.9 L311.6 137.5 L312.2 137.1 L312.9 136.8 L313.5 136.4 L314.1 136.0 L314.7 135.6 L315.4 135.3 L316.0 134.9 L316.6 134.5 L317.3 134.1 L317.9 133.7 L318.5 133.3 L319.1 132.9 L319.8 132.5 L320.4 132.1 L321.0 131.7 L321.6 131.3 L322.3 130.9 L322.9 130.5 L323.5 130.1 L324.1 129.7 L324.8 129.3 L325.4 128.9 L326.0 128.4 L326.7 128.0 L327.3 127.6 L327.9 127.1 L328.5 126.7 L329.2 126.3 L329.8 125.8 L330.4 125.4 L331.0 124.9 L331.7 124.5 L332.3 124.0 L332.9 123.6 L333.5 123.1 L334.2 122.7 L334.8 122.2 L335.4 121.7 L336.1 121.3 L336.7 120.8 L337.3 120.3 L337.9 119.9 L338.6 119.4 L339.2 118.9 L339.8 118.4 L340.4 117.9 L341.1 117.4 L341.7 116.9 L342.3 116.4 L342.9 115.9 L343.6 115.4 L344.2 114.9 L344.8 114.4 L345.5 113.9 L346.1 113.4 L346.7 112.9 L347.3 112.3 L348.0 111.8 L348.6 111.3 L349.2 110.7 L349.8 110.2 L350.5 109.7 L351.1 109.1 L351.7 108.6 L352.3 108.0 L353.0 107.5 L353.6 106.9 L354.2 106.4 L354.9 105.8 L355.5 105.2 L356.1 104.7 L356.7 104.1 L357.4 103.5 L358.0 102.9 L358.6 102.4 L359.2 101.8 L359.9 101.2 L360.5 100.6 L361.1 100.0 L361.7 99.4 L362.4 98.8 L363.0 98.2 L363.6 97.6 L364.3 97.0 L364.9 96.4 L365.5 95.7 L366.1 95.1 L366.8 94.5 L367.4 93.9 L368.0 93.2 L368.6 92.6 L369.3 91.9 L369.9 91.3 L370.5 90.7 L371.1 90.0 L371.8 89.3 L372.4 88.7 L373.0 88.0 L373.7 87.4 L374.3 86.7 L374.9 86.0 L375.5 85.3 L376.2 84.7 L376.8 84.0 L377.4 83.3 L378.0 82.6 L378.7 81.9 L379.3 81.2 L379.9 80.5 L380.5 79.8 L381.2 79.1 L381.8 78.3 L382.4 77.6 L383.1 76.9 L383.7 76.2 L384.3 75.4 L384.9 74.7 L385.6 74.0 L386.2 73.2 L386.8 72.5 L387.4 71.7 L388.1 71.0 L388.7 70.2 L389.3 69.5 L389.9 68.7 L390.6 67.9 L391.2 67.1 L391.8 66.4 L392.5 65.6 L393.1 64.8 L393.7 64.0 L394.3 63.2 L395.0 62.4 L395.6 61.6 L396.2 60.8 L396.8 60.0 L397.5 59.2 L398.1 58.3 L398.7 57.5 L399.3 56.7 L400.0 55.8 L400.6 55.0 L401.2 54.2 L401.9 53.3 L402.5 52.5 L403.1 51.6 L403.7 50.7 L404.4 49.9 L405.0 49.0 L405.6 48.1 L406.2 47.3 L406.9 46.4 L407.5 45.5 L408.1 44.6 L408.7 43.7 L409.4 42.8 L410.0 41.9" fill="none" stroke="#3E5C8A" stroke-width="1.6" clip-path="url(#clip96939)"/>
 <circle cx="159.3" cy="174.6" r="3" fill="#B2483F"/><text x="165.3" y="168.6" font-size="9" fill="#B2483F" font-family="IBM Plex Mono,monospace">(1, 2)</text></svg>
+    </div></div>
   </div>
 </div>
 
