@@ -39,11 +39,13 @@ var V33={};
     return {st:n?"linked":"none",n:n};
   };
   /* 그 주 영상 정리: LIB.items(course 일치, lmsvideo 또는 파일명 영상정리) 중 weekOf(item.date)===weekOf(date) */
-  V33.weeklyState=function(c,date){
-    if(!V32.LIB||V32.dupNames()[c.name]) return {st:"unknown",n:0};
+  V33.weeklyState=function(c,date,counts){
+    var dev=(counts&&counts.ok)?(counts.map["영상정리"]||0):0;           /* 이 회차에 기기로 올린 영상 정리 첨부 (오타 4차) */
+    if(dev>0) return {st:"have",n:0,dev:dev};
+    if(!V32.LIB||V32.dupNames()[c.name]) return {st:"unknown",n:0,dev:0};
     var w=weekOf(date), n=0;
     (V32.LIB.items||[]).forEach(function(i){ if(i.course===c.name&&(i.type==="lmsvideo"||/영상정리/.test(i.file||""))&&i.date&&weekOf(i.date)===w) n++; });
-    return {st:n?"pc":"none",n:n};
+    return {st:n?"pc":"none",n:n,dev:0};
   };
   /* 상단(과목 공통): LIB.common 파일명 정규식 */
   V33.preState=function(c,item){
@@ -53,7 +55,7 @@ var V33={};
   };
   V33.itemState=function(m,c,date,sl,counts){
     if(m.hw) return V33.hwState(c,date);
-    if(m.weekly) return V33.weeklyState(c,date);
+    if(m.weekly) return V33.weeklyState(c,date,counts);
     return V32.kindState(m,sl,counts,V32.pcOf(c.name,date));
   };
 
@@ -73,6 +75,7 @@ var V33={};
         bits.push(r.n?("연결됨 "+r.n+"개"):"");
         btn=r.n?'<button class="btn xs" data-v33go="hw">주차 링크</button>':'<span class="smut" style="font-size:11px">해답지 생성 후 자동</span>';
       } else if(m.weekly){
+        if(r.dev>0) bits.push("기기 "+r.dev+"개");
         if(r.n) bits.push("PC "+r.n+"개 · 이번 주");
         if(r.st==="unknown") bits.push('<span class="smut">PC 확인 못 함</span>');
         btn='<button class="btn xs a" data-v32put="영상정리">올리기</button>';
@@ -134,9 +137,15 @@ var V33={};
     var c=course(cid); if(!c||!V33.specFor(c)) return;
     var must=$("#lqSumMust",root); if(!must||$("#v33Pre",root)) return;
     must.insertAdjacentHTML("beforebegin",V33.preHTML(c));
-    root.addEventListener("click",function(e){ var b=e.target&&e.target.closest&&e.target.closest("[data-v33go]"); if(!b) return;
-      var w=weekOf(date); captureLog(cid,date); closeSheet(); try{ weekSheet(cid,w); }catch(err){} });
   };
+  /* 「주차 링크」 — 문서에 한 번만 등록, 현재 열린 회차(V32.cur)만 처리 (오타 4차) */
+  if(!V33._goBound){ V33._goBound=true;
+    document.addEventListener("click",function(e){
+      var b=e.target&&e.target.closest&&e.target.closest("[data-v33go]"); if(!b) return;
+      var cur=V32.cur; if(!cur||!cur.cid) return;
+      var w=weekOf(cur.date); captureLog(cur.cid,cur.date); closeSheet(); try{ weekSheet(cur.cid,w); }catch(err){}
+    });
+  }
 
   /* ---------- 과목 화면 규칙 카드 ---------- */
   var _renderCourse=renderCourse;
