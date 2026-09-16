@@ -1,0 +1,10 @@
+너는 오타다. AGENTS.md 지침대로 답한다. 3차 = 구현 검수다. 2차 GREEN 설계(v32-design-brief-r2.md, _v32-otta-2.md)대로 구현됐는지 본다.
+파일(읽기만):
+- 구현 원본: C:\Users\user\Desktop\아톰OS\기술실\study-console\docs\v32-layer-src.js (index.html 끝 V32 LAYER 와 동일)
+- 앱: C:\Users\user\Desktop\아톰OS\기술실\study-console\index.html (V32 LAYER 는 파일 끝)
+- 인벤토리 스크립트: C:\Users\user\Desktop\아톰OS\기술실\study-materials\_진도커버리지.py (classify·library 함수)
+- 스모크 하네스: C:\Users\user\.claude\scratch\sc_test\smoke.cjs, 구문 게이트 gate.cjs
+- 결과: 구문 script 3개 오류 0 · 스모크 29건 × 3시점(2026-09-16, 10-08, 08-25) 실패 0 오류 0 · 헤드리스 캡처 900px 표(5열 맞음)·390px 목록/표·라이브러리·회차 시트(4종 표시, 개큰지각 버튼) 아톰이 육안 확인
+- 변경 기록: CHANGELOG.md 「.32」 항목
+검수 항목: (1) 2차 조건 "PC 조회 실패해도 기기 have 유지" 가 kindState/mustHTML 에서 지켜지는가 (2) attStats 6종·휴강 제외·lateN (3) 예전 판서 첨부 미분류 보존과 재분류 경로 (4) library.json 분류 규칙·.gitignore (5) meetings(): enrolledFrom·cancelled·학기 밖 제외 (6) patchV32b 가 아토 시트와 일치하는가, 덮어쓰기 범위가 색 칸에 한정되는가 (7) 그 외 재현되는 결함.
+출력: 첫 줄 판정(GREEN/RED/판정 불가). 항목별 한 줄. RED 면 재현 조건과 GREEN 조건. 한국어 존댓말 1200자 안팎.

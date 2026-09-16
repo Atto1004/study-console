@@ -7816,8 +7816,20 @@ var V32={LIB:null,LIBERR:false,LIBMAP:{},cur:null,attCache:{},gridTok:0};
     var have={}; $$("option",sel).forEach(function(o){ have[o.value||o.textContent]=1; });
     V32.KINDS_ATT.forEach(function(k){ if(!have[k]){ var o=document.createElement("option"); o.textContent=k; sel.appendChild(o); } });
   };
-  /* PC 인벤토리 조회: {rec:n,pre:n,...} · null = 인벤토리 없음/못 읽음 */
-  V32.pcOf=function(cname,date){ return V32.LIB? (V32.LIBMAP[cname+"|"+date]||{}) : null; };
+  /* 같은 이름의 과목이 둘이면 이름으로 연결하지 않는다(오타 2차·3차) */
+  V32.dupNames=function(){ var m={},d={}; coursesAll().forEach(function(c){ if(m[c.name]) d[c.name]=1; m[c.name]=1; }); return d; };
+  V32.courseByName=function(){ var d=V32.dupNames(), out={}; courses().forEach(function(c){ if(!d[c.name]) out[c.name]=c; }); return out; };
+  /* PC 인벤토리 조회: {rec:n,pre:n,...} · null = 인벤토리 없음/못 읽음/이름 중복 */
+  V32.pcOf=function(cname,date){ if(!V32.LIB||V32.dupNames()[cname]) return null; return V32.LIBMAP[cname+"|"+date]||{}; };
+  /* 새 첨부 정규화 — 타임라인 사진(6295행)이 예전 kind "판서"로 저장되는 것을 칠판판서로 (오타 3차) */
+  V32.normalizeAtt=function(a){ if(a&&a.tl&&a.kind===V32.KIND_LEGACY&&!a.v32legacy) a.kind="칠판판서"; return a; };
+  (function(){ var _put=idb.put; idb.put=function(a){ V32.normalizeAtt(a); return _put.apply(idb,arguments); }; })();
+  /* 첨부 목록 → kind 별 개수. 타임라인 사진(tl)도 센다 — 원본 6170행은 뺐지만 판서 사진은 대개 타임라인에 붙는다 */
+  V32.countAtt=function(r){
+    var counts={ok:!!(r&&r.ok),map:{},tlLegacy:0};
+    if(r&&r.ok) r.list.forEach(function(a){ var k=(typeof a.kind==="string"&&a.kind)?a.kind:"_none"; counts.map[k]=(counts.map[k]||0)+1; if(a.tl&&a.kind===V32.KIND_LEGACY) counts.tlLegacy++; });
+    return counts;
+  };
   /* 종류별 상태. 기기(첨부·슬롯) 판정은 PC 조회 실패와 무관하게 유지한다(오타 2차 조건) */
   V32.kindState=function(m,sl,counts,pc){
     var txt=(m.slot&&typeof sl[m.slot]==="string")?sl[m.slot].trim():"";
@@ -7847,7 +7859,7 @@ var V32={LIB:null,LIBERR:false,LIBMAP:{},cur:null,attCache:{},gridTok:0};
       var bits=[];
       if(r.txt) bits.push("텍스트 "+r.txt.length+"자");
       if(r.dev>0) bits.push("기기 "+r.dev+"개");
-      if(r.legacy>0) bits.push('<span class="v32-legacy">미분류 '+r.legacy+'개</span>');
+      if(r.legacy>0) bits.push('<span class="v32-legacy">미분류 '+r.legacy+'개'+(counts&&counts.tlLegacy?' (타임라인 사진 '+counts.tlLegacy+')':'')+'</span>');
       if(r.pcN>0) bits.push("PC "+r.pcN+"개"+(r.st==="pc"?" · 열기 미지원":""));
       if(r.pcUnknown&&V32.LIBERR) bits.push('<span class="smut">PC 확인 못 함</span>');
       var dot = r.st==="have"?"on" : r.st==="pc"?"on pc" : r.st==="maybe"?"unk" : r.st==="pending"?"unk" : r.st==="unknown"?"unk" : "no";
@@ -7885,14 +7897,58 @@ var V32={LIB:null,LIBERR:false,LIBMAP:{},cur:null,attCache:{},gridTok:0};
     if(sel){ V32.ensureKindOptions(sel); sel.value=b.dataset.v32put; }
     if(fb) fb.click();
   },true);
-  /* logSheet 래핑 — 현재 회차를 기억(mustHTML 이 PC 인벤토리를 찾을 때), kind 선택지 보강, 미분류 첨부에 분류 셀렉트 */
+  /* 원본 bindMust 와 같은 동작 — 우리가 다시 그린 요약 상자의 data-must 버튼용 */
+  V32.bindMust=function(box,cid,date){
+    var reopen=function(){ closeSheet(); logSheet(cid,date); };
+    $$("[data-must]",box).forEach(function(b){ b.onclick=function(){
+      var k=b.dataset.must, act=b.dataset.act;
+      if(act==="seeText"||act==="putText"){ captureLog(cid,date); slotSheet(cid,date,k,reopen); return; }
+      var att=$("#lqAtt",$("#sheet")||document); if(att&&att.scrollIntoView) att.scrollIntoView({block:"center"});
+    }; });
+  };
+  /* 재분류 — 입력 중이던 진도·메모를 먼저 거두고(captureLog) 다시 연다 (오타 3차 조건) */
+  V32.reclassify=function(cid,date,ids,kind){
+    return Promise.all(ids.map(function(id){ return idb.get(id).then(function(a){ if(!a) return; a.kind=kind; return idb.put(a); }); }))
+      .then(function(){ toast(kind+"로 분류했습니다"); captureLog(cid,date); closeSheet(); logSheet(cid,date); });
+  };
+  /* logSheet 래핑 — 현재 회차를 기억(mustHTML 이 PC 인벤토리를 찾을 때), kind 선택지 보강, 4종 요약을 타임라인 사진까지 세어 다시 그림, 미분류 첨부에 분류 셀렉트·일괄 버튼 */
   var _logSheet=logSheet;
   logSheet=function(cid,date){
     V32.cur={cid:cid,date:date};
     _logSheet(cid,date);
-    var root=$("#sheet"); if(!root) return;
+    var root=$("#sheet"); if(!root||!window.MutationObserver) return;
     V32.ensureKindOptions($("#lqAttKind",root));
-    var box=$("#lqAtt",root); if(!box||!window.MutationObserver) return;
+    var key=sessKey(cid,date), tlLegacyIds=[];
+    /* (1) 4종 요약: 원본이 채운 내용(타임라인 제외 집계)을 우리 집계로 바꾼다. 우리 것엔 data-v32mine 표식 */
+    var must=$("#lqSumMust",root);
+    var refill=function(){
+      if(!must||!must.isConnected) return;
+      var first=must.firstElementChild; if(first&&first.hasAttribute("data-v32mine")) return;
+      idb.allForSafe(key).then(function(r){
+        if(!must.isConnected||must!==$("#lqSumMust",$("#sheet")||document)) return;
+        var f2=must.firstElementChild; if(f2&&f2.hasAttribute("data-v32mine")) return;
+        var counts=V32.countAtt(r);
+        tlLegacyIds=(r&&r.ok)? r.list.filter(function(a){return a.tl&&a.kind===V32.KIND_LEGACY;}).map(function(a){return a.id;}) : [];
+        var s0=sessionOn(cid,date), sl=(s0&&s0.slots&&typeof s0.slots==="object")?s0.slots:{};
+        V32.cur={cid:cid,date:date};
+        must.innerHTML=mustHTML(sl,counts);
+        if(must.firstElementChild) must.firstElementChild.setAttribute("data-v32mine","1");
+        V32.bindMust(must,cid,date);
+        bulk();
+      });
+    };
+    if(must){ new MutationObserver(refill).observe(must,{childList:true}); refill(); }
+    /* (2) 첨부 칸: 예전 「판서」 첨부에 분류 셀렉트, 타임라인 사진은 일괄 버튼 */
+    var box=$("#lqAtt",root); if(!box) return;
+    var bulk=function(){
+      var old=$("#v32TlReclass",root); if(old) old.remove();
+      if(!tlLegacyIds.length) return;
+      var div=document.createElement("div"); div.id="v32TlReclass"; div.className="hint v32-bulk";
+      div.innerHTML='타임라인 사진 중 예전 「판서」로 저장된 미분류 '+tlLegacyIds.length+'개 → '+
+        '<button class="btn xs" data-tlk="필기본">전부 내 필기본</button> <button class="btn xs" data-tlk="칠판판서">전부 칠판 판서</button>';
+      box.insertAdjacentElement("afterend",div);
+      $$("[data-tlk]",div).forEach(function(b){ b.onclick=function(){ V32.reclassify(cid,date,tlLegacyIds.slice(),b.dataset.tlk); }; });
+    };
     var decorate=function(){
       $$(".att-cell",box).forEach(function(cell){
         if(cell.querySelector(".v32-reclass")) return;
@@ -7901,11 +7957,7 @@ var V32={LIB:null,LIBERR:false,LIBMAP:{},cur:null,attCache:{},gridTok:0};
         var id=del.dataset.adel;
         var sel=document.createElement("select"); sel.className="select v32-reclass"; sel.title="필기본인지 칠판 판서인지 분류";
         ["미분류","필기본","칠판판서"].forEach(function(k){ var o=document.createElement("option"); o.textContent=k; sel.appendChild(o); });
-        sel.onchange=function(){
-          var k=sel.value; if(k==="미분류") return;
-          idb.get(id).then(function(a){ if(!a) return; a.kind=k; return idb.put(a); })
-            .then(function(){ toast(k+"로 분류했습니다"); closeSheet(); logSheet(cid,date); });
-        };
+        sel.onchange=function(){ var k=sel.value; if(k==="미분류") return; V32.reclassify(cid,date,[id],k); };
         cell.appendChild(sel);
       });
     };
@@ -7989,8 +8041,7 @@ var V32={LIB:null,LIBERR:false,LIBMAP:{},cur:null,attCache:{},gridTok:0};
       var c=course(cid); if(!c) return;
       idb.allForSafe(key).then(function(r){
         if(tok!==V32.gridTok||!el.isConnected) return;
-        var counts={ok:r.ok,map:{}};
-        if(r.ok) r.list.forEach(function(a){ if(a.tl) return; var k=(typeof a.kind==="string"&&a.kind)?a.kind:"_none"; counts.map[k]=(counts.map[k]||0)+1; });
+        var counts=V32.countAtt(r);
         var tmp=document.createElement("span"); tmp.innerHTML=V32.dotsHTML(c,date,counts);
         el.replaceWith(tmp.firstChild);
       });
@@ -8059,9 +8110,9 @@ var V32={LIB:null,LIBERR:false,LIBMAP:{},cur:null,attCache:{},gridTok:0};
     } else {
       var w2=clamp(ui.gridWeek,1,t.weeks), dows2=byDow(w2);
       html='<div class="v32-wknav"><button class="btn sm" data-gw="-1">‹</button><b>'+esc(V32.weekLabel(w2))+(w2===cw?' <span class="chip">이번 주</span>':'')+'</b><button class="btn sm" data-gw="1">›</button></div>'+
-        [1,2,3,4,5].map(function(d){ var o=dows2[d];
-          return '<div class="v32-day'+(o.date===td?" today":"")+'"><div class="v32-dh">'+DAY[d]+' <small>'+esc(V32.md(o.date))+'</small>'+(o.hol?' <span class="v32-tag">휴강</span>':'')+'</div>'+
-            (o.hol?'':(o.items.length?o.items.map(function(c){return V32.cellLine(c,o.date,td);}).join(""):'<div class="hint">수업 없음</div>'))+'</div>'; }).join("");
+        [1,2,3,4,5].map(function(d){ var o=dows2[d], inTerm=(o.date>=t.startDate&&o.date<=t.endDate);
+          return '<div class="v32-day'+(o.date===td?" today":"")+'"><div class="v32-dh">'+DAY[d]+' <small>'+esc(V32.md(o.date))+'</small>'+(o.hol?' <span class="v32-tag">휴강</span>':'')+(inTerm?'':' <span class="v32-tag">학기 밖</span>')+'</div>'+
+            ((o.hol||!inTerm)?'':(o.items.length?o.items.map(function(c){return V32.cellLine(c,o.date,td);}).join(""):'<div class="hint">수업 없음</div>'))+'</div>'; }).join("");
     }
     $("#calBody").innerHTML='<div class="v32-wrap"><div class="v32-chips">'+chips+'</div>'+legend+tools+html+'</div>';
     var body=$("#calBody");
@@ -8087,7 +8138,7 @@ var V32={LIB:null,LIBERR:false,LIBMAP:{},cur:null,attCache:{},gridTok:0};
   V32.TYPES=[["rec","🎙 녹음본"],["pre","📘 강의자료"],["note","✍️ 내 필기본"],["board","🧱 칠판 판서"],["summary","📝 정리"],["hw","📎 과제"],["derived","🧾 파생 텍스트"],["other","📁 기타"],["dev","📱 이 기기 첨부"]];
   V32.renderLib=function(){
     var v=$("#v-lib"); if(!v) return;
-    var type=ui.libType||"rec", cs=courses(), byName={}; cs.forEach(function(c){ byName[c.name]=c; });
+    var type=ui.libType||"rec", cs=courses(), byName=V32.courseByName();   /* 이름이 겹치는 과목은 미연결 */
     var tabs='<div class="v32-tabs">'+V32.TYPES.map(function(x){ return '<button class="btn sm'+(x[0]===type?" a":"")+'" data-lt="'+x[0]+'">'+x[1]+'</button>'; }).join("")+'</div>';
     var body="";
     if(type==="dev"){
@@ -8121,14 +8172,18 @@ var V32={LIB:null,LIBERR:false,LIBMAP:{},cur:null,attCache:{},gridTok:0};
     $$("[data-open-c]",v).forEach(function(b){ b.onclick=function(){ logSheet(b.dataset.openC,b.dataset.openD); }; });
     if(type==="dev"){
       var tok=++V32.gridTok, out=[], jobs=[];
-      cs.forEach(function(c){ sessions(c.id).forEach(function(s){ jobs.push(idb.allForSafe(sessKey(c.id,s.date)).then(function(r){ if(r.ok) r.list.forEach(function(a){ if(!a.tl) out.push({c:c,date:s.date,a:a}); }); })); }); });
+      cs.forEach(function(c){ sessions(c.id).forEach(function(s){ jobs.push(idb.allForSafe(sessKey(c.id,s.date)).then(function(r){ if(r.ok) r.list.forEach(function(a){ out.push({c:c,date:s.date,a:a}); }); })); }); });
       Promise.all(jobs).then(function(){
         if(tok!==V32.gridTok) return; var box=$("#v32DevList",v); if(!box) return;
         out.sort(function(x,y){ return x.c.name<y.c.name?-1:x.c.name>y.c.name?1:x.date<y.date?-1:1; });
         box.className=""; box.innerHTML= out.length? '<div class="card v32-lib">'+out.map(function(o){
-          return '<div class="v32-li"><span class="v32-ld">'+esc(V32.abbr(o.c.name))+' '+esc(V32.md(o.date))+'</span><span class="v32-lf">'+esc(o.a.name||"파일")+' <span class="v32-tag'+(o.a.kind===V32.KIND_LEGACY?" warn":"")+'">'+esc(o.a.kind||"자료")+(o.a.kind===V32.KIND_LEGACY?" · 미분류":"")+'</span></span>'+
+          var legacy=(o.a.kind===V32.KIND_LEGACY);
+          return '<div class="v32-li"><span class="v32-ld">'+esc(V32.abbr(o.c.name))+' '+esc(V32.md(o.date))+'</span><span class="v32-lf">'+esc(o.a.name||"파일")+' <span class="v32-tag'+(legacy?" warn":"")+'">'+esc(o.a.kind||"자료")+(legacy?" · 미분류":"")+'</span>'+(o.a.tl?' <span class="v32-tag">타임라인</span>':'')+'</span>'+
+            (legacy?'<select class="select v32-reclass v32-inline" data-rid="'+esc(o.a.id)+'" data-rc="'+o.c.id+'" data-rd="'+o.date+'"><option>미분류</option><option>필기본</option><option>칠판판서</option></select>':'')+
             '<button class="btn xs" data-open-c="'+o.c.id+'" data-open-d="'+o.date+'">회차</button></div>'; }).join("")+'</div>' : '<div class="card"><div class="hint">이 기기에 첨부된 파일이 없습니다.</div></div>';
         $$("[data-open-c]",box).forEach(function(b){ b.onclick=function(){ logSheet(b.dataset.openC,b.dataset.openD); }; });
+        $$("[data-rid]",box).forEach(function(sel){ sel.onchange=function(){ var k=sel.value; if(k==="미분류") return;
+          idb.get(sel.dataset.rid).then(function(a){ if(!a) return; a.kind=k; return idb.put(a); }).then(function(){ toast(k+"로 분류했습니다"); V32.renderLib(); }); }; });
       });
     }
   };
@@ -8152,7 +8207,7 @@ var V32={LIB:null,LIBERR:false,LIBMAP:{},cur:null,attCache:{},gridTok:0};
     '.attq button[data-s="vlate"][aria-pressed="true"]{background:#EA7A1A;color:#fff}'+
     '.attq button[data-s="excused"][aria-pressed="true"]{background:#E0569B;color:#fff}'+
     '.db-badge.vlate{background:#EA7A1A}.db-badge.excused{background:#E0569B}'+
-    '.sdot.pc{background:#2563EB}.v32-legacy{color:#B7791F;font-weight:600}.v32-reclass{margin-top:4px;font-size:11px;width:100%}'+
+    '.sdot.pc{background:#2563EB}.v32-legacy{color:#B7791F;font-weight:600}.v32-reclass{margin-top:4px;font-size:11px;width:100%}.v32-reclass.v32-inline{width:auto;margin:0 4px 0 0;flex:0 0 auto}.v32-bulk{margin-top:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}'+
     '.v32-wrap{padding:10px 12px 18px}.v32-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}'+
     '.v32-chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:3px 8px;border:1px solid var(--line-2);border-radius:999px}.v32-chip i{width:8px;height:8px;border-radius:50%;display:inline-block}'+
     '.v32-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11.5px;color:var(--mut);margin-bottom:8px;align-items:center}.v32-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px}'+
