@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-17.41";
+var BUILD="2026-09-17.42";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4839,6 +4839,10 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-17.42",d:"09-17",items:[
+    "메뉴 레일 폭 축소(184 → 128px) — 항목 오른쪽에 남던 빈 여백 제거",
+    "공부 타이머는 시험기간 모드에서만 — 오늘 탭 타이머 카드와 학습 화면 시간 표시가 평시에는 나오지 않음"
+  ]},
   {v:"2026-09-17.41",d:"09-17",items:[
     "학습하기 = 바로 학습 화면 — 회차 표의 [학습하기]가 수업 내용 화면을 거치지 않고 그 회차의 학습 슬라이드를 앱 안에서 바로 연다. 슬라이드가 아직 없는 회차는 「학습 준비 중」(비활성)",
     "미적2 과목 규칙에서 「미적분 클리닉 매주 가야 한다」 제거"
@@ -9266,6 +9270,40 @@ var V33={};
   }
   var css=document.createElement("style"); css.id="v38css";
   css.textContent=".v38-off{opacity:.5;cursor:default}";
+  document.head.appendChild(css);
+})();
+/* ============================================================
+   V39 LAYER — 메뉴 레일 폭 축소 · 학습 타이머는 시험기간 모드에서만 (아토 2026-09-17)
+   ① 좌측 메뉴 레일 184px → 128px. 항목 글자가 2~3자라 오른쪽 여백이 남던 것을 없앤다(폰 ≤860px는 원래 숨김).
+   ② 공부 타이머(오늘 탭 카드)와 학습 화면의 시간 표시는 phase()==="EXAM"(시험기간)일 때만 나온다.
+      평시에는 카드 자체를 만들지 않고, 이미 있으면 지운다. 진행 중이던 타이머 상태(mc-timer)는 건드리지 않는다.
+   ============================================================ */
+(function(){
+  if(window.V39) return;
+  var V39=window.V39={};
+  V39.examOn=function(){ try{ return phase()==="EXAM"; }catch(e){ return false; } };
+  /* ② 오늘 탭 타이머 카드 */
+  if(window.V25&&V25.renderTimer){
+    var _rt=V25.renderTimer;
+    V25.renderTimer=function(){
+      if(!V39.examOn()){ var c=$("#timerCard"); if(c) c.remove(); return; }
+      return _rt.apply(this,arguments);
+    };
+  }
+  /* ② 학습 화면(studyunit) 시간 표시 */
+  var _rsu=renderStudyUnit;
+  renderStudyUnit=function(){
+    var r=_rsu.apply(this,arguments);
+    var t=$("#stTimer"); if(t){ var on=V39.examOn(); t.style.display=on?"":"none"; var h=t.nextElementSibling; if(h&&h.classList.contains("hint")) h.style.display=on?"":"none"; }
+    return r;
+  };
+  var _tick=tickStudy;
+  tickStudy=function(){ if(!V39.examOn()) return; return _tick.apply(this,arguments); };
+  /* ① 레일 폭 */
+  var css=document.createElement("style"); css.id="v39css";
+  css.textContent=[
+    "@media(min-width:861px){.rail{width:128px;padding:12px 8px}.navb{padding:0 10px;gap:8px}.rail-sec{padding-left:10px}}"
+  ].join("\n");
   document.head.appendChild(css);
 })();
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start);
