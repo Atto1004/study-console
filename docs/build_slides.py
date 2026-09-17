@@ -56,6 +56,11 @@ for pi, sec in enumerate(parts, 1):
             if mode == "c": concept_head = head_txt.replace("개념", "", 1).strip()
             if mode == "b": concept_head = concept_head if 'concept_head' in dir() else "개념"
             continue
+        if mode == "c" and el.tag == "div" and "extra" in (el.get("class") or "").split():
+            # 개념 영역의 보충: 제목 줄 + 안의 블록들을 개념 장 재료로 (V4-EXTRA-C)
+            concept_html.append('<div class="one"><b>' + (el.get("data-title") or "보충") + '</b></div>')
+            for k in el: concept_html.append(LH.tostring(k, encoding="unicode", with_tail=False))
+            continue
         if mode == "c" and el.tag == "div" and any(c in (el.get("class") or "") for c in ["why", "concept", "one", "say"]):
             concept_html.append(LH.tostring(el, encoding="unicode"))
         elif mode in ("b", "a") and el.tag == "div" and "extra" in (el.get("class") or "").split():
@@ -87,7 +92,10 @@ for pi, sec in enumerate(parts, 1):
     import re as _re
     def _weight(h):
         t = _re.sub(r"<[^>]+>", "", h)
-        w = len(t)
+        # 수식 소스는 글자 수 대신 고정 무게: 인라인 12, 디스플레이 60 (행렬은 아래서 따로 가산)
+        n_inl = len(_re.findall(r"\\\(.*?\\\)", t, _re.S)); n_disp = len(_re.findall(r"\\\[.*?\\\]", t, _re.S))
+        t2 = _re.sub(r"\\\(.*?\\\)", "", t, flags=_re.S); t2 = _re.sub(r"\\\[.*?\\\]", "", t2, flags=_re.S)
+        w = len(t2) + 12 * n_inl + 60 * n_disp
         w += 140 * h.count("<table")            # 표
         w += 40 * h.count("\\begin{pmatrix}") + 40 * h.count("\\begin{vmatrix}")   # 행렬(세로로 큼)
         w += 12 * h.count("<tr")
@@ -110,7 +118,7 @@ for pi, sec in enumerate(parts, 1):
         else:
             _chunks.append(h)
     pages, cur, cw = [], [], 170 * len(concept_exam)   # 첫 장에 붙는 시험 언급 상자 무게
-    LIMIT = 420
+    LIMIT = 440
     for h in _chunks:
         w = _weight(h)
         if cur and cw + w > LIMIT:

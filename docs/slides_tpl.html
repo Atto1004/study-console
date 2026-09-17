@@ -394,7 +394,7 @@ function render(){
     const qs=SLIDES.filter(x=>x.type==="q"&&!(ST.skip||{})[x.id]); const ok=qs.filter(q=>ST.correct[q.id]===true).length, done=qs.filter(q=>ST.done[q.id]).length;
     const wrong=SLIDES.filter(x=>x.type==="q"&&ST.correct[x.id]===false);
     body.innerHTML='<div class="kicker">전체 결과</div><h1>__TITLE__</h1><div class="score"><div class="c"><b>'+ok+'/'+qs.length+'</b>정답 · 푼 문제 '+num(done)+'</div><div class="c"><b>'+wrong.length+'</b>틀린 문제</div></div>'+
-      '<p>'+(wrong.length?'틀린 문제: '+wrong.map(w=>esc(w.qn)).join(", "):'틀린 문제가 없습니다.')+'</p>';
+      '<p>'+(wrong.length?'틀린 문제: '+wrong.slice(0,6).map(w=>esc(w.qn)).join(", ")+(wrong.length>6?' 외 '+num(wrong.length-6)+'개':''):'틀린 문제가 없습니다.')+'</p>';
     act.innerHTML='<button class="btn xs" id="retry"'+(wrong.length?"":" disabled")+'>틀린 문제만 다시</button><button class="btn xs" id="first">처음으로</button>';
     $("#retry").onclick=()=>{ if(!wrong.length) return; wrong.forEach(q=>{ delete ST.revealed[q.id]; delete ST.done[q.id]; delete ST.correct[q.id]; }); ST.idx=SLIDES.indexOf(wrong[0]); save(); render(); };
     $("#first").onclick=()=>{ ST.idx=0; save(); render(); };
