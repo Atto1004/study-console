@@ -34,6 +34,11 @@ mjx-container{color:inherit}
 .q-kind{display:inline-block;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;border-radius:5px;padding:2px 8px;color:#fff;background:var(--ok);margin-right:8px}.q-kind.a{background:var(--warn)}
 .ans{background:var(--ans);border-radius:12px;padding:12px 16px;margin-top:12px;border-left:4px solid var(--acc)}
 .ans.hidden{display:none}
+.myans{margin-top:12px}.myans label{display:block;font-size:13px;color:var(--ink-2,#555);margin-bottom:4px}.myans .hint{font-weight:400;opacity:.7}
+.myans textarea{width:100%;box-sizing:border-box;font:inherit;font-size:20px;line-height:1.4;padding:10px 14px;border:2px solid var(--acc);border-radius:12px;background:#fff;resize:none;outline:none}
+.myans textarea:focus{box-shadow:0 0 0 3px rgba(60,90,200,.15)}
+.myans-show{margin-top:12px;border:2px dashed var(--acc);border-radius:12px;padding:8px 14px}.myans-txt{font-size:20px;white-space:pre-wrap;word-break:keep-all}
+.btn[disabled]{opacity:.45;cursor:default}
 .cover{height:100%;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:6px}
 .cover .big{font-family:var(--font-display);font-size:clamp(30px,5vw,60px);line-height:1.15;margin:6px 0}
 .cover .sub{color:var(--ink-2);font-size:1.05em}
@@ -71,7 +76,7 @@ const DECK_ID="__DECK_ID__";
 const SLIDES=__SLIDES__;
 const PARTS=__PARTS__;
 const KEY="mc-slides-"+DECK_ID;
-let ST={idx:0,done:{},correct:{},revealed:{}};
+let ST={idx:0,done:{},correct:{},revealed:{},answer:{}};
 try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}
 const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(ST)); }catch(e){} };
 const $=s=>document.querySelector(s);
@@ -90,7 +95,7 @@ function render(){
       '<div class="sub">파트 '+PARTS.length+'개 · 문제 '+SLIDES.filter(x=>x.type==="q").length+'개</div></div>';
     act.innerHTML='<button class="btn a" id="go">시작</button>'+(Object.keys(ST.done).length?'<button class="btn" id="reset">처음부터(기록 지우기)</button>':'');
     $("#go").onclick=()=>{ ST.done[s.id]=true; save(); go(1); };
-    const r=$("#reset"); if(r) r.onclick=()=>{ if(confirm("진행 기록을 지울까요?")){ ST={idx:0,done:{},correct:{},revealed:{}}; save(); render(); } };
+    const r=$("#reset"); if(r) r.onclick=()=>{ if(confirm("진행 기록을 지울까요?")){ ST={idx:0,done:{},correct:{},revealed:{},answer:{}}; save(); render(); } };
   } else if(s.type==="cover"){
     body.innerHTML='<div class="cover"><div class="kicker">'+esc(s.no)+'</div><div class="big">'+esc(s.title)+(s.star?' <span class="star">★</span>':'')+'</div><div class="sub">개념 → 기초 문제 → 응용 문제 순서로 갑니다.</div></div>';
     act.innerHTML='<button class="btn a" id="ok">시작</button>'; $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); go(1); };
@@ -100,9 +105,21 @@ function render(){
     $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); render(); };
   } else if(s.type==="q"){
     const rev=!!ST.revealed[s.id];
+    ST.answer=ST.answer||{}; const my=ST.answer[s.id]||"";
     body.innerHTML='<div class="kicker">파트 '+s.part+'</div><h2><span class="q-kind'+(s.kind==="응용"?" a":"")+'">'+s.kind+'</span>'+esc(s.qn)+'</h2><div class="qbody">'+s.html+'</div>'+
+      (rev
+        ? '<div class="myans-show"><div class="kicker">내 답</div><div class="myans-txt">'+esc(my)+'</div></div>'
+        : '<div class="myans"><label for="myans">내 답 <span class="hint">— 풀이 과정 말고 답만. 행렬은 [1 2; 3 4]처럼, 여러 개면 쉼표로</span></label><textarea id="myans" rows="2" placeholder="여기에 답을 쓰고 「답 확인」">'+esc(my)+'</textarea></div>')+
       '<div class="ans'+(rev?"":" hidden")+'"><div class="kicker">답 · 풀이</div>'+s.ans+'</div>';
-    if(!rev){ act.innerHTML='<button class="btn a" id="reveal">답 보기 (먼저 손으로 풀고)</button>'; $("#reveal").onclick=()=>{ ST.revealed[s.id]=true; save(); render(); }; }
+    if(!rev){
+      act.innerHTML='<button class="btn a" id="reveal" disabled>답 확인</button>';
+      const ta=$("#myans"), rb=$("#reveal");
+      const sync=()=>{ ST.answer[s.id]=ta.value; rb.disabled=!ta.value.trim(); };
+      ta.oninput=sync; ta.onchange=()=>{ sync(); save(); }; sync();
+      rb.onclick=()=>{ if(!ta.value.trim()){ ta.focus(); return; } ST.answer[s.id]=ta.value.trim(); ST.revealed[s.id]=true; save(); render(); };
+      ta.onkeydown=e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); rb.click(); } };
+      setTimeout(()=>ta.focus(),50);
+    }
     else { const c=ST.correct[s.id];
       act.innerHTML='<button class="btn ok" id="yes">맞았어요'+(c===true?" ✓":"")+'</button><button class="btn crit" id="no">틀렸어요 · 다시'+(c===false?" ✓":"")+'</button>';
       $("#yes").onclick=()=>{ ST.correct[s.id]=true; ST.done[s.id]=true; save(); render(); };
