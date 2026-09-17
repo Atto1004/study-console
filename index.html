@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-17.37";
+var BUILD="2026-09-17.38";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4839,6 +4839,7 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-17.38",d:"09-17",items:["미분적분학2 「행렬과 행렬식 1~2주차 개념 학습」 노트 추가 — 학습지·녹음·아토 풀이본·필기 합본, 교수 강조는 형광펜·빨간 글씨·★로 표시, 스스로 6문제. 9/3·9/8 회차 정리와 정리 노트 목록에 링크"]},
   {v:"2026-09-17.37",d:"09-17",items:[
     "과목 화면 재구성 — 주차별 수업 정리가 회차 표로: 주차 × 수업 요일 칸마다 출결·진도·과제·정리 상태와 [학습하기][정리][기록]. 주 2회 과목은 화 | 목 두 칸, 주 1회는 한 칸. 녹음 요약 줄은 표에서 제거",
     "과목 상단을 한 줄로 — (재)과목명 (학점) · 교수님 [요일] + 출석·지각·결석·시험 D-day 칩. 학습 처방전·주차 타임라인·회차 로그·커버리지·출결·과목 자료·과목 규칙·버튼 묶음은 「세부정보」 버튼 안으로",
@@ -8764,6 +8765,9 @@ var V33={};
   var _boot=boot;
   boot=function(){ _boot(); var ch=false; try{ var t0=term(); ch=!t0.patchV35a; V35.patch(); }catch(e){ if(window.console) console.warn("V35 패치 오류", e); } if(ch){ try{ render(); }catch(e){} } };   /* 이 레이어는 start() 호출문보다 앞에 삽입되므로 래퍼가 먼저 등록된다 */
   /* NOTES 목록에 벡터 정리노트 추가(정리 노트 카드·과목 자료) */
+  if(Array.isArray(window.NOTES)&&!NOTES.some(function(n){return n.file==="notes/calc2-matrix-w1-2.html";})){
+    NOTES.push({course:"미분적분학2",type:"정리",title:"행렬과 행렬식 1~2주차 개념 학습 — 백지에서 크래머까지",file:"notes/calc2-matrix-w1-2.html",week:2,date:"2026-09-17",sub:"학습지+녹음+아토 풀이본 합본 · 교수 강조 표시 · 스스로 6문제"});
+  }
   if(Array.isArray(window.NOTES)&&!NOTES.some(function(n){return n.file==="notes/calc2-vectors-0917.html";})){
     NOTES.push({course:"미분적분학2",type:"정리",title:"벡터 정리노트 12.1~12.3 도입 — 클리닉·중간 대비",file:"notes/calc2-vectors-0917.html",week:3,date:"2026-09-17",sub:"공식 4 · 연습 10문제 · 시험은 표준기저벡터부터"});
   }
@@ -8943,13 +8947,15 @@ var V33={};
       board:"예제 2 (1)~(5) 연산 시연, 예제 3·4 행렬식 계산.",
       recording:"9/3 62분 — 덧셈·뺄셈·실수배는 같은 꼴끼리, 나눗셈 없음. 곱셈은 앞 열=뒤 행, AB≠BA. 행렬식 표기: det와 세로줄 필수, × 기호 금지. 손계산은 3차까지, 계산기 불가.",
       material:"학습지 p.3~6.",notes:"아토 필기: '실수배', '두 행렬의 곱', 'A·A·A… 실수의 계산과 동일', 'det(A)=|A| 행렬 A', '얘 써야 됨'. Ex02 (4) AB^t=[14 6 4;24 9 6;26 12 8], (5) A²=O 검산 ✓.",
-      exam:[],tasks:[{text:"학습지 Ex01~Ex04 재풀이(답 가리고) — 전치·대칭 판별, AB^t, A²=O, det=0의 x, 3차 사루스",due:"2026-09-22",src:"정리 9/1·9/3"}],links:[]},
+      exam:[],tasks:[{text:"학습지 Ex01~Ex04 재풀이(답 가리고) — 전치·대칭 판별, AB^t, A²=O, det=0의 x, 3차 사루스",due:"2026-09-22",src:"정리 9/1·9/3"}],
+      links:[{label:"행렬과 행렬식 1~2주차 개념 학습 (합본·교수 강조 표시)",url:"notes/calc2-matrix-w1-2.html"}]},
     "2026-09-08":{range:"학습지 (4) 소행렬식·여인수 → (5) 역행렬 → (6) 연립방정식 → (7) 크래머",summary:"결석분 — 아토가 학습지 p.7~14를 직접 풀어둔 PDF로 정리(Ex05~Ex10 검산 전부 정답)",
       textbook:SEED35[2].textbook.split(" 12.1:")[0],board:"판서 없음(결석).",recording:"녹음 없음(결석).",
       material:SEED35[2].material,notes:SEED35[2].notes,
       exam:[{t:"녹음 9/3 32:00 (적용)",quote:"중간고사 행렬 파트 2~3문제는 행렬식부터 — 손계산 3차까지, det 세로줄·행렬 괄호 표기, × 기호 금지.",memo:"이 회차 내용(여인수 전개·3×3 역행렬·크래머)이 그 유형"}],
       tasks:[{text:"시험 대비 재풀이: Ex06 여인수 전개(다른 행 기준으로도) · Ex8 3×3 역행렬 · Ex10 크래머 — 답 가리고 1회씩",due:"2026-09-22",src:"정리 9/8"},
-             {text:"9/3 예고 강의자료실 연습문제(행렬·행렬식, 답안 포함) — LMS 토큰 연결 후 내려받기",due:"",src:"녹음 9/3 1:01:20"}],links:[]},
+             {text:"9/3 예고 강의자료실 연습문제(행렬·행렬식, 답안 포함) — LMS 토큰 연결 후 내려받기",due:"",src:"녹음 9/3 1:01:20"}],
+      links:[{label:"행렬과 행렬식 1~2주차 개념 학습 (합본·교수 강조 표시)",url:"notes/calc2-matrix-w1-2.html"}]},
     "2026-09-10":{range:"12.1 3차원 좌표계 도입",summary:"지각분 — 좌표계 3종(직교·원주·구면)·곡선 vs 곡면·점 찍기, 필기 1장 + 9/15 녹음 역참조로 복원",
       textbook:"Stewart 12.1 앞부분: 직교좌표 P(x,y,z), 원주좌표 P(r,θ,z)(r 동경·θ 편각, 문제는 주로 이것), 구면좌표(교수: 뺀다). 변수 2개 = R² 곡선, 3개 = R³ 곡면. 좌표평면 3개 → 팔분공간 8개.",
       board:"판서 없음(지각). 아토 연습노트 25/30쪽: 12.1 1) 3D Space 좌표계 3종 2) Surface & Solids R² 곡선 x,y / R³ 곡면 x,y,z.",
@@ -9018,8 +9024,11 @@ var V33={};
     t.patchV36a=true;
     try{ persist(); }catch(e){ t.patchV36a=false; if(window.console) console.warn("V36 저장 실패", e); }
   };
+  V36.patchLinks=function(){ var t=term(); if(t.patchV36b) return; var c=t.courses.filter(function(x){return x.name==="미분적분학2";})[0]; if(!c) return;
+    ["2026-09-03","2026-09-08"].forEach(function(d){ var n=V36.dayNote(c,d,true); if(!n.links.some(function(l){return /calc2-matrix-w1-2/.test(l.url||"");})) n.links.push({label:"행렬과 행렬식 1~2주차 개념 학습 (합본·교수 강조 표시)",url:"notes/calc2-matrix-w1-2.html"}); });
+    t.patchV36b=true; persist(); };
   var _boot=boot;
-  boot=function(){ _boot(); var ch=false; try{ ch=!term().patchV36a; V36.patch(); }catch(e){ if(window.console) console.warn("V36 패치 오류", e); } if(ch){ try{ render(); }catch(e){} } };
+  boot=function(){ _boot(); var ch=false; try{ ch=!term().patchV36a; V36.patch(); V36.patchLinks(); }catch(e){ if(window.console) console.warn("V36 패치 오류", e); } if(ch){ try{ render(); }catch(e){} } };
 
   var css=document.createElement("style"); css.id="v36css";
   css.textContent=[

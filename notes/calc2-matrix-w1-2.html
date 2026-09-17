@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>미적분학2 · 1~2주차 개념 학습 — 행렬과 행렬식 (백지에서 시작)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F5F7F6;--paper:#fff;--ink:#1B2430;--ink-2:#3F4C5A;--ink-3:#6E7B88;--line:#DCE2E6;--line-2:#C5CED5;
+  --acc:#4E5FB5;--acc-soft:#E8EAF7;--acc-ink:#36418C;--warn:#B9791A;--warn-soft:#FBF1DD;--warn-ink:#7A4E0B;
+  --ok:#3D7A4E;--ok-soft:#E5F1E7;--ok-ink:#2B5A39;--crit:#B2483F;--crit-soft:#F8E6E3;--crit-ink:#7E2F28;--ans:#F0F3F5;--hl:#FFF176;
+  --font-display:"Gowun Batang","Noto Serif KR",Georgia,serif;--font-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;--font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.85;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere}
+mjx-container{color:inherit} mjx-container[display="true"]{margin:.5em 0 !important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.wrap{max-width:780px;margin:0 auto;padding:0 20px 90px}
+.head{padding:44px 0 22px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.eyebrow b{color:var(--acc);font-weight:500}.eyebrow .rec{background:var(--ok-soft);color:var(--ok-ink);border-radius:5px;padding:1px 8px;text-transform:none;letter-spacing:.04em}
+h1{font-family:var(--font-display);font-weight:700;font-size:clamp(28px,4.4vw,40px);line-height:1.22;margin:12px 0 10px;letter-spacing:-.01em}
+.lede{font-size:16.5px;color:var(--ink-2);margin:0}
+section{padding:34px 0 6px} section+section{border-top:1px solid var(--line)}
+h2{font-family:var(--font-display);font-weight:700;font-size:25px;line-height:1.3;margin:0 0 8px}
+h2 .no{font-family:var(--font-mono);font-weight:500;font-size:12px;color:var(--acc);letter-spacing:.1em;display:block;margin-bottom:6px}
+h3{font-size:17.5px;font-weight:700;margin:26px 0 8px}
+p{margin:0 0 12px} ul,ol{margin:0 0 12px;padding-left:22px} li{margin:4px 0}
+.tw{overflow-x:auto;margin:12px 0 16px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:14.5px}
+th,td{padding:9px 14px;text-align:left;vertical-align:top;border-top:1px solid var(--line)}
+thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3);font-weight:500;background:var(--ans)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0 14px}
+.card .t{font-weight:700;margin-bottom:4px}.card p:last-child{margin-bottom:0}
+.say{font-size:15px;color:var(--ink-2);background:var(--ans);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:8px 12px;margin:8px 0 0}
+.say b{color:var(--acc-ink)}
+/* 표시 체계 */
+.hl{background:var(--hl);padding:0 3px;border-radius:3px}
+.red{color:var(--crit);font-weight:700}
+.star{color:var(--warn);font-weight:700}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13.5px;margin:10px 0 0}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.step{border:2px solid var(--acc);border-radius:12px;padding:12px 16px;margin:12px 0 16px;background:var(--paper)}
+.step .n{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--acc);margin-bottom:2px}
+.why{background:var(--acc-soft);color:var(--acc-ink);border-radius:10px;padding:10px 14px;margin:10px 0 14px;font-size:15px}
+.one{border-left:4px solid var(--ok);background:var(--ok-soft);padding:8px 12px;border-radius:0 8px 8px 0;margin:10px 0 14px;font-weight:600}
+.q{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:12px 0;break-inside:avoid}
+.q .qn{font-family:var(--font-mono);font-size:12px;color:var(--acc);letter-spacing:.08em}
+.q details{margin-top:8px}.q summary{cursor:pointer;font-size:14px;color:var(--ink-3)}.q .a{background:var(--ans);border-radius:8px;padding:8px 12px;margin-top:6px;font-size:15px}
+.chk{list-style:none;padding-left:0}.chk li{padding-left:26px;position:relative}.chk li::before{content:"☐";position:absolute;left:2px;color:var(--ink-3)}
+.term{border-bottom:1px dashed var(--acc);cursor:help;color:var(--acc-ink)}
+#pop{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);max-width:540px;width:calc(100% - 40px);background:var(--paper);border:1px solid var(--line-2);border-radius:12px;padding:12px 16px;box-shadow:0 10px 30px rgba(0,0,0,.15);display:none;z-index:9;font-size:14.5px}
+#pop b{color:var(--acc-ink)}#pop .k{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-top:4px}
+.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+@media print{body{background:#fff;font-size:14px}.wrap{max-width:100%;padding:0}.card,.tw,.step,.q,.why,.one{break-inside:avoid}#pop{display:none!important}.q summary{color:var(--ink-3);font-size:12px}@page{size:A4;margin:12mm 11mm}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="head">
+  <div class="eyebrow"><b>미분적분학2 · 홍순필 교수</b><span>1~2주차 · 9/1 · 9/3 · 9/8 · 9/10</span><span class="rec">1차 정리본 · 컨펌 대기</span></div>
+  <h1>행렬과 행렬식 — 백지에서 시작해 크래머까지</h1>
+  <p class="lede">학습지 Lecture 2-1(14쪽) + 9/1·9/3 녹음 + 아토가 직접 푼 풀이본(9/8 결석분) + 9/10 필기를 하나로 합쳤다. 교수님이 <b>시험·감점</b>이라고 짚은 자리는 표시해 뒀다. 순서대로 읽고, 각 단계 끝의 「스스로」를 손으로 풀면 클리닉 전에 이 단원이 정리된다.</p>
+  <div class="legend"><span><span class="hl">형광펜</span> = 교수님이 중요하다고 한 것</span><span><span class="red">빨간 글씨</span> = 감점·주의</span><span><span class="star">★</span> = 시험에 나온다고 한 것</span><span><span class="term" data-k="행렬">점선 밑줄</span> = 눌러서 뜻 보기</span></div>
+</header>
+
+<section>
+  <h2><span class="no">0 · MAP</span>이 단원이 왜 있고, 어디까지 가는가</h2>
+  <div class="why">연립일차방정식(미지수가 3개, 4개…)을 <b>빠르게 푸는 도구</b>가 행렬이다. 중학교식 소거법은 미지수가 늘면 느려진다. 계수만 뽑아 직사각형에 넣고(행렬), 그 행렬의 숫자 하나(행렬식)로 해가 있는지 판단하고, 역행렬·크래머로 해를 바로 구한다. 교재(Stewart)에는 없어서 교수님이 학습지를 따로 주셨다 → <span class="hl">학습지가 이 단원의 유일한 교재</span>.</div>
+  <div class="tw"><table><thead><tr><th>단계</th><th>학습지</th><th>수업</th><th>시험</th></tr></thead><tbody>
+    <tr><td>1 행렬이란 · 5종</td><td>(1) p.1~2</td><td>9/1</td><td>기본(안 나옴)</td></tr>
+    <tr><td>2 연산 (덧셈·실수배·곱·거듭제곱)</td><td>(2) p.3~4</td><td>9/3</td><td><span class="hl">덧셈·실수배는 시험 ✗</span>, 곱은 도구</td></tr>
+    <tr><td>3 행렬식 (2차 · 3차 사루스)</td><td>(3) p.5~6</td><td>9/3</td><td><span class="star">★ 시험은 여기부터</span></td></tr>
+    <tr><td>4 소행렬식 · 여인수 · 여인수 전개</td><td>(4) p.7~8</td><td>9/8 (결석 → 아토 풀이본)</td><td><span class="star">★ 중간 2~3문제 유형</span></td></tr>
+    <tr><td>5 역행렬 (2×2 · 3×3 수반행렬)</td><td>(5) p.9~11</td><td>9/8</td><td><span class="star">★</span></td></tr>
+    <tr><td>6 연립방정식 풀기 · 크래머</td><td>(6)(7) p.12~14</td><td>9/8</td><td><span class="star">★</span></td></tr>
+    <tr><td>7 12.1 3차원 좌표계 도입</td><td>교재</td><td>9/10 (지각)</td><td>12.1 자체는 시험 ✗</td></tr>
+  </tbody></table></div>
+  <p class="say"><b>교수(9/3 30:54)</b> "시험 문제는 행렬식부터 이제 나올 건데, 머릿속에 암기를 해야죠." · <b>(9/3 32:00)</b> "중간고사 관련 문제 두 문제나 세 문제를 낼 예정인데 이 행렬식을 가지고 문제 나오는 파트가 있다." · <b>(9/3 58:40)</b> <span class="red">"전자계산기 손 못 대. 손으로 계산해야 돼. 손으로 풀 수 있는 건 3차까지."</span></p>
+</section>
+
+<section>
+  <h2><span class="no">1 · WHAT</span>행렬이란 — 숫자를 직사각형에 넣은 것 (9/1)</h2>
+  <div class="step"><div class="n">STEP 1 · 정의</div>
+    <p><span class="term" data-k="행렬">행렬</span>(matrix)은 숫자를 <b>가로줄(행, row) m개 × 세로줄(열, column) n개</b>로 놓은 직사각형이다. 이것을 <b>m×n 행렬</b>이라 부른다. 안의 숫자 하나하나가 <span class="term" data-k="성분">성분</span> \(a_{ij}\) — <span class="hl">i가 행(몇 번째 줄), j가 열(몇 번째 칸)</span>. 행렬 이름은 대문자 \(A\), 성분은 소문자 \(a_{ij}\).</p>
+    \[A=(a_{ij})_{m\times n}=\begin{pmatrix}a_{11}&a_{12}&\cdots&a_{1n}\\ a_{21}&a_{22}&\cdots&a_{2n}\\ \vdots&&&\vdots\\ a_{m1}&a_{m2}&\cdots&a_{mn}\end{pmatrix}\]
+    <p class="say"><b>헷갈릴 때</b> "행은 가로로 <u>행</u>진, 열은 세로로 <u>열</u> 맞춰" — \(a_{23}\)은 2번째 줄, 3번째 칸.</p></div>
+  <div class="step"><div class="n">STEP 2 · 다섯 가지 이름 (학습지 정의02)</div>
+    <div class="tw"><table><thead><tr><th>이름</th><th>뜻</th><th>숫자로 치면</th></tr></thead><tbody>
+      <tr><td><span class="term" data-k="정사각행렬">정사각행렬</span></td><td>행 = 열 (n×n). 이때 "n차"라 부른다</td><td>—</td></tr>
+      <tr><td><span class="term" data-k="단위행렬">단위행렬</span> \(I_n\)</td><td>대각선(i=j)만 1, 나머지 0</td><td>숫자 <b>1</b> (\(AI=A\))</td></tr>
+      <tr><td>영행렬 \(O\)</td><td>전부 0</td><td>숫자 <b>0</b> (\(AO=O\))</td></tr>
+      <tr><td><span class="term" data-k="전치행렬">전치행렬</span> \(A^t\)</td><td>행과 열을 맞바꿈 (\(a_{ij}\to a_{ji}\)). 어떤 행렬이든 가능</td><td>뒤집기</td></tr>
+      <tr><td><span class="term" data-k="대칭행렬">대칭행렬</span></td><td>\(A^t=A\). <b>정사각행렬에서만</b> 말이 된다. 대각선을 거울로 놓고 같으면 대칭</td><td>거울</td></tr>
+    </tbody></table></div>
+    <p>학습지 Ex01: \(A=\begin{pmatrix}2&0&0\\0&2&0\\0&0&2\end{pmatrix}\) → 대칭 ○ · \(B=\begin{pmatrix}1&2&3\\0&4&5\\0&0&6\end{pmatrix}\) → 전치는 \(\begin{pmatrix}1&0&0\\2&4&0\\3&5&6\end{pmatrix}\), 대칭 ✗ · \(C_{2\times3}\) → 전치만 가능(3×2), 대칭은 말할 수 없음 · \(D=\begin{pmatrix}0&5&3\\5&6&7\\3&7&12\end{pmatrix}\) → 대칭 ○ (아토 풀이 ✓).</p></div>
+  <div class="one">한 줄: 행렬 = 숫자 직사각형. 단위행렬은 1, 영행렬은 0, 전치는 뒤집기, 대칭은 뒤집어도 같은 것.</div>
+</section>
+
+<section>
+  <h2><span class="no">2 · OPERATE</span>행렬 연산 — 되는 것과 안 되는 것 (9/3)</h2>
+  <div class="step"><div class="n">STEP 3 · 덧셈 · 뺄셈 · 실수배 — 같은 자리끼리</div>
+    <p>두 행렬이 <b>같은 꼴(m×n)</b>일 때만. \(A\pm B=(a_{ij}\pm b_{ij})\), \(kA=(ka_{ij})\). 상등 \(A=B\)는 모든 자리가 같다는 뜻.</p>
+    <p>학습지 Ex02 (1) \(\begin{pmatrix}3&2&1\\3&0&-2\end{pmatrix}+\begin{pmatrix}1&3&6\\2&1&0\end{pmatrix}=\begin{pmatrix}4&5&7\\5&1&-2\end{pmatrix}\) · (2) \(4\begin{pmatrix}2&5\\0&1\end{pmatrix}=\begin{pmatrix}8&20\\0&4\end{pmatrix}\) · (3) \(A-2B=\begin{pmatrix}3&2\\6&3\\5&4\end{pmatrix}-\begin{pmatrix}4&8\\0&6\\0&4\end{pmatrix}=\begin{pmatrix}-1&-6\\6&-3\\5&0\end{pmatrix}\)</p>
+    <p class="say"><b>교수(9/3 24:05)</b> <span class="hl">"(덧셈·실수배) 이거는 시험 문제 안 나온다."</span> — 그래도 뒤의 계산 재료라서 틀리면 안 됨.</p></div>
+  <div class="step"><div class="n">STEP 4 · 곱셈 — 앞의 열 수 = 뒤의 행 수</div>
+    <p>\(A\)가 m×n, \(B\)가 n×r이어야 \(AB\)가 되고 결과는 <b>m×r</b>. 가운데 n이 사라진다. 그래서 <span class="red">\(AB\ne BA\)가 보통</span>(아예 정의 안 될 때도 있음) — 아토 필기 "행렬의 곱은 교환법칙 성립 ✗".</p>
+    \[c_{ij}=\sum_{k=1}^{n}a_{ik}b_{kj}=a_{i1}b_{1j}+a_{i2}b_{2j}+\cdots+a_{in}b_{nj}\]
+    <p><b>앞 행렬의 i행</b>과 <b>뒤 행렬의 j열</b>을 짝지어 곱해 더한다. 학습지 예: \(\begin{pmatrix}1&2\\3&4\end{pmatrix}\begin{pmatrix}0&1\\2&0\end{pmatrix}=\begin{pmatrix}1\cdot0+2\cdot2&1\cdot1+2\cdot0\\3\cdot0+4\cdot2&3\cdot1+4\cdot0\end{pmatrix}=\begin{pmatrix}4&1\\8&3\end{pmatrix}\) (아토 필기 "1×0+2×2=4 1행1열").</p>
+    <p>Ex02 (4) \(AB^t\): \(A_{3\times2}\), \(B^t_{2\times3}\) → 3×3 \(=\begin{pmatrix}14&6&4\\24&9&6\\26&12&8\end{pmatrix}\) ✓ · (5) \(A=\begin{pmatrix}1&2&5\\2&4&10\\-1&-2&-5\end{pmatrix}\) → \(A^2=O\) ✓ (행이 전부 (1,2,5)의 배수라 곱하면 0).</p>
+    <p>거듭제곱 \(A^n=A\cdot A\cdots A\), \(A^rA^s=A^{r+s}\), \((A^r)^s=A^{rs}\) — 아토 필기 "실수의 계산과 동일".</p></div>
+  <div class="one">한 줄: 더하기는 같은 자리, 곱하기는 「앞 행 × 뒤 열」. 곱은 순서를 바꾸면 달라진다.</div>
+  <div class="q"><div class="qn">스스로 1</div><p>\(P=\begin{pmatrix}1&0\\2&3\end{pmatrix}\), \(Q=\begin{pmatrix}2&1\\0&1\end{pmatrix}\). \(PQ\)와 \(QP\)를 각각 구하고 다른지 확인.</p>
+    <details><summary>답</summary><div class="a">\(PQ=\begin{pmatrix}2&1\\4&5\end{pmatrix}\), \(QP=\begin{pmatrix}4&3\\2&3\end{pmatrix}\) — 다르다.</div></details></div>
+</section>
+
+<section>
+  <h2><span class="no">3 · DET</span>행렬식 — 정사각행렬을 숫자 하나로 (9/3) <span class="star">★ 시험은 여기부터</span></h2>
+  <div class="why">연립방정식 \(AX=B\)를 행렬로 쓰면, \(A\)의 <span class="term" data-k="행렬식">행렬식</span> \(\det(A)=|A|\)가 <b>0이냐 아니냐</b>로 해가 유일한지 갈린다. 그래서 행렬식이 이 단원의 심장이고, 교수님이 "시험은 여기부터"라고 한 이유.</div>
+  <div class="step"><div class="n">STEP 5 · 2차 — ad − bc</div>
+    \[\det\begin{pmatrix}a_{11}&a_{12}\\a_{21}&a_{22}\end{pmatrix}=\begin{vmatrix}a_{11}&a_{12}\\a_{21}&a_{22}\end{vmatrix}=a_{11}a_{22}-a_{12}a_{21}\]
+    <p>대각선(↘) 곱 빼기 반대 대각선(↙) 곱. <span class="red">표기: 행렬은 괄호 ( ), 행렬식은 세로줄 | |. \(\det\)와 세로줄을 안 쓰면 감점</span> — 교수(9/3 44:43) "당연히 알겠지 하고 안 쓰면 감점 당해요." 아토 필기 "얘 써야 됨".</p>
+    <p>Ex03: \(A=\begin{pmatrix}x-1&-2\\1&x-4\end{pmatrix}\), \(\det A=0\) → \((x-1)(x-4)+2=x^2-5x+6=(x-2)(x-3)=0\) → <b>\(x=2\) 또는 \(3\)</b> ✓. 교수(9/3 51:xx) "시험 문제: 행렬 A를 주고 det가 0일 때 x를 구하라" 유형.</p></div>
+  <div class="step"><div class="n">STEP 6 · 3차 — 사루스(Sarrus) 규칙</div>
+    \[\det A=(a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{13}a_{22}a_{31}+a_{12}a_{21}a_{33}+a_{11}a_{23}a_{32})\]
+    <p>오른쪽 아래로 내려가는 대각선 3개는 +, 왼쪽 아래로 내려가는 3개는 −. <span class="hl">공식을 글자로 외우지 말고 "↘ 세 개 더하고 ↙ 세 개 빼기" 그림으로 외울 것</span>(교수 9/3 46:xx "이거 암기하면 안 돼 … 그냥 가로 치고 빼기 가로 쳐놓고"). 4차부터는 손으로 안 한다.</p>
+    <p>Ex04: \(B=\begin{pmatrix}2&1&3\\4&2&1\\6&-3&4\end{pmatrix}\) → \((16+6-36)-(36+(-6)+16)=-14-46=\) <b>−60</b> ✓ (아토 풀이 \(16+6-36-(-6+16+36)=-60\)).</p>
+    <p class="say"><b>교수(9/3 58:xx)</b> "3차가 숫자가 너무 많거나 문자가 섞여 있으면 사루스는 적절치 못해 → 3차를 2차 행렬식 형태로 바꿔 푸는 방법" = 다음 단계 <b>여인수 전개</b>. <span class="star">★ "여기서 중간고사 문제 나옵니다."</span></p></div>
+  <div class="one">한 줄: 2차는 ad−bc, 3차는 사루스(↘ 더하기 ↙ 빼기). det와 세로줄은 반드시 쓴다.</div>
+  <div class="q"><div class="qn">스스로 2</div><p>\(\begin{vmatrix}x&3\\2&x-1\end{vmatrix}=0\) 을 만족하는 \(x\)는?</p><details><summary>답</summary><div class="a">\(x(x-1)-6=x^2-x-6=(x-3)(x+2)=0\) → \(x=3\) 또는 \(-2\)</div></details></div>
+  <div class="q"><div class="qn">스스로 3</div><p>\(\begin{vmatrix}1&2&0\\2&1&2\\-1&3&0\end{vmatrix}\) 을 사루스로.</p><details><summary>답</summary><div class="a">\((0-4+0)-(0+6+0)=-10\). (이 행렬은 STEP 9의 Ex8에도 나온다.)</div></details></div>
+</section>
+
+<section>
+  <h2><span class="no">4 · COFACTOR</span>소행렬식과 여인수 — 3차를 2차 세 개로 (9/8, 아토 풀이본) <span class="star">★</span></h2>
+  <div class="step"><div class="n">STEP 7 · 용어 두 개</div>
+    <ul>
+      <li><span class="term" data-k="소행렬식">소행렬식</span> \(M_{ij}\): \(a_{ij}\)가 있는 <b>행과 열을 지우고</b> 남은 것의 행렬식. 3차면 2차 행렬식이 된다.</li>
+      <li><span class="term" data-k="여인수">여인수</span> \(A_{ij}=(-1)^{i+j}M_{ij}\): 소행렬식에 <b>부호</b>를 붙인 것. 부호판 \(\begin{pmatrix}+&-&+\\-&+&-\\+&-&+\end{pmatrix}\) — 아토 필기 "여인수에 의해 부호 결정".</li>
+    </ul></div>
+  <div class="step"><div class="n">STEP 8 · 여인수 전개 — 아무 행(열)이나 기준으로</div>
+    \[\det A=a_{11}A_{11}+a_{12}A_{12}+a_{13}A_{13}\quad(\text{1행 기준})\]
+    <p>기준 행(열)의 성분 × 그 자리 여인수를 다 더한다. <span class="hl">어느 행·열을 골라도 값은 같다</span> → 0이 많은 줄을 고르면 계산이 준다(아토 필기 "열이나 행 중에 기준을 쓰기, ex) 1행 기준… 선언").</p>
+    <p><b>Ex05</b> \(A=\begin{pmatrix}1&2&3\\4&5&6\\7&8&9\end{pmatrix}\) 소행렬식: \(M_{11}=5\cdot9-6\cdot8=-3,\ M_{12}=-6,\ M_{13}=-3,\ M_{21}=-6,\ M_{22}=-12,\ M_{23}=-6,\ M_{31}=-3,\ M_{32}=-6,\ M_{33}=-3\). 여인수: 부호판대로 \(A_{12}=+6,\ A_{21}=+6,\ A_{23}=+6,\ A_{32}=+6\), 나머지는 \(M\)과 같음. (아토 풀이 전부 ✓)</p>
+    <p><b>Ex06</b> \(D=\begin{vmatrix}1&a&b+c\\1&b&c+a\\1&c&a+b\end{vmatrix}\) 1열 기준 전개 → 전부 소거 → <b>0</b> ✓. 빠른 이유: 2열+3열 = \(a+b+c\)(모든 행 같음) = 상수×1열 → 종속.</p></div>
+  <div class="one">한 줄: 지우고(소행렬식) → 부호 붙이고(여인수) → 기준 줄 성분과 곱해 더한다(전개). 0 많은 줄이 편하다.</div>
+  <div class="q"><div class="qn">스스로 4</div><p>\(\begin{vmatrix}2&0&1\\1&3&0\\0&1&4\end{vmatrix}\) 을 여인수 전개(1행 기준)로.</p><details><summary>답</summary><div class="a">\(2\begin{vmatrix}3&0\\1&4\end{vmatrix}-0+1\begin{vmatrix}1&3\\0&1\end{vmatrix}=2\cdot12+1\cdot1=25\)</div></details></div>
+</section>
+
+<section>
+  <h2><span class="no">5 · INVERSE</span>역행렬 — 나눗셈 대신 (9/8) <span class="star">★</span></h2>
+  <div class="why">행렬엔 나눗셈이 없다. 대신 \(AA^{-1}=I\)가 되는 \(A^{-1}\)(<span class="term" data-k="역행렬">역행렬</span>)을 만들어 양변에 곱한다. \(AX=B\ \Rightarrow\ X=A^{-1}B\). <span class="red">순서 주의: 왼쪽에 곱했으면 양변 다 왼쪽에</span>(교환법칙 ✗). 아토 필기 "선언 필수" = 풀이 시작에 \(A, X, B\)가 무엇인지 먼저 쓰기.</div>
+  <div class="step"><div class="n">STEP 9 · 2×2</div>
+    \[A^{-1}=\frac{1}{\det A}\begin{pmatrix}a_{22}&-a_{12}\\-a_{21}&a_{11}\end{pmatrix}\]
+    <p>주대각(↘)은 맞바꾸고, 부대각(↙)은 부호만 바꾼다(아토 필기 "음의 부호 부착"). <span class="red">\(\det A=0\)이면 역행렬 없음</span> — 그래서 먼저 det를 구하고 "≠0"을 쓴다.</p>
+    <p><b>Ex07</b> \(A=\begin{pmatrix}4&1\\6&2\end{pmatrix}\): \(\det A=8-6=2\ (\ne0)\) → \(A^{-1}=\tfrac12\begin{pmatrix}2&-1\\-6&4\end{pmatrix}=\begin{pmatrix}1&-\tfrac12\\-3&2\end{pmatrix}\) ✓ (학습지 "Quiz" 표시).</p></div>
+  <div class="step"><div class="n">STEP 10 · 3×3 — 수반행렬</div>
+    \[A^{-1}=\frac{1}{\det A}\,\mathrm{adj}(A),\qquad \mathrm{adj}(A)=\begin{pmatrix}A_{11}&A_{21}&A_{31}\\A_{12}&A_{22}&A_{32}\\A_{13}&A_{23}&A_{33}\end{pmatrix}\]
+    <p><span class="term" data-k="수반행렬">수반행렬</span> = <b>여인수를 전부 구해 행렬로 놓고 전치</b>한 것(아토 필기 "행과 열 바꿈"). 수순: det(사루스 또는 전개) → 여인수 9개 → 전치 → det로 나누기.</p>
+    <p><b>Ex8</b> (아토 별표) \(A=\begin{pmatrix}1&2&0\\2&1&2\\-1&3&0\end{pmatrix}\): \(\det A=-10\). 여인수 \(A_{11}=-6, A_{12}=-2, A_{13}=7, A_{21}=0, A_{22}=0, A_{23}=-5, A_{31}=4, A_{32}=-2, A_{33}=-3\) → \(\mathrm{adj}(A)=\begin{pmatrix}-6&0&4\\-2&0&-2\\7&-5&-3\end{pmatrix}\) → \(A^{-1}=\begin{pmatrix}\tfrac35&0&-\tfrac25\\ \tfrac15&0&\tfrac15\\ -\tfrac{7}{10}&\tfrac12&\tfrac{3}{10}\end{pmatrix}\) ✓ (아톰 검산 일치). 이게 시험에서 <span class="hl">3×3 역행렬 한 문제</span>의 전형.</p></div>
+  <div class="one">한 줄: 2×2는 대각 바꾸고 부호 바꿔 det로 나눔. 3×3은 여인수 → 전치(수반) → det로 나눔. det=0이면 없다.</div>
+  <div class="q"><div class="qn">스스로 5</div><p>\(\begin{pmatrix}3&1\\5&2\end{pmatrix}\)의 역행렬.</p><details><summary>답</summary><div class="a">\(\det=6-5=1\) → \(\begin{pmatrix}2&-1\\-5&3\end{pmatrix}\). 검산: 곱하면 \(I\).</div></details></div>
+</section>
+
+<section>
+  <h2><span class="no">6 · SOLVE</span>연립방정식 풀기 — 역행렬 · 크래머 (9/8) <span class="star">★</span></h2>
+  <div class="step"><div class="n">STEP 11 · 역행렬로</div>
+    <p><b>Ex9</b> \(x+2y=1,\ 3x+y=1\) → \(A=\begin{pmatrix}1&2\\3&1\end{pmatrix}\), \(\det A=-5\), \(A^{-1}=-\tfrac15\begin{pmatrix}1&-2\\-3&1\end{pmatrix}\) → \(X=A^{-1}B=-\tfrac15\begin{pmatrix}-1\\-2\end{pmatrix}=\begin{pmatrix}\tfrac15\\ \tfrac25\end{pmatrix}\) ✓. 대입 검산 \(\tfrac15+\tfrac45=1\).</p></div>
+  <div class="step"><div class="n">STEP 12 · 크래머의 법칙 — 3차 이상은 이걸로</div>
+    \[x_j=\frac{\det(A_j)}{\det(A)}\quad(\det A\ne0),\qquad A_j=A\text{의 }j\text{열을 }B\text{로 바꾼 행렬}\]
+    <p>아토가 학습지 여백에 적은 질문 "여기서는 j에 1을 못 넣지 않나?" → <b>일반형 표기일 뿐</b>. \(j=1\)이면 \(B\)가 맨 앞 열(그 앞 열이 없을 뿐), \(j=n\)이면 맨 뒤 열.</p>
+    <p><b>Ex10</b> \(x_1+2x_2+x_3=4,\ x_1-x_2+x_3=5,\ 2x_1+3x_2-x_3=1\): \(\det A=9\), \(\det A_1=20\), \(\det A_2=-3\), \(\det A_3=22\) → \(x_1=\tfrac{20}{9},\ x_2=-\tfrac13,\ x_3=\tfrac{22}{9}\) ✓ (1식 대입 \(\tfrac{20}{9}-\tfrac69+\tfrac{22}{9}=4\)).</p></div>
+  <div class="one">한 줄: det A ≠ 0 확인 → 열을 B로 바꾼 행렬식 ÷ det A. 미지수가 3개면 행렬식 4번.</div>
+  <div class="q"><div class="qn">스스로 6</div><p>\(2x+y=5,\ x-y=1\)을 크래머로.</p><details><summary>답</summary><div class="a">\(\det A=-3\), \(\det A_1=\begin{vmatrix}5&1\\1&-1\end{vmatrix}=-6\), \(\det A_2=\begin{vmatrix}2&5\\1&1\end{vmatrix}=-3\) → \(x=2,\ y=1\).</div></details></div>
+</section>
+
+<section>
+  <h2><span class="no">7 · NEXT</span>12.1 3차원 좌표계 — 벡터로 가는 문 (9/10)</h2>
+  <ul>
+    <li>직교좌표 \(P(x,y,z)\) · 원주좌표 \(P(r,\theta,z)\)(<span class="hl">문제는 주로 이것</span>) · 구면좌표(교수: 뺀다).</li>
+    <li>변수 2개 = 평면의 곡선, 3개 = 공간의 <b>곡면</b>. 같은 \(x^2+y^2=1\)이 R²에선 원, R³에선 원기둥면.</li>
+    <li>점 찍기 규칙: \(z=0\)으로 두고 xy에 찍은 뒤 z만큼 올린다. <span class="hl">12.1 자체는 시험 ✗</span>, 12.2 벡터부터 중간 범위(→ 「벡터 정리노트」).</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="no">8 · CHECK</span>클리닉 가기 전 체크 (17:00)</h2>
+  <ul class="chk">
+    <li>2차 행렬식 ad−bc, 3차 사루스를 그림으로 그릴 수 있다.</li>
+    <li>det와 세로줄 표기를 빠뜨리지 않는다(감점).</li>
+    <li>여인수 부호판 (+ − + / − + − / + − +)을 쓸 수 있다.</li>
+    <li>2×2 역행렬 공식을 쓰고, det=0이면 없다고 말할 수 있다.</li>
+    <li>3×3 역행렬 수순(det → 여인수 9개 → 전치 → 나누기)을 말할 수 있다.</li>
+    <li>크래머: \(A_j\)가 무엇인지 설명할 수 있다.</li>
+    <li>스스로 1~6을 답 가리고 풀었다.</li>
+  </ul>
+  <p class="say"><b>클리닉 질문 후보</b> — 교수(9/17)는 클리닉에서 <b>벡터 연산·크기</b>를 물어본다고 했다. 행렬은 이 노트로 정리하고, 클리닉에서는 「벡터 정리노트」 Q1~Q6을 먼저 풀어 보이고 틀린 것만 묻는다.</p>
+</section>
+
+<section>
+  <h2><span class="no">9 · CURRICULUM</span>이건 언제 배운 것인가</h2>
+  <div class="tw"><table><thead><tr><th>개념</th><th>한국 교육과정</th><th>메모</th></tr></thead><tbody>
+    <tr><td>연립일차방정식 · 소거법</td><td>중2</td><td>행렬이 대신하려는 것</td></tr>
+    <tr><td>행렬의 정의·연산·역행렬(2×2)</td><td>고1 (2009 개정 이전 수학Ⅰ) → <b>현재 교육과정에서 빠짐</b></td><td>아토 세대는 안 배웠을 가능성 큼 → 여기서 처음</td></tr>
+    <tr><td>행렬식·사루스·여인수·크래머</td><td>대학</td><td>학습지가 교재</td></tr>
+    <tr><td>3차원 좌표</td><td>고3 기하(공간좌표)</td><td>12.1</td></tr>
+  </tbody></table></div>
+</section>
+
+<section>
+  <h2><span class="no">10 · SOURCES</span>근거 · 다음 단계</h2>
+  <p class="log"><b>9/1</b> 녹음 35분 정리 · <b>9/3</b> 녹음 62분 정리 + 정리노트(사루스) · <b>9/8</b> 학습지 아토 풀이본 14p(검산 전부 정답) · <b>9/10</b> 필기 1장 + 9/15 녹음 역참조 · 학습지 Lecture 2-1 p.1~14.</p>
+  <p class="log"><b>다음</b>: 아토 컨펌 → 2차 재가공(더 쉽게, 겹침 합치기) → 학습앱 「학습하기」에 단계별(개념 → 문제 → 완료) 게임식 학습으로 탑재.</p>
+  <div class="foot">아톰 · 2026-09-17 14:50 · 1차 정리본. 용어 점선 밑줄은 화면에서 눌러 확인. PDF는 답이 펼쳐진 상태.</div>
+</section>
+</div>
+<div id="pop"></div>
+<script>
+const GLOSSARY={
+ "행렬":{en:"matrix",k:"구 고1(현재 교육과정 제외) → 대학",d:"숫자를 행(가로)·열(세로) 직사각형으로 배열한 것. 연립방정식의 계수를 담는 그릇."},
+ "성분":{en:"element / entry",k:"대학",d:"행렬 안의 숫자 하나. a_ij = i행 j열."},
+ "정사각행렬":{en:"square matrix",k:"대학",d:"행 수 = 열 수인 행렬. 행렬식·역행렬은 정사각행렬에서만."},
+ "단위행렬":{en:"identity matrix I",k:"구 고1",d:"대각선 1, 나머지 0. 곱해도 그대로(숫자 1 역할)."},
+ "전치행렬":{en:"transpose Aᵗ",k:"대학",d:"행과 열을 맞바꾼 행렬."},
+ "대칭행렬":{en:"symmetric matrix",k:"대학",d:"전치해도 자기 자신인 정사각행렬."},
+ "행렬식":{en:"determinant det(A)=|A|",k:"대학 (2×2는 구 고1)",d:"정사각행렬에서 얻는 숫자 하나. 0이면 역행렬 없음·해가 유일하지 않음."},
+ "소행렬식":{en:"minor M_ij",k:"대학",d:"a_ij의 행·열을 지운 나머지의 행렬식."},
+ "여인수":{en:"cofactor A_ij",k:"대학",d:"소행렬식에 (−1)^(i+j) 부호를 붙인 것."},
+ "역행렬":{en:"inverse matrix A⁻¹",k:"구 고1(2×2) → 대학",d:"A와 곱하면 단위행렬이 되는 행렬. 행렬의 나눗셈 역할."},
+ "수반행렬":{en:"adjugate adj(A)",k:"대학",d:"여인수 행렬의 전치. A⁻¹ = adj(A)/det(A)."}
+};
+const pop=document.getElementById('pop');
+document.querySelectorAll('.term').forEach(el=>{el.addEventListener('click',e=>{const g=GLOSSARY[el.dataset.k];if(!g)return;pop.innerHTML='<b>'+el.dataset.k+'</b> — '+g.en+'<div>'+g.d+'</div><div class="k">교육과정: '+g.k+'</div>';pop.style.display='block';e.stopPropagation();});});
+document.addEventListener('click',()=>pop.style.display='none');
+const openAll=()=>document.querySelectorAll('.q details').forEach(d=>d.open=true);
+window.addEventListener('beforeprint',openAll); if(location.hash==='#print'||window.matchMedia('print').matches) openAll();
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>
+</body>
+</html>

@@ -50,7 +50,7 @@ thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing
 #pop{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);max-width:540px;width:calc(100% - 40px);background:var(--paper);border:1px solid var(--line-2);border-radius:12px;padding:12px 16px;box-shadow:0 10px 30px rgba(0,0,0,.15);display:none;z-index:9;font-size:14.5px}
 #pop b{color:var(--acc-ink)} #pop .k{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-top:4px}
 .foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
-@media print{body{background:#fff;font-size:14px}.wrap{max-width:100%;padding:0}.card,.tw,.note,.q,.box{break-inside:avoid}#pop{display:none!important}.q details{display:block}.q summary{display:none}.q .a{display:block}@page{size:A4;margin:12mm 11mm}}
+@media print{body{background:#fff;font-size:14px}.wrap{max-width:100%;padding:0}.card,.tw,.note,.q,.box{break-inside:avoid}#pop{display:none!important}.q summary{color:var(--ink-3);font-size:12px}@page{size:A4;margin:12mm 11mm}}
 </style>
 </head>
 <body>
@@ -254,6 +254,8 @@ const GLOSSARY={
 const pop=document.getElementById('pop');
 document.querySelectorAll('.term').forEach(el=>{el.addEventListener('click',e=>{const g=GLOSSARY[el.dataset.k];if(!g)return;pop.innerHTML='<b>'+el.dataset.k+'</b> — '+g.en+'<div>'+g.d+'</div><div class="k">교육과정: '+g.k+'</div>';pop.style.display='block';e.stopPropagation();});});
 document.addEventListener('click',()=>pop.style.display='none');
+const openAll=()=>document.querySelectorAll('.q details').forEach(d=>d.open=true);
+window.addEventListener('beforeprint',openAll); if(location.hash==='#print'||window.matchMedia('print').matches) openAll();
 window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>
