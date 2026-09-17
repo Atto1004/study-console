@@ -282,7 +282,7 @@ function render(){
 function startFrom(id){
   const n=SLIDES.findIndex(x=>x.id===id); if(n<0) return;
   ST.skip=ST.skip||{};
-  SLIDES.forEach((x,i)=>{ if(i<n&&x.type!=="start"&&x.type!=="toc"&&x.type!=="jump"&&!ST.done[x.id]){ ST.done[x.id]=true; ST.skip[x.id]=true; } });
+  SLIDES.forEach((x,i)=>{ if(i<n&&x.type!=="start"&&x.type!=="jump"&&!ST.done[x.id]){ ST.done[x.id]=true; ST.skip[x.id]=true; } });
   ST.idx=n; save(); render();
 }
 function unskipAll(){ ST.skip=ST.skip||{}; Object.keys(ST.skip).forEach(k=>{ delete ST.done[k]; }); ST.skip={}; save(); render(); }

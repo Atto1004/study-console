@@ -80,10 +80,8 @@ for pi, sec in enumerate(parts, 1):
 slides.append({"id": "final", "type": "final"})
 
 # 진도 목차 (0절 표)
-toc = doc.xpath('//section[.//h2/span[@class="no"][starts-with(normalize-space(text()),"0")]]')
-toc_html = LH.tostring(toc[0].xpath('.//div[@class="tw"]')[0], encoding="unicode") if toc else ""
-slides.insert(0, {"id": "toc", "type": "concept", "part": 0, "title": "일차별 진도 목차 — 어디를 배웠나", "html": toc_html})
-slides.insert(1, {"id": "jump", "type": "jump", "part": 0})
+# 일차별 진도 목차는 덱에 넣지 않는다 — 과목 페이지 회차 표가 그 역할 (아토 2026-09-17)
+slides.insert(0, {"id": "jump", "type": "jump", "part": 0})
 slides.insert(0, {"id": "start", "type": "start"})
 
 # 출처 발췌 이미지: <note>.sources.json 이 있으면 PDF 영역을 잘라 <out dir>/src/<deck>/ 에 JPEG로 넣고 슬라이드에 src 목록을 붙인다
