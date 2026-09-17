@@ -185,7 +185,7 @@ function render(){
     $("#go").onclick=()=>{ ST.done[s.id]=true; save(); go(1); };
     const r=$("#reset"); if(r) r.onclick=()=>{ if(confirm("진행 기록을 지울까요?")){ ST={idx:0,done:{},correct:{},revealed:{},answer:{},ink:{},finger:false,padBig:false,skip:{}}; save(); render(); } };
   } else if(s.type==="cover"){
-    body.innerHTML='<div class="cover"><div class="kicker">'+esc(s.no)+'</div><div class="big">'+esc(s.title)+(s.star?' <span class="star">★</span>':'')+'</div><div class="sub">개념 → 기초 문제 → 응용 문제 순서로 갑니다.</div></div>';
+    body.innerHTML='<div class="cover"><div class="kicker">'+esc(s.no)+'</div><div class="big">'+esc(String(s.title).replace(/[\s★]+$/,""))+(s.star?' <span class="star">★</span>':'')+'</div><div class="sub">개념 → 기초 문제 → 응용 문제 순서로 갑니다.</div></div>';
     act.innerHTML='<button class="btn a" id="ok">시작</button>'; $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); go(1); };
   } else if(s.type==="concept"){
     body.innerHTML='<div class="kicker">'+(s.part?'파트 '+s.part+' · 개념':'')+'</div><h2>'+esc(s.title)+'</h2>'+s.html;
