@@ -7,6 +7,15 @@ import io, sys, re, json
 from lxml import html as LH
 
 src, out, deck_id, title = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+
+# 자기완결 검사 — 문제 한 장에 필요한 행렬이 다 적혀 있어야 한다 (아토 2026-09-17 "bc가 없는데 어딜 보고 풀라는 거야"). 위반이면 덱을 만들지 않는다.
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from check_q_refs import check as _check_refs
+_bad = _check_refs(src)
+if _bad:
+    for _qn, _und, _refs in _bad: print("!! " + _qn + " | 정의 없는 기호: " + ",".join(_und) + " | 참조 문구: " + ",".join(_refs))
+    print("자기완결 위반 %d건 — 슬라이드 생성 중단. 정리노트의 문제 본문을 고쳐라." % len(_bad)); sys.exit(1)
 doc = LH.fromstring(io.open(src, encoding="utf-8").read())
 
 def inner(el):
