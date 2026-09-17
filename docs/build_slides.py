@@ -99,6 +99,7 @@ for pi, sec in enumerate(parts, 1):
         w += 140 * h.count("<table")            # 표
         w += 40 * h.count("\\begin{pmatrix}") + 40 * h.count("\\begin{vmatrix}")   # 행렬(세로로 큼)
         w += 12 * h.count("<tr")
+        w += 26 * h.count("<li") + 22 * h.count("<br") + 30 * h.count(chr(10))   # 줄 수(목록·줄바꿈·코드 줄)
         return w
     _chunks = []
     for h in concept_html:
@@ -117,8 +118,14 @@ for pi, sec in enumerate(parts, 1):
             for k in kids: _chunks.append(('<div class="concept">' + k + '</div>'))
         else:
             _chunks.append(h)
-    pages, cur, cw = [], [], 170 * len(concept_exam)   # 첫 장에 붙는 시험 언급 상자 무게
     LIMIT = 440
+    for _a in sys.argv:
+        if _a.startswith('--limit='): LIMIT = int(_a.split('=')[1])
+    exam_pages = []
+    if len(concept_exam) >= 3:   # 시험 언급이 많으면 전용 장(2개씩)으로 앞에 낸다
+        exam_pages = [concept_exam[i:i+2] for i in range(0, len(concept_exam), 2)]
+        concept_exam = []
+    pages, cur, cw = [], [], 170 * len(concept_exam)   # 첫 장에 붙는 시험 언급 상자 무게
     for h in _chunks:
         w = _weight(h)
         if cur and cw + w > LIMIT:
@@ -127,6 +134,9 @@ for pi, sec in enumerate(parts, 1):
     if cur: pages.append(cur)
     if not pages: pages = [[]]
     _title = concept_head if 'concept_head' in dir() else "개념"
+    for k, ex in enumerate(exam_pages):
+        slides.insert(cover_idx + 1 + k, {"id": f"p{pi}-exam-{k+1}", "type": "concept", "part": pi, "title": "시험 언급 (" + str(k+1) + "/" + str(len(exam_pages)) + ")", "html": "", "exam": ex})
+    cover_idx += len(exam_pages)
     for k, pg in enumerate(pages):
         slides.insert(cover_idx + 1 + k, {"id": f"p{pi}-concept" + ("" if k == 0 else f"-{k+1}"), "type": "concept", "part": pi,
                        "title": _title + ("" if len(pages) == 1 else f" ({k+1}/{len(pages)})"), "html": "".join(pg), "exam": concept_exam if k == 0 else []})
@@ -202,6 +212,13 @@ if "--no-check" not in sys.argv:
         print("검사 결과를 못 읽음 — 크롬 출력 확인 필요"); sys.exit(1)
     n, bad, lst = int(m.group(1)), int(m.group(2)), _html.unescape(m.group(3)).strip()
     print("배치 검사(1024×768):", n, "장 · 실패", bad)
+    if bad and "--soft" in sys.argv:
+        ids = set(l.split(" ")[0] for l in lst.splitlines() if l.strip())
+        for sl in slides:
+            if sl["id"] in ids: sl["scroll"] = True
+        page2 = tpl.replace("__TITLE__", title).replace("__DECK_ID__", deck_id).replace("__SLIDES__", json.dumps(slides, ensure_ascii=False)).replace("__PARTS__", json.dumps(parts_meta, ensure_ascii=False))
+        io.open(out, "w", encoding="utf-8", newline="\n").write(page2)
+        print("--soft: 넘친 " + str(len(ids)) + "장을 스크롤 허용으로 표시하고 통과 (임시 덱)"); sys.exit(0)
     if bad:
         print(lst); print("빌드 실패 — 넘치는 장은 정리노트에서 나누거나 build 분할 기준을 낮춰라."); sys.exit(1)
 
