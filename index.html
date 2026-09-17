@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-17.42";
+var BUILD="2026-09-17.43";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4839,6 +4839,10 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-17.43",d:"09-17",items:[
+    "회차별 학습하기가 덱의 그 회차 파트에서 열림 — 9/1 파트 1, 9/3 파트 2, 9/8은 파트 4(소행렬식·여인수)부터 열리며 앞 파트는 완료로 표시",
+    "덱: 시작 위치 장(어디서부터 할까?)에서 아무 장이나 골라 시작, 앞은 건너뜀. 일차별 진도 목차는 덱에서 빼고 과목 페이지 회차 표로"
+  ]},
   {v:"2026-09-17.42",d:"09-17",items:[
     "메뉴 레일 폭 축소(184 → 128px) — 항목 오른쪽에 남던 빈 여백 제거",
     "공부 타이머는 시험기간 모드에서만 — 오늘 탭 타이머 카드와 학습 화면 시간 표시가 평시에는 나오지 않음"
@@ -9305,6 +9309,24 @@ var V33={};
     "@media(min-width:861px){.rail{width:128px;padding:12px 8px}.navb{padding:0 10px;gap:8px}.rail-sec{padding-left:10px}}"
   ].join("\n");
   document.head.appendChild(css);
+})();
+/* ============================================================
+   V40 LAYER — 회차별 학습하기가 덱의 그 회차 파트에서 열린다 (아토 2026-09-17 "학습하기 소행렬식부터 진행, 이전까지는 완료 처리")
+   미적2 행렬 덱 링크에 해시를 붙인다: 9/1 → #at=p1-cover(이동만) · 9/3 → #at=p2-cover · 9/8 → #done=p4-cover(앞 파트는 완료 표시).
+   덱 쪽 규칙(slides_tpl): #at= 이동만 · #from= 앞은 건너뜀 · #done= 앞은 완료.
+   ============================================================ */
+(function(){
+  if(window.V40) return;
+  var V40=window.V40={};
+  V40.ANCHOR={"2026-09-01":"#at=p1-cover","2026-09-03":"#at=p2-cover","2026-09-08":"#done=p4-cover"};
+  V40.patch=function(){
+    var t=term(); if(t.patchV40a) return; var c=t.courses.filter(function(x){return x.name==="미분적분학2";})[0]; if(!c||!window.V36) return;
+    Object.keys(V40.ANCHOR).forEach(function(d){ var n=V36.dayNote(c,d); if(!n) return;
+      n.links.forEach(function(l){ if(/calc2-matrix-slides\.html/.test(l.url||"")) l.url="notes/calc2-matrix-slides.html"+V40.ANCHOR[d]; }); });
+    t.patchV40a=true; persist();
+  };
+  var _boot=boot;
+  boot=function(){ _boot(); try{ V40.patch(); }catch(e){ if(window.console) console.warn("V40 패치 오류", e); } };
 })();
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start);
 else start();

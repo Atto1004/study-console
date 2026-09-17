@@ -279,10 +279,10 @@ function render(){
   if(window.MathJax&&MathJax.typesetPromise) MathJax.typesetPromise([body]).catch(()=>{});
 }
 /* 여기부터 시작 — 앞 장은 전부 「건너뜀」(done+skip). 아토 2026-09-17 "2-1 예제 2-3부터 이해 안 돼, 그 앞은 학습 안 해도 돼" */
-function startFrom(id){
+function startFrom(id,mode){   /* mode: "skip"(기본) 앞은 건너뜀 · "done" 앞은 완료 · "at" 이동만 */
   const n=SLIDES.findIndex(x=>x.id===id); if(n<0) return;
-  ST.skip=ST.skip||{};
-  SLIDES.forEach((x,i)=>{ if(i<n&&x.type!=="start"&&x.type!=="jump"&&!ST.done[x.id]){ ST.done[x.id]=true; ST.skip[x.id]=true; } });
+  ST.skip=ST.skip||{}; mode=mode||"skip";
+  if(mode!=="at") SLIDES.forEach((x,i)=>{ if(i<n&&x.type!=="start"&&x.type!=="jump"&&!ST.done[x.id]){ ST.done[x.id]=true; if(mode==="skip") ST.skip[x.id]=true; } });
   ST.idx=n; save(); render();
 }
 function unskipAll(){ ST.skip=ST.skip||{}; Object.keys(ST.skip).forEach(k=>{ delete ST.done[k]; }); ST.skip={}; save(); render(); }
@@ -325,7 +325,7 @@ function openSrc(list,i){
   const p=$("#srcPrev"), n=$("#srcNext"); if(p) p.onclick=()=>openSrc(list,i-1); if(n) n.onclick=()=>openSrc(list,i+1);
 }
 $("#next").onclick=()=>go(1); $("#prev").onclick=()=>go(-1);
-{ const m=/^#from=([\w-]+)$/.exec(location.hash||""); if(m){ startFrom(m[1]); } }
+{ const m=/^#(from|done|at)=([\w-]+)$/.exec(location.hash||""); if(m){ startFrom(m[2], m[1]==="from"?"skip":m[1]); } }
 if(location.hash==="#src"){ setTimeout(()=>{ const b=$("#srcs .src-th"); if(b) b.click(); },400); }
 document.addEventListener("keydown",e=>{ if(e.key==="ArrowRight"||e.key===" ") go(1); else if(e.key==="ArrowLeft") go(-1); });
 let tx=null; document.addEventListener("touchstart",e=>{ tx=e.touches[0].clientX; },{passive:true});
