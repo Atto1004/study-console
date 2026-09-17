@@ -53,8 +53,15 @@ for pi, sec in enumerate(parts, 1):
             body = [LH.tostring(x, encoding="unicode") for x in el if x.tag not in ("details",) and "qn" not in (x.get("class") or "")]
             ans = el.xpath('.//div[@class="ans"]')
             q_index += 1
+            # 선택지: ol.choices > li (정답 li[data-ok]). 있으면 버튼형 문제, 없으면 텍스트 답
+            ch = el.xpath('./ol[contains(@class,"choices")]')
+            choices = None
+            if ch:
+                choices = [{"html": inner(li), "ok": li.get("data-ok") == "1"} for li in ch[0].xpath('./li')]
+                assert sum(1 for c in choices if c["ok"]) == 1, "선택지 정답은 정확히 하나: " + qn
+                body = [LH.tostring(x, encoding="unicode") for x in el if x.tag not in ("details", "ol") and "qn" not in (x.get("class") or "")]
             slides.append({"id": f"p{pi}-{'b' if mode=='b' else 'a'}{q_index}", "type": "q", "part": pi, "kind": "기초" if mode == "b" else "응용",
-                           "qn": qn, "html": "".join(body), "ans": inner(ans[0]) if ans else ""})
+                           "qn": qn, "html": "".join(body), "ans": inner(ans[0]) if ans else "", "choices": choices})
     # 개념 슬라이드는 표지 바로 뒤에 삽입
     cover_idx = next(i for i, s in enumerate(slides) if s["id"] == f"p{pi}-cover")
     slides.insert(cover_idx + 1, {"id": f"p{pi}-concept", "type": "concept", "part": pi, "title": concept_head if 'concept_head' in dir() else "개념", "html": "".join(concept_html)})
@@ -66,6 +73,32 @@ toc = doc.xpath('//section[.//h2/span[@class="no"][starts-with(normalize-space(t
 toc_html = LH.tostring(toc[0].xpath('.//div[@class="tw"]')[0], encoding="unicode") if toc else ""
 slides.insert(0, {"id": "toc", "type": "concept", "part": 0, "title": "일차별 진도 목차 — 어디를 배웠나", "html": toc_html})
 slides.insert(0, {"id": "start", "type": "start"})
+
+# 출처 발췌 이미지: <note>.sources.json 이 있으면 PDF 영역을 잘라 <out dir>/src/<deck>/ 에 JPEG로 넣고 슬라이드에 src 목록을 붙인다
+srcs_json = src.rsplit(".", 1)[0] + ".sources.json"
+if os.path.exists(srcs_json):
+    import fitz, warnings
+    warnings.filterwarnings("ignore")
+    SM = json.load(io.open(srcs_json, encoding="utf-8"))
+    out_dir = os.path.join(os.path.dirname(os.path.abspath(out)), "src", deck_id)
+    os.makedirs(out_dir, exist_ok=True)
+    docs = {k: fitz.open(os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(src)), v["path"]))) for k, v in SM["docs"].items()}
+    by_id = {sl["id"]: sl for sl in slides}
+    n_img = 0
+    for sid, lst in SM["slides"].items():
+        if sid not in by_id: print("  (출처 지정됐지만 슬라이드 없음)", sid); continue
+        out_list = []
+        for k, it in enumerate(lst):
+            pg = docs[it["doc"]][it["page"] - 1]
+            x0, y0, x1, y1 = it["rect"]; pad = 6
+            clip = fitz.Rect(max(0, x0 - pad), max(0, y0 - pad), min(pg.rect.width, x1 + pad), min(pg.rect.height, y1 + pad))
+            fn = f"{sid}-{k+1}.jpg"
+            pix = pg.get_pixmap(dpi=130, clip=clip)
+            pix.save(os.path.join(out_dir, fn), jpg_quality=78)
+            out_list.append({"img": f"src/{deck_id}/{fn}", "label": it.get("label", SM["docs"][it["doc"]]["label"]), "w": pix.width, "h": pix.height})
+            n_img += 1
+        by_id[sid]["src"] = out_list
+    print("출처 발췌", n_img, "장 →", out_dir)
 
 parts_meta = [{"n": i, "title": p.xpath('./h2')[0].text_content().replace(p.xpath('./h2/span[@class="no"]/text()')[0], "").strip()} for i, p in enumerate(parts, 1)]
 

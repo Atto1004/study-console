@@ -53,6 +53,32 @@ mjx-container{color:inherit}
 #body.pad-big .pad{min-height:0;margin-top:6px}
 #body.pad-big .myans{margin-top:6px}#body.pad-big .myans textarea{font-size:16px;padding:5px 12px;height:38px;line-height:1.3}
 #body.q-mode .ans{margin-top:10px}
+/* 선택지 */
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.choice{display:flex;align-items:center;gap:10px;text-align:left;font:inherit;font-size:.95em;padding:9px 12px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);cursor:pointer;min-height:48px}
+.choice .cn{flex:0 0 26px;height:26px;border-radius:50%;background:var(--acc-soft);color:var(--acc-ink);display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:12px;font-weight:600}
+.choice .ct{min-width:0;overflow-wrap:anywhere}
+.choice.sel{border-color:var(--acc);background:var(--acc-soft)}
+.choice.ok{border-color:var(--ok);background:var(--ok-soft)}.choice.ok .cn{background:var(--ok);color:#fff}
+.choice.bad{border-color:var(--crit);background:var(--crit-soft)}.choice.bad .cn{background:var(--crit);color:#fff}
+.choice[disabled]{cursor:default}
+.verdict{font-weight:700;padding:8px 14px;border-radius:10px}.verdict.ok{background:var(--ok-soft);color:var(--ok)}.verdict.bad{background:var(--crit-soft);color:var(--crit)}
+/* 출처 썸네일 */
+#srcs{display:flex;gap:6px;margin-right:10px}
+.src-th{position:relative;width:52px;height:52px;padding:0;border:2px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;cursor:pointer;flex:0 0 auto}
+.src-th img{width:100%;height:100%;object-fit:cover;object-position:left top;display:block}
+.src-th .src-n{position:absolute;right:2px;bottom:2px;font-family:var(--font-mono);font-size:10px;background:rgba(27,36,48,.75);color:#fff;border-radius:5px;padding:0 4px}
+.src-th:hover{border-color:var(--acc)}
+#srclb{position:absolute;inset:0;background:rgba(15,23,32,.96);display:none;flex-direction:column;z-index:20;padding:14px}
+#srclb.on{display:flex}
+.src-top{display:flex;align-items:center;gap:10px;color:#fff;font-size:13px;padding:4px 6px 10px}.src-top b{color:#C9D2FF}.src-top .src-pos{margin-left:auto;font-family:var(--font-mono);opacity:.8}
+.src-x{font:inherit;font-size:16px;background:transparent;border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:2px 10px;cursor:pointer}
+.src-body{flex:1;min-height:0;overflow:auto;background:#fff;border-radius:12px;display:flex;align-items:flex-start;justify-content:center;touch-action:pan-x pan-y pinch-zoom}
+.src-body img{width:100%;height:auto;cursor:zoom-in;display:block}
+.src-body img.zoom{width:190%;max-width:none;cursor:zoom-out}
+.src-foot{display:flex;align-items:center;gap:10px;padding:10px 4px 0;color:#fff}.src-foot .hint{margin:0 auto;opacity:.75;font-size:12px}
+.nav.undone{border-style:dashed}
+#body.q-mode.rev .pad{flex:0 0 96px;min-height:96px}#body.q-mode.rev .pad canvas{min-height:60px}
 .cover{height:100%;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:6px}
 .cover .big{font-family:var(--font-display);font-size:clamp(30px,5vw,60px);line-height:1.15;margin:6px 0}
 .cover .sub{color:var(--ink-2);font-size:1.05em}
@@ -68,6 +94,8 @@ mjx-container{color:inherit}
 .nav{width:46px;height:46px;border-radius:999px;border:2px solid var(--acc);background:#fff;color:var(--acc);font-size:22px;cursor:pointer;display:grid;place-items:center;transition:opacity .2s,transform .2s}
 .nav.next{background:var(--acc);color:#fff}
 .nav.locked{opacity:.18;transform:scale(.9);pointer-events:none}
+.nav.next.undone{background:#fff;color:var(--acc);border-style:dashed;opacity:.85}
+.nav[disabled]{opacity:.18;pointer-events:none}
 .nav.pulse{animation:pulse 1.1s ease-in-out infinite}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
 .done-tag{font-family:var(--font-mono);font-size:11px;color:var(--ok);letter-spacing:.08em}
@@ -136,9 +164,9 @@ function render(){
   const i=Math.max(0,Math.min(ST.idx,SLIDES.length-1)); ST.idx=i; const s=SLIDES[i]; const body=$("#body"), act=$("#act");
   $("#pos").textContent=(i+1)+" / "+SLIDES.length; $("#bar i").style.width=((i+1)/SLIDES.length*100)+"%";
   $("#parts").innerHTML=PARTS.map(p=>'<span class="'+(p.n===s.part?"cur":partDone(p.n)?"done":"")+'">'+p.n+'</span>').join("");
-  act.innerHTML=""; $("#doneTag").textContent=ST.done[s.id]?"완료":""; body.classList.remove("q-mode","pad-big"); if(PAD.ro){ PAD.ro.disconnect(); PAD.ro=null; }
+  act.innerHTML=""; $("#doneTag").textContent=ST.done[s.id]?"완료":""; body.classList.remove("q-mode","pad-big","rev"); if(PAD.ro){ PAD.ro.disconnect(); PAD.ro=null; }
   if(s.type==="start"){
-    body.innerHTML='<div class="cover"><div class="kicker">학습 슬라이드 · 가로 화면</div><div class="big">__TITLE__</div><div class="sub">한 페이지를 끝내면 오른쪽 아래 <b>→</b>가 켜집니다. 개념 페이지는 「읽었어요」, 문제 페이지는 「답 보기」 뒤 맞음/틀림을 고릅니다. 진행과 정답률은 이 기기에 저장됩니다.</div>'+
+    body.innerHTML='<div class="cover"><div class="kicker">학습 슬라이드 · 가로 화면</div><div class="big">__TITLE__</div><div class="sub">오른쪽 아래 <b>→</b>로 언제든 넘어갈 수 있고, 페이지를 끝내면 화살표가 실선이 됩니다. 기초 문제는 보기를 누르고, 답이 여러 개인 문제는 답을 씁니다. 오른쪽 아래 작은 사진은 이 페이지의 출처(학습지·내 풀이본)라 누르면 커집니다. 진행과 정답률은 이 기기에 저장됩니다.</div>'+
       '<div class="sub">파트 '+PARTS.length+'개 · 문제 '+SLIDES.filter(x=>x.type==="q").length+'개</div></div>';
     act.innerHTML='<button class="btn a" id="go">시작</button>'+(Object.keys(ST.done).length?'<button class="btn" id="reset">처음부터(기록 지우기)</button>':'');
     $("#go").onclick=()=>{ ST.done[s.id]=true; save(); go(1); };
@@ -152,19 +180,35 @@ function render(){
     $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); render(); };
   } else if(s.type==="q"){
     const rev=!!ST.revealed[s.id];
-    ST.answer=ST.answer||{}; ST.ink=ST.ink||{}; const my=ST.answer[s.id]||"";
-    body.classList.add("q-mode"); body.classList.toggle("pad-big",!!ST.padBig);
+    ST.answer=ST.answer||{}; ST.ink=ST.ink||{}; const my=ST.answer[s.id]||""; /* V2-CHOICES */
+    const mc=Array.isArray(s.choices)&&s.choices.length>0;
+    body.classList.add("q-mode"); body.classList.toggle("pad-big",!!ST.padBig); body.classList.toggle("rev",rev);
+    const choiceHTML=()=>'<div class="choices'+(rev?" rev":"")+'">'+s.choices.map((c,i)=>{ const sel=String(my)===String(i); const cls=(sel?" sel":"")+(rev?(c.ok?" ok":(sel?" bad":"")):"");
+      return '<button class="choice'+cls+'" data-ci="'+i+'"'+(rev?" disabled":"")+'><span class="cn">'+(i+1)+'</span><span class="ct">'+c.html+'</span></button>'; }).join("")+'</div>';
     body.innerHTML='<div class="kicker">파트 '+s.part+'</div><h2><span class="q-kind'+(s.kind==="응용"?" a":"")+'">'+s.kind+'</span>'+esc(s.qn)+'</h2><div class="qbody">'+s.html+'</div>'+
       '<div class="pad"><div class="pad-bar"><b>풀이 메모장</b><span class="hint">애플펜슬로 쓰세요</span>'+
         '<button data-tool="pen" class="on">펜</button><button data-tool="eraser">지우개</button><button data-act="undo">되돌리기</button><button data-act="clear">지우기</button>'+
         '<button data-act="finger" class="'+(ST.finger?"on":"")+'">손가락도</button><button data-act="big" class="'+(ST.padBig?"on":"")+'">'+(ST.padBig?"작게":"크게")+'</button></div>'+
         '<canvas id="pad"></canvas></div>'+
-      (rev
+      (mc ? choiceHTML() : rev
         ? '<div class="myans-show"><div class="kicker">내 답</div><div class="myans-txt">'+esc(my)+'</div></div>'
         : '<div class="myans"><label for="myans">내 답 <span class="hint">— 풀이 과정 말고 답만. 행렬은 [1 2; 3 4]처럼, 여러 개면 쉼표로</span></label><textarea id="myans" rows="'+(ST.padBig?1:2)+'" placeholder="여기에 답을 쓰고 「답 확인」">'+esc(my)+'</textarea></div>')+
       '<div class="ans'+(rev?"":" hidden")+'"><div class="kicker">답 · 풀이</div>'+s.ans+'</div>';
     mountPad(s.id);
-    if(!rev){
+    if(mc&&!rev){
+      act.innerHTML='<button class="btn a" id="reveal" disabled>답 확인</button>';
+      const rb=$("#reveal"); const upd=()=>{ rb.disabled=!(String(my2)!==""); };
+      let my2=my;
+      body.querySelectorAll(".choice").forEach(b=>{ b.onclick=()=>{ my2=b.dataset.ci; ST.answer[s.id]=my2; save(); body.querySelectorAll(".choice").forEach(x=>x.classList.toggle("sel",x===b)); upd(); }; });
+      upd();
+      rb.onclick=()=>{ if(String(my2)==="") return; const ok=!!(s.choices[+my2]&&s.choices[+my2].ok); ST.answer[s.id]=my2; ST.revealed[s.id]=true; ST.correct[s.id]=ok; ST.done[s.id]=true; save(); render(); };
+    }
+    else if(mc&&rev){
+      const c=ST.correct[s.id];
+      act.innerHTML='<span class="verdict '+(c?"ok":"bad")+'">'+(c?"정답":"오답 — 풀이를 읽고 다시")+'</span><button class="btn" id="retry1">다시 풀기</button>';
+      $("#retry1").onclick=()=>{ delete ST.revealed[s.id]; delete ST.done[s.id]; delete ST.correct[s.id]; delete ST.answer[s.id]; save(); render(); };
+    }
+    else if(!rev){
       act.innerHTML='<button class="btn a" id="reveal" disabled>답 확인</button>';
       const ta=$("#myans"), rb=$("#reveal");
       const sync=()=>{ ST.answer[s.id]=ta.value; rb.disabled=!ta.value.trim(); };
@@ -202,14 +246,36 @@ function render(){
     ST.done[s.id]=true; save();
   }
   const nxt=$("#next"), prv=$("#prev");
-  const unlocked=!!ST.done[s.id]&&i<SLIDES.length-1;
-  nxt.classList.toggle("locked",!unlocked); nxt.classList.toggle("pulse",unlocked);
+  renderSrc(s);
+  const unlocked=i<SLIDES.length-1;   /* 잠금 해제 (아토 2026-09-17): 미완료여도 다음으로 */
+  nxt.classList.remove("locked"); nxt.classList.toggle("undone",!ST.done[s.id]&&unlocked); nxt.classList.toggle("pulse",!!ST.done[s.id]&&unlocked); nxt.disabled=!unlocked;
   prv.classList.toggle("locked",i===0);
   $("#body").scrollTop=0;
   if(window.MathJax&&MathJax.typesetPromise) MathJax.typesetPromise([body]).catch(()=>{});
 }
-function go(d){ const n=ST.idx+d; if(n<0||n>=SLIDES.length) return; if(d>0&&!ST.done[SLIDES[ST.idx].id]) return; ST.idx=n; save(); render(); }
+function go(d){ const n=ST.idx+d; if(n<0||n>=SLIDES.length) return; ST.idx=n; save(); render(); }
+/* ---------- 출처 발췌 (우측 아래 썸네일 → 확대) ---------- */
+function renderSrc(s){
+  let box=$("#srcs"); if(!box){ box=document.createElement("div"); box.id="srcs"; $("#foot").insertBefore(box,$("#next")); }
+  const list=Array.isArray(s.src)?s.src:[];
+  box.innerHTML=list.map((x,i)=>'<button class="src-th" data-si="'+i+'" title="'+esc(x.label||"출처")+'"><img src="'+esc(x.img)+'" alt="" loading="lazy"><span class="src-n">'+(i+1)+'</span></button>').join("");
+  box.querySelectorAll(".src-th").forEach(b=>{ b.onclick=()=>openSrc(list,+b.dataset.si); });
+}
+function openSrc(list,i){
+  let lb=$("#srclb"); if(!lb){ lb=document.createElement("div"); lb.id="srclb"; $("#stage").appendChild(lb); }
+  const x=list[i];
+  lb.innerHTML='<div class="src-top"><b>출처</b><span>'+esc(x.label||"")+'</span><span class="src-pos">'+(i+1)+' / '+list.length+'</span><button class="src-x" aria-label="닫기">✕</button></div>'+
+    '<div class="src-body"><img src="'+esc(x.img)+'" alt="'+esc(x.label||"")+'"></div>'+
+    '<div class="src-foot"><button class="btn" id="srcPrev"'+(i<=0?" disabled":"")+'>← 이전 출처</button><span class="hint">사진을 누르면 확대 · 드래그로 이동</span><button class="btn" id="srcNext"'+(i>=list.length-1?" disabled":"")+'>다음 출처 →</button></div>';
+  lb.classList.add("on");
+  const img=lb.querySelector(".src-body img"), bd=lb.querySelector(".src-body");
+  img.onclick=()=>{ const z=img.classList.toggle("zoom"); if(!z){ bd.scrollTo(0,0); } };
+  lb.querySelector(".src-x").onclick=()=>lb.classList.remove("on");
+  lb.onclick=e=>{ if(e.target===lb) lb.classList.remove("on"); };
+  const p=$("#srcPrev"), n=$("#srcNext"); if(p) p.onclick=()=>openSrc(list,i-1); if(n) n.onclick=()=>openSrc(list,i+1);
+}
 $("#next").onclick=()=>go(1); $("#prev").onclick=()=>go(-1);
+if(location.hash==="#src"){ setTimeout(()=>{ const b=$("#srcs .src-th"); if(b) b.click(); },400); }
 document.addEventListener("keydown",e=>{ if(e.key==="ArrowRight"||e.key===" ") go(1); else if(e.key==="ArrowLeft") go(-1); });
 let tx=null; document.addEventListener("touchstart",e=>{ tx=e.touches[0].clientX; },{passive:true});
 document.addEventListener("touchend",e=>{ if(tx==null) return; const dx=e.changedTouches[0].clientX-tx; if(Math.abs(dx)>70) go(dx<0?1:-1); tx=null; });
