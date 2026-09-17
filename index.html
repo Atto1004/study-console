@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-17.38";
+var BUILD="2026-09-17.39";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4839,6 +4839,7 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-17.39",d:"09-17",items:["행렬 노트 v2 — 맨 위에 일차별 진도 목차, 본문은 핵심 개념 6파트(정의·연산·행렬식·여인수·역행렬·크래머) × 개념 → 개념 이해(기초, 학습지 예제) → 응용. 12.1은 벡터 노트로 분리. 미적2 9/3·9/8 회차 「정리」 링크와 정리 노트 목록에서 열림"]},
   {v:"2026-09-17.38",d:"09-17",items:["미분적분학2 「행렬과 행렬식 1~2주차 개념 학습」 노트 추가 — 학습지·녹음·아토 풀이본·필기 합본, 교수 강조는 형광펜·빨간 글씨·★로 표시, 스스로 6문제. 9/3·9/8 회차 정리와 정리 노트 목록에 링크"]},
   {v:"2026-09-17.37",d:"09-17",items:[
     "과목 화면 재구성 — 주차별 수업 정리가 회차 표로: 주차 × 수업 요일 칸마다 출결·진도·과제·정리 상태와 [학습하기][정리][기록]. 주 2회 과목은 화 | 목 두 칸, 주 1회는 한 칸. 녹음 요약 줄은 표에서 제거",
@@ -8766,7 +8767,7 @@ var V33={};
   boot=function(){ _boot(); var ch=false; try{ var t0=term(); ch=!t0.patchV35a; V35.patch(); }catch(e){ if(window.console) console.warn("V35 패치 오류", e); } if(ch){ try{ render(); }catch(e){} } };   /* 이 레이어는 start() 호출문보다 앞에 삽입되므로 래퍼가 먼저 등록된다 */
   /* NOTES 목록에 벡터 정리노트 추가(정리 노트 카드·과목 자료) */
   if(Array.isArray(window.NOTES)&&!NOTES.some(function(n){return n.file==="notes/calc2-matrix-w1-2.html";})){
-    NOTES.push({course:"미분적분학2",type:"정리",title:"행렬과 행렬식 1~2주차 개념 학습 — 백지에서 크래머까지",file:"notes/calc2-matrix-w1-2.html",week:2,date:"2026-09-17",sub:"학습지+녹음+아토 풀이본 합본 · 교수 강조 표시 · 스스로 6문제"});
+    NOTES.push({course:"미분적분학2",type:"정리",title:"행렬 단원 통합 학습 (1~2주차) — 개념 → 기초 → 응용",file:"notes/calc2-matrix-w1-2.html",week:2,date:"2026-09-17",sub:"일차별 진도 목차 · 핵심 개념 6파트 · 기초 19 + 응용 18문제 · 교수 강조 표시"});
   }
   if(Array.isArray(window.NOTES)&&!NOTES.some(function(n){return n.file==="notes/calc2-vectors-0917.html";})){
     NOTES.push({course:"미분적분학2",type:"정리",title:"벡터 정리노트 12.1~12.3 도입 — 클리닉·중간 대비",file:"notes/calc2-vectors-0917.html",week:3,date:"2026-09-17",sub:"공식 4 · 연습 10문제 · 시험은 표준기저벡터부터"});
