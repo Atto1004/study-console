@@ -39,6 +39,20 @@ mjx-container{color:inherit}
 .myans textarea:focus{box-shadow:0 0 0 3px rgba(60,90,200,.15)}
 .myans-show{margin-top:12px;border:2px dashed var(--acc);border-radius:12px;padding:8px 14px}.myans-txt{font-size:20px;white-space:pre-wrap;word-break:keep-all}
 .btn[disabled]{opacity:.45;cursor:default}
+#body.q-mode{display:flex;flex-direction:column}
+#body.q-mode .qbody,#body.q-mode h2,#body.q-mode .kicker,#body.q-mode .myans,#body.q-mode .myans-show,#body.q-mode .ans{flex:0 0 auto}
+.pad{flex:1 1 auto;min-height:190px;display:flex;flex-direction:column;margin-top:10px;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:#FCFCF8}
+.pad-bar{display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--ink-2);background:#F5F6F2;flex-wrap:wrap}
+.pad-bar b{color:var(--acc-ink);font-weight:600}.pad-bar .hint{opacity:.7;margin-right:auto}
+.pad-bar button{font:inherit;font-size:12px;padding:3px 9px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink-2);cursor:pointer}
+.pad-bar button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.pad canvas{flex:1 1 auto;min-height:0;width:100%;display:block;touch-action:none;cursor:crosshair;
+  background-image:linear-gradient(to right,rgba(78,95,181,.08) 1px,transparent 1px),linear-gradient(to bottom,rgba(78,95,181,.08) 1px,transparent 1px);background-size:24px 24px}
+#body.pad-big .myans .hint{display:none}
+#body.pad-big .qbody{font-size:.85em;line-height:1.45}#body.pad-big h2{font-size:clamp(16px,1.9vw,21px);margin-bottom:4px}
+#body.pad-big .pad{min-height:0;margin-top:6px}
+#body.pad-big .myans{margin-top:6px}#body.pad-big .myans textarea{font-size:16px;padding:5px 12px;height:38px;line-height:1.3}
+#body.q-mode .ans{margin-top:10px}
 .cover{height:100%;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:6px}
 .cover .big{font-family:var(--font-display);font-size:clamp(30px,5vw,60px);line-height:1.15;margin:6px 0}
 .cover .sub{color:var(--ink-2);font-size:1.05em}
@@ -76,7 +90,7 @@ const DECK_ID="__DECK_ID__";
 const SLIDES=__SLIDES__;
 const PARTS=__PARTS__;
 const KEY="mc-slides-"+DECK_ID;
-let ST={idx:0,done:{},correct:{},revealed:{},answer:{}};
+let ST={idx:0,done:{},correct:{},revealed:{},answer:{},ink:{},finger:false,padBig:false};
 try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}
 const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(ST)); }catch(e){} };
 const $=s=>document.querySelector(s);
@@ -85,17 +99,50 @@ function partScore(p){ const qs=SLIDES.filter(s=>s.type==="q"&&s.part===p); cons
   const cnt=arr=>({n:arr.length,ok:arr.filter(q=>ST.correct[q.id]===true).length,done:arr.filter(q=>ST.done[q.id]).length});
   return {b:cnt(b),a:cnt(a)}; }
 function partDone(p){ return SLIDES.filter(s=>s.part===p&&s.type!=="result").every(s=>ST.done[s.id]); }
+
+/* ---------- 풀이 메모장 (손글씨 캔버스 · 애플펜슬) ----------
+   획은 ST.ink[문제id] = {strokes:[{t:"p"|"e", c:[x,y,p, x,y,p, ...]}]} 로 저장. 좌표는 캔버스 폭 기준 비율(0~1, y도 폭으로 나눔)이라
+   화면 크기가 바뀌어도 같은 모양으로 다시 그린다. 펜(pointerType pen)·마우스는 항상 그리고, 손가락은 「손가락도」를 켰을 때만(손바닥 오인 방지). */
+const PAD={tool:"pen",cv:null,ctx:null,id:null,cur:null,ro:null,dpr:1,W:0,H:0};
+function padStrokes(id){ ST.ink=ST.ink||{}; if(!ST.ink[id]) ST.ink[id]={strokes:[]}; return ST.ink[id].strokes; }
+function padResize(){ const cv=PAD.cv; if(!cv||!cv.isConnected) return; const r=cv.getBoundingClientRect(); if(r.width<10||r.height<10) return;
+  PAD.dpr=Math.min(3,window.devicePixelRatio||1); PAD.W=r.width; PAD.H=r.height; cv.width=Math.round(r.width*PAD.dpr); cv.height=Math.round(r.height*PAD.dpr);
+  PAD.ctx=cv.getContext("2d"); PAD.ctx.setTransform(PAD.dpr,0,0,PAD.dpr,0,0); PAD.ctx.lineCap="round"; PAD.ctx.lineJoin="round"; padRedraw(); }
+function padLine(ctx,t,x0,y0,x1,y1,p){ if(!ctx) return; const W=PAD.W; ctx.globalCompositeOperation=t==="e"?"destination-out":"source-over"; ctx.strokeStyle="#1B2430";
+  ctx.lineWidth=t==="e"?W*0.03:Math.max(1.2,W*0.0035*(0.6+(p||0.5)*1.2)); ctx.beginPath(); ctx.moveTo(x0*W,y0*W); ctx.lineTo(x1*W,y1*W); ctx.stroke(); }
+function padRedraw(){ const ctx=PAD.ctx; if(!ctx) return; ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,PAD.cv.width,PAD.cv.height); ctx.restore();
+  for(const st of padStrokes(PAD.id)){ const c=st.c; if(c.length<3) continue; if(c.length===3){ padLine(ctx,st.t,c[0],c[1],c[0]+0.0005,c[1],c[2]); continue; }
+    for(let i=3;i<c.length;i+=3) padLine(ctx,st.t,c[i-3],c[i-2],c[i],c[i+1],c[i+2]); } }
+function padPt(e){ const r=PAD.cv.getBoundingClientRect(); return [Math.round((e.clientX-r.left)/PAD.W*1000)/1000, Math.round((e.clientY-r.top)/PAD.W*1000)/1000, Math.round((e.pressure||0.5)*100)/100]; }
+function padAllowed(e){ return e.pointerType==="pen"||e.pointerType==="mouse"||(e.pointerType==="touch"&&ST.finger); }
+function mountPad(id){
+  const cv=$("#pad"); if(!cv) return; PAD.cv=cv; PAD.id=id; PAD.cur=null;
+  cv.onpointerdown=e=>{ if(!padAllowed(e)) return; e.preventDefault(); try{ cv.setPointerCapture(e.pointerId); }catch(x){} const pt=padPt(e); PAD.cur={t:PAD.tool==="eraser"?"e":"p",c:pt.slice()}; padLine(PAD.ctx,PAD.cur.t,pt[0],pt[1],pt[0]+0.0005,pt[1],pt[2]); };
+  cv.onpointermove=e=>{ if(!PAD.cur||!padAllowed(e)) return; e.preventDefault(); const evs=(e.getCoalescedEvents&&e.getCoalescedEvents().length)?e.getCoalescedEvents():[e];
+    for(const ev of evs){ const pt=padPt(ev), c=PAD.cur.c, n=c.length; padLine(PAD.ctx,PAD.cur.t,c[n-3],c[n-2],pt[0],pt[1],pt[2]); c.push(pt[0],pt[1],pt[2]); } };
+  const end=()=>{ if(!PAD.cur) return; padStrokes(id).push(PAD.cur); PAD.cur=null; save(); };
+  cv.onpointerup=end; cv.onpointercancel=end; cv.onpointerleave=e=>{ if(PAD.cur&&e.pointerType!=="pen") end(); };
+  cv.oncontextmenu=e=>e.preventDefault();
+  const bar=cv.previousElementSibling;
+  bar.querySelectorAll("[data-tool]").forEach(b=>{ b.onclick=()=>{ PAD.tool=b.dataset.tool; bar.querySelectorAll("[data-tool]").forEach(x=>x.classList.toggle("on",x===b)); }; });
+  bar.querySelector('[data-act="undo"]').onclick=()=>{ padStrokes(id).pop(); save(); padRedraw(); };
+  bar.querySelector('[data-act="clear"]').onclick=()=>{ if(!padStrokes(id).length||confirm("이 문제의 풀이 메모를 지울까요?")){ ST.ink[id]={strokes:[]}; save(); padRedraw(); } };
+  bar.querySelector('[data-act="finger"]').onclick=function(){ ST.finger=!ST.finger; save(); this.classList.toggle("on",ST.finger); };
+  bar.querySelector('[data-act="big"]').onclick=()=>{ ST.padBig=!ST.padBig; save(); render(); };
+  if(window.ResizeObserver){ PAD.ro=new ResizeObserver(()=>padResize()); PAD.ro.observe(cv); }
+  setTimeout(padResize,30);
+}
 function render(){
   const i=Math.max(0,Math.min(ST.idx,SLIDES.length-1)); ST.idx=i; const s=SLIDES[i]; const body=$("#body"), act=$("#act");
   $("#pos").textContent=(i+1)+" / "+SLIDES.length; $("#bar i").style.width=((i+1)/SLIDES.length*100)+"%";
   $("#parts").innerHTML=PARTS.map(p=>'<span class="'+(p.n===s.part?"cur":partDone(p.n)?"done":"")+'">'+p.n+'</span>').join("");
-  act.innerHTML=""; $("#doneTag").textContent=ST.done[s.id]?"완료":"";
+  act.innerHTML=""; $("#doneTag").textContent=ST.done[s.id]?"완료":""; body.classList.remove("q-mode","pad-big"); if(PAD.ro){ PAD.ro.disconnect(); PAD.ro=null; }
   if(s.type==="start"){
     body.innerHTML='<div class="cover"><div class="kicker">학습 슬라이드 · 가로 화면</div><div class="big">__TITLE__</div><div class="sub">한 페이지를 끝내면 오른쪽 아래 <b>→</b>가 켜집니다. 개념 페이지는 「읽었어요」, 문제 페이지는 「답 보기」 뒤 맞음/틀림을 고릅니다. 진행과 정답률은 이 기기에 저장됩니다.</div>'+
       '<div class="sub">파트 '+PARTS.length+'개 · 문제 '+SLIDES.filter(x=>x.type==="q").length+'개</div></div>';
     act.innerHTML='<button class="btn a" id="go">시작</button>'+(Object.keys(ST.done).length?'<button class="btn" id="reset">처음부터(기록 지우기)</button>':'');
     $("#go").onclick=()=>{ ST.done[s.id]=true; save(); go(1); };
-    const r=$("#reset"); if(r) r.onclick=()=>{ if(confirm("진행 기록을 지울까요?")){ ST={idx:0,done:{},correct:{},revealed:{},answer:{}}; save(); render(); } };
+    const r=$("#reset"); if(r) r.onclick=()=>{ if(confirm("진행 기록을 지울까요?")){ ST={idx:0,done:{},correct:{},revealed:{},answer:{},ink:{},finger:false,padBig:false}; save(); render(); } };
   } else if(s.type==="cover"){
     body.innerHTML='<div class="cover"><div class="kicker">'+esc(s.no)+'</div><div class="big">'+esc(s.title)+(s.star?' <span class="star">★</span>':'')+'</div><div class="sub">개념 → 기초 문제 → 응용 문제 순서로 갑니다.</div></div>';
     act.innerHTML='<button class="btn a" id="ok">시작</button>'; $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); go(1); };
@@ -105,12 +152,18 @@ function render(){
     $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); render(); };
   } else if(s.type==="q"){
     const rev=!!ST.revealed[s.id];
-    ST.answer=ST.answer||{}; const my=ST.answer[s.id]||"";
+    ST.answer=ST.answer||{}; ST.ink=ST.ink||{}; const my=ST.answer[s.id]||"";
+    body.classList.add("q-mode"); body.classList.toggle("pad-big",!!ST.padBig);
     body.innerHTML='<div class="kicker">파트 '+s.part+'</div><h2><span class="q-kind'+(s.kind==="응용"?" a":"")+'">'+s.kind+'</span>'+esc(s.qn)+'</h2><div class="qbody">'+s.html+'</div>'+
+      '<div class="pad"><div class="pad-bar"><b>풀이 메모장</b><span class="hint">애플펜슬로 쓰세요</span>'+
+        '<button data-tool="pen" class="on">펜</button><button data-tool="eraser">지우개</button><button data-act="undo">되돌리기</button><button data-act="clear">지우기</button>'+
+        '<button data-act="finger" class="'+(ST.finger?"on":"")+'">손가락도</button><button data-act="big" class="'+(ST.padBig?"on":"")+'">'+(ST.padBig?"작게":"크게")+'</button></div>'+
+        '<canvas id="pad"></canvas></div>'+
       (rev
         ? '<div class="myans-show"><div class="kicker">내 답</div><div class="myans-txt">'+esc(my)+'</div></div>'
-        : '<div class="myans"><label for="myans">내 답 <span class="hint">— 풀이 과정 말고 답만. 행렬은 [1 2; 3 4]처럼, 여러 개면 쉼표로</span></label><textarea id="myans" rows="2" placeholder="여기에 답을 쓰고 「답 확인」">'+esc(my)+'</textarea></div>')+
+        : '<div class="myans"><label for="myans">내 답 <span class="hint">— 풀이 과정 말고 답만. 행렬은 [1 2; 3 4]처럼, 여러 개면 쉼표로</span></label><textarea id="myans" rows="'+(ST.padBig?1:2)+'" placeholder="여기에 답을 쓰고 「답 확인」">'+esc(my)+'</textarea></div>')+
       '<div class="ans'+(rev?"":" hidden")+'"><div class="kicker">답 · 풀이</div>'+s.ans+'</div>';
+    mountPad(s.id);
     if(!rev){
       act.innerHTML='<button class="btn a" id="reveal" disabled>답 확인</button>';
       const ta=$("#myans"), rb=$("#reveal");
