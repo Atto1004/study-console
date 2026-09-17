@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>미적분학2 · 벡터 정리노트 (12.1~12.3 도입) — 9/17 클리닉·중간 대비</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#F5F7F6;--paper:#FFFFFF;--ink:#1B2430;--ink-2:#3F4C5A;--ink-3:#6E7B88;--line:#DCE2E6;--line-2:#C5CED5;
+  --acc:#4E5FB5;--acc-soft:#E8EAF7;--acc-ink:#36418C;--warn:#B9791A;--warn-soft:#FBF1DD;--warn-ink:#7A4E0B;
+  --ok:#3D7A4E;--ok-soft:#E5F1E7;--ok-ink:#2B5A39;--crit:#B2483F;--crit-soft:#F8E6E3;--crit-ink:#7E2F28;--ans:#F0F3F5;
+  --font-display:"Gowun Batang","Noto Serif KR",Georgia,serif;--font-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;--font-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased;word-break:keep-all;overflow-wrap:anywhere}
+mjx-container{color:inherit} mjx-container[display="true"]{margin:.5em 0 !important;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px 90px}
+.head{padding:44px 0 22px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.eyebrow b{color:var(--acc);font-weight:500}
+.eyebrow .rec{background:var(--ok-soft);color:var(--ok-ink);border-radius:5px;padding:1px 8px;text-transform:none;letter-spacing:.04em}
+h1{font-family:var(--font-display);font-weight:700;font-size:clamp(28px,4.4vw,40px);line-height:1.22;margin:12px 0 10px;letter-spacing:-.01em;text-wrap:balance}
+.lede{font-size:16.5px;color:var(--ink-2);margin:0}
+section{padding:34px 0 6px} section+section{border-top:1px solid var(--line)}
+h2{font-family:var(--font-display);font-weight:700;font-size:25px;line-height:1.3;margin:0 0 8px;letter-spacing:-.005em;text-wrap:balance}
+h2 .no{font-family:var(--font-mono);font-weight:500;font-size:12px;color:var(--acc);letter-spacing:.1em;display:block;margin-bottom:6px}
+h3{font-size:17.5px;font-weight:700;margin:26px 0 8px}
+p{margin:0 0 12px} ul,ol{margin:0 0 12px;padding-left:22px} li{margin:4px 0}
+.tw{overflow-x:auto;margin:12px 0 16px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:14.5px}
+th,td{padding:9px 14px;text-align:left;vertical-align:top;border-top:1px solid var(--line)}
+thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3);font-weight:500;background:var(--ans)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0 14px}
+.card .t{font-weight:700;margin-bottom:4px} .card p:last-child{margin-bottom:0}
+.card .say{font-size:15px;color:var(--ink-2);background:var(--ans);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:8px 12px;margin:8px 0 0}
+.card .say b{color:var(--acc-ink)}
+.ts{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-left:6px}
+.note{border-radius:10px;padding:12px 16px;margin:14px 0 18px;font-size:15px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:start}
+.note .ic{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;padding:2px 7px;border-radius:5px;margin-top:3px;white-space:nowrap;color:#fff}
+.note.exam{background:var(--warn-soft);color:var(--warn-ink)} .note.exam .ic{background:var(--warn)}
+.note.tip{background:var(--acc-soft);color:var(--acc-ink)} .note.tip .ic{background:var(--acc)}
+.note.todo{background:var(--crit-soft);color:var(--crit-ink)} .note.todo .ic{background:var(--crit)}
+.note p{margin:0 0 6px}.note p:last-child{margin:0}
+.hs{display:inline-block;font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;background:var(--ok-soft);color:var(--ok-ink);border-radius:5px;padding:1px 7px;margin-left:4px;vertical-align:middle}
+.box{border:2px solid var(--acc);border-radius:10px;padding:10px 14px;margin:10px 0 14px;background:var(--paper)}
+.box .t{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--acc);margin-bottom:2px}
+.q{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:12px 0;break-inside:avoid}
+.q .qn{font-family:var(--font-mono);font-size:12px;color:var(--acc);letter-spacing:.08em}
+.q details{margin-top:8px} .q summary{cursor:pointer;font-size:14px;color:var(--ink-3)} .q .a{background:var(--ans);border-radius:8px;padding:8px 12px;margin-top:6px;font-size:15px}
+.term{border-bottom:1px dashed var(--acc);cursor:help;color:var(--acc-ink)}
+#pop{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);max-width:540px;width:calc(100% - 40px);background:var(--paper);border:1px solid var(--line-2);border-radius:12px;padding:12px 16px;box-shadow:0 10px 30px rgba(0,0,0,.15);display:none;z-index:9;font-size:14.5px}
+#pop b{color:var(--acc-ink)} #pop .k{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-top:4px}
+.foot{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+@media print{body{background:#fff;font-size:14px}.wrap{max-width:100%;padding:0}.card,.tw,.note,.q,.box{break-inside:avoid}#pop{display:none!important}.q details{display:block}.q summary{display:none}.q .a{display:block}@page{size:A4;margin:12mm 11mm}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="head">
+  <div class="eyebrow"><b>미분적분학2 · 홍순필 교수</b><span>2~3주차 · 9/10·9/15·9/17 (4~6일차)</span><span class="rec">클리닉 17:00 · 중간 범위 시작</span></div>
+  <h1>벡터 — 성분·크기·연산·표준기저·단위벡터, 그리고 내적의 문턱</h1>
+  <p class="lede">12.1은 시험에 안 나오지만 그림의 바탕이고, <b>12.2부터 중간고사 범위</b>다. 교수님이 "시험은 표준기저벡터부터"라고 못 박았다. 오늘 클리닉에서는 <b>벡터 연산과 크기</b>를 물어본다고 했으니, 이 노트의 4·5절과 연습문제 1~6번을 풀고 가면 된다.</p>
+</header>
+
+<section>
+  <h2><span class="no">0 · TODAY</span>오늘 17:00 클리닉 전에 할 것 (30분)</h2>
+  <ol>
+    <li><b>4절·5절</b>을 읽고 상자 공식 4개(두 점 벡터·크기·기저 변환·단위벡터)를 손으로 한 번 쓴다.</li>
+    <li><b>연습문제 1~6</b>을 답 가리고 푼다. 근호는 끝까지 정리한다(\(\sqrt{98}\)로 끝내면 감점).</li>
+    <li>틀린 것만 클리닉에서 묻는다. 교수가 "클리닉에서 벡터 연산·크기를 물어본다"고 했으니 <b>먼저 풀어 보이고</b> 검사받는 쪽이 낫다.</li>
+  </ol>
+  <div class="note exam"><span class="ic">EXAM</span><div><p>교수 발언 모음(9/15·9/17): ① 12.1은 시험 ✗, <b>벡터부터 중간 범위</b> ② <b>시험 문제는 표준기저벡터부터</b>, 그 앞(성분·크기·연산)은 기본 ③ 벡터의 상등은 2점짜리 ④ \(|2\vec a-3\vec b|\) 유형이 <b>퀴즈</b>로 나온다 ⑤ \(\vec i,\vec j,\vec k\)로 준 문제는 <b>\(\vec i,\vec j,\vec k\)로 답</b>해야 만점 ⑥ 단위벡터는 \(\frac{1}{|\vec a|}\vec a\) 꼴로 밝혀 쓸 것 ⑦ <b>12.3 내적 = 중간고사 문제</b> ⑧ 근호 정리 안 하면 감점, 채점은 과정(i·ii 단계) 기준.</p></div></div>
+</section>
+
+<section>
+  <h2><span class="no">1 · MAP</span>어디까지 왔고 어디로 가나</h2>
+  <div class="tw"><table><thead><tr><th>회차</th><th>내용</th><th>시험</th><th>이 노트</th></tr></thead><tbody>
+    <tr><td>9/10 (4일차)</td><td>12.1 <span class="term" data-k="좌표계">좌표계</span> 3종 · 곡선 vs 곡면 · 점 찍기</td><td>✗</td><td>2절</td></tr>
+    <tr><td>9/15 (5일차)</td><td>12.1 곡면 그리기 · 거리 · 구면 → 12.2 벡터 정의·<span class="term" data-k="위치벡터">위치벡터</span></td><td>구면까지 ✗ / 벡터 ○</td><td>2·3절</td></tr>
+    <tr><td>9/17 (6일차)</td><td>12.2 두 점 벡터 · 크기 · 연산 · <span class="term" data-k="표준기저벡터">표준기저벡터</span> · <span class="term" data-k="단위벡터">단위벡터</span> → 12.3 <span class="term" data-k="내적">내적</span> 정의</td><td><b>○ 중간</b></td><td>4·5·6절</td></tr>
+    <tr><td>9/22 (7일차, 예정)</td><td>12.3 정리 1 증명(코사인법칙) · 사이각 · 정사영</td><td>○</td><td>6절 미리보기</td></tr>
+  </tbody></table></div>
+</section>
+
+<section>
+  <h2><span class="no">2 · R³</span>3차원 좌표계 — 벡터를 그릴 바탕 (12.1)</h2>
+  <ul>
+    <li><b>직교좌표계</b> \(P(x,y,z)\). 좌표평면 3개가 공간을 8개(<span class="term" data-k="팔분공간">팔분공간</span>)로 나눈다.</li>
+    <li><b>원주좌표계</b> \(P(r,\theta,z)\) — xy 평면을 극좌표(<span class="term" data-k="동경">동경</span> \(r\), <span class="term" data-k="편각">편각</span> \(\theta\))로. 교수: "문제는 주로 이걸로 다룬다". 구면좌표계는 뺀다.</li>
+    <li><b>점 찍기 규칙</b>: \(z=0\)으로 두고 xy 평면에 \((x,y)\)를 먼저 찍은 뒤 \(z\)만큼 올린다. 모든 3D 그림이 이 순서.</li>
+    <li>변수 2개면 곡선(R²), 3개면 <b>곡면</b>(R³). 같은 식 \(x^2+y^2=1\)이 R²에선 원, R³에선 원기둥면.</li>
+  </ul>
+  <div class="box"><div class="t">거리 · 구면 (9/15)</div>
+    \(|PQ|=\sqrt{(x_2-x_1)^2+(y_2-y_1)^2+(z_2-z_1)^2}\) &nbsp;·&nbsp; 구면 \((x-h)^2+(y-k)^2+(z-l)^2=r^2\) — 중심 \((h,k,l)\), 반지름 \(r\). 교수: "답만 쓰지 말고 그림과 의미까지".</div>
+</section>
+
+<section>
+  <h2><span class="no">3 · VECTOR</span>벡터란 — 크기와 방향, 그리고 성분 (12.2 앞부분)</h2>
+  <p><span class="term" data-k="벡터">벡터</span>는 크기와 방향을 가진 양. 화살표로 그리고, 계산할 때는 <b>성분</b>으로 쓴다. R²에서 \(\vec a=(a_1,a_2)\), R³에서 \(\vec a=(a_1,a_2,a_3)\).</p>
+  <div class="card"><div class="t">위치벡터 = 점의 좌표</div>
+    <p>시작점을 <b>원점</b>에 두면 끝점 \(P(a_1,a_2,a_3)\)의 좌표가 곧 벡터의 성분이다. \(\vec a=\overrightarrow{OP}=(a_1,a_2,a_3)\). "a의 위치벡터가 \((a_1,a_2,a_3)\)다" = "a의 성분이 \((a_1,a_2,a_3)\)다" — 같은 말.</p>
+    <div class="say">교수(9/17 04:14): 포지션(position)이라는 말 그대로다. 축구에서 공격수·수비수처럼 <b>어디에 있느냐</b>를 벡터로 적은 것.</div></div>
+</section>
+
+<section>
+  <h2><span class="no">4 · CORE</span>두 점 벡터 · 크기 · 연산 — 기본 3종 (12.2)</h2>
+
+  <h3>① 두 점으로 정한 벡터 — 끝점 − 시작점 <span class="ts">9/17 07:00</span></h3>
+  <div class="box"><div class="t">공식 1</div>
+    \(A(x_1,y_1,z_1)\), \(B(x_2,y_2,z_2)\) 이면 \[\overrightarrow{AB}=\overrightarrow{OB}-\overrightarrow{OA}=(x_2-x_1,\;y_2-y_1,\;z_2-z_1)\]</div>
+  <ul>
+    <li>"두 점 A, B의 벡터"라 하면 <b>앞이 시작점, 뒤가 끝점</b>. \(\overrightarrow{BA}\)로 읽으면 부호가 전부 뒤집힌다.</li>
+    <li>거리 공식에서 <b>루트만 뺀 것</b>. 원점이 없어도 원점에서 출발하는 두 위치벡터의 차로 환원한다.</li>
+    <li>\(\overrightarrow{AB}\)의 성분은 원점에 그린 화살표 자리에 있고, 실제 A→B 화살표는 그것을 <b>평행이동</b>한 것. 방향이 같다는 뜻이지 그 위에 있다는 뜻이 아니다 — 나중에 공간 직선의 <span class="term" data-k="방향벡터">방향벡터</span>로 이어진다.</li>
+  </ul>
+  <div class="card"><div class="t">Ex01 · A(2,−3,4) → B(−2,1,1)</div>
+    <p>\(\overrightarrow{AB}=(-2-2,\;1-(-3),\;1-4)=(-4,\,4,\,-3)\)</p></div>
+
+  <h3>② 벡터의 크기 = 거리 <span class="ts">9/17 12:00</span></h3>
+  <div class="box"><div class="t">공식 2</div>
+    \[|\vec a|=\sqrt{a_1^2+a_2^2+a_3^2}\qquad (\text{R}^2\text{에선 }\sqrt{a_1^2+a_2^2})\]</div>
+  <ul>
+    <li>읽기: "a 벡터의 <b>크기</b>(magnitude)". 절댓값 기호를 쓰지만 절댓값이라 읽지 않는다.</li>
+    <li>두 점 사이 거리와 같은 식. 벡터는 직교좌표 성분과 같은 의미라서 "벡터가 쉽게 느껴져야" 한다(교수).</li>
+  </ul>
+
+  <h3>③ 벡터의 연산 — 덧셈·뺄셈·실수배에만 닫혀 있다 <span class="ts">9/17 15:40</span></h3>
+  <p>곱셈·나눗셈은 없다(내적·외적은 별도 정의). 연산은 <b>같은 차원끼리</b>. 앞으로는 말 안 해도 전부 R³ 기준. \(\vec a=(a_1,a_2,a_3)\), \(\vec b=(b_1,b_2,b_3)\), \(k\)는 실수(상수).</p>
+  <div class="tw"><table><thead><tr><th>연산</th><th>정의</th><th>메모</th></tr></thead><tbody>
+    <tr><td><span class="term" data-k="상등">상등</span></td><td>\(\vec a=\vec b \iff a_1=b_1,\ a_2=b_2,\ a_3=b_3\)</td><td>"대학에서 물어보면 2점짜리"</td></tr>
+    <tr><td>덧셈·뺄셈</td><td>\(\vec a\pm\vec b=(a_1\pm b_1,\ a_2\pm b_2,\ a_3\pm b_3)\)</td><td>같은 성분끼리</td></tr>
+    <tr><td>실수배</td><td>\(k\vec a=(ka_1,\ ka_2,\ ka_3)\)</td><td>성분마다 \(k\) 곱. \(k=0\) 포함</td></tr>
+  </tbody></table></div>
+  <div class="card"><div class="t">Ex02 · \(\vec a=(2,1,3)\), \(\vec b=(3,-2,1)\), \(|2\vec a-3\vec b|=?\) — 퀴즈 유형</div>
+    <p>i) \(2\vec a-3\vec b=(4,2,6)-(9,-6,3)=(-5,\,8,\,3)\) &nbsp; ← 실수배는 숫자만 곱하고 빼기는 그대로 두면 덜 헷갈린다</p>
+    <p>ii) \(|2\vec a-3\vec b|=\sqrt{25+64+9}=\sqrt{98}=\sqrt{2\cdot 7^2}=7\sqrt2\)</p>
+    <div class="say">근호 안은 <b>반드시 소인수분해</b>. \(98=2\times49\). "\(\sqrt{98}\)로 끝내면 감점."</div></div>
+  <div class="note tip"><span class="ic">CHECK</span><div><p>아토 필기(9/17)의 Ex02 i)에 \((-5,-8,3)\)으로 적힌 곳이 있다. \(2-(-6)=+8\)이 맞다. 크기 계산은 맞게 했으니 부호만 고칠 것.</p></div></div>
+</section>
+
+<section>
+  <h2><span class="no">5 · EXAM FROM HERE</span>표준기저벡터와 단위벡터 — "시험은 여기부터" (12.2)</h2>
+
+  <h3>④ 표준기저벡터 \(\vec i,\vec j,\vec k\) <span class="ts">9/17 20:45</span></h3>
+  <div class="box"><div class="t">공식 3</div>
+    \(\vec i=(1,0,0),\ \vec j=(0,1,0),\ \vec k=(0,0,1)\) — 각 축에서 크기 1인 벡터.
+    \[\vec a=(a_1,a_2,a_3)=a_1(1,0,0)+a_2(0,1,0)+a_3(0,0,1)=a_1\vec i+a_2\vec j+a_3\vec k\]</div>
+  <ul>
+    <li>고등과정에 없는 표기. <b>문제가 이 표기로 나온다</b>. \(\vec i,\vec j,\vec k\) 앞의 수가 곧 성분 — 두 표기를 자유롭게 오갈 것.</li>
+    <li>유도는 실수배와 덧셈만 쓴다: \((a_1,0,0)=a_1(1,0,0)\) 처럼 각 성분을 빼내면 된다.</li>
+  </ul>
+  <div class="card"><div class="t">Ex03 · \(\vec a=\vec i+2\vec j-3\vec k\), \(\vec b=4\vec i+7\vec k\), \(2\vec a+3\vec b=?\)</div>
+    <p>\(2\vec a=2\vec i+4\vec j-6\vec k\), \(3\vec b=12\vec i+21\vec k\) → \(\vec i\)끼리·\(\vec j\)끼리·\(\vec k\)끼리: \(\boxed{14\vec i+4\vec j+15\vec k}\)</p>
+    <p>\(\vec b\)에 \(\vec j\)가 없으면 \(0\vec j\)가 있는 것. 성분으로 바꿔 \((1,2,-3),(4,0,7)\)로 풀어도 \((14,4,15)\)로 같지만 —</p>
+    <div class="say"><b>문제가 \(\vec i,\vec j,\vec k\)로 주어지면 답도 \(\vec i,\vec j,\vec k\)로.</b> "출제자가 원하는 형태를 따라가라. 왔다 갔다는 시간 낭비."</div></div>
+
+  <h3>⑤ 단위벡터 — 방향은 같고 크기만 1 <span class="ts">9/17 28:30</span></h3>
+  <div class="box"><div class="t">공식 4</div>
+    \(|\vec a|\ne1\)인 \(\vec a\)와 같은 방향의 단위벡터 \[\vec u=\frac{1}{|\vec a|}\,\vec a\]</div>
+  <ul>
+    <li>\(|\vec i|=|\vec j|=|\vec k|=1\) — 표준기저벡터는 전부 단위벡터.</li>
+    <li>표기 주의: \(\vec u\)라고만 쓰면 일반 벡터다. "단위벡터"라고 밝히거나 \(\frac{1}{|\vec a|}\vec a\) 꼴을 써야 단위벡터로 읽힌다.</li>
+    <li>그림: \(\vec a\)의 끝점까지 가는 화살표 위, 원점에서 \(\frac{1}{|\vec a|}\) 지점이 \(\vec u\)의 끝. "계산만 하지 말고 이 그림을 이해해야 뒤가 쉽다."</li>
+  </ul>
+  <div class="card"><div class="t">Ex04 · \(\vec a=2\vec i-\vec j-2\vec k\)와 같은 방향의 단위벡터</div>
+    <p>i) \(\vec a=(2,-1,-2)\), \(|\vec a|=\sqrt{4+1+4}=3\)</p>
+    <p>ii) \(\vec u=\frac13(2\vec i-\vec j-2\vec k)=\boxed{\tfrac23\vec i-\tfrac13\vec j-\tfrac23\vec k}\) &nbsp; 검산 \(|\vec u|=\sqrt{\tfrac49+\tfrac19+\tfrac49}=1\)</p></div>
+</section>
+
+<section>
+  <h2><span class="no">6 · NEXT</span>내적 — 다음 시간 증명, 오늘은 정의만 (12.3 도입)</h2>
+  <div class="box"><div class="t">정의 1 (Def 01)</div>
+    \[\vec a\cdot\vec b=a_1b_1+a_2b_2+a_3b_3\quad(\text{결과는 실수 = 스칼라})\]</div>
+  <ul>
+    <li>이름: dot product = <b>내적</b> = inner product = scalar product(결과가 스칼라라서). 순서 무관 \(\vec a\cdot\vec b=\vec b\cdot\vec a\).</li>
+    <li>표기: 두 벡터 사이 <b>점을 진하게</b>. 연필로 살짝 ✗, × 기호 ✗.</li>
+    <li><b>정리 1 (Thm 01)</b> 미리보기: 삼각형 OAB에서 \(\overrightarrow{OA}=\vec a\), \(\overrightarrow{OB}=\vec b\), \(\overrightarrow{BA}=\vec a-\vec b\). 세 변 \(|\vec a|,|\vec b|,|\vec a-\vec b|\)와 사이각 \(\theta\) → <span class="term" data-k="코사인법칙">코사인 제2법칙</span>으로 \[\vec a\cdot\vec b=|\vec a||\vec b|\cos\theta\ \Rightarrow\ \cos\theta=\frac{\vec a\cdot\vec b}{|\vec a||\vec b|}\] 아토 필기에 결론까지 적혀 있다. 증명은 9/22.</li>
+  </ul>
+  <div class="note tip"><span class="ic">LINK</span><div><p>정역학 9/9·9/14 정리(교수 필기본 W12·녹음)가 이 내용 그대로다: 내적 정의·성질, 두 벡터 사이 각, 정사영 \(\vec u_p=(\vec u\cdot\vec e)\vec e\). 미적2 9/22 예습 = 정역학 정리 읽기.</p></div></div>
+</section>
+
+<section>
+  <h2><span class="no">7 · DRILL</span>연습문제 — 답 가리고, 근호 끝까지</h2>
+  <p>1~6은 클리닉 준비(연산·크기·단위벡터), 7~10은 중간 대비(기저 표기·내적). 풀이는 판서 형식대로 i)·ii) 단계로.</p>
+
+  <div class="q"><div class="qn">Q1 · 두 점 벡터</div><p>\(A(1,-2,3)\), \(B(4,0,-1)\). \(\overrightarrow{AB}\)와 \(\overrightarrow{BA}\)를 구하라.</p>
+    <details><summary>답</summary><div class="a">\(\overrightarrow{AB}=(3,2,-4)\), \(\overrightarrow{BA}=(-3,-2,4)\). 부호가 전부 뒤집힌다.</div></details></div>
+
+  <div class="q"><div class="qn">Q2 · 크기</div><p>\(\vec a=(3,-6,2)\). \(|\vec a|\)는?</p>
+    <details><summary>답</summary><div class="a">\(\sqrt{9+36+4}=\sqrt{49}=7\)</div></details></div>
+
+  <div class="q"><div class="qn">Q3 · 연산 + 크기 (퀴즈 유형)</div><p>\(\vec a=(1,2,-2)\), \(\vec b=(2,-1,3)\). \(|3\vec a-2\vec b|\)는?</p>
+    <details><summary>답</summary><div class="a">i) \(3\vec a-2\vec b=(3,6,-6)-(4,-2,6)=(-1,8,-12)\) &nbsp; ii) \(\sqrt{1+64+144}=\sqrt{209}\) (\(209=11\times19\), 더 안 줄어듦)</div></details></div>
+
+  <div class="q"><div class="qn">Q4 · 연산 + 크기</div><p>\(\vec a=(2,0,-1)\), \(\vec b=(1,3,2)\). \(|\vec a+2\vec b|\)는?</p>
+    <details><summary>답</summary><div class="a">i) \((2,0,-1)+(2,6,4)=(4,6,3)\) &nbsp; ii) \(\sqrt{16+36+9}=\sqrt{61}\)</div></details></div>
+
+  <div class="q"><div class="qn">Q5 · 단위벡터</div><p>\(\vec a=(4,-4,2)\)와 같은 방향의 단위벡터를 구하라.</p>
+    <details><summary>답</summary><div class="a">i) \(|\vec a|=\sqrt{16+16+4}=6\) &nbsp; ii) \(\vec u=\frac16(4,-4,2)=\left(\tfrac23,-\tfrac23,\tfrac13\right)\). 검산 \(\tfrac49+\tfrac49+\tfrac19=1\).</div></details></div>
+
+  <div class="q"><div class="qn">Q6 · 두 점 → 단위벡터</div><p>\(A(0,1,1)\)에서 \(B(2,3,-1)\)을 향하는 단위벡터는?</p>
+    <details><summary>답</summary><div class="a">i) \(\overrightarrow{AB}=(2,2,-2)\), \(|\overrightarrow{AB}|=\sqrt{12}=2\sqrt3\) &nbsp; ii) \(\vec u=\frac{1}{2\sqrt3}(2,2,-2)=\left(\tfrac{1}{\sqrt3},\tfrac{1}{\sqrt3},-\tfrac{1}{\sqrt3}\right)=\left(\tfrac{\sqrt3}{3},\tfrac{\sqrt3}{3},-\tfrac{\sqrt3}{3}\right)\) — 분모 유리화까지.</div></details></div>
+
+  <div class="q"><div class="qn">Q7 · 기저 표기 (답도 기저로)</div><p>\(\vec a=3\vec i-\vec j+2\vec k\), \(\vec b=-\vec i+4\vec k\). \(\vec a-2\vec b\)는?</p>
+    <details><summary>답</summary><div class="a">\(\vec a-2\vec b=(3\vec i-\vec j+2\vec k)-(-2\vec i+8\vec k)=5\vec i-\vec j-6\vec k\). \(\vec b\)의 \(\vec j\) 성분은 0.</div></details></div>
+
+  <div class="q"><div class="qn">Q8 · 기저 표기 + 단위벡터</div><p>\(\vec a=\vec i-2\vec j+2\vec k\)와 같은 방향의 단위벡터를 \(\vec i,\vec j,\vec k\)로 써라.</p>
+    <details><summary>답</summary><div class="a">\(|\vec a|=\sqrt{1+4+4}=3\) → \(\vec u=\tfrac13\vec i-\tfrac23\vec j+\tfrac23\vec k\)</div></details></div>
+
+  <div class="q"><div class="qn">Q9 · 상등 (2점짜리)</div><p>\((x+1,\ 2y,\ 3)=(4,\ y+3,\ z-1)\)일 때 \(x,y,z\)는?</p>
+    <details><summary>답</summary><div class="a">성분끼리 같다: \(x=3\), \(y=3\), \(z=4\)</div></details></div>
+
+  <div class="q"><div class="qn">Q10 · 내적 정의 (미리보기)</div><p>\(\vec a=(2,-1,3)\), \(\vec b=(1,4,-2)\). \(\vec a\cdot\vec b\)와 \(\cos\theta\)를 구하라.</p>
+    <details><summary>답</summary><div class="a">\(\vec a\cdot\vec b=2-4-6=-8\). \(|\vec a|=\sqrt{14}\), \(|\vec b|=\sqrt{21}\) → \(\cos\theta=\dfrac{-8}{\sqrt{14}\sqrt{21}}=\dfrac{-8}{7\sqrt6}=-\dfrac{4\sqrt6}{21}\). 음수이므로 둔각.</div></details></div>
+</section>
+
+<section>
+  <h2><span class="no">8 · CURRICULUM</span>이건 언제 배운 것인가 — 결손 진단표</h2>
+  <div class="tw"><table><thead><tr><th>개념</th><th>한국 교육과정</th><th>지금 상태</th></tr></thead><tbody>
+    <tr><td>좌표평면·두 점 사이 거리</td><td>중1 좌표 · 고1 공통수학 (거리 공식)</td><td>3D로 성분 하나 늘림</td></tr>
+    <tr><td>제곱근 정리·소인수분해</td><td>초5 소인수분해 · 중3 제곱근</td><td>\(\sqrt{98}=7\sqrt2\) — 감점 포인트</td></tr>
+    <tr><td>벡터의 정의·성분·크기·연산</td><td>고3 기하 (선택, 2015 개정 이후 '기하') — 안 들었으면 <b>여기서 처음</b></td><td>교수: "안 배웠어도 여기서 새로 배우니 어렵게 생각 말 것"</td></tr>
+    <tr><td>표준기저벡터 \(\vec i,\vec j,\vec k\)</td><td>고교 ✗ · <b>대학</b></td><td>시험 출발점</td></tr>
+    <tr><td>단위벡터</td><td>고3 기하(단위벡터 개념만)</td><td>공식 \(\vec a/|\vec a|\)</td></tr>
+    <tr><td>내적·코사인법칙</td><td>고2 수학Ⅰ(코사인법칙) · 고3 기하(내적)</td><td>9/22</td></tr>
+    <tr><td>극좌표(원주좌표계의 바탕)</td><td>고교 ✗ · 대학 미적1/2</td><td>12.1, 시험 ✗</td></tr>
+  </tbody></table></div>
+</section>
+
+<section>
+  <h2><span class="no">9 · SOURCES</span>근거</h2>
+  <p class="log"><b>9/15</b> 녹음 66분 · 판서 5장 · 정리 <code>2026-09-15/정리.md</code></p>
+  <p class="log"><b>9/17</b> 녹음 68분 · 판서 4장 · 아토 필기 2장 · 정리 <code>2026-09-17/정리.md</code></p>
+  <p class="log"><b>9/10</b> 필기 1장 + 9/15 녹음 역참조 · 정리 <code>2026-09-10/정리.md</code></p>
+  <p class="log"><b>정역학</b> 9/9 교수 필기본 W12 · 9/14 녹음 — 내적·정사영 예습용</p>
+  <div class="foot">아톰 · 2026-09-17 13:20 작성. 용어에 점선 밑줄이 있으면 눌러서 뜻·영어·교육과정을 확인할 수 있다(화면에서만). PDF는 답이 펼쳐진 상태로 인쇄된다 — 답 가리고 풀려면 화면에서.</div>
+</section>
+</div>
+<div id="pop"></div>
+<script>
+const GLOSSARY={
+ "좌표계":{en:"coordinate system",k:"중1(좌표평면) → 대학(3D·원주·구면)",d:"공간의 점을 수의 짝으로 나타내는 약속. 직교 (x,y,z) · 원주 (r,θ,z) · 구면 (ρ,θ,φ)."},
+ "위치벡터":{en:"position vector",k:"고3 기하",d:"원점에서 점 P까지 가는 벡터. 성분이 곧 P의 좌표."},
+ "표준기저벡터":{en:"standard basis vector",k:"대학",d:"각 축 방향 크기 1인 벡터 i=(1,0,0), j=(0,1,0), k=(0,0,1). 모든 벡터를 a₁i+a₂j+a₃k로 쓰게 해 준다."},
+ "단위벡터":{en:"unit vector",k:"고3 기하",d:"크기가 1인 벡터. 어떤 벡터를 자기 크기로 나누면 같은 방향의 단위벡터."},
+ "내적":{en:"dot product / inner product / scalar product",k:"고3 기하",d:"두 벡터에서 실수를 만드는 곱. a·b = a₁b₁+a₂b₂+a₃b₃ = |a||b|cosθ."},
+ "팔분공간":{en:"octant",k:"대학",d:"세 좌표평면이 공간을 나눈 8개 구역. 제1팔분공간은 x,y,z 모두 양수."},
+ "동경":{en:"radial distance r",k:"대학(극좌표)",d:"원점에서 점까지의 거리. 극좌표의 r."},
+ "편각":{en:"polar angle θ",k:"대학(극좌표)",d:"양의 x축에서 잰 각. 극좌표의 θ."},
+ "벡터":{en:"vector",k:"고3 기하 (선택) — 안 들었으면 대학에서 처음",d:"크기와 방향을 가진 양. 화살표 또는 성분 (a₁,a₂,a₃)."},
+ "방향벡터":{en:"direction vector",k:"고3 기하",d:"직선이 향하는 방향을 나타내는 벡터. 12.5 공간 직선의 방정식에서 등장."},
+ "상등":{en:"equality of vectors",k:"고3 기하",d:"두 벡터가 같다 = 모든 성분이 같다. 교수: 2점짜리."},
+ "코사인법칙":{en:"law of cosines",k:"고2 수학Ⅰ",d:"삼각형에서 c² = a² + b² − 2ab cos C. 세 변과 한 각의 관계 → 내적 정리 1의 증명 도구."}
+};
+const pop=document.getElementById('pop');
+document.querySelectorAll('.term').forEach(el=>{el.addEventListener('click',e=>{const g=GLOSSARY[el.dataset.k];if(!g)return;pop.innerHTML='<b>'+el.dataset.k+'</b> — '+g.en+'<div>'+g.d+'</div><div class="k">교육과정: '+g.k+'</div>';pop.style.display='block';e.stopPropagation();});});
+document.addEventListener('click',()=>pop.style.display='none');
+window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>
+</body>
+</html>
