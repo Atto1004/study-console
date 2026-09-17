@@ -34,10 +34,20 @@ for pi, sec in enumerate(parts, 1):
     # 표지
     slides.append({"id": f"p{pi}-cover", "type": "cover", "part": pi, "no": no, "title": ptitle, "star": star})
     # 개념: why + concept + one (h3.tag.c 다음 요소들, 기초 h3 전까지)
+    pending_exam = []
     concept_html = []
+    concept_exam = []   # V4-EXAM: 개념 영역의 aside.exam → 개념 장에 붙인다
     mode = None
     q_index = 0
     for el in sec:
+        if el.tag == "aside" and "exam" in (el.get("class") or "").split():
+            ex = {"level": el.get("data-level") or "강조", "when": el.get("data-when") or "", "quote": el.text_content().strip()}
+            if mode == "c" or mode is None:
+                concept_exam.append(ex)
+            else:
+                # 문제 영역: 바로 뒤에 오는 문제에 붙인다 (pending에 쌓아 두고 다음 q 생성 시 소비)
+                pending_exam.append(ex)
+            continue
         if el.tag == "h3":
             tag = el.xpath('./span[contains(@class,"tag")]/@class')
             cls = tag[0].split() if tag else []
@@ -65,11 +75,54 @@ for pi, sec in enumerate(parts, 1):
                 choices = [{"html": inner(li), "ok": li.get("data-ok") == "1"} for li in ch[0].xpath('./li')]
                 assert sum(1 for c in choices if c["ok"]) == 1, "선택지 정답은 정확히 하나: " + qn
                 body = [LH.tostring(x, encoding="unicode") for x in el if x.tag not in ("details", "ol") and "qn" not in (x.get("class") or "")]
+            q_exam = list(pending_exam); pending_exam = []
+            for a in el.xpath('./aside[contains(@class,"exam")]'):
+                q_exam.append({"level": a.get("data-level") or "강조", "when": a.get("data-when") or "", "quote": a.text_content().strip()})
+            body = [x for x in body if not (x.startswith("<aside") and 'class="exam' in x[:40])]
             slides.append({"id": f"p{pi}-{'b' if mode=='b' else 'a'}{q_index}", "type": "q", "part": pi, "kind": "기초" if mode == "b" else "응용",
-                           "qn": qn, "html": "".join(body), "ans": inner(ans[0]) if ans else "", "choices": choices})
+                           "qn": qn, "html": "".join(body), "ans": inner(ans[0]) if ans else "", "choices": choices, "exam": q_exam})
     # 개념 슬라이드는 표지 바로 뒤에 삽입
     cover_idx = next(i for i, s in enumerate(slides) if s["id"] == f"p{pi}-cover")
-    slides.insert(cover_idx + 1, {"id": f"p{pi}-concept", "type": "concept", "part": pi, "title": concept_head if 'concept_head' in dir() else "개념", "html": "".join(concept_html)})
+    # V4-SPLIT: 개념 장을 글자량으로 나눈다 (한 장 ≈ 420자, 표·수식 블록은 무겁게 셈)
+    import re as _re
+    def _weight(h):
+        t = _re.sub(r"<[^>]+>", "", h)
+        w = len(t)
+        w += 140 * h.count("<table")            # 표
+        w += 40 * h.count("\\begin{pmatrix}") + 40 * h.count("\\begin{vmatrix}")   # 행렬(세로로 큼)
+        w += 12 * h.count("<tr")
+        return w
+    _chunks = []
+    for h in concept_html:
+        # div.concept 안의 자식(p, 표, 수식 블록)을 낱개로 풀어 잘게 나눈다
+        if h.startswith('<div class="concept"'):
+            frag = LH.fragment_fromstring(h)
+            kids = []
+            if frag.text and frag.text.strip(): kids.append(frag.text)
+            for k in frag:
+                if k.tag in ("ul", "ol") and len(k) > 1:
+                    for li in k:
+                        kids.append("<" + k.tag + ">" + LH.tostring(li, encoding="unicode", with_tail=False) + "</" + k.tag + ">")
+                else:
+                    kids.append(LH.tostring(k, encoding="unicode", with_tail=False))
+                if k.tail and k.tail.strip(): kids.append(k.tail)
+            for k in kids: _chunks.append(('<div class="concept">' + k + '</div>'))
+        else:
+            _chunks.append(h)
+    pages, cur, cw = [], [], 170 * len(concept_exam)   # 첫 장에 붙는 시험 언급 상자 무게
+    LIMIT = 420
+    for h in _chunks:
+        w = _weight(h)
+        if cur and cw + w > LIMIT:
+            pages.append(cur); cur, cw = [], 0
+        cur.append(h); cw += w
+    if cur: pages.append(cur)
+    if not pages: pages = [[]]
+    _title = concept_head if 'concept_head' in dir() else "개념"
+    for k, pg in enumerate(pages):
+        slides.insert(cover_idx + 1 + k, {"id": f"p{pi}-concept" + ("" if k == 0 else f"-{k+1}"), "type": "concept", "part": pi,
+                       "title": _title + ("" if len(pages) == 1 else f" ({k+1}/{len(pages)})"), "html": "".join(pg), "exam": concept_exam if k == 0 else []})
+    cover_idx += len(pages) - 1
     # 암기 vs 이해 (div.mu) — 개념 바로 뒤 한 장
     mu = sec.xpath('./div[@class="mu"]')
     if mu:
@@ -108,14 +161,39 @@ if os.path.exists(srcs_json):
             out_list.append({"img": f"src/{deck_id}/{fn}", "label": it.get("label", SM["docs"][it["doc"]]["label"]), "w": pix.width, "h": pix.height})
             n_img += 1
         by_id[sid]["src"] = out_list
-    for sl in slides:   # 암기/이해 장은 개념 장과 같은 출처
-        if sl["type"] == "mu" and "src" not in sl and f"p{sl['part']}-concept" in by_id and "src" in by_id[f"p{sl['part']}-concept"]:
+    for sl in slides:   # 암기/이해 장·분할된 개념 장은 개념 장과 같은 출처
+        if (sl["type"] == "mu" or (sl["type"] == "concept" and "-concept-" in sl["id"])) and "src" not in sl and f"p{sl['part']}-concept" in by_id and "src" in by_id[f"p{sl['part']}-concept"]:
             sl["src"] = by_id[f"p{sl['part']}-concept"]["src"]
     print("출처 발췌", n_img, "장 →", out_dir)
 
-parts_meta = [{"n": i, "title": p.xpath('./h2')[0].text_content().replace(p.xpath('./h2/span[@class="no"]/text()')[0], "").strip()} for i, p in enumerate(parts, 1)]
+def _hint(sec):
+    one = sec.xpath('./div[@class="one"]')
+    return one[0].text_content().strip() if one else ""
+parts_meta = [{"n": i, "title": p.xpath('./h2')[0].text_content().replace(p.xpath('./h2/span[@class="no"]/text()')[0], "").strip(), "hint": _hint(p)} for i, p in enumerate(parts, 1)]
 
 tpl = io.open(__file__.replace("build_slides.py", "slides_tpl.html"), encoding="utf-8").read()
 page = tpl.replace("__TITLE__", title).replace("__DECK_ID__", deck_id).replace("__SLIDES__", json.dumps(slides, ensure_ascii=False)).replace("__PARTS__", json.dumps(parts_meta, ensure_ascii=False))
 io.open(out, "w", encoding="utf-8", newline="\n").write(page)
 print("slides", len(slides), "→", out)
+
+# V4-GATE: 실제 배치 검사 — 헤드리스 크롬으로 #check 모드 실행, 실패 0이어야 통과 (지침 §0 "1건이라도 걸리면 실패")
+if "--no-check" not in sys.argv:
+    import subprocess, tempfile, glob, html as _html
+    chrome = None
+    for c in [r"C:\Program Files\Google\Chrome\Application\chrome.exe", r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"]:
+        if os.path.exists(c): chrome = c; break
+    if not chrome:
+        print("검사 건너뜀: 크롬 없음"); sys.exit(0)
+    url = "file:///" + os.path.abspath(out).replace("\\", "/") + "#check"
+    prof = os.path.join(tempfile.gettempdir(), "pdfprof_chk_%d" % os.getpid())
+    r = subprocess.run([chrome, "--headless=new", "--disable-gpu", "--virtual-time-budget=40000", "--window-size=1024,768",
+                        "--user-data-dir=" + prof, "--dump-dom", url], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=180)
+    dom = r.stdout or ""
+    m = re.search(r'id="chkTitle">검사: (\d+)장 · 실패 (\d+)</h2><pre id="chkList">(.*?)</pre>', dom, re.S)
+    if not m:
+        print("검사 결과를 못 읽음 — 크롬 출력 확인 필요"); sys.exit(1)
+    n, bad, lst = int(m.group(1)), int(m.group(2)), _html.unescape(m.group(3)).strip()
+    print("배치 검사(1024×768):", n, "장 · 실패", bad)
+    if bad:
+        print(lst); print("빌드 실패 — 넘치는 장은 정리노트에서 나누거나 build 분할 기준을 낮춰라."); sys.exit(1)
+

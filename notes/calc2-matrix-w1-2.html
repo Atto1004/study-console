@@ -52,6 +52,7 @@ thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing
 .mu{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 14px}.mu>div{border-radius:10px;padding:10px 12px 8px}.mu-mem{background:#FFF8C4;border:1.5px solid #E6C84A}.mu-und{background:#E8F0FB;border:1.5px solid #8EB4E6}.mu-h{font-weight:700;font-size:.92em;margin-bottom:4px}.mu-mem .mu-h{color:#7A5A00}.mu-und .mu-h{color:#1B4F8C}.mu ul{margin:0;padding-left:18px}.mu li{margin:3px 0;font-size:.95em}@media(max-width:600px){.mu{grid-template-columns:1fr}}
 .mu-legend{margin:8px 0 16px;font-size:.92em;color:#3F4C5A}.lg-m{background:#FFF8C4;border:1px solid #E6C84A;border-radius:6px;padding:1px 8px}.lg-u{background:#E8F0FB;border:1px solid #8EB4E6;border-radius:6px;padding:1px 8px}
 .extra{border:2px dashed #8EB4E6;border-radius:12px;padding:10px 14px;margin:12px 0}.extra::before{content:attr(data-title);display:block;font-weight:700;color:#1B4F8C;margin-bottom:6px}
+.exam{display:block;border:4px solid #FF4D8D;padding:8px 12px;margin:8px 0;font-size:.95em}.exam::before{content:'📌 시험 언급 · ' attr(data-level) ' · ' attr(data-when);display:block;color:#FF4D8D;font-weight:700;font-size:.85em}
 </style>
 </head>
 <body>
@@ -106,6 +107,7 @@ thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing
 <section>
   <h2><span class="no">파트 2 · 9/3</span>행렬의 연산 — 덧셈·실수배·곱셈·거듭제곱</h2>
   <h3><span class="tag c">개념</span>같은 자리끼리 더하고, 「앞 행 × 뒤 열」로 곱한다</h3>
+  <aside class="exam" data-level="배제" data-when="9/3 24:05">덧셈·실수배는 시험 문제 안 나온다.</aside>
   <div class="concept">
     <ul>
       <li><b>상등</b> \(A=B\) ⇔ 모든 자리 \(a_{ij}=b_{ij}\)(같은 꼴이어야).</li>
@@ -171,6 +173,9 @@ thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing
 <section>
   <h2><span class="no">파트 3 · 9/3</span>행렬식 — 2차 ad−bc · 3차 사루스 <span class="star">★ 시험은 여기부터</span></h2>
   <h3><span class="tag c">개념</span>정사각행렬을 숫자 하나로</h3>
+  <aside class="exam" data-level="확정" data-when="9/3 30:54">시험 문제는 행렬식부터 나올 건데, 머릿속에 암기를 해야죠.</aside>
+  <aside class="exam" data-level="확정" data-when="9/3 32:00">중간고사 관련 문제 두 문제나 세 문제를 낼 예정인데 이 행렬식을 가지고 문제 나오는 파트가 있다.</aside>
+  <aside class="exam" data-level="강조" data-when="9/3 58:40">전자계산기 손 못 대. 손으로 계산해야 돼. 손으로 풀 수 있는 건 3차까지.</aside>
   <div class="why">\(AX=B\)에서 \(A\)의 <span class="term" data-k="행렬식">행렬식</span> \(\det A=|A|\)가 <b>0이냐 아니냐</b>로 해가 유일한지, 역행렬이 있는지가 갈린다. 그래서 교수님이 "시험은 여기부터".</div>
   <div class="concept">
     <p><b>2차</b> \[\det\begin{pmatrix}a&b\\c&d\end{pmatrix}=\begin{vmatrix}a&b\\c&d\end{vmatrix}=ad-bc\] 대각선(↘) 곱 빼기 반대 대각선(↙) 곱.</p>
@@ -184,7 +189,7 @@ thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing
   <div class="q"><div class="qn">기초 3-2 · 사루스 (Ex04)</div><p>\(B=\begin{pmatrix}2&1&3\\4&2&1\\6&-3&4\end{pmatrix}\), \(\det B\).</p><ol class="choices"><li>\(-14\)</li><li>\(60\)</li><li data-ok="1">\(-60\)</li><li>\(32\)</li></ol><details><summary>답</summary><div class="ans">↘ \(16+6-36=-14\), ↙ \(36+16-6=46\) → \(-14-46=-60\) ✓.</div></details></div>
   <div class="q"><div class="qn">기초 3-3 · 사루스</div><p>\(\begin{vmatrix}1&2&0\\2&1&2\\-1&3&0\end{vmatrix}\)</p><ol class="choices"><li>\(10\)</li><li data-ok="1">\(-10\)</li><li>\(-4\)</li><li>\(6\)</li></ol><details><summary>답</summary><div class="ans">\((0-4+0)-(0+6+0)=-10\). (파트 5 Ex8의 행렬.)</div></details></div>
   <h3><span class="tag a">응용</span>응용 문제 — <span class="star">★ 교수: "행렬 A 주고 det가 0일 때 x를 구하라"</span></h3>
-  <div class="q"><div class="qn a">응용 3-1 · det=0 (Ex03)</div><p>\(A=\begin{pmatrix}x-1&-2\\1&x-4\end{pmatrix}\), \(\det A=0\)인 \(x\).</p><details><summary>답</summary><div class="ans">\((x-1)(x-4)+2=x^2-5x+6=(x-2)(x-3)=0\) → \(x=2,3\) ✓.</div></details></div>
+  <div class="q"><div class="qn a">응용 3-1 · det=0 (Ex03)</div><aside class="exam" data-level="확정" data-when="9/3">행렬 A 주고 det가 0일 때 x를 구하라 — 이런 유형을 낸다.</aside><p>\(A=\begin{pmatrix}x-1&-2\\1&x-4\end{pmatrix}\), \(\det A=0\)인 \(x\).</p><details><summary>답</summary><div class="ans">\((x-1)(x-4)+2=x^2-5x+6=(x-2)(x-3)=0\) → \(x=2,3\) ✓.</div></details></div>
   <div class="q"><div class="qn a">응용 3-2 · det=0 변형</div><p>\(\begin{vmatrix}x&3\\2&x-1\end{vmatrix}=0\)인 \(x\).</p><details><summary>답</summary><div class="ans">\(x^2-x-6=(x-3)(x+2)=0\) → \(x=3,-2\).</div></details></div>
   <div class="q"><div class="qn a">응용 3-3 · 문자 포함 3차</div><p>\(\begin{vmatrix}x&1&0\\0&x&1\\1&0&x\end{vmatrix}=0\)을 만족하는 실수 \(x\).</p><details><summary>답</summary><div class="ans">사루스: \((x^3+1+0)-(0+0+0)=x^3+1=0\) → \(x=-1\).</div></details></div>
 </section>
