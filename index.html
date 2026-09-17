@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-17.40";
+var BUILD="2026-09-17.41";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4839,6 +4839,10 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-17.41",d:"09-17",items:[
+    "학습하기 = 바로 학습 화면 — 회차 표의 [학습하기]가 수업 내용 화면을 거치지 않고 그 회차의 학습 슬라이드를 앱 안에서 바로 연다. 슬라이드가 아직 없는 회차는 「학습 준비 중」(비활성)",
+    "미적2 과목 규칙에서 「미적분 클리닉 매주 가야 한다」 제거"
+  ]},
   {v:"2026-09-17.40",d:"09-17",items:["행렬 단원 학습 슬라이드 — 가로(16:9) PPT형 58페이지: 파트 표지 → 개념(읽었어요) → 기초 문제 → 응용 문제(답 보기 → 맞았어요/틀렸어요) → 파트 결과 → 전체 결과(틀린 문제 다시). 한 페이지를 끝내야 다음 화살표가 켜짐. 진행·정답률은 기기에 저장. 미적2 9/1·9/3·9/8 회차 정리 링크와 정리 노트 목록에서 열림"]},
   {v:"2026-09-17.39",d:"09-17",items:["행렬 노트 v2 — 맨 위에 일차별 진도 목차, 본문은 핵심 개념 6파트(정의·연산·행렬식·여인수·역행렬·크래머) × 개념 → 개념 이해(기초, 학습지 예제) → 응용. 12.1은 벡터 노트로 분리. 미적2 9/3·9/8 회차 「정리」 링크와 정리 노트 목록에서 열림"]},
   {v:"2026-09-17.38",d:"09-17",items:["미분적분학2 「행렬과 행렬식 1~2주차 개념 학습」 노트 추가 — 학습지·녹음·아토 풀이본·필기 합본, 교수 강조는 형광펜·빨간 글씨·★로 표시, 스스로 6문제. 9/3·9/8 회차 정리와 정리 노트 목록에 링크"]},
@@ -8297,7 +8301,7 @@ var V33={};
     "정역학":{pre:[{k:"book",n:"정역학 전공책",re:/교재|전공책|Bedford|Pytel|Fowler/i}],
       post:[PROF,REC], rules:["수업 끝난 뒤 LMS에 수업 영상 + 필기본이 올라온다","영어 수업 → 한글로 변환해 정리한다"]},
     "미분적분학2":{pre:[{k:"book",n:"미분적분학2 전공책",re:/Stewart|교재|전공책|학습지/i}],
-      post:[BOARD,REC,NOTE], rules:["문제풀이 과제는 추후 한 번에 생성된다","미적분 클리닉 매주 가야 한다(가능하면 매일)"]},
+      post:[BOARD,REC,NOTE], rules:["문제풀이 과제는 추후 한 번에 생성된다"]},
     "CADD":{pre:[], post:[VIDEO,Object.assign({},HW,{n:"과제(당일 제출)",how:"과제 산출물이 이 주차 정리 링크·「과제」 노트에 연결되면 채워진다"})], rules:["매주 과제가 생긴다 → 당일 빨리 끝내는 대로 제출","매주 월요일 LMS 강의영상 → 일요일 전까지 수강(이후는 지각 처리)","강의 내용이 중간고사에 나온다 → 영상 내용 자동 정리 시스템 필요(미결)"]},
     "아카데믹글쓰기":{pre:[{k:"material",n:"수업자료",re:/강의자료|수업자료|계획서/}],
       post:[REC], rules:["매주 수업 중 과제 → 수업 중에 해결한다","추후 글쓰기 과제가 있다","교재는 볼 필요 없음"]}
@@ -9214,6 +9218,54 @@ var V33={};
     /* V36 하위 행·V34 상태줄은 회차 표로 대체 */
     "#cNotes .v36-days,#cNotes > .wn-row{display:none}"
   ].join("\n");
+  document.head.appendChild(css);
+})();
+/* ============================================================
+   V38 LAYER — 학습하기 = 바로 학습 화면 (아토 2026-09-17 "학습하기 버튼 → 수업내용 제거, 바로 학습화면 뜨게")
+   ① openStudy(cid, w, date): 그 회차(또는 그 주)에 학습 슬라이드가 연결돼 있으면 수업 내용 화면(studyunit)을 거치지 않고
+      슬라이드를 앱 안(iframe 뷰어)에서 바로 연다. 슬라이드가 없는 회차만 기존 화면으로.
+   ② 회차 표(V37)의 [학습하기]: 슬라이드가 있으면 그대로, 없으면 비활성 「학습 준비 중」 — 수업 내용 화면으로 가는 길을 없앤다.
+   ③ 미적2 과목 규칙에서 「미적분 클리닉 매주 가야 한다」 제거 (아토 2026-09-17) — V33.SPEC 원본에서 지움.
+   슬라이드 판정: 회차 단위면 그 회차 정리 links만, 주 단위면 주 정리 links → NOTES(type 학습, 같은 과목·주차). *slides.html 을 찾는다.
+   ============================================================ */
+(function(){
+  if(window.V38) return;
+  var V38=window.V38={};
+  var isDeck=function(u){ return /slides\.html(\?|#|$)/.test(u||""); };
+  V38.deckFor=function(c,w,date){
+    if(!c) return null;
+    var pick=function(links){ var l=(links||[]).filter(function(x){ return isDeck(x.url); })[0]; return l?{url:l.url,title:l.label||l.url}:null; };
+    var d=null;
+    /* 회차(date)가 주어지면 그 회차 정리에 연결된 슬라이드만 — 같은 주라도 다른 단원(예: 9/10 벡터)에 행렬 슬라이드를 붙이지 않는다 */
+    if(date){ if(window.V36){ var dn=V36.dayNote(c,date); if(dn) d=pick(dn.links); } return d; }
+    if(w){ var wn=weekNote(c,w); if(wn) d=pick(wn.links); }
+    if(!d&&w&&Array.isArray(window.NOTES)){ var n=NOTES.filter(function(x){ return x.course===c.name&&x.type==="학습"&&x.week===w&&isDeck(x.file); })[0]; if(n) d={url:n.file,title:n.title}; }
+    return d;
+  };
+  /* ① openStudy 스왑 */
+  var _openStudy=openStudy;
+  openStudy=function(cid,w,date){
+    var c=course(cid), d=V38.deckFor(c,w,date);
+    if(d){ openNote(d.url,d.title); return; }
+    _openStudy(cid,w,date);
+  };
+  /* ② 회차 표 버튼 */
+  if(window.V37&&V37.cellHTML){
+    var _cellHTML=V37.cellHTML;
+    V37.cellHTML=function(c,x){
+      var h=_cellHTML(c,x);
+      if(x.state==="hol") return h;
+      if(V38.deckFor(c,x.week,x.split?x.date:null)) return h;
+      return h.replace('<button class="btn xs a" data-v37study="'+x.date+'|'+x.week+'">학습하기</button>',
+                       '<button class="btn xs v38-off" disabled title="이 회차 학습 슬라이드 준비 중">학습 준비 중</button>');
+    };
+  }
+  /* ③ 과목 규칙 정리 */
+  if(window.V33&&V33.SPEC&&V33.SPEC["미분적분학2"]){
+    var sp=V33.SPEC["미분적분학2"]; sp.rules=sp.rules.filter(function(r){ return !/클리닉/.test(r); });
+  }
+  var css=document.createElement("style"); css.id="v38css";
+  css.textContent=".v38-off{opacity:.5;cursor:default}";
   document.head.appendChild(css);
 })();
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start);
