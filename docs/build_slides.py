@@ -65,6 +65,12 @@ for pi, sec in enumerate(parts, 1):
     # 개념 슬라이드는 표지 바로 뒤에 삽입
     cover_idx = next(i for i, s in enumerate(slides) if s["id"] == f"p{pi}-cover")
     slides.insert(cover_idx + 1, {"id": f"p{pi}-concept", "type": "concept", "part": pi, "title": concept_head if 'concept_head' in dir() else "개념", "html": "".join(concept_html)})
+    # 암기 vs 이해 (div.mu) — 개념 바로 뒤 한 장
+    mu = sec.xpath('./div[@class="mu"]')
+    if mu:
+        mem = [inner(li) for li in mu[0].xpath('./div[@class="mu-mem"]/ul/li')]
+        und = [inner(li) for li in mu[0].xpath('./div[@class="mu-und"]/ul/li')]
+        slides.insert(cover_idx + 2, {"id": f"p{pi}-mu", "type": "mu", "part": pi, "title": ptitle, "mem": mem, "und": und})
     slides.append({"id": f"p{pi}-result", "type": "result", "part": pi, "title": ptitle})
 slides.append({"id": "final", "type": "final"})
 
@@ -98,6 +104,9 @@ if os.path.exists(srcs_json):
             out_list.append({"img": f"src/{deck_id}/{fn}", "label": it.get("label", SM["docs"][it["doc"]]["label"]), "w": pix.width, "h": pix.height})
             n_img += 1
         by_id[sid]["src"] = out_list
+    for sl in slides:   # 암기/이해 장은 개념 장과 같은 출처
+        if sl["type"] == "mu" and "src" not in sl and f"p{sl['part']}-concept" in by_id and "src" in by_id[f"p{sl['part']}-concept"]:
+            sl["src"] = by_id[f"p{sl['part']}-concept"]["src"]
     print("출처 발췌", n_img, "장 →", out_dir)
 
 parts_meta = [{"n": i, "title": p.xpath('./h2')[0].text_content().replace(p.xpath('./h2/span[@class="no"]/text()')[0], "").strip()} for i, p in enumerate(parts, 1)]
