@@ -17,7 +17,7 @@ mjx-container{color:inherit}
 #top{display:flex;align-items:center;gap:10px;padding:10px 18px;border-bottom:1px solid var(--line);font-size:12px;color:var(--ink-3);font-family:var(--font-mono);letter-spacing:.06em}
 #top b{color:var(--acc);font-weight:500}
 #bar{flex:1;height:5px;background:var(--line);border-radius:5px;overflow:hidden}#bar i{display:block;height:100%;background:var(--acc);width:0;transition:width .25s}
-#body{flex:1;min-height:0;overflow:auto;padding:20px 30px 16px;font-size:clamp(14px,1.9vw,19px);line-height:1.7}
+#body{flex:1;min-height:0;overflow:auto;padding:16px 30px 12px;font-size:clamp(14px,1.9vw,19px);line-height:1.7}
 #body h1{font-family:var(--font-display);font-size:clamp(24px,3.4vw,40px);margin:8px 0 12px;line-height:1.2}
 #body h2{font-family:var(--font-display);font-size:clamp(19px,2.4vw,27px);margin:0 0 10px;line-height:1.3}
 #body .kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;color:var(--acc);text-transform:uppercase}
@@ -29,7 +29,7 @@ mjx-container{color:inherit}
 #body .hl{background:var(--hl);padding:0 3px;border-radius:3px}#body .red{color:var(--crit);font-weight:700}#body .star{color:var(--warn);font-weight:700}
 #body .term{border-bottom:1px dashed var(--acc);color:var(--acc-ink)}
 #body .tw{overflow-x:auto;margin:8px 0;border:1px solid var(--line);border-radius:10px}
-#body table{border-collapse:collapse;width:100%;font-size:.9em}#body th,#body td{padding:7px 12px;text-align:left;vertical-align:top;border-top:1px solid var(--line)}#body thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3);background:var(--ans)}
+#body table{border-collapse:collapse;width:100%;font-size:.9em}#body th,#body td{padding:4px 10px;text-align:left;vertical-align:top;border-top:1px solid var(--line)}#body thead th{border-top:0;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--ink-3);background:var(--ans)}
 #body ul,#body ol{margin:0 0 8px;padding-left:22px}#body li{margin:3px 0}#body p{margin:0 0 8px}
 .q-kind{display:inline-block;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;border-radius:5px;padding:2px 8px;color:#fff;background:var(--ok);margin-right:8px}.q-kind.a{background:var(--warn)}
 .ans{background:var(--ans);border-radius:12px;padding:12px 16px;margin-top:12px;border-left:4px solid var(--acc)}
@@ -84,6 +84,13 @@ mjx-container{color:inherit}
 .src-body img.zoom{width:190%;max-width:none;cursor:zoom-out}
 .src-foot{display:flex;align-items:center;gap:10px;padding:10px 4px 0;color:#fff}.src-foot .hint{margin:0 auto;opacity:.75;font-size:12px}
 .nav.undone{border-style:dashed}
+.jump{margin-top:4px}
+.jump-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}.jump-h .hint{font-size:12px;opacity:.75}
+.jump-part{display:flex;gap:10px;align-items:flex-start;margin:2px 0}.jump-pt{flex:0 0 200px;font-size:12.5px;color:var(--acc-ink);font-weight:600;padding-top:4px}
+.jump-items{display:flex;flex-wrap:wrap;gap:4px}
+.jp{font:inherit;font-size:11px;padding:3px 8px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink-2);cursor:pointer}
+.jp.done{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}.jp.skip{background:#F1F3F5;color:var(--ink-3);text-decoration:line-through}.jp.cur{border-color:var(--acc);background:var(--acc-soft);color:var(--acc-ink)}
+.btn.xs{padding:3px 9px;font-size:12px}
 #body.q-mode.rev .pad{flex:0 0 96px;min-height:96px}#body.q-mode.rev .pad canvas{min-height:60px}
 .cover{height:100%;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:6px}
 .cover .big{font-family:var(--font-display);font-size:clamp(30px,5vw,60px);line-height:1.15;margin:6px 0}
@@ -124,12 +131,12 @@ const DECK_ID="__DECK_ID__";
 const SLIDES=__SLIDES__;
 const PARTS=__PARTS__;
 const KEY="mc-slides-"+DECK_ID;
-let ST={idx:0,done:{},correct:{},revealed:{},answer:{},ink:{},finger:false,padBig:false};
+let ST={idx:0,done:{},correct:{},revealed:{},answer:{},ink:{},finger:false,padBig:false,skip:{}}; /* V3-JUMP */
 try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}
 const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(ST)); }catch(e){} };
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function partScore(p){ const qs=SLIDES.filter(s=>s.type==="q"&&s.part===p); const b=qs.filter(q=>q.kind==="기초"), a=qs.filter(q=>q.kind==="응용");
+function partScore(p){ ST.skip=ST.skip||{}; const qs=SLIDES.filter(s=>s.type==="q"&&s.part===p&&!ST.skip[s.id]); const b=qs.filter(q=>q.kind==="기초"), a=qs.filter(q=>q.kind==="응용");
   const cnt=arr=>({n:arr.length,ok:arr.filter(q=>ST.correct[q.id]===true).length,done:arr.filter(q=>ST.done[q.id]).length});
   return {b:cnt(b),a:cnt(a)}; }
 function partDone(p){ return SLIDES.filter(s=>s.part===p&&s.type!=="result").every(s=>ST.done[s.id]); }
@@ -170,13 +177,13 @@ function render(){
   const i=Math.max(0,Math.min(ST.idx,SLIDES.length-1)); ST.idx=i; const s=SLIDES[i]; const body=$("#body"), act=$("#act");
   $("#pos").textContent=(i+1)+" / "+SLIDES.length; $("#bar i").style.width=((i+1)/SLIDES.length*100)+"%";
   $("#parts").innerHTML=PARTS.map(p=>'<span class="'+(p.n===s.part?"cur":partDone(p.n)?"done":"")+'">'+p.n+'</span>').join("");
-  act.innerHTML=""; $("#doneTag").textContent=ST.done[s.id]?"완료":""; body.classList.remove("q-mode","pad-big","rev"); if(PAD.ro){ PAD.ro.disconnect(); PAD.ro=null; }
+  act.innerHTML=""; ST.skip=ST.skip||{}; $("#doneTag").textContent=ST.skip[s.id]?"건너뜀":ST.done[s.id]?"완료":""; body.classList.remove("q-mode","pad-big","rev"); if(PAD.ro){ PAD.ro.disconnect(); PAD.ro=null; }
   if(s.type==="start"){
     body.innerHTML='<div class="cover"><div class="kicker">학습 슬라이드 · 가로 화면</div><div class="big">__TITLE__</div><div class="sub">오른쪽 아래 <b>→</b>로 언제든 넘어갈 수 있고, 페이지를 끝내면 화살표가 실선이 됩니다. 기초 문제는 보기를 누르고, 답이 여러 개인 문제는 답을 씁니다. 오른쪽 아래 작은 사진은 이 페이지의 출처(학습지·내 풀이본)라 누르면 커집니다. 진행과 정답률은 이 기기에 저장됩니다.</div>'+
       '<div class="sub">파트 '+PARTS.length+'개 · 문제 '+SLIDES.filter(x=>x.type==="q").length+'개</div></div>';
     act.innerHTML='<button class="btn a" id="go">시작</button>'+(Object.keys(ST.done).length?'<button class="btn" id="reset">처음부터(기록 지우기)</button>':'');
     $("#go").onclick=()=>{ ST.done[s.id]=true; save(); go(1); };
-    const r=$("#reset"); if(r) r.onclick=()=>{ if(confirm("진행 기록을 지울까요?")){ ST={idx:0,done:{},correct:{},revealed:{},answer:{},ink:{},finger:false,padBig:false}; save(); render(); } };
+    const r=$("#reset"); if(r) r.onclick=()=>{ if(confirm("진행 기록을 지울까요?")){ ST={idx:0,done:{},correct:{},revealed:{},answer:{},ink:{},finger:false,padBig:false,skip:{}}; save(); render(); } };
   } else if(s.type==="cover"){
     body.innerHTML='<div class="cover"><div class="kicker">'+esc(s.no)+'</div><div class="big">'+esc(s.title)+(s.star?' <span class="star">★</span>':'')+'</div><div class="sub">개념 → 기초 문제 → 응용 문제 순서로 갑니다.</div></div>';
     act.innerHTML='<button class="btn a" id="ok">시작</button>'; $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); go(1); };
@@ -184,6 +191,11 @@ function render(){
     body.innerHTML='<div class="kicker">'+(s.part?'파트 '+s.part+' · 개념':'')+'</div><h2>'+esc(s.title)+'</h2>'+s.html;
     act.innerHTML='<button class="btn ok" id="ok">'+(ST.done[s.id]?"다시 읽음 표시":"읽었어요 — 이해했습니다")+'</button>';
     $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); render(); };
+  } else if(s.type==="jump"){
+    body.innerHTML='<div class="kicker">시작 위치</div><h2>어디서부터 할까?</h2>'+jumpListHTML();
+    body.querySelectorAll("[data-jump]").forEach(b=>{ b.onclick=()=>startFrom(b.dataset.jump); }); const u=$("#unskip"); if(u) u.onclick=unskipAll;
+    act.innerHTML='<button class="btn a" id="ok">처음부터 차례로</button>'; $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); go(1); };
+    ST.done[s.id]=true;
   } else if(s.type==="mu"){
     const li=xs=>xs.map(x=>'<li>'+x+'</li>').join("");
     body.innerHTML='<div class="kicker">파트 '+s.part+' · 암기 vs 이해</div><h2>'+esc(s.title)+' — 무엇을 외우고 무엇을 이해하나</h2>'+
@@ -266,6 +278,31 @@ function render(){
   $("#body").scrollTop=0;
   if(window.MathJax&&MathJax.typesetPromise) MathJax.typesetPromise([body]).catch(()=>{});
 }
+/* 여기부터 시작 — 앞 장은 전부 「건너뜀」(done+skip). 아토 2026-09-17 "2-1 예제 2-3부터 이해 안 돼, 그 앞은 학습 안 해도 돼" */
+function startFrom(id){
+  const n=SLIDES.findIndex(x=>x.id===id); if(n<0) return;
+  ST.skip=ST.skip||{};
+  SLIDES.forEach((x,i)=>{ if(i<n&&x.type!=="start"&&x.type!=="toc"&&x.type!=="jump"&&!ST.done[x.id]){ ST.done[x.id]=true; ST.skip[x.id]=true; } });
+  ST.idx=n; save(); render();
+}
+function unskipAll(){ ST.skip=ST.skip||{}; Object.keys(ST.skip).forEach(k=>{ delete ST.done[k]; }); ST.skip={}; save(); render(); }
+function jumpListHTML(){
+  ST.skip=ST.skip||{};
+  const rows=[]; let cur=null;
+  SLIDES.forEach((x,i)=>{
+    if(x.type==="cover"){ cur={part:x.part,title:x.title,items:[]}; rows.push(cur); return; }
+    if(!cur) return;
+    if(x.type==="concept"||x.type==="mu"||x.type==="q"){
+      const lab= x.type==="concept"?(x.title||"개념"): x.type==="mu"?"암기 vs 이해": x.qn;
+      const st= ST.skip[x.id]?"skip": ST.done[x.id]?"done": (i===ST.idx?"cur":"");
+      cur.items.push('<button class="jp '+st+'" data-jump="'+x.id+'" title="여기부터 시작">'+esc(lab)+'</button>');
+    }
+  });
+  const nSkip=Object.keys(ST.skip).length;
+  return '<div class="jump"><div class="jump-h"><span class="hint">아는 부분은 건너뛰고 막히는 곳부터. 누른 장 앞은 전부 「건너뜀」이 되고 채점에서 빠진다.</span>'+
+    (nSkip?'<button class="btn xs" id="unskip">건너뜀 '+nSkip+'장 되돌리기</button>':'')+'</div>'+
+    rows.map(r=>'<div class="jump-part"><div class="jump-pt">파트 '+r.part+' · '+esc(r.title)+'</div><div class="jump-items">'+r.items.join("")+'</div></div>').join("")+'</div>';
+}
 function go(d){ const n=ST.idx+d; if(n<0||n>=SLIDES.length) return; ST.idx=n; save(); render(); }
 /* ---------- 출처 발췌 (우측 아래 썸네일 → 확대) ---------- */
 function renderSrc(s){
@@ -288,6 +325,7 @@ function openSrc(list,i){
   const p=$("#srcPrev"), n=$("#srcNext"); if(p) p.onclick=()=>openSrc(list,i-1); if(n) n.onclick=()=>openSrc(list,i+1);
 }
 $("#next").onclick=()=>go(1); $("#prev").onclick=()=>go(-1);
+{ const m=/^#from=([\w-]+)$/.exec(location.hash||""); if(m){ startFrom(m[1]); } }
 if(location.hash==="#src"){ setTimeout(()=>{ const b=$("#srcs .src-th"); if(b) b.click(); },400); }
 document.addEventListener("keydown",e=>{ if(e.key==="ArrowRight"||e.key===" ") go(1); else if(e.key==="ArrowLeft") go(-1); });
 let tx=null; document.addEventListener("touchstart",e=>{ tx=e.touches[0].clientX; },{passive:true});

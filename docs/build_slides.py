@@ -48,6 +48,11 @@ for pi, sec in enumerate(parts, 1):
             continue
         if mode == "c" and el.tag == "div" and any(c in (el.get("class") or "") for c in ["why", "concept", "one", "say"]):
             concept_html.append(LH.tostring(el, encoding="unicode"))
+        elif mode in ("b", "a") and el.tag == "div" and "extra" in (el.get("class") or "").split():
+            # 보충(div.extra): 문제 사이에 끼는 개념 장 — 자리 그대로
+            q_index += 1
+            slides.append({"id": f"p{pi}-x{q_index}", "type": "concept", "part": pi, "title": el.get("data-title") or "보충",
+                           "html": "".join(LH.tostring(x, encoding="unicode") for x in el)})
         elif mode in ("b", "a") and el.tag == "div" and "q" in (el.get("class") or "").split():
             qn = el.xpath('./div[contains(@class,"qn")]/text()')[0].strip()
             body = [LH.tostring(x, encoding="unicode") for x in el if x.tag not in ("details",) and "qn" not in (x.get("class") or "")]
@@ -78,6 +83,7 @@ slides.append({"id": "final", "type": "final"})
 toc = doc.xpath('//section[.//h2/span[@class="no"][starts-with(normalize-space(text()),"0")]]')
 toc_html = LH.tostring(toc[0].xpath('.//div[@class="tw"]')[0], encoding="unicode") if toc else ""
 slides.insert(0, {"id": "toc", "type": "concept", "part": 0, "title": "일차별 진도 목차 — 어디를 배웠나", "html": toc_html})
+slides.insert(1, {"id": "jump", "type": "jump", "part": 0})
 slides.insert(0, {"id": "start", "type": "start"})
 
 # 출처 발췌 이미지: <note>.sources.json 이 있으면 PDF 영역을 잘라 <out dir>/src/<deck>/ 에 JPEG로 넣고 슬라이드에 src 목록을 붙인다
