@@ -93,7 +93,11 @@ body{display:grid;place-items:center;padding:12px}
 .pad-bar button{font:inherit;font-size:var(--fs-note);min-height:36px;padding:2px 12px;border:1px solid var(--ink);background:var(--paper);color:var(--ink);cursor:pointer}
 .pad-bar button.on{background:var(--ink);color:var(--paper)}
 .pad canvas{flex:1 1 auto;min-height:0;width:100%;display:block;touch-action:none;cursor:crosshair;background-image:linear-gradient(to right,var(--line) 1px,transparent 1px),linear-gradient(to bottom,var(--line) 1px,transparent 1px);background-size:24px 24px}
-#body.q-mode.rev .pad{display:none}
+/* V4-PADPANEL 필기 판 — 「+ 필기」로 여닫음, 문제 아래쪽을 덮는다 */
+#padPanel{position:absolute;left:24px;right:24px;top:38%;bottom:72px;background:var(--paper);border:2px solid var(--ink);display:none;flex-direction:column;z-index:16}
+#padPanel.on{display:flex}
+#padPanel .pad{flex:1 1 auto;margin:0;border:0;min-height:0}
+#padBtn.on{background:var(--ink);color:var(--paper)}
 /* V4-ANSLB 답·풀이 판 — 작업 영역 전체 */
 #anslb{position:absolute;left:0;right:0;top:0;bottom:0;background:var(--paper);display:none;flex-direction:column;z-index:18;padding:14px 24px;overflow:hidden}
 #anslb.on{display:flex}
@@ -160,12 +164,14 @@ body{display:grid;place-items:center;padding:12px}
   <footer id="foot">
     <button class="btn xs" id="prev" aria-label="이전">← 이전</button>
     <button class="btn xs" id="hintBtn">힌트</button>
+    <button class="btn xs" id="padBtn" aria-label="필기 영역 열기">+ 필기</button>
     <div id="srcs"></div>
     <div id="act"></div>
     <span id="doneTag"></span>
     <button class="btn primary" id="next" aria-label="다음">다음 →</button>
   </footer>
   <div id="hintBox" hidden></div>
+  <div id="padPanel"><div class="pad"><div class="pad-bar"><span>풀이 메모장</span><span class="hint">애플펜슬로 쓰세요</span><button data-tool="pen" class="on">펜</button><button data-tool="eraser">지우개</button><button data-act="undo">되돌리기</button><button data-act="clear">지우기</button><button data-act="finger">손가락도</button><button data-act="close">닫기</button></div><canvas id="pad"></canvas></div></div>
   <div id="chk"></div>
 </div>
 <script>
@@ -229,6 +235,9 @@ function mountPad(id){
   setTimeout(padResize,30);
 }
 
+/* ---------- 필기 판 여닫기 (V4-PADPANEL) ---------- */
+function openPad(id){ const pp=$("#padPanel"); pp.classList.add("on"); $("#padBtn").classList.add("on"); const fb=pp.querySelector('[data-act="finger"]'); if(fb) fb.classList.toggle("on",!!ST.finger); mountPad(id); const cb=pp.querySelector('[data-act="close"]'); if(cb) cb.onclick=closePad; }
+function closePad(){ const pp=$("#padPanel"); if(pp) pp.classList.remove("on"); const b=$("#padBtn"); if(b) b.classList.remove("on"); if(PAD.ro){ PAD.ro.disconnect(); PAD.ro=null; } }
 /* ---------- 시험 언급 상자 (지침 §3) ---------- */
 function examHTML(s){
   const list=Array.isArray(s.exam)?s.exam:[]; if(!list.length) return "";
@@ -305,7 +314,7 @@ function render(){
   const i=Math.max(0,Math.min(ST.idx,SLIDES.length-1)); ST.idx=i; const s=SLIDES[i]; const body=$("#body"), act=$("#act");
   body.dataset.ready="false"; $("#hintBox").hidden=true; { const al=$("#anslb"); if(al) al.classList.remove("on"); } /* V4-ANSLB */
   act.innerHTML=""; ST.skip=ST.skip||{}; $("#doneTag").textContent=ST.skip[s.id]?"건너뜀":ST.done[s.id]?"완료":"";
-  body.classList.remove("q-mode","rev","scrollable"); if(PAD.ro){ PAD.ro.disconnect(); PAD.ro=null; }
+  body.classList.remove("q-mode","rev","scrollable"); closePad(); $("#padBtn").hidden=true;
   renderTop(s);
   if(s.type==="start"){
     body.innerHTML='<div class="cover"><div class="kicker">학습 슬라이드 · 가로 화면</div><div class="big">__TITLE__</div>'+
@@ -341,15 +350,12 @@ function render(){
     const choiceHTML=()=>'<div class="choices'+(rev?" rev":"")+'">'+s.choices.map((c,i)=>{ const sel=String(my)===String(i); const cls=(sel?" sel":"")+(rev?(c.ok?" ok":(sel?" bad":"")):"");
       return '<button class="choice'+cls+'" data-ci="'+i+'"'+(rev?" disabled":"")+'><span class="cn">'+(i+1)+'</span><span class="ct">'+c.html+'</span></button>'; }).join("")+'</div>';
     body.innerHTML=examHTML(s)+'<div class="kicker">파트 '+num(s.part)+'</div><h2><span class="q-kind">'+s.kind+'</span>'+esc(s.qn)+'</h2><div class="qbody">'+s.html+'</div>'+
-      '<div class="pad"><div class="pad-bar"><span>풀이 메모장</span><span class="hint">애플펜슬로 쓰세요</span>'+
-        '<button data-tool="pen" class="on">펜</button><button data-tool="eraser">지우개</button><button data-act="undo">되돌리기</button><button data-act="clear">지우기</button>'+
-        '<button data-act="finger" class="'+(ST.finger?"on":"")+'">손가락도</button></div><canvas id="pad"></canvas></div>'+
       (mc ? choiceHTML() : rev
         ? '<div class="myans-show"><div class="kicker">내 답</div><div class="myans-txt">'+esc(my)+'</div></div>'
         : '<div class="myans"><label for="myans">내 답 — 답만. 행렬은 [1 2; 3 4]처럼, 여러 개면 쉼표로</label><textarea id="myans" rows="2" placeholder="여기에 답을 쓰고 「답 확인」">'+esc(my)+'</textarea></div>')+
       (rev?'<div class="myans-note"><button class="btn xs" id="showAns">답 · 풀이 다시 보기</button></div>':'');
     if(rev){ openAns(s); const sa=$("#showAns"); if(sa) sa.onclick=()=>openAns(s); }
-    mountPad(s.id);
+    closePad(); $("#padBtn").hidden=false;
     if(mc&&!rev){
       act.innerHTML='<button class="btn primary" id="reveal" disabled>답 확인</button>';
       const rb=$("#reveal"); let my2=my; const upd=()=>{ rb.disabled=!(String(my2)!==""); };
@@ -404,6 +410,7 @@ function render(){
 }
 function go(d){ const n=ST.idx+d; if(n<0||n>=SLIDES.length) return; ST.idx=n; save(); render(); }
 $("#next").onclick=()=>go(1); $("#prev").onclick=()=>go(-1);
+$("#padBtn").onclick=()=>{ const s=SLIDES[ST.idx]; if(s.type!=="q") return; if($("#padPanel").classList.contains("on")) closePad(); else openPad(s.id); };
 $("#hintBtn").onclick=()=>{ const s=SLIDES[ST.idx], h=hintFor(s); if(!h) return; const hb=$("#hintBox"); if(!hb.hidden){ hb.hidden=true; return; } hb.innerHTML='<div class="kicker">힌트 · 파트 '+num(s.part)+' 한 줄</div><div>'+esc(h)+'</div>'; hb.hidden=false; typeset(hb); };
 document.addEventListener("keydown",e=>{ const t=e.target; if(t&&/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||(t&&t.isContentEditable)) return; if(e.key==="ArrowRight") go(1); else if(e.key==="ArrowLeft") go(-1); });
 
@@ -425,7 +432,7 @@ async function runCheck(){
   window.CHECK_RESULT={n:SLIDES.length,fails};
 }
 function boot(){
-  { const m=/^#(from|done|at)=([\w-]+)$/.exec(location.hash||""); if(m){ startFrom(m[2], m[1]==="from"?"skip":m[1]); return; } }
+  { const m=/^#(from|done|at)=([\w-]+)(?:,pad)?$/.exec(location.hash||""); if(m){ startFrom(m[2], m[1]==="from"?"skip":m[1]); if(/,pad$/.test(location.hash)) setTimeout(()=>$("#padBtn").click(),300); return; } }
   if(location.hash==="#check"){ runCheck(); return; }
   render();
   if(location.hash==="#src"){ setTimeout(()=>{ const b=$("#srcs .src-th"); if(b) b.click(); },400); }
