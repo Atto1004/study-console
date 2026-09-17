@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-17.39";
+var BUILD="2026-09-17.40";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4839,6 +4839,7 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-17.40",d:"09-17",items:["행렬 단원 학습 슬라이드 — 가로(16:9) PPT형 58페이지: 파트 표지 → 개념(읽었어요) → 기초 문제 → 응용 문제(답 보기 → 맞았어요/틀렸어요) → 파트 결과 → 전체 결과(틀린 문제 다시). 한 페이지를 끝내야 다음 화살표가 켜짐. 진행·정답률은 기기에 저장. 미적2 9/1·9/3·9/8 회차 정리 링크와 정리 노트 목록에서 열림"]},
   {v:"2026-09-17.39",d:"09-17",items:["행렬 노트 v2 — 맨 위에 일차별 진도 목차, 본문은 핵심 개념 6파트(정의·연산·행렬식·여인수·역행렬·크래머) × 개념 → 개념 이해(기초, 학습지 예제) → 응용. 12.1은 벡터 노트로 분리. 미적2 9/3·9/8 회차 「정리」 링크와 정리 노트 목록에서 열림"]},
   {v:"2026-09-17.38",d:"09-17",items:["미분적분학2 「행렬과 행렬식 1~2주차 개념 학습」 노트 추가 — 학습지·녹음·아토 풀이본·필기 합본, 교수 강조는 형광펜·빨간 글씨·★로 표시, 스스로 6문제. 9/3·9/8 회차 정리와 정리 노트 목록에 링크"]},
   {v:"2026-09-17.37",d:"09-17",items:[
@@ -8766,6 +8767,9 @@ var V33={};
   var _boot=boot;
   boot=function(){ _boot(); var ch=false; try{ var t0=term(); ch=!t0.patchV35a; V35.patch(); }catch(e){ if(window.console) console.warn("V35 패치 오류", e); } if(ch){ try{ render(); }catch(e){} } };   /* 이 레이어는 start() 호출문보다 앞에 삽입되므로 래퍼가 먼저 등록된다 */
   /* NOTES 목록에 벡터 정리노트 추가(정리 노트 카드·과목 자료) */
+  if(Array.isArray(window.NOTES)&&!NOTES.some(function(n){return n.file==="notes/calc2-matrix-slides.html";})){
+    NOTES.push({course:"미분적분학2",type:"학습",title:"행렬 단원 학습 슬라이드 — 가로 화면, 58페이지 (개념 → 기초 → 응용)",file:"notes/calc2-matrix-slides.html",week:2,date:"2026-09-17",sub:"한 페이지 완료 → 다음 화살표 · 정답률 저장 · 아이패드 가로"});
+  }
   if(Array.isArray(window.NOTES)&&!NOTES.some(function(n){return n.file==="notes/calc2-matrix-w1-2.html";})){
     NOTES.push({course:"미분적분학2",type:"정리",title:"행렬 단원 통합 학습 (1~2주차) — 개념 → 기초 → 응용",file:"notes/calc2-matrix-w1-2.html",week:2,date:"2026-09-17",sub:"일차별 진도 목차 · 핵심 개념 6파트 · 기초 19 + 응용 18문제 · 교수 강조 표시"});
   }
@@ -9028,8 +9032,11 @@ var V33={};
   V36.patchLinks=function(){ var t=term(); if(t.patchV36b) return; var c=t.courses.filter(function(x){return x.name==="미분적분학2";})[0]; if(!c) return;
     ["2026-09-03","2026-09-08"].forEach(function(d){ var n=V36.dayNote(c,d,true); if(!n.links.some(function(l){return /calc2-matrix-w1-2/.test(l.url||"");})) n.links.push({label:"행렬과 행렬식 1~2주차 개념 학습 (합본·교수 강조 표시)",url:"notes/calc2-matrix-w1-2.html"}); });
     t.patchV36b=true; persist(); };
+  V36.patchSlides=function(){ var t=term(); if(t.patchV36c) return; var c=t.courses.filter(function(x){return x.name==="미분적분학2";})[0]; if(!c) return;
+    ["2026-09-01","2026-09-03","2026-09-08"].forEach(function(d){ var n=V36.dayNote(c,d,true); if(!n.links.some(function(l){return /calc2-matrix-slides/.test(l.url||"");})) n.links.unshift({label:"행렬 단원 학습 슬라이드 (가로 · 개념→기초→응용 · 한 페이지씩)",url:"notes/calc2-matrix-slides.html"}); });
+    t.patchV36c=true; persist(); };
   var _boot=boot;
-  boot=function(){ _boot(); var ch=false; try{ ch=!term().patchV36a; V36.patch(); V36.patchLinks(); }catch(e){ if(window.console) console.warn("V36 패치 오류", e); } if(ch){ try{ render(); }catch(e){} } };
+  boot=function(){ _boot(); var ch=false; try{ ch=!term().patchV36a; V36.patch(); V36.patchLinks(); V36.patchSlides(); }catch(e){ if(window.console) console.warn("V36 패치 오류", e); } if(ch){ try{ render(); }catch(e){} } };
 
   var css=document.createElement("style"); css.id="v36css";
   css.textContent=[
