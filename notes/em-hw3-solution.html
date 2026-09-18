@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<title>공업수학1 3주차 과제 — 해답지</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--ink:#1C2430;--ink-2:#4A5666;--ink-3:#8A94A2;--line:#D8DEE6;--line-2:#EDF0F4;
+ --navy:#3E5C8A;--navy-soft:#EDF2F9;--navy-ink:#24395C;--box:#F4F6F9;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font-family:"Noto Sans KR",system-ui,sans-serif;
+ font-size:14.5px;line-height:1.7;-webkit-font-smoothing:antialiased;word-break:keep-all}
+mjx-container{color:inherit}
+mjx-container[display="true"]{margin:.16em 0!important;text-align:left!important}
+mjx-container[display="true"]>svg{margin:0!important}
+.sheet{max-width:780px;margin:0 auto;padding:0 22px 44px}
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:18px;padding:26px 0 14px}
+.top .l,.top .r{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--ink-3);line-height:1.9}
+.top .r{text-align:right;padding-left:18px;border-left:1px solid var(--line)}
+.top .c{text-align:center}
+.top .c h1{font-family:"Gowun Batang",serif;font-size:31px;font-weight:700;margin:0;letter-spacing:.04em}
+.top .c .sub{font-size:12.5px;color:var(--ink-2);margin-top:2px}
+.rule{height:2px;background:var(--navy);margin:6px 0 4px}
+.rule.thin{height:1px;background:var(--line);margin:0 0 22px}
+.who{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-3);
+ font-family:"IBM Plex Mono",monospace;letter-spacing:.04em;padding:5px 2px 0}
+.sec{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;color:var(--navy-ink);
+ background:var(--navy-soft);border-radius:5px;padding:7px 14px;display:inline-block;margin:26px 0 4px}
+.q{margin:0 0 4px;padding:8px 0 6px;border-bottom:1px dashed var(--line);page-break-inside:avoid;break-inside:avoid}
+.sec{page-break-after:avoid;break-after:avoid}
+.grp{page-break-inside:avoid;break-inside:avoid}
+.q:last-of-type{border-bottom:0}
+.qh{display:flex;align-items:center;gap:12px;margin:0 0 10px}
+.qh .no{flex:none;background:var(--navy);color:#fff;font-family:"IBM Plex Mono",monospace;
+ font-size:14px;font-weight:500;letter-spacing:.04em;padding:5px 12px;border-radius:5px;min-width:44px;text-align:center}
+.qh .qq{flex:1;background:var(--box);border-radius:5px;padding:6px 14px;min-width:0;overflow-x:auto}
+.qh .qq mjx-container{margin:0!important}
+.tag{flex:none;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.09em;
+ color:var(--navy-ink);background:var(--navy-soft);border-radius:999px;padding:3px 10px}
+.body{padding-left:16px}
+.line{margin:0 0 1px;overflow-x:auto}
+.ans{display:inline-block;background:var(--navy-soft);border:1px solid #C6D6EA;border-radius:6px;
+ padding:5px 18px;margin:6px 0 0 4px}
+.ans mjx-container{margin:0!important}
+.chk{margin:4px 0 0;padding:7px 0 0 12px;border-left:2px solid var(--line);color:var(--ink-2)}
+.chk .line{font-size:13.5px}
+.stp{font-weight:700;color:#B2483F;font-size:13px;margin:7px 0 0}
+.stp:first-child{margin-top:2px}
+.sub{font-size:13px;color:var(--ink-2);margin:2px 0 0}
+.ans .lb{font-family:"Noto Sans KR",sans-serif;font-size:12.5px;color:var(--ink-2);margin-right:8px}
+.ref{margin:8px 0 0;padding:6px 12px;border:1px dashed var(--line);border-radius:6px;background:#FBFCFD}
+.ref .stp{color:var(--navy-ink);margin-top:0}
+@media print{.line,.qh .qq{overflow:visible}.sheet{zoom:.8}.top{padding:8px 0 4px}.top .c h1{font-size:26px}.rule.thin{margin:0 0 8px}.who{padding-top:2px}.sec{margin:10px 0 0}body{font-size:13.5px}}
+@page{size:A4;margin:13mm}
+</style>
+<div class="sheet">
+
+<div class="top">
+  <div class="l">MATHEMATICS<br>SOLUTION</div>
+  <div class="c">
+    <h1>수학 해답지</h1>
+    <div class="sub">공업수학1 · 3주차 과제 · 문제별 풀이과정</div>
+  </div>
+  <div class="r">KREYSZIG<br>SET 1.5 · 2.1 · 2.2 · 2.3</div>
+</div>
+<div class="rule"></div><div class="rule thin"></div>
+<div class="who"><span>기계공학과 김아토 · 2022049607</span><span>2026-09-23 (수) 제출</span></div>
+
+<div class="sec">연습문제 1.5 — 비선형상미분방정식 (Bernoulli · 치환)</div>
+
+<div class="q">
+  <div class="qh"><span class="no">23</span><span class="qq">\(y'+xy=y^{-1},\quad y(0)=3\)</span><span class="tag">베르누이 · 초기값</span></div>
+  <div class="body">
+    <div class="stp">Step 1 표준형으로 정리 (베르누이 방정식인지 판별)</div>
+    <div class="line">\[y'+p(x)\,y=g(x)\,y^{a}\qquad p(x)=x,\quad g(x)=1,\quad a=-1\ :\ a\neq 0,\,1\ \text{이므로 비선형 (Bernoulli)}\]</div>
+    <div class="stp">Step 2 치환하여 선형화</div>
+    <div class="line">\[u=y^{\,1-a}=y^{\,1-(-1)}=y^{2},\qquad u'=2y\,y'=2y\left(-xy+y^{-1}\right)=-2xy^{2}+2=-2xu+2\]</div>
+    <div class="line">\[\Longrightarrow\quad u'+2x\,u=2\qquad(u\text{에 관한 선형 비제차})\qquad p(x)=2x,\quad r(x)=2\]</div>
+    <div class="stp">Step 3 일반해 구하기</div>
+    <div class="line">\[h=\int p(x)\,dx=\int 2x\,dx=x^{2}\]</div>
+    <div class="line">\[u=e^{-h}\left[\int e^{h}\,r\,dx+c\right]=e^{-x^{2}}\left[2\int e^{x^{2}}dx+c\right]\]</div>
+    <div class="line">\[\quad=e^{-x^{2}}\left[2\int_{0}^{x}e^{t^{2}}dt+c\right]\qquad\left(\textstyle\int e^{x^{2}}dx\text{는 초등함수가 아님 → 정적분, 상수를 }c\text{로 다시 둠}\right)\]</div>
+    <div class="ans"><span class="lb">∴ 일반해:</span>\(y^{2}=e^{-x^{2}}\left(2\displaystyle\int_{0}^{x}e^{t^{2}}dt+c\right)\)</div>
+    <div class="stp">Step 4 특수해 구하기</div>
+    <div class="sub">초기조건 적용</div>
+    <div class="line">\[u(0)=y(0)^{2}=9=e^{0}\left(2\cdot 0+c\right)\ \Longrightarrow\ c=9\]</div>
+    <div class="ans"><span class="lb">특수해:</span>\(y^{2}=e^{-x^{2}}\left(9+2\displaystyle\int_{0}^{x}e^{t^{2}}dt\right)\)</div>
+    <div class="ans"><span class="lb">즉</span>\(y=e^{-x^{2}/2}\sqrt{9+2\displaystyle\int_{0}^{x}e^{t^{2}}dt}\)</div>
+    <div class="sub">\(y(0)=3>0\)이므로 양의 근, \(9+2\!\int_{0}^{x}\!e^{t^{2}}dt>0\)인 0을 포함하는 구간</div>
+    <div class="stp">Step 5 검증</div>
+    <div class="chk">
+    <div class="line">\[u=e^{-x^{2}}\Big(9+2\!\int_{0}^{x}\!e^{t^{2}}dt\Big)\ \Longrightarrow\ u'=-2x\,e^{-x^{2}}\Big(9+2\!\int_{0}^{x}\!e^{t^{2}}dt\Big)+e^{-x^{2}}\cdot 2e^{x^{2}}=-2xu+2\]</div>
+    <div class="line">\[y'=\frac{u'}{2y}=\frac{-2xu+2}{2y}=-\frac{xy^{2}}{y}+\frac{1}{y}=-xy+y^{-1}\ \Longrightarrow\ y'+xy=y^{-1}\quad\checkmark\qquad y(0)=\sqrt{9}=3\quad\checkmark\]</div>
+    </div>
+      </div>
+</div>
+
+<div class="q">
+  <div class="qh"><span class="no">28</span><span class="qq">\(2xy\,y'+(x-1)\,y^{2}=x^{2}e^{x}\quad(y^{2}=z\text{로 놓아라})\)</span><span class="tag">치환 z = y² · 선형</span></div>
+  <div class="body">
+    <div class="stp">Step 1 치환하여 표준형으로 정리</div>
+    <div class="line">\[z=y^{2},\qquad z'=2y\,y'\ \Longrightarrow\ x\,z'+(x-1)\,z=x^{2}e^{x}\]</div>
+    <div class="line">\[z'+\left(1-\frac{1}{x}\right)z=x\,e^{x}\qquad p(x)=1-\frac{1}{x},\quad r(x)=x\,e^{x}\ :\ z\text{에 관한 선형 비제차}\]</div>
+    <div class="stp">Step 2 일반해 구하기</div>
+    <div class="line">\[h=\int p(x)\,dx=\int\left(1-\frac{1}{x}\right)dx=x-\ln|x|\qquad(x>0\text{ 구간에서})\quad e^{h}=\frac{e^{x}}{x},\qquad e^{-h}=x\,e^{-x}\]</div>
+    <div class="line">\[z=e^{-h}\left[\int e^{h}\,r\,dx+c\right]=x\,e^{-x}\left[\int\frac{e^{x}}{x}\cdot x\,e^{x}\,dx+c\right]=x\,e^{-x}\left[\int e^{2x}dx+c\right]=x\,e^{-x}\left[\tfrac{1}{2}e^{2x}+c\right]\]</div>
+    <div class="line">\[\Longrightarrow\quad z=\tfrac{1}{2}x\,e^{x}+c\,x\,e^{-x}\]</div>
+    <div class="ans"><span class="lb">∴ 일반해:</span>\(y^{2}=\tfrac{1}{2}x\,e^{x}+c\,x\,e^{-x}=x\left(\tfrac{1}{2}e^{x}+c\,e^{-x}\right)\quad(x\neq 0,\ \text{우변}>0\text{인 구간})\)</div>
+    <div class="stp">Step 3 검증</div>
+    <div class="chk">
+    <div class="line">\[z'=\tfrac{1}{2}e^{x}+\tfrac{1}{2}x\,e^{x}+c\,e^{-x}-c\,x\,e^{-x}\]</div>
+    <div class="line">\[x\,z'=\tfrac{1}{2}x\,e^{x}+\tfrac{1}{2}x^{2}e^{x}+c\,x\,e^{-x}-c\,x^{2}e^{-x},\qquad (x-1)\,z=\tfrac{1}{2}x^{2}e^{x}-\tfrac{1}{2}x\,e^{x}+c\,x^{2}e^{-x}-c\,x\,e^{-x}\]</div>
+    <div class="line">\[x\,z'+(x-1)\,z=x^{2}e^{x}\quad\checkmark\]</div>
+    <div class="line">\[2xy\,y'=x\,z'\ \text{이므로}\ 2xy\,y'+(x-1)y^{2}=x^{2}e^{x}\quad\checkmark\]</div>
+    </div>
+  </div>
+</div>
+
+<div class="sec">연습문제 2.1 — 차수축소법 (한 개의 해 y₁을 알 때)</div>
+
+<div class="q">
+  <div class="qh"><span class="no">06</span><span class="qq">\(xy''+2y'+xy=0,\quad y_{1}=\dfrac{\cos x}{x}\)</span><span class="tag">차수축소법</span></div>
+  <div class="body">
+    <div class="stp">Step 1 표준형으로 정리</div>
+    <div class="line">\[y''+\frac{2}{x}\,y'+y=0\qquad p(x)=\frac{2}{x},\quad q(x)=1\]</div>
+    <div class="stp">Step 2 차수축소법 적용</div>
+    <div class="line">\[\int p\,dx=\int\frac{2}{x}\,dx=2\ln|x|,\qquad e^{-\int p\,dx}=e^{-2\ln|x|}=\frac{1}{x^{2}},\qquad y_{1}^{2}=\frac{\cos^{2}x}{x^{2}}\]</div>
+    <div class="line">\[U=\frac{1}{y_{1}^{2}}\,e^{-\int p\,dx}=\frac{x^{2}}{\cos^{2}x}\cdot\frac{1}{x^{2}}=\sec^{2}x,\qquad u=\int U\,dx=\int\sec^{2}x\,dx=\tan x\]</div>
+    <div class="stp">Step 3 두 번째 해 구하기</div>
+    <div class="line">\[y_{2}=u\,y_{1}=\tan x\cdot\frac{\cos x}{x}=\frac{\sin x}{x}\]</div>
+    <div class="ans"><span class="lb">∴ 기저:</span>\(y_{1}=\dfrac{\cos x}{x},\quad y_{2}=\dfrac{\sin x}{x}\)</div>
+    <div class="ans"><span class="lb">일반해:</span>\(y=\dfrac{c_{1}\cos x+c_{2}\sin x}{x}\quad(x\neq 0)\)</div>
+    <div class="stp">Step 4 검증</div>
+    <div class="chk">
+    <div class="line">\[y_{2}=\frac{\sin x}{x},\qquad y_{2}'=\frac{x\cos x-\sin x}{x^{2}},\qquad y_{2}''=\frac{-x^{2}\sin x-2x\cos x+2\sin x}{x^{3}}\]</div>
+    <div class="line">\[x\,y_{2}''+2y_{2}'+x\,y_{2}=\frac{-x^{2}\sin x-2x\cos x+2\sin x}{x^{2}}+\frac{2x\cos x-2\sin x}{x^{2}}+\sin x\]</div>
+    <div class="line">\[\qquad=-\sin x+\sin x=0\quad\checkmark\]</div>
+    <div class="line">\[\frac{y_{2}}{y_{1}}=\tan x\neq\text{const}\ \Longrightarrow\ y_{1},\,y_{2}\ \text{1차독립 (기저)}\quad\checkmark\]</div>
+    </div>
+  </div>
+</div>
+
+<div class="q">
+  <div class="qh"><span class="no">09</span><span class="qq">\(x^{2}y''+xy'-4y=0,\quad y_{1}=x^{2}\)</span><span class="tag">차수축소법</span></div>
+  <div class="body">
+    <div class="stp">Step 1 표준형으로 정리</div>
+    <div class="line">\[y''+\frac{1}{x}\,y'-\frac{4}{x^{2}}\,y=0\qquad p(x)=\frac{1}{x},\quad q(x)=-\frac{4}{x^{2}}\]</div>
+    <div class="stp">Step 2 차수축소법 적용</div>
+    <div class="line">\[\int p\,dx=\int\frac{1}{x}\,dx=\ln|x|\qquad(x>0\text{ 구간에서})\quad e^{-\int p\,dx}=e^{-\ln x}=\frac{1}{x},\qquad y_{1}^{2}=x^{4}\]</div>
+    <div class="line">\[U=\frac{1}{y_{1}^{2}}\,e^{-\int p\,dx}=\frac{1}{x^{4}}\cdot\frac{1}{x}=x^{-5},\qquad u=\int U\,dx=\int x^{-5}dx=-\frac{1}{4}x^{-4}\]</div>
+    <div class="stp">Step 3 두 번째 해 구하기</div>
+    <div class="line">\[y_{2}=u\,y_{1}=-\frac{1}{4}x^{-4}\cdot x^{2}=-\frac{1}{4}x^{-2}\ \Longrightarrow\ \text{상수배를 떼어}\ y_{2}=x^{-2}=\frac{1}{x^{2}}\]</div>
+    <div class="ans"><span class="lb">∴ 기저:</span>\(y_{1}=x^{2},\quad y_{2}=\dfrac{1}{x^{2}}\)</div>
+    <div class="ans"><span class="lb">일반해:</span>\(y=c_{1}x^{2}+\dfrac{c_{2}}{x^{2}}\quad(x\neq 0)\)</div>
+    <div class="stp">Step 4 검증</div>
+    <div class="chk">
+    <div class="line">\[y_{2}=x^{-2},\qquad y_{2}'=-2x^{-3},\qquad y_{2}''=6x^{-4}\]</div>
+    <div class="line">\[x^{2}y_{2}''+x\,y_{2}'-4y_{2}=6x^{-2}-2x^{-2}-4x^{-2}=0\quad\checkmark\]</div>
+    <div class="line">\[\frac{y_{2}}{y_{1}}=x^{-4}\neq\text{const}\ \Longrightarrow\ y_{1},\,y_{2}\ \text{1차독립 (기저)}\quad\checkmark\]</div>
+    </div>
+  </div>
+</div>
+
+<div class="grp">
+<div class="sec">연습문제 2.2 — 상수계수를 갖는 제차선형상미분방정식 (특성방정식)</div>
+
+<div class="q">
+  <div class="qh"><span class="no">4</span><span class="qq">\(y''+4y'+(\pi^{2}+4)\,y=0\)</span><span class="tag">경우 3 · 공액복소근</span></div>
+  <div class="body">
+    <div class="stp">Step 1 특성방정식</div>
+    <div class="line">\[y=e^{\lambda x}\ \Longrightarrow\ \lambda^{2}+4\lambda+(\pi^{2}+4)=0\]</div>
+    <div class="stp">Step 2 근의 판별</div>
+    <div class="line">\[a=4,\ b=\pi^{2}+4:\qquad a^{2}-4b=16-4\pi^{2}-16=-4\pi^{2}\lt 0\ \Longrightarrow\ \text{경우 3 (공액복소근)}\]</div>
+    <div class="line">\[\lambda=-\tfrac{a}{2}\pm i\,\omega,\qquad \omega=\sqrt{b-\tfrac{a^{2}}{4}}=\sqrt{\pi^{2}+4-4}=\pi\ \Longrightarrow\ \lambda=-2\pm i\pi\]</div>
+    <div class="stp">Step 3 일반해 구하기</div>
+    <div class="ans"><span class="lb">∴ 일반해:</span>\(y=e^{-2x}\left(A\cos\pi x+B\sin\pi x\right)\)</div>
+    <div class="stp">Step 4 검증</div>
+    <div class="chk">
+    <div class="line">\[u=A\cos\pi x+B\sin\pi x\ \text{로 놓으면}\ u''=-\pi^{2}u,\qquad y=e^{-2x}u\]</div>
+    <div class="line">\[y'=e^{-2x}\left(u'-2u\right),\qquad y''=e^{-2x}\left(u''-4u'+4u\right)\]</div>
+    <div class="line">\[y''+4y'+(\pi^{2}+4)y=e^{-2x}\left[u''-4u'+4u+4u'-8u+(\pi^{2}+4)u\right]=e^{-2x}\left[u''+\pi^{2}u\right]=e^{-2x}\left[-\pi^{2}u+\pi^{2}u\right]=0\quad\checkmark\]</div>
+    </div>
+  </div>
+</div>
+
+<div class="q">
+  <div class="qh"><span class="no">8</span><span class="qq">\(y''+y'+3.25\,y=0\)</span><span class="tag">경우 3 · 공액복소근</span></div>
+  <div class="body">
+    <div class="stp">Step 1 특성방정식</div>
+    <div class="line">\[\lambda^{2}+\lambda+3.25=0\]</div>
+    <div class="stp">Step 2 근의 판별</div>
+    <div class="line">\[a=1,\ b=3.25:\qquad a^{2}-4b=1-13=-12\lt 0\ \Longrightarrow\ \text{경우 3 (공액복소근)}\]</div>
+    <div class="line">\[\omega=\sqrt{b-\tfrac{a^{2}}{4}}=\sqrt{3.25-0.25}=\sqrt{3}\ \Longrightarrow\ \lambda=-\tfrac{1}{2}\pm i\sqrt{3}\]</div>
+    <div class="stp">Step 3 일반해 구하기</div>
+    <div class="ans"><span class="lb">∴ 일반해:</span>\(y=e^{-x/2}\left(A\cos\sqrt{3}\,x+B\sin\sqrt{3}\,x\right)\)</div>
+    <div class="stp">Step 4 검증</div>
+    <div class="chk">
+    <div class="line">\[u=A\cos\sqrt{3}\,x+B\sin\sqrt{3}\,x,\qquad u''=-3u,\qquad y=e^{-x/2}u\]</div>
+    <div class="line">\[y'=e^{-x/2}\left(u'-\tfrac{1}{2}u\right),\qquad y''=e^{-x/2}\left(u''-u'+\tfrac{1}{4}u\right)\]</div>
+    <div class="line">\[y''+y'+3.25y=e^{-x/2}\left[u''-u'+\tfrac{1}{4}u+u'-\tfrac{1}{2}u+3.25u\right]=e^{-x/2}\left[u''+3u\right]=e^{-x/2}\left[-3u+3u\right]=0\quad\checkmark\]</div>
+    </div>
+  </div>
+</div>
+
+<div class="q">
+  <div class="qh"><span class="no">14</span><span class="qq">\(y''+2k^{2}y'+k^{4}y=0\)</span><span class="tag">경우 2 · 실이중근</span></div>
+  <div class="body">
+    <div class="stp">Step 1 특성방정식</div>
+    <div class="line">\[\lambda^{2}+2k^{2}\lambda+k^{4}=0\]</div>
+    <div class="stp">Step 2 근의 판별</div>
+    <div class="line">\[a=2k^{2},\ b=k^{4}:\qquad a^{2}-4b=4k^{4}-4k^{4}=0\ \Longrightarrow\ \text{경우 2 (실이중근)}\]</div>
+    <div class="line">\[\lambda^{2}+2k^{2}\lambda+k^{4}=(\lambda+k^{2})^{2}=0\ \Longrightarrow\ \lambda=-k^{2}\ (\text{이중근})\]</div>
+    <div class="stp">Step 3 일반해 구하기</div>
+    <div class="ans"><span class="lb">∴ 일반해:</span>\(y=(c_{1}+c_{2}x)\,e^{-k^{2}x}\)</div>
+    <div class="stp">Step 4 검증</div>
+    <div class="chk">
+    <div class="line">\[y=(c_{1}+c_{2}x)e^{-k^{2}x},\qquad y'=e^{-k^{2}x}\left[c_{2}-k^{2}(c_{1}+c_{2}x)\right]\]</div>
+    <div class="line">\[y''=e^{-k^{2}x}\left[-k^{2}c_{2}-k^{2}c_{2}+k^{4}(c_{1}+c_{2}x)\right]=e^{-k^{2}x}\left[-2k^{2}c_{2}+k^{4}(c_{1}+c_{2}x)\right]\]</div>
+    <div class="line">\[y''+2k^{2}y'+k^{4}y=e^{-k^{2}x}\left[-2k^{2}c_{2}+k^{4}(c_{1}+c_{2}x)+2k^{2}c_{2}-2k^{4}(c_{1}+c_{2}x)+k^{4}(c_{1}+c_{2}x)\right]=0\quad\checkmark\]</div>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="grp">
+<div class="sec">연습문제 2.3 — 미분연산자 (인수분해)</div>
+
+<div class="q">
+  <div class="qh"><span class="no">8</span><span class="qq">\((D^{2}+3I)\,y=0\)</span><span class="tag">연산자 인수분해 · 경우 3</span></div>
+  <div class="body">
+    <div class="stp">Step 1 특성방정식</div>
+    <div class="line">\[\lambda^{2}+3=0\]</div>
+    <div class="stp">Step 2 근의 판별</div>
+    <div class="line">\[a=0,\ b=3:\qquad a^{2}-4b=-12\lt 0\ \Longrightarrow\ \text{경우 3 (공액복소근)},\qquad \lambda=\pm i\sqrt{3}\]</div>
+    <div class="stp">Step 3 일반해 구하기 (연산자 인수분해)</div>
+    <div class="line">\[D^{2}+3I=(D-i\sqrt{3}\,I)(D+i\sqrt{3}\,I)\qquad(\text{실수 계수의 일차 연산자로는 인수분해되지 않으므로 복소 인수로})\]</div>
+    <div class="line">\[(D-i\sqrt{3}\,I)\,y_{1}=0\ \Longrightarrow\ y_{1}=e^{i\sqrt{3}x},\qquad (D+i\sqrt{3}\,I)\,y_{2}=0\ \Longrightarrow\ y_{2}=e^{-i\sqrt{3}x}\]</div>
+    <div class="line">\[\text{두 인수는 교환되므로}\ (D^{2}+3I)y_{1}=(D+i\sqrt{3}I)(D-i\sqrt{3}I)y_{1}=0,\quad (D^{2}+3I)y_{2}=0\]</div>
+    <div class="line">\[\cos\sqrt{3}\,x=\tfrac{1}{2}(y_{1}+y_{2}),\qquad \sin\sqrt{3}\,x=\tfrac{1}{2i}(y_{1}-y_{2})\ \Longrightarrow\ \text{실수 기저}\ \cos\sqrt{3}\,x,\ \sin\sqrt{3}\,x\]</div>
+    <div class="ans"><span class="lb">∴ 일반해:</span>\(y=A\cos\sqrt{3}\,x+B\sin\sqrt{3}\,x\)</div>
+    <div class="stp">Step 4 검증</div>
+    <div class="chk">
+    <div class="line">\[y'=-\sqrt{3}A\sin\sqrt{3}\,x+\sqrt{3}B\cos\sqrt{3}\,x,\qquad y''=-3A\cos\sqrt{3}\,x-3B\sin\sqrt{3}\,x=-3y\]</div>
+    <div class="line">\[(D^{2}+3I)\,y=y''+3y=-3y+3y=0\quad\checkmark\]</div>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},svg:{fontCache:'global'},options:{renderActions:{addMenu:[]}}};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.js" async></script>
+</html>
