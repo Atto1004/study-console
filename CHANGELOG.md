@@ -4,6 +4,14 @@
 
 ## 2026-09-21
 
+### .49 — 디자인 재설계 1차: 평면 셸 · 과목 행 목록 · 오늘 탭 · 5탭 (아토 "디자인이 개망 · 메가스터디·이투스 참고")
+- 기준: 브리프 `docs/briefs/v49-design-brief-r3.md`(인강 앱 4종 앱스토어 42장 실측 → 오타 2·3·4차 GREEN), 아토 결정 4건(학습시스템 지침 §15): 색 제한 지침에서 제외 · 표지 사진 → 행 칩 · 5탭 · 덱 본문 손글씨 유지.
+- `V44 LAYER`(원본 `docs/layers/v44-layer-src.js`, 삽입 `~/.claude/scratch/sc_test/insert_v44.py`): 연회색 바탕 `#F4F6F5` + 평면 흰 카드 · 헤더 한 줄(게이지 숨김 → `D-28 중간고사` 칩, 폰은 ↻·◐ 숨김) · 탭 5개(오늘·할 일·학습·과목·설정; 달력 = 오늘 탭 「달력」 버튼 + 달력 화면 「← 오늘」, 학점·졸업 = 과목/학점 화면 세그먼트; cal/grade/course 에서는 오늘/과목 탭이 켜짐) · `renderShelf` 래핑: `.book` → `.crow` 행(44px 색 칩 약자 · 과목명·재수강 · 이수/학점/요일/출석 · 시험 D-day ≤21 · 덱 진도 `학습 n%` / `덱 k/n 진행` / `학습 시작 전` / `덱 준비 중` · ⋯ 44px 메뉴). 이벤트는 원본 `.book` 블록 이관(짧게 = go course · 520ms 길게 = bookMenu · contextmenu · Enter/Space, 자식 버튼 키 입력 무시). 표지/책등 세그먼트 숨김, 개인 공부 세그먼트 유지 · `renderToday` 래핑: `#v44TodayStats`(D-day · 이번 주 회차 ended/total, 시험기간엔 오늘 학습 분) + `#dayBooks` 안을 `.drow`(3px 과목색 바 · 시작/끝 · 과목 · 장소 · 출결 배지 · 덱 있는 회차 [학습]=openStudy)로 · `markSave(state)` 3상태(dirty/saved/failed, cloudSave 실패 경로 2곳 `markSave("failed")`) · 영문 UI 라벨 스크럽(.hs/.kicker/.kbdhint/.rail-sec 중 대문자만, V43 RESUME 포함) · 저장 버튼은 보조(아웃라인), 할 일 요약 버튼도 텍스트형.
+- 과목 팔레트 `V44.COURSE_COLORS`(bucket 기준 8색, 저채도). 기존 `typeA` 면색은 표시 안 함(데이터 유지).
+- **V41 버그 수정**: 임시 덱 4개의 NOTES 등록이 `patchV41b` 플래그 뒤에 있어 두 번째 로드부터 학습 탭 목록·덱 판정에서 빠지던 것 → `V44.ensureDeckNotes` 매 부팅 등록 (허용 목록 밖 — 아토 승인 조건).
+- 검증: 구문검사 0 · 스모크 138건×3시점(V34 표지 검사 → 행 검사로 교체, 기존 CADD 9/15 검사 1건 제외) · `v44_check.cjs` 47건 · 390/768/1180 `documentElement.scrollWidth ≤ innerWidth` 전 뷰(390은 `_shot_m.html` iframe 호스트 + `--allow-file-access-from-files`, 크롬 헤드리스 최소 폭 500) · 캡처 라이트/다크/폰. 오타 5차 RED 5건(자식 버튼 Enter · 44px · dirty 전이 · 덱 분모 · 허용 목록) → 6차 GREEN(`docs/otta/_v44-otta-2.md`).
+- .50 예정: 과목 화면 회차 행 · 할 일 단일 목록 · 덱 조작부(Pretendard·연속 진행바·결과 장 주버튼).
+
 ### .48 — 덱 즉시 채점 · 정답이면 풀이 판 생략 · 「이어서 학습하기」
 - 덱 템플릿 v5a(`docs/tools/slides_tpl.html`, 빌드된 덱 5개에 같은 치환 — `~/.claude/scratch/sc_test/patch_tpl_v5a.py` 멱등): 객관식은 보기를 누르는 순간 제출·채점(「답 확인」 버튼 없음) · 정답이면 답·풀이 판을 자동으로 띄우지 않음(「답 · 풀이 다시 보기」로 열람, 오답·주관식 자기채점 전에는 그대로 뜸) · 저장 때마다 `mc-slides-last`·`mc-slides-last-<deck>` 에 위치 기록 `{deck,title,href,idx,n,sid,part,partTitle,where,qDone,qN,ts}` · `#resume` = 저장 위치에서 열기 · `#check`(빌드 검사) 중에는 저장 안 함.
 - `V43 LAYER`(원본 `docs/layers/v43-layer-src.js`): 오늘 탭 「오늘 수업」 아래 + 그 과목 화면 회차 표 위에 「이어서 학습하기」 카드(과목 칩 · 덱 제목 · 파트 › 위치 · n/N장 · 문제 진행 · 몇 시간 전). 버튼은 덱을 `#resume`으로 앱 안 뷰어에 연다(`#at=`은 파트 시작으로 되돌리므로 안 씀). 뷰어 닫기·`storage` 이벤트로 카드 갱신. 저장값 숫자 칸은 숫자로 강제, 문자열은 esc.
