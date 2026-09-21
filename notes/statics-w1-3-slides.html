@@ -441,6 +441,29 @@ async function runCheck(){
   c.innerHTML='<h2 id="chkTitle">검사: '+SLIDES.length+'장 · 실패 '+fails.length+'</h2><pre id="chkList">'+esc(fails.join("\n"))+'</pre>';
   window.CHECK_RESULT={n:SLIDES.length,fails};
 }
+/* V5B-CTX: 학습 질문 패널용 문맥 (아토 2026-09-21). 앱이 gen 을 주기 전엔 보내지 않는다 — 이전 창의 늦은 메시지를 앱이 gen 으로 걸러낸다 */
+let CTX_GEN=null;
+const ctxPlain=(h,n)=>{ const t=String(h||"").replace(/<[^>]+>/g," ").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/\s+/g," ").trim(); return t.length>n?t.slice(0,n)+"…(잘림)":t; };
+function postCtx(){
+  try{
+    if(location.hash==="#check"||!CTX_GEN||window.parent===window) return;
+    const s=SLIDES[Math.max(0,Math.min(ST.idx,SLIDES.length-1))]; if(!s) return;
+    const p=s.part?PARTS.find(x=>x.n===s.part):null; const li=lastInfo()||{};
+    const msg={type:"mc-slide",v:1,gen:CTX_GEN,deck:DECK_ID,title:String(document.title).slice(0,80),sid:s.id,stype:s.type,part:s.part||null,
+      partTitle:p?String(p.title).replace(/[\s★]+$/,"").slice(0,60):"",label:String(li.where||"").slice(0,80),q:null};
+    if(s.type==="q"){
+      const rev=!!ST.revealed[s.id], mc=Array.isArray(s.choices)&&s.choices.length>0, my=(ST.answer||{})[s.id];
+      msg.q={qn:String(s.qn||"").slice(0,80),kind:String(s.kind||"").slice(0,10),text:ctxPlain(s.html,600),
+        choices:mc?s.choices.slice(0,6).map(c=>ctxPlain(c.html,120)):[],
+        my: my==null||my===""?null:(mc?(s.choices[+my]?ctxPlain(s.choices[+my].html,120):null):String(my).slice(0,200)),
+        revealed:rev, correct: rev&&typeof ST.correct[s.id]==="boolean"?ST.correct[s.id]:null,
+        answer: rev&&mc?(s.choices.map((c,i)=>c.ok?i+1:0).filter(Boolean).join(",")||null):null};
+    } else if(s.type==="concept"||s.type==="mu"){ msg.q={qn:String(s.title||"").slice(0,80),kind:s.type==="mu"?"암기·이해":"개념",text:ctxPlain(s.type==="mu"?[].concat(s.mem||[],s.und||[]).join(" · "):s.html,600),choices:[],my:null,revealed:true,correct:null,answer:null}; }
+    window.parent.postMessage(msg, location.origin);
+  }catch(e){}
+}
+window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; postCtx(); } });
+const _renderV5b=render; render=function(){ _renderV5b(); postCtx(); };
 function boot(){
   { const m=/^#(from|done|at)=([\w-]+)(?:,pad)?$/.exec(location.hash||""); if(m){ startFrom(m[2], m[1]==="from"?"skip":m[1]); if(/,pad$/.test(location.hash)) setTimeout(()=>$("#padBtn").click(),300); return; } }
   if(location.hash==="#check"){ runCheck(); return; }
