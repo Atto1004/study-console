@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-21.51";
+var BUILD="2026-09-21.52";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4839,6 +4839,9 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-21.52",d:"09-21",items:[
+    "질문 패널의 상대 = 김주영 스앵님(학습앱 전용 AI, 아톰·오타와 다른 정체성). atom 에 study 대화가 생기면 자동으로 그쪽으로, 아직 없으면 아톰·오타 그룹 채팅으로 임시 연결(패널 헤더에 표시). 스앵님 정체성 원본 본사/atom/personas/kimjuyoung/CLAUDE.md, 서버 패치 apply_study_persona.py(재시작 필요)"
+  ]},
   {v:"2026-09-21.50",d:"09-21",items:[
     "학습 중 질문: 덱·노트 뷰어 헤더 [질문] → 오른쪽 열(폰은 아래 시트)에서 아톰·오타에게 질문. atom 그룹 채팅(아톰 답 → 오타 검증)으로 들어가고, 현재 장(문제·보기·내 답·정오)이 문맥으로 자동 첨부(끌 수 있음). atom 안(/study/)에서만 전송, 깃허브 페이지에서는 미리보기",
     "상태 표시: 보내는 중 / 아톰이 답하는 중 · 경과 / 오타가 검토 중 / 기록 동기화됨 · 완료 미확정 / 연결 끊김·잠금·로그인 필요. 답변 중 입력 잠금, 다른 창 답변 중이면 초안 보존"
@@ -9751,6 +9754,7 @@ var V33={};
   if(window.V45) return;
   var V45=window.V45={};
   V45.LIM={title:80,partTitle:60,label:80,qn:80,text:600,choice:120,choices:6,my:200,block:1500,answerNote:1500};
+  V45.mode="study";   /* "study" = 김주영 스앵님 전용 대화(kind study, 아토 2026-09-21) · "group" = 서버가 아직 study 대화를 모를 때의 임시 경로(아톰·오타) */
   V45.gen=null; V45.seq=0; V45.expectDeck=null; V45.ctx=null; V45.groupId=null; V45.msgs=[]; V45.live=[]; V45.req=null; V45.state="idle"; V45.open=false; V45.draft="";
   try{ V45.open=localStorage.getItem("mc-qa-open")==="1"; }catch(e){}
   var hosted=function(){ return !!window.ATOM_HOSTED; };
@@ -9793,8 +9797,10 @@ var V33={};
   };
   V45.prompt=function(q){
     var b=V45.ctxBlock();
-    return "[학습 질문 — 설명·검증만, 후속 실행 요청 없음]\n아톰: 학생 눈높이로 1,500자 안에 설명. 오타: 아톰 설명의 수학·논리 정확성만 판정(코드·파일 대상 아님). 판정 형식은 AGENTS.md 그대로.\n질문: "+q+
-      (b?"\n--- 참고 문맥 (덱에서 자동 수집) ---\n"+b:"\n(문맥 없음 — 덱 미지원 화면)");
+    var head= V45.mode==="study"
+      ? "[학습 질문]\n질문: "+q
+      : "[학습 질문 — 설명·검증만, 후속 실행 요청 없음]\n아톰: 학생 눈높이로 1,500자 안에 설명. 오타: 아톰 설명의 수학·논리 정확성만 판정(코드·파일 대상 아님). 판정 형식은 AGENTS.md 그대로.\n질문: "+q;
+    return head+(b?"\n--- 참고 문맥 (덱에서 자동 수집) ---\n"+b:"\n(문맥 없음 — 덱 미지원 화면)");
   };
 
   /* ---------- SSE 파서 (청크 경계·UTF-8 안전) ---------- */
@@ -9804,7 +9810,9 @@ var V33={};
   V45.api=function(url,opt){ return fetch(url,Object.assign({credentials:"same-origin"},opt||{})); };
   V45.findGroup=function(){
     return V45.api("/api/conversations").then(function(r){ if(r.status===401) throw {kind:"unauth"}; if(!r.ok) throw {kind:"http",status:r.status}; return r.json(); })
-      .then(function(list){ var arr=Array.isArray(list)?list:(list&&list.conversations)||[]; var g=arr.filter(function(c){return c.kind==="group";})[0]; if(!g) throw {kind:"nogroup"}; V45.groupId=g.id; return g.id; });
+      .then(function(list){ var arr=Array.isArray(list)?list:(list&&list.conversations)||[]; var st=arr.filter(function(c){return c.kind==="study";})[0], g=arr.filter(function(c){return c.kind==="group";})[0];
+        if(st){ V45.mode="study"; V45.groupId=st.id; } else if(g){ V45.mode="group"; V45.groupId=g.id; } else throw {kind:"nogroup"};
+        V45.renderHead(); return V45.groupId; });
   };
   V45.loadHistory=function(){
     if(!V45.groupId) return Promise.resolve(false);
@@ -9873,6 +9881,10 @@ var V33={};
   /* ---------- 렌더 ---------- */
   var md=function(t){ var h=esc(t); h=h.replace(/```([\s\S]*?)```/g,function(_,c){return '<pre>'+c+'</pre>';}).replace(/`([^`\n]+)`/g,'<code>$1</code>').replace(/\*\*([^*\n]+)\*\*/g,'<b>$1</b>'); return h.split(/\n/).map(function(l){ return /^\s*[-•] /.test(l)?'<div class="v45-li">'+l.replace(/^\s*[-•] /,'')+'</div>':l; }).join("<br>").replace(/(<\/div>)<br>/g,'$1').replace(/<br>(<pre>)/g,'$1'); };
   V45.roleName={user:"아토",assistant:"아톰",otta:"오타"};
+  V45.who=function(role){ return role==="assistant"&&V45.mode==="study"?"스앵님":V45.roleName[role]; };
+  V45.renderHead=function(){ var t=$("#v45Panel .v45-ht b"), n=$("#v45Panel .v45-ht .v45-mut"); if(!t) return;
+    if(V45.mode==="study"){ t.textContent="김주영 스앵님에게 질문"; n.textContent="학습앱 전용 AI · 아톰·오타와 다른 정체성"; }
+    else { t.textContent="아톰 · 오타에게 질문"; n.textContent="스앵님 대화가 아직 없어 아톰·오타 그룹 채팅으로 갑니다(서버 갱신 전)"; } };
   /* 서버에 저장된 아토 메시지는 문맥 블록이 붙은 전체 프롬프트 → 질문 줄만 보이고 문맥은 접는다 */
   V45.userView=function(t){ if(t.indexOf("[학습 질문")!==0) return {q:t,ctx:""}; var m=/\n질문: ([\s\S]*?)(?:\n--- 참고 문맥[^\n]*\n([\s\S]*)|\n\(문맥 없음[^\n]*\)|$)/.exec(t); return m?{q:m[1].trim(),ctx:(m[2]||"").trim()}:{q:t,ctx:""}; };
   V45.renderChip=function(){ var el=$("#v45Chip"); if(!el) return; var c=V45.ctx;
@@ -9885,8 +9897,8 @@ var V33={};
     var atBottom=box.scrollHeight-box.scrollTop-box.clientHeight<40;
     box.innerHTML=all.length?all.map(function(m){ var role=m.role==="user"?"user":m.role==="otta"?"otta":"assistant"; var long=role==="assistant"&&m.text.length>V45.LIM.answerNote;
       var body=m.text, ctxHtml=""; if(role==="user"){ var uv=V45.userView(m.text); body=uv.q; if(uv.ctx) ctxHtml='<details class="v45-det"><summary>문맥</summary>'+md(uv.ctx)+'</details>'; }
-      return '<div class="v45-m '+role+(m.provisional?" prov":"")+'"><div class="v45-who">'+V45.roleName[role]+(m.provisional&&!m.done&&role!=="user"?' <i>…</i>':'')+'</div><div class="v45-b">'+md(body)+ctxHtml+'</div>'+(long?'<div class="v45-note">1,500자 이후는 오타 검증에 들어가지 않았습니다(서버 맥락 절단)</div>':'')+'</div>'; }).join("")
-      :'<div class="v45-empty">덱을 보다가 막히면 여기서 물어보세요. 아톰이 설명하고 오타가 검증합니다.</div>';
+      return '<div class="v45-m '+role+(m.provisional?" prov":"")+'"><div class="v45-who">'+V45.who(role)+(m.provisional&&!m.done&&role!=="user"?' <i>…</i>':'')+'</div><div class="v45-b">'+md(body)+ctxHtml+'</div>'+(long?'<div class="v45-note">1,500자 이후는 오타 검증에 들어가지 않았습니다(서버 맥락 절단)</div>':'')+'</div>'; }).join("")
+      :'<div class="v45-empty">'+(V45.mode==="study"?"덱을 보다가 막히면 스앵님에게 물어보세요. 결론 → 원리 → 확인 문제 순으로 답합니다.":"덱을 보다가 막히면 여기서 물어보세요. 아톰이 설명하고 오타가 검증합니다.")+'</div>';
     if(atBottom||!soft) box.scrollTop=box.scrollHeight;
   };
   V45.renderStatus=function(){ var el=$("#v45Status"); if(!el) return; var s=V45.state, x=V45.stateExtra||""; var t={idle:"",sending:"보내는 중…",running:(x||"답하는 중")+" · "+V45.elapsed(),synced:"기록 동기화됨 · 완료 미확정",unsynced:"기록 확인 안 됨 · 새로고침",dropped:"연결이 끊겼습니다 — 서버는 계속 답할 수 있습니다",locked:"다른 창에서 답변 중 — 초안은 남겨 두었습니다",unauth:"atom 로그인이 필요합니다",nogroup:"그룹 채팅을 찾지 못했습니다",http:"서버 오류 "+x,error:"오류 "+x}[s]||""; el.textContent=t; el.className="v45-status "+s;
@@ -9898,10 +9910,10 @@ var V33={};
   /* ---------- 패널 DOM ---------- */
   V45.ensure=function(){
     var v=$("#ntv"); if(!v||$("#v45Panel")) return;
-    var h=$("#ntv .ntv-h"); var btn=document.createElement("button"); btn.className="btn xs v45-btn"; btn.id="v45Btn"; btn.textContent="질문"; btn.title="아톰·오타에게 질문"; btn.onclick=V45.toggle; h.appendChild(btn);
+    var h=$("#ntv .ntv-h"); var btn=document.createElement("button"); btn.className="btn xs v45-btn"; btn.id="v45Btn"; btn.textContent="질문"; btn.title="김주영 스앵님에게 질문"; btn.onclick=V45.toggle; h.appendChild(btn);
     var wrap=document.createElement("div"); wrap.id="v45Wrap"; var fr=$("#ntvFrame"); fr.parentNode.insertBefore(wrap,fr); wrap.appendChild(fr);
-    var p=document.createElement("aside"); p.id="v45Panel"; p.setAttribute("aria-label","아톰·오타에게 질문");
-    p.innerHTML='<div class="v45-h"><div class="v45-ht"><b>아톰 · 오타에게 질문</b><span class="v45-mut">아톰·오타 그룹 채팅과 같은 대화입니다</span></div><button class="btn xs" id="v45Close" aria-label="닫기">닫기</button></div>'+
+    var p=document.createElement("aside"); p.id="v45Panel"; p.setAttribute("aria-label","스앵님에게 질문");
+    p.innerHTML='<div class="v45-h"><div class="v45-ht"><b>김주영 스앵님에게 질문</b><span class="v45-mut">학습앱 전용 AI · 아톰·오타와 다른 정체성</span></div><button class="btn xs" id="v45Close" aria-label="닫기">닫기</button></div>'+
       '<div class="v45-ctx"><label><input type="checkbox" id="v45Use" checked> 이 문제 문맥 붙이기</label><div id="v45Chip"></div></div>'+
       '<div id="v45Msgs" class="v45-msgs"></div>'+
       '<div id="v45Status" class="v45-status"></div>'+
