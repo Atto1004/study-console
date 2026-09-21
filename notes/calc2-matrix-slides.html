@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 :root{
   /* 5색 고정 (지침 §2) */
@@ -157,6 +158,86 @@ body{display:grid;place-items:center;padding:12px}
 #hintBox[hidden]{display:none}
 /* 검사 모드 표시 */
 #chk{position:absolute;left:0;right:0;top:0;bottom:0;background:var(--paper);overflow:auto;padding:20px;z-index:30;font-size:var(--fs-note);display:none}
+
+/* ===== V6 UI — 조작부 재설계 (아토 2026-09-21). 본문(손글씨·5색)은 그대로, 조작부만 정자·평면 ===== */
+:root{--ui:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;--accent:#4F9A35;--accent-soft:#EAF4E6;--bad:#D23B3B;--bad-soft:#FBEAEA;--line:#E3E8E5;--soft:#F4F6F5;--bg:#EEF1EF;--muted:#6B7570;--ink-3:#8A9490}
+body{background:var(--bg)}
+#stage{border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+/* 상단: 분절 진행 막대 + 정자 라벨 */
+#top{padding:12px 20px;gap:14px;font-family:var(--ui);font-size:13px;color:var(--muted);border-bottom:1px solid var(--line);background:#fff}
+#progress{gap:3px;flex-wrap:nowrap;overflow:hidden}
+.dot{flex:1 1 0;width:auto;min-width:6px;max-width:28px;height:6px;border:0;border-radius:3px;background:var(--line)}
+.dot.done{background:var(--accent)}.dot.cur{background:#B7DBA8;outline:0;box-shadow:inset 0 0 0 1px var(--accent)}.dot.exam{background:#FFC2D8}.dot.exam.done{background:var(--exam)}
+#chapter{font-family:var(--ui);font-size:13px;font-weight:600;color:#1F2A24}
+#pos{font-family:var(--ui);font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted)}
+/* 본문 상자: 두꺼운 파란 테두리 → 좌측 바 */
+#body .why,#body .concept{border:0;border-left:3px solid var(--concept);background:#F5F8FD;border-radius:0 10px 10px 0}
+#body .one{border-radius:0 10px 10px 0}#body .say{border-radius:0 10px 10px 0}
+#body .tw{border-radius:10px}
+.mu-mem{border:0;border-left:3px solid #E5C400;background:#FFF9D6;border-radius:0 10px 10px 0}.mu-und{border:0;border-left:3px solid var(--concept);background:#F5F8FD;border-radius:0 10px 10px 0}
+.q-kind{font-family:var(--ui);font-size:12px;font-weight:600;border:0;border-radius:999px;padding:2px 10px;background:var(--accent-soft);color:var(--accent);vertical-align:middle}
+#body .kicker{font-family:var(--ui);font-size:12px;letter-spacing:0;color:var(--ink-3)}
+/* 보기 카드 */
+.choices{gap:10px;margin-top:12px}
+.choice{font-family:var(--font-hand);border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px 14px;min-height:56px;transition:border-color .12s,background .12s}
+.choice:hover{border-color:#B9C4BE;background:var(--soft)}
+.choice .cn{flex:0 0 28px;width:28px;height:28px;border:0;border-radius:50%;background:var(--soft);color:#1F2A24;font-family:var(--ui);font-size:13px;font-weight:600}
+.choice.sel{border:2px solid var(--accent);padding:11px 13px}.choice.sel .cn{background:var(--accent);color:#fff}
+.choice.ok{border:2px solid var(--accent);background:var(--accent-soft);padding:11px 13px}.choice.ok .cn{background:var(--accent);color:#fff}
+.choice.bad{border:2px solid var(--bad);background:var(--bad-soft);padding:11px 13px}.choice.bad .cn{background:var(--bad);color:#fff}
+.choice[disabled]:not(.ok):not(.bad){opacity:.55}
+.choice:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* 주관식 */
+.myans label{font-family:var(--ui);font-size:12px;color:var(--muted)}
+.myans textarea{border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-family:var(--ui);font-size:16px;background:#fff}
+.myans textarea:focus-visible{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+.myans-show{border:1px dashed #B9C4BE;border-radius:12px;background:var(--soft)}
+.myans-txt{font-family:var(--ui);font-size:16px}
+.myans-note{margin-top:8px}
+/* 판정·안내 */
+.verdict{font-family:var(--ui);font-size:13px;font-weight:600;border:0;border-radius:999px;padding:6px 12px;background:var(--soft);color:#1F2A24}
+.verdict.ok{background:var(--accent-soft);color:var(--accent)}.verdict.bad{background:var(--bad-soft);color:var(--bad)}
+#act .hint{font-family:var(--ui);font-size:12px;color:var(--ink-3)}
+#doneTag{font-family:var(--ui);font-size:12px;color:var(--ink-3)}
+/* 하단 바 · 버튼 */
+#foot{padding:10px 16px;gap:8px;border-top:1px solid var(--line);background:#fff}
+.btn{font-family:var(--ui);font-size:14px;font-weight:600;min-height:40px;padding:6px 16px;border:1px solid var(--line);border-radius:10px;background:#fff;color:#1F2A24;box-shadow:none}
+.btn:hover{background:var(--soft)}
+.btn.xs{font-size:13px;min-height:36px;padding:4px 12px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(.95)}
+#next{min-width:96px}
+#next.undone{background:#fff;color:var(--accent);border:1px solid var(--accent);border-style:solid}
+.btn[disabled]{opacity:.35}
+.btn:focus-visible,.choice:focus-visible,.jp:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#padBtn.on{background:#1F2A24;border-color:#1F2A24;color:#fff}
+/* 출처 썸네일 */
+#srcs{gap:6px}
+.src-th{width:40px;height:40px;border:1px solid var(--line);border-radius:8px}
+.src-th .src-n{font-family:var(--ui);font-size:11px;padding:0 5px;border-radius:6px 0 6px 0}
+.src-x{font-family:var(--ui);font-size:14px;border:1px solid var(--line);border-radius:10px;min-height:40px}
+.src-top{font-family:var(--ui);font-size:13px}.src-body{border-radius:12px}
+.src-foot .hint{font-family:var(--ui);font-size:12px}
+/* 힌트 · 필기 · 풀이 판 · 글꼴 경고 */
+#hintBox{border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.08);bottom:70px}
+#padPanel{border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.08);bottom:70px}
+.pad-bar{font-family:var(--ui);font-size:12px;padding:6px 10px;background:var(--soft);border-radius:14px 14px 0 0}
+.pad-bar button{font-family:var(--ui);font-size:12px;font-weight:600;min-height:32px;padding:2px 10px;border:1px solid var(--line);border-radius:8px}
+.pad-bar button.on{background:#1F2A24;border-color:#1F2A24;color:#fff}
+#anslb{padding:16px 24px}
+#anslb .ans{border:0;border-left:3px solid var(--example);background:#F3F9F2;border-radius:0 10px 10px 0}
+.ans{border:0;border-left:3px solid var(--example);background:#F3F9F2;border-radius:0 10px 10px 0}
+#anslb .ans-top .kicker{font-family:var(--ui);font-size:12px}
+#fontWarn{border:1px solid var(--bad);border-radius:10px;font-family:var(--ui);font-size:12px}
+.score .c.ok b{color:var(--accent)}.score .c.bad b{color:var(--bad)}.rs-rule{font-family:var(--ui);font-size:13px;color:var(--muted);margin-top:4px}.rs-pass{color:var(--accent)}.rs-fail{color:var(--bad)}
+.rs-list{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}.rs-list .kicker{flex:0 0 100%}
+.rs-q{font:inherit;font-size:var(--fs-note);display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:6px 12px;cursor:pointer}.rs-q:hover{background:var(--soft)}
+/* 시작 위치 목록 · 결과 */
+.jp{font-family:var(--ui);font-size:13px;border:1px solid var(--line);border-radius:8px;min-height:34px}
+.jp.done{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-soft)}.jp.cur{border:2px solid var(--accent)}
+.score{gap:12px}.score .c{border:1px solid var(--line);border-radius:12px;background:var(--soft);padding:12px 18px;min-width:120px}
+.score .c b{font-family:var(--ui);font-weight:700;font-size:28px;line-height:1.1}
+.cover .kicker{font-family:var(--ui);font-size:12px;color:var(--ink-3)}
 </style>
 </head>
 <body>
@@ -391,15 +472,32 @@ function render(){
       $("#no").onclick=()=>{ ST.correct[s.id]=false; ST.done[s.id]=true; save(); render(); };
     }
   } else if(s.type==="result"){
-    const sc=partScore(s.part), pct=(o)=>o.n?Math.round(o.ok/o.n*100):0;
-    const passB=sc.b.n===0||sc.b.ok===sc.b.n, passA=sc.a.n===0||sc.a.ok*3>=sc.a.n*2;
-    body.innerHTML='<div class="kicker">파트 '+num(s.part)+' 결과</div><h1>'+esc(String(s.title).replace(/[\s★]+$/,""))+'</h1><div class="score">'+
-      '<div class="c"><b>'+sc.b.ok+'/'+sc.b.n+'</b>기초 · '+num(pct(sc.b)+'%')+' · '+(passB?"통과":"미달")+'</div>'+
-      '<div class="c"><b>'+sc.a.ok+'/'+sc.a.n+'</b>응용 · '+num(pct(sc.a)+'%')+' · '+(passA?"통과":"미달")+'</div></div>'+
-      '<p>'+(passB&&passA?'파트 완료. 기준(기초 전부 + 응용 2/3 이상)을 넘었습니다.':'기준은 기초 전부 + 응용 2/3 이상. 틀린 문제는 개념 페이지로 돌아가 다시 읽고 풀어 보세요.')+'</p>';
-    act.innerHTML='<button class="btn xs" id="back">이 파트 처음으로</button><button class="btn" id="ok">확인</button>';
+    /* V6B-RESULT: 정답·오답·안 푼 3칸 + 숫자 기준 + 틀린 문제 목록 + 주버튼 하나 (브리프 v49 r3 §3) */
+    const sc=partScore(s.part);
+    const qs=SLIDES.filter(x=>x.type==="q"&&x.part===s.part&&!ST.skip[x.id]);
+    const wrong=qs.filter(q=>ST.correct[q.id]===false), left=qs.filter(q=>!ST.done[q.id]||ST.correct[q.id]==null&&!ST.revealed[q.id]);
+    const okN=qs.filter(q=>ST.correct[q.id]===true).length;
+    const passB=sc.b.n===0||sc.b.ok===sc.b.n, needA=Math.ceil(sc.a.n*2/3), passA=sc.a.n===0||sc.a.ok>=needA;
+    const rule=(sc.b.n?'기초 '+sc.b.n+'문제 전부 정답':'')+(sc.b.n&&sc.a.n?' + ':'')+(sc.a.n?'응용 '+sc.a.n+'문제 중 '+needA+'문제 이상':'');
+    body.classList.add("scrollable");
+    body.innerHTML='<div class="kicker">파트 '+num(s.part)+' 결과</div><h1>'+esc(String(s.title).replace(/[\s★]+$/,""))+'</h1>'+
+      '<div class="score"><div class="c ok"><b>'+okN+'</b>정답</div><div class="c bad"><b>'+wrong.length+'</b>오답</div><div class="c"><b>'+left.length+'</b>안 푼 문제</div></div>'+
+      '<p class="rs-rule">통과 기준: '+esc(rule||'문제 없음')+' · 지금 '+(passB&&passA?'<b class="rs-pass">통과</b>':'<b class="rs-fail">미달</b>')+' (기초 '+sc.b.ok+'/'+sc.b.n+' · 응용 '+sc.a.ok+'/'+sc.a.n+')</p>'+
+      (wrong.length?'<div class="rs-list"><div class="kicker">틀린 문제</div>'+wrong.map(q=>'<button class="rs-q" data-go="'+q.id+'"><span class="q-kind">'+esc(q.kind||"")+'</span>'+esc(q.qn||q.id)+'</button>').join("")+'</div>':'')+
+      (left.length&&!wrong.length?'<div class="rs-list"><div class="kicker">안 푼 문제</div>'+left.map(q=>'<button class="rs-q" data-go="'+q.id+'"><span class="q-kind">'+esc(q.kind||"")+'</span>'+esc(q.qn||q.id)+'</button>').join("")+'</div>':'');
+    body.querySelectorAll(".rs-q").forEach(b=>{ b.onclick=()=>startFrom(b.dataset.go,"at"); });
+    const nextPart=PARTS.find(p=>p.n===s.part+1);
+    let primary;
+    if(wrong.length) primary='<button class="btn primary" id="rsGo">틀린 문제 복습</button>';
+    else if(left.length) primary='<button class="btn primary" id="rsGo">안 푼 문제 풀기</button>';
+    else primary='<button class="btn primary" id="rsGo">'+(nextPart?'다음 파트':'전체 결과')+'</button>';
+    act.innerHTML='<button class="btn xs" id="back">이 파트 처음으로</button>'+(wrong.length&&left.length?'<button class="btn xs" id="rsLeft">안 푼 문제 '+left.length+'개</button>':'')+primary;
     $("#back").onclick=()=>{ ST.idx=SLIDES.findIndex(x=>x.id==="p"+s.part+"-cover"); save(); render(); };
-    $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); go(1); };
+    const rl=$("#rsLeft"); if(rl) rl.onclick=()=>startFrom(left[0].id,"at");
+    $("#rsGo").onclick=()=>{ ST.done[s.id]=true; save();
+      if(wrong.length){ wrong.forEach(q=>{ delete ST.revealed[q.id]; delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; }); save(); startFrom(wrong[0].id,"at"); }
+      else if(left.length) startFrom(left[0].id,"at");
+      else go(1); };
   } else if(s.type==="final"){
     const qs=SLIDES.filter(x=>x.type==="q"&&!(ST.skip||{})[x.id]); const ok=qs.filter(q=>ST.correct[q.id]===true).length, done=qs.filter(q=>ST.done[q.id]).length;
     const wrong=SLIDES.filter(x=>x.type==="q"&&ST.correct[x.id]===false);
@@ -471,7 +569,7 @@ function boot(){
   render();
   if(location.hash==="#src"){ setTimeout(()=>{ const b=$("#srcs .src-th"); if(b) b.click(); },400); }
 }
-function fontCheck(){ try{ const ok=document.fonts.check("22px 'Nanum Pen Script'"); if(!ok){ let w=$("#fontWarn"); if(!w){ w=document.createElement("div"); w.id="fontWarn"; $("#stage").appendChild(w); } w.hidden=false; w.textContent="손글씨 글꼴을 불러오지 못해 대체 글꼴로 보입니다. 인터넷 연결을 확인하고 새로 고침하세요."; } }catch(e){} }
+function fontCheck(){ try{ const ok=document.fonts.check("22px 'Nanum Pen Script'"); if(ok){ const w0=$("#fontWarn"); if(w0) w0.hidden=true; return; } setTimeout(fontCheck,3000); /* V6B: 늦게 로드되면 경고를 지운다 */ if(!ok){ let w=$("#fontWarn"); if(!w){ w=document.createElement("div"); w.id="fontWarn"; $("#stage").appendChild(w); } w.hidden=false; w.textContent="손글씨 글꼴을 불러오지 못해 대체 글꼴로 보입니다. 인터넷 연결을 확인하고 새로 고침하세요."; } }catch(e){} }
 function whenReady(){ if(window.renderMathInElement){ fontCheck(); boot(); } else setTimeout(whenReady,40); }
 document.addEventListener("DOMContentLoaded",()=>{ (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(whenReady,whenReady); });
 </script>
