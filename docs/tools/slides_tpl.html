@@ -8,7 +8,7 @@
      폰트 2종: 본문 손글씨(Nanum Pen Script, display=block) + 수식·숫자 정자(KaTeX). 5색 고정. 16:10. 상단 진행점·챕터명·n/N, 하단 [힌트] [확인/다음]. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
@@ -271,6 +271,12 @@ body{padding:0;display:block}
 .cover .big{font-size:calc(var(--fs-title)*1.25)}
 .cover .sub{max-width:60ch}
 @media(max-width:700px){.choices{grid-template-columns:minmax(0,1fr)}#body{padding:14px 16px 10px;overflow:auto}#body.q-mode{justify-content:flex-start}#top,#foot{padding-left:12px;padding-right:12px}#srcs{display:none}#foot{gap:6px}.btn{white-space:nowrap;padding:6px 12px}#act .hint{display:none}#chapter{display:none}}
+
+/* ===== V6D 본문 서체: Gowun Dodum (아토 2026-09-21 "손글씨 대신 더 이쁜 대안") ===== */
+:root{--font-hand:'Gowun Dodum',Pretendard,-apple-system,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;--fs-title:clamp(24px,3.2vh,32px);--fs-body:clamp(17px,2.4vh,23px);--fs-note:clamp(13px,1.8vh,16px)}
+html,body{line-height:1.55}
+#body h1,#body h2{font-weight:700;letter-spacing:-.01em}
+#body .why,#body .concept,#body .one,#body .say{line-height:1.6}
 </style>
 </head>
 <body>
@@ -602,7 +608,7 @@ function boot(){
   render();
   if(location.hash==="#src"){ setTimeout(()=>{ const b=$("#srcs .src-th"); if(b) b.click(); },400); }
 }
-function fontCheck(){ try{ const ok=document.fonts.check("22px 'Nanum Pen Script'"); if(ok){ const w0=$("#fontWarn"); if(w0) w0.hidden=true; return; } setTimeout(fontCheck,3000); /* V6B: 늦게 로드되면 경고를 지운다 */ if(!ok){ let w=$("#fontWarn"); if(!w){ w=document.createElement("div"); w.id="fontWarn"; $("#stage").appendChild(w); } w.hidden=false; w.textContent="손글씨 글꼴을 불러오지 못해 대체 글꼴로 보입니다. 인터넷 연결을 확인하고 새로 고침하세요."; } }catch(e){} }
+function fontCheck(){ try{ const ok=document.fonts.check("22px 'Gowun Dodum'"); if(ok){ const w0=$("#fontWarn"); if(w0) w0.hidden=true; return; } setTimeout(fontCheck,3000); /* V6B: 늦게 로드되면 경고를 지운다 */ if(!ok){ let w=$("#fontWarn"); if(!w){ w=document.createElement("div"); w.id="fontWarn"; $("#stage").appendChild(w); } w.hidden=false; w.textContent="손글씨 글꼴을 불러오지 못해 대체 글꼴로 보입니다. 인터넷 연결을 확인하고 새로 고침하세요."; } }catch(e){} }
 function whenReady(){ if(window.renderMathInElement){ fontCheck(); boot(); } else setTimeout(whenReady,40); }
 document.addEventListener("DOMContentLoaded",()=>{ (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(whenReady,whenReady); });
 </script>
