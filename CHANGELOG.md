@@ -4,6 +4,11 @@
 
 ## 2026-09-21
 
+### .48 — 덱 즉시 채점 · 정답이면 풀이 판 생략 · 「이어서 학습하기」
+- 덱 템플릿 v5a(`docs/tools/slides_tpl.html`, 빌드된 덱 5개에 같은 치환 — `~/.claude/scratch/sc_test/patch_tpl_v5a.py` 멱등): 객관식은 보기를 누르는 순간 제출·채점(「답 확인」 버튼 없음) · 정답이면 답·풀이 판을 자동으로 띄우지 않음(「답 · 풀이 다시 보기」로 열람, 오답·주관식 자기채점 전에는 그대로 뜸) · 저장 때마다 `mc-slides-last`·`mc-slides-last-<deck>` 에 위치 기록 `{deck,title,href,idx,n,sid,part,partTitle,where,qDone,qN,ts}` · `#resume` = 저장 위치에서 열기 · `#check`(빌드 검사) 중에는 저장 안 함.
+- `V43 LAYER`(원본 `docs/layers/v43-layer-src.js`): 오늘 탭 「오늘 수업」 아래 + 그 과목 화면 회차 표 위에 「이어서 학습하기」 카드(과목 칩 · 덱 제목 · 파트 › 위치 · n/N장 · 문제 진행 · 몇 시간 전). 버튼은 덱을 `#resume`으로 앱 안 뷰어에 연다(`#at=`은 파트 시작으로 되돌리므로 안 씀). 뷰어 닫기·`storage` 이벤트로 카드 갱신. 저장값 숫자 칸은 숫자로 강제, 문자열은 esc.
+- 오타 회의: 1차 RED 2건(숫자 칸 esc 누락 · `#check` 중 pagehide 저장) → 수정 → 2차 GREEN (`docs/otta/_v43-otta-2.md`). 검증: 구문검사 0 · 스모크 138건(기존 CADD 9/15 검사 1건 제외 통과) · `v43_check.cjs` 18건 · 재빌드 배치검사 89장 0 · 헤드리스 캡처(오늘·과목·덱 정답 상태).
+
 ### .47 — 정역학 LMS 영상 정리 3건 · 과제 API
 - `V33.SPEC["정역학"].post` 에 `VIDEO`(영상 정리·그 주) 추가 → 회차 카드가 `knowledge/library.json` 의 `lmsvideo`(파일명 `영상정리_*.md`)를 같은 주차로 세어 표시. 정역학 영상정리 3건: `2026-09-09/영상정리_2주차_W2-2_성분과내적정의.md` · `2026-09-14/…W3-1_내적과외적.md` · `2026-09-16/…W3-2_삼중적과힘.md` (원료: LMS 영상 15편 faster-whisper 영어 전사 + 교수 필기 한글 변환, ★시험 언급 절은 교수 발언과 아톰 판단을 구분).
 - atom `lms_sync.mjs` 5단계: `/api/v1/courses/{id}/assignments?include[]=submission` (GET) → `state._assignments`(submission 누락은 `"unknown"` 보존, 미제출 집계 제외) · 새 과제는 `_lms/new_assignments.txt`. 단계 전체 try/catch 로 기존 save·종료 경로 보호. 실측: 정역학 0건, CADD 2건(Week3 due 9/21 23:59 제출 완료).

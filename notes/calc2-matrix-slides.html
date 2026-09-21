@@ -135,7 +135,7 @@ body{display:grid;place-items:center;padding:12px}
 .btn.xs{font-size:var(--fs-note);min-height:36px;padding:2px 12px}
 .btn[disabled]{opacity:.35;cursor:default}
 .btn:focus-visible,.choice:focus-visible,.jp:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
-#act{display:flex;gap:8px;align-items:center;margin-left:auto}
+#act{display:flex;gap:8px;align-items:center;margin-left:auto}#act .hint{font-size:var(--fs-note);color:var(--muted)}
 #next{margin-left:8px}
 #next.undone{background:var(--paper);color:var(--ink);border-style:dashed}
 #doneTag{font-size:var(--fs-note);color:var(--muted)}
@@ -184,7 +184,17 @@ const PARTS=[{"n": 1, "title": "행렬의 정의와 다섯 종류", "hint": "한
 const KEY="mc-slides-"+DECK_ID;
 let ST={idx:0,done:{},correct:{},revealed:{},answer:{},ink:{},finger:false,padBig:false,skip:{}};
 try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}
-const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(ST)); }catch(e){} };
+/* V5A-RESUME: 마지막 학습 위치 — 앱의 「이어서 학습하기」 카드가 읽는다 (아토 2026-09-21). #check(빌드 검사) 중에는 쓰지 않는다 */
+const LAST_KEY="mc-slides-last";
+function lastInfo(){
+  const s=SLIDES[Math.max(0,Math.min(ST.idx,SLIDES.length-1))]; if(!s) return null;
+  const p=s.part?PARTS.find(x=>x.n===s.part):null; const qs=SLIDES.filter(x=>x.type==="q");
+  const clean=t=>String(t||"").replace(/[\s★]+$/,"");
+  const where= s.type==="q"?((s.kind||"")+" 문제 · "+(s.qn||"")).trim() : s.type==="concept"?("개념 · "+clean(s.title)) : s.type==="mu"?"암기 vs 이해" : s.type==="cover"?"파트 시작" : s.type==="result"?"파트 결과" : s.type==="final"?"전체 결과" : s.type==="jump"?"시작 위치 고르기" : "표지";
+  return {deck:DECK_ID,title:document.title,href:location.href.split("#")[0],idx:ST.idx,n:SLIDES.length,sid:s.id,part:s.part||null,partTitle:p?clean(p.title):"",where:where,qDone:qs.filter(q=>ST.done[q.id]).length,qN:qs.length,ts:Date.now()};
+}
+const save=()=>{ if(location.hash==="#check") return; /* 빌드 검사 상태는 저장하지 않는다(오타 RED 2026-09-21) */ try{ localStorage.setItem(KEY,JSON.stringify(ST)); const li=lastInfo(); if(li){ const j=JSON.stringify(li); localStorage.setItem(LAST_KEY,j); localStorage.setItem(LAST_KEY+"-"+DECK_ID,j); } }catch(e){} };
+window.addEventListener("pagehide",()=>{ try{ save(); }catch(e){} });
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const partOf=n=>PARTS.find(p=>p.n===n)||null;
@@ -356,14 +366,12 @@ function render(){
         ? '<div class="myans-show"><div class="kicker">내 답</div><div class="myans-txt">'+esc(my)+'</div></div>'
         : '<div class="myans"><label for="myans">내 답 — 답만. 행렬은 [1 2; 3 4]처럼, 여러 개면 쉼표로</label><textarea id="myans" rows="2" placeholder="여기에 답을 쓰고 「답 확인」">'+esc(my)+'</textarea></div>')+
       (rev?'<div class="myans-note"><button class="btn xs" id="showAns">답 · 풀이 다시 보기</button></div>':'');
-    if(rev){ openAns(s); const sa=$("#showAns"); if(sa) sa.onclick=()=>openAns(s); }
+    if(rev){ if(ST.correct[s.id]!==true) openAns(s); /* V5A: 정답이면 풀이 판을 띄우지 않는다 (아토 2026-09-21) */ const sa=$("#showAns"); if(sa) sa.onclick=()=>openAns(s); }
     closePad(); $("#padBtn").hidden=false;
     if(mc&&!rev){
-      act.innerHTML='<button class="btn primary" id="reveal" disabled>답 확인</button>';
-      const rb=$("#reveal"); let my2=my; const upd=()=>{ rb.disabled=!(String(my2)!==""); };
-      body.querySelectorAll(".choice").forEach(b=>{ b.onclick=()=>{ my2=b.dataset.ci; ST.answer[s.id]=my2; save(); body.querySelectorAll(".choice").forEach(x=>x.classList.toggle("sel",x===b)); upd(); }; });
-      upd();
-      rb.onclick=()=>{ if(String(my2)==="") return; const ok=!!(s.choices[+my2]&&s.choices[+my2].ok); ST.answer[s.id]=my2; ST.revealed[s.id]=true; ST.correct[s.id]=ok; ST.done[s.id]=true; save(); render(); };
+      /* V5A: 보기를 누르는 순간 제출·채점 (아토 2026-09-21 "객관식은 고르면 바로 정답으로 제출") */
+      act.innerHTML='<span class="hint">보기를 누르면 바로 채점됩니다</span>';
+      body.querySelectorAll(".choice").forEach(b=>{ b.onclick=()=>{ const ci=b.dataset.ci; if(ST.revealed[s.id]) return; const ok=!!(s.choices[+ci]&&s.choices[+ci].ok); ST.answer[s.id]=ci; ST.revealed[s.id]=true; ST.correct[s.id]=ok; ST.done[s.id]=true; save(); render(); }; });
     } else if(mc&&rev){
       const c=ST.correct[s.id];
       act.innerHTML='<span class="verdict '+(c?"ok":"bad")+'">'+(c?"정답":"오답 — 풀이를 읽고 다시")+'</span><button class="btn xs" id="retry1">다시 풀기</button>';
@@ -436,6 +444,7 @@ async function runCheck(){
 function boot(){
   { const m=/^#(from|done|at)=([\w-]+)(?:,pad)?$/.exec(location.hash||""); if(m){ startFrom(m[2], m[1]==="from"?"skip":m[1]); if(/,pad$/.test(location.hash)) setTimeout(()=>$("#padBtn").click(),300); return; } }
   if(location.hash==="#check"){ runCheck(); return; }
+  if(location.hash==="#resume"){ render(); save(); return; }   /* V5A: 저장된 위치 그대로 */
   render();
   if(location.hash==="#src"){ setTimeout(()=>{ const b=$("#srcs .src-th"); if(b) b.click(); },400); }
 }
