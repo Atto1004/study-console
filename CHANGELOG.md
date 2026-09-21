@@ -4,6 +4,9 @@
 
 ## 2026-09-21
 
+### .53 — 덱 여백 제거 (아토 "학습하기 여백이 너무 많고 디자인 수정이 제일 시급")
+- 덱 템플릿 **v6c**(`docs/tools/patch_tpl_v6c.py`): `#stage` 16:10 고정 → `100vw×100dvh`(뷰어 안 회색 띠 제거, ≥1480px 만 1400 제한) · 글자 크기 `clamp(…vh…)` · 문제 장 `--qs` 스케일(≥900×680 1.15 · ≥1000×760 1.3 · ≥1100×900 1.45: 제목·본문·보기 카드·간격) + 세로 가운데(`safe center`) · 개념 장 `--cs`(1.12/1.22) + 세로 가운데 + ≥1300px 콘텐츠 폭 1180 · 폰(≤700px) 보기 1열·본문 스크롤·하단 버튼 nowrap·힌트 문구/파트명 숨김. 재빌드 배치 검사(1024×768, 스케일 1.15·1.12 적용 상태) 89장 실패 0. 캡처 `~/.claude/scratch/sc_test/_v53/`.
+
 ### .52 — 김주영 스앵님: 학습앱 전용 AI (아토 "학습앱에서는 김주영 스앵님이라는 새 정체성으로 대화")
 - 정체성 원본 `본사/atom/personas/kimjuyoung/CLAUDE.md`(v0.1): 진단관·설계자·감독관·전략가, 단호·구체·숫자 근거·위로 없음, **지식 이원화**(① 아토가 이해한 지식 = mastery / ② 스앵님이 아는 지식 = 시험 범위·수업 내용 전부 = map.json·graph.json·정리.md·덱) — 목표는 ①이 ②를 덮는 것, 섞지 않음. 답 형식 결론 → 원리 → 확인 문제 1개. 파일 읽기만.
 - 서버 패치 `본사/atom/apply_study_persona.py`(멱등, 복사본에서 구문 확인): FIXED_CHATS 에 `("study","김주영 스앵님")` · `_claude_once/run_claude` 에 `cwd` 인자 → 학습 대화는 `personas/kimjuyoung/` 에서 `claude -p`(그 폴더 CLAUDE.md 만 읽힘, 아톰 헌법 비적용) · `_send` 에서 `kind=="study"` → `_study_flow`(스앵님 한 턴, 오타 검증 없음). **아직 적용·재시작 안 함** — 다른 세션이 server.py 를 미커밋 작업 중(layers). 그 세션이 끝나면 `python apply_study_persona.py` → `restart-atom.ps1`.
