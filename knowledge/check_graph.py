@@ -10,7 +10,7 @@ import glob, json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 LEVELS = ["중등", "고교", "대학기초", "전공"]
 REQ = {"id": str, "name": str, "level": str, "subject": str, "hours": (int, float), "prereq": list, "tags": list, "desc": str}
-ID_PREFIX = ("alg.", "geo.", "trig.", "vec.", "calc.", "lin.", "ode.", "phys.", "mech.", "em.", "cad.")
+ID_PREFIX = ("alg.", "geo.", "trig.", "vec.", "calc.", "lin.", "ode.", "phys.", "mech.", "em.", "cad.", "wr.")   # wr. = 아카데믹글쓰기 (2026-09-22)
 
 
 def load(name):

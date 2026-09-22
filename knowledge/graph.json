@@ -1,6 +1,6 @@
 {
  "version": 1,
- "updated": "2026-09-09",
+ "updated": "2026-09-22",
  "levels": [
   "중등",
   "고교",
@@ -13,7 +13,8 @@
   "미분적분학2",
   "일반물리학2",
   "정역학",
-  "CADD"
+  "CADD",
+  "아카데믹글쓰기"
  ],
  "note": "id 접두어: alg 대수 · geo 기하 · trig 삼각 · vec 벡터 · calc 미적분 · lin 선형대수 · ode 미분방정식 · phys 물리기초 · mech 역학 · em 전자기 · cad CAD. src 가 '일반 지식'이면 표준 정의만 담았고 수업 자료 근거는 없다. 그 외 src 는 study-materials/ 아래 경로.",
  "nodes": [
@@ -1500,6 +1501,360 @@
    ],
    "desc": "작업대(Sketcher·Part Design), 스케치 → 패드/포켓, 시점·선택 (강의계획서: CATIA 사용)",
    "src": "study-console index.html CADD_SYLLABUS"
+  },
+  {
+   "id": "ode.superposition",
+   "name": "2계 선형 ODE — 중첩(선형성)의 원리",
+   "level": "전공",
+   "subject": "공업수학1",
+   "hours": 1,
+   "prereq": [
+    "ode.second_order",
+    "ode.linearity"
+   ],
+   "tags": [
+    "ODE"
+   ],
+   "desc": "제차 선형 ODE의 해 y1, y2 의 선형결합 c1y1+c2y2 도 해 (정리 1). 비제차·비선형에는 성립 안 함",
+   "src": "공업수학1/2026-09-16/정리.md ③-6"
+  },
+  {
+   "id": "ode.basis",
+   "name": "일반해 · 1차독립 · 기저",
+   "level": "전공",
+   "subject": "공업수학1",
+   "hours": 1.5,
+   "prereq": [
+    "ode.superposition"
+   ],
+   "tags": [
+    "ODE"
+   ],
+   "desc": "1차독립인 두 해(기저)로 일반해 y=c1y1+c2y2. 비례하면 종속. IVP 는 y(x0), y'(x0) 두 조건",
+   "src": "공업수학1/2026-09-16/정리.md ③-7·③-8"
+  },
+  {
+   "id": "ode.reduction_order",
+   "name": "차수축소법 (Reduction of Order)",
+   "level": "전공",
+   "subject": "공업수학1",
+   "hours": 1.5,
+   "prereq": [
+    "ode.basis",
+    "ode.linear1"
+   ],
+   "tags": [
+    "ODE"
+   ],
+   "desc": "해 하나 y1 을 알 때 y2=u·y1 로 두고 1계로 낮춰 두 번째 해를 구함",
+   "src": "공업수학1/2026-09-16/정리.md ③-9 (예제 1 설정까지)"
+  },
+  {
+   "id": "ode.const_coeff",
+   "name": "2.2 상수계수 제차 선형 ODE — 특성방정식",
+   "level": "전공",
+   "subject": "공업수학1",
+   "hours": 2,
+   "prereq": [
+    "ode.basis",
+    "alg.quadratic_eq"
+   ],
+   "tags": [
+    "ODE"
+   ],
+   "desc": "y''+ay'+by=0 → λ²+aλ+b=0. 서로 다른 실근·중근·복소근 세 경우의 일반해",
+   "src": "4주차 예고 (강의계획서 순서) — planned"
+  },
+  {
+   "id": "vec.coords3d",
+   "name": "12.1 3차원 좌표계 · 곡면 그리기",
+   "level": "전공",
+   "subject": "미분적분학2",
+   "hours": 1,
+   "prereq": [
+    "vec.3d"
+   ],
+   "tags": [
+    "벡터"
+   ],
+   "desc": "R³ 좌표계 3종, 곡선(R²) vs 곡면(R³), z=0 기준으로 xy 평면에 먼저 그리고 올리기 (예제 1·2)",
+   "src": "미분적분학2/2026-09-10·09-15/정리.md"
+  },
+  {
+   "id": "vec.distance_sphere",
+   "name": "두 점 사이 거리 · 구면의 방정식",
+   "level": "전공",
+   "subject": "미분적분학2",
+   "hours": 1,
+   "prereq": [
+    "vec.coords3d",
+    "alg.sqrt"
+   ],
+   "tags": [
+    "벡터"
+   ],
+   "desc": "|P1P2|=√(Δx²+Δy²+Δz²), (x−a)²+(y−b)²+(z−c)²=r², 완전제곱으로 중심·반지름 찾기 (예제 4)",
+   "src": "미분적분학2/2026-09-15/정리.md ③-3·③-4 ★"
+  },
+  {
+   "id": "vec.position_ops",
+   "name": "12.2 위치벡터 · 두 점 벡터 · 크기 · 연산",
+   "level": "전공",
+   "subject": "미분적분학2",
+   "hours": 1.5,
+   "prereq": [
+    "vec.components",
+    "vec.distance_sphere"
+   ],
+   "tags": [
+    "벡터"
+   ],
+   "desc": "AB→ = OB − OA, |a| = 거리, 상등·덧셈·실수배(덧셈·뺄셈·실수배에만 닫힘)",
+   "src": "미분적분학2/2026-09-17/정리.md ③-1~③-4 ★"
+  },
+  {
+   "id": "vec.basis_unit",
+   "name": "표준기저벡터 i,j,k · 단위벡터 u=a/|a|",
+   "level": "전공",
+   "subject": "미분적분학2",
+   "hours": 1,
+   "prereq": [
+    "vec.position_ops",
+    "vec.unit"
+   ],
+   "tags": [
+    "벡터"
+   ],
+   "desc": "a = a1 i + a2 j + a3 k 표기, 단위벡터 = 방향만 남김. Ex01~03 (|2a−3b| 등)",
+   "src": "미분적분학2/2026-09-17/정리.md ③-5·③-6 ★ (시험 언급)"
+  },
+  {
+   "id": "vec.dot_calc2",
+   "name": "12.3 내적 — 정의 · 각 · 정사영",
+   "level": "전공",
+   "subject": "미분적분학2",
+   "hours": 1.5,
+   "prereq": [
+    "vec.basis_unit",
+    "vec.dot"
+   ],
+   "tags": [
+    "벡터"
+   ],
+   "desc": "a·b=|a||b|cosθ = Σaibi, 수직 판정, 스칼라·벡터 정사영",
+   "src": "4주차 예고 (9/17 '다음은 12.3') — planned"
+  },
+  {
+   "id": "em.gauss",
+   "name": "23장 가우스 법칙 — 정의 · 가우스면 3종",
+   "level": "전공",
+   "subject": "일반물리학2",
+   "hours": 2,
+   "prereq": [
+    "em.continuous",
+    "calc.definite"
+   ],
+   "tags": [
+    "전자기"
+   ],
+   "desc": "∮E·n da = q/ε0. 면·원통·구 세 가우스면으로 무한평면·직선도선 재유도",
+   "src": "일반물리학2/2026-09-16/정리.md ③-1~③-3 ★"
+  },
+  {
+   "id": "em.gauss_apps",
+   "name": "가우스 법칙 응용 — 도체구 · 부도체구",
+   "level": "전공",
+   "subject": "일반물리학2",
+   "hours": 1.5,
+   "prereq": [
+    "em.gauss"
+   ],
+   "tags": [
+    "전자기"
+   ],
+   "desc": "고립도체 내부 E=0·표면 전하, 부도체구 내부 E∝r · 외부 E∝1/r², 전기 선속",
+   "src": "일반물리학2/2026-09-16/정리.md ③-4~③-8 ★"
+  },
+  {
+   "id": "em.potential_energy",
+   "name": "24장 전기 위치 에너지 U(r)",
+   "level": "전공",
+   "subject": "일반물리학2",
+   "hours": 1,
+   "prereq": [
+    "em.coulomb",
+    "calc.definite"
+   ],
+   "tags": [
+    "전자기"
+   ],
+   "desc": "중력 위치 에너지(13장)와 대응. U = kq1q2/r, 기준점 무한대",
+   "src": "일반물리학2/2026-09-18/정리.md ③-1~③-3 ★"
+  },
+  {
+   "id": "em.potential",
+   "name": "전위 V(r) — 점전하 · 여러 점전하",
+   "level": "전공",
+   "subject": "일반물리학2",
+   "hours": 1.5,
+   "prereq": [
+    "em.potential_energy",
+    "em.superposition"
+   ],
+   "tags": [
+    "전자기"
+   ],
+   "desc": "V = U/q0 = kq/r (스칼라라 그냥 더함). 여러 점전하는 Σ",
+   "src": "일반물리학2/2026-09-18/정리.md ③-4·③-5 ★★"
+  },
+  {
+   "id": "em.potential_dist",
+   "name": "연속 분포의 전위 — 쌍극자 · 직선 도선 · 원판",
+   "level": "전공",
+   "subject": "일반물리학2",
+   "hours": 2,
+   "prereq": [
+    "em.potential",
+    "calc.substitution"
+   ],
+   "tags": [
+    "전자기"
+   ],
+   "desc": "쌍극자 V≈kp cosθ/r², 직선 도선 ∫ 적분(ln), 원판 전위. 원형 고리는 교재에 없는 이유",
+   "src": "일반물리학2/2026-09-18/정리.md ③-6~③-9 ★★ 증명 후보"
+  },
+  {
+   "id": "em.capacitance",
+   "name": "25장 전기 용량 — 정의 · 단위 · 평행판",
+   "level": "전공",
+   "subject": "일반물리학2",
+   "hours": 1.5,
+   "prereq": [
+    "em.potential",
+    "em.gauss_apps"
+   ],
+   "tags": [
+    "전자기"
+   ],
+   "desc": "C = Q/V [F], 평행판 C=ε0A/d (9/18 도입만, 4주차 계속)",
+   "src": "일반물리학2/2026-09-18/정리.md 25장 도입 · 4주차 planned"
+  },
+  {
+   "id": "mech.projection",
+   "name": "벡터의 선에 대한 정사영 — 평행·수직 성분",
+   "level": "전공",
+   "subject": "정역학",
+   "hours": 1,
+   "prereq": [
+    "mech.dot_apps"
+   ],
+   "tags": [
+    "정역학"
+   ],
+   "desc": "U∥ = (U·e)e, U⊥ = U − U∥. 내적으로 각·성분 분해",
+   "src": "정역학/2026-09-14/정리.md ③-3"
+  },
+  {
+   "id": "mech.triple_product",
+   "name": "혼합삼중적 U·(V×W) — 행렬식 · 부피 · 공면 판정",
+   "level": "전공",
+   "subject": "정역학",
+   "hours": 1,
+   "prereq": [
+    "mech.cross_apps",
+    "lin.det3"
+   ],
+   "tags": [
+    "정역학"
+   ],
+   "desc": "det|U;V;W|, 절댓값 = 평행육면체 부피, 두 벡터 바꾸면 부호 반대, 세 벡터가 한 평면이면 0 (Ch.4 직선 모멘트에 연결)",
+   "src": "정역학/2026-09-16/수업요약_3주차_W3-2.md"
+  },
+  {
+   "id": "mech.forces_types",
+   "name": "Ch.3 힘의 종류 — 접촉력·장력·도르래·스프링·중력",
+   "level": "전공",
+   "subject": "정역학",
+   "hours": 1.5,
+   "prereq": [
+    "mech.force_vector"
+   ],
+   "tags": [
+    "정역학"
+   ],
+   "desc": "F = N + f, |W| = mg, 뉴턴 3법칙, 장력은 케이블 일직선·도르래 지나도 T1=T2, 스프링 F=kδ",
+   "src": "정역학/2026-09-16/수업요약_3주차_W3-2.md 꼭 외울 것"
+  },
+  {
+   "id": "wr.topic",
+   "name": "글감과 주제 설정 · 주제문",
+   "level": "전공",
+   "subject": "아카데믹글쓰기",
+   "hours": 1,
+   "prereq": [],
+   "tags": [
+    "글쓰기"
+   ],
+   "desc": "글감→주제→주제문(한 문장), 글쓰기 활동① 주제문 쓰기",
+   "src": "아카데믹글쓰기/2026-09-08/정리.md"
+  },
+  {
+   "id": "wr.structure",
+   "name": "글의 구성 — 3단·4단·5단",
+   "level": "전공",
+   "subject": "아카데믹글쓰기",
+   "hours": 1,
+   "prereq": [
+    "wr.topic"
+   ],
+   "tags": [
+    "글쓰기"
+   ],
+   "desc": "서론·본론·결론 / 기승전결 / 발단·전개·위기·절정·결말. 논리적 흐름 vs 서사적 흐름 (교재 64쪽)",
+   "src": "아카데믹글쓰기/2026-09-15/정리.md ③-2·③-4 ★"
+  },
+  {
+   "id": "wr.outline",
+   "name": "개요 — 정의 · 효과 5 · 종류 · 작성 절차 4단계",
+   "level": "전공",
+   "subject": "아카데믹글쓰기",
+   "hours": 1.5,
+   "prereq": [
+    "wr.structure"
+   ],
+   "tags": [
+    "글쓰기"
+   ],
+   "desc": "설계도. 단락/장절/줄거리 중심, 화제/문장 개요. 항목 정리→점검→분류→계열화 (교재 67~90쪽)",
+   "src": "아카데믹글쓰기/2026-09-15/정리.md ③-5~③-8 ★"
+  },
+  {
+   "id": "wr.paragraph",
+   "name": "문장과 단락 — 들여쓰기 · 단락 나누기",
+   "level": "전공",
+   "subject": "아카데믹글쓰기",
+   "hours": 1,
+   "prereq": [
+    "wr.outline"
+   ],
+   "tags": [
+    "글쓰기"
+   ],
+   "desc": "단어<문장<단락, 중심 문장+뒷받침 문장, 들여쓰기로 구분 (교재 150·158쪽) — 기말 손메모 「들여쓰기」",
+   "src": "아카데믹글쓰기/2026-09-15 48~53장 · 2026-09-22 4주차"
+  },
+  {
+   "id": "wr.spelling",
+   "name": "한글 맞춤법 · 띄어쓰기",
+   "level": "전공",
+   "subject": "아카데믹글쓰기",
+   "hours": 2,
+   "prereq": [],
+   "tags": [
+    "글쓰기"
+   ],
+   "desc": "'하' 탈락(40항)·-든/-던(56항)·예사소리 어미(53항)·사이시옷(30항)·조사 vs 의존명사(41·42항)·단위·호칭(43·48항) — 활동③ 연습문제, 기말 출제 예정",
+   "src": "아카데믹글쓰기/_과제/4주차_활동3_맞춤법띄어쓰기_정답표.md"
   }
  ]
 }

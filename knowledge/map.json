@@ -1,98 +1,470 @@
 {
  "_meta": {
   "version": 1,
-  "updated": "2026-09-09",
+  "updated": "2026-09-22",
   "week_rule": "1주차 = 2026-08-30(일)~09-05, 2주차 = 09-06~09-12. 학습앱 기준.",
-  "note": "planned=true 인 주차는 아직 수업 자료(정리.md)가 없어 이전 수업의 예고·OT 일정표로 채운 것. materials 는 study-materials/ 아래 경로. 문제는 _과제·_할일.md·정리노트에 실제로 있는 것만."
+  "note": "planned=true 인 주차는 아직 수업 자료(정리.md)가 없어 이전 수업의 예고·OT 일정표로 채운 것. materials 는 study-materials/ 아래 경로. 문제는 _과제·_할일.md·정리노트에 실제로 있는 것만. | 2026-09-22: 3주차 확정·4주차 planned(예고), 2주차 노드를 정리.md 진도 기준으로 보정, 아카데믹글쓰기 과목 추가."
  },
  "공업수학1": {
   "weeks": {
    "1": {
     "title": "Ch.1 1계 ODE — 1.1 모델화·분류, 해의 종류·초기값 문제 (9/2 결석·9/4)",
-    "dates": ["2026-09-02", "2026-09-04"],
-    "nodes": ["ode.concept", "ode.modeling", "ode.linearity", "ode.solution", "ode.ivp", "ode.exp_model"],
-    "materials": ["공업수학1/2026-09-02/정리.md", "공업수학1/2026-09-04/정리.md", "공업수학1/_정리노트/2026-09-02_결석보강_모델화_선형성.html", "공업수학1/_정리노트/Ch1_1계상미분방정식_정리노트.html", "공업수학1/_정리노트/Ch1_쉬운정리_개념공식문제풀이.html"]
+    "dates": [
+     "2026-09-02",
+     "2026-09-04"
+    ],
+    "nodes": [
+     "ode.concept",
+     "ode.modeling",
+     "ode.linearity",
+     "ode.solution",
+     "ode.ivp",
+     "ode.exp_model"
+    ],
+    "materials": [
+     "공업수학1/2026-09-02/정리.md",
+     "공업수학1/2026-09-04/정리.md",
+     "공업수학1/_정리노트/2026-09-02_결석보강_모델화_선형성.html",
+     "공업수학1/_정리노트/Ch1_1계상미분방정식_정리노트.html",
+     "공업수학1/_정리노트/Ch1_쉬운정리_개념공식문제풀이.html"
+    ]
    },
    "2": {
-    "title": "Ch.1 1.2 방향장 · 1.3 변수분리형(+동차·치환) · 1.4 완전 ODE (9/9 결석 — 예상 범위, 자료 없음)",
-    "dates": ["2026-09-09", "2026-09-11"],
+    "title": "Ch.1 1.2 방향장 · 1.3 변수분리형 · 1.4 완전 ODE·적분인자 (9/9 결석) · 1.5 선형 ODE + 베르누이 (9/11)",
+    "dates": [
+     "2026-09-09",
+     "2026-09-11"
+    ],
     "planned": true,
-    "nodes": ["ode.direction_field", "ode.separable", "ode.homogeneous", "ode.exact", "ode.integrating_factor"],
-    "materials": ["공업수학1/_정리노트/Ch1_1계상미분방정식_정리노트.html", "공업수학1/_과제/1주차_과제가이드.html"]
+    "nodes": [
+     "ode.direction_field",
+     "ode.separable",
+     "ode.homogeneous",
+     "ode.exact",
+     "ode.integrating_factor",
+     "ode.linear1",
+     "ode.bernoulli"
+    ],
+    "materials": [
+     "공업수학1/_정리노트/Ch1_1계상미분방정식_정리노트.html",
+     "공업수학1/_과제/1주차_과제가이드.html"
+    ]
+   },
+   "3": {
+    "title": "베르누이 연습 · 1장 총정리 → 2.1 2계 선형 ODE(중첩 원리·IVP·1차독립·기저) · 차수축소법 소개 (9/16) · 9/18 회차 정리 없음",
+    "dates": [
+     "2026-09-16",
+     "2026-09-18"
+    ],
+    "nodes": [
+     "ode.bernoulli",
+     "ode.second_order",
+     "ode.superposition",
+     "ode.basis",
+     "ode.reduction_order"
+    ],
+    "materials": [
+     "공업수학1/2026-09-16/정리.md",
+     "공업수학1/_과제/3주차_과제_제출용.html"
+    ]
+   },
+   "4": {
+    "title": "2.1 차수축소법 예제 → 2.2 상수계수 제차 선형 ODE(특성방정식 3경우) 예상 (9/23 수) · 9/25 금 추석 휴강",
+    "dates": [
+     "2026-09-23"
+    ],
+    "nodes": [
+     "ode.reduction_order",
+     "ode.const_coeff"
+    ],
+    "materials": [],
+    "planned": true
    }
   },
   "problems": [
-   {"ref": "Kreyszig 1.3 #6", "desc": "y′ = e^{2x−1} y² — 변수분리", "nodes": ["ode.separable", "calc.integral", "alg.exp_log"], "src": "1주차 과제가이드", "due": "2026-09-11"},
-   {"ref": "Kreyszig 1.3 #7", "desc": "xy′ = y + 2x³ sin²(y/x) — 동차(y=ux)", "nodes": ["ode.homogeneous", "ode.separable", "trig.identity", "calc.integral"], "src": "1주차 과제가이드", "due": "2026-09-11"},
-   {"ref": "Kreyszig 1.3 #8 ★", "desc": "y′ = (y+4x)² — 치환형 v=y+4x (교수 강조)", "nodes": ["ode.separable", "calc.substitution", "calc.integral"], "src": "1주차 과제가이드", "due": "2026-09-11"},
-   {"ref": "Kreyszig 1.3 #16", "desc": "y′ = (x+y−2)², y(0)=2 — 치환형 + 초기값", "nodes": ["ode.ivp", "ode.separable", "calc.substitution"], "src": "1주차 과제가이드", "due": "2026-09-11"},
-   {"ref": "Kreyszig 1.3 #17", "desc": "xy′ = y + 3x⁴ cos²(y/x), y(1)=0 — 동차 + 초기값", "nodes": ["ode.homogeneous", "ode.ivp", "trig.identity", "calc.integral"], "src": "1주차 과제가이드", "due": "2026-09-11"}
+   {
+    "ref": "Kreyszig 1.3 #6",
+    "desc": "y′ = e^{2x−1} y² — 변수분리",
+    "nodes": [
+     "ode.separable",
+     "calc.integral",
+     "alg.exp_log"
+    ],
+    "src": "1주차 과제가이드",
+    "due": "2026-09-11"
+   },
+   {
+    "ref": "Kreyszig 1.3 #7",
+    "desc": "xy′ = y + 2x³ sin²(y/x) — 동차(y=ux)",
+    "nodes": [
+     "ode.homogeneous",
+     "ode.separable",
+     "trig.identity",
+     "calc.integral"
+    ],
+    "src": "1주차 과제가이드",
+    "due": "2026-09-11"
+   },
+   {
+    "ref": "Kreyszig 1.3 #8 ★",
+    "desc": "y′ = (y+4x)² — 치환형 v=y+4x (교수 강조)",
+    "nodes": [
+     "ode.separable",
+     "calc.substitution",
+     "calc.integral"
+    ],
+    "src": "1주차 과제가이드",
+    "due": "2026-09-11"
+   },
+   {
+    "ref": "Kreyszig 1.3 #16",
+    "desc": "y′ = (x+y−2)², y(0)=2 — 치환형 + 초기값",
+    "nodes": [
+     "ode.ivp",
+     "ode.separable",
+     "calc.substitution"
+    ],
+    "src": "1주차 과제가이드",
+    "due": "2026-09-11"
+   },
+   {
+    "ref": "Kreyszig 1.3 #17",
+    "desc": "xy′ = y + 3x⁴ cos²(y/x), y(1)=0 — 동차 + 초기값",
+    "nodes": [
+     "ode.homogeneous",
+     "ode.ivp",
+     "trig.identity",
+     "calc.integral"
+    ],
+    "src": "1주차 과제가이드",
+    "due": "2026-09-11"
+   }
   ]
  },
  "미분적분학2": {
   "weeks": {
    "1": {
     "title": "학습지 Lecture 2-1 (1) 행렬의 정의 · (2) 연산 · (3) 행렬식 (9/1·9/3)",
-    "dates": ["2026-09-01", "2026-09-03"],
-    "nodes": ["lin.matrix", "lin.matrix_ops", "lin.det2", "lin.det3"],
-    "materials": ["미분적분학2/2026-09-01/정리.md", "미분적분학2/2026-09-01/학습지_정리.md", "미분적분학2/2026-09-03/정리.md", "미분적분학2/_정리노트/2026-09-03_행렬연산_행렬식.html"]
+    "dates": [
+     "2026-09-01",
+     "2026-09-03"
+    ],
+    "nodes": [
+     "lin.matrix",
+     "lin.matrix_ops",
+     "lin.det2",
+     "lin.det3"
+    ],
+    "materials": [
+     "미분적분학2/2026-09-01/정리.md",
+     "미분적분학2/2026-09-01/학습지_정리.md",
+     "미분적분학2/2026-09-03/정리.md",
+     "미분적분학2/_정리노트/2026-09-03_행렬연산_행렬식.html"
+    ]
    },
    "2": {
-    "title": "(4)(5) 소행렬식·여인수 전개 → (6) 역행렬 · (7) 크래머 법칙 (9/8 결석 — 9/3 예고 기준, 자료 없음)",
-    "dates": ["2026-09-08", "2026-09-10"],
-    "planned": true,
-    "nodes": ["lin.cofactor", "lin.det_props", "lin.inverse", "lin.linear_system", "lin.cramer"],
-    "materials": ["미분적분학2/2026-09-01/학습지_정리.md"]
+    "title": "(4)~(7) 소행렬식·여인수 → 역행렬 · 크래머 (9/8 결석) · 12.1 3차원 좌표계 도입 (9/10 지각)",
+    "dates": [
+     "2026-09-08",
+     "2026-09-10"
+    ],
+    "nodes": [
+     "lin.cofactor",
+     "lin.det_props",
+     "lin.inverse",
+     "lin.linear_system",
+     "lin.cramer",
+     "vec.coords3d"
+    ],
+    "materials": [
+     "미분적분학2/2026-09-01/학습지_정리.md"
+    ]
+   },
+   "3": {
+    "title": "12.1 곡면 그리기·거리·구면의 방정식 (9/15) → 12.2 벡터 — 위치벡터·두 점 벡터·크기·연산·표준기저·단위벡터 (9/17)",
+    "dates": [
+     "2026-09-15",
+     "2026-09-17"
+    ],
+    "nodes": [
+     "vec.coords3d",
+     "vec.distance_sphere",
+     "vec.position_ops",
+     "vec.basis_unit"
+    ],
+    "materials": [
+     "미분적분학2/2026-09-15/정리.md",
+     "미분적분학2/2026-09-17/정리.md"
+    ]
+   },
+   "4": {
+    "title": "12.2 Ex 마무리 → 12.3 내적(정의·각·정사영) 예상 (9/22 화) · 9/24 목 추석 휴강",
+    "dates": [
+     "2026-09-22"
+    ],
+    "nodes": [
+     "vec.basis_unit",
+     "vec.dot_calc2"
+    ],
+    "materials": [],
+    "planned": true
    }
   },
   "problems": [
-   {"ref": "강의자료실 연습문제 (행렬·행렬식, 답안 포함)", "desc": "주말 업로드분 — 9/10(목) 수업 전까지", "nodes": ["lin.matrix_ops", "lin.det2", "lin.det3"], "src": "_할일.md (9/3 녹음 1:01:20)", "due": "2026-09-10"},
-   {"ref": "학습지 Ex01 (1)~(4)", "desc": "정사각행렬 차수·전치행렬·대칭 판정", "nodes": ["lin.matrix"], "src": "학습지_정리.md"},
-   {"ref": "학습지 Ex02 (1)~(5)", "desc": "합·실수배·곱·거듭제곱", "nodes": ["lin.matrix_ops"], "src": "학습지_정리.md"},
-   {"ref": "9/3 예제 3·4", "desc": "det=0 → x=2,3 · det B=−60 (사루스)", "nodes": ["lin.det2", "lin.det3", "alg.quadratic_eq"], "src": "2026-09-03/정리.md"},
-   {"ref": "학습지 Ex9", "desc": "역행렬로 연립1차방정식 풀기", "nodes": ["lin.inverse", "lin.linear_system"], "src": "학습지_정리.md"},
-   {"ref": "학습지 Ex10", "desc": "크래머 법칙으로 연립1차방정식 풀기", "nodes": ["lin.cramer", "lin.det3"], "src": "학습지_정리.md"}
+   {
+    "ref": "강의자료실 연습문제 (행렬·행렬식, 답안 포함)",
+    "desc": "주말 업로드분 — 9/10(목) 수업 전까지",
+    "nodes": [
+     "lin.matrix_ops",
+     "lin.det2",
+     "lin.det3"
+    ],
+    "src": "_할일.md (9/3 녹음 1:01:20)",
+    "due": "2026-09-10"
+   },
+   {
+    "ref": "학습지 Ex01 (1)~(4)",
+    "desc": "정사각행렬 차수·전치행렬·대칭 판정",
+    "nodes": [
+     "lin.matrix"
+    ],
+    "src": "학습지_정리.md"
+   },
+   {
+    "ref": "학습지 Ex02 (1)~(5)",
+    "desc": "합·실수배·곱·거듭제곱",
+    "nodes": [
+     "lin.matrix_ops"
+    ],
+    "src": "학습지_정리.md"
+   },
+   {
+    "ref": "9/3 예제 3·4",
+    "desc": "det=0 → x=2,3 · det B=−60 (사루스)",
+    "nodes": [
+     "lin.det2",
+     "lin.det3",
+     "alg.quadratic_eq"
+    ],
+    "src": "2026-09-03/정리.md"
+   },
+   {
+    "ref": "학습지 Ex9",
+    "desc": "역행렬로 연립1차방정식 풀기",
+    "nodes": [
+     "lin.inverse",
+     "lin.linear_system"
+    ],
+    "src": "학습지_정리.md"
+   },
+   {
+    "ref": "학습지 Ex10",
+    "desc": "크래머 법칙으로 연립1차방정식 풀기",
+    "nodes": [
+     "lin.cramer",
+     "lin.det3"
+    ],
+    "src": "학습지_정리.md"
+   }
   ]
  },
  "일반물리학2": {
   "weeks": {
    "1": {
     "title": "Ch.21~22 전하 · 쿨롱 법칙 · 전기장 서론 (9/2 OT · 9/4 첫 강의)",
-    "dates": ["2026-09-02", "2026-09-04"],
-    "nodes": ["em.charge", "em.coulomb", "em.constants", "em.field", "em.field_lines", "em.superposition", "em.continuous", "em.dipole"],
-    "materials": ["일반물리학2/2026-09-02/정리.md", "일반물리학2/2026-09-04/정리.md", "일반물리학2/_정리노트/2026-09-04_전하와전기장서론.html"]
+    "dates": [
+     "2026-09-02",
+     "2026-09-04"
+    ],
+    "nodes": [
+     "em.charge",
+     "em.coulomb",
+     "em.constants",
+     "em.field",
+     "em.field_lines",
+     "em.superposition",
+     "em.continuous",
+     "em.dipole"
+    ],
+    "materials": [
+     "일반물리학2/2026-09-02/정리.md",
+     "일반물리학2/2026-09-04/정리.md",
+     "일반물리학2/_정리노트/2026-09-04_전하와전기장서론.html"
+    ]
    },
    "2": {
-    "title": "전기장 계산 (점전하군·연속 분포) — 9/9 결석, 9/11 예정 (9/4 예고 기준, 자료 없음)",
-    "dates": ["2026-09-09", "2026-09-11"],
+    "title": "22장 전기장 계산 — 점전하군·쌍극자(Σ)·직선 도선(∫) (9/9 결석) → 원형 도선·원판 + 23장 가우스 서론 (9/11)",
+    "dates": [
+     "2026-09-09",
+     "2026-09-11"
+    ],
     "planned": true,
-    "nodes": ["em.superposition", "em.continuous", "em.dipole", "vec.components", "calc.definite"],
-    "materials": ["일반물리학2/_정리노트/2026-09-04_전하와전기장서론.html"]
+    "nodes": [
+     "em.superposition",
+     "em.dipole",
+     "em.continuous",
+     "calc.definite",
+     "em.gauss"
+    ],
+    "materials": [
+     "일반물리학2/_정리노트/2026-09-04_전하와전기장서론.html"
+    ]
+   },
+   "3": {
+    "title": "23장 가우스 법칙 전부 — 가우스면 3종·도체구·부도체구 (9/16) → 24장 전기 퍼텐셜 전부 + 25장 도입 (9/18)",
+    "dates": [
+     "2026-09-16",
+     "2026-09-18"
+    ],
+    "nodes": [
+     "em.gauss",
+     "em.gauss_apps",
+     "em.potential_energy",
+     "em.potential",
+     "em.potential_dist",
+     "em.capacitance"
+    ],
+    "materials": [
+     "일반물리학2/2026-09-16/정리.md",
+     "일반물리학2/2026-09-18/정리.md"
+    ]
+   },
+   "4": {
+    "title": "25장 전기 용량 — 평행판·직렬/병렬·유전체 예상 (9/23 수) · 9/25 금 추석 휴강",
+    "dates": [
+     "2026-09-23"
+    ],
+    "nodes": [
+     "em.capacitance"
+    ],
+    "materials": [],
+    "planned": true
    }
   },
   "problems": [
-   {"ref": "강의노트 p.8–9 필수문제 1~6", "desc": "9/11(금) 전까지 직접 풀어 답 대조 (문제 본문은 강의노트에만 있음)", "nodes": ["em.charge", "em.coulomb", "vec.components"], "src": "_할일.md (9/4 녹음 16:16·32:14)", "due": "2026-09-11"},
-   {"ref": "슬라이드 예제 01", "desc": "구리 동전 1.0 g 의 총 양전하량 (≈4.3×10⁴ C)", "nodes": ["em.charge", "phys.units", "alg.ratio"], "src": "정리노트 2026-09-04"},
-   {"ref": "슬라이드 예제 02", "desc": "두 이온 사이 힘 1.88×10⁻⁹ N → 전하 2e", "nodes": ["em.coulomb", "alg.sqrt"], "src": "정리노트 2026-09-04"},
-   {"ref": "슬라이드 예제 03", "desc": "핵 속 두 양성자 사이 반발력 ≈14 N", "nodes": ["em.coulomb"], "src": "정리노트 2026-09-04"},
-   {"ref": "슬라이드 예제 04", "desc": "세 전하, q₁에 작용하는 알짜 힘 ≈2.6 N (120° 배치, 성분 합)", "nodes": ["em.coulomb", "vec.components", "trig.ratio"], "src": "정리노트 2026-09-04"},
-   {"ref": "슬라이드 예제 05", "desc": "수소원자 전기력/중력 비 ≈2.3×10³⁹", "nodes": ["em.coulomb", "alg.inverse_square", "alg.exponent_rules"], "src": "정리노트 2026-09-04"}
+   {
+    "ref": "강의노트 p.8–9 필수문제 1~6",
+    "desc": "9/11(금) 전까지 직접 풀어 답 대조 (문제 본문은 강의노트에만 있음)",
+    "nodes": [
+     "em.charge",
+     "em.coulomb",
+     "vec.components"
+    ],
+    "src": "_할일.md (9/4 녹음 16:16·32:14)",
+    "due": "2026-09-11"
+   },
+   {
+    "ref": "슬라이드 예제 01",
+    "desc": "구리 동전 1.0 g 의 총 양전하량 (≈4.3×10⁴ C)",
+    "nodes": [
+     "em.charge",
+     "phys.units",
+     "alg.ratio"
+    ],
+    "src": "정리노트 2026-09-04"
+   },
+   {
+    "ref": "슬라이드 예제 02",
+    "desc": "두 이온 사이 힘 1.88×10⁻⁹ N → 전하 2e",
+    "nodes": [
+     "em.coulomb",
+     "alg.sqrt"
+    ],
+    "src": "정리노트 2026-09-04"
+   },
+   {
+    "ref": "슬라이드 예제 03",
+    "desc": "핵 속 두 양성자 사이 반발력 ≈14 N",
+    "nodes": [
+     "em.coulomb"
+    ],
+    "src": "정리노트 2026-09-04"
+   },
+   {
+    "ref": "슬라이드 예제 04",
+    "desc": "세 전하, q₁에 작용하는 알짜 힘 ≈2.6 N (120° 배치, 성분 합)",
+    "nodes": [
+     "em.coulomb",
+     "vec.components",
+     "trig.ratio"
+    ],
+    "src": "정리노트 2026-09-04"
+   },
+   {
+    "ref": "슬라이드 예제 05",
+    "desc": "수소원자 전기력/중력 비 ≈2.3×10³⁹",
+    "nodes": [
+     "em.coulomb",
+     "alg.inverse_square",
+     "alg.exponent_rules"
+    ],
+    "src": "정리노트 2026-09-04"
+   }
   ]
  },
  "정역학": {
   "weeks": {
    "1": {
     "title": "Lecture Orientation — 과목 개요·평가·일정 (9/2, 수강정정 전)",
-    "dates": ["2026-09-02"],
-    "nodes": ["mech.statics_intro"],
-    "materials": ["정역학/2026-09-02/정리.md"]
+    "dates": [
+     "2026-09-02"
+    ],
+    "nodes": [
+     "mech.statics_intro"
+    ],
+    "materials": [
+     "정역학/2026-09-02/정리.md"
+    ]
    },
    "2": {
-    "title": "Ch.1 Introduction · Ch.2 Vectors — 단위계·벡터 성분·내적·외적·합력 (9/7 · 9/9 결석 — OT 일정표 기준, 정리 자료 없음)",
-    "dates": ["2026-09-07", "2026-09-09"],
+    "title": "Ch.1 Introduction 마무리 · Ch.2 벡터 — 단위벡터·성분(2D·3D)·위치벡터·방향여현·내적 정의 (9/7 · 9/9 결석)",
+    "dates": [
+     "2026-09-07",
+     "2026-09-09"
+    ],
     "planned": true,
-    "nodes": ["mech.statics_intro", "mech.force_vector", "mech.force_3d", "mech.dot_apps", "mech.cross_apps"],
-    "materials": ["정역학/2026-09-02/정리.md"]
+    "nodes": [
+     "mech.statics_intro",
+     "mech.force_vector",
+     "mech.force_3d",
+     "mech.dot_apps"
+    ],
+    "materials": [
+     "정역학/2026-09-02/정리.md"
+    ]
+   },
+   "3": {
+    "title": "2.3 내적 성질·각·정사영 → 2.4 외적 정의·행렬식 (9/14) · W3-2 혼합삼중적 → Ch.3 힘의 종류·자유물체도 (9/16 영상+교수필기)",
+    "dates": [
+     "2026-09-14",
+     "2026-09-16"
+    ],
+    "nodes": [
+     "mech.dot_apps",
+     "mech.projection",
+     "mech.cross_apps",
+     "mech.triple_product",
+     "mech.forces_types",
+     "mech.fbd"
+    ],
+    "materials": [
+     "정역학/2026-09-14/정리.md",
+     "정역학/2026-09-16/수업요약_3주차_W3-2.md",
+     "정역학/2026-09-16/영상정리_3주차_W3-2_삼중적과힘.md"
+    ]
+   },
+   "4": {
+    "title": "Ch.3 입자의 평형 — FBD·2D/3D 평형 방정식 예상 (9/21 월 · 9/23 수)",
+    "dates": [
+     "2026-09-21",
+     "2026-09-23"
+    ],
+    "nodes": [
+     "mech.fbd",
+     "mech.equilibrium_particle"
+    ],
+    "materials": [],
+    "planned": true
    }
   },
   "problems": []
@@ -101,17 +473,107 @@
   "weeks": {
    "1": {
     "title": "OT · LMS 개념 영상 (9/1 — 수업 정리 자료 없음, 강의계획서 기준)",
-    "dates": ["2026-09-01"],
+    "dates": [
+     "2026-09-01"
+    ],
     "planned": true,
-    "nodes": ["cad.tool"],
+    "nodes": [
+     "cad.tool"
+    ],
     "materials": []
    },
    "2": {
     "title": "정투상·스케치 기초 (9/8 결석 — 자료 없음, 일반적 진도 추정)",
-    "dates": ["2026-09-08"],
+    "dates": [
+     "2026-09-08"
+    ],
     "planned": true,
-    "nodes": ["cad.orthographic", "cad.sketch_constraints"],
+    "nodes": [
+     "cad.orthographic",
+     "cad.sketch_constraints"
+    ],
     "materials": []
+   },
+   "3": {
+    "title": "Week 3 투상도법 (LMS 영상 25분, 시청 완료) + CATIA Part Design 2D 실습 · Week3 과제 제출 완료",
+    "dates": [
+     "2026-09-15"
+    ],
+    "nodes": [
+     "cad.orthographic",
+     "cad.tool"
+    ],
+    "materials": [
+     "CADD/2026-09-15/영상정리_3주차_투상도법.md"
+    ]
+   },
+   "4": {
+    "title": "Week 4 LMS 영상(월 업로드) → 수 수업 → 일 마감 (9/22 화 수업)",
+    "dates": [
+     "2026-09-22"
+    ],
+    "nodes": [
+     "cad.tool",
+     "cad.dimensioning"
+    ],
+    "materials": [],
+    "planned": true
+   }
+  },
+  "problems": []
+ },
+ "아카데믹글쓰기": {
+  "weeks": {
+   "3": {
+    "title": "글의 구조화: 구성(3단·4단·5단)과 개요 — 효과 5·종류·유의점·절차 4단계 · 신형철 칼럼 구성 파악(활동②)",
+    "dates": [
+     "2026-09-15"
+    ],
+    "nodes": [
+     "wr.structure",
+     "wr.outline"
+    ],
+    "materials": [
+     "아카데믹글쓰기/2026-09-15/정리.md",
+     "아카데믹글쓰기/2026-09-15/자료요약_3주차_글의구조화_구성과개요.md"
+    ]
+   },
+   "1": {
+    "title": "OT · 교과목 소개 · 평가(기말 20점 이론 키워드 등) (9/1)",
+    "dates": [
+     "2026-09-01"
+    ],
+    "nodes": [],
+    "materials": [
+     "아카데믹글쓰기/2026-09-01/자료요약_1주차_강의계획서.md"
+    ]
+   },
+   "2": {
+    "title": "글에 담는 내 생각: 글감과 주제 설정 · 활동① 주제문 쓰기 (9/8 결석 — LMS 44장으로 따라잡음)",
+    "dates": [
+     "2026-09-08"
+    ],
+    "nodes": [
+     "wr.topic"
+    ],
+    "materials": [
+     "아카데믹글쓰기/2026-09-08/정리.md"
+    ]
+   },
+   "4": {
+    "title": "글의 시각화: 문장과 단락 쓰기 (9/22) · 활동③ 맞춤법·띄어쓰기 토론방 ~9/27",
+    "dates": [
+     "2026-09-22"
+    ],
+    "nodes": [
+     "wr.paragraph",
+     "wr.spelling"
+    ],
+    "materials": [
+     "아카데믹글쓰기/2026-09-22/정리.md",
+     "아카데믹글쓰기/_과제/4주차_활동3_맞춤법띄어쓰기_정답표.md"
+    ],
+    "planned": true
    }
   },
   "problems": []
