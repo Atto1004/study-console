@@ -16,6 +16,15 @@
   /* ---- 과목 팔레트 (브리프 §2) ---- */
   V44.COURSE_COLORS={"전공필수":"#0E8C8C","전공기초":"#D97706","전공선택":"#2F6FB3","교양필수":"#A855A0","교양선택":"#8B5E3C","MSC":"#5B8C2E","기타":"#5B6B8C","개인":"#7A8A2E"};
   V44.color=function(c){ if(!c) return "#5B6B8C"; if(isPersonal(c)) return V44.COURSE_COLORS["개인"]; return V44.COURSE_COLORS[c.bucket]||V44.COURSE_COLORS["기타"]; };
+  /* 출결 표기 (아토 2026-09-23): 「출석 3/4」 대신 「지각 n회 · 결석 n회」만. 0이면 안 보이고, 둘 다 0이면 아무것도 안 붙인다.
+     V32 6종에서 지각 = late + vlate(개큰지각), 결석 = absent (인정결석 excused·출튀 ghost 는 결석으로 세지 않는다) */
+  V44.attTxt=function(at){
+    if(!at) return "";
+    var late=(at.lateN!=null?at.lateN:((at.n&&at.n.late)||0)+((at.n&&at.n.vlate)||0)), ab=(at.n&&at.n.absent)||0, out=[];
+    if(late) out.push("지각 "+late+"회");
+    if(ab) out.push("결석 "+ab+"회");
+    return out.length?" · "+out.join(" · "):"";
+  };
   V44.abbr=function(name){ var s=String(name||"").replace(/\s/g,""); if(/^[A-Za-z0-9]+$/.test(s)) return s.slice(0,4).toUpperCase(); return s.slice(0,2); };
 
   /* ---- 덱 진도 (브리프 §2 지표): mc-slides-last-<deck> 의 n 과 mc-slides-<deck> 의 done 수 ---- */
@@ -101,7 +110,7 @@
     return '<div class="crow'+(c.hidden?" hid":"")+'" role="button" tabindex="0" data-c="'+c.id+'" aria-label="'+esc(c.name)+'">'+
       '<span class="crow-chip" style="background:'+V44.color(c)+'">'+esc(V44.abbr(c.name))+'</span>'+
       '<span class="crow-main"><span class="crow-t">'+(c.fav?'<span class="crow-fav" aria-label="즐겨찾기">★</span>':'')+esc(c.name)+(c.isRetake?' <small class="crow-re">재수강</small>':'')+'</span>'+
-        '<span class="crow-m">'+esc(c.bucket)+' · '+c.credits+'학점'+(c.creditsUnsure?"?":"")+(dayLabel(c)?' · '+esc(dayLabel(c)):'')+(at.held?' · 출석 '+at.n.present+'/'+at.held:'')+'</span></span>'+
+        '<span class="crow-m">'+esc(c.bucket)+' · '+c.credits+'학점'+(c.creditsUnsure?"?":"")+(dayLabel(c)?' · '+esc(dayLabel(c)):'')+''+V44.attTxt(at)+'</span></span>'+
       '<span class="crow-r">'+(dd!==null&&dd>=0&&dd<=21?'<span class="chip '+(dd<=7?"crit":"warn")+'">D-'+dd+'</span>':'')+right+'</span>'+
       '<button class="crow-more" data-more="'+c.id+'" aria-label="'+esc(c.name)+' 메뉴">⋯</button>'+
       '</div>';
