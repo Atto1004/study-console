@@ -230,7 +230,6 @@
     ".v45-note{font-size:11px;color:var(--warn)}.v45-empty{font-size:13px;color:var(--ink-3);padding:12px}",
     ".v45-status{font-size:12px;color:var(--ink-3);padding:4px 12px;min-height:16px;flex:0 0 auto}.v45-status.dropped,.v45-status.unauth,.v45-status.http,.v45-status.error,.v45-status.unsynced,.v45-status.locked{color:var(--crit)}",
     ".v45-in{display:flex;gap:6px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));border-top:1px solid var(--line);flex:0 0 auto;align-items:flex-end;flex-wrap:wrap}.v45-in textarea{flex:1 1 200px;min-height:44px;max-height:120px;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;background:var(--surface);color:var(--ink)}.v45-in .btn.a{min-height:44px}",
-    "#ntvOpen{display:none}",   /* 아토 2026-09-21: 새 탭/새 창 열기 불필요 */
     ".ntv .ntv-h{flex-wrap:nowrap}.ntv .ntv-h .tt{display:block;min-width:0;grid-template-columns:none}.ntv .ntv-h .btn{flex:0 0 auto;white-space:nowrap}body.ntv-on .tabbar{display:none}",   /* .tt 는 시간표 격자 클래스(min-width 520px)와 이름이 겹쳐 폰에서 헤더 버튼을 밀어냈다 */
     "@media(max-width:860px){#v45Wrap{flex-direction:column}#v45Panel{flex:0 0 auto;width:100%;max-height:60dvh;border-left:0;border-top:1px solid var(--line)}}"
   ].join("\n");

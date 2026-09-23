@@ -1940,7 +1940,7 @@ th{font-weight:600;font-size:12px;letter-spacing:0}
         </div>
       </section>
       <div class="ntv" id="ntv" aria-modal="true" role="dialog">
-        <div class="ntv-h"><button class="btn xs" id="ntvBack">← 닫기</button><span class="tt" id="ntvTitle"></span><a class="btn xs" id="ntvOpen" target="_blank" rel="noopener">새 탭</a></div>
+        <div class="ntv-h"><button class="btn xs" id="ntvBack">← 닫기</button><span class="tt" id="ntvTitle"></span></div>
         <iframe id="ntvFrame" title="정리 노트"></iframe>
       </div>
 
@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-22.56";
+var BUILD="2026-09-23.57";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4428,7 +4428,6 @@ function bindNoteRows(root){
 function openNote(file,title){
   var v=$("#ntv"); if(!v) return;
   $("#ntvTitle").textContent=title||file;
-  $("#ntvOpen").href=file;
   $("#ntvFrame").src=file;
   v.classList.add("on"); document.body.style.overflow="hidden";
 }
@@ -4839,6 +4838,9 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-23.57",d:"09-23",items:[
+    "덱·노트 뷰어의 「새 탭」 버튼 제거 — CSS 숨김이 아니라 마크업에서 삭제 (아토)"
+  ]},
   {v:"2026-09-22.56",d:"09-22",items:[
     "커리큘럼 · 시험 범위 vs 이해(학습 탭 카드 + 과목 화면): 과목별 주차 목차와 핵심 개념 노드를 시험 범위 주차 기준으로 보여주고, 이해 확인(퀴즈·자가평가)된 노드와 비어 있는 노드를 구분 — 아토가 이해한 지식 vs 시험 범위 지식 (지침 §16 ②③)",
     "knowledge/map.json 3주차 확정·4주차 예정·2주차 보정, graph.json 노드 95 → 118(2계 ODE·3D 좌표/벡터·가우스/전위/전기용량·정사영/삼중적/힘·FBD·글쓰기 5), 아카데믹글쓰기 과목 추가"
@@ -9987,7 +9989,6 @@ var V33={};
     ".v45-note{font-size:11px;color:var(--warn)}.v45-empty{font-size:13px;color:var(--ink-3);padding:12px}",
     ".v45-status{font-size:12px;color:var(--ink-3);padding:4px 12px;min-height:16px;flex:0 0 auto}.v45-status.dropped,.v45-status.unauth,.v45-status.http,.v45-status.error,.v45-status.unsynced,.v45-status.locked{color:var(--crit)}",
     ".v45-in{display:flex;gap:6px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));border-top:1px solid var(--line);flex:0 0 auto;align-items:flex-end;flex-wrap:wrap}.v45-in textarea{flex:1 1 200px;min-height:44px;max-height:120px;resize:vertical;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;font-size:14px;background:var(--surface);color:var(--ink)}.v45-in .btn.a{min-height:44px}",
-    "#ntvOpen{display:none}",   /* 아토 2026-09-21: 새 탭/새 창 열기 불필요 */
     ".ntv .ntv-h{flex-wrap:nowrap}.ntv .ntv-h .tt{display:block;min-width:0;grid-template-columns:none}.ntv .ntv-h .btn{flex:0 0 auto;white-space:nowrap}body.ntv-on .tabbar{display:none}",   /* .tt 는 시간표 격자 클래스(min-width 520px)와 이름이 겹쳐 폰에서 헤더 버튼을 밀어냈다 */
     "@media(max-width:860px){#v45Wrap{flex-direction:column}#v45Panel{flex:0 0 auto;width:100%;max-height:60dvh;border-left:0;border-top:1px solid var(--line)}}"
   ].join("\n");
