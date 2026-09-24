@@ -9,6 +9,15 @@
 (function(){
   if(window.V49) return;
   var V49=window.V49={D:null,err:null,loading:null,HORIZON:45};
+  /* 오타 사후 검수 RED 1 (2026-09-25): 범위가 "Ch.3~5"처럼 단원으로만 적힌 시험은 V25.examWeeks 가 1주차부터 잡아 OT·Ch.2까지 범위·이해도에 넣었다
+     → 단원이 시작된 주차부터로 보정. V47 이해도·V25 시험 보드도 같은 함수를 쓰므로 함께 맞는다. */
+  V49.RANGE_FROM={"정역학":{from:3,why:"Ch.3 힘은 9/16(3주차)부터 — 교수 \"여기서부터 중간고사 범위\". 1~2주차 벡터는 Ch.3의 도구"}};
+  V49.weekBased=function(ex){ return /\d+\s*[~∼–-]\s*\d+\s*주차/.test((ex&&ex.scope)||""); };
+  if(window.V25&&V25.examWeeks&&!V25.examWeeks._v49){
+    var _ew=V25.examWeeks;
+    V25.examWeeks=function(ex,cw){ var out=_ew(ex,cw); try{ var c=course(ex.courseId), o=c&&V49.RANGE_FROM[c.name]; if(o&&ex.kind==="중간"&&!V49.weekBased(ex)){ out=out.filter(function(w){ return w>=o.from; }); if(!out.length) out=[o.from]; } }catch(e){} return out; };
+    V25.examWeeks._v49=true;
+  }
   V49.load=function(){
     if(V49.loading) return V49.loading;
     V49.loading=fetch("knowledge/decks.json",{cache:"no-store"}).then(function(r){ if(!r.ok) throw new Error("decks.json "+r.status); return r.json(); })
@@ -64,7 +73,9 @@
     var wk=it.wk.length?'<div class="v49-weeks">'+it.wk.map(function(w){ return '<span'+(w.planned?' class="pl"':'')+'><b>'+w.w+'주차</b> '+esc(w.title)+(w.planned?" (예정)":"")+'</span>'; }).join("")+'</div>':'';
     return '<div class="v49-row" data-c="'+c.id+'"><div class="v49-h"><span class="crow-chip" style="background:'+(window.V44?V44.color(c):"#5B6B8C")+'">'+esc(window.V44?V44.abbr(c.name):c.name.slice(0,2))+'</span><b>'+esc(c.name)+'</b>'+
       '<span class="chip '+(it.dd<=7?"crit":it.dd<=14?"warn":"mut")+'">D-'+it.dd+'</span><span class="hint">'+esc(ex.kind)+' '+when+'</span><span class="v49-und">'+und+'</span>'+bar+'</div>'+
-      (ex.scope?'<div class="v49-scope">범위 · '+esc(ex.scope)+'</div>':'<div class="v49-scope v44-mut">범위 미공지 — 지금까지 진도 기준</div>')+wk+
+      (function(){ var wt=it.weeks.length?it.weeks[0]+'~'+it.weeks[it.weeks.length-1]+'주차':'', o=V49.RANGE_FROM[c.name], wb=V49.weekBased(ex);
+        var note= (o&&!wb)?' <span class="v44-mut">· 범위 주차 '+wt+' — '+esc(o.why)+'</span>' : (!wb?' <span class="v44-mut">· 범위 주차 미공지 — 지금까지 '+wt+' 기준</span>':'');
+        return ex.scope?'<div class="v49-scope">범위 · '+esc(ex.scope)+note+'</div>':'<div class="v49-scope v44-mut">범위 미공지 — 지금까지 '+wt+' 진도 기준</div>'; })()+wk+
       '<div class="v49-decks">'+(it.decks.length?it.decks.map(V49.deckHTML).join(""):'<span class="v44-mut">이 과목은 아직 학습 덱이 없습니다 — 과목 화면의 회차 정리로</span>')+'</div></div>';
   };
   V49.todayHTML=function(items){
