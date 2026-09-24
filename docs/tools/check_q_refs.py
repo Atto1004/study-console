@@ -15,7 +15,9 @@ LETTER_USED = re.compile("(?<![A-Za-z" + BS + BS + "])([A-Z])(?=[" + BS + "s" + 
 # 정의: X=\begin / X=\left / X=(
 LETTER_DEF = re.compile("([A-Z])" + BS + "s*(?:=|:=)" + BS + "s*(?:" + BS + BS + "begin|" + BS + BS + "left|" + BS + "()")
 # 일반 진술 선언: "행렬 \(A\)가 대칭이면"
-GENERIC_DEF = re.compile("(?:행렬|임의의|어떤|정사각행렬)" + BS + "s*" + BS + BS + BS + "(" + BS + "s*([A-Z])")
+# 2026-09-24 물리·정역학 덱: "전기장 \(E\)" "장력 \(T\)" 처럼 명사 뒤에 기호를 밝힌 것도 정의로 본다. 문제가 스스로 정의하는 기호는 div.q data-def="E,V" 로도 선언할 수 있다
+NOUNS = "행렬|임의의|어떤|정사각행렬|벡터|전기장|전위|전위차|전하|전하량|힘|장력|수직력|마찰력|무게|반지름|길이|거리|질량|넓이|면적|부피|저항|전류|기전력|전기 용량|전기용량|스프링 상수|선전하밀도|면전하밀도|각|점|상수|일반해|특수해|함수|해|미분방정식|적분인자|연산자|기저|론스키안|행렬식|역행렬"
+GENERIC_DEF = re.compile("(?:" + NOUNS + ")" + BS + "s*(?:의" + BS + "s*(?:크기|세기|값))?" + BS + "s*" + BS + BS + BS + "(" + BS + "s*(?:" + BS + BS + "vec" + BS + "s*)?([A-Z])")
 MATH = re.compile(BS + BS + BS + "((.*?)" + BS + BS + BS + ")|" + BS + BS + BS + "[(.*?)" + BS + BS + BS + "]", re.S)
 TARGET = re.compile("([A-Z])" + BS + "s*(?:을|를)?" + BS + "s*(?:구하라|찾아라|정하라|쓰라|만족)")
 
@@ -28,10 +30,10 @@ def check(path):
         txt = re.sub("<[^>]+>", "", "".join(parts))
         maths = " ".join(a or b for a, b in MATH.findall(txt))
         used = set(LETTER_USED.findall(maths)) - ALWAYS_OK
-        defined = set(LETTER_DEF.findall(maths)) | set(GENERIC_DEF.findall(txt))
+        defined = set(LETTER_DEF.findall(maths)) | set(GENERIC_DEF.findall(txt)) | set(x.strip() for x in (q.get("data-def") or "").split(",") if x.strip())
         target = set(TARGET.findall(txt))
         undefined = sorted(used - defined - target)
-        refs = [w for w in REF_WORDS if w in txt] + REF_QN.findall(txt)
+        refs = [w for w in REF_WORDS if (re.search("(?<![가-힣])" + re.escape(w), txt) if w.startswith("위") else (w in txt))] + REF_QN.findall(txt)   # "전위 "·"단위 "의 "위 "는 참조가 아니다(2026-09-24)
         if undefined or refs:
             bad.append((qn, undefined, refs))
     return bad

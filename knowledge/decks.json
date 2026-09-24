@@ -1,0 +1,165 @@
+{
+ "generated": "2026-09-24T23:15:29",
+ "decks": [
+  {
+   "id": "calc2-matrix",
+   "file": "notes/calc2-matrix-slides.html",
+   "title": "미적분학2 · 행렬 단원 학습 (1~2주차)",
+   "course": "미분적분학2",
+   "weeks": [
+    1,
+    2
+   ],
+   "scope": "행렬 · 행렬식 · 역행렬 · 크래머 (학습지 (1)~(7))",
+   "parts": 6,
+   "qN": 41,
+   "qMC": 21,
+   "slides": 89,
+   "kind": "exam",
+   "quiz": true
+  },
+  {
+   "id": "calc2-vectors",
+   "file": "notes/calc2-vectors-slides.html",
+   "title": "미분적분학2 · 중간고사 대비 벡터 (12.1 좌표 · 12.2 벡터 · 12.3 내적 · 12.4 외적)",
+   "course": "미분적분학2",
+   "weeks": [
+    2,
+    3,
+    4
+   ],
+   "scope": "12.1 3차원 좌표계 · 12.2 벡터 · 12.3 내적 도입",
+   "parts": 5,
+   "qN": 25,
+   "qMC": 17,
+   "slides": 56,
+   "kind": "exam",
+   "quiz": true
+  },
+  {
+   "id": "em1-mid",
+   "file": "notes/em1-mid-slides.html",
+   "title": "공업수학1 · 중간고사 대비 (1장 1계 ODE · 2.1~2.3 · 2.5 오일러-코시)",
+   "course": "공업수학1",
+   "weeks": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "scope": "1장 1계 ODE 전부 · 2.1~2.3 2계 선형(기저·특성방정식·연산자)",
+   "parts": 6,
+   "qN": 36,
+   "qMC": 24,
+   "slides": 81,
+   "kind": "exam",
+   "quiz": true
+  },
+  {
+   "id": "em1-w1-3",
+   "file": "notes/em1-w1-3-slides.html",
+   "title": "공업수학1 · 1~3주차 임시 정리",
+   "course": "공업수학1",
+   "weeks": [
+    2,
+    3
+   ],
+   "scope": "회차 정리 자동 변환(9/9·9/11·9/16)",
+   "parts": 3,
+   "qN": 0,
+   "qMC": 0,
+   "slides": 84,
+   "kind": "temp",
+   "quiz": false
+  },
+  {
+   "id": "phys2-mid",
+   "file": "notes/phys2-mid-slides.html",
+   "title": "일반물리학2 · 중간고사 대비 (21 전하 · 22 전기장 · 23 가우스 · 24 전위 · 25 전기용량)",
+   "course": "일반물리학2",
+   "weeks": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "scope": "21 전하 · 22 전기장 · 23 가우스 · 24 전위 · 25 전기용량 도입",
+   "parts": 5,
+   "qN": 34,
+   "qMC": 23,
+   "slides": 70,
+   "kind": "exam",
+   "quiz": true
+  },
+  {
+   "id": "phys2-w1-3",
+   "file": "notes/phys2-w1-3-slides.html",
+   "title": "일반물리학2 · 1~3주차 임시 정리",
+   "course": "일반물리학2",
+   "weeks": [
+    1,
+    2,
+    3
+   ],
+   "scope": "회차 정리 자동 변환(9/4~9/18)",
+   "parts": 5,
+   "qN": 0,
+   "qMC": 0,
+   "slides": 88,
+   "kind": "temp",
+   "quiz": false
+  },
+  {
+   "id": "statics-mid",
+   "file": "notes/statics-mid-slides.html",
+   "title": "정역학 · 중간고사 대비 (Ch.2 벡터 · Ch.3 힘과 평형)",
+   "course": "정역학",
+   "weeks": [
+    2,
+    3,
+    4
+   ],
+   "scope": "Ch.2 벡터(성분·방향여현·내적·정사영·외적·삼중적) · Ch.3 힘·평형·자유물체도",
+   "parts": 5,
+   "qN": 31,
+   "qMC": 21,
+   "slides": 63,
+   "kind": "exam",
+   "quiz": true
+  },
+  {
+   "id": "statics-w1-3",
+   "file": "notes/statics-w1-3-slides.html",
+   "title": "정역학 · 1~3주차 임시 정리",
+   "course": "정역학",
+   "weeks": [
+    2,
+    3
+   ],
+   "scope": "회차 정리 자동 변환(9/7·9/9·9/14)",
+   "parts": 3,
+   "qN": 0,
+   "qMC": 0,
+   "slides": 43,
+   "kind": "temp",
+   "quiz": false
+  },
+  {
+   "id": "writing-w1-3",
+   "file": "notes/writing-w1-3-slides.html",
+   "title": "아카데믹글쓰기 · 1~3주차 임시 정리",
+   "course": "아카데믹글쓰기",
+   "weeks": [
+    2,
+    3
+   ],
+   "scope": "회차 정리 자동 변환(9/8·9/15)",
+   "parts": 2,
+   "qN": 0,
+   "qMC": 0,
+   "slides": 53,
+   "kind": "temp",
+   "quiz": false
+  }
+ ]
+}
