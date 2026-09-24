@@ -277,6 +277,38 @@ body{padding:0;display:block}
 html,body{line-height:1.55}
 #body h1,#body h2{font-weight:700;letter-spacing:-.01em}
 #body .why,#body .concept,#body .one,#body .say{line-height:1.6}
+
+/* ===== V6F 글래스 (대표님 2026-09-24) — 치수 불변, 색·투명·모서리만 ===== */
+:root{--gl:rgba(255,255,255,.60);--gl-2:rgba(255,255,255,.42);--gl-3:rgba(255,255,255,.82);--gl-line:rgba(255,255,255,.80);--gl-hi:inset 0 1px 0 rgba(255,255,255,.85);--gl-blur:blur(18px) saturate(140%);--line:rgba(17,17,17,.14);--soft:rgba(255,255,255,.40)}
+html{background:linear-gradient(160deg,#E9F0F5 0%,#F2F5F0 48%,#EDF2EE 100%) fixed}
+body{background:transparent;position:relative}
+body::before,body::after{content:"";position:fixed;z-index:0;border-radius:50%;pointer-events:none;filter:blur(60px)}
+body::before{width:52vw;height:52vw;max-width:640px;max-height:640px;left:-14vw;top:-18vh;background:radial-gradient(circle at 40% 40%,rgba(74,222,128,.32),transparent 68%)}
+body::after{width:60vw;height:60vw;max-width:760px;max-height:760px;right:-20vw;bottom:-24vh;background:radial-gradient(circle at 50% 50%,rgba(96,165,250,.30),transparent 66%)}
+#stage{position:relative;z-index:1;background:var(--gl-2);-webkit-backdrop-filter:var(--gl-blur);backdrop-filter:var(--gl-blur);border-color:var(--gl-line)}
+#top{background:var(--gl-2);border-bottom:1px solid var(--gl-line)}
+#foot{background:var(--gl-2);border-top:1px solid var(--gl-line)}
+.dot{background:rgba(255,255,255,.7)}
+.btn{background:var(--gl);border-color:rgba(17,17,17,.55);border-radius:12px;box-shadow:var(--gl-hi)}
+.btn.primary{background:#15803D;border-color:#15803D;color:#fff;box-shadow:0 4px 12px rgba(21,128,61,.28),inset 0 1px 0 rgba(255,255,255,.25)}
+.choice{background:var(--gl);border-color:rgba(255,255,255,.85);border-radius:14px;box-shadow:0 2px 10px rgba(20,40,60,.06),var(--gl-hi)}
+.choice.sel{border-color:var(--ink)}
+.choice .cn{background:rgba(255,255,255,.7)}
+#body .why,#body .concept{background:var(--gl-2);border-color:rgba(25,113,194,.38);border-radius:14px}
+#body .say,#body .one{background:var(--gl-2);border-radius:0 12px 12px 0}
+#body .tw{border-radius:10px;background:var(--gl-2)}
+.exam-callout{background:rgba(255,77,141,.08);border-radius:14px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.mu>div{border-radius:14px}
+.score .c{border-radius:14px;background:var(--gl-2)}
+.q-kind{border-radius:8px;background:var(--gl-2)}
+.verdict{border-radius:12px;background:var(--gl)}
+.jp{border-radius:10px;background:var(--gl)}
+.myans textarea{border-radius:12px;background:var(--gl)}
+#anslb,#padPanel{background:var(--gl-3);-webkit-backdrop-filter:blur(24px) saturate(150%);backdrop-filter:blur(24px) saturate(150%)}
+#padPanel{border-radius:16px;border-color:rgba(17,17,17,.45)}
+.pad{border-radius:10px;background:rgba(255,255,255,.85)}
+#hintBox{border-radius:14px}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#stage{background:#FAFBFA}.choice,.btn,#top,#foot,#body .why,#body .concept{background:#FFFFFF}}
 </style>
 </head>
 <body>

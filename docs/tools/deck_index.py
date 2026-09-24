@@ -29,10 +29,25 @@ for f in sorted(glob.glob(os.path.join(ROOT, "notes", "*-slides.html"))):
     title = (re.search(r"<title>([^<]*)</title>", s) or [None, did])[1]
     qs = [x for x in slides if x.get("type") == "q"]
     parts = sorted(set(x.get("part") for x in slides if x.get("type") == "cover"))
+    # 파트별 회차 날짜·슬라이드 id — 「수업 따라가기」(V50)가 회차 ↔ 파트를 잇는다. 표지 no "파트 1 · 9/7·9/9" / "9/16 → 9/21·23" 에서 날짜를 읽는다
+    def part_dates(no):
+        ds, mon = [], None
+        for m in re.finditer(r"(\d{1,2})/(\d{1,2})|(?<=[·,~→ ])(\d{1,2})(?![/\d])", no or ""):
+            if m.group(1): mon, day = int(m.group(1)), int(m.group(2))
+            elif mon: day = int(m.group(3))
+            else: continue
+            if 1 <= mon <= 12 and 1 <= day <= 31: ds.append("2026-%02d-%02d" % (mon, day))
+        return sorted(set(ds))
+    plist = []
+    for n in parts:
+        cov = [x for x in slides if x.get("type") == "cover" and x.get("part") == n][0]
+        sids = [x["id"] for x in slides if x.get("part") == n and x.get("type") in ("concept", "mu", "q")]
+        plist.append({"n": n, "title": re.sub(r"[\s★]+$", "", cov.get("title") or ""), "no": cov.get("no") or "", "dates": part_dates(cov.get("no")),
+                      "sids": sids, "qids": [x["id"] for x in slides if x.get("part") == n and x.get("type") == "q"]})
     pre = did.split("-")[0]
     meta = META.get(did, {})
     out.append({"id": did, "file": "notes/" + os.path.basename(f), "title": title, "course": COURSE.get(pre, "?"),
-                "weeks": meta.get("weeks", []), "scope": meta.get("scope", ""), "parts": len(parts),
+                "weeks": meta.get("weeks", []), "scope": meta.get("scope", ""), "parts": len(parts), "partList": plist,
                 "qN": len(qs), "qMC": sum(1 for q in qs if q.get("choices")), "slides": len(slides),
                 "kind": "exam" if qs else "temp", "quiz": "V6E-QUIZ" in s})
 data = {"generated": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S"), "decks": out}

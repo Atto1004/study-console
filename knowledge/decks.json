@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-24T23:15:29",
+ "generated": "2026-09-24T23:37:02",
  "decks": [
   {
    "id": "calc2-matrix",
@@ -12,6 +12,195 @@
    ],
    "scope": "행렬 · 행렬식 · 역행렬 · 크래머 (학습지 (1)~(7))",
    "parts": 6,
+   "partList": [
+    {
+     "n": 1,
+     "title": "행렬의 정의와 다섯 종류",
+     "no": "파트 1 · 9/1",
+     "dates": [
+      "2026-09-01"
+     ],
+     "sids": [
+      "p1-concept",
+      "p1-concept-2",
+      "p1-concept-3",
+      "p1-mu",
+      "p1-b1",
+      "p1-b2",
+      "p1-b3",
+      "p1-b4",
+      "p1-a5",
+      "p1-a6"
+     ],
+     "qids": [
+      "p1-b1",
+      "p1-b2",
+      "p1-b3",
+      "p1-b4",
+      "p1-a5",
+      "p1-a6"
+     ]
+    },
+    {
+     "n": 2,
+     "title": "행렬의 연산 — 덧셈·실수배·곱셈·거듭제곱",
+     "no": "파트 2 · 9/3",
+     "dates": [
+      "2026-09-03"
+     ],
+     "sids": [
+      "p2-concept",
+      "p2-concept-2",
+      "p2-concept-3",
+      "p2-mu",
+      "p2-b1",
+      "p2-b2",
+      "p2-x3",
+      "p2-x4",
+      "p2-x5",
+      "p2-x6",
+      "p2-b7",
+      "p2-b8",
+      "p2-a9",
+      "p2-a10",
+      "p2-a11",
+      "p2-a12"
+     ],
+     "qids": [
+      "p2-b1",
+      "p2-b2",
+      "p2-b7",
+      "p2-b8",
+      "p2-a9",
+      "p2-a10",
+      "p2-a11",
+      "p2-a12"
+     ]
+    },
+    {
+     "n": 3,
+     "title": "행렬식 — 2차 ad−bc · 3차 사루스 ★ 시험은 여기부터",
+     "no": "파트 3 · 9/3",
+     "dates": [
+      "2026-09-03"
+     ],
+     "sids": [
+      "p3-exam-1",
+      "p3-exam-2",
+      "p3-concept",
+      "p3-concept-2",
+      "p3-mu",
+      "p3-b1",
+      "p3-b2",
+      "p3-b3",
+      "p3-a4",
+      "p3-a5",
+      "p3-a6"
+     ],
+     "qids": [
+      "p3-b1",
+      "p3-b2",
+      "p3-b3",
+      "p3-a4",
+      "p3-a5",
+      "p3-a6"
+     ]
+    },
+    {
+     "n": 4,
+     "title": "소행렬식 · 여인수 · 여인수 전개",
+     "no": "파트 4 · 9/8",
+     "dates": [
+      "2026-09-08"
+     ],
+     "sids": [
+      "p4-concept",
+      "p4-concept-2",
+      "p4-concept-3",
+      "p4-concept-4",
+      "p4-mu",
+      "p4-b1",
+      "p4-b2",
+      "p4-b3",
+      "p4-b4",
+      "p4-b5",
+      "p4-a6",
+      "p4-a7",
+      "p4-a8"
+     ],
+     "qids": [
+      "p4-b1",
+      "p4-b2",
+      "p4-b3",
+      "p4-b4",
+      "p4-b5",
+      "p4-a6",
+      "p4-a7",
+      "p4-a8"
+     ]
+    },
+    {
+     "n": 5,
+     "title": "역행렬 — 나눗셈 대신",
+     "no": "파트 5 · 9/8",
+     "dates": [
+      "2026-09-08"
+     ],
+     "sids": [
+      "p5-concept",
+      "p5-concept-2",
+      "p5-concept-3",
+      "p5-concept-4",
+      "p5-mu",
+      "p5-b1",
+      "p5-b2",
+      "p5-b3",
+      "p5-b4",
+      "p5-a5",
+      "p5-a6",
+      "p5-a7"
+     ],
+     "qids": [
+      "p5-b1",
+      "p5-b2",
+      "p5-b3",
+      "p5-b4",
+      "p5-a5",
+      "p5-a6",
+      "p5-a7"
+     ]
+    },
+    {
+     "n": 6,
+     "title": "연립방정식 풀기 — 역행렬 · 크래머의 법칙",
+     "no": "파트 6 · 9/8",
+     "dates": [
+      "2026-09-08"
+     ],
+     "sids": [
+      "p6-concept",
+      "p6-concept-2",
+      "p6-concept-3",
+      "p6-concept-4",
+      "p6-concept-5",
+      "p6-mu",
+      "p6-b1",
+      "p6-b2",
+      "p6-b3",
+      "p6-a4",
+      "p6-a5",
+      "p6-a6"
+     ],
+     "qids": [
+      "p6-b1",
+      "p6-b2",
+      "p6-b3",
+      "p6-a4",
+      "p6-a5",
+      "p6-a6"
+     ]
+    }
+   ],
    "qN": 41,
    "qMC": 21,
    "slides": 89,
@@ -30,6 +219,139 @@
    ],
    "scope": "12.1 3차원 좌표계 · 12.2 벡터 · 12.3 내적 도입",
    "parts": 5,
+   "partList": [
+    {
+     "n": 1,
+     "title": "12.1 3차원 좌표계 · 거리 · 구면 (시험 ✗, 그림의 바탕)",
+     "no": "파트 1 · 9/10·9/15",
+     "dates": [
+      "2026-09-10",
+      "2026-09-15"
+     ],
+     "sids": [
+      "p1-concept",
+      "p1-concept-2",
+      "p1-mu",
+      "p1-b1",
+      "p1-b2",
+      "p1-a3"
+     ],
+     "qids": [
+      "p1-b1",
+      "p1-b2",
+      "p1-a3"
+     ]
+    },
+    {
+     "n": 2,
+     "title": "12.2 벡터 — 위치벡터 · 두 점 벡터 · 크기 · 연산",
+     "no": "파트 2 · 9/15·9/17",
+     "dates": [
+      "2026-09-15",
+      "2026-09-17"
+     ],
+     "sids": [
+      "p2-concept",
+      "p2-concept-2",
+      "p2-concept-3",
+      "p2-mu",
+      "p2-b1",
+      "p2-b2",
+      "p2-b3",
+      "p2-b4",
+      "p2-a5",
+      "p2-a6"
+     ],
+     "qids": [
+      "p2-b1",
+      "p2-b2",
+      "p2-b3",
+      "p2-b4",
+      "p2-a5",
+      "p2-a6"
+     ]
+    },
+    {
+     "n": 3,
+     "title": "표준기저벡터 i, j, k · 단위벡터 — \"시험은 여기부터\"",
+     "no": "파트 3 · 9/17",
+     "dates": [
+      "2026-09-17"
+     ],
+     "sids": [
+      "p3-concept",
+      "p3-concept-2",
+      "p3-concept-3",
+      "p3-mu",
+      "p3-b1",
+      "p3-b2",
+      "p3-b3",
+      "p3-b4",
+      "p3-a5",
+      "p3-a6"
+     ],
+     "qids": [
+      "p3-b1",
+      "p3-b2",
+      "p3-b3",
+      "p3-b4",
+      "p3-a5",
+      "p3-a6"
+     ]
+    },
+    {
+     "n": 4,
+     "title": "12.3 내적 — 정의 · 사이각 · 방향각과 방향코사인",
+     "no": "파트 4 · 9/17·9/22",
+     "dates": [
+      "2026-09-17",
+      "2026-09-22"
+     ],
+     "sids": [
+      "p4-concept",
+      "p4-concept-2",
+      "p4-concept-3",
+      "p4-mu",
+      "p4-b1",
+      "p4-b2",
+      "p4-b3",
+      "p4-b4",
+      "p4-a5",
+      "p4-a6"
+     ],
+     "qids": [
+      "p4-b1",
+      "p4-b2",
+      "p4-b3",
+      "p4-b4",
+      "p4-a5",
+      "p4-a6"
+     ]
+    },
+    {
+     "n": 5,
+     "title": "12.4 외적 — 정의 · 2×2 행렬식 · 두 벡터에 수직",
+     "no": "파트 5 · 9/22",
+     "dates": [
+      "2026-09-22"
+     ],
+     "sids": [
+      "p5-concept",
+      "p5-concept-2",
+      "p5-mu",
+      "p5-b1",
+      "p5-b2",
+      "p5-b3",
+      "p5-a4"
+     ],
+     "qids": [
+      "p5-b1",
+      "p5-b2",
+      "p5-b3",
+      "p5-a4"
+     ]
+    }
+   ],
    "qN": 25,
    "qMC": 17,
    "slides": 56,
@@ -49,6 +371,186 @@
    ],
    "scope": "1장 1계 ODE 전부 · 2.1~2.3 2계 선형(기저·특성방정식·연산자)",
    "parts": 6,
+   "partList": [
+    {
+     "n": 1,
+     "title": "1.1~1.3 기본 개념 · 초기값 문제 · 변수분리 · 동차형",
+     "no": "파트 1 · 9/2·9/4",
+     "dates": [
+      "2026-09-02",
+      "2026-09-04"
+     ],
+     "sids": [
+      "p1-concept",
+      "p1-concept-2",
+      "p1-concept-3",
+      "p1-mu",
+      "p1-b1",
+      "p1-b2",
+      "p1-b3",
+      "p1-b4",
+      "p1-a5",
+      "p1-a6"
+     ],
+     "qids": [
+      "p1-b1",
+      "p1-b2",
+      "p1-b3",
+      "p1-b4",
+      "p1-a5",
+      "p1-a6"
+     ]
+    },
+    {
+     "n": 2,
+     "title": "1.4 완전미분방정식 · 적분인자 정리 1·2",
+     "no": "파트 2 · 9/9·9/11",
+     "dates": [
+      "2026-09-09",
+      "2026-09-11"
+     ],
+     "sids": [
+      "p2-concept",
+      "p2-concept-2",
+      "p2-concept-3",
+      "p2-concept-4",
+      "p2-mu",
+      "p2-b1",
+      "p2-b2",
+      "p2-b3",
+      "p2-b4",
+      "p2-a5",
+      "p2-a6"
+     ],
+     "qids": [
+      "p2-b1",
+      "p2-b2",
+      "p2-b3",
+      "p2-b4",
+      "p2-a5",
+      "p2-a6"
+     ]
+    },
+    {
+     "n": 3,
+     "title": "1.5 선형 ODE 공식 · 베르누이 · 치환",
+     "no": "파트 3 · 9/11·9/16",
+     "dates": [
+      "2026-09-11",
+      "2026-09-16"
+     ],
+     "sids": [
+      "p3-concept",
+      "p3-concept-2",
+      "p3-concept-3",
+      "p3-concept-4",
+      "p3-concept-5",
+      "p3-mu",
+      "p3-b1",
+      "p3-b2",
+      "p3-b3",
+      "p3-b4",
+      "p3-a5",
+      "p3-a6"
+     ],
+     "qids": [
+      "p3-b1",
+      "p3-b2",
+      "p3-b3",
+      "p3-b4",
+      "p3-a5",
+      "p3-a6"
+     ]
+    },
+    {
+     "n": 4,
+     "title": "2.1 2계 선형 — 중첩 원리 · 1차독립 · 기저 · 차수축소 · 론스키안",
+     "no": "파트 4 · 9/16·9/23",
+     "dates": [
+      "2026-09-16",
+      "2026-09-23"
+     ],
+     "sids": [
+      "p4-concept",
+      "p4-concept-2",
+      "p4-concept-3",
+      "p4-concept-4",
+      "p4-mu",
+      "p4-b1",
+      "p4-b2",
+      "p4-b3",
+      "p4-b4",
+      "p4-a5",
+      "p4-a6"
+     ],
+     "qids": [
+      "p4-b1",
+      "p4-b2",
+      "p4-b3",
+      "p4-b4",
+      "p4-a5",
+      "p4-a6"
+     ]
+    },
+    {
+     "n": 5,
+     "title": "2.2 상수계수 · 특성방정식 세 경우 · 2.3 미분연산자",
+     "no": "파트 5 · 9/18 (슬라이드 보강)",
+     "dates": [
+      "2026-09-18"
+     ],
+     "sids": [
+      "p5-concept",
+      "p5-concept-2",
+      "p5-concept-3",
+      "p5-concept-4",
+      "p5-mu",
+      "p5-b1",
+      "p5-b2",
+      "p5-b3",
+      "p5-b4",
+      "p5-a5",
+      "p5-a6"
+     ],
+     "qids": [
+      "p5-b1",
+      "p5-b2",
+      "p5-b3",
+      "p5-b4",
+      "p5-a5",
+      "p5-a6"
+     ]
+    },
+    {
+     "n": 6,
+     "title": "2.5 오일러-코시 방정식 — 보조방정식 · 세 경우",
+     "no": "파트 6 · 9/23",
+     "dates": [
+      "2026-09-23"
+     ],
+     "sids": [
+      "p6-concept",
+      "p6-concept-2",
+      "p6-concept-3",
+      "p6-concept-4",
+      "p6-mu",
+      "p6-b1",
+      "p6-b2",
+      "p6-b3",
+      "p6-b4",
+      "p6-a5",
+      "p6-a6"
+     ],
+     "qids": [
+      "p6-b1",
+      "p6-b2",
+      "p6-b3",
+      "p6-b4",
+      "p6-a5",
+      "p6-a6"
+     ]
+    }
+   ],
    "qN": 36,
    "qMC": 24,
    "slides": 81,
@@ -66,11 +568,121 @@
    ],
    "scope": "회차 정리 자동 변환(9/9·9/11·9/16)",
    "parts": 3,
+   "partList": [
+    {
+     "n": 1,
+     "title": "1.4 완전상미분방정식 · 적분인자",
+     "no": "파트 1 · 9/9",
+     "dates": [
+      "2026-09-09"
+     ],
+     "sids": [
+      "p1-concept",
+      "p1-concept-2",
+      "p1-concept-3",
+      "p1-concept-4",
+      "p1-concept-5",
+      "p1-concept-6",
+      "p1-concept-7",
+      "p1-concept-8",
+      "p1-concept-9",
+      "p1-concept-10",
+      "p1-concept-11",
+      "p1-concept-12",
+      "p1-concept-13",
+      "p1-concept-14"
+     ],
+     "qids": []
+    },
+    {
+     "n": 2,
+     "title": "1.5 선형 상미분방정식 + 베르누이",
+     "no": "파트 2 · 9/11",
+     "dates": [
+      "2026-09-11"
+     ],
+     "sids": [
+      "p2-concept",
+      "p2-concept-2",
+      "p2-concept-3",
+      "p2-concept-4",
+      "p2-concept-5",
+      "p2-concept-6",
+      "p2-concept-7",
+      "p2-concept-8",
+      "p2-concept-9",
+      "p2-concept-10",
+      "p2-concept-11",
+      "p2-concept-12",
+      "p2-concept-13",
+      "p2-concept-14",
+      "p2-concept-15",
+      "p2-concept-16"
+     ],
+     "qids": []
+    },
+    {
+     "n": 3,
+     "title": "베르누이 연습 3제 + 1장 총정리 → 2장 2계 선형 ODE 시작",
+     "no": "파트 3 · 9/16",
+     "dates": [
+      "2026-09-16"
+     ],
+     "sids": [
+      "p3-exam-1",
+      "p3-exam-2",
+      "p3-exam-3",
+      "p3-concept",
+      "p3-concept-2",
+      "p3-concept-3",
+      "p3-concept-4",
+      "p3-concept-5",
+      "p3-concept-6",
+      "p3-concept-7",
+      "p3-concept-8",
+      "p3-concept-9",
+      "p3-concept-10",
+      "p3-concept-11",
+      "p3-concept-12",
+      "p3-concept-13",
+      "p3-concept-14",
+      "p3-concept-15",
+      "p3-concept-16",
+      "p3-concept-17",
+      "p3-concept-18",
+      "p3-concept-19",
+      "p3-concept-20",
+      "p3-concept-21",
+      "p3-concept-22",
+      "p3-concept-23",
+      "p3-concept-24",
+      "p3-concept-25",
+      "p3-concept-26",
+      "p3-concept-27",
+      "p3-concept-28",
+      "p3-concept-29",
+      "p3-concept-30",
+      "p3-concept-31",
+      "p3-concept-32",
+      "p3-concept-33",
+      "p3-concept-34",
+      "p3-concept-35",
+      "p3-concept-36",
+      "p3-concept-37",
+      "p3-concept-38",
+      "p3-concept-39",
+      "p3-concept-40",
+      "p3-concept-41",
+      "p3-concept-42"
+     ],
+     "qids": []
+    }
+   ],
    "qN": 0,
    "qMC": 0,
    "slides": 84,
    "kind": "temp",
-   "quiz": false
+   "quiz": true
   },
   {
    "id": "phys2-mid",
@@ -85,6 +697,162 @@
    ],
    "scope": "21 전하 · 22 전기장 · 23 가우스 · 24 전위 · 25 전기용량 도입",
    "parts": 5,
+   "partList": [
+    {
+     "n": 1,
+     "title": "21장 전하와 쿨롱 법칙 · 전기장의 정의",
+     "no": "파트 1 · 9/4",
+     "dates": [
+      "2026-09-04"
+     ],
+     "sids": [
+      "p1-concept",
+      "p1-concept-2",
+      "p1-concept-3",
+      "p1-mu",
+      "p1-b1",
+      "p1-b2",
+      "p1-b3",
+      "p1-b4",
+      "p1-a5",
+      "p1-a6"
+     ],
+     "qids": [
+      "p1-b1",
+      "p1-b2",
+      "p1-b3",
+      "p1-b4",
+      "p1-a5",
+      "p1-a6"
+     ]
+    },
+    {
+     "n": 2,
+     "title": "22장 전기장 계산 — 불연속(Σ) · 연속(∫) 6종",
+     "no": "파트 2 · 9/9·9/11",
+     "dates": [
+      "2026-09-09",
+      "2026-09-11"
+     ],
+     "sids": [
+      "p2-concept",
+      "p2-concept-2",
+      "p2-concept-3",
+      "p2-concept-4",
+      "p2-mu",
+      "p2-b1",
+      "p2-b2",
+      "p2-b3",
+      "p2-b4",
+      "p2-b5",
+      "p2-a6",
+      "p2-a7"
+     ],
+     "qids": [
+      "p2-b1",
+      "p2-b2",
+      "p2-b3",
+      "p2-b4",
+      "p2-b5",
+      "p2-a6",
+      "p2-a7"
+     ]
+    },
+    {
+     "n": 3,
+     "title": "23장 가우스 법칙 — 가우스면 3종 · 도체구 · 부도체구",
+     "no": "파트 3 · 9/11·9/16",
+     "dates": [
+      "2026-09-11",
+      "2026-09-16"
+     ],
+     "sids": [
+      "p3-concept",
+      "p3-concept-2",
+      "p3-concept-3",
+      "p3-mu",
+      "p3-b1",
+      "p3-b2",
+      "p3-b3",
+      "p3-b4",
+      "p3-b5",
+      "p3-a6",
+      "p3-a7"
+     ],
+     "qids": [
+      "p3-b1",
+      "p3-b2",
+      "p3-b3",
+      "p3-b4",
+      "p3-b5",
+      "p3-a6",
+      "p3-a7"
+     ]
+    },
+    {
+     "n": 4,
+     "title": "24장 전기 퍼텐셜(전위) — 점전하 · 여러 점전하 · 증명 3제",
+     "no": "파트 4 · 9/18",
+     "dates": [
+      "2026-09-18"
+     ],
+     "sids": [
+      "p4-exam-1",
+      "p4-exam-2",
+      "p4-concept",
+      "p4-concept-2",
+      "p4-concept-3",
+      "p4-mu",
+      "p4-b1",
+      "p4-b2",
+      "p4-b3",
+      "p4-b4",
+      "p4-b5",
+      "p4-a6",
+      "p4-a7",
+      "p4-a8"
+     ],
+     "qids": [
+      "p4-b1",
+      "p4-b2",
+      "p4-b3",
+      "p4-b4",
+      "p4-b5",
+      "p4-a6",
+      "p4-a7",
+      "p4-a8"
+     ]
+    },
+    {
+     "n": 5,
+     "title": "25장 전기 용량 — 축전기 3종 · 고립 도체구 · 유전체",
+     "no": "파트 5 · 9/18·9/23",
+     "dates": [
+      "2026-09-18",
+      "2026-09-23"
+     ],
+     "sids": [
+      "p5-concept",
+      "p5-concept-2",
+      "p5-concept-3",
+      "p5-mu",
+      "p5-b1",
+      "p5-b2",
+      "p5-b3",
+      "p5-b4",
+      "p5-a5",
+      "p5-a6"
+     ],
+     "qids": [
+      "p5-b1",
+      "p5-b2",
+      "p5-b3",
+      "p5-b4",
+      "p5-a5",
+      "p5-a6"
+     ]
+    }
+   ],
    "qN": 34,
    "qMC": 23,
    "slides": 70,
@@ -103,11 +871,143 @@
    ],
    "scope": "회차 정리 자동 변환(9/4~9/18)",
    "parts": 5,
+   "partList": [
+    {
+     "n": 1,
+     "title": "전기장 시작",
+     "no": "파트 1 · 9/4",
+     "dates": [
+      "2026-09-04"
+     ],
+     "sids": [
+      "p1-concept"
+     ],
+     "qids": []
+    },
+    {
+     "n": 2,
+     "title": "22장 전기장 계산 — 점전하·점전하군·쌍극자(Σ) → 직선 도선(∫)",
+     "no": "파트 2 · 9/9",
+     "dates": [
+      "2026-09-09"
+     ],
+     "sids": [
+      "p2-exam-1",
+      "p2-exam-2",
+      "p2-concept",
+      "p2-concept-2",
+      "p2-concept-3",
+      "p2-concept-4",
+      "p2-concept-5",
+      "p2-concept-6",
+      "p2-concept-7",
+      "p2-concept-8"
+     ],
+     "qids": []
+    },
+    {
+     "n": 3,
+     "title": "원형 도선·원판의 전기장 + 가우스 법칙 서론",
+     "no": "파트 3 · 9/11",
+     "dates": [
+      "2026-09-11"
+     ],
+     "sids": [
+      "p3-concept",
+      "p3-concept-2",
+      "p3-concept-3",
+      "p3-concept-4",
+      "p3-concept-5",
+      "p3-concept-6",
+      "p3-concept-7",
+      "p3-concept-8",
+      "p3-concept-9",
+      "p3-concept-10",
+      "p3-concept-11",
+      "p3-concept-12"
+     ],
+     "qids": []
+    },
+    {
+     "n": 4,
+     "title": "23장 가우스 법칙 — 정의·가우스면 3종·도체구·부도체구",
+     "no": "파트 4 · 9/16",
+     "dates": [
+      "2026-09-16"
+     ],
+     "sids": [
+      "p4-exam-1",
+      "p4-exam-2",
+      "p4-exam-3",
+      "p4-exam-4",
+      "p4-concept",
+      "p4-concept-2",
+      "p4-concept-3",
+      "p4-concept-4",
+      "p4-concept-5",
+      "p4-concept-6",
+      "p4-concept-7",
+      "p4-concept-8",
+      "p4-concept-9",
+      "p4-concept-10",
+      "p4-concept-11",
+      "p4-concept-12",
+      "p4-concept-13",
+      "p4-concept-14",
+      "p4-concept-15",
+      "p4-concept-16",
+      "p4-concept-17",
+      "p4-concept-18",
+      "p4-concept-19",
+      "p4-concept-20",
+      "p4-concept-21",
+      "p4-concept-22",
+      "p4-concept-23",
+      "p4-concept-24",
+      "p4-concept-25",
+      "p4-concept-26",
+      "p4-concept-27",
+      "p4-concept-28"
+     ],
+     "qids": []
+    },
+    {
+     "n": 5,
+     "title": "24장 전기 퍼텐셜(전위) — 점전하·쌍극자·직선 도선·원판 + 25장 축전기 도입",
+     "no": "파트 5 · 9/18",
+     "dates": [
+      "2026-09-18"
+     ],
+     "sids": [
+      "p5-exam-1",
+      "p5-exam-2",
+      "p5-exam-3",
+      "p5-exam-4",
+      "p5-concept",
+      "p5-concept-2",
+      "p5-concept-3",
+      "p5-concept-4",
+      "p5-concept-5",
+      "p5-concept-6",
+      "p5-concept-7",
+      "p5-concept-8",
+      "p5-concept-9",
+      "p5-concept-10",
+      "p5-concept-11",
+      "p5-concept-12",
+      "p5-concept-13",
+      "p5-concept-14",
+      "p5-concept-15",
+      "p5-concept-16"
+     ],
+     "qids": []
+    }
+   ],
    "qN": 0,
    "qMC": 0,
    "slides": 88,
    "kind": "temp",
-   "quiz": false
+   "quiz": true
   },
   {
    "id": "statics-mid",
@@ -121,6 +1021,154 @@
    ],
    "scope": "Ch.2 벡터(성분·방향여현·내적·정사영·외적·삼중적) · Ch.3 힘·평형·자유물체도",
    "parts": 5,
+   "partList": [
+    {
+     "n": 1,
+     "title": "벡터의 성분 · 위치벡터 · 방향여현",
+     "no": "파트 1 · 9/7·9/9",
+     "dates": [
+      "2026-09-07",
+      "2026-09-09"
+     ],
+     "sids": [
+      "p1-concept",
+      "p1-concept-2",
+      "p1-concept-3",
+      "p1-mu",
+      "p1-b1",
+      "p1-b2",
+      "p1-b3",
+      "p1-b4",
+      "p1-a5",
+      "p1-a6"
+     ],
+     "qids": [
+      "p1-b1",
+      "p1-b2",
+      "p1-b3",
+      "p1-b4",
+      "p1-a5",
+      "p1-a6"
+     ]
+    },
+    {
+     "n": 2,
+     "title": "내적 · 두 벡터 사이 각 · 정사영",
+     "no": "파트 2 · 9/9·9/14",
+     "dates": [
+      "2026-09-09",
+      "2026-09-14"
+     ],
+     "sids": [
+      "p2-concept",
+      "p2-concept-2",
+      "p2-concept-3",
+      "p2-mu",
+      "p2-b1",
+      "p2-b2",
+      "p2-b3",
+      "p2-b4",
+      "p2-a5",
+      "p2-a6"
+     ],
+     "qids": [
+      "p2-b1",
+      "p2-b2",
+      "p2-b3",
+      "p2-b4",
+      "p2-a5",
+      "p2-a6"
+     ]
+    },
+    {
+     "n": 3,
+     "title": "외적 · 행렬식 · 혼합삼중적",
+     "no": "파트 3 · 9/14·9/16",
+     "dates": [
+      "2026-09-14",
+      "2026-09-16"
+     ],
+     "sids": [
+      "p3-concept",
+      "p3-concept-2",
+      "p3-concept-3",
+      "p3-mu",
+      "p3-b1",
+      "p3-b2",
+      "p3-b3",
+      "p3-b4",
+      "p3-b5",
+      "p3-a6",
+      "p3-a7"
+     ],
+     "qids": [
+      "p3-b1",
+      "p3-b2",
+      "p3-b3",
+      "p3-b4",
+      "p3-b5",
+      "p3-a6",
+      "p3-a7"
+     ]
+    },
+    {
+     "n": 4,
+     "title": "Ch.3 힘의 종류 — 접촉력 · 장력 · 도르래 · 스프링",
+     "no": "파트 4 · 9/16",
+     "dates": [
+      "2026-09-16"
+     ],
+     "sids": [
+      "p4-concept",
+      "p4-concept-2",
+      "p4-concept-3",
+      "p4-mu",
+      "p4-b1",
+      "p4-b2",
+      "p4-b3",
+      "p4-b4",
+      "p4-a5",
+      "p4-a6"
+     ],
+     "qids": [
+      "p4-b1",
+      "p4-b2",
+      "p4-b3",
+      "p4-b4",
+      "p4-a5",
+      "p4-a6"
+     ]
+    },
+    {
+     "n": 5,
+     "title": "평형과 자유물체도 — ΣF = 0",
+     "no": "파트 5 · 9/16 → 9/21·23",
+     "dates": [
+      "2026-09-16",
+      "2026-09-21",
+      "2026-09-23"
+     ],
+     "sids": [
+      "p5-concept",
+      "p5-concept-2",
+      "p5-mu",
+      "p5-b1",
+      "p5-b2",
+      "p5-b3",
+      "p5-b4",
+      "p5-a5",
+      "p5-a6"
+     ],
+     "qids": [
+      "p5-b1",
+      "p5-b2",
+      "p5-b3",
+      "p5-b4",
+      "p5-a5",
+      "p5-a6"
+     ]
+    }
+   ],
    "qN": 31,
    "qMC": 21,
    "slides": 63,
@@ -138,11 +1186,80 @@
    ],
    "scope": "회차 정리 자동 변환(9/7·9/9·9/14)",
    "parts": 3,
+   "partList": [
+    {
+     "n": 1,
+     "title": "Ch.1 Introduction 마무리 + Ch.2 Vectors",
+     "no": "파트 1 · 9/7",
+     "dates": [
+      "2026-09-07"
+     ],
+     "sids": [
+      "p1-exam-1",
+      "p1-exam-2",
+      "p1-exam-3",
+      "p1-exam-4",
+      "p1-exam-5",
+      "p1-exam-6",
+      "p1-exam-7",
+      "p1-exam-8",
+      "p1-concept",
+      "p1-concept-2",
+      "p1-concept-3",
+      "p1-concept-4",
+      "p1-concept-5"
+     ],
+     "qids": []
+    },
+    {
+     "n": 2,
+     "title": "Ch.2 벡터 — 성분(2D·3D) · 위치벡터 · 방향여현 · 내적 정의",
+     "no": "파트 2 · 9/9",
+     "dates": [
+      "2026-09-09"
+     ],
+     "sids": [
+      "p2-concept",
+      "p2-concept-2",
+      "p2-concept-3",
+      "p2-concept-4",
+      "p2-concept-5",
+      "p2-concept-6",
+      "p2-concept-7"
+     ],
+     "qids": []
+    },
+    {
+     "n": 3,
+     "title": "Ch.2 벡터 — 내적 마무리 · 정사영 · 외적(Cross Product)",
+     "no": "파트 3 · 9/14",
+     "dates": [
+      "2026-09-14"
+     ],
+     "sids": [
+      "p3-exam-1",
+      "p3-exam-2",
+      "p3-concept",
+      "p3-concept-2",
+      "p3-concept-3",
+      "p3-concept-4",
+      "p3-concept-5",
+      "p3-concept-6",
+      "p3-concept-7",
+      "p3-concept-8",
+      "p3-concept-9",
+      "p3-concept-10",
+      "p3-concept-11",
+      "p3-concept-12"
+     ],
+     "qids": []
+    }
+   ],
    "qN": 0,
    "qMC": 0,
    "slides": 43,
    "kind": "temp",
-   "quiz": false
+   "quiz": true
   },
   {
    "id": "writing-w1-3",
@@ -155,11 +1272,81 @@
    ],
    "scope": "회차 정리 자동 변환(9/8·9/15)",
    "parts": 2,
+   "partList": [
+    {
+     "n": 1,
+     "title": "글에 담는 내 생각: 글감과 주제 설정",
+     "no": "파트 1 · 9/8",
+     "dates": [
+      "2026-09-08"
+     ],
+     "sids": [
+      "p1-concept",
+      "p1-concept-2",
+      "p1-concept-3",
+      "p1-concept-4",
+      "p1-concept-5",
+      "p1-concept-6",
+      "p1-concept-7",
+      "p1-concept-8",
+      "p1-concept-9",
+      "p1-concept-10",
+      "p1-concept-11",
+      "p1-concept-12",
+      "p1-concept-13",
+      "p1-concept-14",
+      "p1-concept-15",
+      "p1-concept-16",
+      "p1-concept-17",
+      "p1-concept-18",
+      "p1-concept-19",
+      "p1-concept-20",
+      "p1-concept-21",
+      "p1-concept-22",
+      "p1-concept-23",
+      "p1-concept-24",
+      "p1-concept-25"
+     ],
+     "qids": []
+    },
+    {
+     "n": 2,
+     "title": "글의 구조화: 구성과 개요",
+     "no": "파트 2 · 9/15",
+     "dates": [
+      "2026-09-15"
+     ],
+     "sids": [
+      "p2-concept",
+      "p2-concept-2",
+      "p2-concept-3",
+      "p2-concept-4",
+      "p2-concept-5",
+      "p2-concept-6",
+      "p2-concept-7",
+      "p2-concept-8",
+      "p2-concept-9",
+      "p2-concept-10",
+      "p2-concept-11",
+      "p2-concept-12",
+      "p2-concept-13",
+      "p2-concept-14",
+      "p2-concept-15",
+      "p2-concept-16",
+      "p2-concept-17",
+      "p2-concept-18",
+      "p2-concept-19",
+      "p2-concept-20",
+      "p2-concept-21"
+     ],
+     "qids": []
+    }
+   ],
    "qN": 0,
    "qMC": 0,
    "slides": 53,
    "kind": "temp",
-   "quiz": false
+   "quiz": true
   }
  ]
 }
