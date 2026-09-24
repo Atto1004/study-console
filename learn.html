@@ -62,6 +62,24 @@ header .back{font-size:14px;color:var(--sub)}header h1{font-size:20px;font-weigh
 .src{font-size:12px;color:var(--sub);margin-top:8px}
 details.prog{margin-bottom:10px}details.prog summary{cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;justify-content:space-between}details.prog summary::after{content:"▾";color:var(--sub)}details.prog[open] summary::after{content:"▴"}
 details.prog ul{margin:6px 0 0;padding-left:18px;font-size:14px}details.prog li{margin:2px 0}
+
+/* 마인드맵 (MINDMAP, 2026-09-24) */
+#mapCard .mapbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+#mapWrap{overflow:auto;max-height:70vh;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+#mapSvg{display:block}
+#mapSvg .edge{fill:none;stroke:var(--line);stroke-width:1.5}
+#mapSvg .edge.hot{stroke:var(--acc);stroke-width:2.5}
+#mapSvg .lvlband{fill:var(--card);opacity:.55}
+#mapSvg .lvltx{fill:var(--sub);font-size:11px;font-weight:700}
+#mapSvg .nd rect{stroke-width:1.5;rx:9;ry:9}
+#mapSvg .nd text{font-size:12.5px;font-weight:600;fill:var(--ink);dominant-baseline:middle}
+#mapSvg .nd{cursor:pointer}
+#mapSvg .nd:hover rect{filter:brightness(.96)}
+#mapSvg .nd.target rect{stroke-dasharray:4 3}
+#mapSvg .nd.dim{opacity:.35}
+.mapseg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.mapseg button{border:0;background:var(--card);color:var(--sub);font:inherit;font-size:12px;padding:5px 10px;cursor:pointer}
+.mapseg button.on{background:var(--acc-soft);color:var(--acc);font-weight:700}
 </style>
 </head>
 <body>
@@ -78,6 +96,15 @@ details.prog ul{margin:6px 0 0;padding-left:18px;font-size:14px}details.prog li{
  <div class="card">
   <div class="tabs"><button id="tabW" class="on">주차</button><button id="tabP">과제·문제</button></div>
   <div id="list"></div>
+ </div>
+ <div class="card" id="mapCard" style="display:none">
+  <h2>개념 마인드맵 <small>선 = 선수지식(먼저 알아야 하는 것) → 나중 개념</small></h2>
+  <div class="mapbar">
+   <span class="mapseg" id="mapScope"><button data-v="all" class="on">과목 전체</button><button data-v="sel">선택한 주차</button></span>
+   <span class="meta" id="mapMeta"></span>
+  </div>
+  <div class="legend"><span><i class="dot" style="background:var(--known)"></i>안다</span><span><i class="dot" style="background:var(--shaky)"></i>흔들림</span><span><i class="dot" style="background:var(--unknown)"></i>모름</span><span><i class="dot" style="background:var(--unrated)"></i>미평가</span><span>옆으로 스크롤 · 「선택한 주차」를 누르면 그 주차 개념만 점선으로</span></div>
+  <div id="mapWrap"><svg id="mapSvg"></svg></div>
  </div>
  <div class="card" id="treeCard" style="display:none">
   <h2 id="treeTitle"></h2>
@@ -124,6 +151,7 @@ function saveM(upd){var now=Date.now()/1000;Object.keys(upd).forEach(function(id
   localStorage.setItem("atto.mastery",JSON.stringify(M));return Promise.resolve()}
 /* ── 화면 ── */
 function renderChips(){var subs=(G.subjects||[]).filter(function(s){return s!=="공통"});$("#chips").innerHTML=subs.map(function(s){return '<button class="chip'+(s===SUBJ?" on":"")+'" data-s="'+esc(s)+'">'+esc(s)+'</button>'}).join("");
+  [].forEach.call(document.querySelectorAll("#mapScope button"),function(b){b.onclick=function(){MAPV=b.dataset.v;renderMap()}});
   [].forEach.call(document.querySelectorAll("#chips .chip"),function(b){b.onclick=function(){SUBJ=b.dataset.s;SEL=null;history.replaceState(null,"","?subject="+encodeURIComponent(SUBJ));render()}})}
 function renderSummary(){var ids=subjectNodes(SUBJ);if(!ids.length){$("#sumTitle").textContent=SUBJ?SUBJ+" — 노드 없음":"과목을 고르세요";return}
   var a=analyze(ids),learned=ids.filter(function(n){return st(n)!=="unrated"}).length,ws=0,ms=0;ids.forEach(function(n){var h=+NODES[n].hours||1;ws+=h;ms+=score(M[n]).score*h});
@@ -149,7 +177,56 @@ function renderTree(){var c=$("#treeCard");if(!SEL){c.style.display="none";retur
 function renderProg(){var p=PROG&&PROG[SUBJ];var el=$("#prog");if(!p){el.style.display="none";return}el.style.display="";var h="";
   Object.keys(p.weeks||p).sort().forEach(function(k){var w=(p.weeks||p)[k];h+='<li><b>'+esc(k)+'주차</b> '+esc(w.진도||w.progress||"")+(w.과제&&w.과제.length?' · 과제: '+w.과제.map(esc).join(", "):"")+(w.필요자료&&w.필요자료.length?' · <span style="color:var(--unknown)">필요: '+w.필요자료.map(esc).join(", ")+'</span>':"")+'</li>'});
   $("#progBody").innerHTML='<ul>'+h+'</ul>'}
-function render(){renderChips();renderProg();renderSummary();renderList();renderTree()}
+/* ── MINDMAP: 개념 연결도 (아토 2026-09-24 "연결해") ── */
+var MAPV="all";
+function tw(t){var w=0;for(var i=0;i<t.length;i++){var c=t.charCodeAt(i);w+=(c>0x1100&&c<0xD7FF)?12.5:(c>=48&&c<=57)?7.5:7}return w}
+function mapWidth(t){return Math.max(84,Math.min(330,tw(t)+22))}
+function clipW(t,max){if(tw(t)<=max)return t;var o="";for(var i=0;i<t.length;i++){if(tw(o+t[i])>max-10)break;o+=t[i]}return o+"…"}
+function renderMap(){
+  var card=$("#mapCard"); if(!SUBJ||!MAP[SUBJ]){card.style.display="none";return}
+  var base=subjectNodes(SUBJ), targ={};
+  if(MAPV==="sel"&&SEL){var d=MAP[SUBJ]||{},ids2;
+    if(SEL.type==="w"){ids2=((d.weeks||{})[SEL.key]||{}).nodes||[]}else{ids2=((d.problems||[])[SEL.key]||{}).nodes||[]}
+    base=ids2.slice()}
+  base.forEach(function(n){targ[n]=1});
+  var ids=closure(base).filter(function(n){return NODES[n]});
+  if(!ids.length){card.style.display="none";return}
+  card.style.display="";
+  [].forEach.call(document.querySelectorAll("#mapScope button"),function(b){b.classList.toggle("on",b.dataset.v===MAPV)});
+  var cnt={known:0,shaky:0,unknown:0,unrated:0};ids.forEach(function(n){cnt[st(n)]++});
+  var edges=[];ids.forEach(function(n){(NODES[n].prereq||[]).forEach(function(p){if(ids.indexOf(p)>=0)edges.push([p,n])})});
+  $("#mapMeta").innerHTML='개념 <b>'+ids.length+'</b> · 연결 <b>'+edges.length+'</b> · 안다 <b style="color:var(--known)">'+cnt.known+'</b> · 흔들림 <b style="color:var(--shaky)">'+cnt.shaky+'</b> · 모름 <b style="color:var(--unknown)">'+(cnt.unknown+cnt.unrated)+'</b>';
+  /* 층별 배치 + 무게중심 정렬 */
+  var rows=LEVELS.map(function(L){return ids.filter(function(n){return NODES[n].level===L})}).filter(function(r){return r.length});
+  var rowNames=LEVELS.filter(function(L){return ids.some(function(n){return NODES[n].level===L})});
+  var pos={},PAD=16,GAPX=14,ROWH=92,TOP=26,NH=34;
+  rows.forEach(function(r){r.sort(function(a,b){return NODES[a].name.localeCompare(NODES[b].name,"ko")})});
+  for(var it=0;it<3;it++){rows.forEach(function(r,ri){
+      if(ri>0){var prev=rows[ri-1],idx={};prev.forEach(function(n,i){idx[n]=i});
+        r.sort(function(a,b){var fa=bary(a,idx),fb=bary(b,idx);return fa-fb||NODES[a].name.localeCompare(NODES[b].name,"ko")})}
+      function bary(n,idx){var ps=(NODES[n].prereq||[]).filter(function(p){return idx[p]!=null});
+        if(!ps.length)return 9999;var s=0;ps.forEach(function(p){s+=idx[p]});return s/ps.length}
+    })}
+  var maxW=0;
+  rows.forEach(function(r,ri){var x=PAD;r.forEach(function(n){var w=mapWidth(NODES[n].name);pos[n]={x:x,y:TOP+ri*ROWH,w:w,h:NH};x+=w+GAPX});maxW=Math.max(maxW,x+PAD)});
+  var H=TOP+rows.length*ROWH+10;
+  var svg=$("#mapSvg");svg.setAttribute("width",maxW);svg.setAttribute("height",H);svg.setAttribute("viewBox","0 0 "+maxW+" "+H);
+  var COL={known:"var(--known)",shaky:"var(--shaky)",unknown:"var(--unknown)",unrated:"var(--unrated)"};
+  var h="";
+  rows.forEach(function(r,ri){var y=TOP+ri*ROWH;h+='<rect class="lvlband" x="0" y="'+(y-16)+'" width="'+maxW+'" height="'+(NH+22)+'"/><text class="lvltx" x="6" y="'+(y-5)+'">'+esc(rowNames[ri])+' · '+r.length+'</text>'});
+  edges.forEach(function(e){var a=pos[e[0]],b=pos[e[1]];if(!a||!b)return;
+    var x1=a.x+a.w/2,y1=a.y+a.h,x2=b.x+b.w/2,y2=b.y,my=(y1+y2)/2,hot=(MAPV==="sel"&&targ[e[1]])?" hot":"";
+    h+='<path class="edge'+hot+'" d="M'+x1+' '+y1+' C'+x1+' '+my+' '+x2+' '+my+' '+x2+' '+y2+'"/>'});
+  ids.forEach(function(n){var p=pos[n],s2=st(n),c=COL[s2],nm=NODES[n].name;
+    var cls="nd"+((MAPV==="sel"&&targ[n])?" target":"")+((MAPV==="sel"&&!targ[n])?" dim":"");
+    h+='<g class="'+cls+'" data-id="'+n+'"><title>'+esc(nm+" — "+(NODES[n].desc||""))+'</title>'+
+       '<rect x="'+p.x+'" y="'+p.y+'" width="'+p.w+'" height="'+p.h+'" fill="color-mix(in srgb,'+c+' 14%,var(--card))" stroke="'+c+'"/>'+
+       '<text x="'+(p.x+11)+'" y="'+(p.y+p.h/2+1)+'">'+esc(clipW(nm,p.w-22))+'</text></g>'});
+  svg.innerHTML=h;
+  [].forEach.call(svg.querySelectorAll(".nd"),function(g){g.onclick=function(){openCard(g.getAttribute("data-id"))}});
+}
+function clip(t,n){return t.length>n?t.slice(0,Math.max(1,n-1))+"…":t}
+function render(){renderChips();renderProg();renderSummary();renderList();renderTree();renderMap()}
 /* ── 카드 시트: 쉬운 설명 + 자가평가 + 퀴즈 → 저장 ── */
 var CARDS={};
 function getCard(id){if(CARDS[id]!==undefined)return Promise.resolve(CARDS[id]);return fetch("knowledge/cards/"+id+".json").then(function(r){return r.ok?r.json():null}).catch(function(){return null}).then(function(c){CARDS[id]=c;return c})}
@@ -178,7 +255,9 @@ $("#sheetBg").onclick=closeCard;$("#tabW").onclick=function(){VIEW="w";$("#tabW"
   Promise.all([fetch("knowledge/graph.json").then(function(r){return r.json()}),fetch("knowledge/map.json").then(function(r){return r.ok?r.json():{}}).catch(function(){return {}}),fetch("knowledge/progress.json").then(function(r){return r.ok?r.json():null}).catch(function(){return null}),probe]).then(function(a){
     G=a[0];MAP=a[1]||{};PROG=a[2];(G.nodes||[]).forEach(function(n){NODES[n.id]=n});$("#mode").textContent=SERVER?"atom 저장":"이 기기에만 저장";
     var subs=(G.subjects||[]).filter(function(s){return s!=="공통"});SUBJ=q.get("subject")&&subs.indexOf(q.get("subject"))>=0?q.get("subject"):subs[0]||"";
-    return loadM()}).then(function(){render();var w=new URLSearchParams(location.search).get("week");if(w&&MAP[SUBJ]&&MAP[SUBJ].weeks&&MAP[SUBJ].weeks[w]){SEL={type:"w",key:w};renderList();renderTree()}
+    return loadM()}).then(function(){render();var qq=new URLSearchParams(location.search);
+    if(qq.get("map")){setTimeout(function(){var c=$("#mapCard");if(c&&c.style.display!=="none")c.scrollIntoView({behavior:"smooth",block:"start"})},250)}
+    var w=qq.get("week");if(w&&MAP[SUBJ]&&MAP[SUBJ].weeks&&MAP[SUBJ].weeks[w]){SEL={type:"w",key:w};renderList();renderTree()}
     if(SERVER&&window.EventSource){try{var es=new EventSource("/api/watch");es.onmessage=function(ev){try{var d=JSON.parse(ev.data);if(d.type==="mastery")loadM().then(render)}catch(e){}}}catch(e){}}
   }).catch(function(e){$("#sumTitle").textContent="지식 그래프를 불러오지 못했습니다";$("#list").innerHTML='<div class="empty">'+esc(e&&e.message||e)+'</div>'})})();
 </script>

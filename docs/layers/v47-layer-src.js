@@ -56,11 +56,12 @@
     var head='<div class="v47-row" data-c="'+c.id+'"><span class="crow-chip" style="background:'+(window.V44?V44.color(c):"#5B6B8C")+'">'+esc(window.V44?V44.abbr(c.name):c.name.slice(0,2))+'</span>'+
       '<span class="v47-main"><span class="v47-t">'+esc(c.name)+' <small>'+esc(scopeTxt)+'</small></span>'+
       '<span class="v47-m">범위 '+total+' · <b class="k">이해 확인 '+k+'</b> · 흔들림 '+s.cnt.shaky+' · 비어 있음 '+(s.cnt.unknown+s.cnt.unrated)+(V47.mastErr?' · <span class="v47-warn">이해도 못 읽음</span>':'')+'</span>'+bar+'</span>'+
+      '<a class="btn xs v47-map" href="learn.html?subject='+encodeURIComponent(c.name)+'&map=1" title="개념 마인드맵">마인드맵</a>'+
       (single?'':'<button class="crow-more" data-v47t="'+c.id+'" aria-label="펼치기">'+(open?"−":"+")+'</button>')+'</div>';
     if(!open) return head;
     var cw=currentWeek()||1;
     var rows=s.weeks.map(function(w){ var wk=s.d.weeks[String(w)], inScope=s.scope.weeks.indexOf(w)>=0, nodes=(wk.nodes||[]).filter(function(id){return V47.NODES[id];});
-      return '<div class="v47-wk'+(inScope?" scope":"")+(wk.planned?" planned":"")+(w===cw?" cur":"")+'"><div class="v47-wh"><b>'+w+'주차</b>'+(wk.planned?'<span class="chip mut">예정</span>':'')+(inScope?'<span class="chip acc">범위</span>':'')+'<span class="v47-wt">'+esc(wk.title||"")+'</span></div>'+
+      return '<div class="v47-wk'+(inScope?" scope":"")+(wk.planned?" planned":"")+(w===cw?" cur":"")+'"><div class="v47-wh"><b>'+w+'주차</b>'+(wk.planned?'<span class="chip mut">예정</span>':'')+(inScope?'<span class="chip acc">범위</span>':'')+'<span class="v47-wt">'+esc(wk.title||"")+'</span><a class="btn xs v47-wmap" href="learn.html?subject='+encodeURIComponent(c.name)+'&week='+w+'&map=1">이 주차 맵</a></div>'+
         '<div class="v47-nodes">'+(nodes.length?nodes.map(chip).join(""):'<span class="v44-mut">노드 없음</span>')+'</div></div>'; }).join("");
     var missing=s.ids.filter(function(id){ return V47.state(V47.MAST[id])!=="known"; });
     var next=missing.length?'<div class="v47-next"><b>다음 확인할 것</b> '+missing.slice(0,4).map(chip).join("")+(missing.length>4?'<span class="v44-mut"> 외 '+(missing.length-4)+'</span>':'')+' <a class="btn xs" href="learn.html?subject='+encodeURIComponent(c.name)+'">지식맵에서 확인</a></div>':'<div class="v47-next"><b>범위 전부 이해 확인됨</b></div>';
@@ -110,6 +111,7 @@
     ".v47-n{display:inline-flex;align-items:center;gap:4px;font-size:12px;line-height:16px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);text-decoration:none}.v47-n::before{content:'';width:7px;height:7px;border-radius:50%;background:#B9C4BE}",
     ".v47-n.st-known{border-color:var(--accent);background:var(--accent-soft)}.v47-n.st-known::before{background:var(--accent)}.v47-n.st-shaky::before{background:#E5C400}.v47-n.st-unknown::before{background:var(--crit)}",
     ".v47-next{font-size:13px;padding:8px 0 6px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}.v47-next b{margin-right:4px}",
+    ".v47-map,.v47-wmap{flex:0 0 auto;text-decoration:none}.v47-wmap{margin-left:auto}",
     ".v47-legend{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 12px;border-top:1px solid var(--line);font-size:12px}",
     "@media(max-width:860px){.v47-t{white-space:normal}.v47-row{padding:10px}}"
   ].join("\n");
