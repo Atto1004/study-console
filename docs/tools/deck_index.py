@@ -18,6 +18,22 @@ META = {
     "statics-w1-3":   {"weeks": [2, 3], "scope": "회차 정리 자동 변환(9/7·9/9·9/14)"},
     "writing-w1-3":   {"weeks": [2, 3], "scope": "회차 정리 자동 변환(9/8·9/15)"},
 }
+# 회차 날짜 검증 — 달력 유효성 + coverage.json(수업 없는 날·휴강)과 대조 (오타 v52 RED 2)
+_covp = os.path.join(ROOT, "knowledge", "coverage.json")
+COV = {}
+if os.path.exists(_covp):
+    for r in json.load(io.open(_covp, encoding="utf-8")).get("rows", []):
+        COV[r["subject"]] = {c["date"]: c["state"] for c in r.get("cells", [])}
+def check_dates(did, course, p):
+    good = []
+    for ds in p["dates"]:
+        try: datetime.date.fromisoformat(ds)
+        except ValueError: print("WARN 잘못된 날짜", did, "파트", p["n"], ds); continue
+        st = COV.get(course, {}).get(ds)
+        if st in ("수업없음", "휴강"): print("WARN 수업 없는 날", did, "파트", p["n"], ds, st); continue
+        good.append(ds)
+    if not good: print("WARN 회차 날짜 없음", did, "파트", p["n"], repr(p["no"]))
+    p["dates"] = good
 out = []
 for f in sorted(glob.glob(os.path.join(ROOT, "notes", "*-slides.html"))):
     s = io.open(f, encoding="utf-8").read()
@@ -46,6 +62,7 @@ for f in sorted(glob.glob(os.path.join(ROOT, "notes", "*-slides.html"))):
                       "sids": sids, "qids": [x["id"] for x in slides if x.get("part") == n and x.get("type") == "q"]})
     pre = did.split("-")[0]
     meta = META.get(did, {})
+    for p in plist: check_dates(did, COURSE.get(pre, "?"), p)
     out.append({"id": did, "file": "notes/" + os.path.basename(f), "title": title, "course": COURSE.get(pre, "?"),
                 "weeks": meta.get("weeks", []), "scope": meta.get("scope", ""), "parts": len(parts), "partList": plist,
                 "qN": len(qs), "qMC": sum(1 for q in qs if q.get("choices")), "slides": len(slides),

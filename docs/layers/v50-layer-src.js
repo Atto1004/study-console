@@ -22,18 +22,23 @@
   };
   V50.md=function(d){ return (+d.slice(5,7))+"/"+(+d.slice(8,10))+"("+DAY[D(d).getDay()]+")"; };
   V50.deckSt=function(id){ try{ return JSON.parse(localStorage.getItem("mc-slides-"+id)||"null")||{}; }catch(e){ return {}; } };
-  /* 회차 ↔ 덱 파트 */
+  V50.quizSt=function(id){ try{ return JSON.parse(localStorage.getItem("mc-slides-"+id+"-quiz")||"null")||{}; }catch(e){ return {}; } };
+  /* 회차 ↔ 덱 파트. 파트 완료 = 개념·암기 장 전부 읽음(건너뜀 제외) + 문제 90% 이상 풀고 60% 이상 정답(「문제만」 정답도 인정) — 오타 v52 RED 3 반영 */
   V50.partsFor=function(c,date){
     var decks=((window.V49&&V49.D&&V49.D.decks)||[]).filter(function(d){ return d.course===c.name&&Array.isArray(d.partList); });
     var pick=function(kind){
       var out=[];
       decks.filter(function(d){ return d.kind===kind; }).forEach(function(d){
-        var st=V50.deckSt(d.id);
+        var st=V50.deckSt(d.id), qz=V50.quizSt(d.id), skip=st.skip||{}, dn=st.done||{}, co=st.correct||{}, qco=qz.correct||{};
         (d.partList||[]).forEach(function(p){
           if((p.dates||[]).indexOf(date)<0) return;
-          var sids=p.sids||[], qids=p.qids||[];
-          var done=sids.filter(function(s){ return st.done&&st.done[s]; }).length, qOk=qids.filter(function(q){ return st.correct&&st.correct[q]===true; }).length, qDone=qids.filter(function(q){ return st.done&&st.done[q]; }).length;
-          out.push({deck:d,p:p,done:done,n:sids.length,qOk:qOk,qDone:qDone,qN:qids.length,ratio:sids.length?done/sids.length:0});
+          var sids=p.sids||[], qids=p.qids||[], cids=sids.filter(function(s){ return qids.indexOf(s)<0; });
+          var cDone=cids.filter(function(s){ return dn[s]&&!skip[s]; }).length;
+          var qDone=qids.filter(function(q){ return (dn[q]&&!skip[q])||qco[q]===true||qco[q]===false; }).length;
+          var qOk=qids.filter(function(q){ return co[q]===true||qco[q]===true; }).length;
+          var complete=(cids.length?cDone===cids.length:true)&&(qids.length?(qDone>=Math.ceil(qids.length*.9)&&qOk>=Math.ceil(qids.length*.6)):true);
+          var tot=cids.length+qids.length, done=cDone+qDone;
+          out.push({deck:d,p:p,done:done,n:tot,cDone:cDone,cN:cids.length,qOk:qOk,qDone:qDone,qN:qids.length,ratio:tot?done/tot:0,complete:complete,shared:(p.dates||[]).length>1});
         });
       });
       return out;
@@ -51,8 +56,9 @@
     var absent=!!(s&&s.status&&window.ABSENT&&ABSENT[s.status]);
     var ratio=parts.length?parts.reduce(function(a,x){ return a+x.ratio; },0)/parts.length:0;
     var hasNote=!!((info&&info.has)||(dn&&window.V36&&V36.dayHas&&V36.dayHas(c,date)));
-    var st= parts.length? (ratio>=.9?"done":ratio>0?"part":(date===td?"today":"todo")) : (hasNote?"note":"wait");
-    return {date:date,w:w,title:title,info:info,parts:parts,ratio:ratio,st:st,absent:absent};
+    var allDone=parts.length>0&&parts.every(function(x){ return x.complete; }), any=parts.some(function(x){ return x.done>0; });   /* 평균이 아니라 모든 파트가 기준 충족 */
+    var st= parts.length? (allDone?"done":any?"part":(date===td?"today":"todo")) : (hasNote?"note":"wait");
+    return {date:date,w:w,title:title,info:info,parts:parts,ratio:ratio,st:st,absent:absent,noNote:parts.length>0&&!hasNote};
   };
   V50.items=function(){
     var td=today(), S=(V50.S&&V50.S.courses)||{}, out=[];
@@ -64,9 +70,10 @@
         else if(!next&&!holidayOn(d)){ var s2=sessionOn(c.id,d); if(!(s2&&s2.cancelled)) next=d; }
       });
       var here=past.slice().reverse().filter(function(x){ return x.st!=="wait"; })[0]||null;
-      var todo=past.filter(function(x){ return x.st==="todo"||x.st==="part"||x.st==="today"; });
+      var todo=past.filter(function(x){ return x.st==="todo"||x.st==="part"; });            /* 밀림 = 지난 회차만 */
+      var todayL=past.filter(function(x){ return x.st==="today"; });                        /* 오늘 수업은 따로 센다 */
       var m=(window.V47&&V47.M&&V47.M[c.name])||null, nw=next?weekOf(next):null, nt=(m&&nw&&m.weeks&&m.weeks[String(nw)])?m.weeks[String(nw)]:null;
-      out.push({c:c,past:past,next:next,nextTitle:nt?(nt.title||""):"",nextPlanned:!!(nt&&nt.planned),here:here,todo:todo,target:todo[0]||null,
+      out.push({c:c,past:past,next:next,nextTitle:nt?(nt.title||""):"",nextPlanned:!!(nt&&nt.planned),here:here,todo:todo,todayL:todayL,target:todo[0]||todayL[0]||null,
         done:past.filter(function(x){ return x.st==="done"; }).length,wait:past.filter(function(x){ return x.st==="wait"; }).length});
     });
     out.sort(function(a,b){ return (b.todo.length-a.todo.length)||a.c.name.localeCompare(b.c.name); });
@@ -81,10 +88,10 @@
   };
   V50.dot=function(x){ return '<i class="v50-dot st-'+x.st+(x.absent?' ab':'')+'" title="'+esc(V50.md(x.date)+" · "+(V50.STN[x.st]||"")+(x.absent?" · 결석":""))+'"></i>'; };
   V50.sessHTML=function(it,x){
-    var prog=x.parts.length?x.parts.map(function(p){ return '<span class="v50-p'+(p.ratio>=.9?' ok':p.ratio>0?' half':'')+'">'+esc("파트 "+p.p.n+(p.p.title?" · "+p.p.title:""))+' <small>'+p.done+'/'+p.n+(p.qN?' · 문제 '+p.qOk+'/'+p.qN:'')+'</small></span>'; }).join(""):'';
+    var prog=x.parts.length?x.parts.map(function(p){ return '<span class="v50-p'+(p.complete?' ok':p.done>0?' half':'')+'">'+esc("파트 "+p.p.n+(p.p.title?" · "+p.p.title:""))+(p.shared?' <small>('+esc(p.p.dates.map(function(d){ return (+d.slice(5,7))+"/"+(+d.slice(8,10)); }).join("·"))+' 공유)</small>':'')+' <small>개념 '+p.cDone+'/'+p.cN+(p.qN?' · 문제 '+p.qDone+'/'+p.qN+' 풀고 '+p.qOk+' 정답':'')+'</small></span>'; }).join(""):'';
     var chip= x.st==="done"?"ok" : x.st==="todo"?"crit" : (x.st==="part"||x.st==="today")?"warn" : "mut";
     return '<div class="v50-s st-'+x.st+'"><div class="v50-sh"><b>'+esc(V50.md(x.date))+'</b><span class="hint">'+x.w+'주차</span><span class="chip '+chip+'">'+esc(V50.STN[x.st])+'</span>'+(x.absent?'<span class="chip crit">결석</span>':'')+'<span class="v50-act">'+V50.btnFor(it,x)+'</span></div>'+
-      (x.title?'<div class="v50-t">'+esc(x.title)+'</div>':(x.st==="wait"?'<div class="v50-t v44-mut">자료가 들어오면 아톰이 정리합니다</div>':''))+(prog?'<div class="v50-parts">'+prog+'</div>':'')+'</div>';
+      (x.title?'<div class="v50-t">'+esc(x.title)+(x.noNote?' <span class="v44-mut">· 회차 정리 전 — 덱은 예상 진도</span>':'')+'</div>':(x.st==="wait"?'<div class="v50-t v44-mut">자료가 들어오면 아톰이 정리합니다</div>':''))+(prog?'<div class="v50-parts">'+prog+'</div>':'')+'</div>';
   };
   V50.rowHTML=function(it){
     var c=it.c, open=!!V50.open[c.id], n=it.past.length;
@@ -112,10 +119,10 @@
   };
   V50.render=function(){
     var card=V50.ensureCard(); if(!card) return; var body=$("#v50Body"), hs=$("#v50Hs");
-    var items=V50.items(), todo=items.reduce(function(a,it){ return a+it.todo.length; },0), wait=items.reduce(function(a,it){ return a+it.wait; },0);
-    if(hs) hs.textContent=todo?"밀림 "+todo:"";
+    var items=V50.items(), todo=items.reduce(function(a,it){ return a+it.todo.length; },0), tdN=items.reduce(function(a,it){ return a+it.todayL.length; },0), wait=items.reduce(function(a,it){ return a+it.wait; },0);
+    if(hs) hs.textContent=(todo?"밀림 "+todo:"")+(tdN?(todo?" · ":"")+"오늘 "+tdN:"");
     var top=(V50.err?'<div class="v49-err">회차 목록(knowledge/sessions.json)을 못 읽었습니다: '+esc(V50.err)+' — 앱 기록만으로 표시합니다.</div>':'')+
-      '<div class="v50-top">'+(todo?'<b>밀린 회차 '+todo+'개</b> — 가장 오래된 것부터 「따라가기」':'<b>밀린 회차 없음</b>')+(wait?' · 정리 대기 '+wait+'회차(자료가 오면 아톰이 정리)':'')+'</div>';
+      '<div class="v50-top">'+(todo?'<b>밀린 회차 '+todo+'개</b> — 가장 오래된 것부터 「따라가기」':'<b>밀린 회차 없음</b>')+(tdN?' · <b>오늘 수업 '+tdN+'회차</b>':'')+(wait?' · 정리 대기 '+wait+'회차(자료가 오면 아톰이 정리)':'')+'</div>';
     body.innerHTML=top+(items.length?items.map(V50.rowHTML).join(""):'<div class="v44-mut" style="padding:12px">과목이 없습니다.</div>');
     V50.bind(body);
   };
@@ -125,7 +132,7 @@
   /* ---- 오늘 탭 브리핑 첫 줄 ---- */
   V50.renderToday=function(){
     var steps=$("#brief .steps"); if(!steps) return; var old=$("#v50Step"); if(old) old.remove();
-    var items=V50.items(), todo=[]; items.forEach(function(it){ it.todo.forEach(function(x){ todo.push({it:it,x:x}); }); });
+    var items=V50.items(), todo=[]; items.forEach(function(it){ it.todo.concat(it.todayL).forEach(function(x){ todo.push({it:it,x:x}); }); });
     todo.sort(function(a,b){ return a.x.date<b.x.date?-1:1; });
     var el=document.createElement("div"); el.className="step"; el.id="v50Step";
     el.innerHTML= todo.length? '<b>수업 따라가기</b> — 밀린 회차 '+todo.length+'개 · 가장 오래된 것 '+esc(todo[0].it.c.name)+' '+esc(V50.md(todo[0].x.date))+(todo[0].x.title?' · '+esc(todo[0].x.title.slice(0,36)):'')+' <button class="linkish" data-v50go="1">따라가기 →</button>' : '<b>수업 따라가기</b> — 밀린 회차 없음';
@@ -137,12 +144,12 @@
     var v=$("#v-today"); if(!v) return; var items=V50.items(), rows=[];
     items.forEach(function(it){ if(it.target) rows.push({it:it,x:it.target}); });
     rows.sort(function(a,b){ return a.x.date<b.x.date?-1:1; });
-    var todo=items.reduce(function(a,it){ return a+it.todo.length; },0);
+    var todo=items.reduce(function(a,it){ return a+it.todo.length; },0), tdN=items.reduce(function(a,it){ return a+it.todayL.length; },0);
     var c=$("#v50Today");
     if(!c){ c=document.createElement("div"); c.className="card v50"; c.id="v50Today";
       var ref=$("#v43Today"); if(!ref){ var cards=$$("#v-today .card"); ref=cards.filter(function(el){ return /오늘 수업/.test((el.querySelector(".card-h h3")||{}).textContent||""); })[0]||null; }
       if(ref) v.insertBefore(c,ref); else v.appendChild(c); }
-    c.innerHTML='<div class="card-h"><h3>수업 따라가기</h3><span class="hs">'+(todo?'밀림 '+todo:'')+'</span><div class="ha"><button class="btn xs" data-v50go="1">전체 →</button></div></div>'+
+    c.innerHTML='<div class="card-h"><h3>수업 따라가기</h3><span class="hs">'+(todo?'밀림 '+todo:'')+(tdN?(todo?' · ':'')+'오늘 '+tdN:'')+'</span><div class="ha"><button class="btn xs" data-v50go="1">전체 →</button></div></div>'+
       '<div class="card-b tight">'+(rows.length?rows.slice(0,4).map(function(r){ return '<div class="v50-td"><span class="crow-chip" style="background:'+(window.V44?V44.color(r.it.c):"#5B6B8C")+'">'+esc(window.V44?V44.abbr(r.it.c.name):r.it.c.name.slice(0,2))+'</span><span class="v50-tdm"><b>'+esc(r.it.c.name)+'</b> <span class="hint">'+esc(V50.md(r.x.date))+(r.it.todo.length>1?' · 밀림 '+r.it.todo.length:'')+'</span><br><span class="v50-tdt">'+esc(r.x.title||"")+'</span></span><span class="v50-act">'+V50.btnFor(r.it,r.x)+'</span></div>'; }).join(""):'<div class="v44-mut" style="padding:10px 12px">밀린 회차가 없습니다 — 다음 수업 뒤에 다시 채워집니다.</div>')+'</div>';
     $$("[data-v50go]",c).forEach(function(b){ b.onclick=function(){ go("study"); }; });
     V50.bind(c);

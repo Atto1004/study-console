@@ -22,7 +22,9 @@
     "body::after{width:60vw;height:60vw;max-width:760px;max-height:760px;right:-20vw;bottom:-24vh;background:radial-gradient(circle at 50% 50%,var(--gl-b2),transparent 66%)}",
     /* ---- 유리 패널 ---- */
     ".card,.tile,.modebar,.exboard{background:var(--gl);-webkit-backdrop-filter:var(--gl-blur);backdrop-filter:var(--gl-blur);border:1px solid var(--gl-line);border-radius:var(--r);box-shadow:var(--gl-sh),var(--gl-hi)}",
-    ".card .card{background:var(--gl-2);box-shadow:none;border-color:var(--gl-line-2)}",
+    ".card .card{background:var(--gl-3);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;border-color:var(--gl-line-2)}",
+    ":root:not([data-theme=\"dark\"]){--ink-2:#5B6A60;--ink-3:#66736B}",
+    "@media(prefers-color-scheme:dark){:root:not([data-theme=\"light\"]){--ink-2:#9BAA9F;--ink-3:#8A978F}}",
     ".card-h{border-bottom:1px solid var(--gl-line-2);background:transparent}",
     ".topbar{background:var(--gl);-webkit-backdrop-filter:blur(24px) saturate(150%);backdrop-filter:blur(24px) saturate(150%);border-bottom:1px solid var(--gl-line)}",
     ".gauge{border-right:1px solid var(--gl-line-2)}",
@@ -62,7 +64,7 @@
     /* ---- 브리핑 줄 긴 글: 폰에서 가로로 안 넘치게 (오늘 탭 .step 안 span, 예전부터 있던 넘침) ---- */
     ".step>*{min-width:0;overflow-wrap:anywhere}",
     /* ---- 폴백 ---- */
-    "@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.card,.tile,.modebar,.exboard,.topbar,.rail,.sheet,.toast,.btn,.input,.select,.ta{background:var(--surface)}.lrow,.crow,.drow,.v47-wk,.v49-deck,.v50-s,.v49-today,.v50-top{background:var(--surface-2)}}"
+    "@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.card,.tile,.modebar,.exboard,.topbar,.rail,.sheet,.toast,.btn,.input,.select,.ta,.ntv-h,.iconbtn{background:var(--surface)}.v48{background:var(--crit-soft)}.lrow,.crow,.drow,.v47-wk,.v49-deck,.v50-s,.v49-today,.v50-top,.seg{background:var(--surface-2)}}"
   ].join("\n");
   document.head.appendChild(css);
 })();
