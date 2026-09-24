@@ -38,14 +38,15 @@
           var qOk=qids.filter(function(q){ return co[q]===true||qco[q]===true; }).length;
           var complete=(cids.length?cDone===cids.length:true)&&(qids.length?(qDone>=Math.ceil(qids.length*.9)&&qOk>=Math.ceil(qids.length*.6)):true);
           var tot=cids.length+qids.length, done=cDone+qDone;
-          out.push({deck:d,p:p,done:done,n:tot,cDone:cDone,cN:cids.length,qOk:qOk,qDone:qDone,qN:qids.length,ratio:tot?done/tot:0,complete:complete,shared:(p.dates||[]).length>1});
+          var last=(p.dates||[]).slice().sort().pop();
+          out.push({deck:d,p:p,done:done,n:tot,cDone:cDone,cN:cids.length,qOk:qOk,qDone:qDone,qN:qids.length,ratio:tot?done/tot:0,complete:complete,shared:(p.dates||[]).length>1,judgeAt:last,judged:last===date});
         });
       });
       return out;
     };
     var ex=pick("exam"); return ex.length?ex:pick("temp");
   };
-  V50.STN={done:"따라감",part:"진행 중",today:"오늘 수업",todo:"밀림",note:"정리만 있음",wait:"정리 대기",future:"예정"};
+  V50.STN={done:"따라감",part:"진행 중",today:"오늘 수업",todo:"밀림",cont:"이어짐",note:"정리만 있음",wait:"정리 대기",future:"예정"};
   V50.session=function(c,date,td,S){
     var s=sessionOn(c.id,date), hol=holidayOn(date), cancelled=!!(s&&s.cancelled);
     if(hol||cancelled) return null;
@@ -56,9 +57,14 @@
     var absent=!!(s&&s.status&&window.ABSENT&&ABSENT[s.status]);
     var ratio=parts.length?parts.reduce(function(a,x){ return a+x.ratio; },0)/parts.length:0;
     var hasNote=!!((info&&info.has)||(dn&&window.V36&&V36.dayHas&&V36.dayHas(c,date)));
-    var allDone=parts.length>0&&parts.every(function(x){ return x.complete; }), any=parts.some(function(x){ return x.done>0; });   /* 평균이 아니라 모든 파트가 기준 충족 */
-    var st= parts.length? (allDone?"done":any?"part":(date===td?"today":"todo")) : (hasNote?"note":"wait");
-    return {date:date,w:w,title:title,info:info,parts:parts,ratio:ratio,st:st,absent:absent,noNote:parts.length>0&&!hasNote};
+    /* 오타 v52 재검수: 여러 회차에 걸친 파트는 마지막 회차에서 한 번만 판정한다. 앞 회차는 그 파트가 끝나면 「따라감」, 아니면 「이어짐」(밀림 아님) */
+    var J=parts.filter(function(x){ return x.judged; }), C=parts.filter(function(x){ return !x.judged; });
+    var allDone=J.length>0&&J.every(function(x){ return x.complete; }), any=J.some(function(x){ return x.done>0; });
+    var st;
+    if(J.length){ st= allDone?"done" : (date===td?"today" : any?"part":"todo"); }          /* 오늘 회차는 진행 여부와 무관하게 「오늘」 */
+    else if(C.length){ st= C.every(function(x){ return x.complete; })?"done":"cont"; }
+    else st= hasNote?"note":"wait";
+    return {date:date,w:w,title:title,info:info,parts:parts,J:J,C:C,ratio:ratio,st:st,absent:absent,noNote:parts.length>0&&!hasNote};
   };
   V50.items=function(){
     var td=today(), S=(V50.S&&V50.S.courses)||{}, out=[];
@@ -81,17 +87,18 @@
   };
   /* ---- 렌더 ---- */
   V50.btnFor=function(it,x){
-    if(x.parts.length){ var tp=x.parts.filter(function(p){ return p.ratio<.9; })[0]||x.parts[0];
+    if(x.parts.length){ var tp=(x.J||[]).filter(function(p){ return !p.complete; })[0]||(x.C||[]).filter(function(p){ return !p.complete; })[0]||x.parts[0];
       return '<button class="btn xs a" data-v50open="'+esc(tp.deck.file)+'#at=p'+tp.p.n+'-cover" data-v50title="'+esc(tp.deck.title)+'">'+(x.st==="done"?"다시 보기":"따라가기")+'</button>'; }
     if(x.st==="note") return '<button class="btn xs" data-v50note="'+it.c.id+'|'+x.w+'|'+x.date+'">회차 정리</button>';
     return '';
   };
   V50.dot=function(x){ return '<i class="v50-dot st-'+x.st+(x.absent?' ab':'')+'" title="'+esc(V50.md(x.date)+" · "+(V50.STN[x.st]||"")+(x.absent?" · 결석":""))+'"></i>'; };
   V50.sessHTML=function(it,x){
-    var prog=x.parts.length?x.parts.map(function(p){ return '<span class="v50-p'+(p.complete?' ok':p.done>0?' half':'')+'">'+esc("파트 "+p.p.n+(p.p.title?" · "+p.p.title:""))+(p.shared?' <small>('+esc(p.p.dates.map(function(d){ return (+d.slice(5,7))+"/"+(+d.slice(8,10)); }).join("·"))+' 공유)</small>':'')+' <small>개념 '+p.cDone+'/'+p.cN+(p.qN?' · 문제 '+p.qDone+'/'+p.qN+' 풀고 '+p.qOk+' 정답':'')+'</small></span>'; }).join(""):'';
+    var prog=x.parts.length?x.parts.map(function(p){ return '<span class="v50-p'+(p.complete?' ok':p.done>0?' half':'')+'">'+esc("파트 "+p.p.n+(p.p.title?" · "+p.p.title:""))+(p.shared?' <small>('+esc(p.p.dates.map(function(d){ return (+d.slice(5,7))+"/"+(+d.slice(8,10)); }).join("·"))+' 공유 · '+(p.judged?'이 회차에서 판정':(+p.judgeAt.slice(5,7))+'/'+(+p.judgeAt.slice(8,10))+'에서 판정')+')</small>':'')+' <small>개념 '+p.cDone+'/'+p.cN+(p.qN?' · 문제 '+p.qDone+'/'+p.qN+' 풀고 '+p.qOk+' 정답':'')+'</small></span>'; }).join(""):'';
     var chip= x.st==="done"?"ok" : x.st==="todo"?"crit" : (x.st==="part"||x.st==="today")?"warn" : "mut";
+    var contNote= x.st==="cont"?' <span class="v44-mut">· 이 회차 내용은 뒤 회차와 한 파트 — 그 회차에서 판정</span>':'';
     return '<div class="v50-s st-'+x.st+'"><div class="v50-sh"><b>'+esc(V50.md(x.date))+'</b><span class="hint">'+x.w+'주차</span><span class="chip '+chip+'">'+esc(V50.STN[x.st])+'</span>'+(x.absent?'<span class="chip crit">결석</span>':'')+'<span class="v50-act">'+V50.btnFor(it,x)+'</span></div>'+
-      (x.title?'<div class="v50-t">'+esc(x.title)+(x.noNote?' <span class="v44-mut">· 회차 정리 전 — 덱은 예상 진도</span>':'')+'</div>':(x.st==="wait"?'<div class="v50-t v44-mut">자료가 들어오면 아톰이 정리합니다</div>':''))+(prog?'<div class="v50-parts">'+prog+'</div>':'')+'</div>';
+      (x.title?'<div class="v50-t">'+esc(x.title)+(x.noNote?' <span class="v44-mut">· 회차 정리 전 — 덱은 예상 진도</span>':'')+contNote+'</div>':(x.st==="wait"?'<div class="v50-t v44-mut">자료가 들어오면 아톰이 정리합니다</div>':''))+(prog?'<div class="v50-parts">'+prog+'</div>':'')+'</div>';
   };
   V50.rowHTML=function(it){
     var c=it.c, open=!!V50.open[c.id], n=it.past.length;
@@ -132,10 +139,11 @@
   /* ---- 오늘 탭 브리핑 첫 줄 ---- */
   V50.renderToday=function(){
     var steps=$("#brief .steps"); if(!steps) return; var old=$("#v50Step"); if(old) old.remove();
-    var items=V50.items(), todo=[]; items.forEach(function(it){ it.todo.concat(it.todayL).forEach(function(x){ todo.push({it:it,x:x}); }); });
+    var items=V50.items(), todo=[], tdL=[]; items.forEach(function(it){ it.todo.forEach(function(x){ todo.push({it:it,x:x}); }); it.todayL.forEach(function(x){ tdL.push({it:it,x:x}); }); });
     todo.sort(function(a,b){ return a.x.date<b.x.date?-1:1; });
     var el=document.createElement("div"); el.className="step"; el.id="v50Step";
-    el.innerHTML= todo.length? '<b>수업 따라가기</b> — 밀린 회차 '+todo.length+'개 · 가장 오래된 것 '+esc(todo[0].it.c.name)+' '+esc(V50.md(todo[0].x.date))+(todo[0].x.title?' · '+esc(todo[0].x.title.slice(0,36)):'')+' <button class="linkish" data-v50go="1">따라가기 →</button>' : '<b>수업 따라가기</b> — 밀린 회차 없음';
+    var first=todo[0]||tdL[0];
+    el.innerHTML='<b>수업 따라가기</b> — '+(todo.length?'밀린 회차 '+todo.length+'개':'밀린 회차 없음')+(tdL.length?' · 오늘 수업 '+tdL.length+'회차':'')+(first?' · '+(todo.length?'가장 오래된 밀림 ':'오늘 ')+esc(first.it.c.name)+' '+esc(V50.md(first.x.date))+(first.x.title?' · '+esc(first.x.title.slice(0,36)):'')+' <button class="linkish" data-v50go="1">따라가기 →</button>':'');
     steps.insertBefore(el,steps.firstChild);
     var b=el.querySelector("[data-v50go]"); if(b) b.onclick=function(){ go("study"); };
   };
@@ -164,6 +172,7 @@
     ".v50-dots{display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap}",
     ".v50-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--line-2);box-sizing:border-box}",
     ".v50-dot.st-done{background:var(--ok)}.v50-dot.st-part,.v50-dot.st-today{background:var(--warn)}.v50-dot.st-todo{background:var(--crit)}.v50-dot.st-note{background:var(--info)}",
+    ".v50-dot.st-cont{background:transparent;border:2px solid var(--ok);opacity:.7}",
     ".v50-dot.st-wait{background:transparent;border:1px dashed var(--line-2)}.v50-dot.st-future{background:transparent;border:1px solid var(--line-2)}.v50-dot.ab{box-shadow:0 0 0 2px var(--crit-soft)}",
     ".v50-sum{font-size:12.5px;color:var(--ink-2)}.v50-crit{color:var(--crit)}.v50-ok{color:var(--ok)}",
     ".v50-line{font-size:12.5px;color:var(--ink-2);margin-top:5px;line-height:1.5;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}.v50-line.v50-tgt{color:var(--ink)}",

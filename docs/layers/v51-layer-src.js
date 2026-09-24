@@ -64,7 +64,7 @@
     /* ---- 브리핑 줄 긴 글: 폰에서 가로로 안 넘치게 (오늘 탭 .step 안 span, 예전부터 있던 넘침) ---- */
     ".step>*{min-width:0;overflow-wrap:anywhere}",
     /* ---- 폴백 ---- */
-    "@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.card,.tile,.modebar,.exboard,.topbar,.rail,.sheet,.toast,.btn,.input,.select,.ta,.ntv-h,.iconbtn{background:var(--surface)}.v48{background:var(--crit-soft)}.lrow,.crow,.drow,.v47-wk,.v49-deck,.v50-s,.v49-today,.v50-top,.seg{background:var(--surface-2)}}"
+    "@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.card,.tile,.modebar,.exboard,.topbar,.rail,.sheet,.toast,.btn,.input,.select,.ta,.ntv-h,.iconbtn,.card .card{background:var(--surface)}.v48{background:var(--crit-soft)}.lrow,.crow,.drow,.v47-wk,.v49-deck,.v50-s,.v49-today,.v50-top,.seg{background:var(--surface-2)}}"
   ].join("\n");
   document.head.appendChild(css);
 })();
