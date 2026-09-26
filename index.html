@@ -11063,7 +11063,7 @@ var V33={};
     if(none.length){ h+='<div class="v55-unit none" style="--uc:#8E8E8E"><div class="v55-ub"><div class="v55-un">단원 미지정</div><div class="v55-ut">knowledge/units.json 에 날짜를 넣으면 단원으로 들어갑니다</div><div class="v55-up"><b>'+none.length+'</b><small>회차</small></div></div></div>'; var i2=0; none.concat(pastEx[-2]||[]).sort(byDate).forEach(function(x){ h+= x.kind==="exam"? V55.nodeHTML(c,x,0,false,{}) : V55.nodeHTML(c,x,i2++,x===cur,{uc:"#8E8E8E"}); }); }
     /* 앞으로: 시험마다 [그 전 예정 회차] → [그 시험 범위(phase)의 아직 없는 단원] → [시험 ★]. 중간이 지났으면 기말 앞에 final 단원이 온다 (오타 v55 5) */
     var futEx=exs.filter(function(e){ return e.date>=td; }).sort(byDate), rest=fut.slice().sort(byDate), plannedLeft=groups.filter(function(g){ return !g.items.length&&g.u.planned; });
-    var futList=function(list,first){ if(!list.length) return ''; if(!first) return '<div class="v55-sec"><span>회차 '+list.length+'개</span></div>';
+    var futList=function(list,first){ if(!list.length||!first) return '';   /* 첫 시험 전 회차만 마디로, 그 뒤 구간은 머리말의 개수만 */
       var showAll=!!V55.showAll[c.id], lim=showAll?list.length:4;
       return '<div class="v55-fut">'+list.slice(0,lim).map(function(x,i){ return V55.nodeHTML(c,x,i,x===cur,{uc:"#AFAFAF",compact:true}); }).join("")+'</div>'+(list.length>4?'<div class="v55-more"><button type="button" class="btn xs" data-v55more="1">'+(showAll?"접기":"전부 보기 ("+list.length+")")+'</button></div>':''); };
     futEx.forEach(function(e,idx){ var kind=String(e.ex.kind||""), ph=/중간/.test(kind)?"mid":/기말/.test(kind)?"final":null;
