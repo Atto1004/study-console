@@ -58,6 +58,10 @@ for (const rel of files) {
   const html = fs.readFileSync(path.join(ROOT, rel), "utf8");
   const figs = [...html.matchAll(/<figure class="fig">[\s\S]*?<\/figure>/g)].map(m => m[0]);
   if (!figs.length) { report[rel] = []; continue; }
+  /* raw  그림 문자열 안의 이스케이프 안 된 < — 브라우저가 태그로 읽어 라벨이 사라지고 뒤 요소까지 깨진다(getBBox 로는 못 본다). 알려진 태그 이름이 아닌 < 는 전부 문제 */
+  const KNOWN = /^<\/?(?:figure|figcaption|svg|g|path|circle|rect|line|text|tspan|polygon|polyline|ellipse|defs|marker|clipPath|use|title|desc|linearGradient|radialGradient|stop|pattern|mask|filter|image|b|i|em|strong|sup|sub|span|br|small|code)\b/;
+  const raw = []; figs.forEach((f, fi) => { for (const m of f.matchAll(/<[^]/g)) { const s = f.slice(m.index, m.index + 24); if (!KNOWN.test(s) && !s.startsWith("<!--")) raw.push({ fig: fi, at: s }); } });
+  if (raw.length) { total += raw.length; console.log("ISSUES " + rel.replace("notes/lessons/", "") + "  raw < " + raw.length + ": " + raw.slice(0, 4).map(r => "fig" + (r.fig + 1) + " " + JSON.stringify(r.at)).join(" · ")); }
   const hp = path.join(OUTDIR, rel.replace(/[\/\\]/g, "_"));
   fs.writeFileSync(hp, HARNESS(figs.join("\n")), "utf8");
   let dom = "";

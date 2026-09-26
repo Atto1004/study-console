@@ -22,7 +22,10 @@
      "q5",
      "q6"
     ],
-    "week": 1
+    "week": 1,
+    "classroom": "notes/classroom/phys2/2026-09-04.html",
+    "chapters": 6,
+    "steps": 46
    },
    "2026-09-09": {
     "id": "phys2-2026-09-09",
@@ -43,7 +46,10 @@
      "q5",
      "q6"
     ],
-    "week": 2
+    "week": 2,
+    "classroom": "notes/classroom/phys2/2026-09-09.html",
+    "chapters": 4,
+    "steps": 31
    },
    "2026-09-11": {
     "id": "phys2-2026-09-11",
@@ -64,7 +70,10 @@
      "q5",
      "q6"
     ],
-    "week": 2
+    "week": 2,
+    "classroom": "notes/classroom/phys2/2026-09-11.html",
+    "chapters": 4,
+    "steps": 41
    },
    "2026-09-16": {
     "id": "phys2-2026-09-16",
@@ -86,7 +95,10 @@
      "q5",
      "q6"
     ],
-    "week": 3
+    "week": 3,
+    "classroom": "notes/classroom/phys2/2026-09-16.html",
+    "chapters": 5,
+    "steps": 42
    },
    "2026-09-18": {
     "id": "phys2-2026-09-18",
@@ -109,7 +121,10 @@
      "q5",
      "q6"
     ],
-    "week": 3
+    "week": 3,
+    "classroom": "notes/classroom/phys2/2026-09-18.html",
+    "chapters": 6,
+    "steps": 50
    },
    "2026-09-23": {
     "id": "phys2-2026-09-23",
@@ -131,7 +146,10 @@
      "q5",
      "q6"
     ],
-    "week": 4
+    "week": 4,
+    "classroom": "notes/classroom/phys2/2026-09-23.html",
+    "chapters": 5,
+    "steps": 36
    }
   },
   "정역학": {
@@ -156,7 +174,10 @@
      "q5",
      "q6"
     ],
-    "week": 2
+    "week": 2,
+    "classroom": "notes/classroom/statics/2026-09-07.html",
+    "chapters": 6,
+    "steps": 41
    },
    "2026-09-09": {
     "id": "statics-2026-09-09",
@@ -178,7 +199,10 @@
      "q5",
      "q6"
     ],
-    "week": 2
+    "week": 2,
+    "classroom": "notes/classroom/statics/2026-09-09.html",
+    "chapters": 5,
+    "steps": 36
    },
    "2026-09-14": {
     "id": "statics-2026-09-14",
@@ -200,7 +224,10 @@
      "q5",
      "q6"
     ],
-    "week": 3
+    "week": 3,
+    "classroom": "notes/classroom/statics/2026-09-14.html",
+    "chapters": 5,
+    "steps": 37
    },
    "2026-09-16": {
     "id": "statics-2026-09-16",
@@ -222,7 +249,10 @@
      "q5",
      "q6"
     ],
-    "week": 3
+    "week": 3,
+    "classroom": "notes/classroom/statics/2026-09-16.html",
+    "chapters": 5,
+    "steps": 30
    }
   },
   "공업수학1": {
@@ -246,7 +276,10 @@
      "q5",
      "q6"
     ],
-    "week": 1
+    "week": 1,
+    "classroom": "notes/classroom/em1/2026-09-02.html",
+    "chapters": 5,
+    "steps": 31
    },
    "2026-09-04": {
     "id": "em1-2026-09-04",
@@ -268,7 +301,10 @@
      "q5",
      "q6"
     ],
-    "week": 1
+    "week": 1,
+    "classroom": "notes/classroom/em1/2026-09-04.html",
+    "chapters": 5,
+    "steps": 32
    },
    "2026-09-09": {
     "id": "em1-2026-09-09",
@@ -291,7 +327,10 @@
      "q5",
      "q6"
     ],
-    "week": 2
+    "week": 2,
+    "classroom": "notes/classroom/em1/2026-09-09.html",
+    "chapters": 6,
+    "steps": 36
    },
    "2026-09-11": {
     "id": "em1-2026-09-11",
@@ -314,7 +353,10 @@
      "q5",
      "q6"
     ],
-    "week": 2
+    "week": 2,
+    "classroom": "notes/classroom/em1/2026-09-11.html",
+    "chapters": 6,
+    "steps": 37
    },
    "2026-09-16": {
     "id": "em1-2026-09-16",
@@ -337,7 +379,10 @@
      "q5",
      "q6"
     ],
-    "week": 3
+    "week": 3,
+    "classroom": "notes/classroom/em1/2026-09-16.html",
+    "chapters": 6,
+    "steps": 43
    },
    "2026-09-18": {
     "id": "em1-2026-09-18",
@@ -359,7 +404,10 @@
      "q5",
      "q6"
     ],
-    "week": 3
+    "week": 3,
+    "classroom": "notes/classroom/em1/2026-09-18.html",
+    "chapters": 5,
+    "steps": 29
    },
    "2026-09-23": {
     "id": "em1-2026-09-23",
@@ -381,7 +429,10 @@
      "q5",
      "q6"
     ],
-    "week": 4
+    "week": 4,
+    "classroom": "notes/classroom/em1/2026-09-23.html",
+    "chapters": 5,
+    "steps": 29
    }
   },
   "미분적분학2": {
@@ -405,7 +456,10 @@
      "q5",
      "q6"
     ],
-    "week": 1
+    "week": 1,
+    "classroom": "notes/classroom/calc2/2026-09-01.html",
+    "chapters": 5,
+    "steps": 27
    },
    "2026-09-03": {
     "id": "calc2-2026-09-03",
@@ -427,7 +481,10 @@
      "q5",
      "q6"
     ],
-    "week": 1
+    "week": 1,
+    "classroom": "notes/classroom/calc2/2026-09-03.html",
+    "chapters": 5,
+    "steps": 31
    },
    "2026-09-08": {
     "id": "calc2-2026-09-08",
@@ -449,7 +506,10 @@
      "q5",
      "q6"
     ],
-    "week": 2
+    "week": 2,
+    "classroom": "notes/classroom/calc2/2026-09-08.html",
+    "chapters": 5,
+    "steps": 30
    },
    "2026-09-15": {
     "id": "calc2-2026-09-15",
@@ -471,7 +531,10 @@
      "q5",
      "q6"
     ],
-    "week": 3
+    "week": 3,
+    "classroom": "notes/classroom/calc2/2026-09-15.html",
+    "chapters": 5,
+    "steps": 30
    },
    "2026-09-17": {
     "id": "calc2-2026-09-17",
@@ -493,7 +556,10 @@
      "q5",
      "q6"
     ],
-    "week": 3
+    "week": 3,
+    "classroom": "notes/classroom/calc2/2026-09-17.html",
+    "chapters": 5,
+    "steps": 32
    },
    "2026-09-22": {
     "id": "calc2-2026-09-22",
@@ -515,7 +581,10 @@
      "q5",
      "q6"
     ],
-    "week": 4
+    "week": 4,
+    "classroom": "notes/classroom/calc2/2026-09-22.html",
+    "chapters": 5,
+    "steps": 28
    },
    "2026-09-10": {
     "id": "calc2-2026-09-10",
@@ -536,9 +605,12 @@
      "q5",
      "q6"
     ],
-    "week": 2
+    "week": 2,
+    "classroom": "notes/classroom/calc2/2026-09-10.html",
+    "chapters": 4,
+    "steps": 21
    }
   }
  },
- "generated": "2026-09-26T23:24:18"
+ "generated": "2026-09-26T23:58:39"
 }

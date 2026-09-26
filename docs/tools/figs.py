@@ -37,20 +37,20 @@ def charge(x, y, sign="+", label="", r=14, color=None):
     fs = 16 if r >= 13 else round(r * 1.15)   # 작은 원에서는 기호가 원 테두리를 넘지 않게
     s = f'<circle cx="{x}" cy="{y}" r="{r}" fill="#fff"/><circle cx="{x}" cy="{y}" r="{r}" fill="{c}" fill-opacity=".15" stroke="{c}" stroke-width="2"/>'
     s += f'<text x="{x}" y="{y + fs * .32:.1f}" text-anchor="middle" font-size="{fs}" font-weight="700" fill="{c}">{sign}</text>'
-    if label: s += f'<text x="{x}" y="{y+r+16}" text-anchor="middle" font-size="13" fill="{INK}">{_sub(label)}</text>'
+    if label: s += f'<text x="{x}" y="{y+r+16}" text-anchor="middle" font-size="13" fill="{INK}">{_sub(_esc(label))}</text>'
     return s
 
 def dot(x, y, label="", r=4, color=None, dy=-8):
     c = color or INK
     s = f'<circle cx="{x}" cy="{y}" r="{r}" fill="{c}"/>'
-    if label: s += f'<text x="{x+8}" y="{y+dy+8}" font-size="13" fill="{c}">{_sub(label)}</text>'
+    if label: s += f'<text x="{x+8}" y="{y+dy+8}" font-size="13" fill="{c}">{_sub(_esc(label))}</text>'
     return s
 
 def arrow(x1, y1, x2, y2, color=None, label="", w=2, lx=0, ly=-6, dash=""):
     c = color or GREEN
     d = f' stroke-dasharray="{dash}"' if dash else ""
     s = f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{c}" stroke-width="{w}" marker-end="url(#ah)"{d}/>'
-    if label: s += f'<text x="{(x1+x2)/2+lx}" y="{(y1+y2)/2+ly}" text-anchor="middle" font-size="13" fill="{c}">{_sub(label)}</text>'
+    if label: s += f'<text x="{(x1+x2)/2+lx}" y="{(y1+y2)/2+ly}" text-anchor="middle" font-size="13" fill="{c}">{_sub(_esc(label))}</text>'
     return s
 
 def line(x1, y1, x2, y2, color=None, w=2, dash=""):
@@ -58,11 +58,15 @@ def line(x1, y1, x2, y2, color=None, w=2, dash=""):
     d = f' stroke-dasharray="{dash}"' if dash else ""
     return f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{c}" stroke-width="{w}"{d}/>'
 
+def _esc(t):
+    """라벨의 < > & 를 이스케이프한다 — 안 하면 「r<a」 의 <a 가 브라우저에서 태그로 읽혀 라벨이 사라지고 뒤 요소까지 깨진다(일물2 9/16 에서 발견). 이미 넣은 tspan 마크업은 없다(모든 라벨은 순수 글자)."""
+    return str(t).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
 def text(x, y, t, size=14, color=None, anchor="start", bold=False):
     """글자에는 흰 테두리(halo)를 둘러 선 옆에서도 읽히게 한다 — 겹침 자체는 fig_check 로 0건을 만든다"""
     c = color or INK
     return (f'<text x="{x}" y="{y}" font-size="{size}" fill="{c}" text-anchor="{anchor}"{" font-weight=\"700\"" if bold else ""}'
-            f' paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">{_sub(t)}</text>')
+            f' paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">{_sub(_esc(t))}</text>')
 
 def circle(x, y, r, color=None, dash="", fill="none", w=2):
     c = color or INK

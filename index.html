@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-26.70";
+var BUILD="2026-09-26.71";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,12 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-26.71",d:"09-26",items:[
+    "교실 모드 — 회차 24개 전부 초록 칠판 + 스앵님(김주영 미니버전 캐릭터, 표정 6종)이 목차·챕터 순서로 한 단계씩 알려준다. 그림은 칠판에 붙인 자료로(교재와 같은 원본), 예제는 생각한 뒤 풀이 열기, 확인 문제는 칠판에서 바로 채점. XP·레벨·연속일·하트(틀리면 하나, 챕터 복습으로 회복, 매일 3개)·호감도 한 줄 HUD (대표님 2026-09-26: 듀오링고처럼 게임 형태로, 시스템은 최대한 심플)",
+    "회차 표 [학습하기]·수업 따라가기 [교실 열기]가 교실을 연다. 읽기용 수업 노트는 [교재]로 남는다. 교실의 [질문할게요]가 스앵님 질문 패널을 연다",
+    "질문 패널 문맥이 수업 노트·교실에서도 붙는다(전에는 슬라이드 덱 경로만 인식해 문맥이 채택되지 않았음)",
+    "교실 검사기 classroom_check.cjs — 24회차 단계 전부 렌더·문제 흐름·원본 글 유실·저장 키 검사"
+  ]},
   {v:"2026-09-26.70",d:"09-26",items:[
     "수업 노트 그림 품질 검사기(fig_check) 도입 — 24회차 118개 그림에서 글자·선 겹침 218건, 캔버스 밖·깨진 글자까지 전부 0건으로 (대표님 2026-09-26 「그림 오류 절대 안 됨」). 작은 원의 부호·평행판 기호·상자 밖 글자·3D 축 라벨·사루스 대각선(띠로) 공통 수정, 글자에 흰 테두리",
     "수업 노트 파일이 본문을 두 번 담던 것(템플릿 주석 자리표시 치환) 고침 — 용량 절반"
@@ -10734,6 +10740,69 @@ var V33={};
   var _rt=renderToday; renderToday=function(){ _rt(); if(!V52.L&&!V52.err) V52.load().then(function(){ if(ui.view==="today"){ try{ if(window.V50){ V50.renderToday(); V50.renderTodayCard(); } }catch(e){} try{ if(window.V43) V43.renderToday(); }catch(e){} } }); };
   V52.load();
   var css=document.createElement("style"); css.id="v52css"; css.textContent=".v52-min{margin-left:6px;font-size:12px;color:var(--ink-3)}.v52-note{color:var(--accent);font-weight:600}.v52-note.ok{color:var(--ok,var(--accent))}"; document.head.appendChild(css);
+})();
+/* ============================================================
+   V53 LAYER — 교실 모드(초록 칠판 + 스앵님) 연결 (대표님 2026-09-26: 학습지는 목차·챕터로, 초록 칠판에 스앵님 캐릭터가 알려주는 느낌, 듀오링고식 XP·스트릭·하트·호감도 — 시스템은 최대한 심플)
+   knowledge/lessons.json(docs/tools/build_classroom.py)에 회차마다 classroom: notes/classroom/<약칭>/<날짜>.html 이 등록된다. 읽기용 수업 노트(file)는 「교재」로 남는다.
+   ① 회차 표 [학습하기](V38.deckFor) · 수업 따라가기 [따라가기](V50.btnFor): 교실이 있으면 교실을 연다(#resume = 저장 위치) + 작은 [교재] 버튼
+   ② 과목 화면 노트 목록: 「교실 · 날짜 · 제목」 등록 (type 교실)
+   ③ 교실 iframe 메시지: mc-open(교재 열기) · mc-ask(스앵님 질문 패널 열기) · mc-close(닫기)
+   ④ V45 문맥: 수업 노트·교실 경로도 덱 id(<약칭>-<날짜>)로 인식 — 전에는 notes/<이름>-slides.html 만 인식해 노트의 문맥이 채택되지 않았다
+   ⑤ 이어서 학습하기(V43): 교실 기록은 「CH n/m」
+   진행 저장은 교실 페이지가 mc-lesson-<id>(읽음·문제 — 수업 노트·V52 판정과 같은 키)와 mc-tutor(XP·스트릭·하트·호감도)에 쓴다. 앱은 읽기만 한다.
+   ============================================================ */
+(function(){
+  if(window.V53) return;
+  var V53=window.V53={};
+  V53.room=function(l){ return (l&&typeof l.classroom==="string"&&/^notes\/classroom\/[\w-]+\/\d{4}-\d{2}-\d{2}\.html$/.test(l.classroom))?l.classroom:null; };
+  /* ① 회차 표 [학습하기] → 교실 우선 */
+  if(window.V38&&V38.deckFor&&!V38.deckFor._v53){
+    var _df=V38.deckFor;
+    V38.deckFor=function(c,w,date){ if(date&&window.V52){ var l=V52.lesson(c,date), r=V53.room(l); if(r) return {url:r+"#resume",title:l.title}; } return _df(c,w,date); };
+    V38.deckFor._v53=true;
+  }
+  /* ① 수업 따라가기 버튼 → 교실 + [교재] */
+  if(window.V50&&V50.btnFor&&!V50.btnFor._v53){
+    var _bf=V50.btnFor;
+    V50.btnFor=function(it,x){
+      var lp=(x.parts||[]).filter(function(p){ return p.lesson; })[0], r=lp&&V53.room(lp.lesson);
+      if(r) return '<button class="btn xs a" data-v50open="'+esc(r)+'#resume" data-v50title="'+esc(lp.lesson.title)+'">'+(x.st==="done"?"다시 보기":"교실 열기")+'</button>'+
+        '<button class="btn xs v53-book" data-v50open="'+esc(lp.deck.file)+'#resume" data-v50title="'+esc(lp.lesson.title)+'" title="읽기용 수업 노트">교재</button>'+(lp.minutes?'<span class="hint v52-min">약 '+lp.minutes+'분</span>':'');
+      return _bf(it,x);
+    };
+    V50.btnFor._v53=true;
+  }
+  /* ② NOTES 등록 */
+  V53.registerNotes=function(){
+    if(!Array.isArray(window.NOTES)||!window.V52||!V52.L||!V52.L.courses) return;
+    Object.keys(V52.L.courses).forEach(function(cn){ var m=V52.L.courses[cn]; Object.keys(m).sort().forEach(function(d){ var l=m[d], r=V53.room(l); if(!r) return;
+      if(!NOTES.some(function(x){ return x.file===r; })) NOTES.push({course:cn,type:"교실",title:"교실 · "+(+d.slice(5,7))+"/"+(+d.slice(8,10))+" · "+l.title,file:r,week:l.week||weekOf(d)||1,date:d,sub:"스앵님 교실 · 챕터 "+(l.chapters||0)+" · 확인 문제 "+(l.qids||[]).length}); }); });
+  };
+  if(typeof NOTE_TYPE_CLS==="object") NOTE_TYPE_CLS["교실"]="e";
+  if(window.V52&&V52.registerNotes&&!V52.registerNotes._v53){ var _reg=V52.registerNotes; V52.registerNotes=function(){ _reg(); V53.registerNotes(); }; V52.registerNotes._v53=true; if(V52.L) V53.registerNotes(); }
+  /* ③ 교실 iframe 메시지 — origin·source(노트 iframe)·v 가 맞아야 처리. 파일 경로는 notes/ 아래 html 만 */
+  window.addEventListener("message",function(e){
+    try{
+      if(e.origin!==location.origin) return; var fr=$("#ntvFrame"); if(!fr||e.source!==fr.contentWindow) return;
+      var d=e.data; if(!d||typeof d!=="object"||d.v!==1) return;
+      if(d.type==="mc-open"){ if(typeof d.file==="string"&&/^notes\/[\w\-\/.]+\.html(#[\w=\-.]*)?$/.test(d.file)&&!/\.\.|\/\//.test(d.file)) openNote(d.file,String(d.title||"").slice(0,80)); }
+      else if(d.type==="mc-ask"){ if(window.V45&&V45.toggle&&!V45.open) V45.toggle(); }
+      else if(d.type==="mc-close"){ closeNote(); }
+    }catch(err){}
+  });
+  /* ④ V45 문맥 덱 id */
+  if(window.V45&&V45.deckOf&&!V45.deckOf._v53){
+    var _do=V45.deckOf;
+    V45.deckOf=function(file){ var m=/notes\/(?:lessons|classroom)\/([\w-]+)\/(\d{4}-\d{2}-\d{2})\.html/.exec(String(file||"")); return m?(m[1]+"-"+m[2]):_do(file); };
+    V45.deckOf._v53=true;
+  }
+  /* ⑤ 이어서 학습하기: 교실 기록 */
+  if(window.V43&&V43.html&&!V43.html._v53){
+    var _vh=V43.html;
+    V43.html=function(rec,wc){ var h=_vh(rec,wc); if(/notes\/classroom\//.test(rec.href||"")) h=h.replace(/섹션 \d+\/\d+|\d+\/\d+장/, "CH "+Math.min(rec.n||0,(rec.idx|0)+1)+"/"+(rec.n||0)); return h; };
+    V43.html._v53=true;
+  }
+  var css=document.createElement("style"); css.id="v53css"; css.textContent=".v53-book{margin-left:4px}"; document.head.appendChild(css);
 })();
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start);
 else start();

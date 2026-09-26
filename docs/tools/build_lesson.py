@@ -8,6 +8,7 @@
 판서 사진 경로는 notes/lessons/_private/<약칭>/<날짜>/<파일> (gitignore) — 빌더가 study-materials 에서 복사한다(data-photo="상대경로").
 """
 import io, os, re, sys, json, shutil, datetime
+from xml.sax.saxutils import escape
 from lxml import html as LH
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -22,7 +23,8 @@ lesson_id = f"{slug}-{date}"
 doc = LH.fromstring(io.open(src, encoding="utf-8").read())
 
 def inner(el):
-    s = el.text or ""
+    # el.text 는 풀린 글자(&lt; → <)라서 다시 이스케이프한다 — 안 하면 < 가 브라우저에서 태그로 읽혀 글이 사라진다(교실 빌더에서 발견, 2026-09-26)
+    s = escape(el.text or "")
     for ch in el: s += LH.tostring(ch, encoding="unicode", with_tail=True)
     return s
 

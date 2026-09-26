@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>행렬의 연산과 행렬식 — "시험 문제는 행렬식부터 나온다"</title>
+<!-- 교실 모드 템플릿 v1 (대표님 2026-09-26 결정: 초록 칠판 + 스앵님(김주영 미니버전) 캐릭터가 알려주는 느낌 · 목차/챕터 · 듀오링고식 XP·스트릭·하트·호감도 · 시스템은 최대한 심플)
+     build_classroom.py 가 제목·자료(JSON)·교재 경로 자리를 채운다. 저장: localStorage mc-tutor(전역 XP·스트릭·하트·호감도·회차 위치) + mc-lesson-<id>(읽음·문제, 교재 페이지·앱 V52 와 공유) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<style>
+:root{--wall:#F4EEE2;--wood:#7A4E2B;--wood-2:#5C3A1E;--green:#2F5F4E;--green-2:#25503F;--chalk:#F5F2E9;--chalk-2:rgba(245,242,233,.72);--yel:#FFE27A;--pink:#FFA3C7;--sky:#9ADCFF;--mint:#B8F2D0;
+  --ink:#1F2A44;--ink-2:#55627A;--ink-3:#7C889B;--du-green:#58CC02;--du-green-2:#46A302;--du-blue:#1CB0F6;--du-blue-2:#1899D6;--du-red:#FF4B4B;--du-red-2:#EA2B2B;--du-gray:#E5E5E5;--du-gray-2:#CFCFCF;--du-yel:#FFC800;--du-orange:#FF9600;
+  --f:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;--pen:"Nanum Pen Script","Pretendard Variable",sans-serif;--fs:19px;--hud:56px}
+*{box-sizing:border-box}
+html{background:var(--wall)}
+body{margin:0;font-family:var(--f);color:var(--ink);word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased;letter-spacing:-.01em;line-height:1.6;
+  background:radial-gradient(circle at 20% 10%,rgba(255,255,255,.7),transparent 42%),radial-gradient(circle at 80% 90%,rgba(255,225,170,.35),transparent 46%),var(--wall);min-height:100vh}
+button{font-family:inherit}
+/* ---------- HUD ---------- */
+#hud{position:sticky;top:0;z-index:9;height:var(--hud);background:rgba(255,255,255,.78);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);border-bottom:2px solid rgba(31,42,68,.08)}
+#hud .in{max-width:1000px;margin:0 auto;height:100%;padding:0 16px;display:flex;align-items:center;gap:14px}
+#hud .hl{display:flex;flex-direction:column;line-height:1.2;min-width:0}
+#hud .hl b{font-size:14px;white-space:nowrap}
+#hud .hl span{font-size:12px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hud .hc{flex:1;display:flex;align-items:center;gap:10px;min-width:0}
+#hud .chp{font-size:12.5px;font-weight:800;color:var(--ink-2);white-space:nowrap;letter-spacing:.02em}
+#hud .pbar{flex:1;height:14px;border-radius:99px;background:#E6E2D6;overflow:hidden;position:relative}
+#hud .pbar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#7ED957,#58CC02);transition:width .45s cubic-bezier(.2,.8,.2,1)}
+#hud .pbar i::after{content:"";position:absolute;left:8px;right:8px;top:3px;height:4px;border-radius:99px;background:rgba(255,255,255,.35)}
+#hud .hr{display:flex;align-items:center;gap:10px}
+.stat{display:inline-flex;align-items:center;gap:5px;font-weight:800;font-size:14px;color:var(--ink-2);padding:4px 8px;border-radius:12px;background:rgba(255,255,255,.7);border:2px solid rgba(31,42,68,.06);position:relative}
+.stat svg{width:18px;height:18px;display:block}
+.stat small{font-weight:700;color:var(--ink-3);font-size:11px}
+.stat.xp{color:#B26A00}.stat.sk{color:#E8590C}.stat.hp{color:#E03131;gap:2px}.stat.af{color:#D0397A}
+.stat.hp svg{width:17px}
+.stat .gauge{display:inline-block;width:56px;height:9px;border-radius:99px;background:#F1D4E0;overflow:hidden}
+.stat .gauge b{display:block;height:100%;width:0;background:linear-gradient(90deg,#F783AC,#D0397A);transition:width .4s}
+.pop{position:absolute;left:50%;top:-6px;transform:translate(-50%,0);font-size:13px;font-weight:900;color:#2B8A3E;pointer-events:none;opacity:0;animation:pop 1.1s ease-out forwards;white-space:nowrap}
+.pop.bad{color:#E03131}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,0)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-30px)}}
+#hToc{border:0;background:var(--ink);color:#fff;font-weight:800;font-size:13px;padding:7px 12px;border-radius:12px;cursor:pointer;border-bottom:3px solid #000}
+#hToc:active{transform:translateY(1px);border-bottom-width:2px}
+/* ---------- 교실 ---------- */
+main{max-width:1000px;margin:0 auto;padding:14px 16px 20px;display:flex;flex-direction:column;gap:14px;min-height:calc(100vh - var(--hud))}
+#board{position:relative;flex:1;display:flex;flex-direction:column;min-height:360px}
+.frame{flex:1;display:flex;padding:14px;border-radius:14px;background:linear-gradient(180deg,#8B5A2B,#6E4321);box-shadow:0 18px 40px rgba(60,40,20,.22),inset 0 2px 0 rgba(255,255,255,.18),inset 0 -3px 0 rgba(0,0,0,.25);position:relative}
+.frame::before{content:"";position:absolute;inset:6px;border-radius:10px;border:2px solid rgba(255,255,255,.08);pointer-events:none}
+.green{flex:1;position:relative;border-radius:6px;background:
+  radial-gradient(ellipse at 18% 22%,rgba(255,255,255,.07),transparent 42%),radial-gradient(ellipse at 78% 74%,rgba(255,255,255,.05),transparent 40%),
+  repeating-linear-gradient(115deg,rgba(255,255,255,.015) 0 3px,transparent 3px 9px),linear-gradient(160deg,#366B57,#2A5847 55%,#254E3F);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.25),inset 0 0 90px rgba(0,0,0,.28);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.chk{position:absolute;left:18px;top:12px;font-family:var(--pen);font-size:22px;color:var(--yel);letter-spacing:.02em;opacity:.95;z-index:2;text-shadow:0 0 2px rgba(255,226,122,.35)}
+.chk small{font-family:var(--f);font-size:11.5px;font-weight:800;color:var(--chalk-2);margin-left:8px;letter-spacing:.06em;vertical-align:middle}
+#bwrap{flex:1;overflow:auto;padding:46px 34px 26px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent;display:flex;flex-direction:column}
+#bc{margin:auto 0;width:100%}  /* 짧은 판서는 세로 가운데, 긴 판서는 위에서부터 스크롤 */
+#bwrap::-webkit-scrollbar{width:8px}#bwrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,.22);border-radius:99px}
+#bc{color:var(--chalk);font-size:var(--fs);line-height:1.75;text-shadow:0 0 1px rgba(255,255,255,.28);max-width:840px}
+#bc>*{animation:write .5s ease-out both}
+#bc>*:nth-child(2){animation-delay:.15s}#bc>*:nth-child(3){animation-delay:.3s}#bc>*:nth-child(4){animation-delay:.45s}#bc>*:nth-child(n+5){animation-delay:.6s}
+@keyframes write{from{opacity:0;transform:translateY(6px);filter:blur(1px)}to{opacity:1;transform:none;filter:none}}
+#bc b,#bc strong{color:var(--yel);font-weight:800}
+#bc p{margin:0 0 12px}
+#bc .sub{font-family:var(--pen);font-size:28px;color:var(--sky);margin:0 0 6px;line-height:1.2}
+#bc .tk{font-size:calc(var(--fs) + 1px)}
+#bc .katex{color:var(--chalk);font-size:1.06em}#bc .katex-display{margin:12px 0;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+#bc a{color:var(--sky)}
+#bc table{border-collapse:collapse;margin:8px 0;font-size:.92em}#bc td,#bc th{border:1px dashed rgba(245,242,233,.45);padding:5px 10px;text-align:left}#bc th{color:var(--yel)}
+#bc ul,#bc ol{margin:6px 0 10px;padding-left:24px}
+/* 상자들: 분필 테두리 */
+#bc .bx{margin:6px 0 14px;padding:14px 18px 12px;border:2px dashed rgba(245,242,233,.55);border-radius:10px;position:relative;font-size:var(--fs)}
+#bc .bx>i{display:block;font-style:normal;font-family:var(--pen);font-size:24px;line-height:1;margin-bottom:8px;letter-spacing:.02em}
+#bc .bx.why{border-color:rgba(154,220,255,.6)}#bc .bx.why>i{color:var(--sky)}
+#bc .bx.analogy{border-color:rgba(255,226,122,.6)}#bc .bx.analogy>i{color:var(--yel)}
+#bc .bx.formula{border-style:solid;border-color:rgba(184,242,208,.75);background:rgba(255,255,255,.05)}#bc .bx.formula>i{color:var(--mint)}
+#bc .bx.pitfall{border-color:rgba(255,163,199,.7);background:rgba(255,120,160,.07)}#bc .bx.pitfall>i{color:var(--pink)}
+#bc .bx.memo{border-color:rgba(245,242,233,.7);background:rgba(255,255,255,.05)}#bc .bx.memo>i{color:var(--chalk)}
+#bc .bx.say{border:0;border-left:4px solid var(--pink);border-radius:0;padding:4px 16px;font-style:italic}#bc .bx.say>i{color:var(--pink);font-style:normal}
+/* 붙임 자료(그림): 칠판에 붙인 종이 — 그림은 교재와 같은 원본 그대로(색·글자 검증 유지) */
+#bc .paper{background:#FFFDF7;color:var(--ink);text-shadow:none;border-radius:6px;padding:14px 16px 10px;margin:8px auto 16px;max-width:600px;box-shadow:0 10px 24px rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.6) inset;transform:rotate(-.8deg);position:relative;text-align:center}
+#bc .paper::before{content:"";position:absolute;left:50%;top:-10px;width:78px;height:20px;margin-left:-39px;background:rgba(255,224,130,.75);transform:rotate(-2deg);box-shadow:0 1px 2px rgba(0,0,0,.15)}
+#bc .paper svg{max-width:100%;height:auto;display:block;margin:0 auto}
+#bc .paper figcaption,#bc .paper .cap{font-size:14px;color:var(--ink-2);margin-top:8px;line-height:1.5;text-align:center}
+#bc .paper b{color:var(--ink)}#bc .paper .katex{color:var(--ink)}
+#bc .paper.photo img{max-width:100%;max-height:420px;object-fit:contain;border-radius:4px;background:#111}
+/* 예제 */
+#bc .ex .exq{border:2px solid rgba(245,242,233,.6);border-radius:10px;padding:12px 16px;margin-bottom:12px}
+#bc .ex .exq>i{display:block;font-style:normal;font-family:var(--pen);font-size:24px;color:var(--yel);line-height:1;margin-bottom:6px}
+#bc .ex .exa{padding:4px 6px 0 16px;border-left:3px solid var(--mint)}
+#bc .ex .exa>i{display:block;font-style:normal;font-family:var(--pen);font-size:24px;color:var(--mint);line-height:1;margin-bottom:6px}
+#bc .ex .exhide{color:var(--chalk-2);font-style:italic;font-size:15px}
+/* 문제 */
+#bc .qz .qn{font-family:var(--pen);font-size:26px;color:var(--yel);line-height:1.2;margin-bottom:8px}
+#bc .qz .qb{margin-bottom:14px;font-size:calc(var(--fs) + 1px)}
+#bc .qz ol.ch{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+#bc .qz .cb{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;font-size:var(--fs);color:var(--chalk);background:rgba(255,255,255,.06);border:2px solid rgba(245,242,233,.5);border-radius:14px;padding:11px 14px;cursor:pointer;transition:transform .1s,background .15s;line-height:1.5;min-height:52px}
+#bc .qz .cb .n{flex:0 0 32px;height:32px;border-radius:50%;border:2px solid rgba(245,242,233,.7);display:grid;place-items:center;font-weight:900;font-size:15px}
+#bc .qz .cb:hover:not([disabled]){background:rgba(255,255,255,.12);transform:translateY(-1px)}
+#bc .qz .cb[disabled]{cursor:default;opacity:.75}
+#bc .qz .cb.ok{border-color:#7ED957;background:rgba(88,204,2,.22);opacity:1}#bc .qz .cb.ok .n{background:#58CC02;border-color:#58CC02;color:#0B2E00}
+#bc .qz .cb.bad{border-color:#FF6B6B;background:rgba(255,75,75,.2);opacity:1}#bc .qz .cb.bad .n{background:#FF4B4B;border-color:#FF4B4B;color:#fff}
+#bc .qz .cb .katex{color:inherit}
+#bc .qz textarea{width:100%;min-height:74px;font:inherit;font-size:var(--fs);color:var(--chalk);background:rgba(255,255,255,.06);border:2px dashed rgba(245,242,233,.55);border-radius:12px;padding:10px 14px;resize:vertical}
+#bc .qz textarea::placeholder{color:rgba(245,242,233,.45)}
+#bc .qz .my{margin:8px 0;color:var(--chalk-2)}#bc .qz .my b{color:var(--chalk)}
+#bc .qz .vd{display:inline-block;font-weight:900;font-size:15px;padding:3px 12px;border-radius:99px;margin:10px 0 4px}
+#bc .qz .vd.ok{background:#58CC02;color:#0B2E00}#bc .qz .vd.bad{background:#FF4B4B;color:#fff}#bc .qz .vd.wait{background:rgba(255,255,255,.18);color:var(--chalk)}
+#bc .qz .ans{margin-top:10px;padding:12px 16px;border-left:3px solid var(--mint);background:rgba(255,255,255,.05);border-radius:0 10px 10px 0}
+#bc .qz .ans>i{display:block;font-style:normal;font-family:var(--pen);font-size:24px;color:var(--mint);line-height:1;margin-bottom:6px}
+#bc .qz .row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+/* 목차 · 결과 */
+#bc .ttl{font-family:var(--pen);font-size:44px;line-height:1.15;color:var(--chalk);margin:0 0 6px;text-shadow:0 0 3px rgba(255,255,255,.2)}
+#bc .lead{color:var(--chalk-2);font-size:calc(var(--fs) - 1px);margin:0 0 14px}
+#bc .toc{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:8px}
+#bc .toc li{display:flex;align-items:center;gap:12px;font-size:var(--fs);padding:6px 4px;border-bottom:1px dashed rgba(245,242,233,.25)}
+#bc .toc .st{flex:0 0 30px;height:30px;border-radius:50%;border:2px solid rgba(245,242,233,.6);display:grid;place-items:center;font-size:13px;font-weight:900}
+#bc .toc li.done .st{background:#58CC02;border-color:#58CC02;color:#0B2E00}
+#bc .toc li.cur .st{border-color:var(--yel);color:var(--yel)}
+#bc .toc li.cur{color:var(--yel)}
+#bc .toc small{margin-left:auto;font-size:12.5px;color:var(--chalk-2);white-space:nowrap;font-weight:700}
+#bc .res{text-align:center;padding:10px 0 0}
+#bc .res .big{font-family:var(--pen);font-size:64px;line-height:1;color:var(--yel);margin:6px 0 10px}
+#bc .res .stats{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;font-size:var(--fs);margin:6px 0 12px}
+#bc .res .stats b{display:block;font-size:34px;line-height:1.1}
+#bc .res .stats span{display:block;font-size:13px;color:var(--chalk-2);font-weight:700;letter-spacing:.04em}
+#bc .res .badge{margin:4px auto 0;width:140px;height:140px}
+#bc .res .bl{font-size:13px;font-weight:800;color:var(--chalk-2);letter-spacing:.04em;margin-top:4px}
+#bc .res .wrong{margin-top:8px;color:var(--pink);font-size:15px}
+/* 분필 받침 */
+.tray{height:20px;margin:0 30px;border-radius:0 0 8px 8px;background:linear-gradient(180deg,#6E4321,#4E2E14);box-shadow:0 8px 14px rgba(60,40,20,.25);position:relative}
+.tray i{position:absolute;top:5px;height:8px;width:48px;border-radius:4px;background:#F5F2E9;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.tray i.y{left:80px;background:var(--yel)}.tray i.p{left:140px;background:var(--pink)}.tray i.w{left:24px}
+.tray i.er{left:auto;right:30px;width:64px;height:12px;top:3px;border-radius:3px;background:linear-gradient(180deg,#2B2B33,#111);}
+/* ---------- 대화 ---------- */
+#dlg{display:flex;align-items:flex-end;gap:14px;min-height:170px}
+#tutor{flex:0 0 170px;width:170px;height:200px;margin-bottom:-6px;filter:drop-shadow(0 8px 10px rgba(0,0,0,.18));animation:bob 3.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+#tutor svg{width:100%;height:100%;display:block;overflow:visible}
+.box{flex:1;min-width:0;background:#fff;border:2px solid rgba(31,42,68,.12);border-radius:18px;padding:16px 18px 14px;box-shadow:0 12px 30px rgba(31,42,68,.10);position:relative;min-height:150px;display:flex;flex-direction:column}
+.box::before{content:"";position:absolute;left:-12px;bottom:46px;border:10px solid transparent;border-right-color:#fff;border-left:0}
+.name{position:absolute;left:16px;top:-14px;background:var(--ink);color:#FFE27A;font-family:var(--pen);font-size:22px;line-height:1;padding:5px 14px 4px;border-radius:10px;letter-spacing:.03em;border-bottom:3px solid #000}
+.name.prof{background:#7A2E52;color:#FFD6E7}
+.text{flex:1;font-size:18px;line-height:1.65;padding:8px 0 10px;min-height:56px;cursor:pointer}
+.text .cur{display:inline-block;width:.55em;height:1.05em;background:var(--ink);vertical-align:-.15em;margin-left:2px;animation:blinkc .8s step-end infinite}
+@keyframes blinkc{50%{opacity:0}}
+.choices{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.cbt{border:0;font:inherit;font-weight:800;font-size:15.5px;padding:11px 18px;border-radius:14px;cursor:pointer;color:#fff;background:var(--du-blue);border-bottom:4px solid var(--du-blue-2);transition:transform .08s,filter .15s;letter-spacing:-.01em;min-height:46px}
+.cbt:hover{filter:brightness(1.05)}.cbt:active{transform:translateY(2px);border-bottom-width:2px;margin-bottom:2px}
+.cbt.p{background:var(--du-green);border-bottom-color:var(--du-green-2)}
+.cbt.g{background:#fff;color:var(--ink-2);border:2px solid var(--du-gray);border-bottom:4px solid var(--du-gray)}
+.cbt.g:active{border-bottom-width:2px}
+.cbt.r{background:var(--du-red);border-bottom-color:var(--du-red-2)}
+.cbt.y{background:var(--du-yel);border-bottom-color:#E5A800;color:#4A3600}
+.cbt kbd{font:inherit;font-size:11px;opacity:.7;margin-left:6px}
+.choices .sp{flex:1}
+.tip{font-size:12.5px;color:var(--ink-3);margin-left:auto}
+/* ---------- 목차 오버레이 ---------- */
+#ov{position:fixed;inset:0;z-index:20;background:rgba(20,30,40,.55);display:none;align-items:center;justify-content:center;padding:20px}
+#ov.on{display:flex}
+#ov .pn{background:#fff;border-radius:20px;width:min(560px,100%);max-height:86vh;overflow:auto;padding:22px 22px 18px;box-shadow:0 30px 70px rgba(0,0,0,.35)}
+#ov h2{margin:0 0 4px;font-size:22px}
+#ov .mt{font-size:13px;color:var(--ink-3);margin-bottom:12px}
+#ov ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+#ov li button{width:100%;display:flex;align-items:center;gap:12px;text-align:left;font:inherit;font-size:16px;font-weight:700;color:var(--ink);background:#F7F7F7;border:2px solid #EEE;border-radius:14px;padding:12px 14px;cursor:pointer}
+#ov li button:hover{border-color:var(--du-blue)}
+#ov li .st{flex:0 0 30px;height:30px;border-radius:50%;border:2px solid #CFCFCF;display:grid;place-items:center;font-size:13px;font-weight:900;color:var(--ink-3)}
+#ov li.done .st{background:var(--du-green);border-color:var(--du-green);color:#fff}
+#ov li.cur button{border-color:var(--du-yel);background:#FFF8DC}
+#ov li small{margin-left:auto;color:var(--ink-3);font-weight:700;white-space:nowrap}
+#ov .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+/* ---------- 스앵님 ---------- */
+.chibi .f{display:none}
+.chibi[data-face="neutral"] .f-neutral,.chibi[data-face="sharp"] .f-sharp,.chibi[data-face="smile"] .f-smile,.chibi[data-face="angry"] .f-angry,.chibi[data-face="wide"] .f-wide,.chibi[data-face="proud"] .f-proud{display:block}
+.chibi .eye{transform-box:fill-box;transform-origin:center;animation:blink 4.6s ease-in-out infinite}
+@keyframes blink{0%,91%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
+/* ---------- 폰 ---------- */
+@media(max-width:640px){
+  :root{--fs:16.5px;--hud:50px}
+  /* 폰 HUD: 과목 이름은 칠판 위 태그에 있으니 숨기고 CH n/m + 진행 막대 + 수치만 */
+  #hud .in{gap:6px;padding:0 8px}#hud .hl{display:none}#hud .hc{flex:1 1 auto;min-width:70px;gap:6px}#hud .chp{font-size:11px}#hud .pbar{height:10px}#hud .hr{gap:4px;flex:0 0 auto}.stat{padding:3px 5px;font-size:12px;gap:3px;border-width:1px}.stat svg{width:15px;height:15px}.stat.hp svg{width:14px}.stat small{display:none}.stat .gauge{width:30px;height:7px}#hToc{padding:5px 8px;font-size:12px}
+  main{padding:10px 8px 8px;gap:8px}
+  .frame{padding:8px;border-radius:10px}#bwrap{padding:38px 14px 18px}.chk{left:12px;top:8px;font-size:18px}
+  #bc .paper{transform:none;padding:10px 8px 8px;overflow-x:auto}#bc .paper svg{min-width:460px}
+  #bc .ttl{font-size:32px}#bc .res .big{font-size:44px}
+  #board{min-height:300px;max-height:calc(100vh - var(--hud) - 190px)}.chk{padding-right:10px}
+  #dlg{position:sticky;bottom:0;z-index:8;gap:6px;min-height:0;padding-top:6px;background:linear-gradient(180deg,rgba(244,238,226,0),var(--wall) 30%)}
+  #tutor{flex:0 0 92px;width:92px;height:110px;margin-bottom:0}
+  .box{padding:12px 12px 10px;min-height:120px;border-radius:14px}.box::before{bottom:30px}.name{font-size:18px;top:-12px;padding:4px 10px 3px}
+  .text{font-size:15.5px;padding:6px 0 8px;min-height:44px}
+  .cbt{font-size:14px;padding:10px 14px;min-height:42px}.tip{display:none}
+}
+@media(min-width:641px){body{overflow-y:auto}main{height:calc(100vh - var(--hud))}#board{min-height:0}#bwrap{min-height:0}}
+</style>
+</head>
+<body>
+<div id="hud"><div class="in">
+  <div class="hl"><b id="hCourse"></b><span id="hSess"></span></div>
+  <div class="hc"><span class="chp" id="hCh">CH 0/0</span><div class="pbar"><i id="hBar"></i></div></div>
+  <div class="hr">
+    <span class="stat xp" id="sXp" title="경험치"><svg viewBox="0 0 24 24" fill="#FFC800" stroke="#B26A00" stroke-width="1.5" stroke-linejoin="round"><path d="M12 2.5l2.9 6.2 6.8.8-5 4.7 1.3 6.8L12 17.7 5.9 21l1.3-6.8-5-4.7 6.8-.8z"/></svg><b id="hXp">0</b><small id="hLv">Lv 1</small></span>
+    <span class="stat sk" id="sSk" title="연속 학습일"><svg viewBox="0 0 24 24" fill="#FF9600" stroke="#C2410C" stroke-width="1.4" stroke-linejoin="round"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2 .8-3.3 1.6-4.4.4 1.4 1.2 2.2 2.4 2.4C10.5 8.5 10.5 5 12 2z"/></svg><b id="hStreak">0</b></span>
+    <span class="stat hp" id="hHearts" title="하트"></span>
+    <span class="stat af" id="sAf" title="호감도"><svg viewBox="0 0 24 24" fill="#F783AC" stroke="#D0397A" stroke-width="1.5" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.3-9.2C1.5 8.5 3.6 5 7 5c2 0 3.6 1.1 5 2.6C13.4 6.1 15 5 17 5c3.4 0 5.5 3.5 4.3 6.8C19.5 16.4 12 21 12 21z"/></svg><i class="gauge"><b id="hAff"></b></i></span>
+    <button id="hToc" type="button">목차</button>
+  </div>
+</div></div>
+<main>
+  <div id="board">
+    <div class="frame"><div class="green"><div class="chk" id="chk"></div><div id="bwrap"><div id="bc"></div></div></div></div>
+    <div class="tray"><i class="w"></i><i class="y"></i><i class="p"></i><i class="er"></i></div>
+  </div>
+  <div id="dlg">
+    <div id="tutor">
+      <svg class="chibi" id="chibi" data-face="neutral" viewBox="0 0 220 260" aria-label="스앵님">
+        <circle cx="158" cy="94" r="24" fill="#1B1A21" stroke="#0E0D12" stroke-width="2"/>
+        <rect x="132" y="86" width="10" height="16" rx="3" fill="#B08D57"/>
+        <rect x="98" y="172" width="24" height="26" fill="#EBCDB8"/>
+        <path d="M48 258 C50 214 68 198 110 194 C152 198 170 214 172 258 Z" fill="#17161C"/>
+        <path d="M96 194 L110 228 L124 194 Z" fill="#F7F3EE"/>
+        <path d="M96 194 L82 234 L106 214 Z" fill="#26252E"/><path d="M124 194 L138 234 L114 214 Z" fill="#26252E"/>
+        <circle cx="136" cy="222" r="3" fill="#C9A24A"/>
+        <ellipse cx="47" cy="124" rx="7" ry="10" fill="#F2D9C6" stroke="#2A2325" stroke-width="1.5"/>
+        <ellipse cx="173" cy="124" rx="7" ry="10" fill="#F2D9C6" stroke="#2A2325" stroke-width="1.5"/>
+        <ellipse cx="110" cy="118" rx="64" ry="68" fill="#F7E4D4" stroke="#2A2325" stroke-width="1.8"/>
+        <path d="M46 114 C40 60 78 38 112 40 C150 42 182 66 176 120 C170 100 160 90 150 84 C138 78 126 84 120 94 C112 78 96 72 84 80 C72 88 60 102 46 114 Z" fill="#1B1A21"/>
+        <path d="M120 94 C130 86 142 86 150 90" fill="none" stroke="#2C2B35" stroke-width="1.2"/>
+        <path d="M108 136 q3 4 0 6" fill="none" stroke="#B08A78" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- 무표정 -->
+        <g class="f f-neutral">
+          <g class="eye"><ellipse cx="86" cy="125" rx="9" ry="10" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="87" cy="126" r="5.5" fill="#2E2A33"/><circle cx="84.5" cy="123" r="1.7" fill="#fff"/><path d="M77 118 Q86 110 95 118" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/></g>
+          <g class="eye"><ellipse cx="134" cy="125" rx="9" ry="10" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="135" cy="126" r="5.5" fill="#2E2A33"/><circle cx="132.5" cy="123" r="1.7" fill="#fff"/><path d="M125 118 Q134 110 143 118" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/></g>
+          <path d="M73 105 Q86 100 99 105" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/><path d="M121 105 Q134 100 147 105" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M100 152 Q110 156 120 152" fill="none" stroke="#9B3B4E" stroke-width="2.2" stroke-linecap="round"/>
+        </g>
+        <!-- 날카로움 -->
+        <g class="f f-sharp">
+          <g class="eye"><ellipse cx="86" cy="126" rx="10" ry="7.5" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="87" cy="127" r="5" fill="#2E2A33"/><circle cx="85" cy="124.5" r="1.4" fill="#fff"/><path d="M75 122 Q86 112 97 122 L97 117 Q86 108 75 117 Z" fill="#1B1A21"/></g>
+          <g class="eye"><ellipse cx="134" cy="126" rx="10" ry="7.5" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="135" cy="127" r="5" fill="#2E2A33"/><circle cx="133" cy="124.5" r="1.4" fill="#fff"/><path d="M123 122 Q134 112 145 122 L145 117 Q134 108 123 117 Z" fill="#1B1A21"/></g>
+          <path d="M72 102 L98 109" fill="none" stroke="#2A2325" stroke-width="2.6" stroke-linecap="round"/><path d="M122 109 L148 102" fill="none" stroke="#2A2325" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M100 153 L120 153" fill="none" stroke="#9B3B4E" stroke-width="2.2" stroke-linecap="round"/>
+        </g>
+        <!-- 미소 -->
+        <g class="f f-smile">
+          <path d="M77 126 Q86 116 95 126" fill="none" stroke="#2A2325" stroke-width="2.6" stroke-linecap="round"/><path d="M125 126 Q134 116 143 126" fill="none" stroke="#2A2325" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M73 106 Q86 101 99 106" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/><path d="M121 106 Q134 101 147 106" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/>
+          <ellipse cx="72" cy="140" rx="8" ry="4" fill="#F5B5B5" opacity=".6"/><ellipse cx="148" cy="140" rx="8" ry="4" fill="#F5B5B5" opacity=".6"/>
+          <path d="M99 150 Q110 161 121 150" fill="none" stroke="#9B3B4E" stroke-width="2.4" stroke-linecap="round"/>
+        </g>
+        <!-- 화남 -->
+        <g class="f f-angry">
+          <g class="eye"><ellipse cx="86" cy="126" rx="10" ry="7" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="87" cy="127" r="5" fill="#2E2A33"/><path d="M75 122 Q86 111 97 122 L97 117 Q86 106 75 117 Z" fill="#1B1A21"/></g>
+          <g class="eye"><ellipse cx="134" cy="126" rx="10" ry="7" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="135" cy="127" r="5" fill="#2E2A33"/><path d="M123 122 Q134 111 145 122 L145 117 Q134 106 123 117 Z" fill="#1B1A21"/></g>
+          <path d="M71 99 L99 111" fill="none" stroke="#2A2325" stroke-width="2.8" stroke-linecap="round"/><path d="M121 111 L149 99" fill="none" stroke="#2A2325" stroke-width="2.8" stroke-linecap="round"/>
+          <path d="M100 157 Q110 150 120 157" fill="none" stroke="#9B3B4E" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M156 70 l6 -6 M160 78 l8 -2 M152 64 l2 -8" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round"/>
+        </g>
+        <!-- 놀람 -->
+        <g class="f f-wide">
+          <g class="eye"><ellipse cx="86" cy="125" rx="10" ry="12" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="87" cy="126" r="6" fill="#2E2A33"/><circle cx="84" cy="122.5" r="2" fill="#fff"/></g>
+          <g class="eye"><ellipse cx="134" cy="125" rx="10" ry="12" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="135" cy="126" r="6" fill="#2E2A33"/><circle cx="132" cy="122.5" r="2" fill="#fff"/></g>
+          <path d="M73 100 Q86 93 99 100" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/><path d="M121 100 Q134 93 147 100" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/>
+          <ellipse cx="110" cy="154" rx="4.5" ry="5.5" fill="#6B2F3A"/>
+        </g>
+        <!-- 흡족 -->
+        <g class="f f-proud">
+          <g><ellipse cx="86" cy="125" rx="9" ry="9" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="87" cy="127" r="5" fill="#2E2A33"/><path d="M76 125 Q86 113 96 125 L96 116 Q86 105 76 116 Z" fill="#1B1A21"/></g>
+          <g><ellipse cx="134" cy="125" rx="9" ry="9" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="135" cy="127" r="5" fill="#2E2A33"/><path d="M124 125 Q134 113 144 125 L144 116 Q134 105 124 116 Z" fill="#1B1A21"/></g>
+          <path d="M73 106 Q86 101 99 106" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/><path d="M121 106 Q134 101 147 106" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/>
+          <ellipse cx="72" cy="140" rx="8" ry="4" fill="#F5B5B5" opacity=".45"/><ellipse cx="148" cy="140" rx="8" ry="4" fill="#F5B5B5" opacity=".45"/>
+          <path d="M99 152 Q112 157 122 148" fill="none" stroke="#9B3B4E" stroke-width="2.4" stroke-linecap="round"/>
+        </g>
+      </svg>
+    </div>
+    <div class="box"><div class="name" id="dName">스앵님</div><div class="text" id="dText"></div><div class="choices" id="dCh"></div></div>
+  </div>
+</main>
+<div id="ov"><div class="pn"><h2>목차</h2><div class="mt" id="ovMeta"></div><ul id="ovList"></ul><div class="row"><button class="cbt g" id="ovClose" type="button">닫기</button><span class="sp" style="flex:1"></span><button class="cbt g" id="ovBook" type="button">교재 보기</button><button class="cbt g" id="ovReset" type="button">이 회차 기록 지우기</button></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script>
+const D={"id": "calc2-2026-09-03", "slug": "calc2", "course": "미분적분학2", "date": "2026-09-03", "sess": "9/3(목) · 1주차", "title": "행렬의 연산과 행렬식 — \"시험 문제는 행렬식부터 나온다\"", "lead": "9/1의 정의에 이어 <b>기본 연산<\/b>(상등·덧셈·실수배·곱셈·거듭제곱)과 <b>행렬식<\/b>(2차 \\(ad-bc\\), 3차 사루스 법칙). 교수님이 직접 \"중간고사 행렬식 관련 2~3문제, 시험 문제는 여기서부터\"라고 했으니 후반부가 중간고사의 출발점이다. 채점은 표기부터: \\(\\det\\)·세로줄 누락 감점, 곱셈에 × 기호 금지, 손계산 3차까지.", "minutes": 20, "chapters": [{"id": "s1", "title": "기본 연산 — 되는 것과 안 되는 것", "steps": [{"t": "formula", "html": "\\[A=B\\ \\Leftrightarrow\\ a_{ij}=b_{ij}\\ (\\text{모든 }i,j)\\qquad A\\pm B=(a_{ij}\\pm b_{ij})\\ (\\text{같은 꼴일 때만})\\qquad kA=(k\\,a_{ij})\\]"}, {"t": "fig", "html": "<svg class=\"fig-svg\" viewbox=\"0 0 560 130\" width=\"560\" height=\"130\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><path d=\"M38 30 L30 30 L30 82 L38 82\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/path><path d=\"M78 30 L86 30 L86 82 L78 82\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/path><text x=\"44.0\" y=\"48.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">1<\/text><text x=\"72.0\" y=\"48.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">2<\/text><text x=\"44.0\" y=\"74.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">3<\/text><text x=\"72.0\" y=\"74.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">4<\/text><text x=\"60\" y=\"100\" font-size=\"12\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<\/text><text x=\"96\" y=\"60\" font-size=\"18\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">+<\/text><path d=\"M120 30 L112 30 L112 82 L120 82\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/path><path d=\"M160 30 L168 30 L168 82 L160 82\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/path><text x=\"126.0\" y=\"48.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">5<\/text><text x=\"154.0\" y=\"48.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">6<\/text><text x=\"126.0\" y=\"74.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">7<\/text><text x=\"154.0\" y=\"74.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">8<\/text><text x=\"142\" y=\"100\" font-size=\"12\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">B<\/text><text x=\"178\" y=\"60\" font-size=\"18\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">=<\/text><path d=\"M202 30 L194 30 L194 82 L202 82\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/path><path d=\"M250 30 L258 30 L258 82 L250 82\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/path><rect x=\"197\" y=\"32\" width=\"26\" height=\"22\" rx=\"4\" fill=\"rgba(224,49,49,.12)\" stroke=\"#E03131\" stroke-width=\"1\"><\/rect><text x=\"210.0\" y=\"48.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">6<\/text><text x=\"242.0\" y=\"48.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">8<\/text><text x=\"210.0\" y=\"74.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">10<\/text><text x=\"242.0\" y=\"74.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">12<\/text><text x=\"226\" y=\"100\" font-size=\"11.5\" fill=\"#E03131\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">같은 자리끼리<\/text><text x=\"300\" y=\"60\" font-size=\"1\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">·<\/text><text x=\"320\" y=\"60\" font-size=\"15\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">2A =<\/text><path d=\"M360 30 L352 30 L352 82 L360 82\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/path><path d=\"M400 30 L408 30 L408 82 L400 82\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/path><text x=\"366.0\" y=\"48.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">2<\/text><text x=\"394.0\" y=\"48.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">4<\/text><text x=\"366.0\" y=\"74.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">6<\/text><text x=\"394.0\" y=\"74.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">8<\/text><text x=\"382\" y=\"100\" font-size=\"11.5\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">모든 성분에 2<\/text><text x=\"470\" y=\"48\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">같은 꼴(m×n)일 때만<\/text><text x=\"470\" y=\"70\" font-size=\"12\" fill=\"#E03131\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">나눗셈은 없다<\/text><\/svg><figcaption>덧셈·실수배는 성분끼리 — 「너무 심플, 시험에 안 나온다」.<\/figcaption>"}, {"t": "why", "html": "덧셈·뺄셈·실수배는 <b>같은 자리 성분끼리<\/b>. 같은 꼴(\\(m\\times n\\))이어야 더할 수 있다. 곱셈은 다음 절의 규칙대로 되고, <b>나눗셈은 없다<\/b>(닫혀 있지 않다 — 대신 역행렬, 9/8)."}, {"t": "say", "html": "예제 2 (1)(2)(3)에 대해: \"1번, 2번은 너무 심플. <b>시험에 안 나온다.<\/b>\" · (3) \\(A-2B\\)는 \"수능 2점짜리\" — 부호는 그대로 두고 숫자 2만 \\(B\\)에 곱해서 빼는 방식 권장."}, {"t": "analogy", "html": "같은 크기의 두 표를 겹쳐 놓고 칸마다 더하는 것. 크기가 다르면 겹쳐지지 않아 더할 수 없다."}, {"t": "memo", "html": "<b>외울 것<\/b> 상등·합·실수배 = 성분끼리 · 같은 꼴만 · 나눗셈 없음 · 시험에는 안 나옴(기본)"}], "say": null}, {"id": "s2", "title": "곱셈 — 앞의 열 수 = 뒤의 행 수 · 거듭제곱", "steps": [{"t": "fig", "html": "<svg class=\"fig-svg\" viewbox=\"0 0 560 190\" width=\"560\" height=\"190\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><path d=\"M38 40 L30 40 L30 96 L38 96\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/path><path d=\"M110 40 L118 40 L118 96 L110 96\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/path><rect x=\"33\" y=\"42\" width=\"38\" height=\"24\" rx=\"4\" fill=\"rgba(224,49,49,.12)\" stroke=\"#E03131\" stroke-width=\"1\"><\/rect><text x=\"52.0\" y=\"59.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">11<\/tspan><\/text><rect x=\"77\" y=\"42\" width=\"38\" height=\"24\" rx=\"4\" fill=\"rgba(224,49,49,.12)\" stroke=\"#E03131\" stroke-width=\"1\"><\/rect><text x=\"96.0\" y=\"59.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">12<\/tspan><\/text><text x=\"52.0\" y=\"87.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">21<\/tspan><\/text><text x=\"96.0\" y=\"87.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">22<\/tspan><\/text><text x=\"74\" y=\"118\" font-size=\"12\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A (2×2)<\/text><text x=\"74\" y=\"134\" font-size=\"11\" fill=\"#E03131\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">i 행<\/text><text x=\"130\" y=\"82\" font-size=\"22\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">·<\/text><path d=\"M158 40 L150 40 L150 96 L158 96\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/path><path d=\"M230 40 L238 40 L238 96 L230 96\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/path><text x=\"172.0\" y=\"59.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">b<tspan baseline-shift=\"sub\" font-size=\"72%\">11<\/tspan><\/text><rect x=\"197\" y=\"42\" width=\"38\" height=\"24\" rx=\"4\" fill=\"rgba(224,49,49,.12)\" stroke=\"#E03131\" stroke-width=\"1\"><\/rect><text x=\"216.0\" y=\"59.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">b<tspan baseline-shift=\"sub\" font-size=\"72%\">12<\/tspan><\/text><text x=\"172.0\" y=\"87.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">b<tspan baseline-shift=\"sub\" font-size=\"72%\">21<\/tspan><\/text><rect x=\"197\" y=\"70\" width=\"38\" height=\"24\" rx=\"4\" fill=\"rgba(224,49,49,.12)\" stroke=\"#E03131\" stroke-width=\"1\"><\/rect><text x=\"216.0\" y=\"87.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">b<tspan baseline-shift=\"sub\" font-size=\"72%\">22<\/tspan><\/text><text x=\"194\" y=\"118\" font-size=\"12\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">B (2×2)<\/text><text x=\"194\" y=\"134\" font-size=\"11\" fill=\"#E03131\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">j 열<\/text><text x=\"250\" y=\"82\" font-size=\"20\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">=<\/text><path d=\"M278 40 L270 40 L270 96 L278 96\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/path><path d=\"M350 40 L358 40 L358 96 L350 96\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/path><text x=\"292.0\" y=\"59.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">c<tspan baseline-shift=\"sub\" font-size=\"72%\">11<\/tspan><\/text><rect x=\"317\" y=\"42\" width=\"38\" height=\"24\" rx=\"4\" fill=\"rgba(224,49,49,.12)\" stroke=\"#E03131\" stroke-width=\"1\"><\/rect><text x=\"336.0\" y=\"59.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">c<tspan baseline-shift=\"sub\" font-size=\"72%\">12<\/tspan><\/text><text x=\"292.0\" y=\"87.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">c<tspan baseline-shift=\"sub\" font-size=\"72%\">21<\/tspan><\/text><text x=\"336.0\" y=\"87.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">c<tspan baseline-shift=\"sub\" font-size=\"72%\">22<\/tspan><\/text><text x=\"314\" y=\"118\" font-size=\"12\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">AB<\/text><text x=\"450\" y=\"50\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">c<tspan baseline-shift=\"sub\" font-size=\"72%\">12<\/tspan> = a<tspan baseline-shift=\"sub\" font-size=\"72%\">11<\/tspan> b<tspan baseline-shift=\"sub\" font-size=\"72%\">12<\/tspan> + a<tspan baseline-shift=\"sub\" font-size=\"72%\">12<\/tspan> b<tspan baseline-shift=\"sub\" font-size=\"72%\">22<\/tspan><\/text><text x=\"450\" y=\"74\" font-size=\"12\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">i 행 × j 열: 짝지어 곱해 더한다<\/text><text x=\"450\" y=\"104\" font-size=\"13.5\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A(m×n) · B(n×r) → m×r<\/text><text x=\"450\" y=\"126\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">앞의 열 수 = 뒤의 행 수 (가운데 n 소거)<\/text><text x=\"450\" y=\"150\" font-size=\"12\" fill=\"#E03131\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">그래서 보통 AB ≠ BA<\/text><text x=\"280\" y=\"176\" font-size=\"11.5\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">예: [1 2; 3 4]·[0 1; 2 0] = [1·0+2·2  1·1+2·0; 3·0+4·2  3·1+4·0] = [4 1; 8 3]<\/text><\/svg><figcaption>행렬의 곱: 결과의 (i, j) 성분 = 앞 행렬 i 행과 뒤 행렬 j 열의 짝 곱의 합.<\/figcaption>"}, {"t": "formula", "html": "\\[A_{m\\times n}B_{n\\times r}=C_{m\\times r},\\qquad c_{ij}=\\sum_{k=1}^{n}a_{ik}b_{kj}=a_{i1}b_{1j}+a_{i2}b_{2j}+\\cdots+a_{in}b_{nj}\\]"}, {"t": "why", "html": "가운데 \\(n\\)이 소거되어야 곱이 정의된다 — 그래서 \\(AB\\)는 되는데 \\(BA\\)는 아예 정의가 안 되기도 하고, 정사각행렬끼리도 보통 \\(AB\\ne BA\\). 교수님은 교재의 인덱스 \\(r\\) 대신 \\(\\Sigma\\)의 인덱스를 고교 수열처럼 \\(k\\)로 통일. <b>거듭제곱<\/b> \\(A^n=AA\\cdots A\\), \\(A^rA^s=A^{r+s}\\), \\((A^r)^s=A^{rs}\\)."}, {"t": "say", "html": "\"저도 계산하다 잘못할 수 있어요. 머릿속에서 안 되면 <b>써 놔야 돼.<\/b>\" · 행렬 곱에 <b>× 기호를 쓰지 말 것<\/b> — 나중에 외적의 뜻으로 쓰인다. 점을 찍거나 나란히 쓴다."}, {"t": "ex", "q": "예제 2 (4)(5) — 꼴이 안 맞으면 전치로, 영행렬이 아닌데 제곱이 영행렬", "a": "<p>(4) \\(A\\)(3×2)와 \\(B\\)(3×2)는 그대로 곱할 수 없다 → \\(B^T\\)(2×3)를 취해 \\(AB^T\\)(3×3) \\(=\\begin{bmatrix}14&amp;6&amp;4\\\\24&amp;9&amp;6\\\\26&amp;12&amp;8\\end{bmatrix}\\). (5) 3차 행렬 \\(A\\)에 0이 하나도 없는데 \\(A^2=O\\) — \"영행렬이 아닌 둘을 곱해도 영행렬이 나올 수 있다\"(수능 2~3점 유형). 숫자와 다른 점이다.<\/p>"}, {"t": "analogy", "html": "기차 연결: 앞 차량의 연결고리 수(열)와 뒤 차량의 고리 수(행)가 맞아야 이어진다. 순서를 바꾸면 고리가 안 맞을 수 있다 — 교환법칙이 없는 이유."}, {"t": "memo", "html": "<b>외울 것<\/b> \\((m\\times n)(n\\times r)=m\\times r\\) · \\(c_{ij}\\) = i 행 · j 열 · \\(AB\\ne BA\\) · × 금지 · \\(A^2=O\\)여도 \\(A\\ne O\\) 가능"}], "say": null}, {"id": "s3", "title": "행렬식(determinant) — 오늘의 키 포인트 ★", "steps": [{"t": "talk", "html": "<p>행렬식은 행렬이 아니라 <b>값<\/b>(숫자 또는 문자식). 표기 \\(\\det A\\) 또는 \\(|A|\\) — \\(|A|\\)는 절댓값이 아니니 헷갈리면 \\(\\det A\\)로. 출발점은 연립방정식 \\(AX=B\\): 계수행렬의 행렬식이 <b>해의 존재<\/b>를 결정한다(9/8 역행렬·크래머로 연결).<\/p>", "sub": null}, {"t": "fig", "html": "<svg class=\"fig-svg\" viewbox=\"0 0 560 120\" width=\"560\" height=\"120\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><path d=\"M62.7 37.7 L118.7 87.7 L125.3 80.3 L69.3 30.3 Z\" fill=\"#2F9E44\" fill-opacity=\"0.22\" stroke=\"none\"><\/path><path d=\"M118.7 30.3 L62.7 80.3 L69.3 87.7 L125.3 37.7 Z\" fill=\"#E03131\" fill-opacity=\"0.16\" stroke=\"none\"><\/path><line x1=\"60\" y1=\"30\" x2=\"60\" y2=\"86\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/line><line x1=\"128\" y1=\"30\" x2=\"128\" y2=\"86\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/line><text x=\"77.0\" y=\"49.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<\/text><text x=\"111.0\" y=\"49.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">b<\/text><text x=\"77.0\" y=\"77.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">c<\/text><text x=\"111.0\" y=\"77.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">d<\/text><text x=\"94\" y=\"104\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">det A = ad − bc<\/text><text x=\"330\" y=\"48\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">↘ 주대각 곱 (+)  −  ↙ 반대 대각 곱 (−)<\/text><text x=\"330\" y=\"72\" font-size=\"11.5\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">고1 유리함수 y = (ax+b)/(cx+d) 의 역함수에서 보던 ad − bc<\/text><text x=\"330\" y=\"98\" font-size=\"12\" fill=\"#E03131\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">행렬식은 행렬이 아니라 「값」 — det A 또는 |A| (절댓값 아님)<\/text><\/svg><figcaption>2차 행렬식. 세로줄과 det 표기를 반드시 쓴다 — 「당연히 알겠지 하고 안 쓰면 감점」.<\/figcaption>"}, {"t": "say", "html": "(32:00) \"오늘 배운 거 오늘 바로 하면, <b>중간고사 관련 문제 두세 문제<\/b>를 낼 예정인데 이 행렬식을 가지고 문제 나오는 파트가 있다. <b>시험 문제는 여기서부터<\/b> 하나씩 나온다.\" · (44:43) \"중간고사 내용, 결과입니다. 이렇게 써야 돼.\""}, {"t": "why", "html": "\\(ad-bc\\)는 사실 3차 사루스 규칙의 특수한 경우지만 2차는 공식처럼 쓴다. 표기가 채점 항목: 세로줄 \\(|\\ |\\)과 \\(\\det\\)를 반드시 쓴다 — \"당연히 알겠지 하고 안 쓰면 감점.\""}, {"t": "analogy", "html": "행렬은 \"표\", 행렬식은 그 표를 한 숫자로 요약한 \"점수\". 점수가 0이면(9/8) 표가 담은 연립방정식이 제대로 안 풀린다."}, {"t": "memo", "html": "<b>외울 것<\/b> \\(\\det\\begin{bmatrix}a&amp;b\\\\c&amp;d\\end{bmatrix}=ad-bc\\) · 행렬식 = 값 · 세로줄·det 표기 필수(감점) · 시험은 여기서부터"}], "say": null}, {"id": "s4", "title": "3차 행렬식 — 사루스(Sarrus) 법칙", "steps": [{"t": "fig", "html": "<svg class=\"fig-svg\" viewbox=\"0 0 560 200\" width=\"560\" height=\"200\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><path d=\"M57.8 49.5 L141.8 109.5 L148.2 100.5 L64.2 40.5 Z\" fill=\"#2F9E44\" fill-opacity=\"0.2\" stroke=\"none\"><\/path><path d=\"M141.8 40.5 L57.8 100.5 L64.2 109.5 L148.2 49.5 Z\" fill=\"#E03131\" fill-opacity=\"0.15\" stroke=\"none\"><\/path><path d=\"M99.8 49.5 L183.8 109.5 L190.2 100.5 L106.2 40.5 Z\" fill=\"#2F9E44\" fill-opacity=\"0.2\" stroke=\"none\"><\/path><path d=\"M183.8 40.5 L99.8 100.5 L106.2 109.5 L190.2 49.5 Z\" fill=\"#E03131\" fill-opacity=\"0.15\" stroke=\"none\"><\/path><path d=\"M141.8 49.5 L225.8 109.5 L232.2 100.5 L148.2 40.5 Z\" fill=\"#2F9E44\" fill-opacity=\"0.2\" stroke=\"none\"><\/path><path d=\"M225.8 40.5 L141.8 100.5 L148.2 109.5 L232.2 49.5 Z\" fill=\"#E03131\" fill-opacity=\"0.15\" stroke=\"none\"><\/path><line x1=\"40\" y1=\"30\" x2=\"40\" y2=\"120\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/line><line x1=\"166\" y1=\"30\" x2=\"166\" y2=\"120\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/line><text x=\"61.0\" y=\"50.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">11<\/tspan><\/text><text x=\"103.0\" y=\"50.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">12<\/tspan><\/text><text x=\"145.0\" y=\"50.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">13<\/tspan><\/text><text x=\"61.0\" y=\"80.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">21<\/tspan><\/text><text x=\"103.0\" y=\"80.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">22<\/tspan><\/text><text x=\"145.0\" y=\"80.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">23<\/tspan><\/text><text x=\"61.0\" y=\"110.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">31<\/tspan><\/text><text x=\"103.0\" y=\"110.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">32<\/tspan><\/text><text x=\"145.0\" y=\"110.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">33<\/tspan><\/text><text x=\"187.0\" y=\"50.0\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">11<\/tspan><\/text><text x=\"229.0\" y=\"50.0\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">12<\/tspan><\/text><text x=\"187.0\" y=\"80.0\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">21<\/tspan><\/text><text x=\"229.0\" y=\"80.0\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">22<\/tspan><\/text><text x=\"187.0\" y=\"110.0\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">31<\/tspan><\/text><text x=\"229.0\" y=\"110.0\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">a<tspan baseline-shift=\"sub\" font-size=\"72%\">32<\/tspan><\/text><text x=\"146\" y=\"140\" font-size=\"12.5\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">↘ 초록 3개 곱의 합  −  ↙ 빨강 3개 곱의 합<\/text><text x=\"430\" y=\"50\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">3차 = 사루스(Sarrus) 법칙<\/text><text x=\"430\" y=\"78\" font-size=\"12\" fill=\"#2F9E44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">+ a₁₁a₂₂a₃₃ + a₁₂a₂₃a₃₁ + a₁₃a₂₁a₃₂<\/text><text x=\"430\" y=\"100\" font-size=\"12\" fill=\"#E03131\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">− a₁₃a₂₂a₃₁ − a₁₂a₂₁a₃₃ − a₁₁a₂₃a₃₂<\/text><text x=\"430\" y=\"132\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">「그림 모양이 아니라 3개씩 곱한다」<\/text><text x=\"430\" y=\"152\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">각 곱을 작게 적어 두고 합산 — 부호 실수 방지<\/text><text x=\"280\" y=\"186\" font-size=\"11.5\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">2차·3차까지만. 4차 이상은 컴퓨터(계산기 불가) → 다음 시간 여인수 전개<\/text><\/svg><figcaption>사루스 법칙: 1·2열을 오른쪽에 다시 쓰고 대각선 3개씩. 「왜」가 아니라 정의 — 갖다 쓰면 된다.<\/figcaption>"}, {"t": "formula", "html": "\\[\\det A=\\underbrace{a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32}}_{\\searrow\\ 3\\text{개}}-\\underbrace{\\big(a_{13}a_{22}a_{31}+a_{12}a_{21}a_{33}+a_{11}a_{23}a_{32}\\big)}_{\\swarrow\\ 3\\text{개}}\\]"}, {"t": "say", "html": "\"그림 모양이 중요한 게 아니라 <b>3개씩 곱한다<\/b>는 것. 왜 그렇게 되냐가 아니라 정의다. 갖다 쓰면 된다.\" · \"3차 행렬식 자체는 머릿속에 암기해야.\""}, {"t": "why", "html": "1·2열을 오른쪽에 다시 적으면 ↘ 대각선 3개, ↙ 대각선 3개가 보인다. 성분이 크거나 문자면 사루스가 복잡하고 계산기는 못 쓰니, 3차를 2차로 쪼개는 <b>소행렬식·여인수 전개<\/b>를 9/8에 배운다(중간 범위). 행렬식의 성질을 이용한 계산은 올해부터 뺐다."}, {"t": "analogy", "html": "세 줄짜리 뜨개질: 오른쪽 아래로 세 코, 왼쪽 아래로 세 코. 코를 세는 순서만 지키면 된다."}, {"t": "memo", "html": "<b>외울 것<\/b> 사루스 = ↘ 3개 합 − ↙ 3개 합 · 1·2열 복사 · 곱마다 작게 적고 합산 · 4차 이상 없음"}], "say": null}, {"id": "s5", "title": "예제 3·4 — det = 0인 x · 3차 행렬식 계산", "steps": [{"t": "ex", "q": "예제 3 — \\(\\det A=0\\)을 만족하는 \\(x\\)", "a": "<p>성분에 \\(x\\)가 든 2차 행렬에서 \\(ad-bc=x^2-5x+6=(x-2)(x-3)=0\\) → \\(x=2\\) 또는 \\(3\\). 흐름: <b>행렬식 → 2차방정식 → 인수분해<\/b>. \"실제 시험에서는 답이 하나만 나오게 낸다.\" 답 표기는 sol 또는 \\(\\therefore\\).<\/p>"}, {"t": "fig", "html": "<svg class=\"fig-svg\" viewbox=\"0 0 560 160\" width=\"560\" height=\"160\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><path d=\"M51.4 43.2 L111.4 95.2 L118.6 86.8 L58.6 34.8 Z\" fill=\"#2F9E44\" fill-opacity=\"0.2\" stroke=\"none\"><\/path><path d=\"M111.4 34.8 L51.4 86.8 L58.6 95.2 L118.6 43.2 Z\" fill=\"#E03131\" fill-opacity=\"0.15\" stroke=\"none\"><\/path><path d=\"M81.4 43.2 L141.4 95.2 L148.6 86.8 L88.6 34.8 Z\" fill=\"#2F9E44\" fill-opacity=\"0.2\" stroke=\"none\"><\/path><path d=\"M141.4 34.8 L81.4 86.8 L88.6 95.2 L148.6 43.2 Z\" fill=\"#E03131\" fill-opacity=\"0.15\" stroke=\"none\"><\/path><path d=\"M111.4 43.2 L171.4 95.2 L178.6 86.8 L118.6 34.8 Z\" fill=\"#2F9E44\" fill-opacity=\"0.2\" stroke=\"none\"><\/path><path d=\"M171.4 34.8 L111.4 86.8 L118.6 95.2 L178.6 43.2 Z\" fill=\"#E03131\" fill-opacity=\"0.15\" stroke=\"none\"><\/path><line x1=\"40\" y1=\"26\" x2=\"40\" y2=\"104\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/line><line x1=\"130\" y1=\"26\" x2=\"130\" y2=\"104\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/line><text x=\"55.0\" y=\"44.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">2<\/text><text x=\"85.0\" y=\"44.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">1<\/text><text x=\"115.0\" y=\"44.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">3<\/text><text x=\"55.0\" y=\"70.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">4<\/text><text x=\"85.0\" y=\"70.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">2<\/text><text x=\"115.0\" y=\"70.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">1<\/text><text x=\"55.0\" y=\"96.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">6<\/text><text x=\"85.0\" y=\"96.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">-3<\/text><text x=\"115.0\" y=\"96.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">4<\/text><text x=\"145.0\" y=\"44.0\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">2<\/text><text x=\"175.0\" y=\"44.0\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">1<\/text><text x=\"145.0\" y=\"70.0\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">4<\/text><text x=\"175.0\" y=\"70.0\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">2<\/text><text x=\"145.0\" y=\"96.0\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">6<\/text><text x=\"175.0\" y=\"96.0\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">-3<\/text><text x=\"300\" y=\"48\" font-size=\"12.5\" fill=\"#2F9E44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">+ : 2·2·4 = 16,  1·1·6 = 6,  3·4·(−3) = −36  → −14<\/text><text x=\"300\" y=\"76\" font-size=\"12.5\" fill=\"#E03131\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">− : 3·2·6 = 36,  1·4·4 = 16,  2·1·(−3) = −6  → 46<\/text><text x=\"300\" y=\"108\" font-size=\"15\" fill=\"#1F2A44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">det B = −14 − 46 = −60<\/text><text x=\"300\" y=\"134\" font-size=\"11.5\" fill=\"#8A97A6\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">「세 개를 다 계산해서 조그맣게 써 놓으면 돼요」<\/text><\/svg><figcaption>예제 4 — 3차 행렬식 계산. 부호가 섞이므로 + 를 미리 쓰지 말고 곱마다 따로 적은 뒤 합산.<\/figcaption>"}, {"t": "why", "html": "부호가 섞이므로 +를 미리 쓰지 말고 <b>여섯 곱을 각각<\/b> 적은 뒤 합산한다. \\(-14-46=-60\\). 예제 3 유형(\\(\\det=0\\)인 \\(x\\))과 예제 4 유형(3차 수치 계산)이 교수님이 말한 \"행렬식 문제\"의 두 얼굴."}, {"t": "say", "html": "(58:40) 성분이 크거나 문자면 사루스가 복잡 → 다음 주 화요일 소행렬식·여인수. \"주말에 강의자료실에 행렬·행렬식 연습문제(답안 포함)를 올린다. 제출은 아니지만 화요일 전까지 풀어올 것\" — 사실상 출제 풀."}, {"t": "analogy", "html": "예제 3은 \"점수가 0이 되는 \\(x\\)를 찾아라\"(방정식), 예제 4는 \"점수를 계산하라\"(산수). 같은 도구로 묻는 방향만 다르다."}, {"t": "memo", "html": "<b>외울 것<\/b> \\(\\det=0\\) → 방정식 → 인수분해 · 예제 4 \\(\\det B=-60\\) · 곱 6개 따로 적기 · 주말 연습문제 = 출제 풀"}], "say": null}], "quiz": [{"id": "q1", "qn": "확인 1 · 곱셈 조건", "html": "\\(A\\)가 \\(m\\times n\\), \\(B\\)가 \\(p\\times r\\)일 때 \\(AB\\)가 정의되는 조건과 결과의 꼴은?", "choices": [{"html": "\\(n=p\\)일 때, 결과는 \\(m\\times r\\)", "ok": true}, {"html": "\\(m=r\\)일 때, 결과는 \\(n\\times p\\)", "ok": false}, {"html": "\\(m=p\\)일 때, 결과는 \\(n\\times r\\)", "ok": false}, {"html": "항상 정의되고 결과는 \\(m\\times n\\)", "ok": false}], "ans": "앞의 열 수 = 뒤의 행 수. 가운데가 소거된다."}, {"id": "q2", "qn": "확인 2 · 곱 계산", "html": "\\(A=\\begin{bmatrix}1&amp;2\\\\3&amp;4\\end{bmatrix}\\), \\(B=\\begin{bmatrix}0&amp;1\\\\2&amp;0\\end{bmatrix}\\)일 때 \\(AB\\)는?", "choices": [{"html": "\\(\\begin{bmatrix}4&amp;1\\\\8&amp;3\\end{bmatrix}\\)", "ok": true}, {"html": "\\(\\begin{bmatrix}0&amp;2\\\\6&amp;0\\end{bmatrix}\\)", "ok": false}, {"html": "\\(\\begin{bmatrix}3&amp;4\\\\2&amp;4\\end{bmatrix}\\)", "ok": false}, {"html": "\\(\\begin{bmatrix}1&amp;3\\\\5&amp;3\\end{bmatrix}\\)", "ok": false}], "ans": "\\(c_{11}=1\\cdot0+2\\cdot2=4\\), \\(c_{12}=1\\cdot1+2\\cdot0=1\\), \\(c_{21}=8\\), \\(c_{22}=3\\). 2번은 성분끼리 곱한 것(행렬 곱 아님)."}, {"id": "q3", "qn": "확인 3 · 2차 행렬식", "html": "\\(\\det\\begin{bmatrix}a&amp;b\\\\c&amp;d\\end{bmatrix}\\)는?", "choices": [{"html": "\\(ad-bc\\)", "ok": true}, {"html": "\\(ab-cd\\)", "ok": false}, {"html": "\\(ad+bc\\)", "ok": false}, {"html": "\\(ac-bd\\)", "ok": false}], "ans": "주대각 곱 − 반대 대각 곱."}, {"id": "q4", "qn": "확인 4 · 예제 4", "html": "\\(B=\\begin{bmatrix}2&amp;1&amp;3\\\\4&amp;2&amp;1\\\\6&amp;-3&amp;4\\end{bmatrix}\\)의 행렬식은?", "choices": [{"html": "\\(-60\\)", "ok": true}, {"html": "\\(60\\)", "ok": false}, {"html": "\\(-14\\)", "ok": false}, {"html": "\\(32\\)", "ok": false}], "ans": "↘ \\(16+6-36=-14\\), ↙ \\(36+16-6=46\\) → \\(-14-46=-60\\). 3번은 ↙를 빼기 전."}, {"id": "q5", "qn": "확인 5 · 예제 3", "html": "2차 행렬식이 \\(x^2-5x+6\\)일 때 \\(\\det A=0\\)이 되는 \\(x\\)는?", "choices": [{"html": "\\(x=2\\) 또는 \\(3\\)", "ok": true}, {"html": "\\(x=-2\\) 또는 \\(-3\\)", "ok": false}, {"html": "\\(x=1\\) 또는 \\(6\\)", "ok": false}, {"html": "\\(x=0\\)", "ok": false}], "ans": "\\((x-2)(x-3)=0\\). 시험은 답이 하나 나오게 낸다."}, {"id": "q6", "qn": "확인 6 · 사루스", "html": "3차 행렬식의 사루스 법칙을 말로 설명하고, 답안에서 감점되는 표기 두 가지를 쓰라.", "choices": null, "ans": "1·2열을 오른쪽에 다시 쓰고 ↘ 대각선 3개 곱의 합에서 ↙ 대각선 3개 곱의 합을 뺀다. 감점: \\(\\det\\)·세로줄 누락, 행렬 곱에 × 기호(그리고 \\(|A|\\)를 절댓값으로 착각)."}]};
+const LESSON_REL="../../lessons/calc2/2026-09-03.html", LESSON_APP="notes/lessons/calc2/2026-09-03.html";
+const $=s=>document.querySelector(s), $$=(s,el)=>Array.from((el||document).querySelectorAll(s));
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const TODAY=fmt(new Date()), YDAY=(()=>{const d=new Date();d.setDate(d.getDate()-1);return fmt(d);})();
+const KEY="mc-tutor", LKEY="mc-lesson-"+D.id;
+const load=(k,def)=>{ try{ const v=JSON.parse(localStorage.getItem(k)||"null"); return (v&&typeof v==="object")?Object.assign(def,v):def; }catch(e){ return def; } };
+let T=load(KEY,{v:1,xp:0,streak:0,last:"",hearts:3,hday:"",aff:20,lessons:{}});
+if(!T.lessons||typeof T.lessons!=="object") T.lessons={};
+if(T.hday!==TODAY){ T.hearts=3; T.hday=TODAY; }
+if(T.last&&T.last!==TODAY&&T.last!==YDAY) T.streak=0;
+let L=T.lessons[D.id]||(T.lessons[D.id]={pos:null,ch:{},done:false,xp:0});
+let ST=load(LKEY,{read:{},done:{},correct:{},answer:{},ts:0});
+const CH=D.chapters, QZ=D.quiz||[], NCH=CH.length+(QZ.length?1:0);
+const EMB=window.parent!==window;
+let S={mode:"intro",ci:0,si:0,qi:0,rev:false,again:0};
+/* ---------- 저장 ---------- */
+function save(){
+  T.lessons[D.id]=L; try{ localStorage.setItem(KEY,JSON.stringify(T)); ST.ts=Date.now(); localStorage.setItem(LKEY,JSON.stringify(ST)); }catch(e){}
+  try{ const dc=CH.filter(c=>L.ch[c.id]).length, qd=QZ.filter(q=>ST.done[q.id]).length;
+    const where= S.mode==="quiz"?"확인 문제 "+(S.qi+1)+"/"+QZ.length : S.mode==="result"?"결과" : S.mode==="step"?"CH "+(S.ci+1)+" · "+(CH[S.ci]||{}).title : "목차";
+    const li={deck:D.id,title:document.title,href:location.href.split("#")[0],idx:Math.max(0,dc-1),n:CH.length,sid:(CH[S.ci]||{}).id||"",part:null,partTitle:document.title.slice(0,60),where:String(where).slice(0,80),qDone:qd,qN:QZ.length,ts:Date.now()};
+    const j=JSON.stringify(li); localStorage.setItem("mc-slides-last",j); localStorage.setItem("mc-slides-last-"+D.id,j); }catch(e){}
+}
+/* ---------- HUD ---------- */
+const lvl=xp=>1+Math.floor(xp/150), lvlPct=xp=>Math.round((xp%150)/150*100);
+function hud(){
+  $("#hCourse").textContent=D.course; $("#hSess").textContent=D.sess;
+  const dc=CH.filter(c=>L.ch[c.id]).length, qAll=QZ.length&&QZ.every(q=>ST.done[q.id]);
+  const cur= S.mode==="quiz"||S.mode==="result"? NCH : S.mode==="step"? S.ci+1 : Math.min(NCH,dc+1);
+  $("#hCh").textContent="CH "+cur+"/"+NCH;
+  const prog=(dc+(qAll?1:0))/NCH*100; $("#hBar").style.width=Math.round(prog)+"%";
+  $("#hXp").textContent=T.xp; $("#hLv").textContent="Lv "+lvl(T.xp); $("#sXp").title="경험치 "+T.xp+" · 다음 레벨까지 "+(150-T.xp%150);
+  $("#hStreak").textContent=T.streak; $("#sSk").title="연속 학습 "+T.streak+"일";
+  $("#hHearts").innerHTML=[0,1,2].map(i=>'<svg viewBox="0 0 24 24" fill="'+(i<T.hearts?"#FF4B4B":"none")+'" stroke="'+(i<T.hearts?"#D42020":"#C9C9C9")+'" stroke-width="1.8" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.3-9.2C1.5 8.5 3.6 5 7 5c2 0 3.6 1.1 5 2.6C13.4 6.1 15 5 17 5c3.4 0 5.5 3.5 4.3 6.8C19.5 16.4 12 21 12 21z"/></svg>').join("");
+  $("#hHearts").title="하트 "+T.hearts+"/3 · 틀리면 하나씩, 매일 3개로";
+  $("#hAff").style.width=Math.max(0,Math.min(100,T.aff))+"%"; $("#sAf").title="호감도 "+T.aff+" · "+affName();
+}
+function affName(){ return T.aff>=85?"전적으로 믿는":T.aff>=60?"인정":T.aff>=30?"지켜보는 중":"무관심"; }
+function pop(sel,txt,bad){ const el=$(sel); if(!el) return; const p=document.createElement("span"); p.className="pop"+(bad?" bad":""); p.textContent=txt; el.appendChild(p); setTimeout(()=>p.remove(),1200); }
+function gainXP(n){ T.xp+=n; L.xp=(L.xp||0)+n; pop("#sXp","+"+n+" XP"); }
+function gainAff(n){ T.aff=Math.max(0,Math.min(100,T.aff+n)); pop("#sAf",(n>0?"+":"")+n,n<0); }
+function touchStreak(){ if(T.last===TODAY) return; T.streak=(T.last===YDAY)?T.streak+1:1; T.last=TODAY; pop("#sSk","+1"); }
+/* ---------- 대사 ---------- */
+const LINES={
+  intro:["앉으세요. 오늘은 {n}챕터, 약 {min}분입니다. 눈으로 훑는 건 공부가 아닙니다. 한 장씩 넘기세요.","오늘 분량 {n}챕터. 핑계는 안 받습니다. 시작하면 끝까지 갑니다.","저를 전적으로 믿으셔야 합니다. 오늘 {n}챕터, 순서대로만 따라오면 됩니다."],
+  again_intro:["다시 왔군요. 지난번 자리에서 이어갑니다. 앞이 흐릿하면 목차에서 돌아가세요.","이어서 합니다. 어제 한 건 어제 것이고, 오늘은 오늘 것입니다."],
+  done_intro:["이 회차는 이미 끝냈습니다. 다시 보는 건 좋은 습관입니다. 틀렸던 문제부터 보세요.","복습이군요. 두 번째는 빠르게, 대신 외울 것 상자는 눈 감고 말할 수 있을 때까지."],
+  chapter:["챕터 {c}. {title}. 여기서부터 시험 문제가 나옵니다.","{title}. 이 챕터를 이해 못 하면 다음 챕터는 읽어도 소용없습니다.","챕터 {c}입니다. 제목을 한 번 소리 내 읽고 시작하세요."],
+  talk:["읽으세요. 굵은 글씨는 시험에 그대로 나옵니다.","한 문장씩. 이해 안 되는 문장이 있으면 넘기지 말고 「다시」를 누르세요.","여기까지 읽고, 방금 읽은 걸 한 줄로 말해 보세요. 못 하면 안 읽은 겁니다.","천천히. 빨리 넘기는 학생이 제일 먼저 틀립니다."],
+  fig:["글보다 그림이 먼저입니다. 그림을 보세요.","이 그림을 백지에 다시 그릴 수 있어야 아는 겁니다.","화살표 방향과 글자 위치까지 눈에 넣으세요. 시험 문제는 이 그림에서 나옵니다.","붙여 둔 자료입니다. 캡션까지 읽으세요."],
+  why:["왜 그런지 묻는 학생만 남습니다. 이유를 읽으세요.","「왜」를 알면 공식을 잊어도 다시 만들 수 있습니다.","이 상자는 외우는 게 아니라 납득하는 겁니다. 납득될 때까지."],
+  analogy:["비유입니다. 비유로 이해하고, 공식은 비유 없이 쓸 수 있어야 합니다.","이해가 안 될 때 돌아올 자리입니다. 지금은 가볍게 읽으세요.","이 비유가 머리에 남으면 시험장에서 식이 떠오릅니다."],
+  formula:["외우세요. 이해했다고 안 외우면 시험장에서 손이 안 움직입니다.","이 식은 시험지에 없습니다. 머릿속에서 나와야 합니다. 세 번 쓰세요.","기호 하나씩 읽으세요. 좌변이 뭔지, 우변이 뭔지 말로 설명할 수 있어야 합니다."],
+  pitfall:["여기서 절반이 틀립니다. 눈에 새기세요.","채점할 때 가장 많이 감점되는 지점입니다. 실수라고 부르지 마세요. 준비 부족입니다.","함정입니다. 시험 전날 이 상자만 다시 봐도 됩니다."],
+  memo:["정리입니다. 이 상자는 시험 전날 다시 봅니다.","여기 있는 것만 외워도 기본 점수는 나옵니다. 하나도 빼지 마세요.","한 줄 정리. 가리고 말해 보세요."],
+  say:["교수님이 직접 한 말입니다. 강조한 건 그대로 시험에 나옵니다.","교수의 말은 출제 의도입니다. 문장 그대로 기억하세요.","이 말을 왜 했는지 생각해 보세요. 채점 기준이 여기 있습니다."],
+  ex:["예제입니다. 답부터 보지 말고 30초 생각하세요. 그다음 풀이를 여세요.","풀이를 보기 전에 첫 식을 세워 보세요. 못 세우면 앞 챕터로 돌아갑니다.","이 예제는 시험에 숫자만 바꿔 나옵니다. 손으로 따라 푸세요."],
+  exopen:["풀이입니다. 식이 왜 그렇게 세워졌는지만 보세요. 계산은 나중입니다.","한 줄 한 줄 「왜」를 붙이세요. 답만 맞는 건 의미 없습니다.","여기서 막혔던 줄이 어디였는지 기억해 두세요. 거기가 약점입니다."],
+  again:["다시 봅시다. 이번엔 굵은 글씨만 먼저 읽고, 그다음 문장을 읽으세요.","좋습니다. 모른다고 말하는 건 부끄러운 게 아닙니다. 한 번 더.","한 번 더. 이번엔 손가락으로 짚으면서 읽으세요.","다시. 그림이 있으면 그림 먼저, 식이 있으면 기호 먼저."],
+  ask:["물어보세요. 애매하게 넘어가는 게 제일 나쁩니다.","질문은 구체적으로. 「모르겠어요」는 질문이 아닙니다. 어디서 막혔는지 말하세요.","좋은 습관입니다. 막힌 곳을 정확히 짚어서 물으세요."],
+  askoff:["질문은 앱 안에서 열었을 때 받습니다. 지금은 막힌 곳을 적어 두세요.","여기서는 질문 창이 안 열립니다. 앱에서 이 회차를 열면 바로 물을 수 있습니다."],
+  chdone:["챕터 {c} 끝. 넘어갑니다.","됐습니다. 다음.","나쁘지 않습니다. 이 속도로.","한 챕터 끝났습니다. 방금 챕터 제목을 다시 말해 보세요."],
+  chdone_warm:["잘 따라오고 있습니다. 다음 챕터.","좋습니다. 오늘 집중이 괜찮군요.","이 정도면 됩니다. 계속."],
+  quiz:["확인 문제 {n}개. 하트 {h}개. 틀리면 하트가 줄어듭니다. 찍지 마세요.","이제 확인합니다. 읽은 게 남았는지, 지나갔는지.","문제 {n}개. 맞히는 것보다 왜 맞았는지가 중요합니다."],
+  q:["문제 {k}. 읽고, 고르세요.","{k}번. 보기를 다 읽고 나서 고르세요.","문제 {k}. 서두르지 마세요.","{k}번입니다. 답이 보여도 나머지 보기를 왜 아닌지 확인하세요."],
+  qin:["답을 쓰는 문제입니다. 답만 간단히 쓰고 「답 보기」를 누르세요.","계산해서 쓰세요. 그다음 해설과 비교합니다."],
+  ok:["맞습니다.","정답. 왜 맞았는지도 말할 수 있어야 합니다.","좋습니다. 계속.","맞았습니다. 해설도 한 번 읽으세요. 다른 각도가 있습니다."],
+  ok_warm:["맞습니다. 이런 학생이면 가르칠 맛이 납니다.","정답. 오늘 눈빛이 다르군요.","좋습니다. 저를 믿은 결과입니다."],
+  bad:["틀렸습니다. 해설을 읽으세요. 같은 문제를 두 번 틀리면 그건 실력입니다.","아닙니다. 어디서 틀렸는지 해설에서 찾으세요.","오답. 하트 하나. 감정 쓰지 말고 이유를 찾으세요."],
+  nohearts:["하트가 없습니다. 챕터 하나를 다시 보고 오세요. 그러면 하트 하나를 돌려드립니다.","여기서 더 찍는 건 의미 없습니다. 목차로 가서 약한 챕터를 다시 읽으세요."],
+  heartback:["하트 하나 돌려드립니다. 이번엔 읽은 대로 푸세요.","복습했으니 하트 하나. 다시 문제로."],
+  res_good:["오늘은 됐습니다. 이 결과는 운이 아니라 순서대로 한 결과입니다.","{ok}/{n}. 인정합니다. 내일도 같은 시간에 오세요.","좋습니다. 틀린 건 없거나 적습니다. 외울 것 상자만 한 번 더 보세요."],
+  res_mid:["{ok}/{n}. 반은 넘겼지만 아직입니다. 틀린 문제를 지금 다시 푸세요.","됐고 안 됐고의 중간입니다. 틀린 문제의 해설을 다시 읽고 오세요."],
+  res_bad:["{ok}/{n}. 읽은 게 아니라 본 겁니다. 챕터부터 다시.","이 점수로는 시험장에서 손이 안 움직입니다. 목차로 돌아가서 처음부터."],
+  chapter_face:{talk:"neutral",fig:"neutral",why:"sharp",analogy:"smile",formula:"sharp",pitfall:"angry",memo:"neutral",say:"neutral",ex:"sharp",exopen:"neutral",board:"neutral"}
+};
+function hash(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return (h>>>0); }
+function pick(pool,seed,vars){ const arr=LINES[pool]||[]; if(!arr.length) return ""; const t=arr[hash(D.id+"|"+pool+"|"+seed)%arr.length]; return t.replace(/\{(\w+)\}/g,(m,k)=>(vars&&k in vars)?vars[k]:m); }
+const warm=()=>T.aff>=60;
+/* ---------- 타자 ---------- */
+let typing=null, fullText="";
+function say(text,face,name){
+  $("#chibi").setAttribute("data-face",face||"neutral");
+  const nm=$("#dName"); nm.textContent=name||"스앵님"; nm.classList.toggle("prof",name==="교수님");
+  const el=$("#dText"); if(typing){ clearInterval(typing); typing=null; }
+  fullText=text; el.innerHTML=""; let i=0; const cur=document.createElement("i"); cur.className="cur";
+  typing=setInterval(()=>{ i++; el.textContent=text.slice(0,i); if(i<text.length) el.appendChild(cur); else { clearInterval(typing); typing=null; } },22);
+}
+$("#dText").onclick=()=>{ if(typing){ clearInterval(typing); typing=null; $("#dText").textContent=fullText; } };
+function choices(list){ const box=$("#dCh"); box.innerHTML=""; list.forEach(c=>{ if(c.tip){ const s=document.createElement("span"); s.className="tip"; s.textContent=c.tip; box.appendChild(s); return; }
+  const b=document.createElement("button"); b.type="button"; b.className="cbt "+(c.cls||"g"); b.innerHTML=esc(c.t)+(c.key?'<kbd>'+c.key+'</kbd>':''); b.onclick=c.f; if(c.primary) b.dataset.primary="1"; box.appendChild(b); }); }
+/* ---------- 칠판 ---------- */
+function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} }
+function board(html,tag){ $("#chk").innerHTML=tag||""; const bc=$("#bc"); bc.innerHTML=html; typeset(bc); $("#bwrap").scrollTop=0; }
+const BOX={why:"왜 그런가",analogy:"비유",formula:"외울 것",pitfall:"함정",memo:"정리",say:"교수님 말"};
+function stepHTML(st,rev){
+  const sub=st.sub?'<div class="sub">'+esc(st.sub)+'</div>':'';
+  switch(st.t){
+    case "talk": return sub+'<div class="tk">'+st.html+'</div>';
+    case "fig": return sub+'<figure class="paper">'+st.html+'</figure>';
+    case "board": return sub+'<figure class="paper photo"><img src="'+esc(st.src)+'" alt="판서 사진" onerror="this.closest(\'figure\').style.display=\'none\'">'+(st.cap?'<div class="cap">'+st.cap+'</div>':'')+'</figure>';
+    case "ex": return sub+'<div class="ex"><div class="exq"><i>예제</i>'+st.q+'</div>'+(rev?'<div class="exa"><i>풀이</i>'+st.a+'</div>':'<div class="exhide">풀이는 생각한 뒤에 엽니다.</div>')+'</div>';
+    default: return sub+'<div class="bx '+esc(st.t)+'"><i>'+(BOX[st.t]||"")+'</i>'+st.html+'</div>';
+  }
+}
+function tocHTML(){
+  const dc=CH.filter(c=>L.ch[c.id]).length;
+  let h='<ul class="toc">'+CH.map((c,i)=>{ const done=!!L.ch[c.id], cur=S.mode==="step"&&S.ci===i; return '<li class="'+(done?"done":"")+(cur?" cur":"")+'"><span class="st">'+(done?"✓":i+1)+'</span><span>'+esc(c.title)+'</span><small>'+c.steps.length+'단계</small></li>'; }).join("");
+  if(QZ.length){ const qd=QZ.filter(q=>ST.done[q.id]).length, qo=QZ.filter(q=>ST.correct[q.id]===true).length; h+='<li class="'+(qd>=QZ.length?"done":"")+(S.mode==="quiz"?" cur":"")+'"><span class="st">'+(qd>=QZ.length?"✓":"?")+'</span><span>확인 문제</span><small>'+(qd?qo+"/"+qd+" 정답":QZ.length+"문제")+'</small></li>'; }
+  return h+'</ul>';
+}
+/* ---------- 화면 ---------- */
+function render(){
+  hud(); L.pos=(S.mode==="step"||S.mode==="quiz")?{mode:S.mode,ci:S.ci,si:S.si,qi:S.qi}:L.pos; save();
+  if(S.mode==="intro") return renderIntro();
+  if(S.mode==="step") return renderStep();
+  if(S.mode==="quiz") return renderQuiz();
+  if(S.mode==="nohearts") return renderNoHearts();
+  if(S.mode==="result") return renderResult();
+}
+function renderIntro(){
+  const dc=CH.filter(c=>L.ch[c.id]).length, resume=L.pos&&!L.done&&(dc>0||QZ.some(q=>ST.done[q.id]));
+  board('<div class="ttl">'+esc(D.title)+'</div>'+(D.lead?'<div class="lead">'+D.lead+'</div>':'')+'<div class="sub">오늘의 목차</div>'+tocHTML(),'<span>오늘 수업</span><small>'+esc(D.course)+'</small>');
+  const line= L.done? pick("done_intro","i") : resume? pick("again_intro","i") : pick("intro","i",{n:CH.length,min:D.minutes||18});
+  say(line, L.done?"proud":"neutral");
+  const cs=[];
+  if(resume) cs.push({t:"이어서 하기",cls:"p",primary:1,key:"Enter",f:()=>{ S=Object.assign(S,{mode:L.pos.mode||"step",ci:L.pos.ci||0,si:L.pos.si||0,qi:L.pos.qi||0,rev:false,again:0}); if(S.mode==="quiz"){ const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; } render(); }});
+  cs.push({t:resume?"처음부터":"시작하기",cls:resume?"g":"p",primary:resume?0:1,key:resume?"":"Enter",f:()=>{ S=Object.assign(S,{mode:"step",ci:0,si:0,rev:false,again:0}); render(); }});
+  cs.push({t:"교재 보기",cls:"g",f:()=>openBook((CH[0]||{}).id)});
+  choices(cs);
+}
+function renderStep(){
+  const ch=CH[S.ci]; if(!ch){ S.mode=QZ.length?"quiz":"result"; return render(); }
+  const st=ch.steps[S.si]; if(!st){ return finishChapter(); }
+  board(stepHTML(st,S.rev),'<span>CH '+(S.ci+1)+' · '+esc(ch.title)+'</span><small>'+(S.si+1)+' / '+ch.steps.length+'</small>');
+  const seed=S.ci+":"+S.si+":"+S.again;
+  let line, face=LINES.chapter_face[st.t]||"neutral", name="스앵님";
+  if(S.again>0){ line=pick("again",seed); face="sharp"; }
+  else if(st.say){ line=st.say; }
+  else if(S.si===0){ line=pick("chapter",seed,{c:S.ci+1,title:ch.title}); face="sharp"; }
+  else if(st.t==="ex"&&S.rev){ line=pick("exopen",seed); }
+  else line=pick(st.t in LINES?st.t:"talk",seed);
+  say(line,face,name);
+  const cs=[];
+  if(st.t==="ex"&&!S.rev) cs.push({t:"풀이 보기",cls:"p",primary:1,key:"Enter",f:()=>{ S.rev=true; S.again=0; render(); }});
+  else cs.push({t:"이해했어요",cls:"p",primary:1,key:"Enter",f:()=>next()});
+  cs.push({t:"다시 설명",cls:"g",f:()=>{ S.again++; render(); }});
+  cs.push({t:"질문할게요",cls:"",f:ask});
+  cs.push({tip:"Enter = 다음 · 클릭하면 대사 건너뜀"});
+  choices(cs);
+}
+function next(){ S.again=0; S.rev=false; S.si++; render(); }
+function finishChapter(){
+  const ch=CH[S.ci]; const was=!!L.ch[ch.id];
+  L.ch[ch.id]=true; ST.read[ch.id]=true; touchStreak();
+  let extra="";
+  if(!was){ gainXP(10); gainAff(2); } else if(T.hearts<3){ T.hearts++; extra=" "+pick("heartback",S.ci); pop("#hHearts","+1"); }
+  save(); hud();
+  S.si=0; S.ci++;
+  if(S.ci>=CH.length){ if(QZ.length){ S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; } else S.mode="result"; }
+  const line=(warm()?pick("chdone_warm",S.ci):pick("chdone",S.ci,{c:S.ci}))+extra;
+  if(S.mode==="quiz"&&S.ci===CH.length){ render(); say(pick("quiz","q",{n:QZ.length,h:T.hearts}),"sharp"); return; }
+  render(); say(line,"proud");
+}
+function renderQuiz(){
+  const q=QZ[S.qi]; if(!q){ S.mode="result"; return render(); }
+  const mc=Array.isArray(q.choices)&&q.choices.length, rev=!!ST.done[q.id], my=ST.answer[q.id], c=ST.correct[q.id];
+  let h='<div class="qz"><div class="qn">'+esc(q.qn||("문제 "+(S.qi+1)))+'</div><div class="qb">'+q.html+'</div>';
+  if(mc) h+='<ol class="ch">'+q.choices.map((x,i)=>'<li><button type="button" class="cb'+(rev?(x.ok?" ok":(String(my)===String(i)?" bad":"")):"")+'" data-i="'+i+'"'+(rev?" disabled":"")+'><span class="n">'+(i+1)+'</span><span>'+x.html+'</span></button></li>').join("")+'</ol>';
+  else h+= rev? '<div class="my"><b>내 답</b> '+esc(my||"(빈칸)")+'</div>' : '<textarea id="myans" placeholder="답만 간단히">'+esc(my||"")+'</textarea><div class="row"><button type="button" class="cbt p" id="reveal">답 보기</button></div>';
+  if(rev){ h+='<span class="vd '+(c===true?"ok":c===false?"bad":"wait")+'">'+(c===true?"정답":c===false?"오답":"채점 전")+'</span>';
+    if(!mc&&c==null) h+='<div class="row"><button type="button" class="cbt p" data-g="1">맞았어요</button><button type="button" class="cbt r" data-g="0">틀렸어요</button></div>';
+    h+='<div class="ans"><i>해설</i>'+(q.ans||"")+'</div>'; }
+  h+='</div>';
+  board(h,'<span>확인 문제</span><small>'+(S.qi+1)+' / '+QZ.length+'</small>');
+  $$("#bc .cb").forEach(b=>{ b.onclick=()=>answer(q,+b.dataset.i); });
+  const rv=$("#reveal"); if(rv) rv.onclick=()=>{ const ta=$("#myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); render(); say("해설과 비교하세요. 스스로 채점합니다. 봐주지 마세요.","sharp"); };
+  $$("#bc [data-g]").forEach(b=>{ b.onclick=()=>grade(q,b.dataset.g==="1"); });
+  if(!rev){ say(mc?pick("q",S.qi,{k:S.qi+1}):pick("qin",S.qi),"neutral"); choices([{t:"질문할게요",cls:"",f:ask},{tip:mc?"숫자 키 1~"+q.choices.length+" 로 고를 수 있습니다":""}]); }
+  else { const last=S.qi>=QZ.length-1;
+    choices([{t:last?"결과 보기":"다음 문제",cls:"p",primary:1,key:"Enter",f:()=>{ if(last){ S.mode="result"; } else S.qi++; render(); }},{t:"다시 풀기",cls:"g",f:()=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; save(); render(); }},{t:"질문할게요",cls:"",f:ask}]); }
+}
+function answer(q,i){
+  if(ST.done[q.id]) return;
+  if(T.hearts<=0){ S.mode="nohearts"; return render(); }
+  ST.answer[q.id]=i; ST.done[q.id]=true; const ok=!!(q.choices[i]&&q.choices[i].ok); ST.correct[q.id]=ok; touchStreak();
+  if(ok){ gainXP(15); gainAff(3); } else { T.hearts=Math.max(0,T.hearts-1); gainAff(-1); pop("#hHearts","-1",true); }
+  save(); render(); say(ok?(warm()?pick("ok_warm",S.qi):pick("ok",S.qi)):pick("bad",S.qi), ok?(warm()?"proud":"smile"):"angry");
+}
+function grade(q,ok){
+  if(T.hearts<=0&&!ok){ S.mode="nohearts"; return render(); }
+  ST.correct[q.id]=ok; touchStreak();
+  if(ok){ gainXP(15); gainAff(3); } else { T.hearts=Math.max(0,T.hearts-1); gainAff(-1); pop("#hHearts","-1",true); }
+  save(); render(); say(ok?(warm()?pick("ok_warm",S.qi):pick("ok",S.qi)):pick("bad",S.qi), ok?"smile":"angry");
+}
+function renderNoHearts(){
+  board('<div class="ttl">하트 0</div><div class="lead">챕터 하나를 다시 읽고 끝까지 가면 하트 하나가 돌아옵니다. 하트는 매일 3개로 채워집니다.</div><div class="sub">목차</div>'+tocHTML(),'<span>잠깐</span>');
+  say(pick("nohearts","nh"),"angry");
+  choices([{t:"목차에서 챕터 고르기",cls:"p",primary:1,key:"Enter",f:openToc},{t:"교재 보기",cls:"g",f:()=>openBook((CH[0]||{}).id)}]);
+}
+function renderResult(){
+  const n=QZ.length, ok=QZ.filter(q=>ST.correct[q.id]===true).length, wrong=QZ.filter(q=>ST.correct[q.id]===false), dn=QZ.filter(q=>ST.done[q.id]).length;
+  const first=!L.done&&dn>=n; if(first){ L.done=true; gainXP(20); touchStreak(); save(); }
+  const ratio=n?ok/n:1, good=ratio>=.8, mid=ratio>=.5;
+  const badge='<svg class="badge" viewBox="0 0 120 120" fill="none" stroke="#FFE27A" stroke-width="2.5" stroke-linejoin="round"><circle cx="60" cy="60" r="50" stroke-dasharray="4 3"/><circle cx="60" cy="60" r="40"/><path d="M60 30l8.8 18 19.8 2.9-14.3 13.9 3.4 19.7L60 75.2l-17.7 9.3 3.4-19.7L31.4 50.9l19.8-2.9z" fill="rgba(255,226,122,.18)"/></svg><div class="bl">'+esc(D.course)+' · '+esc(D.sess)+' · 챕터 '+CH.length+'</div>';
+  board('<div class="res"><div class="big">'+(good?"수고했습니다":mid?"절반은 넘겼습니다":"다시 합니다")+'</div><div class="stats"><div><b>'+ok+'/'+n+'</b><span>정답</span></div><div><b>+'+(L.xp||0)+'</b><span>이 회차 XP</span></div><div><b>'+T.streak+'</b><span>연속일</span></div><div><b>'+T.aff+'</b><span>호감도 · '+affName()+'</span></div></div>'+badge+(wrong.length?'<div class="wrong">틀린 문제 '+wrong.length+'개 — 해설을 읽고 다시 푸세요.</div>':'')+'</div>','<span>오늘의 결과</span>');
+  say(pick(good?"res_good":mid?"res_mid":"res_bad","r",{ok:ok,n:n}), good?"proud":mid?"sharp":"angry");
+  const cs=[];
+  if(wrong.length) cs.push({t:"틀린 문제 다시 ("+wrong.length+")",cls:"p",primary:1,key:"Enter",f:()=>{ wrong.forEach(q=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; }); save(); S.mode="quiz"; S.qi=QZ.findIndex(q=>!ST.done[q.id]); render(); }});
+  cs.push({t:"교재 보기",cls:"g",f:()=>openBook(null)});
+  cs.push({t:"목차",cls:"g",f:openToc});
+  if(EMB) cs.push({t:"앱으로",cls:wrong.length?"g":"p",primary:wrong.length?0:1,f:()=>post({type:"mc-close",v:1})});
+  choices(cs);
+}
+/* ---------- 목차 · 교재 · 질문 ---------- */
+function openToc(){ const ov=$("#ov"); $("#ovMeta").textContent=D.course+" · "+D.sess+" · XP "+(L.xp||0);
+  $("#ovList").innerHTML=CH.map((c,i)=>'<li class="'+(L.ch[c.id]?"done":"")+(S.mode==="step"&&S.ci===i?" cur":"")+'"><button type="button" data-ci="'+i+'"><span class="st">'+(L.ch[c.id]?"✓":i+1)+'</span><span>'+esc(c.title)+'</span><small>'+c.steps.length+'단계</small></button></li>').join("")
+    +(QZ.length?'<li class="'+(QZ.every(q=>ST.done[q.id])?"done":"")+(S.mode==="quiz"?" cur":"")+'"><button type="button" data-q="1"><span class="st">?</span><span>확인 문제</span><small>'+QZ.filter(q=>ST.done[q.id]).length+'/'+QZ.length+'</small></button></li>':"");
+  $$("#ovList [data-ci]").forEach(b=>{ b.onclick=()=>{ ov.classList.remove("on"); S=Object.assign(S,{mode:"step",ci:+b.dataset.ci,si:0,rev:false,again:0}); render(); }; });
+  const qb=$("#ovList [data-q]"); if(qb) qb.onclick=()=>{ ov.classList.remove("on"); if(T.hearts<=0&&QZ.some(q=>!ST.done[q.id])){ S.mode="nohearts"; return render(); } S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; render(); };
+  ov.classList.add("on"); }
+$("#hToc").onclick=openToc; $("#ovClose").onclick=()=>$("#ov").classList.remove("on"); $("#ov").onclick=e=>{ if(e.target.id==="ov") $("#ov").classList.remove("on"); };
+$("#ovBook").onclick=()=>openBook(S.mode==="step"?(CH[S.ci]||{}).id:null);
+$("#ovReset").onclick=()=>{ if(!confirm("이 회차의 챕터·문제 기록을 지울까요? (XP·스트릭은 남습니다)")) return; L={pos:null,ch:{},done:false,xp:0}; ST={read:{},done:{},correct:{},answer:{},ts:0}; S=Object.assign(S,{mode:"intro",ci:0,si:0,qi:0,rev:false,again:0}); $("#ov").classList.remove("on"); render(); };
+function post(m){ try{ window.parent.postMessage(m,location.origin); }catch(e){} }
+function openBook(sid){ const hash=sid?"#s="+sid:""; if(EMB){ post({type:"mc-open",v:1,file:LESSON_APP+hash,title:document.title}); } else location.href=LESSON_REL+hash; }
+function ask(){ if(EMB){ post({type:"mc-ask",v:1}); say(pick("ask",S.ci+":"+S.si),"wide"); gainAff(1); save(); hud(); } else say(pick("askoff",S.ci),"sharp"); }
+/* ---------- 앱 질문 패널 문맥 (V45 규약) ---------- */
+let CTX_GEN=null;
+function ctx(){ if(!CTX_GEN||!EMB) return; let label="", q=null, sid="";
+  if(S.mode==="step"){ const ch=CH[S.ci]||{}, st=(ch.steps||[])[S.si]||{}; sid=ch.id||""; label="CH "+(S.ci+1)+" · "+(ch.title||""); const tmp=document.createElement("div"); tmp.innerHTML=st.t==="ex"?(st.q+" "+(S.rev?st.a:"")):(st.html||""); q={qn:(ch.title||"").slice(0,80),kind:"개념",text:(tmp.textContent||"").replace(/\s+/g," ").trim().slice(0,600),choices:[],my:null,revealed:true,correct:null,answer:null}; }
+  else if(S.mode==="quiz"){ const qq=QZ[S.qi]; if(qq){ const tmp=document.createElement("div"); tmp.innerHTML=qq.html; label="확인 문제 "+(S.qi+1); const tc=x=>{ const d=document.createElement("div"); d.innerHTML=x; return (d.textContent||"").trim(); };
+    q={qn:qq.qn,kind:"문제",text:(tmp.textContent||"").replace(/\s+/g," ").trim().slice(0,600),choices:(qq.choices||[]).map(c=>tc(c.html)),my:(ST.answer[qq.id]==null?null:String(ST.answer[qq.id])),revealed:!!ST.done[qq.id],correct:(typeof ST.correct[qq.id]==="boolean"?ST.correct[qq.id]:null),answer:null}; } }
+  else label=S.mode;
+  post({type:"mc-slide",v:1,gen:CTX_GEN,deck:D.id,title:document.title.slice(0,80),sid:sid,stype:S.mode==="quiz"?"quiz":"concept",part:null,partTitle:document.title.slice(0,60),label:("교실 · "+label).slice(0,80),q:q}); }
+window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; ctx(); } });
+const _render=render; render=function(){ _render(); ctx(); };
+/* ---------- 키보드 ---------- */
+document.addEventListener("keydown",e=>{ if(e.target&&/TEXTAREA|INPUT/.test(e.target.tagName)) return; if($("#ov").classList.contains("on")){ if(e.key==="Escape") $("#ov").classList.remove("on"); return; }
+  if(e.key==="Enter"||e.key===" "){ if(typing){ clearInterval(typing); typing=null; $("#dText").textContent=fullText; return; } const b=$("#dCh [data-primary]"); if(b){ e.preventDefault(); b.click(); } }
+  else if(/^[1-6]$/.test(e.key)&&S.mode==="quiz"){ const b=$$("#bc .cb")[+e.key-1]; if(b&&!b.disabled) b.click(); } });
+/* ---------- 시작 ---------- */
+/* 해시: #resume(저장 위치) · #ch=2(챕터 2) · #ch=2.5(챕터 2의 5단계) · #quiz · #result */
+function boot(){ const m=/^#(resume|ch=(\d+)(?:\.(\d+))?|quiz|result)$/.exec(location.hash||"");
+  if(m&&m[1]==="resume"&&L.pos&&!L.done){ S=Object.assign(S,{mode:L.pos.mode||"step",ci:L.pos.ci||0,si:L.pos.si||0,qi:L.pos.qi||0}); if(S.mode==="quiz"){ const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; if(k<0&&QZ.every(q=>ST.done[q.id])) S.mode="result"; } if(S.mode==="step"&&!CH[S.ci]) S.mode="intro"; }
+  else if(m&&m[2]){ const ci=Math.max(0,Math.min(CH.length-1,+m[2]-1)); const si=m[3]?Math.max(0,Math.min(CH[ci].steps.length-1,+m[3]-1)):0; S=Object.assign(S,{mode:"step",ci:ci,si:si,rev:(CH[ci].steps[si]||{}).t==="ex"&&/\.\d+r$/.test(location.hash)}); }
+  else if(m&&m[1]==="quiz"&&QZ.length){ S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; }
+  else if(m&&m[1]==="result"){ S.mode="result"; }
+  render(); }
+window.__cr={get D(){return D;},get S(){return S;},set S(v){S=v;},get T(){return T;},get L(){return L;},get ST(){return ST;},get fullText(){return fullText;},render:function(){ return render(); }};  /* 검사기(classroom_check.cjs)용 창구 */
+(function wait(){ if(window.renderMathInElement) boot(); else setTimeout(wait,40); })();
+</script>
+</body>
+</html>
