@@ -319,6 +319,12 @@ let ST=load(LKEY,{read:{},done:{},correct:{},answer:{},ts:0});
 const CH=D.chapters, QZ=D.quiz||[], NCH=CH.length+(QZ.length?1:0);
 const EMB=window.parent!==window;
 let S={mode:"intro",ci:0,si:0,qi:0,rev:false,again:0};
+/* 저장 위치는 정수·범위로 정리해서 쓴다 — 문자열("2"+1="21")·손상·재빌드 모두 여기서 걸러진다 (오타 v55 1) */
+function posOf(){ const p=(L.pos&&typeof L.pos==="object")?L.pos:{}; const mode=(p.mode==="quiz"||p.mode==="step"||p.mode==="result")?p.mode:"step";
+  let ci=parseInt(p.ci,10); if(!Number.isInteger(ci)||ci<0||ci>=CH.length) ci=0;
+  const n=(CH[ci]||{steps:[]}).steps.length; let si=parseInt(p.si,10); if(!Number.isInteger(si)||si<0) si=0; else if(si>=n) si=Math.max(0,n-1);
+  let qi=parseInt(p.qi,10); if(!Number.isInteger(qi)||qi<0||qi>=QZ.length) qi=0;
+  return {mode:mode,ci:ci,si:si,qi:qi}; }
 /* ---------- 저장 ---------- */
 function save(){
   T.lessons[D.id]=L; try{ localStorage.setItem(KEY,JSON.stringify(T)); ST.ts=Date.now(); localStorage.setItem(LKEY,JSON.stringify(ST)); }catch(e){}
@@ -430,7 +436,7 @@ function renderIntro(){
   const line= L.done? pick("done_intro","i") : resume? pick("again_intro","i") : pick("intro","i",{n:CH.length,min:D.minutes||18});
   say(line, L.done?"proud":"neutral");
   const cs=[];
-  if(resume) cs.push({t:"이어서 하기",cls:"p",primary:1,key:"Enter",f:()=>{ S=Object.assign(S,{mode:L.pos.mode||"step",ci:L.pos.ci||0,si:L.pos.si||0,qi:L.pos.qi||0,rev:false,again:0}); if(S.mode==="quiz"){ const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; } render(); }});
+  if(resume) cs.push({t:"이어서 하기",cls:"p",primary:1,key:"Enter",f:()=>{ const p=posOf(); S=Object.assign(S,{mode:p.mode,ci:p.ci,si:p.si,qi:p.qi,rev:false,again:0}); if(S.mode==="quiz"){ const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; } if(S.mode==="result") S.mode="intro"; render(); }});
   cs.push({t:resume?"처음부터":"시작하기",cls:resume?"g":"p",primary:resume?0:1,key:resume?"":"Enter",f:()=>{ S=Object.assign(S,{mode:"step",ci:0,si:0,rev:false,again:0}); render(); }});
   cs.push({t:"교재 보기",cls:"g",f:()=>openBook((CH[0]||{}).id)});
   choices(cs);
@@ -555,9 +561,7 @@ document.addEventListener("keydown",e=>{ if(e.target&&/TEXTAREA|INPUT/.test(e.ta
 /* ---------- 시작 ---------- */
 /* 해시: #resume(저장 위치) · #ch=2(챕터 2) · #ch=2.5(챕터 2의 5단계) · #quiz · #result */
 function boot(){ const m=/^#(resume|ch=(\d+)(?:\.(\d+))?|quiz|result)$/.exec(location.hash||"");
-  if(m&&m[1]==="resume"&&L.pos&&!L.done){ S=Object.assign(S,{mode:L.pos.mode||"step",ci:+L.pos.ci||0,si:+L.pos.si||0,qi:+L.pos.qi||0}); if(S.mode==="quiz"){ const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; if(k<0&&QZ.every(q=>ST.done[q.id])) S.mode="result"; }
-    if(S.mode==="step"){ if(!CH[S.ci]) S.mode="intro"; else if(S.si<0||S.si>=CH[S.ci].steps.length) S.si=Math.max(0,CH[S.ci].steps.length-1); }   /* 재빌드로 단계 수가 바뀐 저장값 보정 (오타 v54 A③) */
-    if(S.mode!=="step"&&S.mode!=="quiz"&&S.mode!=="result") S.mode="intro"; }
+  if(m&&m[1]==="resume"&&L.pos&&!L.done){ const p=posOf(); S=Object.assign(S,{mode:p.mode,ci:p.ci,si:p.si,qi:p.qi}); if(S.mode==="quiz"){ const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; if(k<0&&QZ.every(q=>ST.done[q.id])) S.mode="result"; } if(S.mode==="step"&&!CH.length) S.mode="intro"; }
   else if(m&&m[2]){ const ci=Math.max(0,Math.min(CH.length-1,+m[2]-1)); const si=m[3]?Math.max(0,Math.min(CH[ci].steps.length-1,+m[3]-1)):0; S=Object.assign(S,{mode:"step",ci:ci,si:si,rev:(CH[ci].steps[si]||{}).t==="ex"&&/\.\d+r$/.test(location.hash)}); }
   else if(m&&m[1]==="quiz"&&QZ.length){ S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; }
   else if(m&&m[1]==="result"){ S.mode="result"; }

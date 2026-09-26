@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-27.75";
+var BUILD="2026-09-27.76";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,13 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-27.76",d:"09-27",items:[
+    "오타 2차 검수(RED 5건) 반영 — 교실: 저장 위치를 정수·범위로 정리해서 씀(문자열 위치로 챕터가 조기 완료되던 것). 경로: 단원 대조는 장 번호 → 키워드 순(13.1 벡터함수·Ch.8·29장 오분류), 지난 시험은 회차 사이 날짜 순(첫 회차보다 앞이면 맨 앞), 다음 시험이 기말이면 기말 범위 단원이 기말 앞에, 어두운 테마 글자색(파랑·초록·빨강·주황)과 진행 막대 대비 4.5:1/3:1. 검사기 v55_path_check.cjs 추가",
+    "오타 사후 검수(v54 1차 RED 7건) 반영 — 교실: 다시 풀기로 정답을 또 맞혀도 XP 는 처음 한 번(문제별 보상 기록), 자정을 넘겨도 하트·연속일을 그날 기준으로 다시 판정, 재빌드로 단계 수가 바뀐 저장 위치는 마지막 단계로 보정(안 읽은 챕터를 완료로 치지 않음), 하트 0이면 입력형 답 보기·자기 채점도 막음. 빌더: 섹션 첫 문단의 data-tutor 오류. 스킨: 시트 뒤 흐림 해제, 글자 대비 4.5:1(보조 글자·초록/주황/빨강/파랑 글자·초록 버튼은 짙은 초록 글자), 단원 배너는 연한 단원색 바탕에 짙은 글자",
+    "학습 경로를 단원(장)별로 — 회차 마디를 주차가 아니라 단원 배너(단원 n · 제목 · 따라감 n/m · 진행 막대, 단원마다 색) 아래 묶는다. 예정 회차는 다음 시험 전까지 작게 접어 두고(전부 보기), 그 아래 「앞으로 배울 단원」(강의계획서 근거) → 시험 ★ → 시험 뒤 단원. 단원 목록은 knowledge/units.json(과목별 장 · 회차 날짜 · 제목 대조 규칙), 히어로에 「단원 n · 제목」 칩 (대표님 2026-09-27 「단원별로 진도 구분」)",
+    "과목 화면 개편 — 듀오링고식 「학습 경로」: 회차마다 동그란 마디(따라감 ✓ · 진행 중 고리 · 밀림 · 오늘 · 정리 대기 · 예정 잠김 · 시험 ★)를 주차 제목 아래 지그재그로 세우고, 다음에 할 마디 옆에 김주영 스앵님이 선다. 마디를 누르면 그 회차 교실. 상단 히어로 카드(따라감·밀림·이 과목 XP·시험 D-day·진행 막대·이어서 학습하기·스앵님 말풍선). 기존 회차 표는 「회차 표 펼치기」로 접어 둠(기능 그대로), 세부정보도 그대로 (대표님 2026-09-27)",
+    "김주영 스앵님 캐릭터 보완 — 가운데 가르마로 넘긴 머리 + 낮은 쪽머리, 진주 귀걸이, 검정 터틀넥 + 블레이저 + 금 브로치, 눈꼬리 올라간 눈, 진한 붉은 입술. 원본 SVG 하나(docs/tools/tutor.svg)를 교실 24회차와 앱 과목 화면이 같이 쓴다. 이름은 교실·앱 전부 「김주영 스앵님」"
+  ]},
   {v:"2026-09-27.75",d:"09-27",items:[
     "오타 사후 검수(v54 1차 RED 7건) 반영 — 교실: 다시 풀기로 정답을 또 맞혀도 XP 는 처음 한 번(문제별 보상 기록), 자정을 넘겨도 하트·연속일을 그날 기준으로 다시 판정, 재빌드로 단계 수가 바뀐 저장 위치는 마지막 단계로 보정(안 읽은 챕터를 완료로 치지 않음), 하트 0이면 입력형 답 보기·자기 채점도 막음. 빌더: 섹션 첫 문단의 data-tutor 오류. 스킨: 시트 뒤 흐림 해제, 글자 대비 4.5:1(보조 글자·초록/주황/빨강/파랑 글자·초록 버튼은 짙은 초록 글자), 단원 배너는 연한 단원색 바탕에 짙은 글자",
     "학습 경로를 단원(장)별로 — 회차 마디를 주차가 아니라 단원 배너(단원 n · 제목 · 따라감 n/m · 진행 막대, 단원마다 색) 아래 묶는다. 예정 회차는 다음 시험 전까지 작게 접어 두고(전부 보기), 그 아래 「앞으로 배울 단원」(강의계획서 근거) → 시험 ★ → 시험 뒤 단원. 단원 목록은 knowledge/units.json(과목별 장 · 회차 날짜 · 제목 대조 규칙), 히어로에 「단원 n · 제목」 칩 (대표님 2026-09-27 「단원별로 진도 구분」)",
@@ -10850,7 +10857,9 @@ var V33={};
     /* 글자색은 흰 바탕 4.5:1 이상(오타 v54 D): ink-3 #707070 = 5.3 · 초록 글자 #2E7D00 = 5.2 · 주황 #B85C00 = 4.6 · 빨강 #D42020 = 5.0 · 파랑 #0A7BBF = 4.6. 밝은 듀오링고 색(#58CC02 · #1CB0F6 …)은 배경·테두리·큰 도형에만 */
     '--bg:#F7F7F7;--bg-grid:transparent;--surface:#FFFFFF;--surface-2:#F0F0F0;--surface-3:#E5E5E5;--ink:#3C3C3C;--ink-2:#575757;--ink-3:#707070;--line:#E5E5E5;--line-2:#CFCFCF;',
     '--accent:#2E7D00;--accent-ink:#2E7D00;--accent-soft:#E6F9D6;--accent-line:#A5ED6E;--ok:#2E7D00;--ok-soft:#E6F9D6;--warn:#B85C00;--warn-soft:#FFE9CC;--crit:#D42020;--crit-soft:#FFE0E0;--info:#0A7BBF;--info-soft:#DDF4FF;',
-    '--shadow:none;--r:16px;--r-s:12px;--r-pill:999px;--duo-green:#58CC02;--duo-blue:#1CB0F6;--duo-blue-2:#1899D6;--duo-blue-text:#0A7BBF;--duo-green-2:#46A302;--duo-yel:#FFC800;--duo-purple:#CE82FF;',
+    '--shadow:none;--r:16px;--r-s:12px;--r-pill:999px;--duo-green:#58CC02;--duo-blue:#1CB0F6;--duo-blue-2:#1899D6;--duo-green-2:#46A302;--duo-yel:#FFC800;--duo-purple:#CE82FF;',
+    /* 글자용 색은 테마마다 따로(오타 v55 2: 어두운 바탕에서 #0A7BBF 는 3.2:1) — 밝음: 짙은색, 어두움: 밝은색 */
+    '--duo-blue-text:#0A7BBF;--duo-green-text:#2E7D00;--duo-red-text:#D42020;--duo-orange-text:#9A5B00;',
     /* 글래스 층(V51) 토큰을 단색으로 — 유리·블러·번지는 빛을 끄고 평평한 듀오링고 면으로 */
     '--gl:var(--surface);--gl-2:var(--surface-2);--gl-3:var(--surface);--gl-line:var(--line);--gl-line-2:var(--line);--gl-hi:none;--gl-sh:none;--gl-blur:none;--gl-on:var(--surface-2);--gl-bg0:var(--bg);--gl-bg1:var(--bg);--gl-bg2:var(--bg);--gl-b1:transparent;--gl-b2:transparent;--gl-b3:transparent;--on-accent:#fff}',
     ':root:not([data-theme="dark"]){--ink-2:#575757;--ink-3:#707070}',
@@ -10869,9 +10878,11 @@ var V33={};
     'html.v54 .iconbtn{background:var(--surface);border:2px solid var(--line);border-radius:10px}',
     'html.v54 .bar,html.v54 .v49-bar,html.v54 .v47-bar{background:var(--surface-3);border-radius:99px;overflow:hidden}',
     '@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#131F24;--surface:#1B2A31;--surface-2:#243640;--surface-3:#2E434F;--ink:#F1F7FB;--ink-2:#C7D3DA;--ink-3:#8FA3AE;--line:#37464F;--line-2:#4A5D69;',
-    '--accent:#58CC02;--accent-ink:#93D333;--accent-soft:rgba(88,204,2,.16);--accent-line:rgba(88,204,2,.45);--ok:#58CC02;--ok-soft:rgba(88,204,2,.16);--warn:#FF9600;--warn-soft:rgba(255,150,0,.16);--crit:#FF4B4B;--crit-soft:rgba(255,75,75,.18);--info:#1CB0F6;--info-soft:rgba(28,176,246,.16);--shadow:none;--thumb:#4A5D69}}',
+    '--accent:#58CC02;--accent-ink:#93D333;--accent-soft:rgba(88,204,2,.16);--accent-line:rgba(88,204,2,.45);--ok:#58CC02;--ok-soft:rgba(88,204,2,.16);--warn:#FF9600;--warn-soft:rgba(255,150,0,.16);--crit:#FF6B6B;--crit-soft:rgba(255,75,75,.18);--info:#1CB0F6;--info-soft:rgba(28,176,246,.16);--shadow:none;--thumb:#4A5D69;',
+    '--duo-blue-text:#5AC8FA;--duo-green-text:#7ED957;--duo-red-text:#FF7B7B;--duo-orange-text:#FFB347}}',
     ':root[data-theme="dark"]{--bg:#131F24;--surface:#1B2A31;--surface-2:#243640;--surface-3:#2E434F;--ink:#F1F7FB;--ink-2:#C7D3DA;--ink-3:#8FA3AE;--line:#37464F;--line-2:#4A5D69;',
-    '--accent:#58CC02;--accent-ink:#93D333;--accent-soft:rgba(88,204,2,.16);--accent-line:rgba(88,204,2,.45);--ok:#58CC02;--ok-soft:rgba(88,204,2,.16);--warn:#FF9600;--warn-soft:rgba(255,150,0,.16);--crit:#FF4B4B;--crit-soft:rgba(255,75,75,.18);--info:#1CB0F6;--info-soft:rgba(28,176,246,.16);--shadow:none;--thumb:#4A5D69}',
+    '--accent:#58CC02;--accent-ink:#93D333;--accent-soft:rgba(88,204,2,.16);--accent-line:rgba(88,204,2,.45);--ok:#58CC02;--ok-soft:rgba(88,204,2,.16);--warn:#FF9600;--warn-soft:rgba(255,150,0,.16);--crit:#FF6B6B;--crit-soft:rgba(255,75,75,.18);--info:#1CB0F6;--info-soft:rgba(28,176,246,.16);--shadow:none;--thumb:#4A5D69;',
+    '--duo-blue-text:#5AC8FA;--duo-green-text:#7ED957;--duo-red-text:#FF7B7B;--duo-orange-text:#FFB347}',
     /* 바탕·글꼴 */
     'html.v54 body{background-image:none;font-family:var(--font-body);letter-spacing:-.01em;font-weight:500}',
     'html.v54 h1,html.v54 h2,html.v54 h3,html.v54 h4{font-weight:800;letter-spacing:-.025em}',
@@ -10949,10 +10960,14 @@ var V33={};
     V55.uLoading=fetch("knowledge/units.json",{cache:"no-store"}).then(function(r){ if(!r.ok) throw new Error("units.json "+r.status); return r.json(); }).then(function(d){ V55.U=(d&&typeof d==="object")?d:{}; return V55.U; }).catch(function(e){ V55.uErr=String(e&&e.message||e); V55.U={}; return null; });
     return V55.uLoading; };
   V55.units=function(c){ var u=V55.U&&V55.U[c.name]; return (u&&Array.isArray(u.units))?u.units:[]; };
+  /* 회차 → 단원: ① dates ② 장 번호(num) ③ 키워드(kw) — 장 번호가 키워드보다 먼저다(오타 v55: 「13.1 벡터함수」가 「벡터」로 12장에 잡히던 것) */
   V55.unitOf=function(c,x,units){
     for(var i=0;i<units.length;i++){ if((units[i].dates||[]).indexOf(x.date)>=0) return i; }
     var t=[x.title||"",(x.info&&x.info.title)||""].join(" "); var l=(window.V52&&V52.lesson)?V52.lesson(c,x.date):null; if(l&&l.title) t+=" "+l.title;
-    if(t.trim()) for(var j=0;j<units.length;j++){ if(units[j].match){ try{ if(new RegExp(units[j].match).test(t)) return j; }catch(e){} } }
+    if(!t.trim()) return -1;
+    var test=function(re){ if(!re) return false; try{ return new RegExp(re).test(t); }catch(e){ return false; } };
+    for(var j=0;j<units.length;j++){ if(test(units[j].num)) return j; }
+    for(var k=0;k<units.length;k++){ if(test(units[k].kw||units[k].match)) return k; }
     return -1; };
   V55.UC=["#58CC02","#1CB0F6","#CE82FF","#FF9600","#2B70C9","#00CD9C","#FF4B4B","#FFC800"];
   V55.ucOf=function(k){ return V55.UC[((k%V55.UC.length)+V55.UC.length)%V55.UC.length]; };
@@ -11040,22 +11055,25 @@ var V33={};
     var sess=nodes.filter(function(x){ return x.kind==="sess"&&x.st!=="future"; }), fut=nodes.filter(function(x){ return x.kind==="sess"&&x.st==="future"; }), exs=nodes.filter(function(x){ return x.kind==="exam"; });
     var groups=units.map(function(u){ return {u:u,items:[]}; }), none=[];
     sess.forEach(function(x){ var k=V55.unitOf(c,x,units); if(k<0) none.push(x); else groups[k].items.push(x); });
-    /* 지난 시험은 그 날짜 전에 끝난 마지막 단원 뒤에 */
-    var pastEx={}; exs.filter(function(e){ return e.date<td; }).forEach(function(e){ var at=-1; groups.forEach(function(g,k){ if(g.items.some(function(x){ return x.date<e.date; })) at=k; }); (pastEx[at]=pastEx[at]||[]).push(e); });
-    var h='';
-    groups.forEach(function(g,k){ if(!g.items.length) return; h+=V55.unitHTML(g.u,k,g.items,cur); var i=0; g.items.forEach(function(x){ h+=V55.nodeHTML(c,x,i++,x===cur,{uc:V55.ucOf(k)}); }); (pastEx[k]||[]).forEach(function(e){ h+=V55.nodeHTML(c,e,0,false,{}); }); });
-    if(none.length){ h+='<div class="v55-unit none" style="--uc:#8E8E8E"><div class="v55-ub"><div class="v55-un">단원 미지정</div><div class="v55-ut">knowledge/units.json 에 날짜를 넣으면 단원으로 들어갑니다</div><div class="v55-up"><b>'+none.length+'</b><small>회차</small></div></div></div>'; var i2=0; none.forEach(function(x){ h+=V55.nodeHTML(c,x,i2++,x===cur,{uc:"#8E8E8E"}); }); }
-    var nextEx=exs.filter(function(e){ return e.date>=td; }).sort(function(a,b){ return a.date<b.date?-1:1; })[0];
-    var before=fut.filter(function(x){ return !nextEx||x.date<nextEx.date; }), after=fut.filter(function(x){ return nextEx&&x.date>nextEx.date; });
-    var planned=groups.filter(function(g){ return !g.items.length&&g.u.planned; }), plannedMid=planned.filter(function(g){ return (g.u.phase||"mid")==="mid"; }), plannedFin=planned.filter(function(g){ return g.u.phase==="final"; });
-    if(before.length){ var showAll=!!V55.showAll[c.id], lim=showAll?before.length:4;
-      h+='<div class="v55-sec"><span>예정 회차 '+before.length+'개'+(nextEx?' · '+esc(String(nextEx.ex.kind||"시험"))+' 전':'')+'</span></div><div class="v55-fut">'+before.slice(0,lim).map(function(x,i){ return V55.nodeHTML(c,x,i,x===cur,{uc:"#AFAFAF",compact:true}); }).join("")+'</div>'+
-        (before.length>4?'<div class="v55-more"><button type="button" class="btn xs" data-v55more="1">'+(showAll?"접기":"전부 보기 ("+before.length+")")+'</button></div>':''); }
-    if(plannedMid.length) h+='<div class="v55-sec"><span>앞으로 배울 단원</span></div>'+plannedMid.map(function(g){ return V55.planHTML(g.u); }).join("");
-    if(nextEx){ h+=V55.nodeHTML(c,nextEx,0,false,{});
-      var restEx=exs.filter(function(e){ return e.date>nextEx.date; });
-      if(after.length||plannedFin.length||restEx.length){ h+='<div class="v55-sec"><span>'+esc(String(nextEx.ex.kind||"시험"))+' 뒤'+(after.length?' · 회차 '+after.length+'개':'')+'</span></div>'+plannedFin.map(function(g){ return V55.planHTML(g.u); }).join("")+restEx.map(function(e){ return V55.nodeHTML(c,e,0,false,{}); }).join(""); } }
-    else if(plannedFin.length) h+=plannedFin.map(function(g){ return V55.planHTML(g.u); }).join("");
+    /* 지난 시험은 날짜 순서대로 — 그 날짜 전 회차가 있는 마지막 단원 안에서 회차 사이에 끼우고, 어느 회차보다 앞이면 맨 앞에 (오타 v55 4) */
+    var pastEx={}, preEx=[]; exs.filter(function(e){ return e.date<td; }).forEach(function(e){ var at=-1; groups.forEach(function(g,k){ if(g.items.some(function(x){ return x.date<e.date; })) at=k; }); if(at<0){ if(!none.length) preEx.push(e); else at=-2; } if(at>=0||at===-2) (pastEx[at]=pastEx[at]||[]).push(e); });
+    var byDate=function(a,b){ return a.date<b.date?-1:a.date>b.date?1:(a.kind==="exam"?1:-1); };
+    var h=''; preEx.sort(byDate).forEach(function(e){ h+=V55.nodeHTML(c,e,0,false,{}); });
+    groups.forEach(function(g,k){ if(!g.items.length) return; h+=V55.unitHTML(g.u,k,g.items,cur); var i=0; g.items.concat(pastEx[k]||[]).sort(byDate).forEach(function(x){ h+= x.kind==="exam"? V55.nodeHTML(c,x,0,false,{}) : V55.nodeHTML(c,x,i++,x===cur,{uc:V55.ucOf(k)}); }); });
+    if(none.length){ h+='<div class="v55-unit none" style="--uc:#8E8E8E"><div class="v55-ub"><div class="v55-un">단원 미지정</div><div class="v55-ut">knowledge/units.json 에 날짜를 넣으면 단원으로 들어갑니다</div><div class="v55-up"><b>'+none.length+'</b><small>회차</small></div></div></div>'; var i2=0; none.concat(pastEx[-2]||[]).sort(byDate).forEach(function(x){ h+= x.kind==="exam"? V55.nodeHTML(c,x,0,false,{}) : V55.nodeHTML(c,x,i2++,x===cur,{uc:"#8E8E8E"}); }); }
+    /* 앞으로: 시험마다 [그 전 예정 회차] → [그 시험 범위(phase)의 아직 없는 단원] → [시험 ★]. 중간이 지났으면 기말 앞에 final 단원이 온다 (오타 v55 5) */
+    var futEx=exs.filter(function(e){ return e.date>=td; }).sort(byDate), rest=fut.slice().sort(byDate), plannedLeft=groups.filter(function(g){ return !g.items.length&&g.u.planned; });
+    var futList=function(list,first){ if(!list.length) return ''; if(!first) return '<div class="v55-sec"><span>회차 '+list.length+'개</span></div>';
+      var showAll=!!V55.showAll[c.id], lim=showAll?list.length:4;
+      return '<div class="v55-fut">'+list.slice(0,lim).map(function(x,i){ return V55.nodeHTML(c,x,i,x===cur,{uc:"#AFAFAF",compact:true}); }).join("")+'</div>'+(list.length>4?'<div class="v55-more"><button type="button" class="btn xs" data-v55more="1">'+(showAll?"접기":"전부 보기 ("+list.length+")")+'</button></div>':''); };
+    futEx.forEach(function(e,idx){ var kind=String(e.ex.kind||""), ph=/중간/.test(kind)?"mid":/기말/.test(kind)?"final":null;
+      var seg=rest.filter(function(x){ return x.date<e.date; }); rest=rest.filter(function(x){ return x.date>e.date; });
+      if(seg.length) h+='<div class="v55-sec"><span>예정 회차 '+seg.length+'개 · '+esc(kind||"시험")+' 전</span></div>'+futList(seg,idx===0);
+      var pl=ph?plannedLeft.filter(function(g){ return (g.u.phase||"mid")===ph; }):[]; plannedLeft=plannedLeft.filter(function(g){ return pl.indexOf(g)<0; });
+      if(pl.length) h+='<div class="v55-sec"><span>'+esc(kind||"시험")+' 범위 · 앞으로 배울 단원</span></div>'+pl.map(function(g){ return V55.planHTML(g.u); }).join("");
+      h+=V55.nodeHTML(c,e,0,false,{}); });
+    if(rest.length) h+='<div class="v55-sec"><span>예정 회차 '+rest.length+'개'+(futEx.length?' · '+esc(String(futEx[futEx.length-1].ex.kind||"시험"))+' 뒤':'')+'</span></div>'+futList(rest,futEx.length===0);
+    if(plannedLeft.length) h+='<div class="v55-sec"><span>앞으로 배울 단원</span></div>'+plannedLeft.map(function(g){ return V55.planHTML(g.u); }).join("");
     return '<div class="v55-path">'+(h||'<div class="hint">회차가 없습니다</div>')+'</div>';
   };
   V55.render=function(){
@@ -11103,8 +11121,8 @@ var V33={};
     ".v55-stats{display:flex;gap:6px;flex-wrap:wrap}.v55-stats>div{flex:1 1 90px;min-width:0;border:2px solid var(--line);border-radius:14px;padding:8px 10px;background:var(--surface-2,#F0F0F0)}",
     ".v55-stats b{display:block;font-size:24px;line-height:1.1;font-weight:900;letter-spacing:-.02em}.v55-stats b small{font-size:13px;color:var(--ink-3);font-weight:800}.v55-stats span{font-size:11.5px;font-weight:700;color:var(--ink-3)}",
     /* 글자 대비 4.5:1(오타 v54 D): 초록 글자 #2E7D00 · 주황 #9A5B00 · 파랑 #0A7BBF · 빨강 var(--crit). 밝은 색은 바탕·테두리·큰 도형에만 */
-    ".v55-ok{color:#2E7D00}.v55-crit{color:var(--crit)}.v55-xp{color:#9A5B00}",
-    ".v55-bar{height:14px;border-radius:99px;background:var(--surface-3,#E5E5E5);overflow:hidden}.v55-bar i{display:block;height:100%;border-radius:99px;background:#3D8F00;transition:width .4s}",
+    ".v55-ok{color:var(--duo-green-text,#2E7D00)}.v55-crit{color:var(--crit)}.v55-xp{color:var(--duo-orange-text,#9A5B00)}",
+    ".v55-bar{height:14px;border-radius:99px;background:var(--surface-3,#E5E5E5);overflow:hidden}.v55-bar i{display:block;height:100%;border-radius:99px;background:var(--duo-green-text,#2E7D00);transition:width .4s}",
     ".v55-act{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.v55-actsp{flex:1}.v55-cta{font-size:14px;padding:9px 16px}.v55-detailbtn{margin-left:auto}",
     ".v55-hr{flex:0 0 200px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;min-width:0}",
     ".v55-bubble{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:9px 12px;font-size:13px;font-weight:700;line-height:1.45;width:100%;text-align:center}",
@@ -11121,21 +11139,22 @@ var V33={};
     ".v55-unit{margin:18px 0 12px;border-radius:16px;background:color-mix(in srgb,var(--uc,#58CC02) 16%,var(--surface));color:color-mix(in srgb,var(--uc,#58CC02) 52%,#000);border:2px solid color-mix(in srgb,var(--uc,#58CC02) 55%,var(--surface));padding:12px 16px 10px;box-shadow:0 4px 0 color-mix(in srgb,var(--uc,#58CC02) 45%,var(--surface))}",
     ".v55-unit:first-child{margin-top:4px}.v55-ub{display:flex;align-items:center;gap:12px}.v55-un{font-size:11px;font-weight:900;letter-spacing:.08em;white-space:nowrap}",
     ".v55-ut{flex:1;min-width:0;font-size:15px;font-weight:800;line-height:1.3}.v55-up{white-space:nowrap;font-weight:900;font-size:15px}.v55-up small{font-weight:700;margin-left:4px;font-size:11px}",
-    ".v55-ubar{height:8px;border-radius:99px;background:rgba(0,0,0,.08);margin-top:8px;overflow:hidden}.v55-ubar i{display:block;height:100%;background:color-mix(in srgb,var(--uc,#58CC02) 75%,#000);border-radius:99px;transition:width .4s}",
+    /* 진행 막대: 채움은 단원색 45%·검정(밝은 트랙과 5:1 이상), 어두운 테마는 어두운 트랙 + 단원색 55%·흰색 (오타 v55 2) */
+    ".v55-ubar{height:8px;border-radius:99px;background:rgba(0,0,0,.08);margin-top:8px;overflow:hidden}.v55-ubar i{display:block;height:100%;background:color-mix(in srgb,var(--uc,#58CC02) 45%,#000);border-radius:99px;transition:width .4s}",
     ".v55-unit.done .v55-un::after{content:\" ✓\"}.v55-unit.cur{box-shadow:0 4px 0 color-mix(in srgb,var(--uc,#58CC02) 45%,var(--surface)),0 0 0 3px var(--surface),0 0 0 6px var(--uc,#58CC02)}",
     ".v55-unit.none{background:var(--surface-2,#F0F0F0);color:var(--ink-2);border-color:var(--line);box-shadow:0 4px 0 var(--line)}",
-    ":root[data-theme=\"dark\"] .v55-unit{color:color-mix(in srgb,var(--uc,#58CC02) 70%,#fff);background:color-mix(in srgb,var(--uc,#58CC02) 20%,var(--surface))}:root[data-theme=\"dark\"] .v55-ubar{background:rgba(255,255,255,.12)}:root[data-theme=\"dark\"] .v55-ubar i{background:var(--uc,#58CC02)}",
-    "@media(prefers-color-scheme:dark){:root:not([data-theme=\"light\"]) .v55-unit{color:color-mix(in srgb,var(--uc,#58CC02) 70%,#fff);background:color-mix(in srgb,var(--uc,#58CC02) 20%,var(--surface))}:root:not([data-theme=\"light\"]) .v55-ubar{background:rgba(255,255,255,.12)}:root:not([data-theme=\"light\"]) .v55-ubar i{background:var(--uc,#58CC02)}}",
+    ":root[data-theme=\"dark\"] .v55-unit{color:color-mix(in srgb,var(--uc,#58CC02) 55%,#fff);background:color-mix(in srgb,var(--uc,#58CC02) 20%,var(--surface))}:root[data-theme=\"dark\"] .v55-ubar{background:rgba(0,0,0,.35)}:root[data-theme=\"dark\"] .v55-ubar i{background:color-mix(in srgb,var(--uc,#58CC02) 55%,#fff)}",
+    "@media(prefers-color-scheme:dark){:root:not([data-theme=\"light\"]) .v55-unit{color:color-mix(in srgb,var(--uc,#58CC02) 55%,#fff);background:color-mix(in srgb,var(--uc,#58CC02) 20%,var(--surface))}:root:not([data-theme=\"light\"]) .v55-ubar{background:rgba(0,0,0,.35)}:root:not([data-theme=\"light\"]) .v55-ubar i{background:color-mix(in srgb,var(--uc,#58CC02) 55%,#fff)}}",
     ".v55-uchip{background:color-mix(in srgb,var(--uc,#58CC02) 16%,#fff);color:color-mix(in srgb,var(--uc,#58CC02) 52%,#000);border-color:color-mix(in srgb,var(--uc,#58CC02) 45%,#fff)}",
     ".v55-sec{display:flex;align-items:center;gap:10px;margin:18px 0 10px;font-weight:800;font-size:12.5px;color:var(--ink-3)}.v55-sec::before,.v55-sec::after{content:\"\";flex:1;height:2px;background:var(--line);border-radius:2px}",
     ".v55-fut{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;margin:6px 0 4px}.v55-fut .v55-node{width:118px;margin:0;transform:none}.v55-fut .v55-btn{width:52px;height:52px;box-shadow:0 4px 0 var(--line)}.v55-fut .v55-btn svg{width:22px;height:22px}.v55-fut .v55-lbl{font-size:11.5px;margin-top:6px;max-width:118px}.v55-fut .v55-lbl b{font-size:12px}",
     ".v55-more{text-align:center;margin:2px 0 6px}",
     ".v55-plan{display:flex;align-items:center;gap:10px;padding:10px 14px;border:2px dashed var(--line);border-radius:14px;margin:8px 0;color:var(--ink-3);font-weight:700;font-size:13px}.v55-plan .v55-un{color:var(--ink-3)}.v55-plan .v55-ut{flex:1;min-width:0;color:var(--ink-2);font-size:13.5px}.v55-plan small{font-weight:600;white-space:nowrap}",
     ".v55-lbl .wk{font-weight:800;color:var(--ink-3);font-size:11px}",
-    ".v55-btn.todo{border-color:#FF4B4B;color:#D42020;box-shadow:0 6px 0 #FFB3B3}",
-    ".v55-btn.today{border-color:#1CB0F6;color:#0A7BBF;box-shadow:0 6px 0 #A6E1FA}",
-    ".v55-btn.part{border-color:transparent;background:conic-gradient(var(--uc,#58CC02) calc(var(--p,10)*1%),var(--line) 0);color:#2E7D00;box-shadow:0 6px 0 #B9E58D}.v55-btn.part::before{content:\"\";position:absolute;inset:6px;border-radius:50%;background:var(--surface)}.v55-btn.part svg{position:relative}",
-    ".v55-btn.cont{border-color:#B9E58D;color:#2E7D00}.v55-btn.note{border-color:var(--line-2);color:var(--ink-2)}.v55-btn.wait{border-style:dashed;color:var(--ink-3);background:var(--surface-2,#F0F0F0)}",
+    ".v55-btn.todo{border-color:#FF4B4B;color:var(--duo-red-text,#D42020);box-shadow:0 6px 0 #FFB3B3}",
+    ".v55-btn.today{border-color:#1CB0F6;color:var(--duo-blue-text,#0A7BBF);box-shadow:0 6px 0 #A6E1FA}",
+    ".v55-btn.part{border-color:transparent;background:conic-gradient(var(--uc,#58CC02) calc(var(--p,10)*1%),var(--line) 0);color:var(--duo-green-text,#2E7D00);box-shadow:0 6px 0 #B9E58D}.v55-btn.part::before{content:\"\";position:absolute;inset:6px;border-radius:50%;background:var(--surface)}.v55-btn.part svg{position:relative}",
+    ".v55-btn.cont{border-color:#B9E58D;color:var(--duo-green-text,#2E7D00)}.v55-btn.note{border-color:var(--line-2);color:var(--ink-2)}.v55-btn.wait{border-style:dashed;color:var(--ink-3);background:var(--surface-2,#F0F0F0)}",
     ".v55-btn.future{background:var(--surface-2,#F0F0F0);border-color:var(--line);color:var(--ink-3);box-shadow:0 4px 0 var(--line)}",
     ".v55-btn.exam{background:#FFC800;border-color:#FFC800;color:#5A4200;box-shadow:0 6px 0 #E5A800;width:82px;height:82px}.v55-btn.exam svg{width:38px;height:38px}.v55-btn.exam.past{background:#F1E3A8;border-color:#F1E3A8;box-shadow:0 6px 0 #D9C67A}",
     ".v55-node.cur .v55-btn{width:84px;height:84px;background:var(--uc,#1CB0F6);border-color:var(--uc,#1CB0F6);color:color-mix(in srgb,var(--uc,#1CB0F6) 30%,#000);box-shadow:0 6px 0 color-mix(in srgb,var(--uc,#1CB0F6) 72%,#000);animation:v55pulse 1.8s ease-out infinite}.v55-node.cur .v55-btn.part{background:conic-gradient(#fff calc(var(--p,10)*1%),rgba(255,255,255,.35) 0)}.v55-node.cur .v55-btn.part::before{background:var(--uc,#1CB0F6)}",
@@ -11146,9 +11165,9 @@ var V33={};
     ".v55-start::after{content:\"\";position:absolute;left:50%;bottom:-7px;margin-left:-5px;border:5px solid transparent;border-top-color:#1CB0F6;border-bottom:0}",
     "@keyframes v55bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,-4px)}}",
     ".v55-ab{position:absolute;right:-8px;top:-6px;background:#FF4B4B;color:#fff;font-size:10px;font-weight:900;border-radius:99px;padding:2px 6px;border:2px solid var(--surface)}",
-    ".v55-sc{position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);background:var(--surface);border:2px solid #58CC02;color:#2E7D00;font-size:10.5px;font-weight:900;border-radius:99px;padding:0 6px;line-height:16px;white-space:nowrap}",
+    ".v55-sc{position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);background:var(--surface);border:2px solid #58CC02;color:var(--duo-green-text,#2E7D00);font-size:10.5px;font-weight:900;border-radius:99px;padding:0 6px;line-height:16px;white-space:nowrap}",
     ".v55-lbl{margin-top:10px;text-align:center;font-size:12.5px;line-height:1.35;max-width:220px;color:var(--ink-2)}.v55-lbl b{display:block;font-size:13px;color:var(--ink)}.v55-lbl b small{font-weight:800;color:var(--ink-3);margin-left:4px}.v55-lbl em{font-style:normal;color:var(--crit);font-weight:800}",
-    ".v55-lbl small.s-done{color:#2E7D00}.v55-lbl small.s-todo,.v55-lbl small.s-part{color:var(--crit)}.v55-lbl small.s-today{color:#0A7BBF}",
+    ".v55-lbl small.s-done{color:var(--duo-green-text,#2E7D00)}.v55-lbl small.s-todo,.v55-lbl small.s-part{color:var(--crit)}.v55-lbl small.s-today{color:var(--duo-blue-text,#0A7BBF)}",
     ".v55-node.cur{margin-top:44px}.v55-node .v55-tutor{position:absolute;top:-30px;width:110px;height:128px;pointer-events:none}.v55-node .v55-tutor.r{left:calc(50% + 58px)}.v55-node .v55-tutor.l{right:calc(50% + 58px)}",
     ".v55-scope{margin-top:10px;background:var(--surface);border:2px solid #F1E3A8;border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.5;max-width:520px;text-align:left}.v55-scope b{display:block;margin-bottom:4px}",
     /* 회차 표 접기 */

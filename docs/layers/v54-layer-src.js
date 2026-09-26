@@ -26,7 +26,9 @@
     /* 글자색은 흰 바탕 4.5:1 이상(오타 v54 D): ink-3 #707070 = 5.3 · 초록 글자 #2E7D00 = 5.2 · 주황 #B85C00 = 4.6 · 빨강 #D42020 = 5.0 · 파랑 #0A7BBF = 4.6. 밝은 듀오링고 색(#58CC02 · #1CB0F6 …)은 배경·테두리·큰 도형에만 */
     '--bg:#F7F7F7;--bg-grid:transparent;--surface:#FFFFFF;--surface-2:#F0F0F0;--surface-3:#E5E5E5;--ink:#3C3C3C;--ink-2:#575757;--ink-3:#707070;--line:#E5E5E5;--line-2:#CFCFCF;',
     '--accent:#2E7D00;--accent-ink:#2E7D00;--accent-soft:#E6F9D6;--accent-line:#A5ED6E;--ok:#2E7D00;--ok-soft:#E6F9D6;--warn:#B85C00;--warn-soft:#FFE9CC;--crit:#D42020;--crit-soft:#FFE0E0;--info:#0A7BBF;--info-soft:#DDF4FF;',
-    '--shadow:none;--r:16px;--r-s:12px;--r-pill:999px;--duo-green:#58CC02;--duo-blue:#1CB0F6;--duo-blue-2:#1899D6;--duo-blue-text:#0A7BBF;--duo-green-2:#46A302;--duo-yel:#FFC800;--duo-purple:#CE82FF;',
+    '--shadow:none;--r:16px;--r-s:12px;--r-pill:999px;--duo-green:#58CC02;--duo-blue:#1CB0F6;--duo-blue-2:#1899D6;--duo-green-2:#46A302;--duo-yel:#FFC800;--duo-purple:#CE82FF;',
+    /* 글자용 색은 테마마다 따로(오타 v55 2: 어두운 바탕에서 #0A7BBF 는 3.2:1) — 밝음: 짙은색, 어두움: 밝은색 */
+    '--duo-blue-text:#0A7BBF;--duo-green-text:#2E7D00;--duo-red-text:#D42020;--duo-orange-text:#9A5B00;',
     /* 글래스 층(V51) 토큰을 단색으로 — 유리·블러·번지는 빛을 끄고 평평한 듀오링고 면으로 */
     '--gl:var(--surface);--gl-2:var(--surface-2);--gl-3:var(--surface);--gl-line:var(--line);--gl-line-2:var(--line);--gl-hi:none;--gl-sh:none;--gl-blur:none;--gl-on:var(--surface-2);--gl-bg0:var(--bg);--gl-bg1:var(--bg);--gl-bg2:var(--bg);--gl-b1:transparent;--gl-b2:transparent;--gl-b3:transparent;--on-accent:#fff}',
     ':root:not([data-theme="dark"]){--ink-2:#575757;--ink-3:#707070}',
@@ -45,9 +47,11 @@
     'html.v54 .iconbtn{background:var(--surface);border:2px solid var(--line);border-radius:10px}',
     'html.v54 .bar,html.v54 .v49-bar,html.v54 .v47-bar{background:var(--surface-3);border-radius:99px;overflow:hidden}',
     '@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#131F24;--surface:#1B2A31;--surface-2:#243640;--surface-3:#2E434F;--ink:#F1F7FB;--ink-2:#C7D3DA;--ink-3:#8FA3AE;--line:#37464F;--line-2:#4A5D69;',
-    '--accent:#58CC02;--accent-ink:#93D333;--accent-soft:rgba(88,204,2,.16);--accent-line:rgba(88,204,2,.45);--ok:#58CC02;--ok-soft:rgba(88,204,2,.16);--warn:#FF9600;--warn-soft:rgba(255,150,0,.16);--crit:#FF4B4B;--crit-soft:rgba(255,75,75,.18);--info:#1CB0F6;--info-soft:rgba(28,176,246,.16);--shadow:none;--thumb:#4A5D69}}',
+    '--accent:#58CC02;--accent-ink:#93D333;--accent-soft:rgba(88,204,2,.16);--accent-line:rgba(88,204,2,.45);--ok:#58CC02;--ok-soft:rgba(88,204,2,.16);--warn:#FF9600;--warn-soft:rgba(255,150,0,.16);--crit:#FF6B6B;--crit-soft:rgba(255,75,75,.18);--info:#1CB0F6;--info-soft:rgba(28,176,246,.16);--shadow:none;--thumb:#4A5D69;',
+    '--duo-blue-text:#5AC8FA;--duo-green-text:#7ED957;--duo-red-text:#FF7B7B;--duo-orange-text:#FFB347}}',
     ':root[data-theme="dark"]{--bg:#131F24;--surface:#1B2A31;--surface-2:#243640;--surface-3:#2E434F;--ink:#F1F7FB;--ink-2:#C7D3DA;--ink-3:#8FA3AE;--line:#37464F;--line-2:#4A5D69;',
-    '--accent:#58CC02;--accent-ink:#93D333;--accent-soft:rgba(88,204,2,.16);--accent-line:rgba(88,204,2,.45);--ok:#58CC02;--ok-soft:rgba(88,204,2,.16);--warn:#FF9600;--warn-soft:rgba(255,150,0,.16);--crit:#FF4B4B;--crit-soft:rgba(255,75,75,.18);--info:#1CB0F6;--info-soft:rgba(28,176,246,.16);--shadow:none;--thumb:#4A5D69}',
+    '--accent:#58CC02;--accent-ink:#93D333;--accent-soft:rgba(88,204,2,.16);--accent-line:rgba(88,204,2,.45);--ok:#58CC02;--ok-soft:rgba(88,204,2,.16);--warn:#FF9600;--warn-soft:rgba(255,150,0,.16);--crit:#FF6B6B;--crit-soft:rgba(255,75,75,.18);--info:#1CB0F6;--info-soft:rgba(28,176,246,.16);--shadow:none;--thumb:#4A5D69;',
+    '--duo-blue-text:#5AC8FA;--duo-green-text:#7ED957;--duo-red-text:#FF7B7B;--duo-orange-text:#FFB347}',
     /* 바탕·글꼴 */
     'html.v54 body{background-image:none;font-family:var(--font-body);letter-spacing:-.01em;font-weight:500}',
     'html.v54 h1,html.v54 h2,html.v54 h3,html.v54 h4{font-weight:800;letter-spacing:-.025em}',

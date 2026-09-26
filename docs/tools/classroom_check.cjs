@@ -48,6 +48,11 @@ function check(file) {
     { const xp1 = X.T.xp; const L = X.L; L.pos = { mode: "step", ci: 1, si: 999 }; L.done = false; delete L.ch[D.chapters[1].id]; w.location.hash = "#resume"; X.boot();
       if (X.S.mode !== "step" || X.S.ci !== 1 || X.S.si !== D.chapters[1].steps.length - 1) problems.push("#resume 범위 밖 단계 보정 실패: " + X.S.mode + " " + X.S.ci + "/" + X.S.si);
       if (L.ch[D.chapters[1].id] || X.T.xp !== xp1) problems.push("#resume 범위 밖 위치가 챕터를 완료로 침"); w.location.hash = ""; }
+    // 오타 v55 1: 저장 위치가 문자열("0","2")이어도 목차의 「이어서 하기」 뒤 「이해했어요」가 3단계로 가고 챕터를 완료로 치지 않는다
+    { const L2 = X.L; L2.pos = { mode: "step", ci: "0", si: "2" }; L2.done = false; delete L2.ch[D.chapters[0].id]; const xpS = X.T.xp; X.S.mode = "intro"; X.render();
+      const btn = [...doc.querySelectorAll("#dCh .cbt")].find(b => /이어서 하기/.test(b.textContent)); if (!btn) problems.push("목차에 「이어서 하기」 없음"); else { btn.click();
+        if (X.S.ci !== 0 || X.S.si !== 2 || typeof X.S.si !== "number") problems.push("이어서 하기 위치가 정수 아님: " + JSON.stringify([X.S.ci, X.S.si])); X.next();
+        if (X.S.si !== 3 || X.S.mode !== "step") problems.push("이어서 하기 뒤 다음 단계가 3이 아님: " + X.S.mode + " " + X.S.si); if (L2.ch[D.chapters[0].id] || X.T.xp !== xpS) problems.push("문자열 위치로 챕터가 완료됨"); } }
     // 오타 v54 A①: 정답 → 다시 풀기 → 정답 = XP 한 번
     if (D.quiz.length && D.quiz[0].choices) { const q = D.quiz[0], ST3 = X.ST; delete ST3.done[q.id]; delete ST3.correct[q.id]; delete ST3.answer[q.id]; X.T.hearts = 3; const xp2 = X.T.xp; X.S.mode = "quiz"; X.S.qi = 0; X.render();
       const okI = q.choices.findIndex(c => c.ok); doc.querySelectorAll("#bc .cb")[okI].click(); if (X.T.xp !== xp2) problems.push("다시 풀기 정답에 XP 를 또 줌: +" + (X.T.xp - xp2)); }

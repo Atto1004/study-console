@@ -24,10 +24,14 @@
     V55.uLoading=fetch("knowledge/units.json",{cache:"no-store"}).then(function(r){ if(!r.ok) throw new Error("units.json "+r.status); return r.json(); }).then(function(d){ V55.U=(d&&typeof d==="object")?d:{}; return V55.U; }).catch(function(e){ V55.uErr=String(e&&e.message||e); V55.U={}; return null; });
     return V55.uLoading; };
   V55.units=function(c){ var u=V55.U&&V55.U[c.name]; return (u&&Array.isArray(u.units))?u.units:[]; };
+  /* 회차 → 단원: ① dates ② 장 번호(num) ③ 키워드(kw) — 장 번호가 키워드보다 먼저다(오타 v55: 「13.1 벡터함수」가 「벡터」로 12장에 잡히던 것) */
   V55.unitOf=function(c,x,units){
     for(var i=0;i<units.length;i++){ if((units[i].dates||[]).indexOf(x.date)>=0) return i; }
     var t=[x.title||"",(x.info&&x.info.title)||""].join(" "); var l=(window.V52&&V52.lesson)?V52.lesson(c,x.date):null; if(l&&l.title) t+=" "+l.title;
-    if(t.trim()) for(var j=0;j<units.length;j++){ if(units[j].match){ try{ if(new RegExp(units[j].match).test(t)) return j; }catch(e){} } }
+    if(!t.trim()) return -1;
+    var test=function(re){ if(!re) return false; try{ return new RegExp(re).test(t); }catch(e){ return false; } };
+    for(var j=0;j<units.length;j++){ if(test(units[j].num)) return j; }
+    for(var k=0;k<units.length;k++){ if(test(units[k].kw||units[k].match)) return k; }
     return -1; };
   V55.UC=["#58CC02","#1CB0F6","#CE82FF","#FF9600","#2B70C9","#00CD9C","#FF4B4B","#FFC800"];
   V55.ucOf=function(k){ return V55.UC[((k%V55.UC.length)+V55.UC.length)%V55.UC.length]; };
@@ -115,22 +119,25 @@
     var sess=nodes.filter(function(x){ return x.kind==="sess"&&x.st!=="future"; }), fut=nodes.filter(function(x){ return x.kind==="sess"&&x.st==="future"; }), exs=nodes.filter(function(x){ return x.kind==="exam"; });
     var groups=units.map(function(u){ return {u:u,items:[]}; }), none=[];
     sess.forEach(function(x){ var k=V55.unitOf(c,x,units); if(k<0) none.push(x); else groups[k].items.push(x); });
-    /* 지난 시험은 그 날짜 전에 끝난 마지막 단원 뒤에 */
-    var pastEx={}; exs.filter(function(e){ return e.date<td; }).forEach(function(e){ var at=-1; groups.forEach(function(g,k){ if(g.items.some(function(x){ return x.date<e.date; })) at=k; }); (pastEx[at]=pastEx[at]||[]).push(e); });
-    var h='';
-    groups.forEach(function(g,k){ if(!g.items.length) return; h+=V55.unitHTML(g.u,k,g.items,cur); var i=0; g.items.forEach(function(x){ h+=V55.nodeHTML(c,x,i++,x===cur,{uc:V55.ucOf(k)}); }); (pastEx[k]||[]).forEach(function(e){ h+=V55.nodeHTML(c,e,0,false,{}); }); });
-    if(none.length){ h+='<div class="v55-unit none" style="--uc:#8E8E8E"><div class="v55-ub"><div class="v55-un">단원 미지정</div><div class="v55-ut">knowledge/units.json 에 날짜를 넣으면 단원으로 들어갑니다</div><div class="v55-up"><b>'+none.length+'</b><small>회차</small></div></div></div>'; var i2=0; none.forEach(function(x){ h+=V55.nodeHTML(c,x,i2++,x===cur,{uc:"#8E8E8E"}); }); }
-    var nextEx=exs.filter(function(e){ return e.date>=td; }).sort(function(a,b){ return a.date<b.date?-1:1; })[0];
-    var before=fut.filter(function(x){ return !nextEx||x.date<nextEx.date; }), after=fut.filter(function(x){ return nextEx&&x.date>nextEx.date; });
-    var planned=groups.filter(function(g){ return !g.items.length&&g.u.planned; }), plannedMid=planned.filter(function(g){ return (g.u.phase||"mid")==="mid"; }), plannedFin=planned.filter(function(g){ return g.u.phase==="final"; });
-    if(before.length){ var showAll=!!V55.showAll[c.id], lim=showAll?before.length:4;
-      h+='<div class="v55-sec"><span>예정 회차 '+before.length+'개'+(nextEx?' · '+esc(String(nextEx.ex.kind||"시험"))+' 전':'')+'</span></div><div class="v55-fut">'+before.slice(0,lim).map(function(x,i){ return V55.nodeHTML(c,x,i,x===cur,{uc:"#AFAFAF",compact:true}); }).join("")+'</div>'+
-        (before.length>4?'<div class="v55-more"><button type="button" class="btn xs" data-v55more="1">'+(showAll?"접기":"전부 보기 ("+before.length+")")+'</button></div>':''); }
-    if(plannedMid.length) h+='<div class="v55-sec"><span>앞으로 배울 단원</span></div>'+plannedMid.map(function(g){ return V55.planHTML(g.u); }).join("");
-    if(nextEx){ h+=V55.nodeHTML(c,nextEx,0,false,{});
-      var restEx=exs.filter(function(e){ return e.date>nextEx.date; });
-      if(after.length||plannedFin.length||restEx.length){ h+='<div class="v55-sec"><span>'+esc(String(nextEx.ex.kind||"시험"))+' 뒤'+(after.length?' · 회차 '+after.length+'개':'')+'</span></div>'+plannedFin.map(function(g){ return V55.planHTML(g.u); }).join("")+restEx.map(function(e){ return V55.nodeHTML(c,e,0,false,{}); }).join(""); } }
-    else if(plannedFin.length) h+=plannedFin.map(function(g){ return V55.planHTML(g.u); }).join("");
+    /* 지난 시험은 날짜 순서대로 — 그 날짜 전 회차가 있는 마지막 단원 안에서 회차 사이에 끼우고, 어느 회차보다 앞이면 맨 앞에 (오타 v55 4) */
+    var pastEx={}, preEx=[]; exs.filter(function(e){ return e.date<td; }).forEach(function(e){ var at=-1; groups.forEach(function(g,k){ if(g.items.some(function(x){ return x.date<e.date; })) at=k; }); if(at<0){ if(!none.length) preEx.push(e); else at=-2; } if(at>=0||at===-2) (pastEx[at]=pastEx[at]||[]).push(e); });
+    var byDate=function(a,b){ return a.date<b.date?-1:a.date>b.date?1:(a.kind==="exam"?1:-1); };
+    var h=''; preEx.sort(byDate).forEach(function(e){ h+=V55.nodeHTML(c,e,0,false,{}); });
+    groups.forEach(function(g,k){ if(!g.items.length) return; h+=V55.unitHTML(g.u,k,g.items,cur); var i=0; g.items.concat(pastEx[k]||[]).sort(byDate).forEach(function(x){ h+= x.kind==="exam"? V55.nodeHTML(c,x,0,false,{}) : V55.nodeHTML(c,x,i++,x===cur,{uc:V55.ucOf(k)}); }); });
+    if(none.length){ h+='<div class="v55-unit none" style="--uc:#8E8E8E"><div class="v55-ub"><div class="v55-un">단원 미지정</div><div class="v55-ut">knowledge/units.json 에 날짜를 넣으면 단원으로 들어갑니다</div><div class="v55-up"><b>'+none.length+'</b><small>회차</small></div></div></div>'; var i2=0; none.concat(pastEx[-2]||[]).sort(byDate).forEach(function(x){ h+= x.kind==="exam"? V55.nodeHTML(c,x,0,false,{}) : V55.nodeHTML(c,x,i2++,x===cur,{uc:"#8E8E8E"}); }); }
+    /* 앞으로: 시험마다 [그 전 예정 회차] → [그 시험 범위(phase)의 아직 없는 단원] → [시험 ★]. 중간이 지났으면 기말 앞에 final 단원이 온다 (오타 v55 5) */
+    var futEx=exs.filter(function(e){ return e.date>=td; }).sort(byDate), rest=fut.slice().sort(byDate), plannedLeft=groups.filter(function(g){ return !g.items.length&&g.u.planned; });
+    var futList=function(list,first){ if(!list.length) return ''; if(!first) return '<div class="v55-sec"><span>회차 '+list.length+'개</span></div>';
+      var showAll=!!V55.showAll[c.id], lim=showAll?list.length:4;
+      return '<div class="v55-fut">'+list.slice(0,lim).map(function(x,i){ return V55.nodeHTML(c,x,i,x===cur,{uc:"#AFAFAF",compact:true}); }).join("")+'</div>'+(list.length>4?'<div class="v55-more"><button type="button" class="btn xs" data-v55more="1">'+(showAll?"접기":"전부 보기 ("+list.length+")")+'</button></div>':''); };
+    futEx.forEach(function(e,idx){ var kind=String(e.ex.kind||""), ph=/중간/.test(kind)?"mid":/기말/.test(kind)?"final":null;
+      var seg=rest.filter(function(x){ return x.date<e.date; }); rest=rest.filter(function(x){ return x.date>e.date; });
+      if(seg.length) h+='<div class="v55-sec"><span>예정 회차 '+seg.length+'개 · '+esc(kind||"시험")+' 전</span></div>'+futList(seg,idx===0);
+      var pl=ph?plannedLeft.filter(function(g){ return (g.u.phase||"mid")===ph; }):[]; plannedLeft=plannedLeft.filter(function(g){ return pl.indexOf(g)<0; });
+      if(pl.length) h+='<div class="v55-sec"><span>'+esc(kind||"시험")+' 범위 · 앞으로 배울 단원</span></div>'+pl.map(function(g){ return V55.planHTML(g.u); }).join("");
+      h+=V55.nodeHTML(c,e,0,false,{}); });
+    if(rest.length) h+='<div class="v55-sec"><span>예정 회차 '+rest.length+'개'+(futEx.length?' · '+esc(String(futEx[futEx.length-1].ex.kind||"시험"))+' 뒤':'')+'</span></div>'+futList(rest,futEx.length===0);
+    if(plannedLeft.length) h+='<div class="v55-sec"><span>앞으로 배울 단원</span></div>'+plannedLeft.map(function(g){ return V55.planHTML(g.u); }).join("");
     return '<div class="v55-path">'+(h||'<div class="hint">회차가 없습니다</div>')+'</div>';
   };
   V55.render=function(){
@@ -178,8 +185,8 @@
     ".v55-stats{display:flex;gap:6px;flex-wrap:wrap}.v55-stats>div{flex:1 1 90px;min-width:0;border:2px solid var(--line);border-radius:14px;padding:8px 10px;background:var(--surface-2,#F0F0F0)}",
     ".v55-stats b{display:block;font-size:24px;line-height:1.1;font-weight:900;letter-spacing:-.02em}.v55-stats b small{font-size:13px;color:var(--ink-3);font-weight:800}.v55-stats span{font-size:11.5px;font-weight:700;color:var(--ink-3)}",
     /* 글자 대비 4.5:1(오타 v54 D): 초록 글자 #2E7D00 · 주황 #9A5B00 · 파랑 #0A7BBF · 빨강 var(--crit). 밝은 색은 바탕·테두리·큰 도형에만 */
-    ".v55-ok{color:#2E7D00}.v55-crit{color:var(--crit)}.v55-xp{color:#9A5B00}",
-    ".v55-bar{height:14px;border-radius:99px;background:var(--surface-3,#E5E5E5);overflow:hidden}.v55-bar i{display:block;height:100%;border-radius:99px;background:#3D8F00;transition:width .4s}",
+    ".v55-ok{color:var(--duo-green-text,#2E7D00)}.v55-crit{color:var(--crit)}.v55-xp{color:var(--duo-orange-text,#9A5B00)}",
+    ".v55-bar{height:14px;border-radius:99px;background:var(--surface-3,#E5E5E5);overflow:hidden}.v55-bar i{display:block;height:100%;border-radius:99px;background:var(--duo-green-text,#2E7D00);transition:width .4s}",
     ".v55-act{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.v55-actsp{flex:1}.v55-cta{font-size:14px;padding:9px 16px}.v55-detailbtn{margin-left:auto}",
     ".v55-hr{flex:0 0 200px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;min-width:0}",
     ".v55-bubble{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:9px 12px;font-size:13px;font-weight:700;line-height:1.45;width:100%;text-align:center}",
@@ -196,21 +203,22 @@
     ".v55-unit{margin:18px 0 12px;border-radius:16px;background:color-mix(in srgb,var(--uc,#58CC02) 16%,var(--surface));color:color-mix(in srgb,var(--uc,#58CC02) 52%,#000);border:2px solid color-mix(in srgb,var(--uc,#58CC02) 55%,var(--surface));padding:12px 16px 10px;box-shadow:0 4px 0 color-mix(in srgb,var(--uc,#58CC02) 45%,var(--surface))}",
     ".v55-unit:first-child{margin-top:4px}.v55-ub{display:flex;align-items:center;gap:12px}.v55-un{font-size:11px;font-weight:900;letter-spacing:.08em;white-space:nowrap}",
     ".v55-ut{flex:1;min-width:0;font-size:15px;font-weight:800;line-height:1.3}.v55-up{white-space:nowrap;font-weight:900;font-size:15px}.v55-up small{font-weight:700;margin-left:4px;font-size:11px}",
-    ".v55-ubar{height:8px;border-radius:99px;background:rgba(0,0,0,.08);margin-top:8px;overflow:hidden}.v55-ubar i{display:block;height:100%;background:color-mix(in srgb,var(--uc,#58CC02) 75%,#000);border-radius:99px;transition:width .4s}",
+    /* 진행 막대: 채움은 단원색 45%·검정(밝은 트랙과 5:1 이상), 어두운 테마는 어두운 트랙 + 단원색 55%·흰색 (오타 v55 2) */
+    ".v55-ubar{height:8px;border-radius:99px;background:rgba(0,0,0,.08);margin-top:8px;overflow:hidden}.v55-ubar i{display:block;height:100%;background:color-mix(in srgb,var(--uc,#58CC02) 45%,#000);border-radius:99px;transition:width .4s}",
     ".v55-unit.done .v55-un::after{content:\" ✓\"}.v55-unit.cur{box-shadow:0 4px 0 color-mix(in srgb,var(--uc,#58CC02) 45%,var(--surface)),0 0 0 3px var(--surface),0 0 0 6px var(--uc,#58CC02)}",
     ".v55-unit.none{background:var(--surface-2,#F0F0F0);color:var(--ink-2);border-color:var(--line);box-shadow:0 4px 0 var(--line)}",
-    ":root[data-theme=\"dark\"] .v55-unit{color:color-mix(in srgb,var(--uc,#58CC02) 70%,#fff);background:color-mix(in srgb,var(--uc,#58CC02) 20%,var(--surface))}:root[data-theme=\"dark\"] .v55-ubar{background:rgba(255,255,255,.12)}:root[data-theme=\"dark\"] .v55-ubar i{background:var(--uc,#58CC02)}",
-    "@media(prefers-color-scheme:dark){:root:not([data-theme=\"light\"]) .v55-unit{color:color-mix(in srgb,var(--uc,#58CC02) 70%,#fff);background:color-mix(in srgb,var(--uc,#58CC02) 20%,var(--surface))}:root:not([data-theme=\"light\"]) .v55-ubar{background:rgba(255,255,255,.12)}:root:not([data-theme=\"light\"]) .v55-ubar i{background:var(--uc,#58CC02)}}",
+    ":root[data-theme=\"dark\"] .v55-unit{color:color-mix(in srgb,var(--uc,#58CC02) 55%,#fff);background:color-mix(in srgb,var(--uc,#58CC02) 20%,var(--surface))}:root[data-theme=\"dark\"] .v55-ubar{background:rgba(0,0,0,.35)}:root[data-theme=\"dark\"] .v55-ubar i{background:color-mix(in srgb,var(--uc,#58CC02) 55%,#fff)}",
+    "@media(prefers-color-scheme:dark){:root:not([data-theme=\"light\"]) .v55-unit{color:color-mix(in srgb,var(--uc,#58CC02) 55%,#fff);background:color-mix(in srgb,var(--uc,#58CC02) 20%,var(--surface))}:root:not([data-theme=\"light\"]) .v55-ubar{background:rgba(0,0,0,.35)}:root:not([data-theme=\"light\"]) .v55-ubar i{background:color-mix(in srgb,var(--uc,#58CC02) 55%,#fff)}}",
     ".v55-uchip{background:color-mix(in srgb,var(--uc,#58CC02) 16%,#fff);color:color-mix(in srgb,var(--uc,#58CC02) 52%,#000);border-color:color-mix(in srgb,var(--uc,#58CC02) 45%,#fff)}",
     ".v55-sec{display:flex;align-items:center;gap:10px;margin:18px 0 10px;font-weight:800;font-size:12.5px;color:var(--ink-3)}.v55-sec::before,.v55-sec::after{content:\"\";flex:1;height:2px;background:var(--line);border-radius:2px}",
     ".v55-fut{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;margin:6px 0 4px}.v55-fut .v55-node{width:118px;margin:0;transform:none}.v55-fut .v55-btn{width:52px;height:52px;box-shadow:0 4px 0 var(--line)}.v55-fut .v55-btn svg{width:22px;height:22px}.v55-fut .v55-lbl{font-size:11.5px;margin-top:6px;max-width:118px}.v55-fut .v55-lbl b{font-size:12px}",
     ".v55-more{text-align:center;margin:2px 0 6px}",
     ".v55-plan{display:flex;align-items:center;gap:10px;padding:10px 14px;border:2px dashed var(--line);border-radius:14px;margin:8px 0;color:var(--ink-3);font-weight:700;font-size:13px}.v55-plan .v55-un{color:var(--ink-3)}.v55-plan .v55-ut{flex:1;min-width:0;color:var(--ink-2);font-size:13.5px}.v55-plan small{font-weight:600;white-space:nowrap}",
     ".v55-lbl .wk{font-weight:800;color:var(--ink-3);font-size:11px}",
-    ".v55-btn.todo{border-color:#FF4B4B;color:#D42020;box-shadow:0 6px 0 #FFB3B3}",
-    ".v55-btn.today{border-color:#1CB0F6;color:#0A7BBF;box-shadow:0 6px 0 #A6E1FA}",
-    ".v55-btn.part{border-color:transparent;background:conic-gradient(var(--uc,#58CC02) calc(var(--p,10)*1%),var(--line) 0);color:#2E7D00;box-shadow:0 6px 0 #B9E58D}.v55-btn.part::before{content:\"\";position:absolute;inset:6px;border-radius:50%;background:var(--surface)}.v55-btn.part svg{position:relative}",
-    ".v55-btn.cont{border-color:#B9E58D;color:#2E7D00}.v55-btn.note{border-color:var(--line-2);color:var(--ink-2)}.v55-btn.wait{border-style:dashed;color:var(--ink-3);background:var(--surface-2,#F0F0F0)}",
+    ".v55-btn.todo{border-color:#FF4B4B;color:var(--duo-red-text,#D42020);box-shadow:0 6px 0 #FFB3B3}",
+    ".v55-btn.today{border-color:#1CB0F6;color:var(--duo-blue-text,#0A7BBF);box-shadow:0 6px 0 #A6E1FA}",
+    ".v55-btn.part{border-color:transparent;background:conic-gradient(var(--uc,#58CC02) calc(var(--p,10)*1%),var(--line) 0);color:var(--duo-green-text,#2E7D00);box-shadow:0 6px 0 #B9E58D}.v55-btn.part::before{content:\"\";position:absolute;inset:6px;border-radius:50%;background:var(--surface)}.v55-btn.part svg{position:relative}",
+    ".v55-btn.cont{border-color:#B9E58D;color:var(--duo-green-text,#2E7D00)}.v55-btn.note{border-color:var(--line-2);color:var(--ink-2)}.v55-btn.wait{border-style:dashed;color:var(--ink-3);background:var(--surface-2,#F0F0F0)}",
     ".v55-btn.future{background:var(--surface-2,#F0F0F0);border-color:var(--line);color:var(--ink-3);box-shadow:0 4px 0 var(--line)}",
     ".v55-btn.exam{background:#FFC800;border-color:#FFC800;color:#5A4200;box-shadow:0 6px 0 #E5A800;width:82px;height:82px}.v55-btn.exam svg{width:38px;height:38px}.v55-btn.exam.past{background:#F1E3A8;border-color:#F1E3A8;box-shadow:0 6px 0 #D9C67A}",
     ".v55-node.cur .v55-btn{width:84px;height:84px;background:var(--uc,#1CB0F6);border-color:var(--uc,#1CB0F6);color:color-mix(in srgb,var(--uc,#1CB0F6) 30%,#000);box-shadow:0 6px 0 color-mix(in srgb,var(--uc,#1CB0F6) 72%,#000);animation:v55pulse 1.8s ease-out infinite}.v55-node.cur .v55-btn.part{background:conic-gradient(#fff calc(var(--p,10)*1%),rgba(255,255,255,.35) 0)}.v55-node.cur .v55-btn.part::before{background:var(--uc,#1CB0F6)}",
@@ -221,9 +229,9 @@
     ".v55-start::after{content:\"\";position:absolute;left:50%;bottom:-7px;margin-left:-5px;border:5px solid transparent;border-top-color:#1CB0F6;border-bottom:0}",
     "@keyframes v55bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,-4px)}}",
     ".v55-ab{position:absolute;right:-8px;top:-6px;background:#FF4B4B;color:#fff;font-size:10px;font-weight:900;border-radius:99px;padding:2px 6px;border:2px solid var(--surface)}",
-    ".v55-sc{position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);background:var(--surface);border:2px solid #58CC02;color:#2E7D00;font-size:10.5px;font-weight:900;border-radius:99px;padding:0 6px;line-height:16px;white-space:nowrap}",
+    ".v55-sc{position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);background:var(--surface);border:2px solid #58CC02;color:var(--duo-green-text,#2E7D00);font-size:10.5px;font-weight:900;border-radius:99px;padding:0 6px;line-height:16px;white-space:nowrap}",
     ".v55-lbl{margin-top:10px;text-align:center;font-size:12.5px;line-height:1.35;max-width:220px;color:var(--ink-2)}.v55-lbl b{display:block;font-size:13px;color:var(--ink)}.v55-lbl b small{font-weight:800;color:var(--ink-3);margin-left:4px}.v55-lbl em{font-style:normal;color:var(--crit);font-weight:800}",
-    ".v55-lbl small.s-done{color:#2E7D00}.v55-lbl small.s-todo,.v55-lbl small.s-part{color:var(--crit)}.v55-lbl small.s-today{color:#0A7BBF}",
+    ".v55-lbl small.s-done{color:var(--duo-green-text,#2E7D00)}.v55-lbl small.s-todo,.v55-lbl small.s-part{color:var(--crit)}.v55-lbl small.s-today{color:var(--duo-blue-text,#0A7BBF)}",
     ".v55-node.cur{margin-top:44px}.v55-node .v55-tutor{position:absolute;top:-30px;width:110px;height:128px;pointer-events:none}.v55-node .v55-tutor.r{left:calc(50% + 58px)}.v55-node .v55-tutor.l{right:calc(50% + 58px)}",
     ".v55-scope{margin-top:10px;background:var(--surface);border:2px solid #F1E3A8;border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.5;max-width:520px;text-align:left}.v55-scope b{display:block;margin-bottom:4px}",
     /* 회차 표 접기 */
