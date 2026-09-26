@@ -32,6 +32,18 @@ setTimeout(() => { const w = d.window, doc = w.document; const by = n => w.cours
     const pathEl = doc.querySelector("#v55Path .v55-path"); const firstKids = [...pathEl.children]; const firstUnit = firstKids.findIndex(el => el.classList.contains("v55-unit")), preNode = firstKids.findIndex(el => /진단/.test(el.textContent));
     ok(preNode >= 0 && preNode < firstUnit, "첫 회차보다 앞선 지난 시험(8/31)이 첫 단원 배너 앞에: " + preNode + " < " + firstUnit);
     t.exams = t.exams.filter(e => !/^t-/.test(e.id));
+    /* ②-2 같은 날 회차 → 시험 순서 (오타 v56 ④⑤): 지난 시험 9/9 는 단원 2 의 9/9 회차 뒤·9/11 앞, 예정 시험 9/30 은 9/30 예정 회차 뒤 */
+    t.exams.push({ id: "t-same-past", courseId: c.id, kind: "쪽지", date: "2026-09-09", scope: "검사용" }); w.go("course", c.id);
+    txt = nodesText(); const s9 = txt.findIndex(s => /9\/9/.test(s)), e9 = txt.findIndex(s => /쪽지/.test(s)), s11 = txt.findIndex(s => /9\/11/.test(s));
+    ok(s9 >= 0 && e9 === s9 + 1 && s11 === e9 + 1, "9/9 지난 시험이 같은 날 회차 바로 뒤·9/11 앞: " + [s9, e9, s11].join(","));
+    const unit2 = [...doc.querySelectorAll("#v55Path .v55-path > *")]; const iU2 = unit2.findIndex(el => el.classList.contains("v55-unit") && /22장/.test(el.textContent)), iE9 = unit2.findIndex(el => /쪽지/.test(el.textContent));
+    ok(iU2 >= 0 && iE9 > iU2, "그 시험이 단원 2 배너 뒤(단원 안)에 있음: " + iU2 + " < " + iE9);
+    t.exams = t.exams.filter(e => !/^t-/.test(e.id));
+    const fut30 = w.V32.meetings(c).find(dt => dt > w.today()); t.exams.push({ id: "t-same-fut", courseId: c.id, kind: "퀴즈", date: fut30, scope: "검사용" }); w.V55.showAll[c.id] = true; w.go("course", c.id);
+    const kidsF = [...doc.querySelectorAll("#v55Path .v55-path > *")]; const iFutNode = kidsF.findIndex(el => el.classList.contains("v55-fut") && new RegExp((+fut30.slice(5, 7)) + "/" + (+fut30.slice(8, 10)) + "\\(").test(el.textContent)), iQuiz = kidsF.findIndex(el => el.classList.contains("v55-node") && /퀴즈/.test(el.textContent));
+    ok(iFutNode >= 0 && iQuiz > iFutNode, "시험과 같은 날 예정 회차(" + fut30 + ")가 사라지지 않고 시험 앞에: " + iFutNode + " < " + iQuiz);
+    ok(kidsF.filter(el => el.classList.contains("v55-plan")).length === 7, "phase 없는 퀴즈에는 단원을 붙이지 않고 전부 남김(7): " + kidsF.filter(el => el.classList.contains("v55-plan")).length);
+    t.exams = t.exams.filter(e => !/^t-/.test(e.id)); w.V55.showAll = {};
     /* ③ 다음 시험 = 기말: final 단원이 기말 앞, 지나간 중간의 mid 단원은 맨 뒤 */
     const mid = t.exams.find(e => e.courseId === c.id && e.kind === "중간"); const midDate = mid.date; mid.date = "2026-09-10"; w.go("course", c.id);
     const kids = [...doc.querySelector("#v55Path .v55-path").children]; const iFinal = kids.findIndex(el => el.classList.contains("v55-node") && /기말/.test(el.textContent)); const plans = kids.map((el, i) => ({ i, el })).filter(x => x.el.classList.contains("v55-plan"));

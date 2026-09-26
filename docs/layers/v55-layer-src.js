@@ -120,7 +120,8 @@
     var groups=units.map(function(u){ return {u:u,items:[]}; }), none=[];
     sess.forEach(function(x){ var k=V55.unitOf(c,x,units); if(k<0) none.push(x); else groups[k].items.push(x); });
     /* 지난 시험은 날짜 순서대로 — 그 날짜 전 회차가 있는 마지막 단원 안에서 회차 사이에 끼우고, 어느 회차보다 앞이면 맨 앞에 (오타 v55 4) */
-    var pastEx={}, preEx=[]; exs.filter(function(e){ return e.date<td; }).forEach(function(e){ var at=-1; groups.forEach(function(g,k){ if(g.items.some(function(x){ return x.date<e.date; })) at=k; }); if(at<0){ if(!none.length) preEx.push(e); else at=-2; } if(at>=0||at===-2) (pastEx[at]=pastEx[at]||[]).push(e); });
+    /* 같은 날 회차와 시험은 회차 → 시험 순 (오타 v56 ④: `<` 로 고르면 같은 날 회차가 시험 뒤 단원으로 밀린다) */
+    var pastEx={}, preEx=[]; exs.filter(function(e){ return e.date<td; }).forEach(function(e){ var at=-1; groups.forEach(function(g,k){ if(g.items.some(function(x){ return x.date<=e.date; })) at=k; }); if(at<0){ if(!none.length) preEx.push(e); else at=-2; } if(at>=0||at===-2) (pastEx[at]=pastEx[at]||[]).push(e); });
     var byDate=function(a,b){ return a.date<b.date?-1:a.date>b.date?1:(a.kind==="exam"?1:-1); };
     var h=''; preEx.sort(byDate).forEach(function(e){ h+=V55.nodeHTML(c,e,0,false,{}); });
     groups.forEach(function(g,k){ if(!g.items.length) return; h+=V55.unitHTML(g.u,k,g.items,cur); var i=0; g.items.concat(pastEx[k]||[]).sort(byDate).forEach(function(x){ h+= x.kind==="exam"? V55.nodeHTML(c,x,0,false,{}) : V55.nodeHTML(c,x,i++,x===cur,{uc:V55.ucOf(k)}); }); });
@@ -131,7 +132,7 @@
       var showAll=!!V55.showAll[c.id], lim=showAll?list.length:4;
       return '<div class="v55-fut">'+list.slice(0,lim).map(function(x,i){ return V55.nodeHTML(c,x,i,x===cur,{uc:"#AFAFAF",compact:true}); }).join("")+'</div>'+(list.length>4?'<div class="v55-more"><button type="button" class="btn xs" data-v55more="1">'+(showAll?"접기":"전부 보기 ("+list.length+")")+'</button></div>':''); };
     futEx.forEach(function(e,idx){ var kind=String(e.ex.kind||""), ph=/중간/.test(kind)?"mid":/기말/.test(kind)?"final":null;
-      var seg=rest.filter(function(x){ return x.date<e.date; }); rest=rest.filter(function(x){ return x.date>e.date; });
+      var seg=rest.filter(function(x){ return x.date<=e.date; }); rest=rest.filter(function(x){ return x.date>e.date; });   /* 같은 날 회차는 시험 앞에 (오타 v56 ⑤: 양쪽에서 빠져 사라지던 것) */
       if(seg.length) h+='<div class="v55-sec"><span>예정 회차 '+seg.length+'개 · '+esc(kind||"시험")+' 전</span></div>'+futList(seg,idx===0);
       var pl=ph?plannedLeft.filter(function(g){ return (g.u.phase||"mid")===ph; }):[]; plannedLeft=plannedLeft.filter(function(g){ return pl.indexOf(g)<0; });
       if(pl.length) h+='<div class="v55-sec"><span>'+esc(kind||"시험")+' 범위 · 앞으로 배울 단원</span></div>'+pl.map(function(g){ return V55.planHTML(g.u); }).join("");
