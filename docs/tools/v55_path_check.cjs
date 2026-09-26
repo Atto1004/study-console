@@ -56,6 +56,11 @@ setTimeout(() => { const w = d.window, doc = w.document; const by = n => w.cours
     w.V55.showAll[c.id] = true; w.go("course", c.id); const n1 = doc.querySelectorAll("#v55Path .v55-fut .v55-node").length;
     const c2 = by("정역학"); w.go("course", c2.id); const n2 = doc.querySelectorAll("#v55Path .v55-fut .v55-node").length;
     ok(n1 > 4 && n2 === 4, "전부 보기: 일물2 " + n1 + "개(전부) · 정역학 " + n2 + "개(접힘)");
+    /* 동률 비교(오타 v57): 같은 날·같은 종류는 0 → 입력 순서 보존, 회차가 시험 앞 */
+    { const S1 = { kind: "sess", date: "2026-10-01", id: "S1" }, S2 = { kind: "sess", date: "2026-10-01", id: "S2" }, E1 = { kind: "exam", date: "2026-10-01", id: "E1" }, E2 = { kind: "exam", date: "2026-10-01", id: "E2" };
+      const o1 = [S1, S2, E1, E2].sort(w.V55.byDate).map(x => x.id).join(""), o2 = [E2, S2, E1, S1].sort(w.V55.byDate).map(x => x.id).join("");
+      ok(w.V55.byDate(S1, S2) === 0 && w.V55.byDate(E1, E2) === 0 && w.V55.byDate(S1, E1) < 0 && w.V55.byDate(E1, S1) > 0, "byDate: 같은 종류 0 · 회차 < 시험");
+      ok(o1 === "S1S2E1E2" && o2 === "S2S1E2E1", "동률 정렬이 입력 순서를 보존: " + o1 + " / " + o2); }
     /* 어두운 테마 글자 토큰 */
     const css = doc.querySelector("#v54css") && doc.querySelector("#v54css").textContent || ""; ok(/data-theme="dark"\]\{[^}]*--duo-blue-text:#5AC8FA/.test(css) && /--duo-green-text:#7ED957/.test(css), "어두운 테마 글자 토큰(파랑 #5AC8FA · 초록 #7ED957)");
     console.log("errs", errs.length, errs.slice(0, 3)); process.exit(fail ? 1 : 0);

@@ -47,9 +47,11 @@
       if(d<=td){ var x=window.V50?V50.session(c,d,td,S):null; if(x){ x.kind="sess"; out.push(x); } }
       else out.push({kind:"sess",date:d,w:weekOf(d)||1,st:"future",title:"",absent:false,parts:[]}); });
     (exams(c.id)||[]).forEach(function(ex){ if(!ex||!ex.date) return; out.push({kind:"exam",date:ex.date,w:weekOf(ex.date)||0,ex:ex,st:ex.date<td?"exam-past":"exam"}); });
-    out.sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:(a.kind==="exam"?1:-1); });
+    out.sort(V55.byDate);
     return out;
   };
+  /* 날짜 → 같은 날은 회차 → 시험, 날짜·종류가 같으면 0(입력 순서 보존 — 오타 v57: 동률에 ±1을 돌려주면 정렬이 뒤집힌다) */
+  V55.byDate=function(a,b){ if(a.date!==b.date) return a.date<b.date?-1:1; return (a.kind==="exam"?1:0)-(b.kind==="exam"?1:0); };
   V55.current=function(nodes){ return nodes.filter(function(x){ return x.kind==="sess"&&(x.st==="todo"||x.st==="part"||x.st==="today"); })[0]||nodes.filter(function(x){ return x.kind==="sess"&&x.st==="future"; })[0]||null; };
   V55.STN={done:"따라감",part:"진행 중",today:"오늘 수업",todo:"밀림",cont:"이어짐",note:"정리만 있음",wait:"정리 대기",future:"예정",exam:"시험",'exam-past':"시험 끝"};
   V55.icon=function(k){ var P={check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',play:'<path d="M8.5 5.5v13l10.5-6.5z" fill="currentColor" stroke="none"/>',lock:'<rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',wait:'<path d="M7 3.5h10M7 20.5h10M8 3.5c0 5 8 5 8 8.5s-8 3.5-8 8.5M16 3.5c0 5-8 5-8 8.5s8 3.5 8 8.5"/>',star:'<path d="M12 3.2l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17.2 6.6 20.1l1-6.1L3.2 9.7l6.1-.9z" fill="currentColor"/>',note:'<path d="M5 4.5h14v15H5z"/><path d="M8 9h8M8 12.5h8M8 16h5"/>',cont:'<path d="M5 12h14M13 6l6 6-6 6"/>',today:'<circle cx="12" cy="12" r="8.6"/><path d="M12 7.3V12l3.1 2"/>'};
@@ -122,7 +124,7 @@
     /* 지난 시험은 날짜 순서대로 — 그 날짜 전 회차가 있는 마지막 단원 안에서 회차 사이에 끼우고, 어느 회차보다 앞이면 맨 앞에 (오타 v55 4) */
     /* 같은 날 회차와 시험은 회차 → 시험 순 (오타 v56 ④: `<` 로 고르면 같은 날 회차가 시험 뒤 단원으로 밀린다) */
     var pastEx={}, preEx=[]; exs.filter(function(e){ return e.date<td; }).forEach(function(e){ var at=-1; groups.forEach(function(g,k){ if(g.items.some(function(x){ return x.date<=e.date; })) at=k; }); if(at<0){ if(!none.length) preEx.push(e); else at=-2; } if(at>=0||at===-2) (pastEx[at]=pastEx[at]||[]).push(e); });
-    var byDate=function(a,b){ return a.date<b.date?-1:a.date>b.date?1:(a.kind==="exam"?1:-1); };
+    var byDate=V55.byDate;
     var h=''; preEx.sort(byDate).forEach(function(e){ h+=V55.nodeHTML(c,e,0,false,{}); });
     groups.forEach(function(g,k){ if(!g.items.length) return; h+=V55.unitHTML(g.u,k,g.items,cur); var i=0; g.items.concat(pastEx[k]||[]).sort(byDate).forEach(function(x){ h+= x.kind==="exam"? V55.nodeHTML(c,x,0,false,{}) : V55.nodeHTML(c,x,i++,x===cur,{uc:V55.ucOf(k)}); }); });
     if(none.length){ h+='<div class="v55-unit none" style="--uc:#8E8E8E"><div class="v55-ub"><div class="v55-un">단원 미지정</div><div class="v55-ut">knowledge/units.json 에 날짜를 넣으면 단원으로 들어갑니다</div><div class="v55-up"><b>'+none.length+'</b><small>회차</small></div></div></div>'; var i2=0; none.concat(pastEx[-2]||[]).sort(byDate).forEach(function(x){ h+= x.kind==="exam"? V55.nodeHTML(c,x,0,false,{}) : V55.nodeHTML(c,x,i2++,x===cur,{uc:"#8E8E8E"}); }); }
