@@ -59,6 +59,8 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <div class="why">\\(\\hat r\\)은 길이 1인 방향 벡터라 \\(\\hat r=\\vec r/r\\). 분모에 \\(r\\)이 하나 더 붙어 \\(r^3\\)이 되지만 <b>같은 식</b>이다. 교수님은 벡터 \\(\\vec r\\)로 쓴 꼴을 요구한다 — 방향이 식 안에 들어 있어서 부호 실수가 줄기 때문.</div>
 <div class="say">"E⃗ = (1/4πε₀)(q/r³) r⃗ — 시험 문제 내면 반드시 써야 된다." (9/11 복습 때)</div>
 <div class="pitfall">\\(q\\)의 부호를 식에 그대로 넣는다. \\(q&lt;0\\)이면 \\(\\vec E\\)가 \\(\\vec r\\)과 반대 → 전하 쪽으로 향한다. 크기만 구하고 방향을 따로 붙이는 습관보다 벡터식 하나로 끝내는 게 안전하다.</div>
+<div class="analogy">체중계에 1 kg 추를 올려 "이 자리의 저울이 얼마나 세게 누르나"를 재듯, 어느 점에 +1 C을 놓아 보고 받는 힘을 읽은 것이 전기장. 추(시험전하)가 커지면 눈금은 커지지만 저울(전기장) 자체는 그대로다 — 그래서 \\(q'\\)로 나눈다.</div>
+<div class="memo"><b>외울 것</b> \\(\\vec E=\\dfrac{{1}}{{4\\pi\\varepsilon_0}}\\dfrac{{q}}{{r^3}}\\vec r\\) — 벡터 \\(\\vec r\\)로 쓰기 · \\(q\\)의 부호 그대로 · 단위 N/C · \\(\\hat r=\\vec r/r\\)</div>
 </section>
 
 <section class="s" data-id="s2">
@@ -72,6 +74,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <p>② \\(q_3\\)가 주는 힘: 인력 → \\(q_3\\) 쪽(+y). 크기 \\(k\\dfrac{{20\\times4}}{{3^2}}=\\dfrac{{80}}{{9}}k\\).</p>
 <p>③ 벡터 합: \\(\\vec F=k\\left(\\dfrac{{15}}{{4}}\\hat i+\\dfrac{{80}}{{9}}\\hat j\\right)\\) N. 크기는 \\(k\\sqrt{{(15/4)^2+(80/9)^2}}\\approx9.6k\\), 방향은 x축에서 \\(\\tan^{{-1}}\\dfrac{{80/9}}{{15/4}}\\approx67^\\circ\\).</p>
 <p>강의노트 답과 같다. 시험은 이 문제의 숫자를 바꾼 꼴 — "각 힘의 방향 → 성분 → 합"의 수순을 손에 익힐 것.</p></div></details>
+<div class="memo"><b>수순 3단계</b> ① 각 전하가 주는 힘(장)의 <b>방향</b>을 그림에 화살표로 먼저 그린다 — 인력은 상대 전하 쪽, 척력은 반대쪽 ② 화살표를 \\(x\\)·\\(y\\) 성분으로 나눈다(각이 있으면 \\(\\cos\\)·\\(\\sin\\)) ③ 성분끼리 더해 크기 \\(\\sqrt{{F_x^2+F_y^2}}\\)와 각 \\(\\tan^{{-1}}(F_y/F_x)\\). 시험은 ①의 화살표 방향에서 반이 갈린다.</div>
 </section>
 
 <section class="s" data-id="s3">
@@ -83,6 +86,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <div class="why">두 항이 거의 같아서 빼면 작은 값만 남고, 그 작은 값이 \\(d\\)에 비례한다. 점전하는 \\(1/z^2\\)인데 쌍극자는 \\(1/z^3\\) — 멀리서 보면 +와 −가 상쇄되어 <b>더 빨리 사라진다</b>.</div>
 <div class="analogy">멀리서 보면 서로 반대인 두 목소리가 거의 지워져 작게 들린다. 가까이 가야 "누가 더 가까운지" 차이가 드러난다.</div>
 <p>쌍극자가 균일한 전기장 안에서 받는 토크와 에너지는 뒤에 나온다(강의노트 p.8).</p>
+<div class="memo"><b>외울 것</b> \\(\\vec p=q\\vec d\\)(방향은 −에서 +로) · 축 위 멀리서 \\(E=\\dfrac{{1}}{{2\\pi\\varepsilon_0}}\\dfrac{{p}}{{z^3}}\\) · 균일한 장 안에서 토크 \\(\\vec\\tau=\\vec p\\times\\vec E\\), 위치 에너지 \\(U=-\\vec p\\cdot\\vec E\\)(강의노트 p.8 — 장과 나란할 때 에너지 최소)</div>
 </section>
 
 <section class="s" data-id="s4">
@@ -94,6 +98,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <div class="why">적분 구간이 <b>\\(a\\)부터 \\(a+L\\)</b>인 이유: P에서 도선의 가까운 끝까지가 \\(a\\), 먼 끝까지가 \\(a+L\\). 마지막에 \\(\\lambda L=q\\)로 되돌린다.</div>
 <div class="memo"><b>검산</b>: \\(a\\gg L\\)이면 \\(a+L\\approx a\\) → \\(E\\to\\dfrac{{1}}{{4\\pi\\varepsilon_0}}\\dfrac{{q}}{{a^2}}\\) — 멀리서 보면 점전하. 유도 결과가 맞는지 확인하는 표준 방법이고, 시험 서술에 한 줄 넣을 만하다.</div>
 <div class="analogy">긴 막대를 멀리서 보면 점 하나로 보인다. 식도 똑같이 점전하 식으로 돌아가야 정상이다.</div>
+<div class="pitfall">P가 도선의 <b>연장선 위</b>에 있을 때만 이 적분이다. P가 도선 <b>옆</b>(수직 거리 \\(a\\))에 있으면 조각마다 방향이 달라 \\(\\cos\\theta\\)가 붙고 대칭으로 한 성분만 남는다 — 9/11 원형 도선과 같은 수순이고, 9/18 전위 계산에서 이 "옆" 배치가 다시 나온다. 도선을 무한히 길게 하면 옆에서 잰 장은 \\(\\lambda/2\\pi\\varepsilon_0 a\\)가 되는데, 9/16 가우스 법칙으로 한 줄에 얻는다.</div>
 <p>이 수순 — \\(dq\\to dE\\to\\) 대칭으로 살아남는 성분만 \\(\\int\\) — 이 다음 시간 원형 도선·원판에도 그대로 쓰인다.</p>
 </section>
 

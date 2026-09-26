@@ -43,6 +43,17 @@ fig_diel = canvas(560, 220,
     text(280, 205, "E = E₀ − E′ = E₀/κ  → V 줄고 C = κC₀ 늘어난다", 13, INK, "middle", True),
     cap="유전체를 넣으면 분극으로 표면에 유도 전하가 생겨 판의 장을 일부 상쇄한다. 판의 \\(q\\)는 그대로인데 전위차가 줄어 용량이 는다.")
 
+fig_three = canvas(560, 195,
+    rect(40, 44, 90, 60, PINK, dash="6 4", fill="rgba(255,77,141,.06)"), text(85, 120, "면 A", 13, PINK, "middle"),
+    arrow(85, 126, 85, 146, GRAY, "", 1.4),
+    plate(45, 152, 80, 8, "+", 5), plate(45, 172, 80, 8, "−", 5), text(85, 30, "평행판", 13, INK, "middle", True),
+    ellipse(280, 50, 30, 10, PINK, 2, "rgba(255,77,141,.06)", "6 4"), ellipse(280, 98, 30, 10, PINK, 2, "none", "6 4"), line(250, 50, 250, 98, PINK, 2, "6 4"), line(310, 50, 310, 98, PINK, 2, "6 4"),
+    text(280, 122, "원통 2πrL", 13, PINK, "middle"), arrow(280, 128, 280, 146, GRAY, "", 1.4),
+    line(230, 154, 330, 154, INK, 2.5), line(230, 180, 330, 180, INK, 2.5), rect(230, 164, 100, 6, RED, fill="rgba(224,49,49,.3)", sw=1), text(280, 30, "원통형(동축)", 13, INK, "middle", True),
+    circle(470, 74, 32, PINK, dash="6 4", w=2), text(470, 122, "구 4πr²", 13, PINK, "middle"), arrow(470, 128, 470, 146, GRAY, "", 1.4),
+    circle(470, 168, 17, INK, w=2), circle(470, 168, 6, RED, w=2, fill="rgba(224,49,49,.3)"), text(470, 30, "구형(동심)", 13, INK, "middle", True),
+    cap="가우스면 3종이 곧 축전기 3종. 순서는 늘 같다: 가우스로 \\(E\\) → 선적분으로 \\(\\Delta V\\) → \\(C=q/\\Delta V\\).")
+
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일반물리학2 · 9/23 축전기 — 평행판 · 원통형 · 구형 · 유전체</title></head><body>
 <header>
 <h1>25장 축전기 — 전기 용량 세 가지와 유전체</h1>
@@ -55,6 +66,8 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <div class="formula">\\[C=\\frac{{q}}{{\\Delta V}}=\\frac{{\\varepsilon_0\\oint\\vec E\\cdot\\hat n\\,dA}}{{-\\int_i^f\\vec E\\cdot d\\vec r}}\\]</div>
 <div class="why">분자: 가우스 법칙 \\(\\oint\\vec E\\cdot\\hat n\\,dA=q/\\varepsilon_0\\)을 \\(q\\)에 대해 푼 것. 분모: 일 \\(W=\\int_i^f q\\vec E\\cdot d\\vec r=-\\Delta U\\) → \\(\\Delta V=\\Delta U/q=-\\int_i^f\\vec E\\cdot d\\vec r\\)(24장 끝에 유도). 즉 23장(가우스)과 24장(전위)을 한 식에 합친 것이 25장이다.</div>
 <div class="say">판서 강조: 분자와 분모를 각각 원으로 묶고 「가우스 법칙」 화살표. 가우스면 3종 → ① 면 → 평행판 ② 원통 → 원통형 ③ 구 → 구형.</div>
+{fig_three}
+<div class="memo"><b>외울 것</b> \\(C=q/\\Delta V\\) [F = C/V] · 순서: 가우스 → 선적분 → 나누기 · 결과는 \\(q\\)가 약분되어 <b>모양(기하)만</b> 남는다 · \\(1\\,\\mu\\)F = \\(10^{{-6}}\\) F</div>
 <div class="analogy">물통의 용량이 "같은 수압으로 얼마나 담기느냐"이듯, 축전기 용량은 <b>같은 전압으로 얼마나 많은 전하를 담느냐</b>. 판이 넓고(A↑) 가까우면(d↓) 많이 담긴다.</div>
 <figure class="board"><img data-photo="일반물리학2/2026-09-23/판서_1_전기용량정의_평행판.jpg" alt="판서 1"><figcaption>판서 ① 일반식 + 평행판 (10:46)</figcaption></figure>
 </section>
@@ -64,6 +77,8 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 {fig_pp}
 <div class="formula">\\[EA=\\frac{{q}}{{\\varepsilon_0}}\\Rightarrow E=\\frac{{\\sigma}}{{\\varepsilon_0}},\\qquad \\Delta V=-\\int_d^0E\\,ds=Ed,\\qquad C=\\frac{{q}}{{\\Delta V}}=\\frac{{\\varepsilon_0EA}}{{Ed}}=\\varepsilon_0\\frac{{A}}{{d}}\\ [\\mathrm F]\\]</div>
 <div class="why">가우스면이 위판만 감싸고 전기력선은 판 사이로만 내려가므로 넓이는 \\(A\\)(무한 평면의 \\(2A\\)와 다르다 — 도체판 한쪽). \\(q\\)가 약분되어 <b>기하(A, d)만 남는다</b>. 용량은 전하를 얼마나 넣었느냐와 무관한 "그릇의 크기".</div>
+<div class="analogy">얇은 종이 한 장을 사이에 두고 손바닥 둘을 마주 대면, 멀리 떨어져 있을 때보다 상대 손의 전하를 훨씬 세게 붙잡아 둔다. 가까울수록(\\(d\\)↓)·넓을수록(\\(A\\)↑) 같은 전압으로 더 많은 전하를 담는다.</div>
+<div class="memo"><b>외울 것</b> \\(C=\\varepsilon_0A/d\\) · \\(E=\\sigma/\\varepsilon_0\\)(도체판 한쪽) · \\(V=Ed\\) · \\(\\varepsilon_0=8.85\\times10^{{-12}}\\) F/m</div>
 <details class="ex"><summary>넓이 \\(0.010\\ \\mathrm{{m^2}}\\), 간격 1.0 mm인 평행판의 용량</summary><div class="body"><p>\\(C=8.85\\times10^{{-12}}\\times\\dfrac{{0.010}}{{0.0010}}=8.85\\times10^{{-11}}\\) F \\(\\approx89\\) pF. mm를 m로 바꾸는 것을 잊지 말 것. 1 μF을 만들려면 판이 100 m²쯤 필요하다 — 그래서 유전체와 말아 감는 구조를 쓴다.</p></div></details>
 </section>
 
@@ -73,6 +88,8 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <div class="formula">\\[E\\cdot2\\pi rL=\\frac{{q}}{{\\varepsilon_0}}\\Rightarrow E=\\frac{{q}}{{2\\pi\\varepsilon_0L}}\\frac1r,\\quad \\Delta V=-\\int_b^a\\frac{{q}}{{2\\pi\\varepsilon_0L}}\\frac{{dr}}{{r}}=\\frac{{q}}{{2\\pi\\varepsilon_0L}}\\ln\\frac ba,\\quad C=\\frac{{2\\pi\\varepsilon_0L}}{{\\ln(b/a)}}\\]</div>
 <div class="why">전기장이 \\(1/r\\)이라 적분하면 \\(\\ln\\)이 나온다. 적분 구간이 \\(b\\)에서 \\(a\\)(바깥에서 안쪽으로)라 부호가 정리되어 양수 \\(\\ln(b/a)\\). 판서에서 \\(q\\)를 취소선으로 약분한 자리.</div>
 <div class="say">판서 강조: \\(E=\\dfrac{{q}}{{2\\pi\\varepsilon_0L}}\\cdot\\dfrac1r\\)에 물결 밑줄, 최종 \\(C\\) 위에 「2πε₀L」 메모.</div>
+<div class="analogy">TV 안테나선(동축 케이블)이 바로 이 축전기다 — 가운데 심선(\\(a\\))과 바깥 그물망(\\(b\\)). 길이 \\(L\\)이 길수록 용량이 커지고, 반지름은 <b>비율 \\(b/a\\)</b>로만 들어간다(둘을 같이 2배 해도 용량은 그대로).</div>
+<div class="memo"><b>외울 것</b> 원통형 \\(C=\\dfrac{{2\\pi\\varepsilon_0L}}{{\\ln(b/a)}}\\) — \\(1/r\\)을 적분하면 \\(\\ln\\) · 적분 방향은 바깥(\\(b\\))에서 안(\\(a\\))으로 → 양수</div>
 <figure class="board"><img data-photo="일반물리학2/2026-09-23/판서_2_원통형축전기_구형도입.jpg" alt="판서 2"><figcaption>판서 ② 원통형 축전기 (10:54)</figcaption></figure>
 </section>
 
@@ -82,6 +99,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <div class="formula">\\[E=\\frac{{1}}{{4\\pi\\varepsilon_0}}\\frac{{q}}{{r^2}},\\quad \\Delta V=\\frac{{q}}{{4\\pi\\varepsilon_0}}\\Big(\\frac1a-\\frac1b\\Big)=\\frac{{q}}{{4\\pi\\varepsilon_0}}\\frac{{b-a}}{{ab}},\\quad C=4\\pi\\varepsilon_0\\frac{{ab}}{{b-a}}=\\frac{{4\\pi\\varepsilon_0a}}{{1-a/b}}\\ \\xrightarrow{{b\\to\\infty}}\\ 4\\pi\\varepsilon_0a\\]</div>
 <div class="why">\\(\\dfrac{{ab}}{{b-a}}\\)를 \\(b\\)로 나누면 \\(\\dfrac{{a}}{{1-a/b}}\\). 바깥 껍질을 무한대로 보내면 \\(a/b\\to0\\) → <b>도체구 하나</b>의 용량 \\(4\\pi\\varepsilon_0a\\). 단위 확인: \\(\\varepsilon_0\\)[F/m] × m = F.</div>
 <div class="analogy">지구도 고립 도체구다: \\(a=6.4\\times10^6\\) m → \\(C\\approx7\\times10^{{-4}}\\) F. 행성만 한 공이 고작 0.7 mF — 패럿이 얼마나 큰 단위인지 감이 온다.</div>
+<div class="memo"><b>외울 것</b> 구형 \\(C=4\\pi\\varepsilon_0\\dfrac{{ab}}{{b-a}}\\) · 고립 도체구 \\(C=4\\pi\\varepsilon_0a\\)(\\(b\\to\\infty\\)) · 세 축전기 모두 \\(\\varepsilon_0\\times\\)길이 차원</div>
 <figure class="board"><img data-photo="일반물리학2/2026-09-23/판서_3_구형축전기_고립도체구.jpg" alt="판서 3"><figcaption>판서 ③ 구형 결과 → b→∞ 고립 도체구 (10:58)</figcaption></figure>
 </section>
 
@@ -92,6 +110,9 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <div class="formula">\\[E=\\frac{{q-q'}}{{\\varepsilon_0A}}=\\frac{{E_0}}{{\\kappa}},\\qquad \\kappa=\\frac{{\\varepsilon}}{{\\varepsilon_0}}>1\\ (\\text{{유전 상수}}),\\qquad V=\\frac{{V_0}}{{\\kappa}},\\quad C=\\kappa C_0,\\qquad q'=\\Big(1-\\frac1\\kappa\\Big)q\\]</div>
 <div class="why">판의 전하 \\(q\\)를 고정한 채(전지를 뗀 상태) 유전체를 넣으면 가우스면 안 알짜는 \\(q-q'\\)로 줄어 \\(E\\)가 준다 → 같은 간격이니 \\(V=Ed\\)도 준다 → \\(C=q/V\\)는 \\(\\kappa\\)배 <b>는다</b>. 9/4에 나온 "유전율이 크면 전기장이 작아진다"가 여기서 식이 된다.</div>
 <div class="say">판서 강조: 「내부 전기장」 물결 밑줄 · 「분극」 동그라미 · \\(\\kappa=\\varepsilon/\\varepsilon_0\\) → 상대 유전율 ⇒ 「유전상수」 동그라미 · \\(q'=\\dfrac{{\\kappa-1}}{{\\kappa}}q\\) 물결 밑줄.</div>
+<div class="analogy">유전체는 판 사이에 끼운 스펀지 완충재다. 판의 전하가 만드는 장을 일부 흡수(상쇄)해, 같은 전하로도 전압이 덜 걸린다 → 같은 전압까지 채우려면 전하를 더 넣을 수 있다 = 용량이 는다. 9/4의 "커튼(유전율)이 두꺼우면 전기장이 준다"가 여기서 식이 된다.</div>
+<div class="pitfall">"전하 고정"(전지를 뗀 뒤 삽입)과 "전압 고정"(전지를 연결한 채 삽입)을 구별한다. 전하 고정: \\(q\\) 그대로, \\(E\\)·\\(V\\)가 \\(1/\\kappa\\). 전압 고정: \\(V\\) 그대로, 전지가 전하를 더 보내 \\(q=\\kappa q_0\\). 어느 쪽이든 \\(C=\\kappa C_0\\) — 용량은 그릇의 성질이라 조건과 무관.</div>
+<div class="memo"><b>외울 것</b> \\(\\kappa=\\varepsilon/\\varepsilon_0&gt;1\\) · \\(E=E_0/\\kappa\\), \\(V=V_0/\\kappa\\), \\(C=\\kappa C_0\\)(전하 고정) · 유도 전하 \\(q'=(1-1/\\kappa)q\\) · 진공 \\(\\kappa=1\\), 종이 ≈ 3.5, 물 ≈ 80</div>
 <details class="ex"><summary>\\(q=6.0\\,\\mu\\)C으로 충전된 평행판에 \\(\\kappa=3\\)인 유전체를 채우면 유도 전하 \\(q'\\)와 전기장 배율은?</summary><div class="body"><p>\\(q'=(1-\\tfrac13)\\times6.0=4.0\\,\\mu\\)C. \\(E=E_0/3\\) — 원래의 1/3. 내부 장을 \\((q-q')/\\varepsilon_0A=2.0\\,\\mu\\mathrm C/\\varepsilon_0A\\)로 확인해도 같다.</p></div></details>
 <figure class="board"><img data-photo="일반물리학2/2026-09-23/판서_5_유전체_분극_유전상수.jpg" alt="판서 5"><figcaption>판서 ⑤ 유전체 — 분극·유도 전하·유전 상수 (11:14)</figcaption></figure>
 </section>

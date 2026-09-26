@@ -56,6 +56,16 @@ fig_three = canvas(560, 180,
     text(460, 160, "구 · 4πr²", 13, INK, "middle"),
     cap="교수님: 물리책의 가우스면은 딱 3개 — 표면적을 쉽게 구할 수 있는 것만 쓴다.")
 
+fig_map = canvas(560, 150,
+    rect(24, 24, 200, 100, GRAY, dash="5 4", rx=12), text(124, 46, "Σ · 불연속", 13, INK, "middle", True),
+    charge(60, 88, "+", "점전하", 11, RED), charge(118, 84, "+", "", 9, RED), charge(140, 94, "−", "점전하군", 9, BLUE), charge(196, 80, "+", "", 8, RED), charge(196, 100, "−", "쌍극자", 8, BLUE),
+    rect(244, 24, 200, 100, GRAY, dash="5 4", rx=12), text(344, 46, "∫dq · 연속", 13, INK, "middle", True),
+    rect(262, 86, 50, 7, RED, fill="rgba(224,49,49,.25)", sw=1), text(287, 112, "직선 λ", 11.5, INK, "middle"),
+    circle(344, 88, 15, RED, w=2.5), text(344, 118, "고리 λ", 11.5, INK, "middle"),
+    circle(404, 88, 17, RED, w=2, fill="rgba(224,49,49,.15)"), text(404, 118, "원판 σ", 11.5, INK, "middle"),
+    arrow(450, 74, 480, 74, INK, "", 1.6), text(518, 70, "다음:", 12, PINK, "middle"), text(518, 88, "가우스", 12, PINK, "middle", True), text(518, 104, "(부피 ρ)", 11, PINK, "middle"),
+    cap="오늘 위치: 연속 분포의 마지막 둘(고리·원판)을 끝내고 가우스 법칙으로 넘어간다.")
+
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일반물리학2 · 9/11 원형 도선 · 원판 · 가우스 법칙 서론</title></head><body>
 <header>
 <h1>원형 도선 · 원판의 전기장 — 그리고 가우스 법칙의 축구공</h1>
@@ -68,7 +78,10 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <p>교수님이 첫머리에 다시 짚었다. 전기장 구하기는 전하 분포가 <b>불연속이냐 연속이냐</b>로 갈린다.</p>
 <div class="memo"><b>불연속 → Σ</b>: 점전하, 전기 쌍극자 · <b>연속 → ∫</b>: 직선 도선(\\(\\lambda\\)) · 원형 도선(\\(\\lambda\\)) · 원판(\\(\\sigma\\)) · <b>다음</b>: 가우스 법칙(부피 \\(\\rho\\))</div>
 <div class="say">"6개 다 했어. 직선 도선, 원형 도선, 원판 — 그걸 전하의 분포가 썸이냐 인테그럴이냐 한 거잖아."</div>
+{fig_map}
+<div class="analogy">여섯 문제는 전부 같은 레시피다 — "조각 하나의 장(점전하 식) → 대칭으로 살아남는 성분 → 더하기(Σ 또는 ∫)". 레시피가 하나라 재료(전하 분포)만 바뀐다. 새 문제를 보면 "조각은 뭐고, 어느 성분이 남나"부터 묻는다.</div>
 <div class="pitfall">밀도 기호를 바꿔 쓰면 감점: 선은 \\(\\lambda=dq/ds\\), 면은 \\(\\sigma=dq/dA\\), 부피는 \\(\\rho\\). 원형 도선은 "선"이라 \\(\\lambda\\), 원판은 "면"이라 \\(\\sigma\\).</div>
+<div class="memo"><b>외울 것</b> 불연속 Σ 3개 · 연속 ∫ 3개 · \\(\\lambda=dq/ds\\), \\(\\sigma=dq/dA\\), \\(\\rho=dq/dV\\) · 조각의 장은 늘 점전하 식 \\(\\dfrac{{1}}{{4\\pi\\varepsilon_0}}\\dfrac{{dq}}{{r^2}}\\)</div>
 <figure class="board"><img data-photo="일반물리학2/2026-09-11/판서_01_전하분포_불연속연속_직선도선.jpg" alt="판서 1"><figcaption>판서 ① 단원 지도 + 직선 도선 복습 (10:38)</figcaption></figure>
 </section>
 
@@ -78,6 +91,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 {fig_ring}
 <div class="why">고리의 정반대편에 똑같은 조각이 있다. 두 조각의 \\(d\\vec E\\)는 수평 성분이 정확히 반대라 <b>상쇄</b>되고, \\(z\\) 성분만 같은 방향으로 쌓인다. 그래서 \\(dE_z=dE\\cos\\theta\\)만 적분하면 된다.</div>
 <div class="say">"가운데를 중심으로 정반대쪽에 똑같은 게 또 하나 있네. 얘네들은 벡터니까 서로 반대 방향으로 상쇄되네. 살아남는 건 z 성분만."</div>
+<div class="analogy">원탁에 둘러앉은 사람들이 가운데 위에 뜬 풍선을 각자 자기 쪽으로 당긴다고 하자. 옆으로 당기는 몫은 맞은편 사람이 정확히 지워 주고, <b>위로 당기는 몫만</b> 쌓인다 — 그래서 \\(z\\) 성분만 남고, 풍선이 탁자 높이(\\(z=0\\))에 있으면 사방에서 당겨 0.</div>
 <div class="formula">\\[dE=\\frac{{1}}{{4\\pi\\varepsilon_0}}\\frac{{\\lambda\\,ds}}{{z^2+R^2}},\\quad \\cos\\theta=\\frac{{z}}{{\\sqrt{{z^2+R^2}}}}\\ \\Rightarrow\\ E_z=\\frac{{1}}{{4\\pi\\varepsilon_0}}\\frac{{\\lambda z}}{{(z^2+R^2)^{{3/2}}}}\\int_0^{{2\\pi R}}ds=\\frac{{1}}{{4\\pi\\varepsilon_0}}\\frac{{qz}}{{(z^2+R^2)^{{3/2}}}}\\]</div>
 <p>적분 안의 모든 값이 \\(ds\\)와 무관해서 \\(\\int_0^{{2\\pi R}}ds=2\\pi R\\)이 고리 둘레로 나온다. \\(\\lambda\\cdot2\\pi R=q\\).</p>
 <div class="say">"좌우 대칭으로 수평 성분은 싹 없어지고 수직 성분만 남는데, 한 바퀴 삥 도니까 0에서 2πR까지 적분해 버리면 된다는 사실만 딱 이해되면 돼." · "이거는 시험 볼 때 쓰려니까 막 하죠."</div>
@@ -97,6 +111,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <div class="formula">\\[R\\to\\infty:\\quad E=\\frac{{\\sigma}}{{2\\varepsilon_0}}=\\frac{{q}}{{2\\varepsilon_0A}}\\]</div>
 <div class="say">"무한 평면의 전기장이에요. z에 안 들어가. 거리와 무관하다." — 판서에 「(의미)」라고 따로 써서 강조.</div>
 <div class="analogy">벽 앞에 서면 벽이 얼마나 큰지 못 느낀다. 어디에 있든 "앞에 벽 하나"일 뿐 — 무한히 넓은 판의 장이 거리와 무관한 이유.</div>
+<div class="memo"><b>외울 것</b> 원판 \\(E=\\dfrac{{\\sigma}}{{2\\varepsilon_0}}\\Big(1-\\dfrac{{z}}{{\\sqrt{{z^2+R^2}}}}\\Big)\\) · 치환 \\(A^2=r^2+z^2\\), 구간 \\(z\\to\\sqrt{{z^2+R^2}}\\) · 무한 평면 \\(\\sigma/2\\varepsilon_0\\)(거리 무관)</div>
 <figure class="board"><img data-photo="일반물리학2/2026-09-11/판서_04_원판_치환적분_무한평면.jpg" alt="판서 4"><figcaption>판서 ④ 치환 적분 → 결과 → 무한 평면 (10:53)</figcaption></figure>
 </section>
 
@@ -109,10 +124,12 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 {fig_gauss}
 <div class="why">전기력선과 법선벡터가 <b>평행</b>이면 사이각 0° → \\(\\vec E\\cdot\\hat n=E\\cdot1\\cdot\\cos0^\\circ=E\\). 벡터의 내적이 그냥 숫자가 되어 \\(\\oint E\\,dA=q/\\varepsilon_0\\). 그래서 가우스 법칙에서 나오는 값은 전부 스칼라다.</div>
 <div class="say">"전기력선 하나와 미소면적 법선벡터 하나는 서로 수직하냐 평행하냐 — 평행한 게 머릿속에 그려져야 돼요."</div>
+<div class="analogy">축구공 안에 전등(+1 C)이 있고 공 표면에 작은 창(\\(dA\\))이 \\(6\\times10^{{18}}\\)개 있다. 창 하나마다 빛줄기(전기력선) 하나가 창에 <b>수직으로</b> 빠져나간다. 창을 다 세면 전등의 밝기(전하)가 나온다 — 창을 세는 것이 가우스 법칙이고, 공 대신 어떤 봉지를 씌워도 빠져나가는 빛줄기 수는 같다.</div>
 <h3>가우스면은 딱 3개</h3>
 {fig_three}
 <div class="why">어렵게 전기장을 구하려는 게 아니라 <b>쉽게</b> 구하려는 것. 그래서 표면적을 바로 쓸 수 있는 세 모양만 쓴다: 면 \\(A\\), 원통 옆면 \\(2\\pi rL\\)(윗면·아랫면은 전기력선과 평행이라 기여 0), 구 \\(4\\pi r^2\\).</div>
 <figure class="board"><img data-photo="일반물리학2/2026-09-11/판서_05_가우스면3종.jpg" alt="판서 5"><figcaption>판서 ⑤ 가우스면 3종 (11:06)</figcaption></figure>
+<div class="memo"><b>외울 것</b> \\(\\oint\\vec E\\cdot\\hat n\\,dA=q_{{enc}}/\\varepsilon_0\\) · 전기력선 ∥ 법선벡터 → 내적은 \\(E\\) · 가우스면 3종: 면 \\(A\\) · 원통 옆면 \\(2\\pi rL\\) · 구 \\(4\\pi r^2\\)</div>
 <p>다음 시간: 가우스 법칙 본격 — 3종으로 지난 결과를 다시 뽑고, 도체구·부도체구.</p>
 </section>
 

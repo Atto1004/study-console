@@ -41,6 +41,24 @@ fig_monopole = canvas(560, 160,
     text(420, 130, "또 N·S — 자하는 혼자 못 산다", 13, INK, "middle"),
     cap="자석은 아무리 잘라도 N·S가 붙어 나온다. 그래서 자기의 소스는 자하가 아니라 전류(I = dq/dt).")
 
+fig_map = canvas(560, 170,
+    rect(30, 30, 230, 120, GRAY, dash="5 4", rx=12), text(145, 52, "불연속 → Σ (하나씩 더한다)", 13, INK, "middle", True),
+    charge(80, 100, "+", "점전하", 12, RED), charge(145, 100, "+", "", 10, RED), charge(175, 100, "−", "점전하군", 10, BLUE), charge(225, 92, "+", "", 9, RED), charge(225, 114, "−", "쌍극자", 9, BLUE),
+    rect(300, 30, 230, 120, GRAY, dash="5 4", rx=12), text(415, 52, "연속 → ∫dq (조각을 적분)", 13, INK, "middle", True),
+    rect(320, 96, 60, 8, RED, fill="rgba(224,49,49,.25)", sw=1), text(350, 126, "직선 λ", 12, INK, "middle"),
+    circle(430, 100, 18, RED, w=2.5), text(430, 136, "고리 λ", 12, INK, "middle"),
+    circle(500, 100, 20, RED, w=2, fill="rgba(224,49,49,.15)"), text(500, 136, "원판 σ", 12, INK, "middle"),
+    cap="22장의 목차 = 세는 방법 두 가지. 재료(전하 분포)만 바뀌고 레시피는 같다: 조각의 장 → 대칭 → 더하기.")
+
+fig_ex4 = canvas(560, 230,
+    charge(280, 60, "+", "q₁", 16, RED), charge(170, 190, "+", "q₂", 16, RED), charge(390, 190, "+", "q₃", 16, RED),
+    line(280, 60, 170, 190, GRAY, 1, "4 3"), line(280, 60, 390, 190, GRAY, 1, "4 3"), line(170, 190, 390, 190, GRAY, 1, "4 3"),
+    arrow(290, 48, 350, 26, GREEN, "", 2.2), text(362, 24, "F₃ (q₃가 밀어냄)", 12, GREEN),
+    arrow(270, 48, 210, 26, GREEN, "", 2.2), text(198, 22, "F₂ (q₂가 밀어냄)", 12, GREEN, "end"),
+    arrow(280, 40, 280, 8, YEL, "", 2.6, dash="5 4"), text(296, 14, "합력 = 성분 합 (위쪽)", 12, "#B26A00"),
+    text(280, 222, "크기를 더하지 말고 x·y 성분으로 나눠 더한다 → 좌우는 상쇄, 위쪽만 남는다", 12.5, INK, "middle"),
+    cap="예제 04 배치의 예(세 전하가 120° 간격, 전부 같은 부호일 때): \\(q_1\\)이 받는 두 힘은 좌우 성분이 지워지고 위쪽 성분만 더해진다.")
+
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일반물리학2 · 9/4 전하와 전기장 서론</title></head><body>
 <header>
 <h1>전하와 전기장 — "전기와 자기는 똑같다"</h1>
@@ -57,6 +75,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 {fig_net}
 <div class="analogy">통장에 +100만 원 재산과 −100만 원 빚이 같이 있으면 남는 건 0이다. 전하도 마찬가지 — 앞으로 "전하 q"라고 하면 언제나 <b>상쇄하고 남은 알짜</b>를 뜻한다.</div>
 <div class="say">"이 얘기(알짜 전하와 전기력선 개수)만 딱 있으면 전기는 끝이야." — 강의노트 뒤의 합력 문제는 전부 이 그림에서 벡터 합만 하면 된다.</div>
+<div class="memo"><b>외울 것</b> \\(q=ne\\), \\(e=1.6\\times10^{{-19}}\\) C · 전하 = 알짜(net) · 전자 하나 = 전기력선 하나</div>
 </section>
 
 <section class="s" data-id="s2">
@@ -67,12 +86,14 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <div class="analogy">바람 지도. 깃발(시험전하)을 어디에 꽂아도 "그 자리의 바람"은 정해져 있다. 큰 깃발은 더 세게 밀리지만 바람 자체가 세진 건 아니다. 전기장은 그 "바람"이다.</div>
 <p>+1 C에는 전자 약 \\(6\\times10^{{18}}\\)개 분량의 전하가 있다(교수님 표현 "600경 개"). 양성자 하나에서 전기력선이 하나 나온다고 보면 +1 C에서는 전기력선이 \\(6\\times10^{{18}}\\)개 뻗어 나간다. 전기장을 구한다 = <b>그 점을 지나는 전기력선을 센다</b>.</p>
 <div class="say">"그러면 이 n개를 어떻게 카운트할 거냐가 핵심 내용인 거예요." — 이 과목의 전기 파트 전체가 "상황별로 전기력선 개수를 세는 법"이다.</div>
+<div class="memo"><b>외울 것</b> \\(\\vec E=\\vec F/q_0\\) [N/C] · 기준은 <b>+1 C</b> · 전기력선은 +에서 나와 −로 들어간다 · 선의 밀도 = 세기, 접선 = 방향 · +1 C = 전기력선 \\(6\\times10^{{18}}\\)개</div>
 </section>
 
 <section class="s" data-id="s3">
 <h2>3. 세는 방법은 둘뿐 — 합(Σ) 아니면 적분(∫)</h2>
 <p>전하가 <b>몇 개</b>로 떨어져 있으면 하나씩 구해서 더한다(Σ). 전하가 도선·판처럼 <b>연속으로 퍼져</b> 있으면 아주 작은 조각 \\(dq\\)가 만드는 장을 적분한다(∫).</p>
-<div class="memo"><b>불연속 → Σ</b>: 점전하 · 점전하군 · 전기쌍극자<br><b>연속 → ∫dq</b>: 직선 도선(\\(\\lambda\\)) · 원형 도선(\\(\\lambda\\)) · 원판(\\(\\sigma\\))</div>
+{fig_map}
+<div class="memo"><b>외울 것</b> <b>불연속 → Σ</b>: 점전하 · 점전하군 · 전기쌍극자<br><b>연속 → ∫dq</b>: 직선 도선(\\(\\lambda\\)) · 원형 도선(\\(\\lambda\\)) · 원판(\\(\\sigma\\)) · \\(dq=\\lambda\\,ds=\\sigma\\,dA=\\rho\\,dV\\)</div>
 <p>연속 분포에는 "단위 길이·면적·부피당 전하"인 <b>밀도</b> 기호가 붙는다: 선 \\(\\lambda=dq/ds\\), 면 \\(\\sigma=dq/dA\\), 부피 \\(\\rho\\). 답에 어느 기호를 쓰는지 틀리면 감점이다.</p>
 <div class="analogy">사탕 다섯 개는 하나씩 세면 되지만(Σ), 설탕 한 봉지는 "1 g당 몇 알" 같은 밀도로 다뤄야 한다(∫). 직선 도선은 설탕을 한 줄로 뿌린 것, 원판은 접시에 편 것.</div>
 <p>이 여섯 가지가 22장의 목차 그대로다. 앞의 셋은 9/9, 뒤의 셋은 9/9~9/11에 하나씩 나온다.</p>
@@ -87,7 +108,9 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <h3>ε₀ — 진공의 유전율, "전기를 꼬시는 정도"</h3>
 <p>誘電率의 誘는 <b>유혹할 유</b>. +극에서 −극으로 전기력선이 갈 때 매질이 그 진행을 얼마나 붙잡느냐를 나타낸다. 진공은 100% 통과시킨다 → 그 값이 \\(\\varepsilon_0\\), <b>가장 작은 유전율</b>. 종이가 끼면 90%, 나무·쇠면 더 적게 → \\(\\varepsilon\\)이 커진다 → 전기장이 작아진다.</p>
 <div class="why">\\(\\varepsilon_0\\)가 가장 작으니 그 역수인 \\(k\\)는 가장 크다 → <b>진공에서 전기력이 가장 세다</b>. 유전체를 넣으면 전기장이 줄어드는 25장 내용이 여기서 예고된다.</div>
+<div class="analogy">유전율은 창문에 친 <b>커튼의 두께</b>. 진공은 커튼이 없는 창(\\(\\varepsilon_0\\), 최소)이라 빛(전기력선)이 다 들어오고, 종이·나무·쇠는 커튼이 두꺼워질수록 덜 들어온다. 커튼이 없을 때 힘이 가장 세다.</div>
 <div class="say">"소리의 매질은 공기다. 그럼 빛(전자기파)의 매질은?" — 진공. 아무도 답을 못 해서 교수님이 한참 기다렸다.</div>
+<div class="memo"><b>외울 것</b> \\(F=\\dfrac{{1}}{{4\\pi\\varepsilon_0}}\\dfrac{{q_1q_2}}{{r^2}}\\) — \\(k\\) 대신 \\(1/4\\pi\\varepsilon_0\\) · \\(\\varepsilon_0=8.854\\times10^{{-12}}\\)(최소) · 같은 부호 척력, 다른 부호 인력</div>
 </section>
 
 <section class="s" data-id="s5">
@@ -105,10 +128,12 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <section class="s" data-id="s6">
 <h2>6. 예제 — 슬라이드 01~05 (답은 슬라이드에 없어 아톰이 계산)</h2>
 <details class="ex"><summary>01 · 구리 동전 1.0 g의 총 양전하량은?</summary><div class="body"><p>구리 원자 하나에 양성자 29개. 1 g은 \\(\\dfrac{{1}}{{63.5}}\\) mol \\(=9.5\\times10^{{21}}\\)개 원자 → 양성자 \\(2.7\\times10^{{23}}\\)개.</p><p>\\(q=ne=2.7\\times10^{{23}}\\times1.6\\times10^{{-19}}\\approx4.3\\times10^{{4}}\\) C. 동전 하나에 4만 쿨롱 — 전자가 같은 양만큼 있어 상쇄될 뿐이다.</p></div></details>
-<details class="ex"><summary>02 · 두 이온이 \\(5.0\\times10^{{-10}}\\) m 떨어져 \\(1.88\\times10^{{-9}}\\) N의 힘 → 각 이온의 전하는?</summary><div class="body"><p>\\(F=k\\dfrac{{q^2}}{{r^2}}\\) → \\(q^2=\\dfrac{{Fr^2}}{{k}}=\\dfrac{{1.88\\times10^{{-9}}\\times(5\\times10^{{-10}})^2}}{{9\\times10^9}}=5.2\\times10^{{-38}}\\) → \\(q=2.3\\times10^{{-19}}\\) C? 아니다 — 다시 계산하면 \\(q\\approx3.2\\times10^{{-19}}\\) C \\(=2e\\). 즉 각 이온은 전자 2개를 잃거나 얻었다.</p><p>핵심: 답이 나오면 <b>\\(e\\)로 나눠 개수로</b> 바꿔 본다.</p></div></details>
+<details class="ex"><summary>02 · 동일한 두 이온이 \\(7.0\\times10^{{-10}}\\) m 떨어져 \\(1.88\\times10^{{-9}}\\) N의 힘 → 각 이온의 전하는?</summary><div class="body"><p>같은 이온이라 전하가 같다(\\(q_1=q_2=q\\)): \\(F=k\\dfrac{{q^2}}{{r^2}}\\) → \\(q^2=\\dfrac{{Fr^2}}{{k}}=\\dfrac{{1.88\\times10^{{-9}}\\times(7.0\\times10^{{-10}})^2}}{{8.99\\times10^9}}=1.02\\times10^{{-37}}\\) → \\(q=3.2\\times10^{{-19}}\\) C \\(=2e\\). 즉 각 이온은 전자 2개를 잃거나 얻었다(부호가 같으니 척력).</p><p>핵심: 답이 나오면 <b>\\(e\\)로 나눠 개수로</b> 바꿔 본다. 정수가 안 나오면 계산이 틀린 것.</p></div></details>
 <details class="ex"><summary>03 · 핵 속 두 양성자 사이 반발력(거리 \\(4\\times10^{{-15}}\\) m)</summary><div class="body"><p>\\(F=9\\times10^9\\times\\dfrac{{(1.6\\times10^{{-19}})^2}}{{(4\\times10^{{-15}})^2}}\\approx14\\) N. 원자핵 크기에서 14 N은 어마어마한 힘 — 그런데도 핵이 안 터지는 이유는 더 센 핵력이 있기 때문.</p></div></details>
-<details class="ex"><summary>04 · 세 전하가 120° 간격 — \\(q_1\\)에 작용하는 알짜 힘</summary><div class="body"><p>각 힘을 \\(\\hat i,\\hat j\\) 성분으로 나눠 더한다. 슬라이드 수치로 \\(\\approx2.6\\) N. 방법이 중요: <b>크기를 더하지 말고 성분을 더한다</b>.</p></div></details>
+<details class="ex"><summary>04 · 세 전하가 120° 간격 — \\(q_1\\)에 작용하는 알짜 힘</summary><div class="body">{fig_ex4}<p>각 힘을 \\(\\hat i,\\hat j\\) 성분으로 나눠 더한다. 슬라이드 수치로 \\(\\approx2.6\\) N. 방법이 중요: <b>크기를 더하지 말고 성분을 더한다</b>.</p></div></details>
 <details class="ex"><summary>05 · 수소 원자에서 전기력 ÷ 중력</summary><div class="body"><p>\\(\\dfrac{{F_e}}{{F_g}}=\\dfrac{{ke^2}}{{Gm_em_p}}\\) — 거리는 약분된다. \\(=\\dfrac{{9\\times10^9\\times(1.6\\times10^{{-19}})^2}}{{6.67\\times10^{{-11}}\\times9.11\\times10^{{-31}}\\times1.67\\times10^{{-27}}}}\\approx2.3\\times10^{{39}}\\). 원자 세계에서 중력은 완전히 무시한다.</p></div></details>
+<div class="analogy">예제 다섯 개는 전부 "단위 환산 + 개수 세기"다. 답이 쿨롱으로 나오면 반드시 \\(e\\)로 나눠 "전자 몇 개"로 바꿔 본다 — 돈을 원 단위로 받았으면 지폐 몇 장인지 세어 보는 습관.</div>
+<div class="memo"><b>외울 것</b> \\(e=1.6\\times10^{{-19}}\\) C · \\(k=9\\times10^9\\) · 1 C = \\(6\\times10^{{18}}\\) e · 힘은 <b>성분으로</b> 더한다 · mm·μC 같은 접두어는 계산 전에 SI로</div>
 <div class="memo">강의노트 p.8~9 <b>필수문제 1~6</b>(답 있음)이 이 회차의 연습이다. 1번(점전하군 합력 \\(k(\\tfrac{{15}}{{4}}\\hat i+\\tfrac{{80}}{{9}}\\hat j)\\))은 9/9 노트에서 푼다.</div>
 </section>
 

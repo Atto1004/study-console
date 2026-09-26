@@ -15,6 +15,8 @@
     return V52.loading;
   };
   V52.lesson=function(c,date){ var L=V52.L&&V52.L.courses; return (c&&L&&L[c.name]&&L[c.name][date])||null; };
+  V52.byId=function(id){ var L=V52.L&&V52.L.courses; if(!L||!id) return null; var out=null;
+    Object.keys(L).some(function(cn){ return Object.keys(L[cn]).some(function(d){ if(L[cn][d].id===id){ out=L[cn][d]; return true; } return false; }); }); return out; };
   V52.st=function(id){ try{ return JSON.parse(localStorage.getItem("mc-lesson-"+id)||"null")||{}; }catch(e){ return {}; } };
   /* 수업 노트를 V50 파트 모양으로 */
   V52.part=function(c,date){
@@ -63,10 +65,30 @@
     Object.keys(V52.L.courses).forEach(function(cn){ var m=V52.L.courses[cn]; Object.keys(m).sort().forEach(function(d){ var l=m[d];
       if(!NOTES.some(function(x){ return x.file===l.file; })) NOTES.push({course:cn,type:"학습",title:"수업 노트 · "+(+d.slice(5,7))+"/"+(+d.slice(8,10))+" · "+l.title,file:l.file,week:l.week||weekOf(d)||1,date:d,sub:"회차 학습 페이지 · 약 "+(l.minutes||0)+"분 · 확인 문제 "+(l.qids||[]).length}); }); });
   };
+  /* ⑤ 회차 표 칸(V37): 「정리」 줄에 수업 노트 진행을 덧붙인다 — 정리.md 가 없어도 노트가 있으면 「정리 없음」 대신 「수업 노트 n/m 읽음」 */
+  if(window.V37&&V37.cellHTML&&!V37.cellHTML._v52){
+    var _ch=V37.cellHTML;
+    V37.cellHTML=function(c,x){ var h=_ch(c,x); var l=V52.lesson(c,x.date); if(!l) return h;
+      var st=V52.st(l.id), n=(l.sids||[]).length, rd=(l.sids||[]).filter(function(s){ return st.read&&st.read[s]; }).length;
+      var tag='<span class="v52-note'+(n&&rd>=n?' ok':'')+'">수업 노트 '+rd+'/'+n+' 읽음</span>';
+      var h2=h.replace(/<span class="v37-none miss">정리 없음<\/span>/, tag);
+      if(h2===h) h2=h.replace(/(<span class="v37-k">정리<\/span><span class="v37-v">)([\s\S]*?)(<\/span><\/div>)/, function(m,a,b,z){ return a+b+' · '+tag+z; });
+      return h2; };
+    V37.cellHTML._v52=true;
+  }
+  /* ④ 이어서 학습하기(V43): 중첩 경로 notes/lessons/… 도 과목을 찾고, 수업 노트는 「섹션 n/m」으로 (오타 RED 2026-09-26: 경로 미인식 · 7/6장 표시) */
+  if(window.V43&&!V43._v52){
+    V43.file=function(rec){ var m=/notes\/[^?#]+$/.exec(rec.href||""); return m?m[0]:null; };
+    var _vh=V43.html;
+    V43.html=function(rec,wc){ var h=_vh(rec,wc); var l=V52.byId(rec.deck); if(!l) return h;
+      var st=V52.st(l.id), rd=(l.sids||[]).filter(function(s){ return st.read&&st.read[s]; }).length;
+      return h.replace(/\d+\/\d+장/, "섹션 "+rd+"/"+(l.sids||[]).length); };
+    V43._v52=true;
+  }
   /* 로드 훅: 데이터가 오면 관련 화면을 다시 그린다 */
   var _rs=renderStudy; renderStudy=function(){ _rs(); if(!V52.L&&!V52.err) V52.load().then(function(){ if(ui.view==="study"&&window.V50){ try{ V50.render(); }catch(e){} } }); };
   var _rc=renderCourse; renderCourse=function(){ _rc(); if(!V52.L&&!V52.err) V52.load().then(function(){ if(ui.view==="course") renderCourse(); }); };
-  var _rt=renderToday; renderToday=function(){ _rt(); if(!V52.L&&!V52.err) V52.load().then(function(){ if(ui.view==="today"&&window.V50){ try{ V50.renderToday(); V50.renderTodayCard(); }catch(e){} } }); };
+  var _rt=renderToday; renderToday=function(){ _rt(); if(!V52.L&&!V52.err) V52.load().then(function(){ if(ui.view==="today"){ try{ if(window.V50){ V50.renderToday(); V50.renderTodayCard(); } }catch(e){} try{ if(window.V43) V43.renderToday(); }catch(e){} } }); };
   V52.load();
-  var css=document.createElement("style"); css.id="v52css"; css.textContent=".v52-min{margin-left:6px;font-size:12px;color:var(--ink-3)}"; document.head.appendChild(css);
+  var css=document.createElement("style"); css.id="v52css"; css.textContent=".v52-min{margin-left:6px;font-size:12px;color:var(--ink-3)}.v52-note{color:var(--accent);font-weight:600}.v52-note.ok{color:var(--ok,var(--accent))}"; document.head.appendChild(css);
 })();

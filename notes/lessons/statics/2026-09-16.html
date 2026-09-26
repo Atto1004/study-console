@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>벡터의 마지막 도구, 그리고 "여기서부터 중간고사" — 힘의 종류와 자유물체도</title>
+<!-- 수업 노트 템플릿 v1 (대표님 2026-09-26 결정: 개념은 스크롤 교재 · 문제는 카드 · 아톰 SVG 그림 · 판서 사진은 atom 안에서만 · 원리 먼저 15~20분)
+     build_lesson.py 가 <section class="s" data-id="s1">
+<div class="no">1 / 5</div><h2>1. 혼합삼중적 U·(V×W) — 행렬식 · 부피 · 공면이면 0</h2>
+<p>4장에서 <b>직선에 대한 힘의 모멘트</b>를 다룰 때 쓴다. 먼저 \(\mathbf V\times\mathbf W\)(외적)를 구하고 그 결과와 \(\mathbf U\)를 내적한다 — 마지막이 내적이니 결과는 <b>스칼라</b>(교수님 질문 "벡터? 스칼라?").</p>
+<div class="formula">\[\mathbf U\cdot(\mathbf V\times\mathbf W)=\begin{vmatrix}U_x&amp;U_y&amp;U_z\\V_x&amp;V_y&amp;V_z\\W_x&amp;W_y&amp;W_z\end{vmatrix},\qquad \mathbf U\cdot(\mathbf V\times\mathbf W)=-\mathbf V\cdot(\mathbf U\times\mathbf W)\ (\text{두 벡터를 바꾸면 부호 반대})\]</div>
+<div class="say">"<b>외우고 가자</b>" — 행렬식. "행렬식으로 계산해 보면 나온다. 행렬식 형태를 기억하라."</div>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 240" width="560" height="240" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><path d="M150 190 L300 190 L360 150 L210 150 Z" fill="rgba(138,151,166,.15)" stroke="#8A97A6" stroke-width="1.5"></path><path d="M180 95 L330 95 L390 55 L240 55 Z" fill="rgba(138,151,166,.06)" stroke="#8A97A6" stroke-width="1.5"></path><line x1="300" y1="190" x2="330" y2="95" stroke="#8A97A6" stroke-width="1.5"></line><line x1="360" y1="150" x2="390" y2="55" stroke="#8A97A6" stroke-width="1.5"></line><line x1="210" y1="150" x2="240" y2="55" stroke="#8A97A6" stroke-width="1.5"></line><line x1="150" y1="190" x2="300" y2="190" stroke="#1971C2" stroke-width="3" marker-end="url(#ah)"></line><text x="225" y="212" font-size="15" fill="#1971C2" text-anchor="middle" font-weight="700">V</text><line x1="150" y1="190" x2="210" y2="150" stroke="#E03131" stroke-width="3" marker-end="url(#ah)"></line><text x="168" y="156" font-size="15" fill="#E03131" text-anchor="middle" font-weight="700">W</text><line x1="150" y1="190" x2="180" y2="95" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="150" y="120" font-size="15" fill="#2F9E44" text-anchor="middle" font-weight="700">U</text><text x="240" y="150" font-size="12.5" fill="#1F2A44" text-anchor="middle">밑면 넓이 |V × W|</text><text x="430" y="60" font-size="13" fill="#1F2A44" text-anchor="middle">U·(V×W) = |V×W| × (U의 수직 높이)</text><text x="430" y="86" font-size="14" fill="#1F2A44" text-anchor="middle" font-weight="700">= 평행육면체의 부피 (절댓값)</text><text x="430" y="130" font-size="12.5" fill="#E03131" text-anchor="middle">세 벡터가 한 평면에 있으면</text><text x="430" y="150" font-size="13" fill="#E03131" text-anchor="middle" font-weight="700">높이 0 → 부피 0 → U·(V×W) = 0</text></svg><figcaption>혼합삼중적의 기하: 밑면(평행사변형 \(\mathbf V,\mathbf W\)) 넓이에 \(\mathbf U\)의 수직 높이 성분을 곱한 것. 필기본 옆 한글 메모 「평행육면체」.</figcaption></figure>
+<div class="why">\(|\mathbf V\times\mathbf W|\)는 밑면 평행사변형의 넓이, 거기에 \(\mathbf U\)의 <b>밑면에 수직한 높이 성분</b>을 곱하니(내적) 평행육면체의 부피가 된다. 세 벡터가 한 평면에 있으면 높이가 0 → <b>공면(coplanar)이면 \(\mathbf U\cdot(\mathbf V\times\mathbf W)=0\)</b> — "계산할 필요 없이 그냥 0". 필기본 빨간 밑줄 두 곳.</div>
+<details class="ex"><summary>연습 — \(\mathbf U=(1,0,0)\), \(\mathbf V=(0,2,0)\), \(\mathbf W=(0,0,3)\) / \(\mathbf W'=(1,1,0)\)</summary><div class="body"><p>\(\begin{vmatrix}1&amp;0&amp;0\\0&amp;2&amp;0\\0&amp;0&amp;3\end{vmatrix}=1\cdot(2\cdot3-0)=6\) → 부피 6(직육면체 1×2×3). \(\mathbf W'\)로 바꾸면 \(\begin{vmatrix}1&amp;0&amp;0\\0&amp;2&amp;0\\1&amp;1&amp;0\end{vmatrix}=1\cdot(2\cdot0-0\cdot1)=0\) → 세 벡터가 모두 \(z=0\) 평면에 있다(공면).</p></div></details>
+<div class="analogy">상자 부피 = 밑면 넓이 × 높이. 세 벡터가 납작하게 한 평면에 누우면 상자가 눌려 부피 0. "세 점(벡터)이 같은 평면 위에 있나?"를 숫자 하나로 판정하는 도구.</div>
+<div class="memo"><b>외울 것</b> \(\mathbf U\cdot(\mathbf V\times\mathbf W)=\det[\mathbf U;\mathbf V;\mathbf W]\) · 스칼라 · 절댓값 = 평행육면체 부피 · <b>공면이면 0</b> · 두 벡터 바꾸면 부호 반대</div>
+</section>
+
+<section class="s" data-id="s2">
+<div class="no">2 / 5</div><h2>2. Ch.3 힘 — "여기서부터 중간고사 범위" · 외력/내력 · 체적력/표면력</h2>
+<div class="say">"<b>여기서부터 중간고사 범위. 3, 4, 5장이 중간고사 범위.</b>" · 이 장에서 정역학의 <b>가장 중요한 두 개념</b>: ① 평형(equilibrium) ② 자유물체도(free-body diagram) — "이 식(평형 방정식)만 쓸 수 있으면 된다."</div>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 210" width="560" height="210" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><rect x="200" y="70" width="160" height="90" rx="6" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2"></rect><text x="280.0" y="120.0" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700">물체</text><line x1="120" y1="115" x2="194" y2="115" stroke="#2F9E44" stroke-width="2.8" marker-end="url(#ah)"></line><text x="147.0" y="103.0" text-anchor="middle" font-size="13" fill="#2F9E44">외력 (다른 물체가)</text><line x1="280" y1="20" x2="280" y2="64" stroke="#1971C2" stroke-width="2.4" marker-end="url(#ah)"></line><text x="350.0" y="42.0" text-anchor="middle" font-size="13" fill="#1971C2">표면력: 접촉</text><line x1="280" y1="160" x2="280" y2="200" stroke="#E03131" stroke-width="2.6" marker-end="url(#ah)"></line><text x="370.0" y="180.0" text-anchor="middle" font-size="13" fill="#E03131">체적력: 중력 W = mg</text><line x1="280" y1="76" x2="280" y2="154" stroke="#8A97A6" stroke-width="1.2" stroke-dasharray="4 3"></line><text x="255" y="100" font-size="11.5" fill="#8A97A6" text-anchor="end">내력</text><text x="255" y="114" font-size="10.5" fill="#8A97A6" text-anchor="end">(같은 물체의</text><text x="255" y="126" font-size="10.5" fill="#8A97A6" text-anchor="end">다른 부분이)</text></svg><figcaption>힘의 분류 두 가지. 외력/내력은 「물체」를 어디까지로 잡느냐에 따라 달라지고, 체적력(부피 전체)/표면력(표면)은 힘이 걸리는 자리로 나눈다.</figcaption></figure>
+<div class="why"><b>외력</b> = 다른 물체가 가하는 힘, <b>내력</b> = 같은 물체의 다른 부분이 가하는 힘. "물체"를 어떻게 정의하느냐에 따라 달라진다 — 여러 개를 묶어 하나로 볼 수도 있다(물리에서 배운 것 반복). <b>체적력</b>(body force)은 부피 전체에 작용(예: 중력), <b>표면력</b>(surface force)은 표면에 작용(예: 접촉력). 무게의 크기 \(|\mathbf W|=mg\), \(g=9.81\ \mathrm{m/s^2}\).</div>
+<div class="analogy">팀을 "물체"로 잡으면 팀원끼리 주고받는 힘은 내력(밖에서 보면 상쇄), 다른 팀이 주는 압박이 외력. 팀원 한 명을 "물체"로 잡는 순간 동료의 힘도 외력이 된다 — 자유물체도의 첫 단계 "무엇을 분리할지"가 이래서 중요하다.</div>
+<div class="memo"><b>외울 것</b> 중간고사 = Ch.3·4·5 (10/19) · Ch.3 핵심 = 평형 + 자유물체도 · 외력/내력은 물체의 정의에 따라 · 체적력(중력)/표면력(접촉) · \(W=mg\)</div>
+</section>
+
+<section class="s" data-id="s3">
+<div class="no">3 / 5</div><h2>3. 접촉력 = 수직력 N + 마찰력 f · 뉴턴 제3법칙</h2>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 220" width="560" height="220" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><path d="M40 190 L 420 190 L 420 90 Z" fill="rgba(31,42,68,.05)" stroke="#1F2A44" stroke-width="2"></path><rect x="230" y="108" width="70" height="44" rx="5" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2"></rect><line x1="265" y1="130" x2="285" y2="60" stroke="#2F9E44" stroke-width="2.8" marker-end="url(#ah)"></line><text x="335.0" y="91.0" text-anchor="middle" font-size="13" fill="#2F9E44">N (면에 수직)</text><line x1="265" y1="130" x2="190" y2="150" stroke="#FF4D8D" stroke-width="2.8" marker-end="url(#ah)"></line><text x="213.5" y="162.0" text-anchor="middle" font-size="13" fill="#FF4D8D">f (면에 평행)</text><line x1="265" y1="130" x2="265" y2="200" stroke="#E03131" stroke-width="2.4" marker-end="url(#ah)"></line><text x="279.0" y="175.0" text-anchor="middle" font-size="13" fill="#E03131">W</text><text x="120" y="60" font-size="15" fill="#1F2A44" text-anchor="middle" font-weight="700">접촉력 F = N + f</text><text x="120" y="84" font-size="12" fill="#8A97A6" text-anchor="middle">곡면이면 접점의 접평면 기준</text><text x="480" y="150" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700">손 ⇄ 벽</text><text x="480" y="170" font-size="12" fill="#1F2A44" text-anchor="middle">F(손→벽) = −F(벽→손)</text><text x="480" y="188" font-size="12" fill="#E03131" text-anchor="middle" font-weight="700">뉴턴 제3법칙</text></svg><figcaption>면과 면이 닿을 때 접촉력은 <b>수직력 N</b>과 <b>마찰력 f</b>로 나뉜다. (그림의 경사면은 방향을 보이기 위한 예)</figcaption></figure>
+<div class="formula">\[\mathbf F=\mathbf N+\mathbf f\qquad(\mathbf N\perp\text{면},\ \mathbf f\parallel\text{면}),\qquad \mathbf F_{손\to벽}=-\mathbf F_{벽\to손}\]</div>
+<div class="why">두 평면이 접촉할 때 한 면이 다른 면에 가하는 접촉력은 일반적으로 두 성분 — 면에 <b>수직</b>인 수직력 \(\mathbf N\), 면에 <b>평행</b>한 마찰력 \(\mathbf f\). 곡면끼리 닿아도 결론은 같다: <b>접촉점의 접평면</b>을 기준으로 나눈다. 손이 벽을 밀면 벽도 손을 같은 크기로 민다(3법칙) — 이것이 자유물체도에서 "떼어낸 자리에 힘을 그리는" 근거.</div>
+<div class="analogy">얼음판에서는 마찰(평행 성분)이 거의 없어 미끄러지고, 모래밭에서는 마찰이 커서 버틴다. 수직력은 "바닥이 나를 받쳐 주는 힘", 마찰력은 "바닥이 나를 옆으로 붙잡는 힘".</div>
+<div class="memo"><b>외울 것</b> 접촉력 \(\mathbf F=\mathbf N+\mathbf f\) · \(\mathbf N\) 수직 · \(\mathbf f\) 평행 · 곡면은 접평면 · 3법칙 \(\mathbf F_{A\to B}=-\mathbf F_{B\to A}\)</div>
+</section>
+
+<section class="s" data-id="s4">
+<div class="no">4 / 5</div><h2>4. 장력 · 도르래 · 스프링</h2>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 230" width="560" height="230" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><line x1="60" y1="30" x2="240" y2="30" stroke="#1F2A44" stroke-width="3"></line><line x1="150" y1="30" x2="150" y2="70" stroke="#1F2A44" stroke-width="2"></line><circle cx="150" cy="95" r="26" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2.5"></circle><circle cx="150" cy="95" r="4" fill="#1F2A44"></circle><line x1="124" y1="95" x2="124" y2="170" stroke="#8A97A6" stroke-width="2"></line><line x1="176" y1="95" x2="176" y2="150" stroke="#8A97A6" stroke-width="2"></line><rect x="94" y="170" width="60" height="44" rx="6" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2"></rect><text x="124.0" y="197.0" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700">m</text><line x1="124" y1="168" x2="124" y2="120" stroke="#2F9E44" stroke-width="2.6" marker-end="url(#ah)"></line><text x="110.0" y="144.0" text-anchor="middle" font-size="13" fill="#2F9E44">T₁</text><line x1="176" y1="150" x2="176" y2="112" stroke="#2F9E44" stroke-width="2.6" marker-end="url(#ah)"></line><text x="192.0" y="131.0" text-anchor="middle" font-size="13" fill="#2F9E44">T₂</text><text x="176" y="176" font-size="11.5" fill="#8A97A6" text-anchor="middle">사람이 당김</text><text x="150" y="222" font-size="12.5" fill="#1F2A44" text-anchor="middle" font-weight="700">도르래: 방향만 바꾼다, T₁ = T₂ (케이블 질량 0)</text><line x1="340" y1="60" x2="340" y2="200" stroke="#1F2A44" stroke-width="2"></line><path d="M340 80 l 20 8 l -40 8 l 40 8 l -40 8 l 40 8 l -40 8 l 20 8" fill="none" stroke="#1F2A44" stroke-width="2"></path><line x1="340" y1="136" x2="340" y2="150" stroke="#1F2A44" stroke-width="2"></line><line x1="340" y1="60" x2="500" y2="60" stroke="#8A97A6" stroke-width="1" stroke-dasharray="4 3"></line><line x1="340" y1="150" x2="500" y2="150" stroke="#8A97A6" stroke-width="1" stroke-dasharray="4 3"></line><text x="470" y="108" font-size="12" fill="#8A97A6" text-anchor="middle">L₀ (자연 길이)</text><text x="430" y="176" font-size="13.5" fill="#1F2A44" text-anchor="middle" font-weight="700">F = k |L − L₀|   [k: N/m]</text><text x="430" y="196" font-size="12" fill="#8A97A6" text-anchor="middle">늘리면 당기고, 누르면 민다</text></svg><figcaption>장력 T의 작용선은 케이블과 일직선. 도르래를 지나도 크기는 그대로. 선형 스프링은 늘어난 길이에 비례해 원래 길이로 돌아가려 한다.</figcaption></figure>
+<div class="why"><b>장력</b>: 로프·케이블이 물체에 <b>묶여서 당겨질 때</b> 가하는 접촉력. 크기 \(T\), 작용선은 <b>케이블과 일직선</b>(colinear), 반대쪽(크레인)에는 \(-\mathbf T\). <b>도르래</b>는 홈 파인 바퀴로 케이블의 <b>방향을 바꾸는</b> 장치 — 장력은 유지된다: \(T_1=T_2\). <b>스프링</b>은 늘어나거나 압축되면 원래 길이로 돌아가려는 힘을 낸다: 자연 길이 \(L_0\), 현재 길이 \(L\), 선형이면 \(|\mathbf F|=k|L-L_0|\), \(k\) [N/m]. \(L&gt;L_0\)면 물체를 당기고, \(L&lt;L_0\)면 민다. 이 과목은 선형 스프링만.</div>
+<div class="say">교수님이 학생에게 되물음: "<b>왜 같다고 가정하나?</b>"(\(T_1=T_2\)) → <b>케이블 질량을 0</b>으로 가정. \(F=ma\)에서 \(m=0\)이니 합력 0 → 장력이 케이블 전체에서 일정. "실제로는 질량이 있어 마찰·중력이 생기니 다르다. 중요한 건 아니지만 적어 둔다."</div>
+<div class="analogy">도르래는 힘의 "방향 전환기" — 아래로 당겨서 위로 들어 올린다, 크기는 그대로. 스프링은 "원래 길이로 돌아가려는 고집"이고, 그 고집의 세기가 \(k\).</div>
+<div class="memo"><b>외울 것</b> 장력 작용선 = 케이블 방향 · 도르래 \(T_1=T_2\)(케이블 질량 0) · 스프링 \(F=k|L-L_0|\), [N/m] · 늘림 → 당김, 압축 → 밈</div>
+</section>
+
+<section class="s" data-id="s5">
+<div class="no">5 / 5</div><h2>5. 평형 ⇔ ΣF = 0 · 자유물체도 3단계 ★★</h2>
+<div class="why"><b>평형</b>의 정의: 물체의 <b>각 부분이 같은 일정 속도</b>를 가짐 — 정지 또는 등속 → 가속도 0. 그러면 \(\sum\mathbf F=m\mathbf a=0\): <b>평형이면 물체에 작용하는 모든 외력의 벡터 합 = 0</b>. 그래서 먼저 <b>물체에 작용하는 모든 외력을 빠짐없이 찾아</b> 표시하고 합을 0으로 놓는다 — 그 "찾아 표시하기"가 자유물체도.</div>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 200" width="560" height="200" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><line x1="40" y1="30" x2="200" y2="30" stroke="#1F2A44" stroke-width="3"></line><line x1="120" y1="30" x2="120" y2="90" stroke="#8A97A6" stroke-width="2"></line><rect x="90" y="90" width="60" height="44" rx="6" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2"></rect><text x="120.0" y="117.0" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700">상자</text><text x="120" y="160" font-size="12" fill="#1F2A44" text-anchor="middle">① 분리할 물체 = 상자</text><line x1="220" y1="100" x2="270" y2="100" stroke="#1F2A44" stroke-width="1.8" marker-end="url(#ah)"></line><text x="245" y="88" font-size="11" fill="#8A97A6" text-anchor="middle">떼어낸다</text><rect x="300" y="80" width="60" height="44" rx="6" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2"></rect><text x="330.0" y="107.0" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700">상자</text><line x1="330" y1="78" x2="330" y2="30" stroke="#2F9E44" stroke-width="2.8" marker-end="url(#ah)"></line><text x="376.0" y="54.0" text-anchor="middle" font-size="13" fill="#2F9E44">T (케이블)</text><line x1="330" y1="126" x2="330" y2="176" stroke="#E03131" stroke-width="2.8" marker-end="url(#ah)"></line><text x="374.0" y="151.0" text-anchor="middle" font-size="13" fill="#E03131">W = mg</text><text x="330" y="196" font-size="12" fill="#1F2A44" text-anchor="middle">② 그 물체만 그리고 ③ 모든 외력 표시</text><text x="480" y="70" font-size="14" fill="#1F2A44" text-anchor="middle" font-weight="700">평형 → ΣF = 0</text><text x="480" y="94" font-size="13.5" fill="#2F9E44" text-anchor="middle">T − mg = 0</text><text x="480" y="116" font-size="13.5" fill="#2F9E44" text-anchor="middle" font-weight="700">T = mg</text></svg><figcaption>자유물체도 3단계. 케이블·바닥·다른 물체는 지우고 그것들이 주던 <b>힘</b>만 남긴다. 그 다음 합력 0.</figcaption></figure>
+<div class="formula">\[\text{평형}\ \Leftrightarrow\ \sum\mathbf F_{\text{외력}}=0\] <b>자유물체도 3단계</b>: ① 분리할 물체를 정한다 → ② 주변에서 떼어내 그 물체만 그린다 → ③ 모든 외력을 표시한다</div>
+<div class="say">"교재에 있지만, 예제를 직접 풀어 봐야 제일 빨리 이해된다. <b>다음 시간에 예제로 자유물체도 그리는 법</b>."</div>
+<details class="ex"><summary>연습 — 질량 10 kg 상자를 케이블로 매달아 도르래를 거쳐 사람이 잡고 정지</summary><div class="body"><p>① 물체 = 상자 ② 상자만 그린다 ③ 외력: 케이블 장력 \(T\)(위), 무게 \(mg\)(아래). \(\sum F_y=T-mg=0\) → \(T=10\times9.81=98.1\) N. 도르래 반대편 사람 쪽 케이블도 98.1 N(방향만 다름, \(T_1=T_2\)).</p></div></details>
+<div class="analogy">자유물체도는 "그 사람만 방에 남기고 나머지는 다 내보낸 뒤, 나간 사람들이 그에게 주던 힘만 화살표로 남기는 것". 화살표를 하나라도 빠뜨리면 평형식이 틀린다 — 그래서 3단계 중 ③이 점수를 가른다.</div>
+<div class="memo"><b>외울 것</b> 평형 = 가속도 0 = 정지 또는 등속 · \(\sum\mathbf F=0\) · FBD ① 물체 정하기 ② 떼어내 그리기 ③ 모든 외력 · 과제 1~2문제가 시험에 그대로(OT)</div>
+</section>
+
+/[{"id": "q1", "qn": "확인 1 · 삼중적의 결과", "html": "\\(\\mathbf U\\cdot(\\mathbf V\\times\\mathbf W)\\)의 결과는?", "choices": [{"html": "스칼라 — 마지막 연산이 내적이므로", "ok": true}, {"html": "벡터 — 외적이 들어 있으므로", "ok": false}, {"html": "3×3 행렬", "ok": false}, {"html": "각도", "ok": false}], "ans": "외적(벡터)을 먼저 하고 내적(스칼라)으로 끝난다. 절댓값 = 평행육면체 부피."}, {"id": "q2", "qn": "확인 2 · 행렬식 계산", "html": "\\(\\mathbf U=(1,0,0)\\), \\(\\mathbf V=(0,2,0)\\), \\(\\mathbf W=(0,0,3)\\)일 때 \\(\\mathbf U\\cdot(\\mathbf V\\times\\mathbf W)\\)는?", "choices": [{"html": "6", "ok": true}, {"html": "0", "ok": false}, {"html": "\\((1,2,3)\\)", "ok": false}, {"html": "5", "ok": false}], "ans": "대각 행렬식 = \\(1\\cdot2\\cdot3=6\\) = 직육면체 부피. \\(\\mathbf W=(1,1,0)\\)이면 공면이라 0."}, {"id": "q3", "qn": "확인 3 · 접촉력", "html": "면과 면이 닿을 때 접촉력의 두 성분은?", "choices": [{"html": "면에 수직한 수직력 \\(\\mathbf N\\) + 면에 평행한 마찰력 \\(\\mathbf f\\)", "ok": true}, {"html": "면에 평행한 수직력 + 면에 수직한 마찰력", "ok": false}, {"html": "수직력 \\(\\mathbf N\\)뿐이다", "ok": false}, {"html": "마찰력은 항상 무게와 같다", "ok": false}], "ans": "\\(\\mathbf F=\\mathbf N+\\mathbf f\\). 곡면이면 접평면 기준."}, {"id": "q4", "qn": "확인 4 · 도르래", "html": "도르래 양쪽 케이블의 장력이 같다(\\(T_1=T_2\\))고 가정하는 근거는?", "choices": [{"html": "케이블 질량을 0으로 두면 \\(F=ma\\)에서 합력이 0이라 장력이 케이블 전체에서 일정", "ok": true}, {"html": "도르래가 회전하지 않기 때문", "ok": false}, {"html": "케이블이 늘어나기 때문", "ok": false}, {"html": "도르래의 마찰이 크기 때문", "ok": false}], "ans": "교수님이 되물은 질문. 실제로는 질량·마찰이 있어 조금 다르다."}, {"id": "q5", "qn": "확인 5 · 평형 방정식", "html": "물체가 평형일 때 성립하는 것은?", "choices": [{"html": "물체에 작용하는 모든 <b>외력</b>의 벡터 합 = 0", "ok": true}, {"html": "\\(\\sum\\mathbf F=m\\mathbf a\\), \\(\\mathbf a\\ne0\\)", "ok": false}, {"html": "내력의 합만 0이면 된다", "ok": false}, {"html": "무게와 장력은 항상 같다", "ok": false}], "ans": "평형 = 가속도 0. 내력은 3법칙으로 저절로 상쇄되니 외력만 센다."}, {"id": "q6", "qn": "확인 6 · 자유물체도", "html": "질량 10 kg 상자를 케이블로 매달아 정지시켰다. 자유물체도 3단계를 쓰고 장력을 구하라.", "choices": null, "ans": "① 물체 = 상자 ② 상자만 그림 ③ 외력: \\(T\\)(위), \\(mg\\)(아래). \\(T-mg=0\\) → \\(T=98.1\\) N. 도르래 너머 사람 쪽도 98.1 N."}]/<span>교수 필기본 W3-2 13p</span><span>LMS 영상 53분</span><span>녹음 없음</span><span>3주차 · 수 · 중간 범위 시작</span> 를 채운다. 저장: localStorage mc-lesson-<id> (읽은 섹션·문제 결과), mc-slides-last* (앱 「이어서 학습하기」). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<style>
+:root{--ink:#1F2A44;--ink-2:#55627A;--ink-3:#7C889B;--line:rgba(31,42,68,.14);--paper:rgba(255,255,255,.72);--paper-2:rgba(255,255,255,.5);--accent:#15803D;
+  --red:#E03131;--blue:#1971C2;--green:#2F9E44;--pink:#D0397A;--yel:#F59F00;--f:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --fs:18px;--lh:1.72;--r:18px}
+*{box-sizing:border-box}
+html{background:linear-gradient(160deg,#E9F0F5 0%,#F2F5F0 48%,#EDF2EE 100%) fixed}
+body{margin:0;font-family:var(--f);font-size:var(--fs);line-height:var(--lh);color:var(--ink);word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;pointer-events:none;filter:blur(60px)}
+body::before{width:52vw;height:52vw;max-width:640px;max-height:640px;left:-14vw;top:-18vh;background:radial-gradient(circle at 40% 40%,rgba(74,222,128,.30),transparent 68%)}
+body::after{width:60vw;height:60vw;max-width:760px;max-height:760px;right:-20vw;bottom:-24vh;background:radial-gradient(circle at 50% 50%,rgba(96,165,250,.28),transparent 66%)}
+/* 상단 고정: 과목 · 회차 · 진행 */
+#top{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.66);-webkit-backdrop-filter:blur(20px) saturate(140%);backdrop-filter:blur(20px) saturate(140%);border-bottom:1px solid rgba(255,255,255,.8)}
+#top .in{max-width:820px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--ink-2)}
+#top b{color:var(--ink);font-weight:700}
+#top .sp{flex:1}
+#bar{height:5px;background:rgba(31,42,68,.10)}
+#bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+#top .pct{font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
+/* 본문 */
+main{max-width:820px;margin:0 auto;padding:22px 20px 120px}
+header.h{padding:8px 0 18px}
+header.h .kicker{font-size:13.5px;color:var(--ink-3);font-weight:600;letter-spacing:.02em}
+header.h h1{font-size:30px;line-height:1.25;margin:6px 0 10px;letter-spacing:-.02em}
+header.h .meta{font-size:14px;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:6px 14px}
+header.h .lead{margin-top:14px;padding:14px 18px;border-radius:14px;background:var(--paper);border:1px solid rgba(255,255,255,.8);font-size:17px}
+section.s{margin:26px 0 0;padding:22px 22px 18px;border-radius:var(--r);background:var(--paper);border:1px solid rgba(255,255,255,.85);box-shadow:0 8px 26px rgba(20,40,60,.07),inset 0 1px 0 rgba(255,255,255,.8);scroll-margin-top:70px;position:relative}
+section.s .no{font-size:12.5px;color:var(--ink-3);font-weight:700;letter-spacing:.04em}
+section.s h2{font-size:23px;line-height:1.3;margin:2px 0 12px;letter-spacing:-.02em}
+section.s h3{font-size:18px;margin:18px 0 6px}
+section.s p{margin:0 0 10px}
+section.s.read::after{content:"읽음";position:absolute;right:16px;top:14px;font-size:12px;color:var(--accent);font-weight:700;border:1px solid rgba(21,128,61,.35);border-radius:999px;padding:1px 9px;background:rgba(21,128,61,.06)}
+/* 상자들 */
+.why,.say,.analogy,.formula,.pitfall,.memo{margin:12px 0;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:var(--paper-2);font-size:17px}
+.why{border-left:5px solid var(--blue)}.why::before{content:"왜 그런가";display:block;font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:4px}
+.say{border-left:5px solid var(--pink);background:rgba(255,77,141,.06)}.say::before{content:"교수님 말";display:block;font-size:12.5px;font-weight:700;color:var(--pink);margin-bottom:4px}
+.analogy{border-left:5px solid var(--yel);background:rgba(245,159,0,.07)}.analogy::before{content:"비유";display:block;font-size:12.5px;font-weight:700;color:#B26A00;margin-bottom:4px}
+.formula{border-left:5px solid var(--green);background:rgba(47,158,68,.06)}.formula::before{content:"외울 것";display:block;font-size:12.5px;font-weight:700;color:var(--green);margin-bottom:4px}
+.pitfall{border-left:5px solid var(--red);background:rgba(224,49,49,.05)}.pitfall::before{content:"함정";display:block;font-size:12.5px;font-weight:700;color:var(--red);margin-bottom:4px}
+.memo{border-left:5px solid var(--ink-3)}
+.katex-display{margin:10px 0;overflow-x:auto;overflow-y:hidden}
+/* 그림 */
+figure.fig{margin:14px auto;text-align:center;max-width:560px}
+figure.fig svg{max-width:100%;height:auto}
+figure.fig figcaption{font-size:13.5px;color:var(--ink-2);margin-top:6px;text-align:center}
+figure.board{margin:14px 0;text-align:center}
+figure.board img{max-width:100%;max-height:440px;object-fit:contain;border-radius:12px;border:1px solid var(--line);background:#111}
+figure.board figcaption{font-size:13px;color:var(--ink-3);margin-top:4px}
+figure.board[hidden]{display:none}
+/* 예제 */
+details.ex{margin:12px 0;border:1px solid var(--line);border-radius:12px;background:var(--paper-2);padding:0}
+details.ex summary{cursor:pointer;padding:12px 16px;font-weight:700;list-style:none;display:block;line-height:1.6}
+details.ex summary::before{content:"예제";display:inline-block;vertical-align:middle;margin-right:10px;font-size:12px;line-height:1.5;color:#fff;background:var(--ink);border-radius:6px;padding:2px 7px}
+details.ex summary::-webkit-details-marker{display:none}
+details.ex .body{padding:0 16px 14px;border-top:1px solid var(--line)}
+details.ex .body p{margin:8px 0}
+/* 문제 카드 */
+#quiz{margin-top:30px}
+#quiz h2{font-size:22px;margin:0 0 6px}
+#quiz .hint{font-size:14px;color:var(--ink-2);margin-bottom:12px}
+.q{margin:12px 0;padding:18px 20px;border-radius:var(--r);background:var(--paper);border:1px solid rgba(255,255,255,.85);box-shadow:0 8px 26px rgba(20,40,60,.07)}
+.q .qn{font-size:13px;font-weight:700;color:var(--ink-3);margin-bottom:4px}
+.q .qb{font-size:17.5px;margin-bottom:10px}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;list-style:none;padding:0;margin:0}
+@media(max-width:640px){.choices{grid-template-columns:1fr}}
+.choice{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.6);cursor:pointer;font:inherit;font-size:16.5px;text-align:left;color:var(--ink);min-height:48px;box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+.choice .cn{flex:0 0 26px;height:26px;border-radius:50%;border:1px solid var(--ink-3);display:flex;align-items:center;justify-content:center;font-size:13px}
+.choice[disabled]{cursor:default}
+.choice.ok{border-color:var(--green);background:rgba(47,158,68,.10)}.choice.ok .cn{background:var(--green);border-color:var(--green);color:#fff}
+.choice.bad{border-color:var(--red);background:rgba(224,49,49,.08)}.choice.bad .cn{background:var(--red);border-color:var(--red);color:#fff}
+.q .ans{display:none;margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(31,42,68,.05);font-size:16px}
+.q.rev .ans{display:block}
+.q .verdict{display:inline-block;margin-top:10px;font-size:14px;font-weight:700;padding:3px 10px;border-radius:999px}
+.q .verdict.ok{background:rgba(47,158,68,.12);color:var(--green)}.q .verdict.bad{background:rgba(224,49,49,.10);color:var(--red)}
+.q .myans{width:100%;font:inherit;font-size:16px;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.7);resize:vertical;min-height:52px}
+.q .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center}
+.btn{font:inherit;font-size:15px;font-weight:600;padding:8px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.7);color:var(--ink);cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}
+.btn.a{background:var(--accent);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(21,128,61,.25)}
+.btn.xs{font-size:13px;padding:5px 10px;border-radius:8px}
+.btn[disabled]{opacity:.5;cursor:default}
+#result{margin-top:16px;padding:16px 20px;border-radius:var(--r);background:var(--paper);border:1px solid rgba(255,255,255,.85);display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+#result b{font-size:22px}
+#done{margin-top:20px;text-align:center;font-size:14px;color:var(--ink-3)}
+/* 다크 */
+@media(prefers-color-scheme:dark){
+  :root{--ink:#F1F6F2;--ink-2:#B7C2BB;--ink-3:#8F9C95;--line:rgba(255,255,255,.12);--paper:rgba(18,26,24,.62);--paper-2:rgba(255,255,255,.05);--accent:#4ADE80;--blue:#74C0FC;--green:#69DB7C;--pink:#FF8AB8;--yel:#FFD43B;--red:#FF8787}
+  html{background:linear-gradient(160deg,#0B1020 0%,#0E1A16 48%,#0B1412 100%) fixed}
+  body::before{background:radial-gradient(circle at 40% 40%,rgba(74,222,128,.18),transparent 68%)}body::after{background:radial-gradient(circle at 50% 50%,rgba(59,130,246,.2),transparent 66%)}
+  #top{background:rgba(18,26,24,.7);border-bottom-color:rgba(255,255,255,.1)}
+  section.s,.q,#result,header.h .lead{border-color:rgba(255,255,255,.1);box-shadow:0 12px 34px rgba(0,0,0,.35)}
+  .choice{background:rgba(255,255,255,.06)}.q .ans{background:rgba(255,255,255,.06)}.q .myans{background:rgba(255,255,255,.06)}
+  .btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}.btn.a{color:#052E16}
+  .say{background:rgba(255,77,141,.10)}.analogy{background:rgba(245,159,0,.10)}.formula{background:rgba(47,158,68,.10)}.pitfall{background:rgba(224,49,49,.10)}
+  figure.fig svg{filter:invert(1) hue-rotate(180deg) saturate(1.2)}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#top{background:#FFFFFF}section.s,.q,#result{background:#FFFFFF}}
+@media(max-width:640px){:root{--fs:17px}main{padding:16px 14px 110px}section.s{padding:18px 16px 14px}header.h h1{font-size:25px}}
+</style>
+</head>
+<body>
+<div id="top"><div class="in"><b id="tCourse">정역학</b><span id="tSess">9/16(수) · 3주차 · 약 20분</span><span class="sp"></span><span id="tRead">읽음 0/0</span><span class="pct" id="tPct">0%</span></div><div id="bar"><i id="barI"></i></div></div>
+<main>
+<header class="h"><div class="kicker">정역학 · 9/16(수) · 3주차 · 약 20분</div><h1>벡터의 마지막 도구, 그리고 "여기서부터 중간고사" — 힘의 종류와 자유물체도</h1><div class="meta"><span>교수 필기본 W3-2 13p</span><span>LMS 영상 53분</span><span>녹음 없음</span><span>3주차 · 수 · 중간 범위 시작</span></div><div class="lead">앞 15분은 Ch.2의 마지막 도구 <b>혼합삼중적</b>(행렬식·부피·공면 판정). 그다음 교수님이 "<b>여기서부터 중간고사 범위. 3, 4, 5장</b>"이라고 선언하고 <b>Ch.3 힘</b>에 들어갔다. 정역학의 두 핵심 <b>평형</b>과 <b>자유물체도</b>를 예고하고, 힘의 종류를 하나씩 정의한 뒤 \(\sum\mathbf F=0\)과 자유물체도 3단계로 마쳤다. 이 회차는 녹음이 없어 교수님 필기본 13쪽과 LMS 영상으로 정리했다.</div></header>
+<section class="s" data-id="s1">
+<div class="no">1 / 5</div><h2>1. 혼합삼중적 U·(V×W) — 행렬식 · 부피 · 공면이면 0</h2>
+<p>4장에서 <b>직선에 대한 힘의 모멘트</b>를 다룰 때 쓴다. 먼저 \(\mathbf V\times\mathbf W\)(외적)를 구하고 그 결과와 \(\mathbf U\)를 내적한다 — 마지막이 내적이니 결과는 <b>스칼라</b>(교수님 질문 "벡터? 스칼라?").</p>
+<div class="formula">\[\mathbf U\cdot(\mathbf V\times\mathbf W)=\begin{vmatrix}U_x&amp;U_y&amp;U_z\\V_x&amp;V_y&amp;V_z\\W_x&amp;W_y&amp;W_z\end{vmatrix},\qquad \mathbf U\cdot(\mathbf V\times\mathbf W)=-\mathbf V\cdot(\mathbf U\times\mathbf W)\ (\text{두 벡터를 바꾸면 부호 반대})\]</div>
+<div class="say">"<b>외우고 가자</b>" — 행렬식. "행렬식으로 계산해 보면 나온다. 행렬식 형태를 기억하라."</div>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 240" width="560" height="240" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><path d="M150 190 L300 190 L360 150 L210 150 Z" fill="rgba(138,151,166,.15)" stroke="#8A97A6" stroke-width="1.5"></path><path d="M180 95 L330 95 L390 55 L240 55 Z" fill="rgba(138,151,166,.06)" stroke="#8A97A6" stroke-width="1.5"></path><line x1="300" y1="190" x2="330" y2="95" stroke="#8A97A6" stroke-width="1.5"></line><line x1="360" y1="150" x2="390" y2="55" stroke="#8A97A6" stroke-width="1.5"></line><line x1="210" y1="150" x2="240" y2="55" stroke="#8A97A6" stroke-width="1.5"></line><line x1="150" y1="190" x2="300" y2="190" stroke="#1971C2" stroke-width="3" marker-end="url(#ah)"></line><text x="225" y="212" font-size="15" fill="#1971C2" text-anchor="middle" font-weight="700">V</text><line x1="150" y1="190" x2="210" y2="150" stroke="#E03131" stroke-width="3" marker-end="url(#ah)"></line><text x="168" y="156" font-size="15" fill="#E03131" text-anchor="middle" font-weight="700">W</text><line x1="150" y1="190" x2="180" y2="95" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="150" y="120" font-size="15" fill="#2F9E44" text-anchor="middle" font-weight="700">U</text><text x="240" y="150" font-size="12.5" fill="#1F2A44" text-anchor="middle">밑면 넓이 |V × W|</text><text x="430" y="60" font-size="13" fill="#1F2A44" text-anchor="middle">U·(V×W) = |V×W| × (U의 수직 높이)</text><text x="430" y="86" font-size="14" fill="#1F2A44" text-anchor="middle" font-weight="700">= 평행육면체의 부피 (절댓값)</text><text x="430" y="130" font-size="12.5" fill="#E03131" text-anchor="middle">세 벡터가 한 평면에 있으면</text><text x="430" y="150" font-size="13" fill="#E03131" text-anchor="middle" font-weight="700">높이 0 → 부피 0 → U·(V×W) = 0</text></svg><figcaption>혼합삼중적의 기하: 밑면(평행사변형 \(\mathbf V,\mathbf W\)) 넓이에 \(\mathbf U\)의 수직 높이 성분을 곱한 것. 필기본 옆 한글 메모 「평행육면체」.</figcaption></figure>
+<div class="why">\(|\mathbf V\times\mathbf W|\)는 밑면 평행사변형의 넓이, 거기에 \(\mathbf U\)의 <b>밑면에 수직한 높이 성분</b>을 곱하니(내적) 평행육면체의 부피가 된다. 세 벡터가 한 평면에 있으면 높이가 0 → <b>공면(coplanar)이면 \(\mathbf U\cdot(\mathbf V\times\mathbf W)=0\)</b> — "계산할 필요 없이 그냥 0". 필기본 빨간 밑줄 두 곳.</div>
+<details class="ex"><summary>연습 — \(\mathbf U=(1,0,0)\), \(\mathbf V=(0,2,0)\), \(\mathbf W=(0,0,3)\) / \(\mathbf W'=(1,1,0)\)</summary><div class="body"><p>\(\begin{vmatrix}1&amp;0&amp;0\\0&amp;2&amp;0\\0&amp;0&amp;3\end{vmatrix}=1\cdot(2\cdot3-0)=6\) → 부피 6(직육면체 1×2×3). \(\mathbf W'\)로 바꾸면 \(\begin{vmatrix}1&amp;0&amp;0\\0&amp;2&amp;0\\1&amp;1&amp;0\end{vmatrix}=1\cdot(2\cdot0-0\cdot1)=0\) → 세 벡터가 모두 \(z=0\) 평면에 있다(공면).</p></div></details>
+<div class="analogy">상자 부피 = 밑면 넓이 × 높이. 세 벡터가 납작하게 한 평면에 누우면 상자가 눌려 부피 0. "세 점(벡터)이 같은 평면 위에 있나?"를 숫자 하나로 판정하는 도구.</div>
+<div class="memo"><b>외울 것</b> \(\mathbf U\cdot(\mathbf V\times\mathbf W)=\det[\mathbf U;\mathbf V;\mathbf W]\) · 스칼라 · 절댓값 = 평행육면체 부피 · <b>공면이면 0</b> · 두 벡터 바꾸면 부호 반대</div>
+</section>
+
+<section class="s" data-id="s2">
+<div class="no">2 / 5</div><h2>2. Ch.3 힘 — "여기서부터 중간고사 범위" · 외력/내력 · 체적력/표면력</h2>
+<div class="say">"<b>여기서부터 중간고사 범위. 3, 4, 5장이 중간고사 범위.</b>" · 이 장에서 정역학의 <b>가장 중요한 두 개념</b>: ① 평형(equilibrium) ② 자유물체도(free-body diagram) — "이 식(평형 방정식)만 쓸 수 있으면 된다."</div>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 210" width="560" height="210" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><rect x="200" y="70" width="160" height="90" rx="6" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2"></rect><text x="280.0" y="120.0" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700">물체</text><line x1="120" y1="115" x2="194" y2="115" stroke="#2F9E44" stroke-width="2.8" marker-end="url(#ah)"></line><text x="147.0" y="103.0" text-anchor="middle" font-size="13" fill="#2F9E44">외력 (다른 물체가)</text><line x1="280" y1="20" x2="280" y2="64" stroke="#1971C2" stroke-width="2.4" marker-end="url(#ah)"></line><text x="350.0" y="42.0" text-anchor="middle" font-size="13" fill="#1971C2">표면력: 접촉</text><line x1="280" y1="160" x2="280" y2="200" stroke="#E03131" stroke-width="2.6" marker-end="url(#ah)"></line><text x="370.0" y="180.0" text-anchor="middle" font-size="13" fill="#E03131">체적력: 중력 W = mg</text><line x1="280" y1="76" x2="280" y2="154" stroke="#8A97A6" stroke-width="1.2" stroke-dasharray="4 3"></line><text x="255" y="100" font-size="11.5" fill="#8A97A6" text-anchor="end">내력</text><text x="255" y="114" font-size="10.5" fill="#8A97A6" text-anchor="end">(같은 물체의</text><text x="255" y="126" font-size="10.5" fill="#8A97A6" text-anchor="end">다른 부분이)</text></svg><figcaption>힘의 분류 두 가지. 외력/내력은 「물체」를 어디까지로 잡느냐에 따라 달라지고, 체적력(부피 전체)/표면력(표면)은 힘이 걸리는 자리로 나눈다.</figcaption></figure>
+<div class="why"><b>외력</b> = 다른 물체가 가하는 힘, <b>내력</b> = 같은 물체의 다른 부분이 가하는 힘. "물체"를 어떻게 정의하느냐에 따라 달라진다 — 여러 개를 묶어 하나로 볼 수도 있다(물리에서 배운 것 반복). <b>체적력</b>(body force)은 부피 전체에 작용(예: 중력), <b>표면력</b>(surface force)은 표면에 작용(예: 접촉력). 무게의 크기 \(|\mathbf W|=mg\), \(g=9.81\ \mathrm{m/s^2}\).</div>
+<div class="analogy">팀을 "물체"로 잡으면 팀원끼리 주고받는 힘은 내력(밖에서 보면 상쇄), 다른 팀이 주는 압박이 외력. 팀원 한 명을 "물체"로 잡는 순간 동료의 힘도 외력이 된다 — 자유물체도의 첫 단계 "무엇을 분리할지"가 이래서 중요하다.</div>
+<div class="memo"><b>외울 것</b> 중간고사 = Ch.3·4·5 (10/19) · Ch.3 핵심 = 평형 + 자유물체도 · 외력/내력은 물체의 정의에 따라 · 체적력(중력)/표면력(접촉) · \(W=mg\)</div>
+</section>
+
+<section class="s" data-id="s3">
+<div class="no">3 / 5</div><h2>3. 접촉력 = 수직력 N + 마찰력 f · 뉴턴 제3법칙</h2>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 220" width="560" height="220" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><path d="M40 190 L 420 190 L 420 90 Z" fill="rgba(31,42,68,.05)" stroke="#1F2A44" stroke-width="2"></path><rect x="230" y="108" width="70" height="44" rx="5" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2"></rect><line x1="265" y1="130" x2="285" y2="60" stroke="#2F9E44" stroke-width="2.8" marker-end="url(#ah)"></line><text x="335.0" y="91.0" text-anchor="middle" font-size="13" fill="#2F9E44">N (면에 수직)</text><line x1="265" y1="130" x2="190" y2="150" stroke="#FF4D8D" stroke-width="2.8" marker-end="url(#ah)"></line><text x="213.5" y="162.0" text-anchor="middle" font-size="13" fill="#FF4D8D">f (면에 평행)</text><line x1="265" y1="130" x2="265" y2="200" stroke="#E03131" stroke-width="2.4" marker-end="url(#ah)"></line><text x="279.0" y="175.0" text-anchor="middle" font-size="13" fill="#E03131">W</text><text x="120" y="60" font-size="15" fill="#1F2A44" text-anchor="middle" font-weight="700">접촉력 F = N + f</text><text x="120" y="84" font-size="12" fill="#8A97A6" text-anchor="middle">곡면이면 접점의 접평면 기준</text><text x="480" y="150" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700">손 ⇄ 벽</text><text x="480" y="170" font-size="12" fill="#1F2A44" text-anchor="middle">F(손→벽) = −F(벽→손)</text><text x="480" y="188" font-size="12" fill="#E03131" text-anchor="middle" font-weight="700">뉴턴 제3법칙</text></svg><figcaption>면과 면이 닿을 때 접촉력은 <b>수직력 N</b>과 <b>마찰력 f</b>로 나뉜다. (그림의 경사면은 방향을 보이기 위한 예)</figcaption></figure>
+<div class="formula">\[\mathbf F=\mathbf N+\mathbf f\qquad(\mathbf N\perp\text{면},\ \mathbf f\parallel\text{면}),\qquad \mathbf F_{손\to벽}=-\mathbf F_{벽\to손}\]</div>
+<div class="why">두 평면이 접촉할 때 한 면이 다른 면에 가하는 접촉력은 일반적으로 두 성분 — 면에 <b>수직</b>인 수직력 \(\mathbf N\), 면에 <b>평행</b>한 마찰력 \(\mathbf f\). 곡면끼리 닿아도 결론은 같다: <b>접촉점의 접평면</b>을 기준으로 나눈다. 손이 벽을 밀면 벽도 손을 같은 크기로 민다(3법칙) — 이것이 자유물체도에서 "떼어낸 자리에 힘을 그리는" 근거.</div>
+<div class="analogy">얼음판에서는 마찰(평행 성분)이 거의 없어 미끄러지고, 모래밭에서는 마찰이 커서 버틴다. 수직력은 "바닥이 나를 받쳐 주는 힘", 마찰력은 "바닥이 나를 옆으로 붙잡는 힘".</div>
+<div class="memo"><b>외울 것</b> 접촉력 \(\mathbf F=\mathbf N+\mathbf f\) · \(\mathbf N\) 수직 · \(\mathbf f\) 평행 · 곡면은 접평면 · 3법칙 \(\mathbf F_{A\to B}=-\mathbf F_{B\to A}\)</div>
+</section>
+
+<section class="s" data-id="s4">
+<div class="no">4 / 5</div><h2>4. 장력 · 도르래 · 스프링</h2>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 230" width="560" height="230" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><line x1="60" y1="30" x2="240" y2="30" stroke="#1F2A44" stroke-width="3"></line><line x1="150" y1="30" x2="150" y2="70" stroke="#1F2A44" stroke-width="2"></line><circle cx="150" cy="95" r="26" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2.5"></circle><circle cx="150" cy="95" r="4" fill="#1F2A44"></circle><line x1="124" y1="95" x2="124" y2="170" stroke="#8A97A6" stroke-width="2"></line><line x1="176" y1="95" x2="176" y2="150" stroke="#8A97A6" stroke-width="2"></line><rect x="94" y="170" width="60" height="44" rx="6" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2"></rect><text x="124.0" y="197.0" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700">m</text><line x1="124" y1="168" x2="124" y2="120" stroke="#2F9E44" stroke-width="2.6" marker-end="url(#ah)"></line><text x="110.0" y="144.0" text-anchor="middle" font-size="13" fill="#2F9E44">T₁</text><line x1="176" y1="150" x2="176" y2="112" stroke="#2F9E44" stroke-width="2.6" marker-end="url(#ah)"></line><text x="192.0" y="131.0" text-anchor="middle" font-size="13" fill="#2F9E44">T₂</text><text x="176" y="176" font-size="11.5" fill="#8A97A6" text-anchor="middle">사람이 당김</text><text x="150" y="222" font-size="12.5" fill="#1F2A44" text-anchor="middle" font-weight="700">도르래: 방향만 바꾼다, T₁ = T₂ (케이블 질량 0)</text><line x1="340" y1="60" x2="340" y2="200" stroke="#1F2A44" stroke-width="2"></line><path d="M340 80 l 20 8 l -40 8 l 40 8 l -40 8 l 40 8 l -40 8 l 20 8" fill="none" stroke="#1F2A44" stroke-width="2"></path><line x1="340" y1="136" x2="340" y2="150" stroke="#1F2A44" stroke-width="2"></line><line x1="340" y1="60" x2="500" y2="60" stroke="#8A97A6" stroke-width="1" stroke-dasharray="4 3"></line><line x1="340" y1="150" x2="500" y2="150" stroke="#8A97A6" stroke-width="1" stroke-dasharray="4 3"></line><text x="470" y="108" font-size="12" fill="#8A97A6" text-anchor="middle">L₀ (자연 길이)</text><text x="430" y="176" font-size="13.5" fill="#1F2A44" text-anchor="middle" font-weight="700">F = k |L − L₀|   [k: N/m]</text><text x="430" y="196" font-size="12" fill="#8A97A6" text-anchor="middle">늘리면 당기고, 누르면 민다</text></svg><figcaption>장력 T의 작용선은 케이블과 일직선. 도르래를 지나도 크기는 그대로. 선형 스프링은 늘어난 길이에 비례해 원래 길이로 돌아가려 한다.</figcaption></figure>
+<div class="why"><b>장력</b>: 로프·케이블이 물체에 <b>묶여서 당겨질 때</b> 가하는 접촉력. 크기 \(T\), 작용선은 <b>케이블과 일직선</b>(colinear), 반대쪽(크레인)에는 \(-\mathbf T\). <b>도르래</b>는 홈 파인 바퀴로 케이블의 <b>방향을 바꾸는</b> 장치 — 장력은 유지된다: \(T_1=T_2\). <b>스프링</b>은 늘어나거나 압축되면 원래 길이로 돌아가려는 힘을 낸다: 자연 길이 \(L_0\), 현재 길이 \(L\), 선형이면 \(|\mathbf F|=k|L-L_0|\), \(k\) [N/m]. \(L&gt;L_0\)면 물체를 당기고, \(L&lt;L_0\)면 민다. 이 과목은 선형 스프링만.</div>
+<div class="say">교수님이 학생에게 되물음: "<b>왜 같다고 가정하나?</b>"(\(T_1=T_2\)) → <b>케이블 질량을 0</b>으로 가정. \(F=ma\)에서 \(m=0\)이니 합력 0 → 장력이 케이블 전체에서 일정. "실제로는 질량이 있어 마찰·중력이 생기니 다르다. 중요한 건 아니지만 적어 둔다."</div>
+<div class="analogy">도르래는 힘의 "방향 전환기" — 아래로 당겨서 위로 들어 올린다, 크기는 그대로. 스프링은 "원래 길이로 돌아가려는 고집"이고, 그 고집의 세기가 \(k\).</div>
+<div class="memo"><b>외울 것</b> 장력 작용선 = 케이블 방향 · 도르래 \(T_1=T_2\)(케이블 질량 0) · 스프링 \(F=k|L-L_0|\), [N/m] · 늘림 → 당김, 압축 → 밈</div>
+</section>
+
+<section class="s" data-id="s5">
+<div class="no">5 / 5</div><h2>5. 평형 ⇔ ΣF = 0 · 자유물체도 3단계 ★★</h2>
+<div class="why"><b>평형</b>의 정의: 물체의 <b>각 부분이 같은 일정 속도</b>를 가짐 — 정지 또는 등속 → 가속도 0. 그러면 \(\sum\mathbf F=m\mathbf a=0\): <b>평형이면 물체에 작용하는 모든 외력의 벡터 합 = 0</b>. 그래서 먼저 <b>물체에 작용하는 모든 외력을 빠짐없이 찾아</b> 표시하고 합을 0으로 놓는다 — 그 "찾아 표시하기"가 자유물체도.</div>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 200" width="560" height="200" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><line x1="40" y1="30" x2="200" y2="30" stroke="#1F2A44" stroke-width="3"></line><line x1="120" y1="30" x2="120" y2="90" stroke="#8A97A6" stroke-width="2"></line><rect x="90" y="90" width="60" height="44" rx="6" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2"></rect><text x="120.0" y="117.0" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700">상자</text><text x="120" y="160" font-size="12" fill="#1F2A44" text-anchor="middle">① 분리할 물체 = 상자</text><line x1="220" y1="100" x2="270" y2="100" stroke="#1F2A44" stroke-width="1.8" marker-end="url(#ah)"></line><text x="245" y="88" font-size="11" fill="#8A97A6" text-anchor="middle">떼어낸다</text><rect x="300" y="80" width="60" height="44" rx="6" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2"></rect><text x="330.0" y="107.0" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700">상자</text><line x1="330" y1="78" x2="330" y2="30" stroke="#2F9E44" stroke-width="2.8" marker-end="url(#ah)"></line><text x="376.0" y="54.0" text-anchor="middle" font-size="13" fill="#2F9E44">T (케이블)</text><line x1="330" y1="126" x2="330" y2="176" stroke="#E03131" stroke-width="2.8" marker-end="url(#ah)"></line><text x="374.0" y="151.0" text-anchor="middle" font-size="13" fill="#E03131">W = mg</text><text x="330" y="196" font-size="12" fill="#1F2A44" text-anchor="middle">② 그 물체만 그리고 ③ 모든 외력 표시</text><text x="480" y="70" font-size="14" fill="#1F2A44" text-anchor="middle" font-weight="700">평형 → ΣF = 0</text><text x="480" y="94" font-size="13.5" fill="#2F9E44" text-anchor="middle">T − mg = 0</text><text x="480" y="116" font-size="13.5" fill="#2F9E44" text-anchor="middle" font-weight="700">T = mg</text></svg><figcaption>자유물체도 3단계. 케이블·바닥·다른 물체는 지우고 그것들이 주던 <b>힘</b>만 남긴다. 그 다음 합력 0.</figcaption></figure>
+<div class="formula">\[\text{평형}\ \Leftrightarrow\ \sum\mathbf F_{\text{외력}}=0\] <b>자유물체도 3단계</b>: ① 분리할 물체를 정한다 → ② 주변에서 떼어내 그 물체만 그린다 → ③ 모든 외력을 표시한다</div>
+<div class="say">"교재에 있지만, 예제를 직접 풀어 봐야 제일 빨리 이해된다. <b>다음 시간에 예제로 자유물체도 그리는 법</b>."</div>
+<details class="ex"><summary>연습 — 질량 10 kg 상자를 케이블로 매달아 도르래를 거쳐 사람이 잡고 정지</summary><div class="body"><p>① 물체 = 상자 ② 상자만 그린다 ③ 외력: 케이블 장력 \(T\)(위), 무게 \(mg\)(아래). \(\sum F_y=T-mg=0\) → \(T=10\times9.81=98.1\) N. 도르래 반대편 사람 쪽 케이블도 98.1 N(방향만 다름, \(T_1=T_2\)).</p></div></details>
+<div class="analogy">자유물체도는 "그 사람만 방에 남기고 나머지는 다 내보낸 뒤, 나간 사람들이 그에게 주던 힘만 화살표로 남기는 것". 화살표를 하나라도 빠뜨리면 평형식이 틀린다 — 그래서 3단계 중 ③이 점수를 가른다.</div>
+<div class="memo"><b>외울 것</b> 평형 = 가속도 0 = 정지 또는 등속 · \(\sum\mathbf F=0\) · FBD ① 물체 정하기 ② 떼어내 그리기 ③ 모든 외력 · 과제 1~2문제가 시험에 그대로(OT)</div>
+</section>
+
+
+<section id="quiz"><h2>확인 문제</h2><div class="hint">보기를 누르면 바로 채점됩니다. 답을 쓰는 문제는 「답 보기」 뒤에 맞음/틀림을 스스로 표시합니다.</div><div id="qlist"></div><div id="result"></div></section>
+<div id="done"></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script>
+const LESSON_ID="statics-2026-09-16", QUIZ=[{"id": "q1", "qn": "확인 1 · 삼중적의 결과", "html": "\\(\\mathbf U\\cdot(\\mathbf V\\times\\mathbf W)\\)의 결과는?", "choices": [{"html": "스칼라 — 마지막 연산이 내적이므로", "ok": true}, {"html": "벡터 — 외적이 들어 있으므로", "ok": false}, {"html": "3×3 행렬", "ok": false}, {"html": "각도", "ok": false}], "ans": "외적(벡터)을 먼저 하고 내적(스칼라)으로 끝난다. 절댓값 = 평행육면체 부피."}, {"id": "q2", "qn": "확인 2 · 행렬식 계산", "html": "\\(\\mathbf U=(1,0,0)\\), \\(\\mathbf V=(0,2,0)\\), \\(\\mathbf W=(0,0,3)\\)일 때 \\(\\mathbf U\\cdot(\\mathbf V\\times\\mathbf W)\\)는?", "choices": [{"html": "6", "ok": true}, {"html": "0", "ok": false}, {"html": "\\((1,2,3)\\)", "ok": false}, {"html": "5", "ok": false}], "ans": "대각 행렬식 = \\(1\\cdot2\\cdot3=6\\) = 직육면체 부피. \\(\\mathbf W=(1,1,0)\\)이면 공면이라 0."}, {"id": "q3", "qn": "확인 3 · 접촉력", "html": "면과 면이 닿을 때 접촉력의 두 성분은?", "choices": [{"html": "면에 수직한 수직력 \\(\\mathbf N\\) + 면에 평행한 마찰력 \\(\\mathbf f\\)", "ok": true}, {"html": "면에 평행한 수직력 + 면에 수직한 마찰력", "ok": false}, {"html": "수직력 \\(\\mathbf N\\)뿐이다", "ok": false}, {"html": "마찰력은 항상 무게와 같다", "ok": false}], "ans": "\\(\\mathbf F=\\mathbf N+\\mathbf f\\). 곡면이면 접평면 기준."}, {"id": "q4", "qn": "확인 4 · 도르래", "html": "도르래 양쪽 케이블의 장력이 같다(\\(T_1=T_2\\))고 가정하는 근거는?", "choices": [{"html": "케이블 질량을 0으로 두면 \\(F=ma\\)에서 합력이 0이라 장력이 케이블 전체에서 일정", "ok": true}, {"html": "도르래가 회전하지 않기 때문", "ok": false}, {"html": "케이블이 늘어나기 때문", "ok": false}, {"html": "도르래의 마찰이 크기 때문", "ok": false}], "ans": "교수님이 되물은 질문. 실제로는 질량·마찰이 있어 조금 다르다."}, {"id": "q5", "qn": "확인 5 · 평형 방정식", "html": "물체가 평형일 때 성립하는 것은?", "choices": [{"html": "물체에 작용하는 모든 <b>외력</b>의 벡터 합 = 0", "ok": true}, {"html": "\\(\\sum\\mathbf F=m\\mathbf a\\), \\(\\mathbf a\\ne0\\)", "ok": false}, {"html": "내력의 합만 0이면 된다", "ok": false}, {"html": "무게와 장력은 항상 같다", "ok": false}], "ans": "평형 = 가속도 0. 내력은 3법칙으로 저절로 상쇄되니 외력만 센다."}, {"id": "q6", "qn": "확인 6 · 자유물체도", "html": "질량 10 kg 상자를 케이블로 매달아 정지시켰다. 자유물체도 3단계를 쓰고 장력을 구하라.", "choices": null, "ans": "① 물체 = 상자 ② 상자만 그림 ③ 외력: \\(T\\)(위), \\(mg\\)(아래). \\(T-mg=0\\) → \\(T=98.1\\) N. 도르래 너머 사람 쪽도 98.1 N."}], N_SEC=document.querySelectorAll("section.s[data-id]").length;
+const KEY="mc-lesson-"+LESSON_ID;
+let ST={read:{},done:{},correct:{},answer:{},ts:0};
+try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}
+const $=s=>document.querySelector(s), $$=(s,el)=>Array.from((el||document).querySelectorAll(s)); /* el 범위 필수 — 문제 카드마다 보기를 따로 묶는다 (오타 RED 2026-09-26: 범위를 무시해 모든 보기가 마지막 문제로 채점됐다) */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function save(){ ST.ts=Date.now(); try{ localStorage.setItem(KEY,JSON.stringify(ST)); const qs=QUIZ.length, qd=QUIZ.filter(q=>ST.done[q.id]).length, rd=Object.keys(ST.read).length;
+  const li={deck:LESSON_ID,title:document.title,href:location.href.split("#")[0],idx:Math.max(0,rd-1),n:N_SEC,sid:curSec||"",part:null,partTitle:document.title.slice(0,60),where:(rd>=N_SEC?"확인 문제":"읽는 중 · "+(curTitle||"")),qDone:qd,qN:qs,ts:Date.now()};
+  const j=JSON.stringify(li); localStorage.setItem("mc-slides-last",j); localStorage.setItem("mc-slides-last-"+LESSON_ID,j); }catch(e){} }
+function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} }
+/* ---- 읽음: 섹션이 화면의 절반 이상 1.2초 보이면 읽음 ---- */
+let curSec=null, curTitle="";
+function renderTop(){ const rd=Object.keys(ST.read).filter(k=>ST.read[k]).length, qd=QUIZ.filter(q=>ST.done[q.id]).length, tot=N_SEC+QUIZ.length;
+  $("#tRead").textContent="읽음 "+rd+"/"+N_SEC+(QUIZ.length?" · 문제 "+qd+"/"+QUIZ.length:""); const p=tot?Math.round((rd+qd)/tot*100):0; $("#tPct").textContent=p+"%"; $("#barI").style.width=p+"%";
+  $$("section.s[data-id]").forEach(s=>s.classList.toggle("read",!!ST.read[s.dataset.id]));
+  /* 따라감 기준은 앱(V52)과 같다: 섹션 전부 + 문제 90% 풀고 60% 정답 */
+  const okN=QUIZ.filter(q=>ST.correct[q.id]===true).length, need=Math.ceil(QUIZ.length*.6);
+  $("#done").textContent= rd>=N_SEC&&qd>=QUIZ.length&&QUIZ.length? (okN>=need? "이 회차 끝 — 정답 "+okN+"/"+QUIZ.length+". 앱의 「수업 따라가기」에서 따라감으로 표시됩니다." : "다 풀었지만 정답 "+okN+"/"+QUIZ.length+" — 틀린 문제를 다시 풀어 "+need+"개 이상 맞히면 따라감으로 표시됩니다.") : ""; }
+const timers={};
+const io=new IntersectionObserver(es=>{ es.forEach(e=>{ const id=e.target.dataset.id; if(e.isIntersecting){ curSec=id; curTitle=(e.target.querySelector("h2")||{}).textContent||""; postCtx(e.target);
+    if(!ST.read[id]&&!timers[id]) timers[id]=setTimeout(()=>{ ST.read[id]=true; save(); renderTop(); },1200); } else { if(timers[id]){ clearTimeout(timers[id]); delete timers[id]; } } }); },{threshold:.5});
+$$("section.s[data-id]").forEach(s=>io.observe(s));
+/* 짧은 섹션(화면보다 작아 50%가 금방 차는) 은 그대로, 긴 섹션은 끝까지 스크롤하면 읽음 */
+window.addEventListener("scroll",()=>{ $$("section.s[data-id]").forEach(s=>{ if(ST.read[s.dataset.id]) return; const r=s.getBoundingClientRect(); if(r.bottom<window.innerHeight*.6&&r.bottom>-2000){ ST.read[s.dataset.id]=true; save(); renderTop(); } }); },{passive:true});
+/* ---- 판서 사진: atom 안에서만 (없으면 숨김) ---- */
+$$("figure.board img").forEach(img=>{ img.addEventListener("error",()=>{ img.closest("figure").hidden=true; }); });
+/* ---- 문제 카드 ---- */
+function qHTML(q,i){ const mc=Array.isArray(q.choices)&&q.choices.length, rev=!!ST.done[q.id], my=ST.answer[q.id];
+  let inner='<div class="qn">'+esc(q.qn||("문제 "+(i+1)))+'</div><div class="qb">'+q.html+'</div>';
+  if(mc){ inner+='<ol class="choices">'+q.choices.map((c,ci)=>{ const sel=String(my)===String(ci); const cls=rev?(c.ok?" ok":(sel?" bad":"")):""; return '<li><button class="choice'+cls+'" data-ci="'+ci+'"'+(rev?" disabled":"")+'><span class="cn">'+(ci+1)+'</span><span>'+c.html+'</span></button></li>'; }).join("")+'</ol>'; }
+  else { inner+= rev? '<div class="memo"><b>내 답</b> '+esc(my||"")+'</div>' : '<textarea class="myans" placeholder="답만 간단히">'+esc(my||"")+'</textarea><div class="row"><button class="btn a" data-reveal>답 보기</button></div>'; }
+  if(rev){ const c=ST.correct[q.id]; inner+='<span class="verdict '+(c===true?"ok":c===false?"bad":"")+'">'+(c===true?"정답":c===false?"오답":"채점 전")+'</span>';
+    if(!mc&&c==null) inner+='<div class="row"><button class="btn" data-grade="1">맞았어요</button><button class="btn" data-grade="0">틀렸어요</button></div>';
+    inner+='<div class="row"><button class="btn xs" data-retry>다시 풀기</button></div>'; }
+  inner+='<div class="ans"><b>답 · 풀이</b><div>'+(q.ans||"")+'</div></div>';
+  return '<div class="q'+(rev?" rev":"")+'" data-q="'+q.id+'">'+inner+'</div>'; }
+function bindQ(){ const box=$("#qlist"); box.innerHTML=QUIZ.map(qHTML).join(""); typeset(box);
+  $$("#qlist .q").forEach(el=>{ const q=QUIZ.find(x=>x.id===el.dataset.q);
+    $$(".choice",el).forEach(b=>{ b.onclick=()=>{ if(ST.done[q.id]) return; const ci=+b.dataset.ci; ST.answer[q.id]=ci; ST.done[q.id]=true; ST.correct[q.id]=!!(q.choices[ci]&&q.choices[ci].ok); save(); bindQ(); renderTop(); }; });
+    const rv=el.querySelector("[data-reveal]"); if(rv) rv.onclick=()=>{ const ta=el.querySelector(".myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); bindQ(); renderTop(); };
+    $$("[data-grade]",el).forEach(b=>{ b.onclick=()=>{ ST.correct[q.id]=b.dataset.grade==="1"; save(); bindQ(); renderTop(); }; });
+    const rt=el.querySelector("[data-retry]"); if(rt) rt.onclick=()=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; save(); bindQ(); renderTop(); };
+  });
+  const done=QUIZ.filter(q=>ST.done[q.id]).length, ok=QUIZ.filter(q=>ST.correct[q.id]===true).length, wrong=QUIZ.filter(q=>ST.correct[q.id]===false);
+  $("#result").innerHTML= QUIZ.length? '<b>'+ok+'/'+QUIZ.length+'</b><span>정답 · 푼 문제 '+done+'</span>'+(wrong.length?'<button class="btn" id="retryWrong">틀린 문제 '+wrong.length+'개 다시</button>':'')+'<span class="sp" style="flex:1"></span><button class="btn xs" id="resetAll">이 회차 기록 지우기</button>' : '';
+  const rw=$("#retryWrong"); if(rw) rw.onclick=()=>{ wrong.forEach(q=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; }); save(); bindQ(); renderTop(); const f=$("#qlist .q:not(.rev)"); if(f) f.scrollIntoView({behavior:"smooth",block:"start"}); };
+  const ra=$("#resetAll"); if(ra) ra.onclick=()=>{ if(confirm("이 회차의 읽음·문제 기록을 지울까요?")){ ST={read:{},done:{},correct:{},answer:{},ts:0}; save(); bindQ(); renderTop(); } }; }
+/* ---- 앱 질문 패널 문맥 (V45 와 같은 규약) ---- */
+let CTX_GEN=null;
+function postCtx(sec){ try{ if(!CTX_GEN||window.parent===window) return; const s=sec||document.querySelector("section.s.read:last-of-type")||document.querySelector("section.s"); if(!s) return;
+  const t=(s.querySelector("h2")||{}).textContent||"", txt=(s.textContent||"").replace(/\s+/g," ").trim().slice(0,600);
+  window.parent.postMessage({type:"mc-slide",v:1,gen:CTX_GEN,deck:LESSON_ID,title:document.title.slice(0,80),sid:s.dataset.id,stype:"concept",part:null,partTitle:document.title.slice(0,60),label:"읽는 중 · "+t.slice(0,60),q:{qn:t.slice(0,80),kind:"개념",text:txt,choices:[],my:null,revealed:true,correct:null,answer:null}},location.origin); }catch(e){} }
+window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; postCtx(); } });
+/* ---- 시작 ---- */
+function boot(){ typeset(document.querySelector("main")); bindQ(); renderTop(); save();
+  const m=/^#s=([\w-]+)$/.exec(location.hash||""); if(m){ const el=document.querySelector('section.s[data-id="'+m[1]+'"]'); if(el) el.scrollIntoView(); }
+  else if(location.hash==="#resume"){ const ids=$$("section.s[data-id]").map(s=>s.dataset.id); const next=ids.find(id=>!ST.read[id]); if(next){ const el=document.querySelector('section.s[data-id="'+next+'"]'); if(el) el.scrollIntoView(); } else if(QUIZ.length){ $("#quiz").scrollIntoView(); } } }
+(function wait(){ if(window.renderMathInElement) boot(); else setTimeout(wait,40); })();
+</script>
+</body>
+</html>

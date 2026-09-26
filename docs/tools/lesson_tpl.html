@@ -59,8 +59,8 @@ figure.board figcaption{font-size:13px;color:var(--ink-3);margin-top:4px}
 figure.board[hidden]{display:none}
 /* 예제 */
 details.ex{margin:12px 0;border:1px solid var(--line);border-radius:12px;background:var(--paper-2);padding:0}
-details.ex summary{cursor:pointer;padding:12px 16px;font-weight:700;list-style:none;display:flex;gap:10px;align-items:center}
-details.ex summary::before{content:"예제";font-size:12px;color:#fff;background:var(--ink);border-radius:6px;padding:2px 7px}
+details.ex summary{cursor:pointer;padding:12px 16px;font-weight:700;list-style:none;display:block;line-height:1.6}
+details.ex summary::before{content:"예제";display:inline-block;vertical-align:middle;margin-right:10px;font-size:12px;line-height:1.5;color:#fff;background:var(--ink);border-radius:6px;padding:2px 7px}
 details.ex summary::-webkit-details-marker{display:none}
 details.ex .body{padding:0 16px 14px;border-top:1px solid var(--line)}
 details.ex .body p{margin:8px 0}
@@ -122,10 +122,10 @@ const LESSON_ID="__ID__", QUIZ=__QUIZ__, N_SEC=document.querySelectorAll("sectio
 const KEY="mc-lesson-"+LESSON_ID;
 let ST={read:{},done:{},correct:{},answer:{},ts:0};
 try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}
-const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const $=s=>document.querySelector(s), $$=(s,el)=>Array.from((el||document).querySelectorAll(s)); /* el 범위 필수 — 문제 카드마다 보기를 따로 묶는다 (오타 RED 2026-09-26: 범위를 무시해 모든 보기가 마지막 문제로 채점됐다) */
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function save(){ ST.ts=Date.now(); try{ localStorage.setItem(KEY,JSON.stringify(ST)); const qs=QUIZ.length, qd=QUIZ.filter(q=>ST.done[q.id]).length, rd=Object.keys(ST.read).length;
-  const li={deck:LESSON_ID,title:document.title,href:location.href.split("#")[0],idx:rd,n:N_SEC,sid:curSec||"",part:null,partTitle:document.title.slice(0,60),where:(rd>=N_SEC?"확인 문제":"읽는 중 · "+(curTitle||"")),qDone:qd,qN:qs,ts:Date.now()};
+  const li={deck:LESSON_ID,title:document.title,href:location.href.split("#")[0],idx:Math.max(0,rd-1),n:N_SEC,sid:curSec||"",part:null,partTitle:document.title.slice(0,60),where:(rd>=N_SEC?"확인 문제":"읽는 중 · "+(curTitle||"")),qDone:qd,qN:qs,ts:Date.now()};
   const j=JSON.stringify(li); localStorage.setItem("mc-slides-last",j); localStorage.setItem("mc-slides-last-"+LESSON_ID,j); }catch(e){} }
 function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} }
 /* ---- 읽음: 섹션이 화면의 절반 이상 1.2초 보이면 읽음 ---- */
@@ -133,7 +133,9 @@ let curSec=null, curTitle="";
 function renderTop(){ const rd=Object.keys(ST.read).filter(k=>ST.read[k]).length, qd=QUIZ.filter(q=>ST.done[q.id]).length, tot=N_SEC+QUIZ.length;
   $("#tRead").textContent="읽음 "+rd+"/"+N_SEC+(QUIZ.length?" · 문제 "+qd+"/"+QUIZ.length:""); const p=tot?Math.round((rd+qd)/tot*100):0; $("#tPct").textContent=p+"%"; $("#barI").style.width=p+"%";
   $$("section.s[data-id]").forEach(s=>s.classList.toggle("read",!!ST.read[s.dataset.id]));
-  $("#done").textContent= rd>=N_SEC&&qd>=QUIZ.length&&QUIZ.length? "이 회차 끝. 앱의 「수업 따라가기」에서 따라감으로 표시됩니다." : ""; }
+  /* 따라감 기준은 앱(V52)과 같다: 섹션 전부 + 문제 90% 풀고 60% 정답 */
+  const okN=QUIZ.filter(q=>ST.correct[q.id]===true).length, need=Math.ceil(QUIZ.length*.6);
+  $("#done").textContent= rd>=N_SEC&&qd>=QUIZ.length&&QUIZ.length? (okN>=need? "이 회차 끝 — 정답 "+okN+"/"+QUIZ.length+". 앱의 「수업 따라가기」에서 따라감으로 표시됩니다." : "다 풀었지만 정답 "+okN+"/"+QUIZ.length+" — 틀린 문제를 다시 풀어 "+need+"개 이상 맞히면 따라감으로 표시됩니다.") : ""; }
 const timers={};
 const io=new IntersectionObserver(es=>{ es.forEach(e=>{ const id=e.target.dataset.id; if(e.isIntersecting){ curSec=id; curTitle=(e.target.querySelector("h2")||{}).textContent||""; postCtx(e.target);
     if(!ST.read[id]&&!timers[id]) timers[id]=setTimeout(()=>{ ST.read[id]=true; save(); renderTop(); },1200); } else { if(timers[id]){ clearTimeout(timers[id]); delete timers[id]; } } }); },{threshold:.5});

@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>역학이란 무엇인가 — 그리고 벡터의 첫걸음</title>
+<!-- 수업 노트 템플릿 v1 (대표님 2026-09-26 결정: 개념은 스크롤 교재 · 문제는 카드 · 아톰 SVG 그림 · 판서 사진은 atom 안에서만 · 원리 먼저 15~20분)
+     build_lesson.py 가 <section class="s" data-id="s1">
+<div class="no">1 / 6</div><h2>1. 역학 = "힘이 가해졌을 때 물체에 생기는 변화"</h2>
+<p>역학의 <b>역</b>은 힘 力. 힘이 물체에 가해지면 물체는 <b>움직이거나</b>, <b>버티며 스트레스를 받거나</b>, <b>변형된다</b> — 이 변화를 통틀어 다루는 학문이 역학(Mechanics)이다.</p>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 190" width="560" height="190" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><rect x="190" y="26" width="180" height="46" rx="10" fill="rgba(31,42,68,.06)" stroke="#1F2A44" stroke-width="2"></rect><text x="280" y="46" font-size="15" fill="#1F2A44" text-anchor="middle" font-weight="700">Mechanics 역학</text><text x="280" y="63" font-size="11.5" fill="#8A97A6" text-anchor="middle">힘(力)이 물체에 가해졌을 때 생기는 변화 전부</text><line x1="280" y1="72" x2="280" y2="96" stroke="#1F2A44" stroke-width="1.5"></line><line x1="150" y1="96" x2="410" y2="96" stroke="#1F2A44" stroke-width="1.5"></line><line x1="150" y1="96" x2="150" y2="116" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><line x1="410" y1="96" x2="410" y2="116" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><rect x="60" y="118" width="180" height="58" rx="10" fill="rgba(47,158,68,.08)" stroke="#2F9E44" stroke-width="2"></rect><text x="150" y="140" font-size="14" fill="#2F9E44" text-anchor="middle" font-weight="700">Statics 정역학</text><text x="150" y="161" font-size="11.5" fill="#1F2A44" text-anchor="middle">"equilibrium" 평형 · 정지 · 이번 학기</text><rect x="320" y="118" width="180" height="58" rx="10" fill="rgba(138,151,166,.10)" stroke="#8A97A6" stroke-width="2"></rect><text x="410" y="140" font-size="14" fill="#8A97A6" text-anchor="middle" font-weight="700">Dynamics 동역학</text><text x="410" y="161" font-size="11.5" fill="#1F2A44" text-anchor="middle">운동(motion) · 나중</text></svg><figcaption>판서 ①의 구조. 교수님이 Mechanics·divided 아래 점선을 긋고 equilibrium 에 따옴표를 쳤다 — 이번 학기의 핵심어.</figcaption></figure>
+<div class="say">"저희 기계공학이지만 <b>Machine이 아니고 Mechanical Engineering</b>이잖아요. Mechanics의 정의를 꼭 알고 가셔야 됩니다."</div>
+<div class="why">정역학(Statics)은 <b>정지해 있는</b>(평형 상태의) 물체를, 동역학(Dynamics)은 <b>운동하는</b> 물체를 다룬다. 이번 학기는 정역학 — 움직이지 않으니 "왜 안 움직이는가"를 힘의 균형으로 설명하는 것이 전부다.</div>
+<div class="say">"결국에는 <b>평형(equilibrium)이 가장 중요</b>합니다. <b>평형방정식을 잘 세우는 것</b>이 제일 중요하고요. 그리고 <b>모멘트</b>, 이 두 가지 가지고 한 학기 동안 하는 거예요." — 두 번 반복.</div>
+<div class="analogy">다리·건물·크레인은 서 있는 채로 힘을 받는다. 무너지지 않는 이유를 설명하는 것이 정역학, 자동차·로켓처럼 움직이는 것을 설명하는 것이 동역학. 같은 「힘」을 다루지만 질문이 다르다.</div>
+<div class="memo"><b>외울 것</b> Mechanics = Statics(평형) + Dynamics(운동) · 정역학의 두 기둥 = <b>평형방정식</b> · <b>모멘트</b> · 이번 학기 = 정역학</div>
+<figure class="board"><img alt="판서 1" src="../_private/statics/2026-09-07/%ED%8C%90%EC%84%9C_1_%EC%97%AD%ED%95%99%EC%A0%95%EC%9D%98_%EC%A0%95%EC%97%AD%ED%95%99%EB%8F%99%EC%97%AD%ED%95%99.jpg" loading="lazy"><figcaption>판서 ① 역학의 정의 — Statics / Dynamics (15:08, 태블릿 화면)</figcaption></figure>
+</section>
+
+<section class="s" data-id="s2">
+<div class="no">2 / 6</div><h2>2. 단위 — 뉴턴은 kg·m/s²</h2>
+<p>주로 <b>SI 단위</b>를 쓴다(US customary 는 참고만). 힘의 단위 뉴턴은 정의부터 기억한다.</p>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 150" width="560" height="150" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><line x1="60" y1="110" x2="500" y2="110" stroke="#1F2A44" stroke-width="2"></line><rect x="200" y="60" width="60" height="50" rx="6" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2"></rect><text x="230.0" y="90.0" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700">1 kg</text><line x1="130" y1="85" x2="196" y2="85" stroke="#2F9E44" stroke-width="2.6" marker-end="url(#ah)"></line><text x="163.0" y="75.0" text-anchor="middle" font-size="13" fill="#2F9E44">F = 1 N</text><line x1="270" y1="40" x2="340" y2="40" stroke="#1971C2" stroke-width="2.2" marker-end="url(#ah)"></line><text x="305.0" y="32.0" text-anchor="middle" font-size="13" fill="#1971C2">a = 1 m/s²</text><text x="280" y="138" font-size="13.5" fill="#1F2A44" text-anchor="middle" font-weight="700">1 N = 1 kg · 1 m/s²   (kN = 10³ N · MN = 10⁶ N)</text></svg><figcaption>힘의 단위 뉴턴: 1 kg 을 1 m/s² 로 가속하는 힘. 각도는 rad — 한 바퀴 2π rad = 360°.</figcaption></figure>
+<div class="formula">\[1\ \mathrm{N}=1\ \mathrm{kg\cdot m/s^2},\qquad \mathrm{kN}=10^3\ \mathrm N,\quad \mathrm{MN}=10^6\ \mathrm N,\qquad 2\pi\ \mathrm{rad}=360^\circ\]</div>
+<div class="why">뉴턴 2법칙 \(F=ma\)에서 나온 단위다. 그래서 힘 문제의 답이 kg·m/s² 로 떨어지면 맞게 계산한 것 — 단위 검산에 쓴다.</div>
+<div class="analogy">사과 하나(약 100 g)를 손에 올렸을 때 느끼는 무게가 대략 1 N. "kN" 이 나오면 사과 천 개, 자동차 한 대 무게가 10 kN 남짓.</div>
+<div class="memo"><b>외울 것</b> \(1\ \mathrm N=1\ \mathrm{kg\,m/s^2}\) · 속도 = 위치의 변화율, 가속도 = 속도의 변화율 · 각도는 rad</div>
+</section>
+
+<section class="s" data-id="s3">
+<div class="no">3 / 6</div><h2>3. 뉴턴의 법칙 — 정역학은 항상 ΣF = 0</h2>
+<table><tr><th></th><th>내용</th><th>정역학에서의 뜻</th></tr>
+<tr><td><b>1법칙</b></td><td>\(\sum\mathbf F=0\)이면 속도가 일정</td><td>정지해 있으면 계속 정지. <b>정역학은 항상 \(\sum\mathbf F=0\)</b></td></tr>
+<tr><td><b>2법칙</b></td><td>\(\sum\mathbf F=d\mathbf p/dt\) (선운동량의 변화율)</td><td>합력이 0이라 안 쓴다 — 동역학 개념</td></tr>
+<tr><td><b>3법칙</b></td><td>\(\mathbf F_{A\to B}=-\mathbf F_{B\to A}\), 크기 같고 방향 반대</td><td>자유물체도(3장)의 근거</td></tr></table>
+<div class="say">"we study statics right so <b>always the summation of forces will be zero</b>"</div>
+<h3>왜 「입자(particle)」라고 하는가 — 교수님이 질문으로 짚은 포인트</h3>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 200" width="560" height="200" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><circle cx="130" cy="100" r="7" fill="#1F2A44"></circle><line x1="40" y1="100" x2="122" y2="100" stroke="#2F9E44" stroke-width="2.6" marker-end="url(#ah)"></line><text x="81.0" y="90.0" text-anchor="middle" font-size="13" fill="#2F9E44">F</text><text x="130" y="150" font-size="13" fill="#1F2A44" text-anchor="middle">입자(particle): 크기 없음</text><text x="130" y="170" font-size="12" fill="#8A97A6" text-anchor="middle">작용선이 항상 중심을 지난다 → 회전 없음</text><rect x="340" y="60" width="120" height="80" rx="6" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2"></rect><circle cx="400" cy="100" r="4" fill="#8A97A6"></circle><line x1="250" y1="72" x2="332" y2="72" stroke="#2F9E44" stroke-width="2.6" marker-end="url(#ah)"></line><text x="291.0" y="62.0" text-anchor="middle" font-size="13" fill="#2F9E44">F</text><line x1="332" y1="72" x2="470" y2="72" stroke="#8A97A6" stroke-width="1" stroke-dasharray="4 3"></line><text x="478" y="76" font-size="11" fill="#8A97A6" text-anchor="start">작용선</text><path d="M368.1 88.4 A 34 34 0 0 1 431.9 88.4" fill="none" stroke="#E03131" stroke-width="2"></path><text x="400.0" y="54.0" font-size="12" fill="#E03131" text-anchor="middle">회전(모멘트)</text><text x="400" y="178" font-size="12.5" fill="#1F2A44" text-anchor="middle">크기가 있으면 작용선 위치에 따라 돈다</text></svg><figcaption>1장에서 「입자」로 두는 이유: 크기가 있으면 힘의 작용선이 중심에서 비껴 모멘트가 생긴다. 모멘트는 4장에서.</figcaption></figure>
+<div class="say">"부피가 있으면 <b>힘의 작용선이 달라져</b> 버리면 얘가 회전을 하게 되겠죠. <b>모멘트가 생기기 때문에.</b>"</div>
+<div class="why">크기가 있는 물체는 같은 힘이라도 <b>어디에</b> 걸리느냐에 따라 회전한다. 1장에서는 그 복잡함을 일단 빼려고 물체를 크기 없는 점(입자)으로 본다. 회전(모멘트)은 4장에서 정식으로 다룬다.</div>
+<div class="analogy">문을 경첩 바로 옆에서 밀면 안 열리고, 손잡이 쪽에서 밀면 쉽게 돈다. 힘은 같은데 <b>작용선의 위치</b>가 다르기 때문 — 이것이 모멘트.</div>
+<p>만유인력 \(F=G\dfrac{m_1m_2}{r^2}\) — 두 입자 사이, 크기 같고 방향 반대. "이 중력이 사실상 만유인력이랑 똑같잖아요." 지표면 근처에서는 \(W=mg\)로 쓴다(3장).</p>
+<div class="memo"><b>외울 것</b> 정역학 = \(\sum\mathbf F=0\) · 입자 = 크기 없음 → 모멘트 없음 · 3법칙 = 작용·반작용(자유물체도) · \(W=mg\)</div>
+</section>
+
+<section class="s" data-id="s4">
+<div class="no">4 / 6</div><h2>4. Ch.2 벡터 — 스칼라와 벡터, 표기, 위치벡터</h2>
+<p><b>스칼라</b>는 숫자 하나로 완전히 기술되는 양(방향 불필요). <b>벡터</b>는 <b>크기(magnitude)와 방향(direction)</b>이 둘 다 같아야 같은 벡터다.</p>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 180" width="560" height="180" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><line x1="60" y1="130" x2="200" y2="50" stroke="#1971C2" stroke-width="3" marker-end="url(#ah)"></line><text x="112" y="78" font-size="16" fill="#1971C2" text-anchor="middle" font-weight="700">u</text><text x="150" y="158" font-size="12.5" fill="#1F2A44" text-anchor="middle">길이 ∝ 크기 |u| · 화살표 방향 = 방향</text><circle cx="330" cy="130" r="5" fill="#1F2A44"></circle><text x="318" y="152" font-size="12" fill="#1F2A44" text-anchor="middle">A (시작)</text><circle cx="500" cy="60" r="5" fill="#1F2A44"></circle><text x="500" y="48" font-size="12" fill="#1F2A44" text-anchor="middle">B (끝)</text><line x1="336" y1="126" x2="494" y2="64" stroke="#2F9E44" stroke-width="2.6" marker-end="url(#ah)"></line><text x="430" y="84" font-size="14" fill="#2F9E44" text-anchor="middle" font-weight="700">r<tspan baseline-shift="sub" font-size="72%">AB</tspan></text><text x="420" y="168" font-size="12.5" fill="#1F2A44" text-anchor="middle">앞 첨자 = 시작점, 뒤 첨자 = 끝점</text></svg><figcaption>벡터는 크기와 방향이 둘 다 같아야 같은 벡터. 위치벡터 \(\mathbf r_{AB}\)는 A에서 B로 쏘는 벡터.</figcaption></figure>
+<div class="memo"><b>표기</b> 벡터는 볼드체 \(\mathbf u\)(손글씨는 화살표·밑줄) · 크기는 \(|\mathbf u|\) — 방향이 사라지고 크기만 남는다 · 그림은 화살표: <b>길이 ∝ 크기</b>, 화살표 방향 = 벡터 방향</div>
+<div class="why"><b>위치벡터 \(\mathbf r_{AB}\)</b> = 점 A에서 점 B로 쏘는 벡터. 앞 첨자가 시작점, 뒤 첨자가 끝점. 다음 시간 "끝점 − 시작점" 계산의 뿌리이고, 4장 모멘트 \(\mathbf M=\mathbf r\times\mathbf F\)의 \(\mathbf r\)이 바로 이것.</div>
+<div class="analogy">"서울에서 부산까지 400 km"는 스칼라(거리), "서울에서 부산 쪽으로 400 km"는 벡터(변위). 방향을 뒤집으면 다른 벡터가 된다.</div>
+<div class="memo"><b>외울 것</b> 벡터 = 크기 + 방향 · \(|\mathbf u|\) = 크기(스칼라) · \(\mathbf r_{AB}\): A → B</div>
+</section>
+
+<section class="s" data-id="s5">
+<div class="no">5 / 6</div><h2>5. 덧셈 · 스칼라배 · 뺄셈</h2>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 225" width="560" height="225" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><line x1="40" y1="170" x2="160" y2="130" stroke="#1971C2" stroke-width="2.6" marker-end="url(#ah)"></line><text x="100.0" y="142.0" text-anchor="middle" font-size="13" fill="#1971C2">u</text><line x1="160" y1="130" x2="210" y2="50" stroke="#E03131" stroke-width="2.6" marker-end="url(#ah)"></line><text x="197.0" y="90.0" text-anchor="middle" font-size="13" fill="#E03131">v</text><line x1="40" y1="170" x2="210" y2="50" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="89.0" y="106.0" text-anchor="middle" font-size="13" fill="#2F9E44">u + v</text><text x="130" y="208" font-size="12.5" fill="#1F2A44" text-anchor="middle">삼각형 법칙: u 꼬리에서 v 머리로</text><line x1="300" y1="170" x2="420" y2="130" stroke="#1971C2" stroke-width="2.6" marker-end="url(#ah)"></line><text x="360.0" y="142.0" text-anchor="middle" font-size="13" fill="#1971C2">u</text><line x1="300" y1="170" x2="350" y2="90" stroke="#E03131" stroke-width="2.6" marker-end="url(#ah)"></line><text x="313.0" y="130.0" text-anchor="middle" font-size="13" fill="#E03131">v</text><line x1="420" y1="130" x2="470" y2="50" stroke="#8A97A6" stroke-width="1.2" stroke-dasharray="4 3"></line><line x1="350" y1="90" x2="470" y2="50" stroke="#8A97A6" stroke-width="1.2" stroke-dasharray="4 3"></line><line x1="300" y1="170" x2="470" y2="50" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="349.0" y="106.0" text-anchor="middle" font-size="13" fill="#2F9E44">u + v</text><text x="390" y="208" font-size="12.5" fill="#1F2A44" text-anchor="middle">평행사변형 법칙: 결과는 같다 (교환법칙)</text></svg><figcaption>덧셈 두 가지 그림. \(\mathbf u+\mathbf v=\mathbf v+\mathbf u\), 묶는 순서도 상관없다(결합법칙). 뺄셈은 \(-\mathbf v\)를 더한다.</figcaption></figure>
+<div class="formula">\[\mathbf u+\mathbf v=\mathbf v+\mathbf u\ (\text{교환}),\quad (\mathbf u+\mathbf v)+\mathbf w=\mathbf u+(\mathbf v+\mathbf w)\ (\text{결합}),\qquad \mathbf r_{AC}=\mathbf r_{AB}+\mathbf r_{BC}\]</div>
+<div class="say">"당장은 어디다 써먹을지 모르겠지만 나중에 문제를 풀면 (쓰인다)" — \(\mathbf r_{AC}=\mathbf r_{AB}+\mathbf r_{BC}\)에 대해.</div>
+<div class="why"><b>스칼라배</b> \(a\mathbf u\)도 벡터. 크기는 \(|a||\mathbf u|\), 방향은 \(a\)의 부호에 따라 — \(a&lt;0\)이면 반대 방향. 결합·분배법칙이 성립하고, 스칼라로 나누기는 \(1/a\)를 곱하는 것. <b>뺄셈</b>은 \(\mathbf u-\mathbf v=\mathbf u+(-\mathbf v)\) — "반대 방향 벡터를 더한다고 생각하면 된다".</div>
+<div class="analogy">지도에서 A → B → C로 돌아가나 A → C로 직행하나 도착지는 같다. 그것이 \(\mathbf r_{AC}=\mathbf r_{AB}+\mathbf r_{BC}\). 어느 길로 묶어 더하든 결과가 같다는 것이 결합법칙.</div>
+<div class="memo"><b>외울 것</b> 삼각형 법칙(꼬리→머리) = 평행사변형 법칙 · \(a\mathbf u\): 부호가 방향 · \(\mathbf u-\mathbf v=\mathbf u+(-\mathbf v)\)</div>
+</section>
+
+<section class="s" data-id="s6">
+<div class="no">6 / 6</div><h2>6. 단위벡터 — 크기 1, 방향만 남긴다 ★</h2>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 150" width="560" height="150" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><line x1="60" y1="100" x2="300" y2="40" stroke="#1971C2" stroke-width="3" marker-end="url(#ah)"></line><text x="180" y="56" font-size="15" fill="#1971C2" text-anchor="middle" font-weight="700">u = |u| e</text><line x1="60" y1="100" x2="120" y2="85" stroke="#2F9E44" stroke-width="3.4" marker-end="url(#ah)"></line><text x="96" y="122" font-size="13" fill="#2F9E44" text-anchor="middle">e (크기 1)</text><text x="420" y="58" font-size="16" fill="#1F2A44" text-anchor="middle" font-weight="700">e = u / |u|</text><text x="420" y="82" font-size="13" fill="#8A97A6" text-anchor="middle">방향만 남긴다</text><text x="420" y="102" font-size="12" fill="#8A97A6" text-anchor="middle">크기가 1이라 곱해도 크기가 안 바뀐다</text></svg><figcaption>단위벡터: 크기 1, 방향만 지정. 어떤 벡터든 「크기 × 방향」으로 쪼갠다 — 3장에서 케이블 힘을 성분으로 쓸 때의 핵심.</figcaption></figure>
+<div class="formula">\[\mathbf e=\frac{\mathbf u}{|\mathbf u|},\quad |\mathbf e|=1,\qquad \mathbf u=|\mathbf u|\,\mathbf e\ (\text{크기}\times\text{방향})\]</div>
+<div class="why">쓰는 이유는 하나 — <b>방향만 지정</b>하려고. 크기가 1이라 어떤 수를 곱해도 방향은 그대로고 크기만 그 수가 된다. "케이블이 A에서 B 방향으로 500 N을 당긴다"를 식으로 쓰려면 \(500\,\mathbf e_{AB}\)가 필요하다.</div>
+<div class="say">"안 쓸 것 같지만 생각보다 많이 쓰이고 <b>고체역학 가서도 많이 쓰기 때문에</b> 한 번씩 (봐 두세요)"</div>
+<div class="analogy">나침반 바늘은 길이가 아니라 방향만 알려 준다. 단위벡터는 그 바늘 — "얼마나 세게"(크기)는 따로 곱한다.</div>
+<div class="memo"><b>외울 것</b> \(\mathbf e=\mathbf u/|\mathbf u|\) · \(\mathbf u=|\mathbf u|\mathbf e\) · 다음 시간: 성분 \(\mathbf i,\mathbf j,\mathbf k\)와 방향여현</div>
+<p>수업 운영: "1장은 그냥 가볍게 introduction". 교수님이 강의 녹화를 처음 시도 — LMS 녹화본·PDF 확인.</p>
+</section>
+
+/[{"id": "q1", "qn": "확인 1 · 정역학의 정의", "html": "정역학(Statics)이 다루는 것은?", "choices": [{"html": "평형(정지) 상태에 있는 물체와 그에 작용하는 힘", "ok": true}, {"html": "운동하는 물체의 가속도", "ok": false}, {"html": "기계(machine)의 설계", "ok": false}, {"html": "물체의 온도 변화", "ok": false}], "ans": "Statics = study of objects in \"equilibrium\". 운동은 Dynamics."}, {"id": "q2", "qn": "확인 2 · 뉴턴 법칙", "html": "정역학에서 <b>항상</b> 성립하는 식은?", "choices": [{"html": "\\(\\sum\\mathbf F=0\\)", "ok": true}, {"html": "\\(\\sum\\mathbf F=d\\mathbf p/dt\\ne0\\)", "ok": false}, {"html": "\\(\\sum\\mathbf F=m\\mathbf a,\\ \\mathbf a\\ne0\\)", "ok": false}, {"html": "\\(\\mathbf F_{A\\to B}=\\mathbf F_{B\\to A}\\)", "ok": false}], "ans": "정지(평형)이므로 합력 0. 3법칙은 부호가 반대(\\(-\\)). 2법칙은 동역학."}, {"id": "q3", "qn": "확인 3 · 단위", "html": "1 N의 정의는?", "choices": [{"html": "1 kg 물체에 \\(1\\ \\mathrm{m/s^2}\\)의 가속도를 만드는 힘", "ok": true}, {"html": "1 kg 물체의 무게", "ok": false}, {"html": "1 g 물체에 \\(1\\ \\mathrm{m/s^2}\\)의 가속도를 만드는 힘", "ok": false}, {"html": "1 m를 1 s에 가는 속도", "ok": false}], "ans": "\\(1\\ \\mathrm N=1\\ \\mathrm{kg\\,m/s^2}\\). 1 kg의 무게는 9.81 N."}, {"id": "q4", "qn": "확인 4 · 왜 입자인가", "html": "1장에서 물체를 「입자」로 보는 이유는?", "choices": [{"html": "크기가 있으면 힘의 작용선 위치에 따라 회전(모멘트)이 생기는데, 이를 일단 배제하려고", "ok": true}, {"html": "모든 물체는 실제로 크기가 없기 때문", "ok": false}, {"html": "입자는 힘을 받지 않기 때문", "ok": false}, {"html": "질량을 무시하기 위해", "ok": false}], "ans": "\"부피가 있으면 힘의 작용선이 달라져 회전 — 모멘트가 생기기 때문\". 모멘트는 4장."}, {"id": "q5", "qn": "확인 5 · 위치벡터", "html": "\\(\\mathbf r_{AB}\\)는?", "choices": [{"html": "점 A에서 점 B로 향하는 벡터", "ok": true}, {"html": "점 B에서 점 A로 향하는 벡터", "ok": false}, {"html": "A와 B 사이의 거리(스칼라)", "ok": false}, {"html": "A와 B의 중점", "ok": false}], "ans": "앞 첨자 = 시작, 뒤 첨자 = 끝. \\(\\mathbf r_{BA}=-\\mathbf r_{AB}\\)."}, {"id": "q6", "qn": "확인 6 · 단위벡터", "html": "단위벡터 \\(\\mathbf e\\)의 정의와, 벡터 \\(\\mathbf u\\)를 단위벡터로 나타내는 식, 그리고 단위벡터를 쓰는 이유를 한 줄로 쓰라.", "choices": null, "ans": "\\(\\mathbf e=\\mathbf u/|\\mathbf u|\\), 크기 1. \\(\\mathbf u=|\\mathbf u|\\,\\mathbf e\\)(크기 × 방향). 이유: <b>방향만</b> 지정하기 위해 — 크기가 1이라 곱해도 크기가 안 바뀐다."}]/<span>녹음 53분</span><span>판서 1장</span><span>강의자료 W11 (Ch.1~2)</span><span>2주차 · 월</span> 를 채운다. 저장: localStorage mc-lesson-<id> (읽은 섹션·문제 결과), mc-slides-last* (앱 「이어서 학습하기」). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<style>
+:root{--ink:#1F2A44;--ink-2:#55627A;--ink-3:#7C889B;--line:rgba(31,42,68,.14);--paper:rgba(255,255,255,.72);--paper-2:rgba(255,255,255,.5);--accent:#15803D;
+  --red:#E03131;--blue:#1971C2;--green:#2F9E44;--pink:#D0397A;--yel:#F59F00;--f:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --fs:18px;--lh:1.72;--r:18px}
+*{box-sizing:border-box}
+html{background:linear-gradient(160deg,#E9F0F5 0%,#F2F5F0 48%,#EDF2EE 100%) fixed}
+body{margin:0;font-family:var(--f);font-size:var(--fs);line-height:var(--lh);color:var(--ink);word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;pointer-events:none;filter:blur(60px)}
+body::before{width:52vw;height:52vw;max-width:640px;max-height:640px;left:-14vw;top:-18vh;background:radial-gradient(circle at 40% 40%,rgba(74,222,128,.30),transparent 68%)}
+body::after{width:60vw;height:60vw;max-width:760px;max-height:760px;right:-20vw;bottom:-24vh;background:radial-gradient(circle at 50% 50%,rgba(96,165,250,.28),transparent 66%)}
+/* 상단 고정: 과목 · 회차 · 진행 */
+#top{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.66);-webkit-backdrop-filter:blur(20px) saturate(140%);backdrop-filter:blur(20px) saturate(140%);border-bottom:1px solid rgba(255,255,255,.8)}
+#top .in{max-width:820px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--ink-2)}
+#top b{color:var(--ink);font-weight:700}
+#top .sp{flex:1}
+#bar{height:5px;background:rgba(31,42,68,.10)}
+#bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+#top .pct{font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
+/* 본문 */
+main{max-width:820px;margin:0 auto;padding:22px 20px 120px}
+header.h{padding:8px 0 18px}
+header.h .kicker{font-size:13.5px;color:var(--ink-3);font-weight:600;letter-spacing:.02em}
+header.h h1{font-size:30px;line-height:1.25;margin:6px 0 10px;letter-spacing:-.02em}
+header.h .meta{font-size:14px;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:6px 14px}
+header.h .lead{margin-top:14px;padding:14px 18px;border-radius:14px;background:var(--paper);border:1px solid rgba(255,255,255,.8);font-size:17px}
+section.s{margin:26px 0 0;padding:22px 22px 18px;border-radius:var(--r);background:var(--paper);border:1px solid rgba(255,255,255,.85);box-shadow:0 8px 26px rgba(20,40,60,.07),inset 0 1px 0 rgba(255,255,255,.8);scroll-margin-top:70px;position:relative}
+section.s .no{font-size:12.5px;color:var(--ink-3);font-weight:700;letter-spacing:.04em}
+section.s h2{font-size:23px;line-height:1.3;margin:2px 0 12px;letter-spacing:-.02em}
+section.s h3{font-size:18px;margin:18px 0 6px}
+section.s p{margin:0 0 10px}
+section.s.read::after{content:"읽음";position:absolute;right:16px;top:14px;font-size:12px;color:var(--accent);font-weight:700;border:1px solid rgba(21,128,61,.35);border-radius:999px;padding:1px 9px;background:rgba(21,128,61,.06)}
+/* 상자들 */
+.why,.say,.analogy,.formula,.pitfall,.memo{margin:12px 0;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:var(--paper-2);font-size:17px}
+.why{border-left:5px solid var(--blue)}.why::before{content:"왜 그런가";display:block;font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:4px}
+.say{border-left:5px solid var(--pink);background:rgba(255,77,141,.06)}.say::before{content:"교수님 말";display:block;font-size:12.5px;font-weight:700;color:var(--pink);margin-bottom:4px}
+.analogy{border-left:5px solid var(--yel);background:rgba(245,159,0,.07)}.analogy::before{content:"비유";display:block;font-size:12.5px;font-weight:700;color:#B26A00;margin-bottom:4px}
+.formula{border-left:5px solid var(--green);background:rgba(47,158,68,.06)}.formula::before{content:"외울 것";display:block;font-size:12.5px;font-weight:700;color:var(--green);margin-bottom:4px}
+.pitfall{border-left:5px solid var(--red);background:rgba(224,49,49,.05)}.pitfall::before{content:"함정";display:block;font-size:12.5px;font-weight:700;color:var(--red);margin-bottom:4px}
+.memo{border-left:5px solid var(--ink-3)}
+.katex-display{margin:10px 0;overflow-x:auto;overflow-y:hidden}
+/* 그림 */
+figure.fig{margin:14px auto;text-align:center;max-width:560px}
+figure.fig svg{max-width:100%;height:auto}
+figure.fig figcaption{font-size:13.5px;color:var(--ink-2);margin-top:6px;text-align:center}
+figure.board{margin:14px 0;text-align:center}
+figure.board img{max-width:100%;max-height:440px;object-fit:contain;border-radius:12px;border:1px solid var(--line);background:#111}
+figure.board figcaption{font-size:13px;color:var(--ink-3);margin-top:4px}
+figure.board[hidden]{display:none}
+/* 예제 */
+details.ex{margin:12px 0;border:1px solid var(--line);border-radius:12px;background:var(--paper-2);padding:0}
+details.ex summary{cursor:pointer;padding:12px 16px;font-weight:700;list-style:none;display:block;line-height:1.6}
+details.ex summary::before{content:"예제";display:inline-block;vertical-align:middle;margin-right:10px;font-size:12px;line-height:1.5;color:#fff;background:var(--ink);border-radius:6px;padding:2px 7px}
+details.ex summary::-webkit-details-marker{display:none}
+details.ex .body{padding:0 16px 14px;border-top:1px solid var(--line)}
+details.ex .body p{margin:8px 0}
+/* 문제 카드 */
+#quiz{margin-top:30px}
+#quiz h2{font-size:22px;margin:0 0 6px}
+#quiz .hint{font-size:14px;color:var(--ink-2);margin-bottom:12px}
+.q{margin:12px 0;padding:18px 20px;border-radius:var(--r);background:var(--paper);border:1px solid rgba(255,255,255,.85);box-shadow:0 8px 26px rgba(20,40,60,.07)}
+.q .qn{font-size:13px;font-weight:700;color:var(--ink-3);margin-bottom:4px}
+.q .qb{font-size:17.5px;margin-bottom:10px}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;list-style:none;padding:0;margin:0}
+@media(max-width:640px){.choices{grid-template-columns:1fr}}
+.choice{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.6);cursor:pointer;font:inherit;font-size:16.5px;text-align:left;color:var(--ink);min-height:48px;box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+.choice .cn{flex:0 0 26px;height:26px;border-radius:50%;border:1px solid var(--ink-3);display:flex;align-items:center;justify-content:center;font-size:13px}
+.choice[disabled]{cursor:default}
+.choice.ok{border-color:var(--green);background:rgba(47,158,68,.10)}.choice.ok .cn{background:var(--green);border-color:var(--green);color:#fff}
+.choice.bad{border-color:var(--red);background:rgba(224,49,49,.08)}.choice.bad .cn{background:var(--red);border-color:var(--red);color:#fff}
+.q .ans{display:none;margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(31,42,68,.05);font-size:16px}
+.q.rev .ans{display:block}
+.q .verdict{display:inline-block;margin-top:10px;font-size:14px;font-weight:700;padding:3px 10px;border-radius:999px}
+.q .verdict.ok{background:rgba(47,158,68,.12);color:var(--green)}.q .verdict.bad{background:rgba(224,49,49,.10);color:var(--red)}
+.q .myans{width:100%;font:inherit;font-size:16px;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.7);resize:vertical;min-height:52px}
+.q .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center}
+.btn{font:inherit;font-size:15px;font-weight:600;padding:8px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.7);color:var(--ink);cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}
+.btn.a{background:var(--accent);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(21,128,61,.25)}
+.btn.xs{font-size:13px;padding:5px 10px;border-radius:8px}
+.btn[disabled]{opacity:.5;cursor:default}
+#result{margin-top:16px;padding:16px 20px;border-radius:var(--r);background:var(--paper);border:1px solid rgba(255,255,255,.85);display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+#result b{font-size:22px}
+#done{margin-top:20px;text-align:center;font-size:14px;color:var(--ink-3)}
+/* 다크 */
+@media(prefers-color-scheme:dark){
+  :root{--ink:#F1F6F2;--ink-2:#B7C2BB;--ink-3:#8F9C95;--line:rgba(255,255,255,.12);--paper:rgba(18,26,24,.62);--paper-2:rgba(255,255,255,.05);--accent:#4ADE80;--blue:#74C0FC;--green:#69DB7C;--pink:#FF8AB8;--yel:#FFD43B;--red:#FF8787}
+  html{background:linear-gradient(160deg,#0B1020 0%,#0E1A16 48%,#0B1412 100%) fixed}
+  body::before{background:radial-gradient(circle at 40% 40%,rgba(74,222,128,.18),transparent 68%)}body::after{background:radial-gradient(circle at 50% 50%,rgba(59,130,246,.2),transparent 66%)}
+  #top{background:rgba(18,26,24,.7);border-bottom-color:rgba(255,255,255,.1)}
+  section.s,.q,#result,header.h .lead{border-color:rgba(255,255,255,.1);box-shadow:0 12px 34px rgba(0,0,0,.35)}
+  .choice{background:rgba(255,255,255,.06)}.q .ans{background:rgba(255,255,255,.06)}.q .myans{background:rgba(255,255,255,.06)}
+  .btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}.btn.a{color:#052E16}
+  .say{background:rgba(255,77,141,.10)}.analogy{background:rgba(245,159,0,.10)}.formula{background:rgba(47,158,68,.10)}.pitfall{background:rgba(224,49,49,.10)}
+  figure.fig svg{filter:invert(1) hue-rotate(180deg) saturate(1.2)}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#top{background:#FFFFFF}section.s,.q,#result{background:#FFFFFF}}
+@media(max-width:640px){:root{--fs:17px}main{padding:16px 14px 110px}section.s{padding:18px 16px 14px}header.h h1{font-size:25px}}
+</style>
+</head>
+<body>
+<div id="top"><div class="in"><b id="tCourse">정역학</b><span id="tSess">9/7(월) · 2주차 · 약 16분</span><span class="sp"></span><span id="tRead">읽음 0/0</span><span class="pct" id="tPct">0%</span></div><div id="bar"><i id="barI"></i></div></div>
+<main>
+<header class="h"><div class="kicker">정역학 · 9/7(월) · 2주차 · 약 16분</div><h1>역학이란 무엇인가 — 그리고 벡터의 첫걸음</h1><div class="meta"><span>녹음 53분</span><span>판서 1장</span><span>강의자료 W11 (Ch.1~2)</span><span>2주차 · 월</span></div><div class="lead">첫 수업의 절반은 <b>Ch.1 소개</b>(역학의 정의·단위·뉴턴 법칙), 나머지는 <b>Ch.2 벡터</b>의 시작(표기·덧셈·단위벡터)이다. 교수님이 두 번 말한 한 학기의 뼈대는 딱 두 개 — <b>평형방정식</b>과 <b>모멘트</b>. 영어 강의 + 한국어 요약으로 진행된다.</div></header>
+<section class="s" data-id="s1">
+<div class="no">1 / 6</div><h2>1. 역학 = "힘이 가해졌을 때 물체에 생기는 변화"</h2>
+<p>역학의 <b>역</b>은 힘 力. 힘이 물체에 가해지면 물체는 <b>움직이거나</b>, <b>버티며 스트레스를 받거나</b>, <b>변형된다</b> — 이 변화를 통틀어 다루는 학문이 역학(Mechanics)이다.</p>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 190" width="560" height="190" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><rect x="190" y="26" width="180" height="46" rx="10" fill="rgba(31,42,68,.06)" stroke="#1F2A44" stroke-width="2"></rect><text x="280" y="46" font-size="15" fill="#1F2A44" text-anchor="middle" font-weight="700">Mechanics 역학</text><text x="280" y="63" font-size="11.5" fill="#8A97A6" text-anchor="middle">힘(力)이 물체에 가해졌을 때 생기는 변화 전부</text><line x1="280" y1="72" x2="280" y2="96" stroke="#1F2A44" stroke-width="1.5"></line><line x1="150" y1="96" x2="410" y2="96" stroke="#1F2A44" stroke-width="1.5"></line><line x1="150" y1="96" x2="150" y2="116" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><line x1="410" y1="96" x2="410" y2="116" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><rect x="60" y="118" width="180" height="58" rx="10" fill="rgba(47,158,68,.08)" stroke="#2F9E44" stroke-width="2"></rect><text x="150" y="140" font-size="14" fill="#2F9E44" text-anchor="middle" font-weight="700">Statics 정역학</text><text x="150" y="161" font-size="11.5" fill="#1F2A44" text-anchor="middle">"equilibrium" 평형 · 정지 · 이번 학기</text><rect x="320" y="118" width="180" height="58" rx="10" fill="rgba(138,151,166,.10)" stroke="#8A97A6" stroke-width="2"></rect><text x="410" y="140" font-size="14" fill="#8A97A6" text-anchor="middle" font-weight="700">Dynamics 동역학</text><text x="410" y="161" font-size="11.5" fill="#1F2A44" text-anchor="middle">운동(motion) · 나중</text></svg><figcaption>판서 ①의 구조. 교수님이 Mechanics·divided 아래 점선을 긋고 equilibrium 에 따옴표를 쳤다 — 이번 학기의 핵심어.</figcaption></figure>
+<div class="say">"저희 기계공학이지만 <b>Machine이 아니고 Mechanical Engineering</b>이잖아요. Mechanics의 정의를 꼭 알고 가셔야 됩니다."</div>
+<div class="why">정역학(Statics)은 <b>정지해 있는</b>(평형 상태의) 물체를, 동역학(Dynamics)은 <b>운동하는</b> 물체를 다룬다. 이번 학기는 정역학 — 움직이지 않으니 "왜 안 움직이는가"를 힘의 균형으로 설명하는 것이 전부다.</div>
+<div class="say">"결국에는 <b>평형(equilibrium)이 가장 중요</b>합니다. <b>평형방정식을 잘 세우는 것</b>이 제일 중요하고요. 그리고 <b>모멘트</b>, 이 두 가지 가지고 한 학기 동안 하는 거예요." — 두 번 반복.</div>
+<div class="analogy">다리·건물·크레인은 서 있는 채로 힘을 받는다. 무너지지 않는 이유를 설명하는 것이 정역학, 자동차·로켓처럼 움직이는 것을 설명하는 것이 동역학. 같은 「힘」을 다루지만 질문이 다르다.</div>
+<div class="memo"><b>외울 것</b> Mechanics = Statics(평형) + Dynamics(운동) · 정역학의 두 기둥 = <b>평형방정식</b> · <b>모멘트</b> · 이번 학기 = 정역학</div>
+<figure class="board"><img alt="판서 1" src="../_private/statics/2026-09-07/%ED%8C%90%EC%84%9C_1_%EC%97%AD%ED%95%99%EC%A0%95%EC%9D%98_%EC%A0%95%EC%97%AD%ED%95%99%EB%8F%99%EC%97%AD%ED%95%99.jpg" loading="lazy"><figcaption>판서 ① 역학의 정의 — Statics / Dynamics (15:08, 태블릿 화면)</figcaption></figure>
+</section>
+
+<section class="s" data-id="s2">
+<div class="no">2 / 6</div><h2>2. 단위 — 뉴턴은 kg·m/s²</h2>
+<p>주로 <b>SI 단위</b>를 쓴다(US customary 는 참고만). 힘의 단위 뉴턴은 정의부터 기억한다.</p>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 150" width="560" height="150" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><line x1="60" y1="110" x2="500" y2="110" stroke="#1F2A44" stroke-width="2"></line><rect x="200" y="60" width="60" height="50" rx="6" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2"></rect><text x="230.0" y="90.0" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700">1 kg</text><line x1="130" y1="85" x2="196" y2="85" stroke="#2F9E44" stroke-width="2.6" marker-end="url(#ah)"></line><text x="163.0" y="75.0" text-anchor="middle" font-size="13" fill="#2F9E44">F = 1 N</text><line x1="270" y1="40" x2="340" y2="40" stroke="#1971C2" stroke-width="2.2" marker-end="url(#ah)"></line><text x="305.0" y="32.0" text-anchor="middle" font-size="13" fill="#1971C2">a = 1 m/s²</text><text x="280" y="138" font-size="13.5" fill="#1F2A44" text-anchor="middle" font-weight="700">1 N = 1 kg · 1 m/s²   (kN = 10³ N · MN = 10⁶ N)</text></svg><figcaption>힘의 단위 뉴턴: 1 kg 을 1 m/s² 로 가속하는 힘. 각도는 rad — 한 바퀴 2π rad = 360°.</figcaption></figure>
+<div class="formula">\[1\ \mathrm{N}=1\ \mathrm{kg\cdot m/s^2},\qquad \mathrm{kN}=10^3\ \mathrm N,\quad \mathrm{MN}=10^6\ \mathrm N,\qquad 2\pi\ \mathrm{rad}=360^\circ\]</div>
+<div class="why">뉴턴 2법칙 \(F=ma\)에서 나온 단위다. 그래서 힘 문제의 답이 kg·m/s² 로 떨어지면 맞게 계산한 것 — 단위 검산에 쓴다.</div>
+<div class="analogy">사과 하나(약 100 g)를 손에 올렸을 때 느끼는 무게가 대략 1 N. "kN" 이 나오면 사과 천 개, 자동차 한 대 무게가 10 kN 남짓.</div>
+<div class="memo"><b>외울 것</b> \(1\ \mathrm N=1\ \mathrm{kg\,m/s^2}\) · 속도 = 위치의 변화율, 가속도 = 속도의 변화율 · 각도는 rad</div>
+</section>
+
+<section class="s" data-id="s3">
+<div class="no">3 / 6</div><h2>3. 뉴턴의 법칙 — 정역학은 항상 ΣF = 0</h2>
+<table><tr><th></th><th>내용</th><th>정역학에서의 뜻</th></tr>
+<tr><td><b>1법칙</b></td><td>\(\sum\mathbf F=0\)이면 속도가 일정</td><td>정지해 있으면 계속 정지. <b>정역학은 항상 \(\sum\mathbf F=0\)</b></td></tr>
+<tr><td><b>2법칙</b></td><td>\(\sum\mathbf F=d\mathbf p/dt\) (선운동량의 변화율)</td><td>합력이 0이라 안 쓴다 — 동역학 개념</td></tr>
+<tr><td><b>3법칙</b></td><td>\(\mathbf F_{A\to B}=-\mathbf F_{B\to A}\), 크기 같고 방향 반대</td><td>자유물체도(3장)의 근거</td></tr></table>
+<div class="say">"we study statics right so <b>always the summation of forces will be zero</b>"</div>
+<h3>왜 「입자(particle)」라고 하는가 — 교수님이 질문으로 짚은 포인트</h3>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 200" width="560" height="200" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><circle cx="130" cy="100" r="7" fill="#1F2A44"></circle><line x1="40" y1="100" x2="122" y2="100" stroke="#2F9E44" stroke-width="2.6" marker-end="url(#ah)"></line><text x="81.0" y="90.0" text-anchor="middle" font-size="13" fill="#2F9E44">F</text><text x="130" y="150" font-size="13" fill="#1F2A44" text-anchor="middle">입자(particle): 크기 없음</text><text x="130" y="170" font-size="12" fill="#8A97A6" text-anchor="middle">작용선이 항상 중심을 지난다 → 회전 없음</text><rect x="340" y="60" width="120" height="80" rx="6" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2"></rect><circle cx="400" cy="100" r="4" fill="#8A97A6"></circle><line x1="250" y1="72" x2="332" y2="72" stroke="#2F9E44" stroke-width="2.6" marker-end="url(#ah)"></line><text x="291.0" y="62.0" text-anchor="middle" font-size="13" fill="#2F9E44">F</text><line x1="332" y1="72" x2="470" y2="72" stroke="#8A97A6" stroke-width="1" stroke-dasharray="4 3"></line><text x="478" y="76" font-size="11" fill="#8A97A6" text-anchor="start">작용선</text><path d="M368.1 88.4 A 34 34 0 0 1 431.9 88.4" fill="none" stroke="#E03131" stroke-width="2"></path><text x="400.0" y="54.0" font-size="12" fill="#E03131" text-anchor="middle">회전(모멘트)</text><text x="400" y="178" font-size="12.5" fill="#1F2A44" text-anchor="middle">크기가 있으면 작용선 위치에 따라 돈다</text></svg><figcaption>1장에서 「입자」로 두는 이유: 크기가 있으면 힘의 작용선이 중심에서 비껴 모멘트가 생긴다. 모멘트는 4장에서.</figcaption></figure>
+<div class="say">"부피가 있으면 <b>힘의 작용선이 달라져</b> 버리면 얘가 회전을 하게 되겠죠. <b>모멘트가 생기기 때문에.</b>"</div>
+<div class="why">크기가 있는 물체는 같은 힘이라도 <b>어디에</b> 걸리느냐에 따라 회전한다. 1장에서는 그 복잡함을 일단 빼려고 물체를 크기 없는 점(입자)으로 본다. 회전(모멘트)은 4장에서 정식으로 다룬다.</div>
+<div class="analogy">문을 경첩 바로 옆에서 밀면 안 열리고, 손잡이 쪽에서 밀면 쉽게 돈다. 힘은 같은데 <b>작용선의 위치</b>가 다르기 때문 — 이것이 모멘트.</div>
+<p>만유인력 \(F=G\dfrac{m_1m_2}{r^2}\) — 두 입자 사이, 크기 같고 방향 반대. "이 중력이 사실상 만유인력이랑 똑같잖아요." 지표면 근처에서는 \(W=mg\)로 쓴다(3장).</p>
+<div class="memo"><b>외울 것</b> 정역학 = \(\sum\mathbf F=0\) · 입자 = 크기 없음 → 모멘트 없음 · 3법칙 = 작용·반작용(자유물체도) · \(W=mg\)</div>
+</section>
+
+<section class="s" data-id="s4">
+<div class="no">4 / 6</div><h2>4. Ch.2 벡터 — 스칼라와 벡터, 표기, 위치벡터</h2>
+<p><b>스칼라</b>는 숫자 하나로 완전히 기술되는 양(방향 불필요). <b>벡터</b>는 <b>크기(magnitude)와 방향(direction)</b>이 둘 다 같아야 같은 벡터다.</p>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 180" width="560" height="180" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><line x1="60" y1="130" x2="200" y2="50" stroke="#1971C2" stroke-width="3" marker-end="url(#ah)"></line><text x="112" y="78" font-size="16" fill="#1971C2" text-anchor="middle" font-weight="700">u</text><text x="150" y="158" font-size="12.5" fill="#1F2A44" text-anchor="middle">길이 ∝ 크기 |u| · 화살표 방향 = 방향</text><circle cx="330" cy="130" r="5" fill="#1F2A44"></circle><text x="318" y="152" font-size="12" fill="#1F2A44" text-anchor="middle">A (시작)</text><circle cx="500" cy="60" r="5" fill="#1F2A44"></circle><text x="500" y="48" font-size="12" fill="#1F2A44" text-anchor="middle">B (끝)</text><line x1="336" y1="126" x2="494" y2="64" stroke="#2F9E44" stroke-width="2.6" marker-end="url(#ah)"></line><text x="430" y="84" font-size="14" fill="#2F9E44" text-anchor="middle" font-weight="700">r<tspan baseline-shift="sub" font-size="72%">AB</tspan></text><text x="420" y="168" font-size="12.5" fill="#1F2A44" text-anchor="middle">앞 첨자 = 시작점, 뒤 첨자 = 끝점</text></svg><figcaption>벡터는 크기와 방향이 둘 다 같아야 같은 벡터. 위치벡터 \(\mathbf r_{AB}\)는 A에서 B로 쏘는 벡터.</figcaption></figure>
+<div class="memo"><b>표기</b> 벡터는 볼드체 \(\mathbf u\)(손글씨는 화살표·밑줄) · 크기는 \(|\mathbf u|\) — 방향이 사라지고 크기만 남는다 · 그림은 화살표: <b>길이 ∝ 크기</b>, 화살표 방향 = 벡터 방향</div>
+<div class="why"><b>위치벡터 \(\mathbf r_{AB}\)</b> = 점 A에서 점 B로 쏘는 벡터. 앞 첨자가 시작점, 뒤 첨자가 끝점. 다음 시간 "끝점 − 시작점" 계산의 뿌리이고, 4장 모멘트 \(\mathbf M=\mathbf r\times\mathbf F\)의 \(\mathbf r\)이 바로 이것.</div>
+<div class="analogy">"서울에서 부산까지 400 km"는 스칼라(거리), "서울에서 부산 쪽으로 400 km"는 벡터(변위). 방향을 뒤집으면 다른 벡터가 된다.</div>
+<div class="memo"><b>외울 것</b> 벡터 = 크기 + 방향 · \(|\mathbf u|\) = 크기(스칼라) · \(\mathbf r_{AB}\): A → B</div>
+</section>
+
+<section class="s" data-id="s5">
+<div class="no">5 / 6</div><h2>5. 덧셈 · 스칼라배 · 뺄셈</h2>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 225" width="560" height="225" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><line x1="40" y1="170" x2="160" y2="130" stroke="#1971C2" stroke-width="2.6" marker-end="url(#ah)"></line><text x="100.0" y="142.0" text-anchor="middle" font-size="13" fill="#1971C2">u</text><line x1="160" y1="130" x2="210" y2="50" stroke="#E03131" stroke-width="2.6" marker-end="url(#ah)"></line><text x="197.0" y="90.0" text-anchor="middle" font-size="13" fill="#E03131">v</text><line x1="40" y1="170" x2="210" y2="50" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="89.0" y="106.0" text-anchor="middle" font-size="13" fill="#2F9E44">u + v</text><text x="130" y="208" font-size="12.5" fill="#1F2A44" text-anchor="middle">삼각형 법칙: u 꼬리에서 v 머리로</text><line x1="300" y1="170" x2="420" y2="130" stroke="#1971C2" stroke-width="2.6" marker-end="url(#ah)"></line><text x="360.0" y="142.0" text-anchor="middle" font-size="13" fill="#1971C2">u</text><line x1="300" y1="170" x2="350" y2="90" stroke="#E03131" stroke-width="2.6" marker-end="url(#ah)"></line><text x="313.0" y="130.0" text-anchor="middle" font-size="13" fill="#E03131">v</text><line x1="420" y1="130" x2="470" y2="50" stroke="#8A97A6" stroke-width="1.2" stroke-dasharray="4 3"></line><line x1="350" y1="90" x2="470" y2="50" stroke="#8A97A6" stroke-width="1.2" stroke-dasharray="4 3"></line><line x1="300" y1="170" x2="470" y2="50" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="349.0" y="106.0" text-anchor="middle" font-size="13" fill="#2F9E44">u + v</text><text x="390" y="208" font-size="12.5" fill="#1F2A44" text-anchor="middle">평행사변형 법칙: 결과는 같다 (교환법칙)</text></svg><figcaption>덧셈 두 가지 그림. \(\mathbf u+\mathbf v=\mathbf v+\mathbf u\), 묶는 순서도 상관없다(결합법칙). 뺄셈은 \(-\mathbf v\)를 더한다.</figcaption></figure>
+<div class="formula">\[\mathbf u+\mathbf v=\mathbf v+\mathbf u\ (\text{교환}),\quad (\mathbf u+\mathbf v)+\mathbf w=\mathbf u+(\mathbf v+\mathbf w)\ (\text{결합}),\qquad \mathbf r_{AC}=\mathbf r_{AB}+\mathbf r_{BC}\]</div>
+<div class="say">"당장은 어디다 써먹을지 모르겠지만 나중에 문제를 풀면 (쓰인다)" — \(\mathbf r_{AC}=\mathbf r_{AB}+\mathbf r_{BC}\)에 대해.</div>
+<div class="why"><b>스칼라배</b> \(a\mathbf u\)도 벡터. 크기는 \(|a||\mathbf u|\), 방향은 \(a\)의 부호에 따라 — \(a&lt;0\)이면 반대 방향. 결합·분배법칙이 성립하고, 스칼라로 나누기는 \(1/a\)를 곱하는 것. <b>뺄셈</b>은 \(\mathbf u-\mathbf v=\mathbf u+(-\mathbf v)\) — "반대 방향 벡터를 더한다고 생각하면 된다".</div>
+<div class="analogy">지도에서 A → B → C로 돌아가나 A → C로 직행하나 도착지는 같다. 그것이 \(\mathbf r_{AC}=\mathbf r_{AB}+\mathbf r_{BC}\). 어느 길로 묶어 더하든 결과가 같다는 것이 결합법칙.</div>
+<div class="memo"><b>외울 것</b> 삼각형 법칙(꼬리→머리) = 평행사변형 법칙 · \(a\mathbf u\): 부호가 방향 · \(\mathbf u-\mathbf v=\mathbf u+(-\mathbf v)\)</div>
+</section>
+
+<section class="s" data-id="s6">
+<div class="no">6 / 6</div><h2>6. 단위벡터 — 크기 1, 방향만 남긴다 ★</h2>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 150" width="560" height="150" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><line x1="60" y1="100" x2="300" y2="40" stroke="#1971C2" stroke-width="3" marker-end="url(#ah)"></line><text x="180" y="56" font-size="15" fill="#1971C2" text-anchor="middle" font-weight="700">u = |u| e</text><line x1="60" y1="100" x2="120" y2="85" stroke="#2F9E44" stroke-width="3.4" marker-end="url(#ah)"></line><text x="96" y="122" font-size="13" fill="#2F9E44" text-anchor="middle">e (크기 1)</text><text x="420" y="58" font-size="16" fill="#1F2A44" text-anchor="middle" font-weight="700">e = u / |u|</text><text x="420" y="82" font-size="13" fill="#8A97A6" text-anchor="middle">방향만 남긴다</text><text x="420" y="102" font-size="12" fill="#8A97A6" text-anchor="middle">크기가 1이라 곱해도 크기가 안 바뀐다</text></svg><figcaption>단위벡터: 크기 1, 방향만 지정. 어떤 벡터든 「크기 × 방향」으로 쪼갠다 — 3장에서 케이블 힘을 성분으로 쓸 때의 핵심.</figcaption></figure>
+<div class="formula">\[\mathbf e=\frac{\mathbf u}{|\mathbf u|},\quad |\mathbf e|=1,\qquad \mathbf u=|\mathbf u|\,\mathbf e\ (\text{크기}\times\text{방향})\]</div>
+<div class="why">쓰는 이유는 하나 — <b>방향만 지정</b>하려고. 크기가 1이라 어떤 수를 곱해도 방향은 그대로고 크기만 그 수가 된다. "케이블이 A에서 B 방향으로 500 N을 당긴다"를 식으로 쓰려면 \(500\,\mathbf e_{AB}\)가 필요하다.</div>
+<div class="say">"안 쓸 것 같지만 생각보다 많이 쓰이고 <b>고체역학 가서도 많이 쓰기 때문에</b> 한 번씩 (봐 두세요)"</div>
+<div class="analogy">나침반 바늘은 길이가 아니라 방향만 알려 준다. 단위벡터는 그 바늘 — "얼마나 세게"(크기)는 따로 곱한다.</div>
+<div class="memo"><b>외울 것</b> \(\mathbf e=\mathbf u/|\mathbf u|\) · \(\mathbf u=|\mathbf u|\mathbf e\) · 다음 시간: 성분 \(\mathbf i,\mathbf j,\mathbf k\)와 방향여현</div>
+<p>수업 운영: "1장은 그냥 가볍게 introduction". 교수님이 강의 녹화를 처음 시도 — LMS 녹화본·PDF 확인.</p>
+</section>
+
+
+<section id="quiz"><h2>확인 문제</h2><div class="hint">보기를 누르면 바로 채점됩니다. 답을 쓰는 문제는 「답 보기」 뒤에 맞음/틀림을 스스로 표시합니다.</div><div id="qlist"></div><div id="result"></div></section>
+<div id="done"></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script>
+const LESSON_ID="statics-2026-09-07", QUIZ=[{"id": "q1", "qn": "확인 1 · 정역학의 정의", "html": "정역학(Statics)이 다루는 것은?", "choices": [{"html": "평형(정지) 상태에 있는 물체와 그에 작용하는 힘", "ok": true}, {"html": "운동하는 물체의 가속도", "ok": false}, {"html": "기계(machine)의 설계", "ok": false}, {"html": "물체의 온도 변화", "ok": false}], "ans": "Statics = study of objects in \"equilibrium\". 운동은 Dynamics."}, {"id": "q2", "qn": "확인 2 · 뉴턴 법칙", "html": "정역학에서 <b>항상</b> 성립하는 식은?", "choices": [{"html": "\\(\\sum\\mathbf F=0\\)", "ok": true}, {"html": "\\(\\sum\\mathbf F=d\\mathbf p/dt\\ne0\\)", "ok": false}, {"html": "\\(\\sum\\mathbf F=m\\mathbf a,\\ \\mathbf a\\ne0\\)", "ok": false}, {"html": "\\(\\mathbf F_{A\\to B}=\\mathbf F_{B\\to A}\\)", "ok": false}], "ans": "정지(평형)이므로 합력 0. 3법칙은 부호가 반대(\\(-\\)). 2법칙은 동역학."}, {"id": "q3", "qn": "확인 3 · 단위", "html": "1 N의 정의는?", "choices": [{"html": "1 kg 물체에 \\(1\\ \\mathrm{m/s^2}\\)의 가속도를 만드는 힘", "ok": true}, {"html": "1 kg 물체의 무게", "ok": false}, {"html": "1 g 물체에 \\(1\\ \\mathrm{m/s^2}\\)의 가속도를 만드는 힘", "ok": false}, {"html": "1 m를 1 s에 가는 속도", "ok": false}], "ans": "\\(1\\ \\mathrm N=1\\ \\mathrm{kg\\,m/s^2}\\). 1 kg의 무게는 9.81 N."}, {"id": "q4", "qn": "확인 4 · 왜 입자인가", "html": "1장에서 물체를 「입자」로 보는 이유는?", "choices": [{"html": "크기가 있으면 힘의 작용선 위치에 따라 회전(모멘트)이 생기는데, 이를 일단 배제하려고", "ok": true}, {"html": "모든 물체는 실제로 크기가 없기 때문", "ok": false}, {"html": "입자는 힘을 받지 않기 때문", "ok": false}, {"html": "질량을 무시하기 위해", "ok": false}], "ans": "\"부피가 있으면 힘의 작용선이 달라져 회전 — 모멘트가 생기기 때문\". 모멘트는 4장."}, {"id": "q5", "qn": "확인 5 · 위치벡터", "html": "\\(\\mathbf r_{AB}\\)는?", "choices": [{"html": "점 A에서 점 B로 향하는 벡터", "ok": true}, {"html": "점 B에서 점 A로 향하는 벡터", "ok": false}, {"html": "A와 B 사이의 거리(스칼라)", "ok": false}, {"html": "A와 B의 중점", "ok": false}], "ans": "앞 첨자 = 시작, 뒤 첨자 = 끝. \\(\\mathbf r_{BA}=-\\mathbf r_{AB}\\)."}, {"id": "q6", "qn": "확인 6 · 단위벡터", "html": "단위벡터 \\(\\mathbf e\\)의 정의와, 벡터 \\(\\mathbf u\\)를 단위벡터로 나타내는 식, 그리고 단위벡터를 쓰는 이유를 한 줄로 쓰라.", "choices": null, "ans": "\\(\\mathbf e=\\mathbf u/|\\mathbf u|\\), 크기 1. \\(\\mathbf u=|\\mathbf u|\\,\\mathbf e\\)(크기 × 방향). 이유: <b>방향만</b> 지정하기 위해 — 크기가 1이라 곱해도 크기가 안 바뀐다."}], N_SEC=document.querySelectorAll("section.s[data-id]").length;
+const KEY="mc-lesson-"+LESSON_ID;
+let ST={read:{},done:{},correct:{},answer:{},ts:0};
+try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}
+const $=s=>document.querySelector(s), $$=(s,el)=>Array.from((el||document).querySelectorAll(s)); /* el 범위 필수 — 문제 카드마다 보기를 따로 묶는다 (오타 RED 2026-09-26: 범위를 무시해 모든 보기가 마지막 문제로 채점됐다) */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function save(){ ST.ts=Date.now(); try{ localStorage.setItem(KEY,JSON.stringify(ST)); const qs=QUIZ.length, qd=QUIZ.filter(q=>ST.done[q.id]).length, rd=Object.keys(ST.read).length;
+  const li={deck:LESSON_ID,title:document.title,href:location.href.split("#")[0],idx:Math.max(0,rd-1),n:N_SEC,sid:curSec||"",part:null,partTitle:document.title.slice(0,60),where:(rd>=N_SEC?"확인 문제":"읽는 중 · "+(curTitle||"")),qDone:qd,qN:qs,ts:Date.now()};
+  const j=JSON.stringify(li); localStorage.setItem("mc-slides-last",j); localStorage.setItem("mc-slides-last-"+LESSON_ID,j); }catch(e){} }
+function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} }
+/* ---- 읽음: 섹션이 화면의 절반 이상 1.2초 보이면 읽음 ---- */
+let curSec=null, curTitle="";
+function renderTop(){ const rd=Object.keys(ST.read).filter(k=>ST.read[k]).length, qd=QUIZ.filter(q=>ST.done[q.id]).length, tot=N_SEC+QUIZ.length;
+  $("#tRead").textContent="읽음 "+rd+"/"+N_SEC+(QUIZ.length?" · 문제 "+qd+"/"+QUIZ.length:""); const p=tot?Math.round((rd+qd)/tot*100):0; $("#tPct").textContent=p+"%"; $("#barI").style.width=p+"%";
+  $$("section.s[data-id]").forEach(s=>s.classList.toggle("read",!!ST.read[s.dataset.id]));
+  /* 따라감 기준은 앱(V52)과 같다: 섹션 전부 + 문제 90% 풀고 60% 정답 */
+  const okN=QUIZ.filter(q=>ST.correct[q.id]===true).length, need=Math.ceil(QUIZ.length*.6);
+  $("#done").textContent= rd>=N_SEC&&qd>=QUIZ.length&&QUIZ.length? (okN>=need? "이 회차 끝 — 정답 "+okN+"/"+QUIZ.length+". 앱의 「수업 따라가기」에서 따라감으로 표시됩니다." : "다 풀었지만 정답 "+okN+"/"+QUIZ.length+" — 틀린 문제를 다시 풀어 "+need+"개 이상 맞히면 따라감으로 표시됩니다.") : ""; }
+const timers={};
+const io=new IntersectionObserver(es=>{ es.forEach(e=>{ const id=e.target.dataset.id; if(e.isIntersecting){ curSec=id; curTitle=(e.target.querySelector("h2")||{}).textContent||""; postCtx(e.target);
+    if(!ST.read[id]&&!timers[id]) timers[id]=setTimeout(()=>{ ST.read[id]=true; save(); renderTop(); },1200); } else { if(timers[id]){ clearTimeout(timers[id]); delete timers[id]; } } }); },{threshold:.5});
+$$("section.s[data-id]").forEach(s=>io.observe(s));
+/* 짧은 섹션(화면보다 작아 50%가 금방 차는) 은 그대로, 긴 섹션은 끝까지 스크롤하면 읽음 */
+window.addEventListener("scroll",()=>{ $$("section.s[data-id]").forEach(s=>{ if(ST.read[s.dataset.id]) return; const r=s.getBoundingClientRect(); if(r.bottom<window.innerHeight*.6&&r.bottom>-2000){ ST.read[s.dataset.id]=true; save(); renderTop(); } }); },{passive:true});
+/* ---- 판서 사진: atom 안에서만 (없으면 숨김) ---- */
+$$("figure.board img").forEach(img=>{ img.addEventListener("error",()=>{ img.closest("figure").hidden=true; }); });
+/* ---- 문제 카드 ---- */
+function qHTML(q,i){ const mc=Array.isArray(q.choices)&&q.choices.length, rev=!!ST.done[q.id], my=ST.answer[q.id];
+  let inner='<div class="qn">'+esc(q.qn||("문제 "+(i+1)))+'</div><div class="qb">'+q.html+'</div>';
+  if(mc){ inner+='<ol class="choices">'+q.choices.map((c,ci)=>{ const sel=String(my)===String(ci); const cls=rev?(c.ok?" ok":(sel?" bad":"")):""; return '<li><button class="choice'+cls+'" data-ci="'+ci+'"'+(rev?" disabled":"")+'><span class="cn">'+(ci+1)+'</span><span>'+c.html+'</span></button></li>'; }).join("")+'</ol>'; }
+  else { inner+= rev? '<div class="memo"><b>내 답</b> '+esc(my||"")+'</div>' : '<textarea class="myans" placeholder="답만 간단히">'+esc(my||"")+'</textarea><div class="row"><button class="btn a" data-reveal>답 보기</button></div>'; }
+  if(rev){ const c=ST.correct[q.id]; inner+='<span class="verdict '+(c===true?"ok":c===false?"bad":"")+'">'+(c===true?"정답":c===false?"오답":"채점 전")+'</span>';
+    if(!mc&&c==null) inner+='<div class="row"><button class="btn" data-grade="1">맞았어요</button><button class="btn" data-grade="0">틀렸어요</button></div>';
+    inner+='<div class="row"><button class="btn xs" data-retry>다시 풀기</button></div>'; }
+  inner+='<div class="ans"><b>답 · 풀이</b><div>'+(q.ans||"")+'</div></div>';
+  return '<div class="q'+(rev?" rev":"")+'" data-q="'+q.id+'">'+inner+'</div>'; }
+function bindQ(){ const box=$("#qlist"); box.innerHTML=QUIZ.map(qHTML).join(""); typeset(box);
+  $$("#qlist .q").forEach(el=>{ const q=QUIZ.find(x=>x.id===el.dataset.q);
+    $$(".choice",el).forEach(b=>{ b.onclick=()=>{ if(ST.done[q.id]) return; const ci=+b.dataset.ci; ST.answer[q.id]=ci; ST.done[q.id]=true; ST.correct[q.id]=!!(q.choices[ci]&&q.choices[ci].ok); save(); bindQ(); renderTop(); }; });
+    const rv=el.querySelector("[data-reveal]"); if(rv) rv.onclick=()=>{ const ta=el.querySelector(".myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); bindQ(); renderTop(); };
+    $$("[data-grade]",el).forEach(b=>{ b.onclick=()=>{ ST.correct[q.id]=b.dataset.grade==="1"; save(); bindQ(); renderTop(); }; });
+    const rt=el.querySelector("[data-retry]"); if(rt) rt.onclick=()=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; save(); bindQ(); renderTop(); };
+  });
+  const done=QUIZ.filter(q=>ST.done[q.id]).length, ok=QUIZ.filter(q=>ST.correct[q.id]===true).length, wrong=QUIZ.filter(q=>ST.correct[q.id]===false);
+  $("#result").innerHTML= QUIZ.length? '<b>'+ok+'/'+QUIZ.length+'</b><span>정답 · 푼 문제 '+done+'</span>'+(wrong.length?'<button class="btn" id="retryWrong">틀린 문제 '+wrong.length+'개 다시</button>':'')+'<span class="sp" style="flex:1"></span><button class="btn xs" id="resetAll">이 회차 기록 지우기</button>' : '';
+  const rw=$("#retryWrong"); if(rw) rw.onclick=()=>{ wrong.forEach(q=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; }); save(); bindQ(); renderTop(); const f=$("#qlist .q:not(.rev)"); if(f) f.scrollIntoView({behavior:"smooth",block:"start"}); };
+  const ra=$("#resetAll"); if(ra) ra.onclick=()=>{ if(confirm("이 회차의 읽음·문제 기록을 지울까요?")){ ST={read:{},done:{},correct:{},answer:{},ts:0}; save(); bindQ(); renderTop(); } }; }
+/* ---- 앱 질문 패널 문맥 (V45 와 같은 규약) ---- */
+let CTX_GEN=null;
+function postCtx(sec){ try{ if(!CTX_GEN||window.parent===window) return; const s=sec||document.querySelector("section.s.read:last-of-type")||document.querySelector("section.s"); if(!s) return;
+  const t=(s.querySelector("h2")||{}).textContent||"", txt=(s.textContent||"").replace(/\s+/g," ").trim().slice(0,600);
+  window.parent.postMessage({type:"mc-slide",v:1,gen:CTX_GEN,deck:LESSON_ID,title:document.title.slice(0,80),sid:s.dataset.id,stype:"concept",part:null,partTitle:document.title.slice(0,60),label:"읽는 중 · "+t.slice(0,60),q:{qn:t.slice(0,80),kind:"개념",text:txt,choices:[],my:null,revealed:true,correct:null,answer:null}},location.origin); }catch(e){} }
+window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; postCtx(); } });
+/* ---- 시작 ---- */
+function boot(){ typeset(document.querySelector("main")); bindQ(); renderTop(); save();
+  const m=/^#s=([\w-]+)$/.exec(location.hash||""); if(m){ const el=document.querySelector('section.s[data-id="'+m[1]+'"]'); if(el) el.scrollIntoView(); }
+  else if(location.hash==="#resume"){ const ids=$$("section.s[data-id]").map(s=>s.dataset.id); const next=ids.find(id=>!ST.read[id]); if(next){ const el=document.querySelector('section.s[data-id="'+next+'"]'); if(el) el.scrollIntoView(); } else if(QUIZ.length){ $("#quiz").scrollIntoView(); } } }
+(function wait(){ if(window.renderMathInElement) boot(); else setTimeout(wait,40); })();
+</script>
+</body>
+</html>

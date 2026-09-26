@@ -59,6 +59,15 @@ fig_shell = canvas(560, 240,
     text(470, 120, "영역별로 q_enc를 다시 센다", 12.5, INK, "middle"), text(470, 140, "r<a: (r³/a³)q · a~b: q", 12, INK, "middle"), text(470, 158, "b~c(도체 안): 0 · r>c: q−q=0", 12, INK, "middle"),
     cap="교재 23장 31번 유형: 부도체 공 + 동심 도체 껍질. 껍질 안쪽 표면에 \\(-q\\)가 유도되어 도체 내부를 0으로 만든다.")
 
+fig_da = canvas(560, 200,
+    path("M120 40 C 220 10, 330 30, 400 70 C 470 110, 440 180, 340 185 C 240 190, 130 175, 100 120 C 80 85, 90 55, 120 40 Z", PINK, 2.5, "rgba(255,77,141,.05)", "7 5"),
+    charge(230, 110, "+", "", 12, RED), charge(290, 95, "+", "", 12, RED), charge(260, 140, "−", "", 12, BLUE), text(260, 172, "q_enc = 안의 알짜 (+e)", 12, INK, "middle"),
+    rect(392, 62, 16, 16, INK, fill="rgba(255,255,255,.7)", sw=1.5), text(384, 56, "dA", 12, INK, "end"),
+    arrow(400, 70, 448, 42, INK, "n̂", 2, 12, -2),
+    arrow(300, 100, 396, 66, GREEN, "E", 2, -6, -10),
+    text(470, 150, "모양은 아무거나", 13, PINK, "middle"), text(470, 170, "안의 알짜전하만 센다", 13, INK, "middle"),
+    cap="폐곡면(가우스면)은 모양이 어떻든 상관없다. 미소면적 \\(dA\\)의 법선벡터 \\(\\hat n\\)과 그곳의 전기력선이 평행이면 \\(\\vec E\\cdot\\hat n=E\\).")
+
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일반물리학2 · 9/16 가우스 법칙 — 3종 · 도체구 · 부도체구</title></head><body>
 <header>
 <h1>23장 가우스 법칙 — 가우스면 3종 · 도체구 · 부도체구</h1>
@@ -71,7 +80,10 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <div class="formula">\\[\\oint\\vec E\\cdot\\hat n\\,dA=\\frac{{q_{{enc}}}}{{\\varepsilon_0}}\\qquad(\\varepsilon_0=8.854\\times10^{{-12}})\\]</div>
 <p>기호를 읽자: \\(\\oint\\)는 <b>폐곡면</b>(닫힌 면이면 모양은 상관없다), \\(\\hat n\\)은 미소면적의 <b>법선벡터</b>, \\(q_{{enc}}\\)는 그 면 <b>안</b>의 알짜전하. 전기력선 하나 ↔ 법선벡터 하나가 1:1로 대응하고, 둘이 <b>평행</b>이라 내적은 그냥 \\(E\\)가 된다.</p>
 <div class="say">"미소면적 법선벡터 하나와 전기력선 하나는 수직해요, 평행해요? — 평행. 이것만 답을 하면 다 해결이 돼."</div>
+{fig_da}
 <div class="why">\\(E\\)가 가우스면 위에서 일정하면 적분 밖으로 나온다: \\(E\\oint dA=q/\\varepsilon_0\\). 그러면 남는 건 <b>표면적</b> 계산뿐. 그래서 표면적을 쉽게 아는 3가지 면만 쓴다.</div>
+<div class="analogy">그물 안에 물고기가 몇 마리인지 알고 싶으면, 그물 표면을 뚫고 나오는 "냄새 줄기"를 세면 된다. 그물 모양은 상관없고 안에 있는 물고기 수만 정한다 — 그것이 폐곡면과 \\(q_{{enc}}\\)의 뜻. 그물 <b>밖</b>의 물고기는 줄기가 들어왔다 나가서 0으로 상쇄된다.</div>
+<div class="memo"><b>외울 것</b> \\(\\oint\\) = 폐곡면 · \\(\\hat n\\) = 법선벡터 · \\(q_{{enc}}\\) = 면 <b>안</b>의 알짜전하 · \\(E\\)가 일정하면 \\(E\\cdot(\\text{{표면적}})=q_{{enc}}/\\varepsilon_0\\)</div>
 <figure class="board"><img data-photo="일반물리학2/2026-09-16/판서_1_가우스법칙_정의_축구공.jpg" alt="판서 1"><figcaption>판서 ① 정의 + 축구공 (02:05~07:31)</figcaption></figure>
 </section>
 
@@ -79,10 +91,11 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <h2>2. 3종으로 지난 결과를 한 줄에 다시 얻는다</h2>
 {fig_re}
 <p><b>무한 평면</b>: 지난 시간 원판에서 \\(R\\to\\infty\\)로 얻은 \\(\\sigma/2\\varepsilon_0\\). 가우스 법칙으로는 — 전기력선이 판 <b>양쪽</b>으로 나가므로 가우스면(앞·뒤 두 장)의 넓이는 \\(2A\\): \\(E\\cdot2A=q/\\varepsilon_0\\) → \\(E=q/2\\varepsilon_0A=\\sigma/2\\varepsilon_0\\) ✓.</p>
-<p><b>직선 도선</b>: 원통 옆면 \\(2\\pi rL\\), 안의 전하 \\(\\lambda L\\): \\(E\\cdot2\\pi rL=\\lambda L/\\varepsilon_0\\) → \\(E=\\lambda/(2\\pi\\varepsilon_0 r)\\) — 9/9의 적분과 같다.</p>
+<p><b>직선 도선</b>: 원통 옆면 \\(2\\pi rL\\), 안의 전하 \\(\\lambda L\\): \\(E\\cdot2\\pi rL=\\lambda L/\\varepsilon_0\\) → \\(E=\\lambda/(2\\pi\\varepsilon_0 r)\\) — <b>무한히 긴</b> 도선을 <b>옆</b>에서 본 결과. 9/9의 유한 도선(연장선 위 점, \\(q/a(a+L)\\))과는 배치가 다르다. 적분으로 하면 반 페이지, 가우스로는 한 줄.</p>
 <p><b>도체 표면 한쪽</b>: \\(EA=q/\\varepsilon_0\\) → \\(\\sigma/\\varepsilon_0\\). 무한 평면(\\(2A\\))과 두 배 차이가 나는 이유가 "양쪽이냐 한쪽이냐"다.</p>
 <div class="say">"이 말이 이해가 되면 가우스 법칙 진짜 쉽게 설명이 될 텐데." · "4개, 5개 만들 수 있냐? 있다. 그런데 그딴 짓은 안 한다. 한 번도 본 적이 없다."</div>
 <div class="analogy">적분은 벽돌을 하나하나 쌓아 집을 짓는 것, 가우스 법칙은 대칭이 좋은 집을 통째로 들어 올리는 것. 대칭(면·원통·구)이 있을 때만 통한다.</div>
+<div class="memo"><b>외울 것</b> 면 \\(2A\\)(부도체 무한 평면) → \\(\\sigma/2\\varepsilon_0\\) · 원통 옆면 \\(2\\pi rL\\) → \\(\\lambda/2\\pi\\varepsilon_0 r\\) · 구 \\(4\\pi r^2\\) → \\(q/4\\pi\\varepsilon_0 r^2\\) · 도체 표면 한쪽 \\(A\\) → \\(\\sigma/\\varepsilon_0\\)</div>
 <figure class="board"><img data-photo="일반물리학2/2026-09-16/판서_3_가우스면3종_무한평면_클로즈업.jpg" alt="판서 3"><figcaption>판서 ③ 3종 넓이 + 무한 평면 2A (13:27~17:24)</figcaption></figure>
 </section>
 
@@ -97,6 +110,8 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <div class="formula">\\[r&lt;R:\\ E=0\\qquad r\\ge R:\\ E\\cdot4\\pi r^2=\\frac{{q}}{{\\varepsilon_0}}\\ \\Rightarrow\\ E=\\frac{{q}}{{4\\pi\\varepsilon_0 r^2}}\\]</div>
 <div class="why">안쪽 가우스면(반지름 \\(r&lt;R\\)) 안에는 전하가 하나도 없다 → \\(q_{{enc}}=0\\) → \\(E=0\\). 바깥 가우스면은 전하 \\(q\\)를 전부 품으므로 중심에 점전하 \\(q\\)가 있는 것과 구별이 안 된다.</div>
 <div class="say">"문제에 '반지름 R인 도체구'가 나오면 바로 이 정리가 떠올라야 한다. 이게 제일 중요한 내용."</div>
+<div class="analogy">도체는 사람이 자유롭게 걸어 다니는 광장. 같은 부호끼리 서로 밀어내니 최대한 멀리 — 가장자리(표면)로 흩어지고 가운데는 빈다. 부도체는 좌석이 고정된 극장 — 전하가 자리에 박혀 안에도 그대로 있다.</div>
+<div class="memo"><b>외울 것</b> 도체구: 전하는 표면에만 · 안 \\(E=0\\) · 밖 \\(E=q/4\\pi\\varepsilon_0r^2\\)(점전하와 같다) · 도체·부도체 둘 다 전하는 있다</div>
 <figure class="board"><img data-photo="일반물리학2/2026-09-16/판서_7_고립도체_도체구_시험대비.jpg" alt="판서 7"><figcaption>판서 ⑦ 고립도체 → 도체구 안 0 / 밖 점전하 (사진에 「시험대비」 캡션)</figcaption></figure>
 </section>
 
@@ -109,6 +124,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <div class="analogy">안개 속을 걸어 들어갈수록 "내 뒤에 남은 안개"가 늘어난다. 부도체구 안에서 중심에서 멀어질수록 가우스면 안의 전하가 \\(r^3\\)으로 늘어, 넓이 \\(r^2\\)로 나눠도 \\(r\\)만큼 커진다.</div>
 <p>그래프는 원점에서 직선으로 올라 \\(r=R\\)에서 꺾이고 \\(1/r^2\\)로 내려온다. 도체구 그래프는 \\(r&lt;R\\)에서 0이었다가 표면에서 갑자기 최대 — 이 차이가 시험 개념 문제 후보.</p>
 <div class="say">"반지름 3배 줄이면 27배" 같은 의미 없는 산수 문제는 안 낸다. "가우스 법칙에서 나오는 값은 다 스칼라" — 이 말이 중요한 말이야.</div>
+<div class="memo"><b>외울 것</b> 부도체구 안 \\(E=\\dfrac{{qr}}{{4\\pi\\varepsilon_0R^3}}\\)(∝ r) · 밖 \\(\\dfrac{{q}}{{4\\pi\\varepsilon_0r^2}}\\) · \\(q'=(r^3/R^3)q\\) · 표면에서 최대</div>
 <figure class="board"><img data-photo="일반물리학2/2026-09-16/판서_6_부도체구_내외부_유도_그래프.jpg" alt="판서 6"><figcaption>판서 ⑥ 부도체구 안·밖 유도 + E–r 그래프 (31:45~37:37)</figcaption></figure>
 </section>
 
@@ -123,6 +139,8 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <p>(c) \\(r=2.3a\\) 도체 껍질 안: 도체 내부 → \\(E=0\\). 그러려면 껍질 <b>안쪽 표면에 \\(-q\\)</b>가 유도되어야 한다(가우스면 안 알짜 0).</p>
 <p>(d) \\(r=3.5a\\) 바깥: \\(q_{{enc}}=q+(-q)=0\\) → \\(E=0\\). 껍질 알짜가 \\(-q\\)인데 안쪽 표면이 \\(-q\\)를 다 썼으니 <b>바깥 표면은 0</b>.</p>
 <p>강의노트 p.12 필수문제 1·2도 같은 구조(껍질 알짜가 \\(-2q\\)면 바깥 표면에 \\(-q\\)가 남는 식). 숫자만 바뀐다.</p></div></details>
+<div class="analogy">양파를 한 겹씩 벗기듯, 반지름 \\(r\\)을 키우며 "지금까지 껍질 안에 든 전하"만 센다. 겹이 바뀔 때마다(부도체 안 → 사이 → 도체 안 → 밖) 안에 든 전하가 달라지고, 그때마다 \\(E\\) 식도 바뀐다.</div>
+<div class="memo"><b>외울 것</b> 영역마다 \\(q_{{enc}}\\) 새로 세기 · 도체 안 \\(E=0\\) ⇒ 껍질 안쪽 표면에 \\(-q_{{안}}\\) 유도 · 바깥 표면 = 껍질 알짜 − 안쪽 표면 · 부도체 안은 \\((r^3/R^3)q\\)</div>
 <div class="memo">교수님: 강의노트 문제 그대로는 안 낸다("포인트 안 올려놨어요") — 이해해야 푸는 변형. 영역 하나하나 \\(q_{{enc}}\\)를 새로 세는 습관이 전부다.</div>
 <figure class="board"><img data-photo="일반물리학2/2026-09-16/교재_23장_연습문제_29-33_31번표시.jpg" alt="교재 31번"><figcaption>교재 23장 연습문제 29~33 (31번 표시)</figcaption></figure>
 </section>
@@ -132,7 +150,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <div class="q" data-qid="q3"><div class="qn">확인 3 · 부도체구 내부</div><div class="qb">반지름 \\(R\\)에 전하 \\(q\\)가 균일하게 퍼진 부도체구의 내부(\\(r&lt;R\\)) 전기장은?</div><ol class="choices"><li data-ok="1">\\(\\dfrac{{qr}}{{4\\pi\\varepsilon_0R^3}}\\) — r에 비례</li><li>0</li><li>\\(\\dfrac{{q}}{{4\\pi\\varepsilon_0 r^2}}\\)</li><li>\\(\\dfrac{{q}}{{4\\pi\\varepsilon_0 R^2}}\\), 일정</li></ol><div class="ans">가우스면 안 전하 \\(q'=(r^3/R^3)q\\) → \\(E\\cdot4\\pi r^2=q'/\\varepsilon_0\\).</div></div>
 <div class="q" data-qid="q4"><div class="qn">확인 4 · 무한 평면에 2A</div><div class="qb">무한 평면(부도체, 면밀도 σ)에 가우스 법칙을 쓸 때 넓이를 \\(2A\\)로 잡는 이유는?</div><ol class="choices"><li data-ok="1">전기력선이 판 양쪽으로 나가 가우스면 앞·뒤 두 장을 모두 지난다</li><li>평면이 두 장이기 때문</li><li>전하가 두 배이기 때문</li><li>원판 공식의 2를 맞추기 위한 약속</li></ol><div class="ans">\\(E\\cdot2A=q/\\varepsilon_0\\) → \\(\\sigma/2\\varepsilon_0\\). 도체 표면 한쪽만이면 \\(\\sigma/\\varepsilon_0\\).</div></div>
 <div class="q" data-qid="q5"><div class="qn">확인 5 · 껍질의 유도 전하</div><div class="qb">부도체 공(+q) 바깥에 알짜 −q인 동심 도체 껍질이 있다. 껍질 <b>안쪽 표면</b>과 <b>바깥 표면</b>의 전하는?</div><ol class="choices"><li data-ok="1">안쪽 −q, 바깥 0</li><li>안쪽 0, 바깥 −q</li><li>안쪽 −q/2, 바깥 −q/2</li><li>안쪽 +q, 바깥 −2q</li></ol><div class="ans">도체 내부 \\(E=0\\)이 되려면 껍질 안쪽 표면이 \\(-q\\)로 안의 \\(+q\\)를 상쇄해야 한다. 알짜 \\(-q\\)를 다 써서 바깥은 0.</div></div>
-<div class="q" data-qid="q6"><div class="qn">확인 6 · 직선 도선을 가우스로</div><div class="qb">선전하밀도 λ인 무한 직선 도선에서 거리 r인 점의 전기장을 원통 가우스면(길이 L)으로 유도하라.</div><div class="ans">옆면에서 \\(\\vec E\\parallel\\hat n\\), 윗면·아랫면 기여 0. \\(E\\cdot2\\pi rL=\\lambda L/\\varepsilon_0\\) → \\(E=\\dfrac{{\\lambda}}{{2\\pi\\varepsilon_0 r}}\\). 9/9의 적분 결과와 같다.</div></div>
+<div class="q" data-qid="q6"><div class="qn">확인 6 · 직선 도선을 가우스로</div><div class="qb">선전하밀도 λ인 무한 직선 도선에서 거리 r인 점의 전기장을 원통 가우스면(길이 L)으로 유도하라.</div><div class="ans">옆면에서 \\(\\vec E\\parallel\\hat n\\), 윗면·아랫면 기여 0. \\(E\\cdot2\\pi rL=\\lambda L/\\varepsilon_0\\) → \\(E=\\dfrac{{\\lambda}}{{2\\pi\\varepsilon_0 r}}\\). 점 P를 도선 옆에 두고 \\(-\\infty\\sim\\infty\\)로 적분해도 같은 값(9/9의 유한 도선·연장선 배치와는 다른 문제).</div></div>
 </body></html>'''
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 io.open(OUT, "w", encoding="utf-8", newline="\n").write(html)

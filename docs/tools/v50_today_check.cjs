@@ -3,7 +3,7 @@ const fs=require("fs"),path=require("path");const {JSDOM,VirtualConsole}=require
 const ROOT="C:/Users/user/Desktop/아톰OS/기술실/study-console";const errs=[];const vc=new VirtualConsole();vc.on("jsdomError",e=>errs.push(e.message));
 const d=new JSDOM(fs.readFileSync(ROOT+"/index.html","utf8"),{runScripts:"dangerously",pretendToBeVisual:true,virtualConsole:vc,url:"http://localhost/study/index.html",beforeParse(w){
  w.matchMedia=()=>({matches:false,addListener(){},removeListener(){},addEventListener(){},removeEventListener(){}});w.scrollTo=()=>{};w.HTMLElement.prototype.scrollIntoView=function(){};
- w.fetch=(u)=>{const p=path.join(ROOT,String(u).replace(/^\.\//,"").split("?")[0]);if(fs.existsSync(p))return Promise.resolve({ok:true,status:200,json:()=>Promise.resolve(JSON.parse(fs.readFileSync(p,"utf8")))});return Promise.resolve({ok:false,status:404,json:()=>Promise.reject(new Error("404"))});};}});
+ w.fetch=(u)=>{/* 덱 논리 검사: 수업 노트(V52)는 없는 것으로 — lessons.json 404 */if(/lessons\.json/.test(String(u)))return Promise.resolve({ok:false,status:404,json:()=>Promise.reject(new Error("404"))});const p=path.join(ROOT,String(u).replace(/^\.\//,"").split("?")[0]);if(fs.existsSync(p))return Promise.resolve({ok:true,status:200,json:()=>Promise.resolve(JSON.parse(fs.readFileSync(p,"utf8")))});return Promise.resolve({ok:false,status:404,json:()=>Promise.reject(new Error("404"))});};}});
 let fail=0;const ok=(c,m)=>{console.log((c?"OK  ":"FAIL ")+m);if(!c)fail++;};
 const decks=JSON.parse(fs.readFileSync(ROOT+"/knowledge/decks.json","utf8")).decks;const P=(id,n)=>decks.find(x=>x.id===id).partList.find(p=>p.n===n);
 setTimeout(()=>{const w=d.window;
