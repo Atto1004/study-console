@@ -104,7 +104,9 @@ details.ex .body p{margin:8px 0}
   figure.fig svg{filter:invert(1) hue-rotate(180deg) saturate(1.2)}
 }
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#top{background:#FFFFFF}section.s,.q,#result{background:#FFFFFF}}
-@media(max-width:640px){:root{--fs:17px}main{padding:16px 14px 110px}section.s{padding:18px 16px 14px}header.h h1{font-size:25px}}
+@media(max-width:640px){:root{--fs:17px}main{padding:16px 14px 110px}section.s{padding:18px 16px 14px}header.h h1{font-size:25px}
+  /* 폰에서는 그림을 축소하지 않고(글자가 7px 로 줄어든다) 가로 스크롤로 본다 */
+  figure.fig{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:none;margin-left:-6px;margin-right:-6px;padding:0 6px}figure.fig svg{min-width:500px}}
 </style>
 </head>
 <body>

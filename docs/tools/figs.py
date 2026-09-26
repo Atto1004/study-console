@@ -5,8 +5,9 @@
 INK = "#1F2A44"; RED = "#E03131"; BLUE = "#1971C2"; GREEN = "#2F9E44"; PINK = "#FF4D8D"; GRAY = "#8A97A6"; YEL = "#F59F00"
 import re as _re
 def _sub(t):
-    """SVG 라벨의 `U_y` · `r_AB` · `q_{enc}` 를 진짜 아래첨자(tspan)로. 캡션(KaTeX)에는 쓰지 않는다."""
-    return _re.sub(r'_\{([^}]+)\}|_([A-Za-z0-9]+)', lambda m: '<tspan baseline-shift="sub" font-size="72%">' + (m.group(1) or m.group(2)) + '</tspan>', str(t))
+    """SVG 라벨의 `U_y` · `r_AB` · `q_{enc}` 를 진짜 아래첨자(tspan)로, 벡터 결합 화살표(a⃗)는 굵은 글자 + 작은 위첨자 → 로. 캡션(KaTeX)에는 쓰지 않는다."""
+    s = _re.sub(r'([A-Za-z]+)⃗', lambda m: '<tspan font-weight="700">' + m.group(1) + '</tspan><tspan baseline-shift="super" font-size="62%">→</tspan>', str(t))
+    return _re.sub(r'_\{([^}]+)\}|_([A-Za-z0-9]+)', lambda m: '<tspan baseline-shift="sub" font-size="72%">' + (m.group(1) or m.group(2)) + '</tspan>', s)
 
 def canvas(w, h, *parts, cap=""):
     body = "".join(parts)
@@ -147,6 +148,18 @@ def fbox(x, y, w, h, label, color=None, fill=None, size=13, sub="", bold=True):
     s = rect(x, y, w, h, c, fill=fill or "rgba(255,255,255,.75)", sw=1.6, rx=9)
     s += text(x + w / 2, y + h / 2 + (5 if not sub else -2), label, size, c, "middle", bold)
     if sub: s += text(x + w / 2, y + h / 2 + 14, sub, 11, GRAY, "middle")
+    return s
+
+def mat(x, y, rows, cw=30, ch=26, color=None, size=13, hl=None, bars=False):
+    """행렬 그림(대괄호) / bars=True 면 행렬식(세로줄). rows=[[...],[...]], hl=(i,j) 강조 칸. 성분의 _ 는 아래첨자"""
+    c = color or INK; s = ""
+    n = len(rows); m = max(len(r) for r in rows); W = m * cw; H = n * ch
+    if bars: s += line(x, y, x, y + H, c, 1.8) + line(x + W, y, x + W, y + H, c, 1.8)
+    else: s += path(f"M{x+8} {y} L{x} {y} L{x} {y+H} L{x+8} {y+H}", c, 1.8) + path(f"M{x+W-8} {y} L{x+W} {y} L{x+W} {y+H} L{x+W-8} {y+H}", c, 1.8)
+    for i, r in enumerate(rows):
+        for j, v in enumerate(r):
+            if hl and (i, j) in (hl if isinstance(hl, list) else [hl]): s += rect(x + j * cw + 3, y + i * ch + 2, cw - 6, ch - 4, RED, fill="rgba(224,49,49,.12)", sw=1, rx=4)
+            s += text(x + j * cw + cw / 2, y + i * ch + ch / 2 + 5, str(v), size, c, "middle")
     return s
 
 def diamond(cx, cy, w, h, label, color=None, size=12.5):
