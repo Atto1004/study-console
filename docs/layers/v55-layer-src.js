@@ -3,7 +3,7 @@
    ① 히어로 카드: 과목 · 교수 · 요일 · 따라감/밀림/이 과목 XP/시험 D-day · 진행 막대 · [교실 열기 · 날짜] [교재] + 김주영 스앵님 말풍선. 기존 #cHead(V37 한 줄)는 숨기고 「세부정보」 버튼만 옮겨 온다.
    ② 학습 경로: 회차마다 동그란 마디(따라감 ✓ · 진행 중 고리 · 밀림 · 오늘 · 이어짐 · 정리만 · 정리 대기 · 예정 잠김) + 시험 ★ 마디를 주차 머리말(map.json 제목) 아래 지그재그로. 다음에 할 마디 옆에 스앵님. 마디 = 교실(V53→V38.deckFor) / 회차 정리(V36.daySheet) / 시험 범위 펼치기.
    ③ 기존 회차 표(V37 카드)는 「회차 표」 접기(기본 접힘, localStorage mc-v55-table)로 남긴다 — 출결·과제·정리·기록 기능은 그대로.
-   판정은 V50.session(수업 따라가기와 같은 기준), 진행률은 mc-lesson-<id>(교실·수업 노트와 같은 키), XP 는 mc-tutor. 캐릭터는 notes/classroom/_assets/tutor.svg(원본 docs/tools/tutor.svg) 를 fetch 해 인라인.
+   판정은 V50.session(수업 따라가기와 같은 기준), 진행률은 mc-lesson-<id>(교실·수업 노트와 같은 키), XP 는 mc-tutor. 캐릭터는 notes/classroom/assets/tutor.svg(원본 docs/tools/tutor.svg; 폴더에 _ 를 쓰면 GitHub Pages 가 안 올린다) 를 fetch 해 인라인.
    ============================================================ */
 (function(){
   if(window.V55) return;
@@ -14,7 +14,7 @@
   V55.tutor=function(){
     if(V55.svg!==null) return Promise.resolve(V55.svg);
     if(V55.loading) return V55.loading;
-    V55.loading=fetch("notes/classroom/_assets/tutor.svg",{cache:"force-cache"}).then(function(r){ return r.ok?r.text():""; }).then(function(t){ V55.svg=String(t).replace(/<!--[\s\S]*?-->/g,"").replace(/<\?xml[^>]*>/,""); return V55.svg; }).catch(function(){ V55.svg=""; return ""; });
+    V55.loading=fetch("notes/classroom/assets/tutor.svg",{cache:"force-cache"}).then(function(r){ return r.ok?r.text():""; }).then(function(t){ V55.svg=String(t).replace(/<!--[\s\S]*?-->/g,"").replace(/<\?xml[^>]*>/,""); return V55.svg; }).catch(function(){ V55.svg=""; return ""; });
     return V55.loading;
   };
   V55.T=function(){ try{ return JSON.parse(localStorage.getItem("mc-tutor")||"null")||{}; }catch(e){ return {}; } };
