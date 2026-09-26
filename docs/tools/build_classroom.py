@@ -45,10 +45,14 @@ def build(src, slug, date, minutes=18):
     for i, sec in enumerate(doc.xpath('//section[contains(concat(" ",normalize-space(@class)," ")," s ")]'), 1):
         sid = sec.get("data-id") or f"s{i}"
         h2 = sec.xpath("./h2"); ctitle = re.sub(r"^\d+[.)]\s*", "", h2[0].text_content().strip()) if h2 else f"챕터 {i}"
-        steps, buf, sub = [], [], None
+        steps, buf, sub, buf_say = [], [], None, None
         def flush():
-            nonlocal buf, sub
-            if buf: steps.append({"t": "talk", "html": "".join(buf), "sub": sub}); buf = []; sub = None
+            nonlocal buf, sub, buf_say
+            if not buf: return   # 비울 게 없으면 소제목(sub)도 건드리지 않는다 — h3 뒤에 그림·상자가 바로 오면 소제목이 그 단계에 붙어야 한다
+            st = {"t": "talk", "html": "".join(buf), "sub": sub}
+            if buf_say: st["say"] = buf_say
+            steps.append(st)
+            buf = []; sub = None; buf_say = None
         for el in sec:
             if not isinstance(el.tag, str): continue
             tag = el.tag; c = cls_of(el)
@@ -56,9 +60,10 @@ def build(src, slug, date, minutes=18):
             tut = el.get("data-tutor")
             if tag == "h3": flush(); sub = el.text_content().strip(); continue
             if tag == "p":
+                # 문단은 버퍼에 모였다가 단계가 되므로 대사도 버퍼와 함께 둔다(첫 문단의 data-tutor 에서 IndexError — 오타 v54 C)
                 buf.append(outer(el))
+                if tut: buf_say = tut
                 if len(buf) >= 2: flush()
-                if tut: steps[-1]["say"] = tut
                 continue
             if tag in ("table", "ul", "ol", "pre", "blockquote"):
                 buf.append(outer(el)); flush(); continue

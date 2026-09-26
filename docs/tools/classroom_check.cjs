@@ -39,9 +39,21 @@ function check(file) {
       if (!(T.xp > before.xp)) problems.push("정답 뒤 XP 안 오름"); if (D.quiz[1] && D.quiz[1].choices && !(T.hearts < before.hearts)) problems.push("오답 뒤 하트 안 줄음");
       if (!T.lessons || !T.lessons[D.id]) problems.push("mc-tutor 에 회차 기록 없음");
       X.S.mode = "result"; X.render(); if (!/정답/.test(bc())) problems.push("결과 화면 없음"); }
-    // 챕터 완료 → mc-lesson read
-    X.S.mode = "step"; X.S.ci = 0; X.S.si = D.chapters[0].steps.length; X.render();
+    // 챕터 완료(마지막 단계에서 「이해했어요」) → mc-lesson read + XP 10, 같은 챕터를 다시 끝내도 XP 는 한 번
+    const xp0 = X.T.xp; X.S.mode = "step"; X.S.ci = 0; X.S.si = D.chapters[0].steps.length - 1; X.S.rev = true; X.render(); X.next();
     const ST2 = JSON.parse(w.localStorage.getItem("mc-lesson-" + D.id) || "{}"); if (!ST2.read || !ST2.read[D.chapters[0].id]) problems.push("챕터 완료가 mc-lesson read 에 안 남음");
+    if (X.T.xp !== xp0 + 10) problems.push("챕터 완료 XP +10 이 아님: " + (X.T.xp - xp0));
+    X.S.mode = "step"; X.S.ci = 0; X.S.si = D.chapters[0].steps.length - 1; X.S.rev = true; X.render(); X.next(); if (X.T.xp !== xp0 + 10) problems.push("챕터 재완료에 XP 를 또 줌");
+    // 오타 v54 A③: 저장 위치가 범위 밖(재빌드)이어도 #resume 가 챕터를 완료로 치지 않는다
+    { const xp1 = X.T.xp; const L = X.L; L.pos = { mode: "step", ci: 1, si: 999 }; L.done = false; delete L.ch[D.chapters[1].id]; w.location.hash = "#resume"; X.boot();
+      if (X.S.mode !== "step" || X.S.ci !== 1 || X.S.si !== D.chapters[1].steps.length - 1) problems.push("#resume 범위 밖 단계 보정 실패: " + X.S.mode + " " + X.S.ci + "/" + X.S.si);
+      if (L.ch[D.chapters[1].id] || X.T.xp !== xp1) problems.push("#resume 범위 밖 위치가 챕터를 완료로 침"); w.location.hash = ""; }
+    // 오타 v54 A①: 정답 → 다시 풀기 → 정답 = XP 한 번
+    if (D.quiz.length && D.quiz[0].choices) { const q = D.quiz[0], ST3 = X.ST; delete ST3.done[q.id]; delete ST3.correct[q.id]; delete ST3.answer[q.id]; X.T.hearts = 3; const xp2 = X.T.xp; X.S.mode = "quiz"; X.S.qi = 0; X.render();
+      const okI = q.choices.findIndex(c => c.ok); doc.querySelectorAll("#bc .cb")[okI].click(); if (X.T.xp !== xp2) problems.push("다시 풀기 정답에 XP 를 또 줌: +" + (X.T.xp - xp2)); }
+    // 오타 v54 A④: 하트 0이면 객관식·입력형 모두 문제를 못 연다(자기 채점 포함)
+    if (D.quiz.length) { const q = D.quiz[0], ST4 = X.ST; delete ST4.done[q.id]; delete ST4.correct[q.id]; delete ST4.answer[q.id]; X.T.hearts = 0; X.S.mode = "quiz"; X.S.qi = 0; X.render();
+      if (X.S.mode !== "nohearts") problems.push("하트 0인데 문제 화면이 열림: " + X.S.mode); X.T.hearts = 3; }
     // 목차 오버레이
     doc.querySelector("#hToc").click(); if (doc.querySelectorAll("#ovList li").length !== D.chapters.length + (D.quiz.length ? 1 : 0)) problems.push("목차 항목 수 불일치");
   } catch (e) { problems.push("예외: " + (e && e.stack || e).split("\n").slice(0, 2).join(" ")); }

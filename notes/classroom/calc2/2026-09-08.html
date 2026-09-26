@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
 <style>
 :root{--wall:#F4EEE2;--wood:#7A4E2B;--wood-2:#5C3A1E;--green:#2F5F4E;--green-2:#25503F;--chalk:#F5F2E9;--chalk-2:rgba(245,242,233,.72);--yel:#FFE27A;--pink:#FFA3C7;--sky:#9ADCFF;--mint:#B8F2D0;
-  --ink:#1F2A44;--ink-2:#55627A;--ink-3:#7C889B;--du-green:#58CC02;--du-green-2:#46A302;--du-blue:#1CB0F6;--du-blue-2:#1899D6;--du-red:#FF4B4B;--du-red-2:#EA2B2B;--du-gray:#E5E5E5;--du-gray-2:#CFCFCF;--du-yel:#FFC800;--du-orange:#FF9600;
+  --ink:#1F2A44;--ink-2:#55627A;--ink-3:#66727F;--du-green:#58CC02;--du-green-2:#46A302;--du-blue:#1CB0F6;--du-blue-2:#1899D6;--du-blue-text:#0A7BBF;--du-red:#D42020;--du-red-2:#A61B1B;--du-gray:#E5E5E5;--du-gray-2:#CFCFCF;--du-yel:#FFC800;--du-orange:#FF9600;
   --f:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;--pen:"Nanum Pen Script","Pretendard Variable",sans-serif;--fs:19px;--hud:56px}
 *{box-sizing:border-box}
 html{background:var(--wall)}
@@ -34,12 +34,12 @@ button{font-family:inherit}
 .stat{display:inline-flex;align-items:center;gap:5px;font-weight:800;font-size:14px;color:var(--ink-2);padding:4px 8px;border-radius:12px;background:rgba(255,255,255,.7);border:2px solid rgba(31,42,68,.06);position:relative}
 .stat svg{width:18px;height:18px;display:block}
 .stat small{font-weight:700;color:var(--ink-3);font-size:11px}
-.stat.xp{color:#B26A00}.stat.sk{color:#E8590C}.stat.hp{color:#E03131;gap:2px}.stat.af{color:#D0397A}
+.stat.xp{color:#9A5B00}.stat.sk{color:#C2410C}.stat.hp{color:#C92A2A;gap:2px}.stat.af{color:#B8286A}  /* 흰 바탕 4.5:1 이상 (오타 v54 D) */
 .stat.hp svg{width:17px}
 .stat .gauge{display:inline-block;width:56px;height:9px;border-radius:99px;background:#F1D4E0;overflow:hidden}
 .stat .gauge b{display:block;height:100%;width:0;background:linear-gradient(90deg,#F783AC,#D0397A);transition:width .4s}
-.pop{position:absolute;left:50%;top:-6px;transform:translate(-50%,0);font-size:13px;font-weight:900;color:#2B8A3E;pointer-events:none;opacity:0;animation:pop 1.1s ease-out forwards;white-space:nowrap}
-.pop.bad{color:#E03131}
+.pop{position:absolute;left:50%;top:-6px;transform:translate(-50%,0);font-size:13px;font-weight:900;color:#1F7A32;pointer-events:none;opacity:0;animation:pop 1.1s ease-out forwards;white-space:nowrap}
+.pop.bad{color:#C92A2A}
 @keyframes pop{0%{opacity:0;transform:translate(-50%,0)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-30px)}}
 #hToc{border:0;background:var(--ink);color:#fff;font-weight:800;font-size:13px;padding:7px 12px;border-radius:12px;cursor:pointer;border-bottom:3px solid #000}
 #hToc:active{transform:translateY(1px);border-bottom-width:2px}
@@ -146,12 +146,12 @@ main{max-width:1000px;margin:0 auto;padding:14px 16px 20px;display:flex;flex-dir
 .text .cur{display:inline-block;width:.55em;height:1.05em;background:var(--ink);vertical-align:-.15em;margin-left:2px;animation:blinkc .8s step-end infinite}
 @keyframes blinkc{50%{opacity:0}}
 .choices{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.cbt{border:0;font:inherit;font-weight:800;font-size:15.5px;padding:11px 18px;border-radius:14px;cursor:pointer;color:#fff;background:var(--du-blue);border-bottom:4px solid var(--du-blue-2);transition:transform .08s,filter .15s;letter-spacing:-.01em;min-height:46px}
-.cbt:hover{filter:brightness(1.05)}.cbt:active{transform:translateY(2px);border-bottom-width:2px;margin-bottom:2px}
-.cbt.p{background:var(--du-green);border-bottom-color:var(--du-green-2)}
+/* 선택지 버튼 — 글자 대비 4.5:1 이상: 질문 = 흰 바탕 파란 글자, 기본 = 밝은 초록 바탕 짙은 초록 글자(7.2:1), 틀림 = 진한 빨강 바탕 흰 글자(5.0:1) */
+.cbt{font:inherit;font-weight:800;font-size:15.5px;padding:11px 18px;border-radius:14px;cursor:pointer;color:var(--du-blue-text);background:#fff;border:2px solid #84D8FF;border-bottom:4px solid #84D8FF;transition:transform .08s,filter .15s;letter-spacing:-.01em;min-height:46px}
+.cbt:hover{filter:brightness(.97)}.cbt:active{transform:translateY(2px);border-bottom-width:2px;margin-bottom:2px}
+.cbt.p{background:var(--du-green);color:#0B2E00;border-color:var(--du-green);border-bottom-color:var(--du-green-2)}
 .cbt.g{background:#fff;color:var(--ink-2);border:2px solid var(--du-gray);border-bottom:4px solid var(--du-gray)}
-.cbt.g:active{border-bottom-width:2px}
-.cbt.r{background:var(--du-red);border-bottom-color:var(--du-red-2)}
+.cbt.r{background:var(--du-red);color:#fff;border-color:var(--du-red);border-bottom-color:var(--du-red-2)}
 .cbt.y{background:var(--du-yel);border-bottom-color:#E5A800;color:#4A3600}
 .cbt kbd{font:inherit;font-size:11px;opacity:.7;margin-left:6px}
 .choices .sp{flex:1}
@@ -305,14 +305,16 @@ const LESSON_REL="../../lessons/calc2/2026-09-08.html", LESSON_APP="notes/lesson
 const $=s=>document.querySelector(s), $$=(s,el)=>Array.from((el||document).querySelectorAll(s));
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const fmt=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-const TODAY=fmt(new Date()), YDAY=(()=>{const d=new Date();d.setDate(d.getDate()-1);return fmt(d);})();
+/* 날짜는 행동할 때마다 다시 본다 — 23:59에 열어 두고 자정을 넘겨도 하트·연속일이 그날 기준 (오타 v54 A②) */
+const TODAY=()=>fmt(new Date()), YDAY=()=>{const d=new Date();d.setDate(d.getDate()-1);return fmt(d);};
 const KEY="mc-tutor", LKEY="mc-lesson-"+D.id;
 const load=(k,def)=>{ try{ const v=JSON.parse(localStorage.getItem(k)||"null"); return (v&&typeof v==="object")?Object.assign(def,v):def; }catch(e){ return def; } };
 let T=load(KEY,{v:1,xp:0,streak:0,last:"",hearts:3,hday:"",aff:20,lessons:{}});
 if(!T.lessons||typeof T.lessons!=="object") T.lessons={};
-if(T.hday!==TODAY){ T.hearts=3; T.hday=TODAY; }
-if(T.last&&T.last!==TODAY&&T.last!==YDAY) T.streak=0;
-let L=T.lessons[D.id]||(T.lessons[D.id]={pos:null,ch:{},done:false,xp:0});
+function dayReset(){ const td=TODAY(); if(T.hday!==td){ T.hearts=3; T.hday=td; } if(T.last&&T.last!==td&&T.last!==YDAY()) T.streak=0; }
+dayReset();
+let L=T.lessons[D.id]||(T.lessons[D.id]={pos:null,ch:{},done:false,xp:0,rew:{}});
+if(!L.rew||typeof L.rew!=="object") L.rew={};   /* 문제별 첫 보상 기록 — 다시 풀기로 XP 를 두 번 받지 않는다 (오타 v54 A①) */
 let ST=load(LKEY,{read:{},done:{},correct:{},answer:{},ts:0});
 const CH=D.chapters, QZ=D.quiz||[], NCH=CH.length+(QZ.length?1:0);
 const EMB=window.parent!==window;
@@ -343,7 +345,7 @@ function affName(){ return T.aff>=85?"전적으로 믿는":T.aff>=60?"인정":T.
 function pop(sel,txt,bad){ const el=$(sel); if(!el) return; const p=document.createElement("span"); p.className="pop"+(bad?" bad":""); p.textContent=txt; el.appendChild(p); setTimeout(()=>p.remove(),1200); }
 function gainXP(n){ T.xp+=n; L.xp=(L.xp||0)+n; pop("#sXp","+"+n+" XP"); }
 function gainAff(n){ T.aff=Math.max(0,Math.min(100,T.aff+n)); pop("#sAf",(n>0?"+":"")+n,n<0); }
-function touchStreak(){ if(T.last===TODAY) return; T.streak=(T.last===YDAY)?T.streak+1:1; T.last=TODAY; pop("#sSk","+1"); }
+function touchStreak(){ dayReset(); const td=TODAY(); if(T.last===td) return; T.streak=(T.last===YDAY())?T.streak+1:1; T.last=td; pop("#sSk","+1"); }
 /* ---------- 대사 ---------- */
 const LINES={
   intro:["앉으세요. 오늘은 {n}챕터, 약 {min}분입니다. 눈으로 훑는 건 공부가 아닙니다. 한 장씩 넘기세요.","오늘 분량 {n}챕터. 핑계는 안 받습니다. 시작하면 끝까지 갑니다.","저를 전적으로 믿으셔야 합니다. 오늘 {n}챕터, 순서대로만 따라오면 됩니다."],
@@ -435,7 +437,9 @@ function renderIntro(){
 }
 function renderStep(){
   const ch=CH[S.ci]; if(!ch){ S.mode=QZ.length?"quiz":"result"; return render(); }
-  const st=ch.steps[S.si]; if(!st){ return finishChapter(); }
+  /* 단계 번호가 범위를 벗어나면(재빌드로 단계 수가 줄었거나 저장값 손상) 마지막 단계로 보정 — 안 읽은 챕터를 완료로 치지 않는다 (오타 v54 A③) */
+  if(S.si<0||S.si>=ch.steps.length) S.si=Math.max(0,ch.steps.length-1);
+  const st=ch.steps[S.si]; if(!st){ S.mode="intro"; return render(); }
   board(stepHTML(st,S.rev),'<span>CH '+(S.ci+1)+' · '+esc(ch.title)+'</span><small>'+(S.si+1)+' / '+ch.steps.length+'</small>');
   const seed=S.ci+":"+S.si+":"+S.again;
   let line, face=LINES.chapter_face[st.t]||"neutral", name="스앵님";
@@ -453,9 +457,9 @@ function renderStep(){
   cs.push({tip:"Enter = 다음 · 클릭하면 대사 건너뜀"});
   choices(cs);
 }
-function next(){ S.again=0; S.rev=false; S.si++; render(); }
+function next(){ S.again=0; S.rev=false; const ch=CH[S.ci]; if(!ch||S.si+1>=ch.steps.length) return finishChapter(); S.si++; render(); }
 function finishChapter(){
-  const ch=CH[S.ci]; const was=!!L.ch[ch.id];
+  const ch=CH[S.ci]; if(!ch){ S.mode="intro"; return render(); } const was=!!L.ch[ch.id]; dayReset();
   L.ch[ch.id]=true; ST.read[ch.id]=true; touchStreak();
   let extra="";
   if(!was){ gainXP(10); gainAff(2); } else if(T.hearts<3){ T.hearts++; extra=" "+pick("heartback",S.ci); pop("#hHearts","+1"); }
@@ -468,6 +472,7 @@ function finishChapter(){
 }
 function renderQuiz(){
   const q=QZ[S.qi]; if(!q){ S.mode="result"; return render(); }
+  dayReset(); if(T.hearts<=0&&!ST.done[q.id]){ S.mode="nohearts"; return render(); }   /* 하트 0: 입력형도 답 보기 전에 막는다 */
   const mc=Array.isArray(q.choices)&&q.choices.length, rev=!!ST.done[q.id], my=ST.answer[q.id], c=ST.correct[q.id];
   let h='<div class="qz"><div class="qn">'+esc(q.qn||("문제 "+(S.qi+1)))+'</div><div class="qb">'+q.html+'</div>';
   if(mc) h+='<ol class="ch">'+q.choices.map((x,i)=>'<li><button type="button" class="cb'+(rev?(x.ok?" ok":(String(my)===String(i)?" bad":"")):"")+'" data-i="'+i+'"'+(rev?" disabled":"")+'><span class="n">'+(i+1)+'</span><span>'+x.html+'</span></button></li>').join("")+'</ol>';
@@ -478,24 +483,28 @@ function renderQuiz(){
   h+='</div>';
   board(h,'<span>확인 문제</span><small>'+(S.qi+1)+' / '+QZ.length+'</small>');
   $$("#bc .cb").forEach(b=>{ b.onclick=()=>answer(q,+b.dataset.i); });
-  const rv=$("#reveal"); if(rv) rv.onclick=()=>{ const ta=$("#myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); render(); say("해설과 비교하세요. 스스로 채점합니다. 봐주지 마세요.","sharp"); };
+  const rv=$("#reveal"); if(rv) rv.onclick=()=>{ dayReset(); if(T.hearts<=0){ S.mode="nohearts"; return render(); } const ta=$("#myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); render(); say("해설과 비교하세요. 스스로 채점합니다. 봐주지 마세요.","sharp"); };
   $$("#bc [data-g]").forEach(b=>{ b.onclick=()=>grade(q,b.dataset.g==="1"); });
   if(!rev){ say(mc?pick("q",S.qi,{k:S.qi+1}):pick("qin",S.qi),"neutral"); choices([{t:"질문할게요",cls:"",f:ask},{tip:mc?"숫자 키 1~"+q.choices.length+" 로 고를 수 있습니다":""}]); }
   else { const last=S.qi>=QZ.length-1;
     choices([{t:last?"결과 보기":"다음 문제",cls:"p",primary:1,key:"Enter",f:()=>{ if(last){ S.mode="result"; } else S.qi++; render(); }},{t:"다시 풀기",cls:"g",f:()=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; save(); render(); }},{t:"질문할게요",cls:"",f:ask}]); }
 }
-function answer(q,i){
-  if(ST.done[q.id]) return;
-  if(T.hearts<=0){ S.mode="nohearts"; return render(); }
-  ST.answer[q.id]=i; ST.done[q.id]=true; const ok=!!(q.choices[i]&&q.choices[i].ok); ST.correct[q.id]=ok; touchStreak();
-  if(ok){ gainXP(15); gainAff(3); } else { T.hearts=Math.max(0,T.hearts-1); gainAff(-1); pop("#hHearts","-1",true); }
+/* 채점 뒤 공통: 첫 정답에만 XP·호감도(다시 풀어도 한 번), 오답은 하트 −1 (객관식·자기 채점 같은 규칙) */
+function settle(q,ok){
+  ST.correct[q.id]=ok; touchStreak();
+  if(ok){ if(!L.rew[q.id]){ L.rew[q.id]=true; gainXP(15); gainAff(3); } }
+  else { T.hearts=Math.max(0,T.hearts-1); gainAff(-1); pop("#hHearts","-1",true); }
   save(); render(); say(ok?(warm()?pick("ok_warm",S.qi):pick("ok",S.qi)):pick("bad",S.qi), ok?(warm()?"proud":"smile"):"angry");
 }
+function answer(q,i){
+  if(ST.done[q.id]) return; dayReset();
+  if(T.hearts<=0){ S.mode="nohearts"; return render(); }
+  ST.answer[q.id]=i; ST.done[q.id]=true; settle(q,!!(q.choices[i]&&q.choices[i].ok));
+}
 function grade(q,ok){
-  if(T.hearts<=0&&!ok){ S.mode="nohearts"; return render(); }
-  ST.correct[q.id]=ok; touchStreak();
-  if(ok){ gainXP(15); gainAff(3); } else { T.hearts=Math.max(0,T.hearts-1); gainAff(-1); pop("#hHearts","-1",true); }
-  save(); render(); say(ok?(warm()?pick("ok_warm",S.qi):pick("ok",S.qi)):pick("bad",S.qi), ok?"smile":"angry");
+  if(typeof ST.correct[q.id]==="boolean") return; dayReset();
+  if(T.hearts<=0){ S.mode="nohearts"; return render(); }   /* 하트 0이면 자기 채점도 막는다 — 객관식과 같은 규칙 (오타 v54 A④) */
+  settle(q,ok);
 }
 function renderNoHearts(){
   board('<div class="ttl">하트 0</div><div class="lead">챕터 하나를 다시 읽고 끝까지 가면 하트 하나가 돌아옵니다. 하트는 매일 3개로 채워집니다.</div><div class="sub">목차</div>'+tocHTML(),'<span>잠깐</span>');
@@ -525,7 +534,7 @@ function openToc(){ const ov=$("#ov"); $("#ovMeta").textContent=D.course+" · "+
   ov.classList.add("on"); }
 $("#hToc").onclick=openToc; $("#ovClose").onclick=()=>$("#ov").classList.remove("on"); $("#ov").onclick=e=>{ if(e.target.id==="ov") $("#ov").classList.remove("on"); };
 $("#ovBook").onclick=()=>openBook(S.mode==="step"?(CH[S.ci]||{}).id:null);
-$("#ovReset").onclick=()=>{ if(!confirm("이 회차의 챕터·문제 기록을 지울까요? (XP·스트릭은 남습니다)")) return; L={pos:null,ch:{},done:false,xp:0}; ST={read:{},done:{},correct:{},answer:{},ts:0}; S=Object.assign(S,{mode:"intro",ci:0,si:0,qi:0,rev:false,again:0}); $("#ov").classList.remove("on"); render(); };
+$("#ovReset").onclick=()=>{ if(!confirm("이 회차의 챕터·문제 기록을 지울까요? (XP·스트릭은 남습니다)")) return; L={pos:null,ch:{},done:false,xp:0,rew:{}}; ST={read:{},done:{},correct:{},answer:{},ts:0}; S=Object.assign(S,{mode:"intro",ci:0,si:0,qi:0,rev:false,again:0}); $("#ov").classList.remove("on"); render(); };
 function post(m){ try{ window.parent.postMessage(m,location.origin); }catch(e){} }
 function openBook(sid){ const hash=sid?"#s="+sid:""; if(EMB){ post({type:"mc-open",v:1,file:LESSON_APP+hash,title:document.title}); } else location.href=LESSON_REL+hash; }
 function ask(){ if(EMB){ post({type:"mc-ask",v:1}); say(pick("ask",S.ci+":"+S.si),"wide"); gainAff(1); save(); hud(); } else say(pick("askoff",S.ci),"sharp"); }
@@ -546,12 +555,14 @@ document.addEventListener("keydown",e=>{ if(e.target&&/TEXTAREA|INPUT/.test(e.ta
 /* ---------- 시작 ---------- */
 /* 해시: #resume(저장 위치) · #ch=2(챕터 2) · #ch=2.5(챕터 2의 5단계) · #quiz · #result */
 function boot(){ const m=/^#(resume|ch=(\d+)(?:\.(\d+))?|quiz|result)$/.exec(location.hash||"");
-  if(m&&m[1]==="resume"&&L.pos&&!L.done){ S=Object.assign(S,{mode:L.pos.mode||"step",ci:L.pos.ci||0,si:L.pos.si||0,qi:L.pos.qi||0}); if(S.mode==="quiz"){ const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; if(k<0&&QZ.every(q=>ST.done[q.id])) S.mode="result"; } if(S.mode==="step"&&!CH[S.ci]) S.mode="intro"; }
+  if(m&&m[1]==="resume"&&L.pos&&!L.done){ S=Object.assign(S,{mode:L.pos.mode||"step",ci:+L.pos.ci||0,si:+L.pos.si||0,qi:+L.pos.qi||0}); if(S.mode==="quiz"){ const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; if(k<0&&QZ.every(q=>ST.done[q.id])) S.mode="result"; }
+    if(S.mode==="step"){ if(!CH[S.ci]) S.mode="intro"; else if(S.si<0||S.si>=CH[S.ci].steps.length) S.si=Math.max(0,CH[S.ci].steps.length-1); }   /* 재빌드로 단계 수가 바뀐 저장값 보정 (오타 v54 A③) */
+    if(S.mode!=="step"&&S.mode!=="quiz"&&S.mode!=="result") S.mode="intro"; }
   else if(m&&m[2]){ const ci=Math.max(0,Math.min(CH.length-1,+m[2]-1)); const si=m[3]?Math.max(0,Math.min(CH[ci].steps.length-1,+m[3]-1)):0; S=Object.assign(S,{mode:"step",ci:ci,si:si,rev:(CH[ci].steps[si]||{}).t==="ex"&&/\.\d+r$/.test(location.hash)}); }
   else if(m&&m[1]==="quiz"&&QZ.length){ S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; }
   else if(m&&m[1]==="result"){ S.mode="result"; }
   render(); }
-window.__cr={get D(){return D;},get S(){return S;},set S(v){S=v;},get T(){return T;},get L(){return L;},get ST(){return ST;},get fullText(){return fullText;},render:function(){ return render(); }};  /* 검사기(classroom_check.cjs)용 창구 */
+window.__cr={get D(){return D;},get S(){return S;},set S(v){S=v;},get T(){return T;},get L(){return L;},set L(v){L=v;T.lessons[D.id]=L;},get ST(){return ST;},set ST(v){ST=v;},get fullText(){return fullText;},render:function(){ return render(); },next:function(){ return next(); },boot:function(){ return boot(); }};  /* 검사기(classroom_check.cjs)용 창구 */
 (function wait(){ if(window.renderMathInElement) boot(); else setTimeout(wait,40); })();
 </script>
 </body>

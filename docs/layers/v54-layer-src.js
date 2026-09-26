@@ -23,12 +23,13 @@
   var L=[
     /* 토큰 */
     ':root{--font-body:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;--font-num:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;',
-    '--bg:#F7F7F7;--bg-grid:transparent;--surface:#FFFFFF;--surface-2:#F0F0F0;--surface-3:#E5E5E5;--ink:#3C3C3C;--ink-2:#6F6F6F;--ink-3:#8E8E8E;--line:#E5E5E5;--line-2:#CFCFCF;',
-    '--accent:#58CC02;--accent-ink:#3D8F00;--accent-soft:#E6F9D6;--accent-line:#A5ED6E;--ok:#58CC02;--ok-soft:#E6F9D6;--warn:#FF9600;--warn-soft:#FFE9CC;--crit:#FF4B4B;--crit-soft:#FFE0E0;--info:#1CB0F6;--info-soft:#DDF4FF;',
-    '--shadow:none;--r:16px;--r-s:12px;--r-pill:999px;--duo-blue:#1CB0F6;--duo-blue-2:#1899D6;--duo-green-2:#46A302;--duo-yel:#FFC800;--duo-purple:#CE82FF;',
+    /* 글자색은 흰 바탕 4.5:1 이상(오타 v54 D): ink-3 #707070 = 5.3 · 초록 글자 #2E7D00 = 5.2 · 주황 #B85C00 = 4.6 · 빨강 #D42020 = 5.0 · 파랑 #0A7BBF = 4.6. 밝은 듀오링고 색(#58CC02 · #1CB0F6 …)은 배경·테두리·큰 도형에만 */
+    '--bg:#F7F7F7;--bg-grid:transparent;--surface:#FFFFFF;--surface-2:#F0F0F0;--surface-3:#E5E5E5;--ink:#3C3C3C;--ink-2:#575757;--ink-3:#707070;--line:#E5E5E5;--line-2:#CFCFCF;',
+    '--accent:#2E7D00;--accent-ink:#2E7D00;--accent-soft:#E6F9D6;--accent-line:#A5ED6E;--ok:#2E7D00;--ok-soft:#E6F9D6;--warn:#B85C00;--warn-soft:#FFE9CC;--crit:#D42020;--crit-soft:#FFE0E0;--info:#0A7BBF;--info-soft:#DDF4FF;',
+    '--shadow:none;--r:16px;--r-s:12px;--r-pill:999px;--duo-green:#58CC02;--duo-blue:#1CB0F6;--duo-blue-2:#1899D6;--duo-blue-text:#0A7BBF;--duo-green-2:#46A302;--duo-yel:#FFC800;--duo-purple:#CE82FF;',
     /* 글래스 층(V51) 토큰을 단색으로 — 유리·블러·번지는 빛을 끄고 평평한 듀오링고 면으로 */
     '--gl:var(--surface);--gl-2:var(--surface-2);--gl-3:var(--surface);--gl-line:var(--line);--gl-line-2:var(--line);--gl-hi:none;--gl-sh:none;--gl-blur:none;--gl-on:var(--surface-2);--gl-bg0:var(--bg);--gl-bg1:var(--bg);--gl-bg2:var(--bg);--gl-b1:transparent;--gl-b2:transparent;--gl-b3:transparent;--on-accent:#fff}',
-    ':root:not([data-theme="dark"]){--ink-2:#6F6F6F;--ink-3:#8E8E8E}',
+    ':root:not([data-theme="dark"]){--ink-2:#575757;--ink-3:#707070}',
     '@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink-2:#C7D3DA;--ink-3:#8FA3AE;--gl:var(--surface);--gl-2:var(--surface-2);--gl-3:var(--surface);--gl-line:var(--line);--gl-line-2:var(--line);--gl-hi:none;--gl-sh:none;--gl-on:var(--surface-2);--gl-bg0:var(--bg);--gl-bg1:var(--bg);--gl-bg2:var(--bg);--gl-b1:transparent;--gl-b2:transparent}}',
     ':root[data-theme="dark"]{--gl:var(--surface);--gl-2:var(--surface-2);--gl-3:var(--surface);--gl-line:var(--line);--gl-line-2:var(--line);--gl-hi:none;--gl-sh:none;--gl-on:var(--surface-2);--gl-bg0:var(--bg);--gl-bg1:var(--bg);--gl-bg2:var(--bg);--gl-b1:transparent;--gl-b2:transparent}',
     'html.v54{background:var(--bg)}html.v54 body::before,html.v54 body::after{display:none}',
@@ -36,10 +37,11 @@
     'html.v54 .card .card{background:var(--surface);border:2px solid var(--line)}',
     'html.v54 .sheet{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none;border:2px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.22);border-radius:20px}',
     'html.v54 .toast{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none;border:2px solid var(--line)}',
+    'html.v54 .scrim{background:rgba(20,30,40,.55);-webkit-backdrop-filter:none;backdrop-filter:none}',
     'html.v54 .lrow,html.v54 .crow,html.v54 .drow,html.v54 .v47-wk,html.v54 .v49-deck,html.v54 .v50-s,html.v54 .v45-msg,html.v54 .exrow{background:var(--surface);border:2px solid var(--line);border-radius:12px}',
     'html.v54 .crow:hover,html.v54 .lrow:hover,html.v54 .drow:hover{background:var(--surface-2)}',
     'html.v54 .v49-today,html.v54 .v50-top,html.v54 .v47-next{background:var(--surface-2);border:2px solid var(--line);border-radius:12px}',
-    'html.v54 .seg{background:var(--surface-2);border:2px solid var(--line);border-radius:12px;padding:3px}html.v54 .seg button{border-radius:9px;font-weight:700}html.v54 .seg button[aria-pressed="true"]{background:var(--surface);box-shadow:none;color:var(--duo-blue)}',
+    'html.v54 .seg{background:var(--surface-2);border:2px solid var(--line);border-radius:12px;padding:3px}html.v54 .seg button{border-radius:9px;font-weight:700}html.v54 .seg button[aria-pressed="true"]{background:var(--surface);box-shadow:none;color:var(--duo-blue-text)}',
     'html.v54 .iconbtn{background:var(--surface);border:2px solid var(--line);border-radius:10px}',
     'html.v54 .bar,html.v54 .v49-bar,html.v54 .v47-bar{background:var(--surface-3);border-radius:99px;overflow:hidden}',
     '@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#131F24;--surface:#1B2A31;--surface-2:#243640;--surface-3:#2E434F;--ink:#F1F7FB;--ink-2:#C7D3DA;--ink-3:#8FA3AE;--line:#37464F;--line-2:#4A5D69;',
@@ -52,7 +54,7 @@
     'html.v54 .num,html.v54 .gauge-v,html.v54 .tile-v{font-family:var(--font-num)}',
     /* 상단바 */
     'html.v54 .topbar{background:var(--surface);backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:2px solid var(--line)}',
-    'html.v54 .brand-mark{border-radius:12px;background:var(--accent);box-shadow:0 3px 0 var(--duo-green-2)}',
+    'html.v54 .brand-mark{border-radius:12px;background:var(--duo-green);box-shadow:0 3px 0 var(--duo-green-2)}',
     'html.v54 .brand-t{font-weight:800;font-size:14px}html.v54 .brand-s{font-weight:600}',
     'html.v54 .gauge{border-right:2px solid var(--line)}html.v54 .gauge-l{font-weight:700;color:var(--ink-3)}html.v54 .gauge-v{font-weight:800}',
     'html.v54 .gauge.hot .gauge-v{color:var(--crit)}html.v54 .gauge.near .gauge-v{color:var(--warn)}',
@@ -61,7 +63,7 @@
     'html.v54 .navb{border-radius:12px;font-weight:800;font-size:14px;padding:11px 12px;border:2px solid transparent;color:var(--ink-2);gap:12px}',
     'html.v54 .navb .ic{width:22px;font-size:17px;opacity:1}html.v54 .navb .ic svg{width:22px;height:22px}',
     'html.v54 .navb:hover{background:var(--surface-2);color:var(--ink)}',
-    'html.v54 .navb[aria-current="true"]{background:var(--info-soft);border-color:#84D8FF;color:var(--duo-blue);font-weight:800}',
+    'html.v54 .navb[aria-current="true"]{background:var(--info-soft);border-color:#84D8FF;color:var(--duo-blue-text);font-weight:800}',
     'html.v54 :root[data-theme="dark"] .navb[aria-current="true"],html.v54 .navb[aria-current="true"]:where(:root[data-theme="dark"] *){border-color:rgba(28,176,246,.5)}',
     'html.v54 .rail-sec{font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}',
     /* 카드·타일 */
@@ -70,10 +72,11 @@
     'html.v54 .card-h .hs{font-weight:700;color:var(--ink-3)}',
     'html.v54 .tile{border:2px solid var(--line);border-radius:16px;box-shadow:none}html.v54 .tile-l{font-weight:700}html.v54 .tile-v{font-weight:900;letter-spacing:-.03em}html.v54 .tile-n{font-weight:500}',
     /* 버튼: 2px 테두리 + 바닥 4px, 누르면 내려감 */
-    'html.v54 .btn{border:2px solid var(--line);border-bottom-width:4px;border-radius:12px;font-weight:800;color:var(--duo-blue);background:var(--surface);padding:8px 14px;transition:filter .12s;letter-spacing:-.01em}',
+    'html.v54 .btn{border:2px solid var(--line);border-bottom-width:4px;border-radius:12px;font-weight:800;color:var(--duo-blue-text);background:var(--surface);padding:8px 14px;transition:filter .12s;letter-spacing:-.01em}',
     'html.v54 .btn:hover{background:var(--surface);filter:brightness(.97)}html.v54 .btn:active{transform:translateY(2px);border-bottom-width:2px;margin-bottom:2px}',
-    'html.v54 .btn.a{background:var(--accent);border-color:var(--accent);border-bottom-color:var(--duo-green-2);color:#fff}html.v54 .btn.a:hover{filter:brightness(1.05)}',
-    'html.v54 :root[data-theme="dark"] .btn.a,html.v54 .btn.a:where(:root[data-theme="dark"] *){color:#fff}',
+    /* 기본 버튼: 밝은 초록 바탕 + 짙은 초록 글자(7.2:1) — 흰 글자는 2.1:1 이라 못 쓴다 */
+    'html.v54 .btn.a{background:var(--duo-green);border-color:var(--duo-green);border-bottom-color:var(--duo-green-2);color:#0B2E00}html.v54 .btn.a:hover{filter:brightness(1.05)}',
+    'html.v54 :root[data-theme="dark"] .btn.a,html.v54 .btn.a:where(:root[data-theme="dark"] *){color:#0B2E00}',
     'html.v54 .btn.q{border-color:transparent;border-bottom-color:transparent;background:var(--surface-2);color:var(--ink-2)}',
     'html.v54 .btn.sm{padding:5px 10px;border-radius:10px;border-bottom-width:3px}html.v54 .btn.sm:active{border-bottom-width:2px;margin-bottom:1px}',
     'html.v54 .btn.xs{padding:3px 8px;font-size:11.5px;border-radius:9px;border-width:2px;border-bottom-width:3px}html.v54 .btn.xs:active{border-bottom-width:2px;margin-bottom:1px}',
@@ -90,7 +93,7 @@
     'html.v54 .nt-row{border:2px solid var(--line);border-radius:14px;margin-bottom:8px}html.v54 .nt-row .ty{font-weight:800;border-radius:8px}html.v54 .nt-row .t{font-weight:700}',
     /* 폰 탭바 */
     '@media(max-width:859px){html.v54 .tabbar{border:2px solid var(--line);background:var(--surface);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 6px 0 var(--line)}',
-    'html.v54 .tabb{font-weight:800}html.v54 .tabb[aria-current="true"]{background:var(--info-soft);color:var(--duo-blue)}}',
+    'html.v54 .tabb{font-weight:800}html.v54 .tabb[aria-current="true"]{background:var(--info-soft);color:var(--duo-blue-text)}}',
     /* 스킨 끄기(설정) */
     'html.v54 .v54-sw{display:flex;align-items:center;gap:10px;flex-wrap:wrap}'
   ];
