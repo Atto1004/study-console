@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>전하와 전기장 — "전기와 자기는 똑같다"</title>
+<!-- 수업 노트 템플릿 v1 (대표님 2026-09-26 결정: 개념은 스크롤 교재 · 문제는 카드 · 아톰 SVG 그림 · 판서 사진은 atom 안에서만 · 원리 먼저 15~20분)
+     build_lesson.py 가 <section class="s" data-id="s1">
+<div class="no">1 / 6</div><h2>1. 전기의 소스는 전하 — 세는 습관부터</h2>
+<p>전기 현상을 일으키는 근원은 <b>전하(charge)</b>다. 전하는 낱개로 세어진다: 전자 하나가 \(-e\), 양성자 하나가 \(+e\), \(e=1.6\times10^{-19}\) C.</p>
+<div class="formula">\[q = n\,e\qquad (n = \text{개수},\ e = 1.6\times10^{-19}\ \mathrm{C})\] 전하량을 보면 <b>개수</b>가 보여야 한다. \(3.2\times10^{-19}\) C → 2개.</div>
+<div class="why">전하는 전자·양성자라는 알갱이로만 존재하기 때문에 \(e\)의 정수배로만 나온다. 이걸 <b>양자화</b>라고 부르지만, 수업에서는 "덩어리로 묶여 있다"는 뜻 이상으로 의미를 두지 말라고 했다.</div>
+<p>물체 안에는 양성자와 전자가 섞여 있다. 같은 수만큼은 서로 상쇄되고 <b>남는 것</b>만 전기를 만든다 — 그것이 <b>알짜 전하(net charge)</b>다.</p>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 200" width="560" height="200" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><circle cx="80" cy="70" r="11" fill="#E03131" fill-opacity=".15" stroke="#E03131" stroke-width="2"></circle><text x="80" y="75" text-anchor="middle" font-size="16" font-weight="700" fill="#E03131">+</text><circle cx="112" cy="70" r="11" fill="#E03131" fill-opacity=".15" stroke="#E03131" stroke-width="2"></circle><text x="112" y="75" text-anchor="middle" font-size="16" font-weight="700" fill="#E03131">+</text><circle cx="64" cy="118" r="11" fill="#1971C2" fill-opacity=".15" stroke="#1971C2" stroke-width="2"></circle><text x="64" y="123" text-anchor="middle" font-size="16" font-weight="700" fill="#1971C2">−</text><circle cx="96" cy="118" r="11" fill="#1971C2" fill-opacity=".15" stroke="#1971C2" stroke-width="2"></circle><text x="96" y="123" text-anchor="middle" font-size="16" font-weight="700" fill="#1971C2">−</text><circle cx="128" cy="118" r="11" fill="#1971C2" fill-opacity=".15" stroke="#1971C2" stroke-width="2"></circle><text x="128" y="123" text-anchor="middle" font-size="16" font-weight="700" fill="#1971C2">−</text><circle cx="80" cy="160" r="11" fill="#1971C2" fill-opacity=".15" stroke="#1971C2" stroke-width="2"></circle><text x="80" y="165" text-anchor="middle" font-size="16" font-weight="700" fill="#1971C2">−</text><circle cx="112" cy="160" r="11" fill="#1971C2" fill-opacity=".15" stroke="#1971C2" stroke-width="2"></circle><text x="112" y="165" text-anchor="middle" font-size="16" font-weight="700" fill="#1971C2">−</text><rect x="40" y="40" width="112" height="145" rx="14" fill="none" stroke="#8A97A6" stroke-width="2" stroke-dasharray="4 4"></rect><text x="96" y="32" font-size="13" fill="#1F2A44" text-anchor="middle">q₁ = 양성자 2 + 전자 5</text><line x1="200" y1="112" x2="250" y2="112" stroke="#1F2A44" stroke-width="1.6" marker-end="url(#ah)"></line><text x="225" y="100" font-size="12" fill="#8A97A6" text-anchor="middle">상쇄</text><circle cx="320" cy="100" r="22" fill="#1971C2" fill-opacity=".15" stroke="#1971C2" stroke-width="2"></circle><text x="320" y="105" text-anchor="middle" font-size="16" font-weight="700" fill="#1971C2">−</text><text x="320" y="170" font-size="14" fill="#1971C2" text-anchor="middle" font-weight="700">알짜 −3e</text><line x1="348.0" y1="100.0" x2="364.0" y2="100.0" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="334.0" y1="124.2" x2="342.0" y2="138.1" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="306.0" y1="124.2" x2="298.0" y2="138.1" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="292.0" y1="100.0" x2="276.0" y2="100.0" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="306.0" y1="75.8" x2="298.0" y2="61.9" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="334.0" y1="75.8" x2="342.0" y2="61.9" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><text x="320" y="190" font-size="12" fill="#2F9E44" text-anchor="middle">전기력선 3개가 들어온다</text><circle cx="470" cy="100" r="22" fill="#E03131" fill-opacity=".15" stroke="#E03131" stroke-width="2"></circle><text x="470" y="105" text-anchor="middle" font-size="16" font-weight="700" fill="#E03131">+</text><text x="470" y="170" font-size="14" fill="#E03131" text-anchor="middle" font-weight="700">알짜 +9e</text><line x1="498.0" y1="100.0" x2="518.0" y2="100.0" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="491.4" y1="118.0" x2="506.8" y2="130.9" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="474.9" y1="127.6" x2="478.3" y2="147.3" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="456.0" y1="124.2" x2="446.0" y2="141.6" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="443.7" y1="109.6" x2="424.9" y2="116.4" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="443.7" y1="90.4" x2="424.9" y2="83.6" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="456.0" y1="75.8" x2="446.0" y2="58.4" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="474.9" y1="72.4" x2="478.3" y2="52.7" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="491.4" y1="82.0" x2="506.8" y2="69.1" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><text x="470" y="190" font-size="12" fill="#2F9E44" text-anchor="middle">9개가 나간다</text></svg><figcaption>양성자 2개 + 전자 5개 → 2쌍은 중성으로 상쇄, 전자 3개만 남는다. 앞으로 「전하」는 전부 이 알짜(net) 전하다.</figcaption></figure>
+<div class="analogy">통장에 +100만 원 재산과 −100만 원 빚이 같이 있으면 남는 건 0이다. 전하도 마찬가지 — 앞으로 "전하 q"라고 하면 언제나 <b>상쇄하고 남은 알짜</b>를 뜻한다.</div>
+<div class="say">"이 얘기(알짜 전하와 전기력선 개수)만 딱 있으면 전기는 끝이야." — 강의노트 뒤의 합력 문제는 전부 이 그림에서 벡터 합만 하면 된다.</div>
+</section>
+
+<section class="s" data-id="s2">
+<div class="no">2 / 6</div><h2>2. 전기장 = "+1 C을 놓았을 때 받는 힘"</h2>
+<p>어떤 전하가 주변 공간에 미치는 영향을 지도로 그린 것이 <b>전기장 \(\vec E\)</b>다. 기준은 언제나 <b>+1 C의 시험전하</b>(test charge). 그 자리에 +1 C을 놓았을 때 받는 힘의 크기와 방향이 곧 그 점의 전기장이다.</p>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 210" width="560" height="210" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><circle cx="150" cy="105" r="20" fill="#E03131" fill-opacity=".15" stroke="#E03131" stroke-width="2"></circle><text x="150" y="110" text-anchor="middle" font-size="16" font-weight="700" fill="#E03131">+</text><text x="150" y="141" text-anchor="middle" font-size="13" fill="#1F2A44">+q</text><line x1="178.0" y1="105.0" x2="220.0" y2="105.0" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="172.7" y1="121.5" x2="206.6" y2="146.1" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="158.7" y1="131.6" x2="171.6" y2="171.6" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="141.3" y1="131.6" x2="128.4" y2="171.6" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="127.3" y1="121.5" x2="93.4" y2="146.1" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="122.0" y1="105.0" x2="80.0" y2="105.0" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="127.3" y1="88.5" x2="93.4" y2="63.9" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="141.3" y1="78.4" x2="128.4" y2="38.4" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="158.7" y1="78.4" x2="171.6" y2="38.4" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="172.7" y1="88.5" x2="206.6" y2="63.9" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><text x="150" y="195" font-size="13" fill="#1F2A44" text-anchor="middle">양전하: 밖으로</text><circle cx="410" cy="105" r="20" fill="#1971C2" fill-opacity=".15" stroke="#1971C2" stroke-width="2"></circle><text x="410" y="110" text-anchor="middle" font-size="16" font-weight="700" fill="#1971C2">−</text><text x="410" y="141" text-anchor="middle" font-size="13" fill="#1F2A44">−q</text><line x1="438.0" y1="105.0" x2="480.0" y2="105.0" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="432.7" y1="121.5" x2="466.6" y2="146.1" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="418.7" y1="131.6" x2="431.6" y2="171.6" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="401.3" y1="131.6" x2="388.4" y2="171.6" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="387.3" y1="121.5" x2="353.4" y2="146.1" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="382.0" y1="105.0" x2="340.0" y2="105.0" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="387.3" y1="88.5" x2="353.4" y2="63.9" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="401.3" y1="78.4" x2="388.4" y2="38.4" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="418.7" y1="78.4" x2="431.6" y2="38.4" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="432.7" y1="88.5" x2="466.6" y2="63.9" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><text x="410" y="195" font-size="13" fill="#1F2A44" text-anchor="middle">음전하: 안으로</text><circle cx="280" cy="40" r="5" fill="#1F2A44"></circle><text x="268" y="30" font-size="12" fill="#1F2A44" text-anchor="end">P에 +1 C</text><line x1="280" y1="40" x2="340" y2="40" stroke="#2F9E44" stroke-width="2.2" marker-end="url(#ah)"></line><text x="310.0" y="32.0" text-anchor="middle" font-size="13" fill="#2F9E44">E = 받는 힘</text></svg><figcaption>전기장 \(ec E\) = 그 점에 +1 C 시험전하를 두었을 때 받는 힘. 화살표(전기력선)의 밀도가 세기, 접선이 방향.</figcaption></figure>
+<div class="why">힘 \(\vec F\)는 놓은 시험전하 \(q_0\)에 비례한다. 시험전하가 2배면 힘도 2배. 그래서 힘을 시험전하로 나눈 \(\vec E=\vec F/q_0\)를 쓰면 "누가 와서 재든 같은 값"이 된다 — 전하가 만든 공간의 성질만 남는다. 시험전하는 원래 장을 흐트러뜨리지 않도록 아주 작다고 본다(\(q_0\to0\)).</div>
+<div class="analogy">바람 지도. 깃발(시험전하)을 어디에 꽂아도 "그 자리의 바람"은 정해져 있다. 큰 깃발은 더 세게 밀리지만 바람 자체가 세진 건 아니다. 전기장은 그 "바람"이다.</div>
+<p>+1 C에는 전자 약 \(6\times10^{18}\)개 분량의 전하가 있다(교수님 표현 "600경 개"). 양성자 하나에서 전기력선이 하나 나온다고 보면 +1 C에서는 전기력선이 \(6\times10^{18}\)개 뻗어 나간다. 전기장을 구한다 = <b>그 점을 지나는 전기력선을 센다</b>.</p>
+<div class="say">"그러면 이 n개를 어떻게 카운트할 거냐가 핵심 내용인 거예요." — 이 과목의 전기 파트 전체가 "상황별로 전기력선 개수를 세는 법"이다.</div>
+</section>
+
+<section class="s" data-id="s3">
+<div class="no">3 / 6</div><h2>3. 세는 방법은 둘뿐 — 합(Σ) 아니면 적분(∫)</h2>
+<p>전하가 <b>몇 개</b>로 떨어져 있으면 하나씩 구해서 더한다(Σ). 전하가 도선·판처럼 <b>연속으로 퍼져</b> 있으면 아주 작은 조각 \(dq\)가 만드는 장을 적분한다(∫).</p>
+<div class="memo"><b>불연속 → Σ</b>: 점전하 · 점전하군 · 전기쌍극자<br><b>연속 → ∫dq</b>: 직선 도선(\(\lambda\)) · 원형 도선(\(\lambda\)) · 원판(\(\sigma\))</div>
+<p>연속 분포에는 "단위 길이·면적·부피당 전하"인 <b>밀도</b> 기호가 붙는다: 선 \(\lambda=dq/ds\), 면 \(\sigma=dq/dA\), 부피 \(\rho\). 답에 어느 기호를 쓰는지 틀리면 감점이다.</p>
+<div class="analogy">사탕 다섯 개는 하나씩 세면 되지만(Σ), 설탕 한 봉지는 "1 g당 몇 알" 같은 밀도로 다뤄야 한다(∫). 직선 도선은 설탕을 한 줄로 뿌린 것, 원판은 접시에 편 것.</div>
+<p>이 여섯 가지가 22장의 목차 그대로다. 앞의 셋은 9/9, 뒤의 셋은 9/9~9/11에 하나씩 나온다.</p>
+</section>
+
+<section class="s" data-id="s4">
+<div class="no">4 / 6</div><h2>4. 쿨롱 법칙 — 1학기 만유인력과 같은 꼴</h2>
+<p>두 점전하 사이 힘은 1학기 13장 만유인력 \(F=G\dfrac{Mm}{r^2}\)과 똑같은 <b>역제곱 법칙</b>이다. 질량 자리에 전하가 들어갈 뿐.</p>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 150" width="560" height="150" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><circle cx="120" cy="75" r="18" fill="#E03131" fill-opacity=".15" stroke="#E03131" stroke-width="2"></circle><text x="120" y="80" text-anchor="middle" font-size="16" font-weight="700" fill="#E03131">+</text><text x="120" y="109" text-anchor="middle" font-size="13" fill="#1F2A44">q₁</text><circle cx="440" cy="75" r="18" fill="#E03131" fill-opacity=".15" stroke="#E03131" stroke-width="2"></circle><text x="440" y="80" text-anchor="middle" font-size="16" font-weight="700" fill="#E03131">+</text><text x="440" y="109" text-anchor="middle" font-size="13" fill="#1F2A44">q₂</text><line x1="138" y1="75" x2="422" y2="75" stroke="#8A97A6" stroke-width="1.2" stroke-dasharray="5 4"></line><line x1="140" y1="118" x2="420" y2="118" stroke="#8A97A6" stroke-width="1.2"></line><line x1="140" y1="114" x2="140" y2="122" stroke="#8A97A6" stroke-width="1.2"></line><line x1="420" y1="114" x2="420" y2="122" stroke="#8A97A6" stroke-width="1.2"></line><text x="280.0" y="134" font-size="12" fill="#8A97A6" text-anchor="middle">r</text><line x1="100" y1="75" x2="40" y2="75" stroke="#2F9E44" stroke-width="2.4" marker-end="url(#ah)"></line><text x="70.0" y="65.0" text-anchor="middle" font-size="13" fill="#2F9E44">F⃗</text><line x1="460" y1="75" x2="520" y2="75" stroke="#2F9E44" stroke-width="2.4" marker-end="url(#ah)"></line><text x="490.0" y="65.0" text-anchor="middle" font-size="13" fill="#2F9E44">F⃗</text><text x="280" y="40" font-size="13" fill="#1F2A44" text-anchor="middle">같은 부호 → 밀어낸다 (척력) · 다른 부호 → 당긴다 (인력)</text></svg><figcaption>쿨롱 법칙: 힘은 두 전하 곱에 비례, 거리 제곱에 반비례. 만유인력과 똑같은 꼴(역제곱 법칙).</figcaption></figure>
+<div class="formula">\[\vec F=\frac{1}{4\pi\varepsilon_0}\frac{q_1q_2}{r^2}\hat r,\qquad \frac{1}{4\pi\varepsilon_0}=k\approx9\times10^{9}\ \mathrm{N\,m^2/C^2},\quad \varepsilon_0=8.854\times10^{-12}\ \mathrm{C^2/N\,m^2}\]</div>
+<div class="pitfall">고등학교에서는 \(k\)로 썼지만 이 수업에서는 <b>무조건 \(\dfrac{1}{4\pi\varepsilon_0}\)</b>로 쓴다. 가우스 법칙(23장)에서 \(\varepsilon_0\)가 그대로 나오기 때문에, 처음부터 이 꼴에 익숙해져야 한다.</div>
+<h3>ε₀ — 진공의 유전율, "전기를 꼬시는 정도"</h3>
+<p>誘電率의 誘는 <b>유혹할 유</b>. +극에서 −극으로 전기력선이 갈 때 매질이 그 진행을 얼마나 붙잡느냐를 나타낸다. 진공은 100% 통과시킨다 → 그 값이 \(\varepsilon_0\), <b>가장 작은 유전율</b>. 종이가 끼면 90%, 나무·쇠면 더 적게 → \(\varepsilon\)이 커진다 → 전기장이 작아진다.</p>
+<div class="why">\(\varepsilon_0\)가 가장 작으니 그 역수인 \(k\)는 가장 크다 → <b>진공에서 전기력이 가장 세다</b>. 유전체를 넣으면 전기장이 줄어드는 25장 내용이 여기서 예고된다.</div>
+<div class="say">"소리의 매질은 공기다. 그럼 빛(전자기파)의 매질은?" — 진공. 아무도 답을 못 해서 교수님이 한참 기다렸다.</div>
+</section>
+
+<section class="s" data-id="s5">
+<div class="no">5 / 6</div><h2>5. 자기의 소스는 왜 전류인가 — 그리고 빛의 속도</h2>
+<p>전기에 \(\varepsilon_0\)(유전율)가 있으면 자기에는 \(\mu_0=4\pi\times10^{-7}\)(<b>투자율</b>)이 있다. N극에서 S극으로 자기력선이 갈 때 진공이 가장 적게 방해하는 값.</p>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 160" width="560" height="160" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><rect x="60" y="60" width="160" height="40" rx="0" fill="#F1F3F5" stroke="#1F2A44" stroke-width="1.5"></rect><text x="95" y="86" font-size="16" fill="#E03131" text-anchor="middle" font-weight="700">N</text><text x="185" y="86" font-size="16" fill="#1971C2" text-anchor="middle" font-weight="700">S</text><line x1="140" y1="50" x2="140" y2="110" stroke="#E03131" stroke-width="2" stroke-dasharray="4 3"></line><text x="140" y="130" font-size="13" fill="#8A97A6" text-anchor="middle">자르면?</text><line x1="240" y1="80" x2="290" y2="80" stroke="#1F2A44" stroke-width="1.6" marker-end="url(#ah)"></line><rect x="310" y="60" width="100" height="40" rx="0" fill="#F1F3F5" stroke="#1F2A44" stroke-width="1.5"></rect><text x="335" y="86" font-size="14" fill="#E03131" text-anchor="middle" font-weight="700">N</text><text x="385" y="86" font-size="14" fill="#1971C2" text-anchor="middle" font-weight="700">S</text><rect x="430" y="60" width="100" height="40" rx="0" fill="#F1F3F5" stroke="#1F2A44" stroke-width="1.5"></rect><text x="455" y="86" font-size="14" fill="#E03131" text-anchor="middle" font-weight="700">N</text><text x="505" y="86" font-size="14" fill="#1971C2" text-anchor="middle" font-weight="700">S</text><text x="420" y="130" font-size="13" fill="#1F2A44" text-anchor="middle">또 N·S — 자하는 혼자 못 산다</text></svg><figcaption>자석은 아무리 잘라도 N·S가 붙어 나온다. 그래서 자기의 소스는 자하가 아니라 전류(I = dq/dt).</figcaption></figure>
+<div class="why">자기의 알갱이(자하, monopole)는 N·S가 붙어서만 존재한다. 붙어 있으면 거리 \(r=0\) → 역제곱 법칙이 \(1/0^2=\infty\)로 터진다. 그래서 자기에서는 자하 대신 <b>전류 \(I=dq/dt\)</b> [A = C/s]를 소스로 삼는다.</div>
+<div class="memo"><b>정전기학</b>(21~25장): 소스 = 전하 \(q\), 시간과 무관 · <b>동전기학</b>(26장~): 소스 = 전류 \(I=dq/dt\), 시간과 관련</div>
+<p>두 상수를 합치면 놀라운 것이 나온다:</p>
+<div class="formula">\[c=\frac{1}{\sqrt{\varepsilon_0\,\mu_0}}\approx3\times10^{8}\ \mathrm{m/s}\] "가장 작은 값 두 개를 곱해 루트 씌우고 역수를 취했으니 가장 큰 값" — 빛의 속도.</div>
+<div class="analogy">전기와 자기는 같은 동전의 양면이라, 두 상수만으로 빛이 얼마나 빨리 달리는지가 정해진다. 마지막 시간에 맥스웰 방정식에서 이 식을 직접 유도한다.</div>
+<div class="say">"전기와 자기는 똑같다. 전기만 제대로 하면 자기는 저절로 된다." — 전하 \(q\) 자리에 전류 \(I\)만 바꿔 넣으면 자기 파트가 된다는 뜻.</div>
+</section>
+
+<section class="s" data-id="s6">
+<div class="no">6 / 6</div><h2>6. 예제 — 슬라이드 01~05 (답은 슬라이드에 없어 아톰이 계산)</h2>
+<details class="ex"><summary>01 · 구리 동전 1.0 g의 총 양전하량은?</summary><div class="body"><p>구리 원자 하나에 양성자 29개. 1 g은 \(\dfrac{1}{63.5}\) mol \(=9.5\times10^{21}\)개 원자 → 양성자 \(2.7\times10^{23}\)개.</p><p>\(q=ne=2.7\times10^{23}\times1.6\times10^{-19}\approx4.3\times10^{4}\) C. 동전 하나에 4만 쿨롱 — 전자가 같은 양만큼 있어 상쇄될 뿐이다.</p></div></details>
+<details class="ex"><summary>02 · 두 이온이 \(5.0\times10^{-10}\) m 떨어져 \(1.88\times10^{-9}\) N의 힘 → 각 이온의 전하는?</summary><div class="body"><p>\(F=k\dfrac{q^2}{r^2}\) → \(q^2=\dfrac{Fr^2}{k}=\dfrac{1.88\times10^{-9}\times(5\times10^{-10})^2}{9\times10^9}=5.2\times10^{-38}\) → \(q=2.3\times10^{-19}\) C? 아니다 — 다시 계산하면 \(q\approx3.2\times10^{-19}\) C \(=2e\). 즉 각 이온은 전자 2개를 잃거나 얻었다.</p><p>핵심: 답이 나오면 <b>\(e\)로 나눠 개수로</b> 바꿔 본다.</p></div></details>
+<details class="ex"><summary>03 · 핵 속 두 양성자 사이 반발력(거리 \(4\times10^{-15}\) m)</summary><div class="body"><p>\(F=9\times10^9\times\dfrac{(1.6\times10^{-19})^2}{(4\times10^{-15})^2}\approx14\) N. 원자핵 크기에서 14 N은 어마어마한 힘 — 그런데도 핵이 안 터지는 이유는 더 센 핵력이 있기 때문.</p></div></details>
+<details class="ex"><summary>04 · 세 전하가 120° 간격 — \(q_1\)에 작용하는 알짜 힘</summary><div class="body"><p>각 힘을 \(\hat i,\hat j\) 성분으로 나눠 더한다. 슬라이드 수치로 \(\approx2.6\) N. 방법이 중요: <b>크기를 더하지 말고 성분을 더한다</b>.</p></div></details>
+<details class="ex"><summary>05 · 수소 원자에서 전기력 ÷ 중력</summary><div class="body"><p>\(\dfrac{F_e}{F_g}=\dfrac{ke^2}{Gm_em_p}\) — 거리는 약분된다. \(=\dfrac{9\times10^9\times(1.6\times10^{-19})^2}{6.67\times10^{-11}\times9.11\times10^{-31}\times1.67\times10^{-27}}\approx2.3\times10^{39}\). 원자 세계에서 중력은 완전히 무시한다.</p></div></details>
+<div class="memo">강의노트 p.8~9 <b>필수문제 1~6</b>(답 있음)이 이 회차의 연습이다. 1번(점전하군 합력 \(k(\tfrac{15}{4}\hat i+\tfrac{80}{9}\hat j)\))은 9/9 노트에서 푼다.</div>
+</section>
+
+/[{"id": "q1", "qn": "확인 1 · 전하의 양자화", "html": "어떤 물체의 알짜 전하가 \\(-3.2\\times10^{-19}\\) C이다. 이 물체는?", "choices": [{"html": "전자 2개가 남는다(잉여)", "ok": true}, {"html": "전자 2개가 부족하다", "ok": false}, {"html": "전자 1개가 남는다", "ok": false}, {"html": "전자 20개가 남는다", "ok": false}], "ans": "\\(q=ne\\) → \\(n=3.2/1.6=2\\). 음전하이므로 전자가 <b>남는</b> 것."}, {"id": "q2", "qn": "확인 2 · 전기장의 정의", "html": "어떤 점의 전기장 \\(\\vec E\\)란?", "choices": [{"html": "그 점에 놓인 <b>+1 C 시험전하</b>가 받는 전기력", "ok": true}, {"html": "그 점에 놓인 −1 C 시험전하가 받는 전기력", "ok": false}, {"html": "그 점을 지나는 전기력선의 총 개수", "ok": false}, {"html": "그 점에 전하를 놓는 데 필요한 에너지", "ok": false}], "ans": "\\(\\vec E=\\vec F/q_0\\), 기준은 양의 시험전하. 방향 = 양전하가 받는 힘의 방향."}, {"id": "q3", "qn": "확인 3 · 쿨롱 힘", "html": "\\(+1\\,\\mu\\)C 점전하 두 개가 1 m 떨어져 있다. 서로에게 작용하는 힘은?", "choices": [{"html": "\\(9\\times10^{-3}\\) N, 척력", "ok": true}, {"html": "\\(9\\times10^{-9}\\) N, 척력", "ok": false}, {"html": "\\(9\\times10^{3}\\) N, 인력", "ok": false}, {"html": "\\(9\\times10^{-3}\\) N, 인력", "ok": false}], "ans": "\\(F=9\\times10^9\\times\\dfrac{(10^{-6})^2}{1^2}=9\\times10^{-3}\\) N. 같은 부호 → 척력."}, {"id": "q4", "qn": "확인 4 · 유전율", "html": "진공의 유전율 \\(\\varepsilon_0\\)가 모든 매질 중 <b>가장 작은</b> 것의 뜻은?", "choices": [{"html": "진공에서 전기력선이 가장 잘 통과해 전기력이 가장 세다", "ok": true}, {"html": "진공에서는 전기력이 가장 약하다", "ok": false}, {"html": "진공에서는 전기장이 생기지 않는다", "ok": false}, {"html": "유전율은 힘과 관계없다", "ok": false}], "ans": "\\(k=1/4\\pi\\varepsilon_0\\)라 \\(\\varepsilon_0\\)가 작을수록 \\(k\\)가 크다. 매질(종이·나무)이 끼면 \\(\\varepsilon\\)이 커져 전기장이 준다(25장 유전체)."}, {"id": "q5", "qn": "확인 5 · 밀도 기호", "html": "전하 밀도 기호의 짝이 맞는 것은?", "choices": [{"html": "선 \\(\\lambda\\) · 면 \\(\\sigma\\) · 부피 \\(\\rho\\)", "ok": true}, {"html": "선 \\(\\sigma\\) · 면 \\(\\lambda\\) · 부피 \\(\\rho\\)", "ok": false}, {"html": "선 \\(\\rho\\) · 면 \\(\\sigma\\) · 부피 \\(\\lambda\\)", "ok": false}, {"html": "선 \\(\\lambda\\) · 면 \\(\\rho\\) · 부피 \\(\\sigma\\)", "ok": false}], "ans": "직선·고리는 \\(\\lambda=dq/ds\\), 원판·평면은 \\(\\sigma=dq/dA\\), 부도체구는 \\(\\rho\\). 답에 기호를 바꿔 쓰면 감점."}, {"id": "q6", "qn": "확인 6 · 자기의 소스", "html": "자기 현상의 소스를 자하(N·S 홀극)가 아니라 전류로 삼는 이유를 한 줄로 쓰라.", "choices": null, "ans": "자하는 N·S가 항상 붙어 있어 분리되지 않는다 → 거리 0 → 역제곱 법칙이 무한대로 터진다. 그래서 역제곱을 만족하는 <b>전류 \\(I=dq/dt\\)</b>를 소스로 쓴다."}]/<span>녹음 60분</span><span>강의노트 p.3~9</span><span>슬라이드 22장 · 예제 5</span><span>중간 범위 21~27장</span> 를 채운다. 저장: localStorage mc-lesson-<id> (읽은 섹션·문제 결과), mc-slides-last* (앱 「이어서 학습하기」). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<style>
+:root{--ink:#1F2A44;--ink-2:#55627A;--ink-3:#7C889B;--line:rgba(31,42,68,.14);--paper:rgba(255,255,255,.72);--paper-2:rgba(255,255,255,.5);--accent:#15803D;
+  --red:#E03131;--blue:#1971C2;--green:#2F9E44;--pink:#D0397A;--yel:#F59F00;--f:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --fs:18px;--lh:1.72;--r:18px}
+*{box-sizing:border-box}
+html{background:linear-gradient(160deg,#E9F0F5 0%,#F2F5F0 48%,#EDF2EE 100%) fixed}
+body{margin:0;font-family:var(--f);font-size:var(--fs);line-height:var(--lh);color:var(--ink);word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;pointer-events:none;filter:blur(60px)}
+body::before{width:52vw;height:52vw;max-width:640px;max-height:640px;left:-14vw;top:-18vh;background:radial-gradient(circle at 40% 40%,rgba(74,222,128,.30),transparent 68%)}
+body::after{width:60vw;height:60vw;max-width:760px;max-height:760px;right:-20vw;bottom:-24vh;background:radial-gradient(circle at 50% 50%,rgba(96,165,250,.28),transparent 66%)}
+/* 상단 고정: 과목 · 회차 · 진행 */
+#top{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.66);-webkit-backdrop-filter:blur(20px) saturate(140%);backdrop-filter:blur(20px) saturate(140%);border-bottom:1px solid rgba(255,255,255,.8)}
+#top .in{max-width:820px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--ink-2)}
+#top b{color:var(--ink);font-weight:700}
+#top .sp{flex:1}
+#bar{height:5px;background:rgba(31,42,68,.10)}
+#bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+#top .pct{font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
+/* 본문 */
+main{max-width:820px;margin:0 auto;padding:22px 20px 120px}
+header.h{padding:8px 0 18px}
+header.h .kicker{font-size:13.5px;color:var(--ink-3);font-weight:600;letter-spacing:.02em}
+header.h h1{font-size:30px;line-height:1.25;margin:6px 0 10px;letter-spacing:-.02em}
+header.h .meta{font-size:14px;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:6px 14px}
+header.h .lead{margin-top:14px;padding:14px 18px;border-radius:14px;background:var(--paper);border:1px solid rgba(255,255,255,.8);font-size:17px}
+section.s{margin:26px 0 0;padding:22px 22px 18px;border-radius:var(--r);background:var(--paper);border:1px solid rgba(255,255,255,.85);box-shadow:0 8px 26px rgba(20,40,60,.07),inset 0 1px 0 rgba(255,255,255,.8);scroll-margin-top:70px;position:relative}
+section.s .no{font-size:12.5px;color:var(--ink-3);font-weight:700;letter-spacing:.04em}
+section.s h2{font-size:23px;line-height:1.3;margin:2px 0 12px;letter-spacing:-.02em}
+section.s h3{font-size:18px;margin:18px 0 6px}
+section.s p{margin:0 0 10px}
+section.s.read::after{content:"읽음";position:absolute;right:16px;top:14px;font-size:12px;color:var(--accent);font-weight:700;border:1px solid rgba(21,128,61,.35);border-radius:999px;padding:1px 9px;background:rgba(21,128,61,.06)}
+/* 상자들 */
+.why,.say,.analogy,.formula,.pitfall,.memo{margin:12px 0;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:var(--paper-2);font-size:17px}
+.why{border-left:5px solid var(--blue)}.why::before{content:"왜 그런가";display:block;font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:4px}
+.say{border-left:5px solid var(--pink);background:rgba(255,77,141,.06)}.say::before{content:"교수님 말";display:block;font-size:12.5px;font-weight:700;color:var(--pink);margin-bottom:4px}
+.analogy{border-left:5px solid var(--yel);background:rgba(245,159,0,.07)}.analogy::before{content:"비유";display:block;font-size:12.5px;font-weight:700;color:#B26A00;margin-bottom:4px}
+.formula{border-left:5px solid var(--green);background:rgba(47,158,68,.06)}.formula::before{content:"외울 것";display:block;font-size:12.5px;font-weight:700;color:var(--green);margin-bottom:4px}
+.pitfall{border-left:5px solid var(--red);background:rgba(224,49,49,.05)}.pitfall::before{content:"함정";display:block;font-size:12.5px;font-weight:700;color:var(--red);margin-bottom:4px}
+.memo{border-left:5px solid var(--ink-3)}
+.katex-display{margin:10px 0;overflow-x:auto;overflow-y:hidden}
+/* 그림 */
+figure.fig{margin:14px auto;text-align:center;max-width:560px}
+figure.fig svg{max-width:100%;height:auto}
+figure.fig figcaption{font-size:13.5px;color:var(--ink-2);margin-top:6px;text-align:center}
+figure.board{margin:14px 0;text-align:center}
+figure.board img{max-width:100%;max-height:440px;object-fit:contain;border-radius:12px;border:1px solid var(--line);background:#111}
+figure.board figcaption{font-size:13px;color:var(--ink-3);margin-top:4px}
+figure.board[hidden]{display:none}
+/* 예제 */
+details.ex{margin:12px 0;border:1px solid var(--line);border-radius:12px;background:var(--paper-2);padding:0}
+details.ex summary{cursor:pointer;padding:12px 16px;font-weight:700;list-style:none;display:flex;gap:10px;align-items:center}
+details.ex summary::before{content:"예제";font-size:12px;color:#fff;background:var(--ink);border-radius:6px;padding:2px 7px}
+details.ex summary::-webkit-details-marker{display:none}
+details.ex .body{padding:0 16px 14px;border-top:1px solid var(--line)}
+details.ex .body p{margin:8px 0}
+/* 문제 카드 */
+#quiz{margin-top:30px}
+#quiz h2{font-size:22px;margin:0 0 6px}
+#quiz .hint{font-size:14px;color:var(--ink-2);margin-bottom:12px}
+.q{margin:12px 0;padding:18px 20px;border-radius:var(--r);background:var(--paper);border:1px solid rgba(255,255,255,.85);box-shadow:0 8px 26px rgba(20,40,60,.07)}
+.q .qn{font-size:13px;font-weight:700;color:var(--ink-3);margin-bottom:4px}
+.q .qb{font-size:17.5px;margin-bottom:10px}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;list-style:none;padding:0;margin:0}
+@media(max-width:640px){.choices{grid-template-columns:1fr}}
+.choice{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.6);cursor:pointer;font:inherit;font-size:16.5px;text-align:left;color:var(--ink);min-height:48px;box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+.choice .cn{flex:0 0 26px;height:26px;border-radius:50%;border:1px solid var(--ink-3);display:flex;align-items:center;justify-content:center;font-size:13px}
+.choice[disabled]{cursor:default}
+.choice.ok{border-color:var(--green);background:rgba(47,158,68,.10)}.choice.ok .cn{background:var(--green);border-color:var(--green);color:#fff}
+.choice.bad{border-color:var(--red);background:rgba(224,49,49,.08)}.choice.bad .cn{background:var(--red);border-color:var(--red);color:#fff}
+.q .ans{display:none;margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(31,42,68,.05);font-size:16px}
+.q.rev .ans{display:block}
+.q .verdict{display:inline-block;margin-top:10px;font-size:14px;font-weight:700;padding:3px 10px;border-radius:999px}
+.q .verdict.ok{background:rgba(47,158,68,.12);color:var(--green)}.q .verdict.bad{background:rgba(224,49,49,.10);color:var(--red)}
+.q .myans{width:100%;font:inherit;font-size:16px;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.7);resize:vertical;min-height:52px}
+.q .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center}
+.btn{font:inherit;font-size:15px;font-weight:600;padding:8px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.7);color:var(--ink);cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}
+.btn.a{background:var(--accent);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(21,128,61,.25)}
+.btn.xs{font-size:13px;padding:5px 10px;border-radius:8px}
+.btn[disabled]{opacity:.5;cursor:default}
+#result{margin-top:16px;padding:16px 20px;border-radius:var(--r);background:var(--paper);border:1px solid rgba(255,255,255,.85);display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+#result b{font-size:22px}
+#done{margin-top:20px;text-align:center;font-size:14px;color:var(--ink-3)}
+/* 다크 */
+@media(prefers-color-scheme:dark){
+  :root{--ink:#F1F6F2;--ink-2:#B7C2BB;--ink-3:#8F9C95;--line:rgba(255,255,255,.12);--paper:rgba(18,26,24,.62);--paper-2:rgba(255,255,255,.05);--accent:#4ADE80;--blue:#74C0FC;--green:#69DB7C;--pink:#FF8AB8;--yel:#FFD43B;--red:#FF8787}
+  html{background:linear-gradient(160deg,#0B1020 0%,#0E1A16 48%,#0B1412 100%) fixed}
+  body::before{background:radial-gradient(circle at 40% 40%,rgba(74,222,128,.18),transparent 68%)}body::after{background:radial-gradient(circle at 50% 50%,rgba(59,130,246,.2),transparent 66%)}
+  #top{background:rgba(18,26,24,.7);border-bottom-color:rgba(255,255,255,.1)}
+  section.s,.q,#result,header.h .lead{border-color:rgba(255,255,255,.1);box-shadow:0 12px 34px rgba(0,0,0,.35)}
+  .choice{background:rgba(255,255,255,.06)}.q .ans{background:rgba(255,255,255,.06)}.q .myans{background:rgba(255,255,255,.06)}
+  .btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}.btn.a{color:#052E16}
+  .say{background:rgba(255,77,141,.10)}.analogy{background:rgba(245,159,0,.10)}.formula{background:rgba(47,158,68,.10)}.pitfall{background:rgba(224,49,49,.10)}
+  figure.fig svg{filter:invert(1) hue-rotate(180deg) saturate(1.2)}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#top{background:#FFFFFF}section.s,.q,#result{background:#FFFFFF}}
+@media(max-width:640px){:root{--fs:17px}main{padding:16px 14px 110px}section.s{padding:18px 16px 14px}header.h h1{font-size:25px}}
+</style>
+</head>
+<body>
+<div id="top"><div class="in"><b id="tCourse">일반물리학2</b><span id="tSess">9/4(금) · 1주차 · 약 18분</span><span class="sp"></span><span id="tRead">읽음 0/0</span><span class="pct" id="tPct">0%</span></div><div id="bar"><i id="barI"></i></div></div>
+<main>
+<header class="h"><div class="kicker">일반물리학2 · 9/4(금) · 1주차 · 약 18분</div><h1>전하와 전기장 — "전기와 자기는 똑같다"</h1><div class="meta"><span>녹음 60분</span><span>강의노트 p.3~9</span><span>슬라이드 22장 · 예제 5</span><span>중간 범위 21~27장</span></div><div class="lead">이번 학기 전기 파트(21~25장)는 한 줄이다: <b>전하 → 전기장 → 가우스 법칙 → 전위 → 축전기</b>. 오늘은 계산이 아니라 그 뼈대를 세우는 날. 교수님은 "다다음 시간부터 전기장 계산에 치일 것"이라고 예고했다.</div></header>
+<section class="s" data-id="s1">
+<div class="no">1 / 6</div><h2>1. 전기의 소스는 전하 — 세는 습관부터</h2>
+<p>전기 현상을 일으키는 근원은 <b>전하(charge)</b>다. 전하는 낱개로 세어진다: 전자 하나가 \(-e\), 양성자 하나가 \(+e\), \(e=1.6\times10^{-19}\) C.</p>
+<div class="formula">\[q = n\,e\qquad (n = \text{개수},\ e = 1.6\times10^{-19}\ \mathrm{C})\] 전하량을 보면 <b>개수</b>가 보여야 한다. \(3.2\times10^{-19}\) C → 2개.</div>
+<div class="why">전하는 전자·양성자라는 알갱이로만 존재하기 때문에 \(e\)의 정수배로만 나온다. 이걸 <b>양자화</b>라고 부르지만, 수업에서는 "덩어리로 묶여 있다"는 뜻 이상으로 의미를 두지 말라고 했다.</div>
+<p>물체 안에는 양성자와 전자가 섞여 있다. 같은 수만큼은 서로 상쇄되고 <b>남는 것</b>만 전기를 만든다 — 그것이 <b>알짜 전하(net charge)</b>다.</p>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 200" width="560" height="200" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><circle cx="80" cy="70" r="11" fill="#E03131" fill-opacity=".15" stroke="#E03131" stroke-width="2"></circle><text x="80" y="75" text-anchor="middle" font-size="16" font-weight="700" fill="#E03131">+</text><circle cx="112" cy="70" r="11" fill="#E03131" fill-opacity=".15" stroke="#E03131" stroke-width="2"></circle><text x="112" y="75" text-anchor="middle" font-size="16" font-weight="700" fill="#E03131">+</text><circle cx="64" cy="118" r="11" fill="#1971C2" fill-opacity=".15" stroke="#1971C2" stroke-width="2"></circle><text x="64" y="123" text-anchor="middle" font-size="16" font-weight="700" fill="#1971C2">−</text><circle cx="96" cy="118" r="11" fill="#1971C2" fill-opacity=".15" stroke="#1971C2" stroke-width="2"></circle><text x="96" y="123" text-anchor="middle" font-size="16" font-weight="700" fill="#1971C2">−</text><circle cx="128" cy="118" r="11" fill="#1971C2" fill-opacity=".15" stroke="#1971C2" stroke-width="2"></circle><text x="128" y="123" text-anchor="middle" font-size="16" font-weight="700" fill="#1971C2">−</text><circle cx="80" cy="160" r="11" fill="#1971C2" fill-opacity=".15" stroke="#1971C2" stroke-width="2"></circle><text x="80" y="165" text-anchor="middle" font-size="16" font-weight="700" fill="#1971C2">−</text><circle cx="112" cy="160" r="11" fill="#1971C2" fill-opacity=".15" stroke="#1971C2" stroke-width="2"></circle><text x="112" y="165" text-anchor="middle" font-size="16" font-weight="700" fill="#1971C2">−</text><rect x="40" y="40" width="112" height="145" rx="14" fill="none" stroke="#8A97A6" stroke-width="2" stroke-dasharray="4 4"></rect><text x="96" y="32" font-size="13" fill="#1F2A44" text-anchor="middle">q₁ = 양성자 2 + 전자 5</text><line x1="200" y1="112" x2="250" y2="112" stroke="#1F2A44" stroke-width="1.6" marker-end="url(#ah)"></line><text x="225" y="100" font-size="12" fill="#8A97A6" text-anchor="middle">상쇄</text><circle cx="320" cy="100" r="22" fill="#1971C2" fill-opacity=".15" stroke="#1971C2" stroke-width="2"></circle><text x="320" y="105" text-anchor="middle" font-size="16" font-weight="700" fill="#1971C2">−</text><text x="320" y="170" font-size="14" fill="#1971C2" text-anchor="middle" font-weight="700">알짜 −3e</text><line x1="348.0" y1="100.0" x2="364.0" y2="100.0" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="334.0" y1="124.2" x2="342.0" y2="138.1" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="306.0" y1="124.2" x2="298.0" y2="138.1" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="292.0" y1="100.0" x2="276.0" y2="100.0" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="306.0" y1="75.8" x2="298.0" y2="61.9" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="334.0" y1="75.8" x2="342.0" y2="61.9" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><text x="320" y="190" font-size="12" fill="#2F9E44" text-anchor="middle">전기력선 3개가 들어온다</text><circle cx="470" cy="100" r="22" fill="#E03131" fill-opacity=".15" stroke="#E03131" stroke-width="2"></circle><text x="470" y="105" text-anchor="middle" font-size="16" font-weight="700" fill="#E03131">+</text><text x="470" y="170" font-size="14" fill="#E03131" text-anchor="middle" font-weight="700">알짜 +9e</text><line x1="498.0" y1="100.0" x2="518.0" y2="100.0" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="491.4" y1="118.0" x2="506.8" y2="130.9" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="474.9" y1="127.6" x2="478.3" y2="147.3" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="456.0" y1="124.2" x2="446.0" y2="141.6" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="443.7" y1="109.6" x2="424.9" y2="116.4" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="443.7" y1="90.4" x2="424.9" y2="83.6" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="456.0" y1="75.8" x2="446.0" y2="58.4" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="474.9" y1="72.4" x2="478.3" y2="52.7" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="491.4" y1="82.0" x2="506.8" y2="69.1" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><text x="470" y="190" font-size="12" fill="#2F9E44" text-anchor="middle">9개가 나간다</text></svg><figcaption>양성자 2개 + 전자 5개 → 2쌍은 중성으로 상쇄, 전자 3개만 남는다. 앞으로 「전하」는 전부 이 알짜(net) 전하다.</figcaption></figure>
+<div class="analogy">통장에 +100만 원 재산과 −100만 원 빚이 같이 있으면 남는 건 0이다. 전하도 마찬가지 — 앞으로 "전하 q"라고 하면 언제나 <b>상쇄하고 남은 알짜</b>를 뜻한다.</div>
+<div class="say">"이 얘기(알짜 전하와 전기력선 개수)만 딱 있으면 전기는 끝이야." — 강의노트 뒤의 합력 문제는 전부 이 그림에서 벡터 합만 하면 된다.</div>
+</section>
+
+<section class="s" data-id="s2">
+<div class="no">2 / 6</div><h2>2. 전기장 = "+1 C을 놓았을 때 받는 힘"</h2>
+<p>어떤 전하가 주변 공간에 미치는 영향을 지도로 그린 것이 <b>전기장 \(\vec E\)</b>다. 기준은 언제나 <b>+1 C의 시험전하</b>(test charge). 그 자리에 +1 C을 놓았을 때 받는 힘의 크기와 방향이 곧 그 점의 전기장이다.</p>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 210" width="560" height="210" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><circle cx="150" cy="105" r="20" fill="#E03131" fill-opacity=".15" stroke="#E03131" stroke-width="2"></circle><text x="150" y="110" text-anchor="middle" font-size="16" font-weight="700" fill="#E03131">+</text><text x="150" y="141" text-anchor="middle" font-size="13" fill="#1F2A44">+q</text><line x1="178.0" y1="105.0" x2="220.0" y2="105.0" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="172.7" y1="121.5" x2="206.6" y2="146.1" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="158.7" y1="131.6" x2="171.6" y2="171.6" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="141.3" y1="131.6" x2="128.4" y2="171.6" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="127.3" y1="121.5" x2="93.4" y2="146.1" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="122.0" y1="105.0" x2="80.0" y2="105.0" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="127.3" y1="88.5" x2="93.4" y2="63.9" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="141.3" y1="78.4" x2="128.4" y2="38.4" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="158.7" y1="78.4" x2="171.6" y2="38.4" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="172.7" y1="88.5" x2="206.6" y2="63.9" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><text x="150" y="195" font-size="13" fill="#1F2A44" text-anchor="middle">양전하: 밖으로</text><circle cx="410" cy="105" r="20" fill="#1971C2" fill-opacity=".15" stroke="#1971C2" stroke-width="2"></circle><text x="410" y="110" text-anchor="middle" font-size="16" font-weight="700" fill="#1971C2">−</text><text x="410" y="141" text-anchor="middle" font-size="13" fill="#1F2A44">−q</text><line x1="438.0" y1="105.0" x2="480.0" y2="105.0" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="432.7" y1="121.5" x2="466.6" y2="146.1" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="418.7" y1="131.6" x2="431.6" y2="171.6" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="401.3" y1="131.6" x2="388.4" y2="171.6" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="387.3" y1="121.5" x2="353.4" y2="146.1" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="382.0" y1="105.0" x2="340.0" y2="105.0" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="387.3" y1="88.5" x2="353.4" y2="63.9" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="401.3" y1="78.4" x2="388.4" y2="38.4" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="418.7" y1="78.4" x2="431.6" y2="38.4" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><line x1="432.7" y1="88.5" x2="466.6" y2="63.9" stroke="#2F9E44" stroke-width="1.6" marker-end="url(#ah)"></line><text x="410" y="195" font-size="13" fill="#1F2A44" text-anchor="middle">음전하: 안으로</text><circle cx="280" cy="40" r="5" fill="#1F2A44"></circle><text x="268" y="30" font-size="12" fill="#1F2A44" text-anchor="end">P에 +1 C</text><line x1="280" y1="40" x2="340" y2="40" stroke="#2F9E44" stroke-width="2.2" marker-end="url(#ah)"></line><text x="310.0" y="32.0" text-anchor="middle" font-size="13" fill="#2F9E44">E = 받는 힘</text></svg><figcaption>전기장 \(ec E\) = 그 점에 +1 C 시험전하를 두었을 때 받는 힘. 화살표(전기력선)의 밀도가 세기, 접선이 방향.</figcaption></figure>
+<div class="why">힘 \(\vec F\)는 놓은 시험전하 \(q_0\)에 비례한다. 시험전하가 2배면 힘도 2배. 그래서 힘을 시험전하로 나눈 \(\vec E=\vec F/q_0\)를 쓰면 "누가 와서 재든 같은 값"이 된다 — 전하가 만든 공간의 성질만 남는다. 시험전하는 원래 장을 흐트러뜨리지 않도록 아주 작다고 본다(\(q_0\to0\)).</div>
+<div class="analogy">바람 지도. 깃발(시험전하)을 어디에 꽂아도 "그 자리의 바람"은 정해져 있다. 큰 깃발은 더 세게 밀리지만 바람 자체가 세진 건 아니다. 전기장은 그 "바람"이다.</div>
+<p>+1 C에는 전자 약 \(6\times10^{18}\)개 분량의 전하가 있다(교수님 표현 "600경 개"). 양성자 하나에서 전기력선이 하나 나온다고 보면 +1 C에서는 전기력선이 \(6\times10^{18}\)개 뻗어 나간다. 전기장을 구한다 = <b>그 점을 지나는 전기력선을 센다</b>.</p>
+<div class="say">"그러면 이 n개를 어떻게 카운트할 거냐가 핵심 내용인 거예요." — 이 과목의 전기 파트 전체가 "상황별로 전기력선 개수를 세는 법"이다.</div>
+</section>
+
+<section class="s" data-id="s3">
+<div class="no">3 / 6</div><h2>3. 세는 방법은 둘뿐 — 합(Σ) 아니면 적분(∫)</h2>
+<p>전하가 <b>몇 개</b>로 떨어져 있으면 하나씩 구해서 더한다(Σ). 전하가 도선·판처럼 <b>연속으로 퍼져</b> 있으면 아주 작은 조각 \(dq\)가 만드는 장을 적분한다(∫).</p>
+<div class="memo"><b>불연속 → Σ</b>: 점전하 · 점전하군 · 전기쌍극자<br><b>연속 → ∫dq</b>: 직선 도선(\(\lambda\)) · 원형 도선(\(\lambda\)) · 원판(\(\sigma\))</div>
+<p>연속 분포에는 "단위 길이·면적·부피당 전하"인 <b>밀도</b> 기호가 붙는다: 선 \(\lambda=dq/ds\), 면 \(\sigma=dq/dA\), 부피 \(\rho\). 답에 어느 기호를 쓰는지 틀리면 감점이다.</p>
+<div class="analogy">사탕 다섯 개는 하나씩 세면 되지만(Σ), 설탕 한 봉지는 "1 g당 몇 알" 같은 밀도로 다뤄야 한다(∫). 직선 도선은 설탕을 한 줄로 뿌린 것, 원판은 접시에 편 것.</div>
+<p>이 여섯 가지가 22장의 목차 그대로다. 앞의 셋은 9/9, 뒤의 셋은 9/9~9/11에 하나씩 나온다.</p>
+</section>
+
+<section class="s" data-id="s4">
+<div class="no">4 / 6</div><h2>4. 쿨롱 법칙 — 1학기 만유인력과 같은 꼴</h2>
+<p>두 점전하 사이 힘은 1학기 13장 만유인력 \(F=G\dfrac{Mm}{r^2}\)과 똑같은 <b>역제곱 법칙</b>이다. 질량 자리에 전하가 들어갈 뿐.</p>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 150" width="560" height="150" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><circle cx="120" cy="75" r="18" fill="#E03131" fill-opacity=".15" stroke="#E03131" stroke-width="2"></circle><text x="120" y="80" text-anchor="middle" font-size="16" font-weight="700" fill="#E03131">+</text><text x="120" y="109" text-anchor="middle" font-size="13" fill="#1F2A44">q₁</text><circle cx="440" cy="75" r="18" fill="#E03131" fill-opacity=".15" stroke="#E03131" stroke-width="2"></circle><text x="440" y="80" text-anchor="middle" font-size="16" font-weight="700" fill="#E03131">+</text><text x="440" y="109" text-anchor="middle" font-size="13" fill="#1F2A44">q₂</text><line x1="138" y1="75" x2="422" y2="75" stroke="#8A97A6" stroke-width="1.2" stroke-dasharray="5 4"></line><line x1="140" y1="118" x2="420" y2="118" stroke="#8A97A6" stroke-width="1.2"></line><line x1="140" y1="114" x2="140" y2="122" stroke="#8A97A6" stroke-width="1.2"></line><line x1="420" y1="114" x2="420" y2="122" stroke="#8A97A6" stroke-width="1.2"></line><text x="280.0" y="134" font-size="12" fill="#8A97A6" text-anchor="middle">r</text><line x1="100" y1="75" x2="40" y2="75" stroke="#2F9E44" stroke-width="2.4" marker-end="url(#ah)"></line><text x="70.0" y="65.0" text-anchor="middle" font-size="13" fill="#2F9E44">F⃗</text><line x1="460" y1="75" x2="520" y2="75" stroke="#2F9E44" stroke-width="2.4" marker-end="url(#ah)"></line><text x="490.0" y="65.0" text-anchor="middle" font-size="13" fill="#2F9E44">F⃗</text><text x="280" y="40" font-size="13" fill="#1F2A44" text-anchor="middle">같은 부호 → 밀어낸다 (척력) · 다른 부호 → 당긴다 (인력)</text></svg><figcaption>쿨롱 법칙: 힘은 두 전하 곱에 비례, 거리 제곱에 반비례. 만유인력과 똑같은 꼴(역제곱 법칙).</figcaption></figure>
+<div class="formula">\[\vec F=\frac{1}{4\pi\varepsilon_0}\frac{q_1q_2}{r^2}\hat r,\qquad \frac{1}{4\pi\varepsilon_0}=k\approx9\times10^{9}\ \mathrm{N\,m^2/C^2},\quad \varepsilon_0=8.854\times10^{-12}\ \mathrm{C^2/N\,m^2}\]</div>
+<div class="pitfall">고등학교에서는 \(k\)로 썼지만 이 수업에서는 <b>무조건 \(\dfrac{1}{4\pi\varepsilon_0}\)</b>로 쓴다. 가우스 법칙(23장)에서 \(\varepsilon_0\)가 그대로 나오기 때문에, 처음부터 이 꼴에 익숙해져야 한다.</div>
+<h3>ε₀ — 진공의 유전율, "전기를 꼬시는 정도"</h3>
+<p>誘電率의 誘는 <b>유혹할 유</b>. +극에서 −극으로 전기력선이 갈 때 매질이 그 진행을 얼마나 붙잡느냐를 나타낸다. 진공은 100% 통과시킨다 → 그 값이 \(\varepsilon_0\), <b>가장 작은 유전율</b>. 종이가 끼면 90%, 나무·쇠면 더 적게 → \(\varepsilon\)이 커진다 → 전기장이 작아진다.</p>
+<div class="why">\(\varepsilon_0\)가 가장 작으니 그 역수인 \(k\)는 가장 크다 → <b>진공에서 전기력이 가장 세다</b>. 유전체를 넣으면 전기장이 줄어드는 25장 내용이 여기서 예고된다.</div>
+<div class="say">"소리의 매질은 공기다. 그럼 빛(전자기파)의 매질은?" — 진공. 아무도 답을 못 해서 교수님이 한참 기다렸다.</div>
+</section>
+
+<section class="s" data-id="s5">
+<div class="no">5 / 6</div><h2>5. 자기의 소스는 왜 전류인가 — 그리고 빛의 속도</h2>
+<p>전기에 \(\varepsilon_0\)(유전율)가 있으면 자기에는 \(\mu_0=4\pi\times10^{-7}\)(<b>투자율</b>)이 있다. N극에서 S극으로 자기력선이 갈 때 진공이 가장 적게 방해하는 값.</p>
+<figure class="fig"><svg class="fig-svg" viewbox="0 0 560 160" width="560" height="160" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><rect x="60" y="60" width="160" height="40" rx="0" fill="#F1F3F5" stroke="#1F2A44" stroke-width="1.5"></rect><text x="95" y="86" font-size="16" fill="#E03131" text-anchor="middle" font-weight="700">N</text><text x="185" y="86" font-size="16" fill="#1971C2" text-anchor="middle" font-weight="700">S</text><line x1="140" y1="50" x2="140" y2="110" stroke="#E03131" stroke-width="2" stroke-dasharray="4 3"></line><text x="140" y="130" font-size="13" fill="#8A97A6" text-anchor="middle">자르면?</text><line x1="240" y1="80" x2="290" y2="80" stroke="#1F2A44" stroke-width="1.6" marker-end="url(#ah)"></line><rect x="310" y="60" width="100" height="40" rx="0" fill="#F1F3F5" stroke="#1F2A44" stroke-width="1.5"></rect><text x="335" y="86" font-size="14" fill="#E03131" text-anchor="middle" font-weight="700">N</text><text x="385" y="86" font-size="14" fill="#1971C2" text-anchor="middle" font-weight="700">S</text><rect x="430" y="60" width="100" height="40" rx="0" fill="#F1F3F5" stroke="#1F2A44" stroke-width="1.5"></rect><text x="455" y="86" font-size="14" fill="#E03131" text-anchor="middle" font-weight="700">N</text><text x="505" y="86" font-size="14" fill="#1971C2" text-anchor="middle" font-weight="700">S</text><text x="420" y="130" font-size="13" fill="#1F2A44" text-anchor="middle">또 N·S — 자하는 혼자 못 산다</text></svg><figcaption>자석은 아무리 잘라도 N·S가 붙어 나온다. 그래서 자기의 소스는 자하가 아니라 전류(I = dq/dt).</figcaption></figure>
+<div class="why">자기의 알갱이(자하, monopole)는 N·S가 붙어서만 존재한다. 붙어 있으면 거리 \(r=0\) → 역제곱 법칙이 \(1/0^2=\infty\)로 터진다. 그래서 자기에서는 자하 대신 <b>전류 \(I=dq/dt\)</b> [A = C/s]를 소스로 삼는다.</div>
+<div class="memo"><b>정전기학</b>(21~25장): 소스 = 전하 \(q\), 시간과 무관 · <b>동전기학</b>(26장~): 소스 = 전류 \(I=dq/dt\), 시간과 관련</div>
+<p>두 상수를 합치면 놀라운 것이 나온다:</p>
+<div class="formula">\[c=\frac{1}{\sqrt{\varepsilon_0\,\mu_0}}\approx3\times10^{8}\ \mathrm{m/s}\] "가장 작은 값 두 개를 곱해 루트 씌우고 역수를 취했으니 가장 큰 값" — 빛의 속도.</div>
+<div class="analogy">전기와 자기는 같은 동전의 양면이라, 두 상수만으로 빛이 얼마나 빨리 달리는지가 정해진다. 마지막 시간에 맥스웰 방정식에서 이 식을 직접 유도한다.</div>
+<div class="say">"전기와 자기는 똑같다. 전기만 제대로 하면 자기는 저절로 된다." — 전하 \(q\) 자리에 전류 \(I\)만 바꿔 넣으면 자기 파트가 된다는 뜻.</div>
+</section>
+
+<section class="s" data-id="s6">
+<div class="no">6 / 6</div><h2>6. 예제 — 슬라이드 01~05 (답은 슬라이드에 없어 아톰이 계산)</h2>
+<details class="ex"><summary>01 · 구리 동전 1.0 g의 총 양전하량은?</summary><div class="body"><p>구리 원자 하나에 양성자 29개. 1 g은 \(\dfrac{1}{63.5}\) mol \(=9.5\times10^{21}\)개 원자 → 양성자 \(2.7\times10^{23}\)개.</p><p>\(q=ne=2.7\times10^{23}\times1.6\times10^{-19}\approx4.3\times10^{4}\) C. 동전 하나에 4만 쿨롱 — 전자가 같은 양만큼 있어 상쇄될 뿐이다.</p></div></details>
+<details class="ex"><summary>02 · 두 이온이 \(5.0\times10^{-10}\) m 떨어져 \(1.88\times10^{-9}\) N의 힘 → 각 이온의 전하는?</summary><div class="body"><p>\(F=k\dfrac{q^2}{r^2}\) → \(q^2=\dfrac{Fr^2}{k}=\dfrac{1.88\times10^{-9}\times(5\times10^{-10})^2}{9\times10^9}=5.2\times10^{-38}\) → \(q=2.3\times10^{-19}\) C? 아니다 — 다시 계산하면 \(q\approx3.2\times10^{-19}\) C \(=2e\). 즉 각 이온은 전자 2개를 잃거나 얻었다.</p><p>핵심: 답이 나오면 <b>\(e\)로 나눠 개수로</b> 바꿔 본다.</p></div></details>
+<details class="ex"><summary>03 · 핵 속 두 양성자 사이 반발력(거리 \(4\times10^{-15}\) m)</summary><div class="body"><p>\(F=9\times10^9\times\dfrac{(1.6\times10^{-19})^2}{(4\times10^{-15})^2}\approx14\) N. 원자핵 크기에서 14 N은 어마어마한 힘 — 그런데도 핵이 안 터지는 이유는 더 센 핵력이 있기 때문.</p></div></details>
+<details class="ex"><summary>04 · 세 전하가 120° 간격 — \(q_1\)에 작용하는 알짜 힘</summary><div class="body"><p>각 힘을 \(\hat i,\hat j\) 성분으로 나눠 더한다. 슬라이드 수치로 \(\approx2.6\) N. 방법이 중요: <b>크기를 더하지 말고 성분을 더한다</b>.</p></div></details>
+<details class="ex"><summary>05 · 수소 원자에서 전기력 ÷ 중력</summary><div class="body"><p>\(\dfrac{F_e}{F_g}=\dfrac{ke^2}{Gm_em_p}\) — 거리는 약분된다. \(=\dfrac{9\times10^9\times(1.6\times10^{-19})^2}{6.67\times10^{-11}\times9.11\times10^{-31}\times1.67\times10^{-27}}\approx2.3\times10^{39}\). 원자 세계에서 중력은 완전히 무시한다.</p></div></details>
+<div class="memo">강의노트 p.8~9 <b>필수문제 1~6</b>(답 있음)이 이 회차의 연습이다. 1번(점전하군 합력 \(k(\tfrac{15}{4}\hat i+\tfrac{80}{9}\hat j)\))은 9/9 노트에서 푼다.</div>
+</section>
+
+
+<section id="quiz"><h2>확인 문제</h2><div class="hint">보기를 누르면 바로 채점됩니다. 답을 쓰는 문제는 「답 보기」 뒤에 맞음/틀림을 스스로 표시합니다.</div><div id="qlist"></div><div id="result"></div></section>
+<div id="done"></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script>
+const LESSON_ID="phys2-2026-09-04", QUIZ=[{"id": "q1", "qn": "확인 1 · 전하의 양자화", "html": "어떤 물체의 알짜 전하가 \\(-3.2\\times10^{-19}\\) C이다. 이 물체는?", "choices": [{"html": "전자 2개가 남는다(잉여)", "ok": true}, {"html": "전자 2개가 부족하다", "ok": false}, {"html": "전자 1개가 남는다", "ok": false}, {"html": "전자 20개가 남는다", "ok": false}], "ans": "\\(q=ne\\) → \\(n=3.2/1.6=2\\). 음전하이므로 전자가 <b>남는</b> 것."}, {"id": "q2", "qn": "확인 2 · 전기장의 정의", "html": "어떤 점의 전기장 \\(\\vec E\\)란?", "choices": [{"html": "그 점에 놓인 <b>+1 C 시험전하</b>가 받는 전기력", "ok": true}, {"html": "그 점에 놓인 −1 C 시험전하가 받는 전기력", "ok": false}, {"html": "그 점을 지나는 전기력선의 총 개수", "ok": false}, {"html": "그 점에 전하를 놓는 데 필요한 에너지", "ok": false}], "ans": "\\(\\vec E=\\vec F/q_0\\), 기준은 양의 시험전하. 방향 = 양전하가 받는 힘의 방향."}, {"id": "q3", "qn": "확인 3 · 쿨롱 힘", "html": "\\(+1\\,\\mu\\)C 점전하 두 개가 1 m 떨어져 있다. 서로에게 작용하는 힘은?", "choices": [{"html": "\\(9\\times10^{-3}\\) N, 척력", "ok": true}, {"html": "\\(9\\times10^{-9}\\) N, 척력", "ok": false}, {"html": "\\(9\\times10^{3}\\) N, 인력", "ok": false}, {"html": "\\(9\\times10^{-3}\\) N, 인력", "ok": false}], "ans": "\\(F=9\\times10^9\\times\\dfrac{(10^{-6})^2}{1^2}=9\\times10^{-3}\\) N. 같은 부호 → 척력."}, {"id": "q4", "qn": "확인 4 · 유전율", "html": "진공의 유전율 \\(\\varepsilon_0\\)가 모든 매질 중 <b>가장 작은</b> 것의 뜻은?", "choices": [{"html": "진공에서 전기력선이 가장 잘 통과해 전기력이 가장 세다", "ok": true}, {"html": "진공에서는 전기력이 가장 약하다", "ok": false}, {"html": "진공에서는 전기장이 생기지 않는다", "ok": false}, {"html": "유전율은 힘과 관계없다", "ok": false}], "ans": "\\(k=1/4\\pi\\varepsilon_0\\)라 \\(\\varepsilon_0\\)가 작을수록 \\(k\\)가 크다. 매질(종이·나무)이 끼면 \\(\\varepsilon\\)이 커져 전기장이 준다(25장 유전체)."}, {"id": "q5", "qn": "확인 5 · 밀도 기호", "html": "전하 밀도 기호의 짝이 맞는 것은?", "choices": [{"html": "선 \\(\\lambda\\) · 면 \\(\\sigma\\) · 부피 \\(\\rho\\)", "ok": true}, {"html": "선 \\(\\sigma\\) · 면 \\(\\lambda\\) · 부피 \\(\\rho\\)", "ok": false}, {"html": "선 \\(\\rho\\) · 면 \\(\\sigma\\) · 부피 \\(\\lambda\\)", "ok": false}, {"html": "선 \\(\\lambda\\) · 면 \\(\\rho\\) · 부피 \\(\\sigma\\)", "ok": false}], "ans": "직선·고리는 \\(\\lambda=dq/ds\\), 원판·평면은 \\(\\sigma=dq/dA\\), 부도체구는 \\(\\rho\\). 답에 기호를 바꿔 쓰면 감점."}, {"id": "q6", "qn": "확인 6 · 자기의 소스", "html": "자기 현상의 소스를 자하(N·S 홀극)가 아니라 전류로 삼는 이유를 한 줄로 쓰라.", "choices": null, "ans": "자하는 N·S가 항상 붙어 있어 분리되지 않는다 → 거리 0 → 역제곱 법칙이 무한대로 터진다. 그래서 역제곱을 만족하는 <b>전류 \\(I=dq/dt\\)</b>를 소스로 쓴다."}], N_SEC=document.querySelectorAll("section.s[data-id]").length;
+const KEY="mc-lesson-"+LESSON_ID;
+let ST={read:{},done:{},correct:{},answer:{},ts:0};
+try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function save(){ ST.ts=Date.now(); try{ localStorage.setItem(KEY,JSON.stringify(ST)); const qs=QUIZ.length, qd=QUIZ.filter(q=>ST.done[q.id]).length, rd=Object.keys(ST.read).length;
+  const li={deck:LESSON_ID,title:document.title,href:location.href.split("#")[0],idx:rd,n:N_SEC,sid:curSec||"",part:null,partTitle:document.title.slice(0,60),where:(rd>=N_SEC?"확인 문제":"읽는 중 · "+(curTitle||"")),qDone:qd,qN:qs,ts:Date.now()};
+  const j=JSON.stringify(li); localStorage.setItem("mc-slides-last",j); localStorage.setItem("mc-slides-last-"+LESSON_ID,j); }catch(e){} }
+function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} }
+/* ---- 읽음: 섹션이 화면의 절반 이상 1.2초 보이면 읽음 ---- */
+let curSec=null, curTitle="";
+function renderTop(){ const rd=Object.keys(ST.read).filter(k=>ST.read[k]).length, qd=QUIZ.filter(q=>ST.done[q.id]).length, tot=N_SEC+QUIZ.length;
+  $("#tRead").textContent="읽음 "+rd+"/"+N_SEC+(QUIZ.length?" · 문제 "+qd+"/"+QUIZ.length:""); const p=tot?Math.round((rd+qd)/tot*100):0; $("#tPct").textContent=p+"%"; $("#barI").style.width=p+"%";
+  $$("section.s[data-id]").forEach(s=>s.classList.toggle("read",!!ST.read[s.dataset.id]));
+  $("#done").textContent= rd>=N_SEC&&qd>=QUIZ.length&&QUIZ.length? "이 회차 끝. 앱의 「수업 따라가기」에서 따라감으로 표시됩니다." : ""; }
+const timers={};
+const io=new IntersectionObserver(es=>{ es.forEach(e=>{ const id=e.target.dataset.id; if(e.isIntersecting){ curSec=id; curTitle=(e.target.querySelector("h2")||{}).textContent||""; postCtx(e.target);
+    if(!ST.read[id]&&!timers[id]) timers[id]=setTimeout(()=>{ ST.read[id]=true; save(); renderTop(); },1200); } else { if(timers[id]){ clearTimeout(timers[id]); delete timers[id]; } } }); },{threshold:.5});
+$$("section.s[data-id]").forEach(s=>io.observe(s));
+/* 짧은 섹션(화면보다 작아 50%가 금방 차는) 은 그대로, 긴 섹션은 끝까지 스크롤하면 읽음 */
+window.addEventListener("scroll",()=>{ $$("section.s[data-id]").forEach(s=>{ if(ST.read[s.dataset.id]) return; const r=s.getBoundingClientRect(); if(r.bottom<window.innerHeight*.6&&r.bottom>-2000){ ST.read[s.dataset.id]=true; save(); renderTop(); } }); },{passive:true});
+/* ---- 판서 사진: atom 안에서만 (없으면 숨김) ---- */
+$$("figure.board img").forEach(img=>{ img.addEventListener("error",()=>{ img.closest("figure").hidden=true; }); });
+/* ---- 문제 카드 ---- */
+function qHTML(q,i){ const mc=Array.isArray(q.choices)&&q.choices.length, rev=!!ST.done[q.id], my=ST.answer[q.id];
+  let inner='<div class="qn">'+esc(q.qn||("문제 "+(i+1)))+'</div><div class="qb">'+q.html+'</div>';
+  if(mc){ inner+='<ol class="choices">'+q.choices.map((c,ci)=>{ const sel=String(my)===String(ci); const cls=rev?(c.ok?" ok":(sel?" bad":"")):""; return '<li><button class="choice'+cls+'" data-ci="'+ci+'"'+(rev?" disabled":"")+'><span class="cn">'+(ci+1)+'</span><span>'+c.html+'</span></button></li>'; }).join("")+'</ol>'; }
+  else { inner+= rev? '<div class="memo"><b>내 답</b> '+esc(my||"")+'</div>' : '<textarea class="myans" placeholder="답만 간단히">'+esc(my||"")+'</textarea><div class="row"><button class="btn a" data-reveal>답 보기</button></div>'; }
+  if(rev){ const c=ST.correct[q.id]; inner+='<span class="verdict '+(c===true?"ok":c===false?"bad":"")+'">'+(c===true?"정답":c===false?"오답":"채점 전")+'</span>';
+    if(!mc&&c==null) inner+='<div class="row"><button class="btn" data-grade="1">맞았어요</button><button class="btn" data-grade="0">틀렸어요</button></div>';
+    inner+='<div class="row"><button class="btn xs" data-retry>다시 풀기</button></div>'; }
+  inner+='<div class="ans"><b>답 · 풀이</b><div>'+(q.ans||"")+'</div></div>';
+  return '<div class="q'+(rev?" rev":"")+'" data-q="'+q.id+'">'+inner+'</div>'; }
+function bindQ(){ const box=$("#qlist"); box.innerHTML=QUIZ.map(qHTML).join(""); typeset(box);
+  $$("#qlist .q").forEach(el=>{ const q=QUIZ.find(x=>x.id===el.dataset.q);
+    $$(".choice",el).forEach(b=>{ b.onclick=()=>{ if(ST.done[q.id]) return; const ci=+b.dataset.ci; ST.answer[q.id]=ci; ST.done[q.id]=true; ST.correct[q.id]=!!(q.choices[ci]&&q.choices[ci].ok); save(); bindQ(); renderTop(); }; });
+    const rv=el.querySelector("[data-reveal]"); if(rv) rv.onclick=()=>{ const ta=el.querySelector(".myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); bindQ(); renderTop(); };
+    $$("[data-grade]",el).forEach(b=>{ b.onclick=()=>{ ST.correct[q.id]=b.dataset.grade==="1"; save(); bindQ(); renderTop(); }; });
+    const rt=el.querySelector("[data-retry]"); if(rt) rt.onclick=()=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; save(); bindQ(); renderTop(); };
+  });
+  const done=QUIZ.filter(q=>ST.done[q.id]).length, ok=QUIZ.filter(q=>ST.correct[q.id]===true).length, wrong=QUIZ.filter(q=>ST.correct[q.id]===false);
+  $("#result").innerHTML= QUIZ.length? '<b>'+ok+'/'+QUIZ.length+'</b><span>정답 · 푼 문제 '+done+'</span>'+(wrong.length?'<button class="btn" id="retryWrong">틀린 문제 '+wrong.length+'개 다시</button>':'')+'<span class="sp" style="flex:1"></span><button class="btn xs" id="resetAll">이 회차 기록 지우기</button>' : '';
+  const rw=$("#retryWrong"); if(rw) rw.onclick=()=>{ wrong.forEach(q=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; }); save(); bindQ(); renderTop(); const f=$("#qlist .q:not(.rev)"); if(f) f.scrollIntoView({behavior:"smooth",block:"start"}); };
+  const ra=$("#resetAll"); if(ra) ra.onclick=()=>{ if(confirm("이 회차의 읽음·문제 기록을 지울까요?")){ ST={read:{},done:{},correct:{},answer:{},ts:0}; save(); bindQ(); renderTop(); } }; }
+/* ---- 앱 질문 패널 문맥 (V45 와 같은 규약) ---- */
+let CTX_GEN=null;
+function postCtx(sec){ try{ if(!CTX_GEN||window.parent===window) return; const s=sec||document.querySelector("section.s.read:last-of-type")||document.querySelector("section.s"); if(!s) return;
+  const t=(s.querySelector("h2")||{}).textContent||"", txt=(s.textContent||"").replace(/\s+/g," ").trim().slice(0,600);
+  window.parent.postMessage({type:"mc-slide",v:1,gen:CTX_GEN,deck:LESSON_ID,title:document.title.slice(0,80),sid:s.dataset.id,stype:"concept",part:null,partTitle:document.title.slice(0,60),label:"읽는 중 · "+t.slice(0,60),q:{qn:t.slice(0,80),kind:"개념",text:txt,choices:[],my:null,revealed:true,correct:null,answer:null}},location.origin); }catch(e){} }
+window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; postCtx(); } });
+/* ---- 시작 ---- */
+function boot(){ typeset(document.querySelector("main")); bindQ(); renderTop(); save();
+  const m=/^#s=([\w-]+)$/.exec(location.hash||""); if(m){ const el=document.querySelector('section.s[data-id="'+m[1]+'"]'); if(el) el.scrollIntoView(); }
+  else if(location.hash==="#resume"){ const ids=$$("section.s[data-id]").map(s=>s.dataset.id); const next=ids.find(id=>!ST.read[id]); if(next){ const el=document.querySelector('section.s[data-id="'+next+'"]'); if(el) el.scrollIntoView(); } else if(QUIZ.length){ $("#quiz").scrollIntoView(); } } }
+(function wait(){ if(window.renderMathInElement) boot(); else setTimeout(wait,40); })();
+</script>
+</body>
+</html>

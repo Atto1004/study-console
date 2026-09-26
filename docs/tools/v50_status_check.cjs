@@ -12,9 +12,9 @@ setTimeout(()=>{const w=d.window;
  w.localStorage.setItem("mc-slides-statics-mid",JSON.stringify({idx:0,done,correct}));
  // 공수1: 파트1 전부 "건너뜀"(done+skip) → 9/2·9/4 는 밀림 그대로
  const e1=P("em1-mid",1);const ed={},sk={};e1.sids.forEach(s=>{ed[s]=true;sk[s]=true;});w.localStorage.setItem("mc-slides-em1-mid",JSON.stringify({idx:0,done:ed,correct:{},skip:sk}));
- // 일물2: 파트1 개념 다 읽고, 문제는 「문제만」 모드에서 전부 정답 → 9/4 따라감 (quiz 키 인정)
- const p1=P("phys2-mid",1);const pd={};p1.sids.filter(s=>p1.qids.indexOf(s)<0).forEach(s=>pd[s]=true);const qc={};p1.qids.forEach(q=>qc[q]=true);
- w.localStorage.setItem("mc-slides-phys2-mid",JSON.stringify({idx:0,done:pd,correct:{}}));w.localStorage.setItem("mc-slides-phys2-mid-quiz",JSON.stringify({idx:0,done:qc,correct:qc}));
+ // 미적2 벡터 덱 파트1(9/10·9/15 → 9/15 판정): 개념 다 읽고, 문제는 「문제만」 모드에서 전부 정답 → 9/15 따라감 (quiz 키 인정). (일물2는 수업 노트가 우선이라 덱으로 못 잰다)
+ const p1=P("calc2-vectors",1);const pd={};p1.sids.filter(s=>p1.qids.indexOf(s)<0).forEach(s=>pd[s]=true);const qc={};p1.qids.forEach(q=>qc[q]=true);
+ w.localStorage.setItem("mc-slides-calc2-vectors",JSON.stringify({idx:0,done:pd,correct:{}}));w.localStorage.setItem("mc-slides-calc2-vectors-quiz",JSON.stringify({idx:0,done:qc,correct:qc}));
  w.go("study");
  setTimeout(()=>{const doc=w.document;const items=w.V50.items();
   const st=items.find(it=>it.c.name==="정역학");const by=(it,date)=>it.past.find(x=>x.date===date);
@@ -22,7 +22,7 @@ setTimeout(()=>{const w=d.window;
   ok(by(st,"2026-09-09").st==="done","정역학 9/9 = 따라감 (판정용 파트1 완료; 파트2는 9/14에서 판정): "+by(st,"2026-09-09").st);
   ok(by(st,"2026-09-14").st==="part","정역학 9/14 = 진행 중 (파트2 전부 읽었지만 문제 전부 오답): "+by(st,"2026-09-14").st);
   const em=items.find(it=>it.c.name==="공업수학1");ok(by(em,"2026-09-04").st==="todo","공수1 9/4 = 밀림 (전부 건너뜀은 완료 아님): "+by(em,"2026-09-04").st);
-  const ph=items.find(it=>it.c.name==="일반물리학2");ok(by(ph,"2026-09-04").st==="done","일물2 9/4 = 따라감 (개념 읽음 + 문제만 정답): "+by(ph,"2026-09-04").st);
+  const ca=items.find(it=>it.c.name==="미분적분학2");ok(by(ca,"2026-09-15").st==="done","미적2 9/15 = 따라감 (개념 읽음 + 문제만 정답): "+by(ca,"2026-09-15").st);
   ok(items.every(it=>it.todayL.every(x=>x.st==="today")&&it.todo.every(x=>x.st!=="today")),"오늘 수업은 밀림에 안 섞임");
   const top=doc.querySelector("#v50Card .v50-top").textContent;console.log("   상단:",top.slice(0,90));
   const row=[...doc.querySelectorAll("#v50Card .v50-row")].find(r=>/정역학/.test(r.textContent));row.querySelector("[data-v50tg]").click();
