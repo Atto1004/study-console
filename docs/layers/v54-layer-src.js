@@ -10,6 +10,14 @@
   var V54=window.V54={on:true};
   try{ var q=new URLSearchParams(location.search).get("skin"); if(q==="classic"||(!q&&localStorage.getItem("mc-skin")==="classic")) V54.on=false; if(q==="duo") localStorage.removeItem("mc-skin"); }catch(e){}
   V54.set=function(on){ try{ if(on) localStorage.removeItem("mc-skin"); else localStorage.setItem("mc-skin","classic"); }catch(e){} location.reload(); };
+  /* 설정 → 「화면」 카드: 듀오링고 톤 ↔ 클래식(글래스) — 스킨이 꺼져 있어도 카드는 있어야 되돌릴 수 있다 */
+  if(typeof renderSet==="function"&&!renderSet._v54){
+    var _rs=renderSet;
+    renderSet=function(){ _rs(); try{ var v=$("#v-set"); if(!v||$("#v54Card")) return; var g=v.querySelector(".grid"); var c=document.createElement("div"); c.className="card"; c.id="v54Card";
+      c.innerHTML='<div class="card-h"><h3>화면</h3><span class="hs">SKIN</span></div><div class="card-b v54-sw"><button class="btn'+(V54.on?" a":"")+'" id="v54Duo" type="button">듀오링고 톤</button><button class="btn'+(V54.on?"":" a")+'" id="v54Classic" type="button">클래식(글래스)</button><span class="hint">밝고 둥근 게임 톤 ↔ 이전 유리 화면. 누르면 새로 고침됩니다.</span></div>';
+      (g||v).appendChild(c); $("#v54Duo").onclick=function(){ V54.set(true); }; $("#v54Classic").onclick=function(){ V54.set(false); }; }catch(e){} };
+    renderSet._v54=true;
+  }
   if(!V54.on) return;
   document.documentElement.classList.add("v54");
   var L=[
@@ -17,7 +25,23 @@
     ':root{--font-body:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;--font-num:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;',
     '--bg:#F7F7F7;--bg-grid:transparent;--surface:#FFFFFF;--surface-2:#F0F0F0;--surface-3:#E5E5E5;--ink:#3C3C3C;--ink-2:#6F6F6F;--ink-3:#8E8E8E;--line:#E5E5E5;--line-2:#CFCFCF;',
     '--accent:#58CC02;--accent-ink:#3D8F00;--accent-soft:#E6F9D6;--accent-line:#A5ED6E;--ok:#58CC02;--ok-soft:#E6F9D6;--warn:#FF9600;--warn-soft:#FFE9CC;--crit:#FF4B4B;--crit-soft:#FFE0E0;--info:#1CB0F6;--info-soft:#DDF4FF;',
-    '--shadow:none;--r:16px;--r-s:12px;--r-pill:999px;--duo-blue:#1CB0F6;--duo-blue-2:#1899D6;--duo-green-2:#46A302;--duo-yel:#FFC800;--duo-purple:#CE82FF}',
+    '--shadow:none;--r:16px;--r-s:12px;--r-pill:999px;--duo-blue:#1CB0F6;--duo-blue-2:#1899D6;--duo-green-2:#46A302;--duo-yel:#FFC800;--duo-purple:#CE82FF;',
+    /* 글래스 층(V51) 토큰을 단색으로 — 유리·블러·번지는 빛을 끄고 평평한 듀오링고 면으로 */
+    '--gl:var(--surface);--gl-2:var(--surface-2);--gl-3:var(--surface);--gl-line:var(--line);--gl-line-2:var(--line);--gl-hi:none;--gl-sh:none;--gl-blur:none;--gl-on:var(--surface-2);--gl-bg0:var(--bg);--gl-bg1:var(--bg);--gl-bg2:var(--bg);--gl-b1:transparent;--gl-b2:transparent;--gl-b3:transparent;--on-accent:#fff}',
+    ':root:not([data-theme="dark"]){--ink-2:#6F6F6F;--ink-3:#8E8E8E}',
+    '@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink-2:#C7D3DA;--ink-3:#8FA3AE;--gl:var(--surface);--gl-2:var(--surface-2);--gl-3:var(--surface);--gl-line:var(--line);--gl-line-2:var(--line);--gl-hi:none;--gl-sh:none;--gl-on:var(--surface-2);--gl-bg0:var(--bg);--gl-bg1:var(--bg);--gl-bg2:var(--bg);--gl-b1:transparent;--gl-b2:transparent}}',
+    ':root[data-theme="dark"]{--gl:var(--surface);--gl-2:var(--surface-2);--gl-3:var(--surface);--gl-line:var(--line);--gl-line-2:var(--line);--gl-hi:none;--gl-sh:none;--gl-on:var(--surface-2);--gl-bg0:var(--bg);--gl-bg1:var(--bg);--gl-bg2:var(--bg);--gl-b1:transparent;--gl-b2:transparent}',
+    'html.v54{background:var(--bg)}html.v54 body::before,html.v54 body::after{display:none}',
+    'html.v54 .card,html.v54 .tile,html.v54 .modebar,html.v54 .exboard{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none}',
+    'html.v54 .card .card{background:var(--surface);border:2px solid var(--line)}',
+    'html.v54 .sheet{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none;border:2px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.22);border-radius:20px}',
+    'html.v54 .toast{background:var(--surface);-webkit-backdrop-filter:none;backdrop-filter:none;border:2px solid var(--line)}',
+    'html.v54 .lrow,html.v54 .crow,html.v54 .drow,html.v54 .v47-wk,html.v54 .v49-deck,html.v54 .v50-s,html.v54 .v45-msg,html.v54 .exrow{background:var(--surface);border:2px solid var(--line);border-radius:12px}',
+    'html.v54 .crow:hover,html.v54 .lrow:hover,html.v54 .drow:hover{background:var(--surface-2)}',
+    'html.v54 .v49-today,html.v54 .v50-top,html.v54 .v47-next{background:var(--surface-2);border:2px solid var(--line);border-radius:12px}',
+    'html.v54 .seg{background:var(--surface-2);border:2px solid var(--line);border-radius:12px;padding:3px}html.v54 .seg button{border-radius:9px;font-weight:700}html.v54 .seg button[aria-pressed="true"]{background:var(--surface);box-shadow:none;color:var(--duo-blue)}',
+    'html.v54 .iconbtn{background:var(--surface);border:2px solid var(--line);border-radius:10px}',
+    'html.v54 .bar,html.v54 .v49-bar,html.v54 .v47-bar{background:var(--surface-3);border-radius:99px;overflow:hidden}',
     '@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#131F24;--surface:#1B2A31;--surface-2:#243640;--surface-3:#2E434F;--ink:#F1F7FB;--ink-2:#C7D3DA;--ink-3:#8FA3AE;--line:#37464F;--line-2:#4A5D69;',
     '--accent:#58CC02;--accent-ink:#93D333;--accent-soft:rgba(88,204,2,.16);--accent-line:rgba(88,204,2,.45);--ok:#58CC02;--ok-soft:rgba(88,204,2,.16);--warn:#FF9600;--warn-soft:rgba(255,150,0,.16);--crit:#FF4B4B;--crit-soft:rgba(255,75,75,.18);--info:#1CB0F6;--info-soft:rgba(28,176,246,.16);--shadow:none;--thumb:#4A5D69}}',
     ':root[data-theme="dark"]{--bg:#131F24;--surface:#1B2A31;--surface-2:#243640;--surface-3:#2E434F;--ink:#F1F7FB;--ink-2:#C7D3DA;--ink-3:#8FA3AE;--line:#37464F;--line-2:#4A5D69;',
