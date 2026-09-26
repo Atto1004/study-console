@@ -28,25 +28,25 @@ fig_dist = canvas(560, 200,
     cap="두 점 사이의 거리(Ex03). 순서 무관, 근호는 반드시 정리.")
 
 fig_sph = canvas(560, 220,
-    circle(130, 110, 62, INK, w=2.2), ellipse(130, 110, 62, 16, GRAY, 1.2, "none", "4 3"), dot(130, 110, "", 5, RED), text(130, 104, "C(−2, 3, −1)", 11.5, RED, "middle"),
+    circle(130, 110, 62, INK, w=2.2), dot(130, 110, "", 5, RED), text(130, 102, "C(−2, 3, −1)", 11.5, RED, "middle"),
     line(130, 110, 192, 110, GREEN, 2), text(162, 128, "r = 2√2", 12, GREEN, "middle", True), text(130, 196, "Ex04  (x+2)² + (y−3)² + (z+1)² = 8", 12, INK, "middle"),
     circle(400, 110, 70, INK, w=2), circle(400, 110, 35, INK, w=2), path("M330 110 A 70 70 0 0 0 470 110 L 435 110 A 35 35 0 0 1 365 110 Z", BLUE, 1, "rgba(25,113,194,.22)"),
-    line(320, 110, 480, 110, GRAY, 1.2, "4 3"), text(400, 200, "추가 예제  1 ≤ x²+y²+z² ≤ 4, z ≤ 0", 12, INK, "middle"), text(400, 40, "구 껍질 사이, 아래 반쪽 — 「달걀 반쪽의 흰자」", 11.5, GRAY, "middle"),
+    line(320, 110, 480, 110, GRAY, 1.2, "4 3"), text(400, 200, "추가 예제  1 ≤ x²+y²+z² ≤ 4, z ≤ 0", 12, INK, "middle"), text(400, 24, "구 껍질 사이, 아래 반쪽 — 「달걀 반쪽의 흰자」", 11.5, GRAY, "middle"),
     cap="구면의 방정식 (x−h)² + (y−k)² + (z−l)² = r². 「값만 구하면 중고등학교. 대학은 이게 뭐냐를 그림으로.」")
 
 fig_vec = canvas(560, 150,
     dot(40, 110, "", 5, INK), text(36, 130, "A 시작점 (initial)", 12, INK), dot(200, 40, "", 5, INK), text(196, 30, "B 끝점 (terminal)", 12, INK),
-    arrow(46, 107, 194, 44, BLUE, "", 3), text(130, 90, "AB⃗ = v⃗", 15, BLUE, "middle", True),
-    arrow(300, 110, 448, 47, BLUE, "", 2.4), arrow(330, 130, 478, 67, BLUE, "", 2.4), text(420, 120, "= u⃗ = w⃗ (크기·방향 같으면 같은 벡터)", 11.5, GRAY),
-    text(470, 26, "스칼라 = 크기만 · 벡터 = 크기 + 방향", 12.5, INK, "middle", True),
+    arrow(46, 107, 194, 44, BLUE, "", 3), text(150, 102, "AB⃗ = v⃗", 15, BLUE, "middle", True),
+    arrow(300, 110, 448, 47, BLUE, "", 2.4), arrow(330, 130, 478, 67, BLUE, "", 2.4), text(430, 144, "= u⃗ = w⃗ (크기·방향이 같으면 같은 벡터)", 11.5, GRAY, "middle"),
+    text(440, 26, "스칼라 = 크기만 · 벡터 = 크기 + 방향", 12.5, INK, "middle", True),
     cap="12.2 벡터의 기하학적 표현. 손으로는 위에 화살표 필수(볼드체는 컴퓨터용). 순서를 바꾸면 안 된다.")
 
 fig_pos = canvas(560, 190,
     axis(40, 150, 220, 150, "x", "y") + arrow(40, 150, 40, 30, INK, "", 1.5),
-    dot(170, 60, "", 5, PINK), text(178, 56, "P(a₁, a₂)", 12, PINK), arrow(40, 150, 166, 63, GREEN, "", 2.8), text(90, 100, "a⃗ = OP⃗ = ⟨a₁, a₂⟩", 12.5, GREEN, "middle", True),
+    dot(170, 60, "", 5, PINK), text(178, 56, "P(a₁, a₂)", 12, PINK), arrow(40, 150, 166, 63, GREEN, "", 2.8), text(48, 56, "a⃗ = OP⃗ = ⟨a₁, a₂⟩", 12.5, GREEN, "start", True),
     axes3d(360, 150, 80), dot(*p3(360, 150, 50, 90, 80), "", 5, PINK), text(p3(360, 150, 50, 90, 80)[0] + 8, p3(360, 150, 50, 90, 80)[1] - 4, "Q(a₁, a₂, a₃)", 12, PINK),
     arrow(360, 150, *p3(360, 150, 50, 90, 80), GREEN, "", 2.8), line(*p3(360, 150, 50, 90, 0), *p3(360, 150, 50, 90, 80), GRAY, 1, "4 3"), dot(*p3(360, 150, 50, 90, 0), "", 3, GRAY),
-    text(470, 178, "a⃗ = OQ⃗ = ⟨a₁, a₂, a₃⟩", 12.5, GREEN, "middle", True),
+    text(470, 30, "a⃗ = OQ⃗ = ⟨a₁, a₂, a₃⟩", 12.5, GREEN, "middle", True),
     cap="성분(component) = 원점에서 출발해 점 P 를 가리키는 벡터의 좌표 = 위치벡터(position vector).")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미분적분학2 · 9/15 곡면 그리기 · 거리 · 구면 · 벡터 도입</title></head><body>

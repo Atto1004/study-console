@@ -6,7 +6,7 @@ from figs import *
 OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\정역학\_수업노트\2026-09-07.html"
 
 fig_tree = canvas(560, 190,
-    rect(190, 26, 180, 46, INK, fill="rgba(31,42,68,.06)", sw=2, rx=10), text(280, 46, "Mechanics 역학", 15, INK, "middle", True), text(280, 63, "힘(力)이 물체에 가해졌을 때 생기는 변화 전부", 11.5, GRAY, "middle"),
+    rect(160, 26, 240, 46, INK, fill="rgba(31,42,68,.06)", sw=2, rx=10), text(280, 46, "Mechanics 역학", 15, INK, "middle", True), text(280, 63, "힘(力)이 물체에 가해졌을 때 생기는 변화 전부", 11, GRAY, "middle"),
     line(280, 72, 280, 96, INK, 1.5), line(150, 96, 410, 96, INK, 1.5), arrow(150, 96, 150, 116, INK, "", 1.5), arrow(410, 96, 410, 116, INK, "", 1.5),
     rect(60, 118, 180, 58, GREEN, fill="rgba(47,158,68,.08)", sw=2, rx=10), text(150, 140, "Statics 정역학", 14, GREEN, "middle", True), text(150, 161, "\"equilibrium\" 평형 · 정지 · 이번 학기", 11.5, INK, "middle"),
     rect(320, 118, 180, 58, GRAY, fill="rgba(138,151,166,.10)", sw=2, rx=10), text(410, 140, "Dynamics 동역학", 14, GRAY, "middle", True), text(410, 161, "운동(motion) · 나중", 11.5, INK, "middle"),
@@ -30,15 +30,15 @@ fig_particle = canvas(560, 200,
 fig_vec = canvas(560, 180,
     arrow(60, 130, 200, 50, BLUE, "", 3), text(112, 78, "u", 16, BLUE, "middle", True), text(150, 158, "길이 ∝ 크기 |u| · 화살표 방향 = 방향", 12.5, INK, "middle"),
     dot(330, 130, "", 5, INK), text(318, 152, "A (시작)", 12, INK, "middle"), dot(500, 60, "", 5, INK), text(500, 48, "B (끝)", 12, INK, "middle"),
-    arrow(336, 126, 494, 64, GREEN, "", 2.6), text(430, 84, "r_AB", 14, GREEN, "middle", True),
+    arrow(336, 126, 494, 64, GREEN, "", 2.6), text(430, 70, "r_AB", 14, GREEN, "middle", True),
     text(420, 168, "앞 첨자 = 시작점, 뒤 첨자 = 끝점", 12.5, INK, "middle"),
     cap="벡터는 크기와 방향이 둘 다 같아야 같은 벡터. 위치벡터 \\(\\mathbf r_{AB}\\)는 A에서 B로 쏘는 벡터.")
 
 fig_add = canvas(560, 225,
-    arrow(40, 170, 160, 130, BLUE, "u", 2.6, 0, -8), arrow(160, 130, 210, 50, RED, "v", 2.6, 12, 0), arrow(40, 170, 210, 50, GREEN, "u + v", 3, -36, -4),
+    arrow(40, 170, 160, 130, BLUE, "u", 2.6, 0, -8), arrow(160, 130, 210, 50, RED, "v", 2.6, 12, 0), arrow(40, 170, 210, 50, GREEN, "u + v", 3, -40, -4),
     text(130, 208, "삼각형 법칙: u 꼬리에서 v 머리로", 12.5, INK, "middle"),
     arrow(300, 170, 420, 130, BLUE, "u", 2.6, 0, -8), arrow(300, 170, 350, 90, RED, "v", 2.6, -12, 0),
-    line(420, 130, 470, 50, GRAY, 1.2, "4 3"), line(350, 90, 470, 50, GRAY, 1.2, "4 3"), arrow(300, 170, 470, 50, GREEN, "u + v", 3, -36, -4),
+    line(420, 130, 470, 50, GRAY, 1.2, "4 3"), line(350, 90, 470, 50, GRAY, 1.2, "4 3"), arrow(300, 170, 470, 50, GREEN, "u + v", 3, 61, 18),
     text(390, 208, "평행사변형 법칙: 결과는 같다 (교환법칙)", 12.5, INK, "middle"),
     cap="덧셈 두 가지 그림. \\(\\mathbf u+\\mathbf v=\\mathbf v+\\mathbf u\\), 묶는 순서도 상관없다(결합법칙). 뺄셈은 \\(-\\mathbf v\\)를 더한다.")
 

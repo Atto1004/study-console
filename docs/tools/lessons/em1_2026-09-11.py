@@ -38,7 +38,7 @@ fig_recip = canvas(560, 150,
 
 fig_rl = canvas(560, 220,
     rect(40, 40, 200, 130, INK, fill="none", sw=2.2),
-    line(40, 95, 40, 115, "#fff", 6), line(30, 95, 50, 95, INK, 2.5), line(35, 115, 45, 115, INK, 3.5), text(18, 110, "E", 13, INK, "end", True), text(18, 126, "48 V", 11, GRAY, "end"),
+    line(40, 95, 40, 115, "#fff", 6), line(30, 95, 50, 95, INK, 2.5), line(35, 115, 45, 115, INK, 3.5), text(18, 110, "E", 13, INK, "end", True), text(4, 126, "48 V", 11, GRAY, "start"),
     rect(120, 30, 50, 20, INK, fill="#F1F3F5", sw=2), text(145, 22, "R = 11 Ω", 12, INK, "middle"), text(145, 66, "전압강하 iR", 11, GRAY, "middle"),
     path("M240 80 c 12 0 12 14 0 14 c 12 0 12 14 0 14 c 12 0 12 14 0 14", INK, 2.5), text(268, 104, "L = 0.1 H", 12, INK), text(268, 120, "L·di/dt", 11, GRAY),
     arrow(80, 170, 120, 170, GREEN, "i(t)", 2.2, 0, 14),
@@ -49,7 +49,7 @@ fig_rl = canvas(560, 220,
     cap="RL 회로(KVL): 전압강하 합 = 기전력. 독립변수만 t 로 바뀐 같은 선형 공식. 전류는 E/R 로 수렴.")
 
 fig_bern = canvas(560, 140,
-    fbox(20, 34, 180, 60, "y′ + p y = g·y^a", INK, sub="a ≠ 0, 1 이면 비선형", size=15), arrow(202, 64, 250, 64, GREEN, "", 2.2), text(226, 50, "u = y^(1−a)", 12, GREEN, "middle", True),
+    fbox(20, 34, 180, 60, "y′ + p y = g·y^a", INK, sub="a ≠ 0, 1 이면 비선형", size=15), arrow(202, 64, 250, 64, GREEN, "", 2.2), text(226, 24, "u = y^(1−a)", 12, GREEN, "middle", True),
     fbox(254, 34, 200, 60, "u′ + (1−a)p·u = (1−a)g", RED, sub="u 에 대한 비제차 선형 → 공식", size=14), arrow(456, 64, 500, 64, GREEN, "", 2.2), text(478, 50, "되돌리기", 11.5, GREEN, "middle"),
     fbox(504, 40, 46, 48, "y", INK, size=15),
     cap="베르누이 방정식(다음 주 연습). 「u 를 다시 y 로 바꿔야 돼. 이게 끝이 아니죠.」")

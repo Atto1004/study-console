@@ -6,27 +6,27 @@ from figs import *
 OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\정역학\_수업노트\2026-09-16.html"
 
 # 평행육면체: 밑면 V,W · 높이 U
-o = (150, 190); V = (150, 0); W = (60, -40); U = (30, -95)
+o = (120, 190); V = (150, 0); W = (60, -40); U = (30, -95)
 def add(*ps): return (sum(p[0] for p in ps), sum(p[1] for p in ps))
 pV, pW, pU = add(o, V), add(o, W), add(o, U); pVW = add(o, V, W); pUV = add(o, U, V); pUW = add(o, U, W); pUVW = add(o, U, V, W)
 fig_box = canvas(560, 240,
     path(f"M{o[0]} {o[1]} L{pV[0]} {pV[1]} L{pVW[0]} {pVW[1]} L{pW[0]} {pW[1]} Z", GRAY, 1.5, "rgba(138,151,166,.15)"),
     path(f"M{pU[0]} {pU[1]} L{pUV[0]} {pUV[1]} L{pUVW[0]} {pUVW[1]} L{pUW[0]} {pUW[1]} Z", GRAY, 1.5, "rgba(138,151,166,.06)"),
     line(pV[0], pV[1], pUV[0], pUV[1], GRAY, 1.5), line(pVW[0], pVW[1], pUVW[0], pUVW[1], GRAY, 1.5), line(pW[0], pW[1], pUW[0], pUW[1], GRAY, 1.5),
-    arrow(o[0], o[1], pV[0], pV[1], BLUE, "", 3), text(225, 212, "V", 15, BLUE, "middle", True),
-    arrow(o[0], o[1], pW[0], pW[1], RED, "", 3), text(168, 156, "W", 15, RED, "middle", True),
-    arrow(o[0], o[1], pU[0], pU[1], GREEN, "", 3), text(150, 120, "U", 15, GREEN, "middle", True),
-    text(240, 150, "밑면 넓이 |V × W|", 12.5, INK, "middle"),
-    text(430, 60, "U·(V×W) = |V×W| × (U의 수직 높이)", 13, INK, "middle"), text(430, 86, "= 평행육면체의 부피 (절댓값)", 14, INK, "middle", True),
-    text(430, 130, "세 벡터가 한 평면에 있으면", 12.5, RED, "middle"), text(430, 150, "높이 0 → 부피 0 → U·(V×W) = 0", 13, RED, "middle", True),
+    arrow(o[0], o[1], pV[0], pV[1], BLUE, "", 3), text(195, 212, "V", 15, BLUE, "middle", True),
+    arrow(o[0], o[1], pW[0], pW[1], RED, "", 3), text(190, 166, "W", 15, RED, "start", True),
+    arrow(o[0], o[1], pU[0], pU[1], GREEN, "", 3), text(118, 120, "U", 15, GREEN, "end", True),
+    text(240, 178, "밑면 |V×W|", 12, INK, "middle"),
+    text(462, 44, "U·(V×W)", 13, INK, "middle", True), text(462, 66, "= |V×W| × (U의 수직 높이)", 11.5, INK, "middle"), text(462, 90, "= 평행육면체의 부피 (절댓값)", 11.5, INK, "middle", True),
+    text(462, 126, "세 벡터가 한 평면에 있으면", 12, RED, "middle"), text(462, 146, "높이 0 → 부피 0 → U·(V×W) = 0", 11.5, RED, "middle", True),
     cap="혼합삼중적의 기하: 밑면(평행사변형 \\(\\mathbf V,\\mathbf W\\)) 넓이에 \\(\\mathbf U\\)의 수직 높이 성분을 곱한 것. 필기본 옆 한글 메모 「평행육면체」.")
 
 fig_forces = canvas(560, 210,
-    block(200, 70, 160, 90, "물체", INK),
+    block(200, 70, 160, 90, "", INK), text(280, 88, "물체", 13, INK, "middle", True),
     arrow(120, 115, 194, 115, GREEN, "외력 (다른 물체가)", 2.8, -10, -12),
     arrow(280, 20, 280, 64, BLUE, "표면력: 접촉", 2.4, 70, 0),
     arrow(280, 160, 280, 200, RED, "체적력: 중력 W = mg", 2.6, 90, 0),
-    line(280, 76, 280, 154, GRAY, 1.2, "4 3"), text(255, 100, "내력", 11.5, GRAY, "end"), text(255, 114, "(같은 물체의", 10.5, GRAY, "end"), text(255, 126, "다른 부분이)", 10.5, GRAY, "end"),
+    line(280, 96, 280, 154, GRAY, 1.2, "4 3"), text(255, 108, "내력", 11.5, GRAY, "end"), text(255, 122, "(같은 물체의", 10.5, GRAY, "end"), text(255, 134, "다른 부분이)", 10.5, GRAY, "end"),
     cap="힘의 분류 두 가지. 외력/내력은 「물체」를 어디까지로 잡느냐에 따라 달라지고, 체적력(부피 전체)/표면력(표면)은 힘이 걸리는 자리로 나눈다.")
 
 fig_contact = canvas(560, 220,
@@ -34,7 +34,7 @@ fig_contact = canvas(560, 220,
     # 경사면 위 블록 (회전 없이 단순화)
     rect(230, 108, 70, 44, INK, fill="#F1F3F5", sw=2, rx=5),
     arrow(265, 130, 285, 60, GREEN, "N (면에 수직)", 2.8, 60, -4),
-    arrow(265, 130, 190, 150, PINK, "f (면에 평행)", 2.8, -14, 22),
+    arrow(265, 130, 190, 150, PINK, "", 2.8), text(160, 148, "f (면에 평행)", 12, PINK, "end"),
     arrow(265, 130, 265, 200, RED, "W", 2.4, 14, 10),
     text(120, 60, "접촉력 F = N + f", 15, INK, "middle", True), text(120, 84, "곡면이면 접점의 접평면 기준", 12, GRAY, "middle"),
     text(480, 150, "손 ⇄ 벽", 13, INK, "middle", True), text(480, 170, "F(손→벽) = −F(벽→손)", 12, INK, "middle"), text(480, 188, "뉴턴 제3법칙", 12, RED, "middle", True),
@@ -42,9 +42,9 @@ fig_contact = canvas(560, 220,
 
 fig_pulley = canvas(560, 230,
     line(60, 30, 240, 30, INK, 3), line(150, 30, 150, 70, INK, 2), circle(150, 95, 26, INK, w=2.5, fill="#F1F3F5"), dot(150, 95, "", 4, INK),
-    line(124, 95, 124, 170, GRAY, 2), line(176, 95, 176, 150, GRAY, 2),
-    block(94, 170, 60, 44, "m", INK), arrow(124, 168, 124, 120, GREEN, "T₁", 2.6, -14, 0),
-    arrow(176, 150, 176, 112, GREEN, "T₂", 2.6, 16, 0), text(176, 176, "사람이 당김", 11.5, GRAY, "middle"),
+    line(124, 95, 124, 160, GRAY, 2), line(176, 95, 176, 150, GRAY, 2),
+    block(94, 160, 60, 44, "m", INK), arrow(124, 158, 124, 120, GREEN, "T₁", 2.6, -14, 0),
+    arrow(176, 150, 176, 112, GREEN, "T₂", 2.6, 16, 0), text(200, 176, "사람이 당김", 11.5, GRAY, "start"),
     text(150, 222, "도르래: 방향만 바꾼다, T₁ = T₂ (케이블 질량 0)", 12.5, INK, "middle", True),
     # 스프링
     line(340, 60, 340, 200, INK, 2), path("M340 80 l 20 8 l -40 8 l 40 8 l -40 8 l 40 8 l -40 8 l 20 8", INK, 2), line(340, 136, 340, 150, INK, 2),

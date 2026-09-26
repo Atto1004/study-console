@@ -7,12 +7,12 @@ OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\공업수학1\_
 
 X1 = lambda x: 40 + x * 30; Y1 = lambda y: 170 - y * 30
 def _lvl(c, color, w):
-    pts = [(X1(2.5 + c * 0.5 * math.cos(a) * 1.6), Y1(2.5 + c * 0.5 * math.sin(a))) for a in [2 * math.pi * i / 60 for i in range(61)]]
+    pts = [(X1(2.5 + c * 0.55 * math.cos(a) * 1.6), Y1(2.5 + c * 0.55 * math.sin(a))) for a in [2 * math.pi * i / 60 for i in range(61)]]
     return polyline(pts, color, w)
 fig_exact = canvas(560, 200,
     axis(40, 170, 300, 170, "x", "y") + arrow(40, 170, 40, 20, INK, "", 1.5),
     *[_lvl(c, GRAY if c != 2 else RED, 1.4 if c != 2 else 2.6) for c in (1, 2, 3, 4)],
-    text(115, 96, "u = 1", 10.5, GRAY, "middle"), text(190, 62, "u = c", 11.5, RED, "middle", True),
+    text(115, 99, "u = 1", 10.5, GRAY, "middle"), text(115, 74, "u = 2", 10, RED, "middle", True), text(250, 52, "u = c 등고선", 11.5, RED, "middle", True),
     text(430, 50, "M dx + N dy = du", 15, INK, "middle", True), text(430, 76, "M = ∂u/∂x,  N = ∂u/∂y", 13, INK, "middle"),
     text(430, 106, "du = 0  ⇒  u(x, y) = c", 14, RED, "middle", True), text(430, 130, "해 = 어떤 함수 u 의 등고선", 12.5, GRAY, "middle"),
     text(430, 160, "그 u 를 찾는 것이 1.4 의 전부", 12.5, GREEN, "middle", True),

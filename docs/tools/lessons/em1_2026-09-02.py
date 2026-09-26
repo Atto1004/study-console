@@ -6,9 +6,9 @@ from figs import *
 OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\공업수학1\_수업노트\2026-09-02.html"
 
 fig_model = canvas(560, 150,
-    fbox(20, 40, 120, 60, "물리 상황", INK, sub="탱크·회로·낙하"), arrow(142, 70, 176, 70, GREEN, "", 2), text(159, 58, "① 모델 설정", 11, GREEN, "middle"),
-    fbox(180, 40, 130, 60, "미분방정식", BLUE, sub="y′ = f(x, y)"), arrow(312, 70, 346, 70, GREEN, "", 2), text(329, 58, "② 해법", 11, GREEN, "middle"),
-    fbox(350, 40, 90, 60, "해 y(x)", BLUE, sub="식 하나"), arrow(442, 70, 476, 70, GREEN, "", 2), text(459, 58, "③ 해석", 11, GREEN, "middle"),
+    fbox(20, 40, 120, 60, "물리 상황", INK, sub="탱크·회로·낙하"), arrow(142, 70, 176, 70, GREEN, "", 2), text(159, 30, "① 모델 설정", 11, GREEN, "middle"),
+    fbox(180, 40, 130, 60, "미분방정식", BLUE, sub="y′ = f(x, y)"), arrow(312, 70, 346, 70, GREEN, "", 2), text(329, 30, "② 해법", 11, GREEN, "middle"),
+    fbox(350, 40, 90, 60, "해 y(x)", BLUE, sub="식 하나"), arrow(442, 70, 476, 70, GREEN, "", 2), text(459, 30, "③ 해석", 11, GREEN, "middle"),
     fbox(480, 40, 70, 60, "답", RED, sub="몇 시간?"),
     text(280, 130, "이 과목 전체가 ②(해법)이고, 과제·시험은 ①③까지 묻는다", 12.5, GRAY, "middle"),
     cap="모델화 3단계: 물리 법칙으로 식을 세우고(설정), 수학으로 풀고(해법), 그 해가 무슨 뜻인지 되돌린다(해석).")
@@ -18,7 +18,7 @@ def _cool(X, Y):
 X1 = lambda t: 30 + t * 14; Y1 = lambda T: 150 - (T - 20) * 1.4
 fig_models = canvas(560, 170,
     axis(30, 150, 180, 150, "t", "T") + arrow(30, 150, 30, 40, INK, "", 1.5), line(30, 150, 180, 150, GRAY, 1, "3 3"),
-    _cool(X1, Y1), text(105, 44, "뉴턴 냉각", 12.5, INK, "middle", True), text(105, 60, "T′ = −k(T − T_a)", 12, RED, "middle"), text(150, 144, "T_a", 11, GRAY, "middle"),
+    _cool(X1, Y1), text(105, 44, "뉴턴 냉각", 12.5, INK, "middle", True), text(105, 60, "T′ = −k(T − T_a)", 12, RED, "middle"), text(46, 141, "T_a", 11, GRAY, "middle"),
     line(230, 40, 230, 160, GRAY, 1, "3 3"),
     circle(300, 90, 16, INK, w=2, fill="#F1F3F5"), arrow(300, 108, 300, 150, RED, "mg", 2.2, 16, 0), arrow(300, 72, 300, 34, BLUE, "kv (저항)", 2.2, 30, 0), text(300, 168, "낙하 + 공기저항", 12.5, INK, "middle", True), text(300, 22, "m v′ = mg − kv", 12, RED, "middle"),
     line(390, 40, 390, 160, GRAY, 1, "3 3"),
@@ -46,7 +46,7 @@ X2 = lambda x: 60 + x * 60; Y2 = lambda y: 160 - y * 26
 fig_family = canvas(560, 180,
     axis(60, 160, 540, 160, "x", "y") + arrow(60, 160, 60, 20, INK, "", 1.5),
     *[fplot(lambda x, c=c: c * math.exp(-0.5 * x), 0, 7.5, X2, Y2, color=GRAY if c != 3 else RED, w=1.6 if c != 3 else 2.6) for c in (1, 2, 3, 4, 5)],
-    dot(60, Y2(3), "", 5, RED), text(74, Y2(3) - 6, "y(0) = 3 → 이 곡선 하나", 12.5, RED),
+    dot(60, Y2(3), "", 5, RED), text(230, 44, "y(0) = 3 → 이 곡선 하나 (빨강)", 12.5, RED),
     text(430, 60, "y = c·e^(−x/2)  (c 마다 곡선 하나)", 13, INK, "middle"), text(430, 80, "= 일반해 (가족)", 12.5, GRAY, "middle"),
     cap="미분방정식의 해는 하나가 아니라 「가족」이다. 조건 하나(초기값)가 그중 한 곡선을 고른다 — 9/4 의 주제.")
 

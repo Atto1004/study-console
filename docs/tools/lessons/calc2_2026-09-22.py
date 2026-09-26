@@ -8,17 +8,17 @@ OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\미분적분학
 fig_cos = canvas(560, 190,
     dot(70, 150, "", 5, INK), text(56, 168, "O", 13, INK, "middle", True), dot(270, 50, "", 5, PINK), text(270, 38, "A", 13, PINK, "middle"), dot(400, 140, "", 5, PINK), text(412, 144, "B", 13, PINK),
     arrow(76, 146, 264, 54, BLUE, "", 3), text(150, 92, "|a⃗|", 13, BLUE, "middle", True), arrow(76, 149, 394, 141, RED, "", 3), text(230, 162, "|b⃗|", 13, RED, "middle", True),
-    arrow(394, 136, 276, 56, GREEN, "", 2.6), text(360, 86, "|a⃗ − b⃗|", 13, GREEN, "middle", True), arc(70, 150, 44, -27, -2, GRAY, 1.5, "θ", 54),
-    text(470, 46, "코사인 제2법칙 (일각삼변)", 12.5, INK, "middle", True), text(470, 70, "|a−b|² = |a|² + |b|² − 2|a||b|cos θ", 12, INK, "middle"),
-    text(470, 100, "한편 |a−b|² = (a−b)·(a−b)", 12, INK, "middle"), text(470, 120, "= |a|² − 2 a·b + |b|²", 12, INK, "middle"),
-    text(470, 150, "∴ a⃗·b⃗ = |a⃗||b⃗| cos θ", 14, RED, "middle", True),
+    arrow(394, 136, 276, 56, GREEN, "", 2.6), text(307, 138, "|a⃗ − b⃗|", 13, GREEN, "middle", True), arc(70, 150, 44, -27, -2, GRAY, 1.5, "θ", 54),
+    text(452, 40, "코사인 제2법칙 (일각삼변)", 12.5, INK, "middle", True), text(452, 62, "|a−b|² = |a|² + |b|² − 2|a||b|cos θ", 11, INK, "middle"),
+    text(452, 96, "한편 |a−b|² = (a−b)·(a−b)", 12, INK, "middle"), text(452, 116, "= |a|² − 2 a·b + |b|²", 12, INK, "middle"),
+    text(452, 174, "∴ a⃗·b⃗ = |a⃗||b⃗| cos θ", 14, RED, "middle", True),
     cap="Thm 01 의 증명(교재) — 지각 구간(9:05~9:45)의 내용으로 추정. 두 식의 |a|², |b|² 이 지워지고 내적만 남는다.")
 
 ox, oy = 150, 160
 T = p3(ox, oy, 45, 95, 80)
 fig_dir = canvas(560, 220,
     axes3d(ox, oy, 100), arrow(ox, oy, T[0], T[1], GREEN, "", 3), dot(T[0], T[1], "", 5, PINK), text(T[0] + 8, T[1] - 6, "a⃗ = (a₁, a₂, a₃)", 12.5, PINK),
-    text(ox + 26, oy - 18, "β", 13, RED, "middle", True), text(ox - 4, oy - 60, "γ", 13, RED, "middle", True), text(ox - 30, oy + 12, "α", 13, RED, "middle", True),
+    text(ox + 46, oy - 10, "β", 13, RED, "middle", True), text(ox - 4, oy - 60, "γ", 13, RED, "middle", True), text(ox - 30, oy + 12, "α", 13, RED, "middle", True),
     text(430, 44, "방향각 α, β, γ = a⃗ 가 x·y·z 축(i, j, k)과 이루는 각", 12, INK, "middle"),
     text(430, 74, "cos α = (a⃗·i⃗)/(|a⃗||i⃗|) = a₁/|a⃗|", 13, INK, "middle", True), text(430, 96, "cos β = a₂/|a⃗|,   cos γ = a₃/|a⃗|", 13, INK, "middle", True),
     text(430, 126, "ㄱ cos²α + cos²β + cos²γ = 1", 13, RED, "middle", True), text(430, 148, "ㄴ u⃗ = a⃗/|a⃗| = (cos α, cos β, cos γ)", 13, RED, "middle", True),
@@ -32,13 +32,13 @@ fig_ex04 = canvas(560, 150,
     cap="Ex04 (판서 ②③, 답 분홍 박스). 분모의 근호는 유리화해 정리.")
 
 fig_cross = canvas(560, 230,
-    path("M60 190 L 300 190 L 380 120 L 140 120 Z", GRAY, 1.5, "rgba(138,151,166,.12)", "4 3"),
-    arrow(120, 170, 300, 170, BLUE, "", 3), text(210, 190, "a⃗", 15, BLUE, "middle", True), arrow(120, 170, 200, 130, RED, "", 3), text(150, 138, "b⃗", 15, RED, "middle", True),
-    arrow(120, 170, 120, 30, GREEN, "", 3.4), text(134, 40, "c⃗ = a⃗ × b⃗  ⊥ a⃗, ⊥ b⃗", 14, GREEN, "start", True),
-    text(430, 60, "[Def 01] 외적 (cross / outer product)", 13, INK, "middle", True),
-    text(430, 90, "a⃗ × b⃗ = (a₂b₃ − a₃b₂,  a₃b₁ − a₁b₃,  a₁b₂ − a₂b₁)", 11.5, INK, "middle"),
-    mat(330, 110, [["a_2", "a_3"], ["b_2", "b_3"]], 30, 24, bars=True), mat(400, 110, [["a_3", "a_1"], ["b_3", "b_1"]], 30, 24, bars=True), mat(470, 110, [["a_1", "a_2"], ["b_1", "b_2"]], 30, 24, bars=True),
-    text(430, 176, "성분마다 자기 번호를 뺀 나머지 두 번호가 순환 순서(2→3, 3→1, 1→2)", 11, GRAY, "middle"), text(430, 196, "결과는 벡터 — 내적(스칼라)과 다르다", 11.5, RED, "middle"),
+    path("M50 195 L 270 195 L 330 135 L 110 135 Z", GRAY, 1.5, "rgba(138,151,166,.12)", "4 3"),
+    arrow(110, 178, 250, 178, BLUE, "", 3), text(180, 214, "a⃗", 15, BLUE, "middle", True), arrow(110, 178, 190, 142, RED, "", 3), text(150, 150, "b⃗", 15, RED, "middle", True),
+    arrow(110, 178, 110, 40, GREEN, "", 3.4), text(124, 46, "c⃗ = a⃗ × b⃗  ⊥ a⃗, ⊥ b⃗", 14, GREEN, "start", True),
+    text(440, 60, "[Def 01] 외적 (cross / outer product)", 13, INK, "middle", True),
+    text(440, 88, "a⃗ × b⃗ = (a₂b₃ − a₃b₂,  a₃b₁ − a₁b₃,  a₁b₂ − a₂b₁)", 10.5, INK, "middle"),
+    mat(340, 104, [["a_2", "a_3"], ["b_2", "b_3"]], 30, 24, bars=True), mat(410, 104, [["a_3", "a_1"], ["b_3", "b_1"]], 30, 24, bars=True), mat(480, 104, [["a_1", "a_2"], ["b_1", "b_2"]], 30, 24, bars=True),
+    text(440, 176, "결과는 벡터 — 내적(스칼라)과 다르다", 11.5, RED, "middle"), text(440, 196, "자기 번호 뺀 두 번호 = 순환 (2,3)(3,1)(1,2)", 11, GRAY, "middle"),
     cap="12.4 외적의 정의(판서 ④). 2×2 행렬식 세 개 — 9/3 의 ad − bc 가 여기서 쓰인다.")
 
 fig_der = canvas(560, 150,

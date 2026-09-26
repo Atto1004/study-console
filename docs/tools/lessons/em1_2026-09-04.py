@@ -10,7 +10,7 @@ fig_ivp = canvas(560, 190,
     axis(60, 165, 330, 165, "x", "y") + arrow(60, 165, 60, 20, INK, "", 1.5),
     *[fplot(lambda x, c=c: c * math.exp(3 * x), 0, 1.3, X1, Y1, color=GRAY, w=1.5, ylim=(0, 16)) for c in (1, 2, 3.5, 9)],
     fplot(lambda x: 5.7 * math.exp(3 * x), 0, 1.3, X1, Y1, color=RED, w=2.8, ylim=(0, 16)),
-    dot(60, Y1(5.7), "", 5, RED), text(74, Y1(5.7) + 4, "(0, 5.7) 초기조건", 12.5, RED),
+    dot(60, Y1(5.7), "", 5, RED), text(56, Y1(5.7) + 4, "(0, 5.7)", 12.5, RED, "end"), text(56, Y1(5.7) + 20, "초기조건", 11.5, RED, "end"),
     text(440, 60, "y′ = 3y", 15, INK, "middle", True), text(440, 84, "일반해 y = c·e³ˣ", 13, GRAY, "middle"), text(440, 108, "y(0) = 5.7 → c = 5.7", 13, INK, "middle"),
     text(440, 132, "특수해 y = 5.7e³ˣ", 14, RED, "middle", True),
     cap="초기값 문제(IVP): 일반해(회색 가족)에서 초기조건이 지나는 곡선 하나(빨강)를 고른다.")
@@ -44,13 +44,13 @@ fig_circles = canvas(560, 220,
     cap="Ex.8 의 해 가족: c 가 달라지면 반지름이 다른 원. 해를 「그림」으로 읽는 연습 — 정리하면 강점이 된다.")
 
 X4 = lambda t: 60 + t * 0.0095; Y4 = lambda h: 150 - h * 0.55
-fig_tank = canvas(560, 180,
+fig_tank = canvas(560, 192,
     rect(40, 40, 110, 110, INK, fill="none", sw=2), rect(41, 70, 108, 79, BLUE, fill="rgba(25,113,194,.18)", sw=0), text(95, 62, "h(t)", 13, BLUE, "middle", True),
-    rect(148, 140, 10, 6, INK, fill="#fff", sw=1), arrow(160, 143, 200, 143, BLUE, "유출 v = 0.6√(2gh)", 2, 40, -8),
-    text(95, 168, "지름 2 m 탱크 · 지름 1 cm 구멍", 11.5, GRAY, "middle"),
-    axis(260, 150, 540, 150, "t [s]", "h [cm]") + arrow(260, 150, 260, 30, INK, "", 1.5),
+    rect(148, 140, 10, 6, INK, fill="#fff", sw=1), arrow(160, 143, 200, 143, BLUE, "", 2), text(180, 166, "유출 v = 0.6√(2gh)", 11, BLUE, "middle"),
+    text(95, 184, "지름 2 m 탱크 · 지름 1 cm 구멍", 11.5, GRAY, "middle"),
+    axis(260, 150, 540, 150, "t", "h [cm]") + arrow(260, 150, 260, 30, INK, "", 1.5),
     fplot(lambda t: (15 - 0.000332 * t) ** 2, 0, 45181, lambda t: 260 + t * 0.006, lambda h: 150 - h * 0.5, color=RED, w=2.6),
-    text(275, 42, "225 cm", 11.5, GRAY), text(531, 166, "45 181 s ≈ 12.6 h", 11.5, RED, "end"),
+    text(275, 42, "225 cm", 11.5, GRAY), text(400, 168, "45 181 s ≈ 12.6 h 에 바닥", 11.5, RED, "middle"),
     cap="Ex.7 토리첼리: 물 높이 h 가 √h 에 비례해 줄어든다 → 포물선 모양으로 비어 12.6시간 뒤 바닥(교재 수치).")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공업수학1 · 9/4 해와 초기값 문제 · 변수분리형 · 동차형</title></head><body>

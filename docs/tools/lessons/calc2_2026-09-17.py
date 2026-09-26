@@ -7,9 +7,9 @@ OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\미분적분학
 
 fig_ab = canvas(560, 200,
     dot(80, 160, "", 5, INK), text(64, 178, "O", 13, INK, "middle", True),
-    dot(220, 60, "", 5, PINK), text(214, 48, "A(x₁, y₁, z₁)", 12, PINK, "middle"), dot(420, 120, "", 5, PINK), text(430, 116, "B(x₂, y₂, z₂)", 12, PINK),
+    dot(220, 60, "", 5, PINK), text(196, 44, "A(x₁, y₁, z₁)", 12, PINK, "middle"), dot(420, 120, "", 5, PINK), text(430, 116, "B(x₂, y₂, z₂)", 12, PINK),
     arrow(86, 156, 214, 64, YEL, "", 2.6), text(130, 100, "OA⃗", 13, "#B26A00", "middle", True), arrow(86, 158, 414, 121, YEL, "", 2.6), text(250, 152, "OB⃗", 13, "#B26A00", "middle", True),
-    arrow(226, 62, 414, 118, GREEN, "", 3), text(330, 78, "AB⃗ = OB⃗ − OA⃗", 14, GREEN, "middle", True),
+    arrow(226, 62, 414, 118, GREEN, "", 3), text(330, 60, "AB⃗ = OB⃗ − OA⃗", 14, GREEN, "middle", True),
     text(330, 184, "= (x₂−x₁, y₂−y₁, z₂−z₁)   「끝점 − 시작점」 — 거리 공식에서 루트만 안 씌운 것", 12, INK, "middle"),
     cap="원점이 없는 두 점 벡터를 위치벡터로 환원(판서 ①). BA 로 읽으면 안 된다 — 확 바뀐다.")
 
@@ -33,20 +33,20 @@ fig_ijk = canvas(560, 200,
 
 fig_unit = canvas(560, 150,
     dot(40, 110, "", 5, INK), text(30, 128, "O", 12, INK, "middle", True),
-    arrow(46, 107, 300, 40, BLUE, "", 3), text(200, 56, "a⃗ = 2i − j − 2k,  |a⃗| = 3", 13, BLUE, "middle", True),
+    arrow(46, 107, 300, 40, BLUE, "", 3), text(232, 96, "a⃗ = 2i − j − 2k,  |a⃗| = 3", 13, BLUE, "middle", True),
     arrow(46, 107, 130, 85, GREEN, "", 3.4), text(88, 130, "u⃗ = (1/|a|) a⃗", 13, GREEN, "middle", True), text(88, 146, "같은 방향, 원점에서 1/3 지점", 11, GRAY, "middle"),
     text(430, 60, "★⑤ 단위벡터 = 크기 1", 14, INK, "middle", True), text(430, 84, "u⃗ = a⃗ / |a⃗| = ⅔i − ⅓j − ⅔k (Ex04)", 12.5, INK, "middle"),
     text(430, 112, "「u 라고만 쓰면 일반 벡터 — (1/|a|)a 꼴로 써야」", 11.5, RED, "middle"),
     cap="어떤 벡터든 자기 크기로 나누면 같은 방향의 단위벡터. i, j, k 도 단위벡터.")
 
-fig_dot = canvas(560, 200,
-    dot(80, 160, "", 5, INK), text(66, 178, "O", 13, INK, "middle", True),
-    dot(300, 50, "", 5, PINK), text(300, 38, "A", 13, PINK, "middle"), dot(440, 150, "", 5, PINK), text(452, 154, "B", 13, PINK),
-    arrow(86, 156, 294, 54, BLUE, "", 3), text(170, 96, "a⃗ = OA⃗", 13, BLUE, "middle", True), arrow(86, 158, 434, 151, RED, "", 3), text(260, 172, "b⃗ = OB⃗", 13, RED, "middle", True),
-    arrow(434, 146, 306, 56, GREEN, "", 2.6), text(392, 92, "BA⃗ = a⃗ − b⃗", 13, GREEN, "middle", True),
-    arc(80, 160, 44, -27, -2, GRAY, 1.5, "θ", 54),
-    text(470, 40, "[Def 01] a⃗·b⃗ = a₁b₁ + a₂b₂ + a₃b₃", 12.5, INK, "middle", True), text(470, 64, "결과는 실수(스칼라) → scalar product", 11.5, GRAY, "middle"),
-    text(470, 96, "[Thm 01] a⃗·b⃗ = |a⃗||b⃗| cos θ", 12.5, INK, "middle", True), text(470, 118, "삼각형 OAB, 일각삼변 → 코사인 제2법칙", 11.5, GRAY, "middle"),
+fig_dot = canvas(560, 230,
+    dot(70, 170, "", 5, INK), text(56, 188, "O", 13, INK, "middle", True),
+    dot(260, 60, "", 5, PINK), text(260, 46, "A", 13, PINK, "middle"), dot(390, 150, "", 5, PINK), text(402, 156, "B", 13, PINK),
+    arrow(76, 166, 254, 64, BLUE, "", 3), text(128, 96, "a⃗ = OA⃗", 13, BLUE, "middle", True), arrow(76, 168, 384, 151, RED, "", 3), text(230, 182, "b⃗ = OB⃗", 13, RED, "middle", True),
+    arrow(384, 146, 266, 66, GREEN, "", 2.6), text(346, 74, "BA⃗ = a⃗ − b⃗", 13, GREEN, "middle", True),
+    arc(70, 170, 44, -30, -3, GRAY, 1.5, "θ", 54),
+    text(445, 34, "[Def 01] a⃗·b⃗ = a₁b₁ + a₂b₂ + a₃b₃", 12, INK, "middle", True), text(445, 54, "결과는 실수(스칼라) → scalar product", 11.5, GRAY, "middle"),
+    text(445, 190, "[Thm 01] a⃗·b⃗ = |a⃗||b⃗| cos θ", 12, INK, "middle", True), text(445, 210, "삼각형 OAB, 일각삼변 → 코사인 제2법칙", 11.5, GRAY, "middle"),
     cap="12.3 내적 도입. 점은 진하게(× 금지), 순서 무관. 증명(코사인 법칙)은 9/22.")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미분적분학2 · 9/17 벡터 계산 — 두 점 벡터 · 크기 · 표준기저 · 단위벡터 · 내적 도입</title></head><body>

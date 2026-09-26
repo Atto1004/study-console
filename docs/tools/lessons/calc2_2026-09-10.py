@@ -6,14 +6,14 @@ from figs import *
 OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\미분적분학2\_수업노트\2026-09-10.html"
 
 ox, oy = 170, 170
-P = p3(ox, oy, 70, 120, 90); Pxy = p3(ox, oy, 70, 120, 0); Px = p3(ox, oy, 70, 0, 0); Py = p3(ox, oy, 0, 120, 0)
+P = p3(ox, oy, 70, 100, 90); Pxy = p3(ox, oy, 70, 100, 0); Px = p3(ox, oy, 70, 0, 0); Py = p3(ox, oy, 0, 100, 0)
 fig_axes = canvas(560, 250,
     axes3d(ox, oy, 110),
     line(Px[0], Px[1], Pxy[0], Pxy[1], GRAY, 1.2, "4 3"), line(Py[0], Py[1], Pxy[0], Pxy[1], GRAY, 1.2, "4 3"),
     dot(Pxy[0], Pxy[1], "", 5, BLUE), text(Pxy[0] + 8, Pxy[1] + 16, "P(x₁, y₁, 0)  ① 먼저 찍고", 12, BLUE),
-    line(Pxy[0], Pxy[1], P[0], P[1], GRAY, 1.2, "4 3"), arrow(Pxy[0] + 14, Pxy[1] - 6, P[0] + 14, P[1] + 8, GREEN, "② z₁ 만큼 올린다", 1.8, 62, 4),
+    line(Pxy[0], Pxy[1], P[0], P[1], GRAY, 1.2, "4 3"), arrow(Pxy[0] + 14, Pxy[1] - 6, P[0] + 14, P[1] + 8, GREEN, "② z₁ 만큼 올린다", 1.8, 62, -30),
     dot(P[0], P[1], "", 6, PINK), text(P[0] + 10, P[1] - 6, "P(x₁, y₁, z₁)", 13, PINK, "start", True),
-    arrow(ox, oy, Pxy[0], Pxy[1], YEL, "", 2.4), text((ox + Pxy[0]) / 2 - 10, (oy + Pxy[1]) / 2 + 18, "r (동경)", 12, "#B26A00", "middle"),
+    arrow(ox, oy, Pxy[0], Pxy[1], YEL, "", 2.4), text(200, 226, "r (동경)", 12, "#B26A00", "middle"),
     arc(ox, oy, 30, 0, 22, GRAY, 1.2, "θ", 40),
     text(450, 60, "직교좌표  P(x, y, z)  ✓", 13.5, INK, "middle", True), text(450, 84, "원주좌표  P(r, θ, z)  ✓", 13.5, INK, "middle", True), text(450, 108, "구면좌표  (ρ, θ, φ)  ✗ 뺀다", 13, GRAY, "middle"),
     text(450, 150, "원주좌표 = xy 평면의 극좌표 + 높이 z", 12, GRAY, "middle"), text(450, 170, "x = r cos θ, y = r sin θ, z = z", 12.5, INK, "middle"),
@@ -34,7 +34,7 @@ fig_cs = canvas(560, 210,
     axis(60, 160, 220, 160, "x", "y") + arrow(60, 160, 60, 40, INK, "", 1.5),
     fplot(lambda x: 1.5 + 1.2 * math.sin(x), 0, 5.4, X1, Y1, color=RED, w=2.6), text(140, 190, "① R² : 곡선 (x, y)", 12.5, INK, "middle", True),
     line(280, 40, 280, 180, GRAY, 1, "3 3"),
-    axes3d(360, 150, 70), path("M330 130 C 380 60, 470 70, 500 120 C 470 150, 380 160, 330 130 Z", RED, 2.2, "rgba(224,49,49,.10)"),
+    axes3d(360, 150, 70), path("M330 108 C 380 40, 470 50, 500 98 C 470 128, 380 138, 330 108 Z", RED, 2.2, "rgba(224,49,49,.10)"),
     text(430, 190, "★② R³ : 곡면 (x, y, z)", 12.5, INK, "middle", True),
     cap="변수 개수가 도형의 차원을 정한다. 이 과목의 대상은 곡면(판서 ② 앞의 별표는 교수님 분필).")
 

@@ -9,7 +9,7 @@ X1 = lambda x: 50 + x * 90; Y1 = lambda y: 160 - y * 14
 fig_ec = canvas(560, 190,
     axis(50, 160, 300, 160, "x (> 0)", "y") + arrow(50, 160, 50, 20, INK, "", 1.5),
     fplot(lambda x: x ** 2, 0, 2.6, X1, Y1, color=BLUE, w=2.4, ylim=(0, 9.5)), fplot(lambda x: x ** 3, 0, 2.2, X1, Y1, color=RED, w=2.4, ylim=(0, 9.5)),
-    text(292, 70, "x²", 13, BLUE, "end", True), text(230, 32, "x³", 13, RED, "start", True),
+    text(300, 68, "x²", 13, BLUE, "start", True), text(252, 40, "x³", 13, RED, "start", True),
     text(430, 50, "x²y″ + axy′ + by = 0", 14.5, INK, "middle", True), text(430, 76, "y = xᵐ 대입 → x 가 전부 빠진다", 12.5, GRAY, "middle"),
     text(430, 104, "m² + (a − 1)m + b = 0", 15, RED, "middle", True), text(430, 126, "보조방정식 (auxiliary equation)", 12, GRAY, "middle"),
     text(430, 158, "(1) 실근 m₁ ≠ m₂ → y = c₁x^m₁ + c₂x^m₂", 12.5, INK, "middle"),

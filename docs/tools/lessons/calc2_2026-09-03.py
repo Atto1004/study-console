@@ -17,20 +17,22 @@ fig_mul = canvas(560, 190,
     cap="행렬의 곱: 결과의 (i, j) 성분 = 앞 행렬 i 행과 뒤 행렬 j 열의 짝 곱의 합.")
 
 fig_det2 = canvas(560, 120,
-    mat(60, 30, [["a", "b"], ["c", "d"]], 34, 28, bars=True), line(66, 34, 122, 84, GREEN, 2.2), line(122, 34, 66, 84, RED, 2.2, "4 3"),
+    band(66, 34, 122, 84, 10, GREEN, .22), band(122, 34, 66, 84, 10, RED, .16), mat(60, 30, [["a", "b"], ["c", "d"]], 34, 28, bars=True),
     text(94, 104, "det A = ad − bc", 13, INK, "middle", True),
     text(330, 48, "↘ 주대각 곱 (+)  −  ↙ 반대 대각 곱 (−)", 13, INK, "middle"), text(330, 72, "고1 유리함수 y = (ax+b)/(cx+d) 의 역함수에서 보던 ad − bc", 11.5, GRAY, "middle"),
     text(330, 98, "행렬식은 행렬이 아니라 「값」 — det A 또는 |A| (절댓값 아님)", 12, RED, "middle", True),
     cap="2차 행렬식. 세로줄과 det 표기를 반드시 쓴다 — 「당연히 알겠지 하고 안 쓰면 감점」.")
 
 def sarrus(x, y, rows, cw=30, ch=26):
-    s = mat(x, y, rows, cw, ch, bars=True)
+    # 대각선은 글자를 관통하는 선 대신 반투명 띠(획 없음)로 — 글자 위에 선이 겹치지 않는다
+    s = ""
+    for k in range(3):
+        s += band(x + (k + .5) * cw, y + ch * .5, x + (k + 2.5) * cw, y + ch * 2.5, 11, GREEN, .2)
+        s += band(x + (k + 2.5) * cw, y + ch * .5, x + (k + .5) * cw, y + ch * 2.5, 11, RED, .15)
+    s += mat(x, y, rows, cw, ch, bars=True)
     # 오른쪽에 1·2열 반복
     for i, r in enumerate(rows):
         s += text(x + 3 * cw + cw / 2, y + i * ch + ch / 2 + 5, str(r[0]), 13, GRAY, "middle") + text(x + 4 * cw + cw / 2, y + i * ch + ch / 2 + 5, str(r[1]), 13, GRAY, "middle")
-    for k in range(3):
-        s += line(x + (k + .5) * cw, y + ch * .5, x + (k + 2.5) * cw, y + ch * 2.5, GREEN, 2)
-        s += line(x + (k + 2.5) * cw, y + ch * .5, x + (k + .5) * cw, y + ch * 2.5, RED, 1.6, "4 3")
     return s
 fig_sarrus = canvas(560, 200,
     sarrus(40, 30, [["a_11", "a_12", "a_13"], ["a_21", "a_22", "a_23"], ["a_31", "a_32", "a_33"]], 42, 30),

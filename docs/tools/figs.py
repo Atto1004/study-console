@@ -5,9 +5,24 @@
 INK = "#1F2A44"; RED = "#E03131"; BLUE = "#1971C2"; GREEN = "#2F9E44"; PINK = "#FF4D8D"; GRAY = "#8A97A6"; YEL = "#F59F00"
 import re as _re
 def _sub(t):
-    """SVG 라벨의 `U_y` · `r_AB` · `q_{enc}` 를 진짜 아래첨자(tspan)로, 벡터 결합 화살표(a⃗)는 굵은 글자 + 작은 위첨자 → 로. 캡션(KaTeX)에는 쓰지 않는다."""
+    """SVG 라벨의 `U_y` · `r_AB` · `q_{enc}` 를 진짜 아래첨자(tspan)로, 벡터 결합 화살표(a⃗)·모자(n̂)는 굵은 글자 + 작은 위첨자로.
+    결합 문자는 Pretendard 에서 깨져 보이므로 SVG 텍스트에 그대로 두지 않는다. 캡션(KaTeX)에는 쓰지 않는다."""
     s = _re.sub(r'([A-Za-z]+)⃗', lambda m: '<tspan font-weight="700">' + m.group(1) + '</tspan><tspan baseline-shift="super" font-size="62%">→</tspan>', str(t))
+    s = _re.sub(r'([A-Za-z])̂', lambda m: '<tspan font-weight="700">' + m.group(1) + '</tspan><tspan baseline-shift="super" font-size="62%">^</tspan>', s)
     return _re.sub(r'_\{([^}]+)\}|_([A-Za-z0-9]+)', lambda m: '<tspan baseline-shift="sub" font-size="72%">' + (m.group(1) or m.group(2)) + '</tspan>', s)
+
+def _fit(t, size, maxw):
+    """라벨이 상자보다 넓으면 글자 크기를 줄인다(폭 어림: 라틴 0.56em · 한글 0.98em · 기호 0.6em)"""
+    est = sum((0.98 if ord(ch) > 0x2E7F else 0.56 if ch.isalnum() else 0.6) for ch in _re.sub(r'<[^>]+>', '', str(t))) * size
+    return round(size * maxw / est, 1) if est > maxw else size
+
+def band(x1, y1, x2, y2, w=8, color=None, alpha=.16):
+    """글자 위를 지나는 대각선 대신 쓰는 반투명 띠(획 없음) — 사루스 대각선·지우기 표시 등"""
+    import math
+    c = color or GREEN; dx, dy = x2 - x1, y2 - y1; L = math.hypot(dx, dy) or 1
+    nx, ny = -dy / L * w / 2, dx / L * w / 2
+    pts = [(x1 + nx, y1 + ny), (x2 + nx, y2 + ny), (x2 - nx, y2 - ny), (x1 - nx, y1 - ny)]
+    return '<path d="M' + ' L'.join(f'{x:.1f} {y:.1f}' for x, y in pts) + f' Z" fill="{c}" fill-opacity="{alpha}" stroke="none"/>'
 
 def canvas(w, h, *parts, cap=""):
     body = "".join(parts)
@@ -19,8 +34,9 @@ def canvas(w, h, *parts, cap=""):
 
 def charge(x, y, sign="+", label="", r=14, color=None):
     c = color or (RED if sign == "+" else BLUE)
-    s = f'<circle cx="{x}" cy="{y}" r="{r}" fill="{c}" fill-opacity=".15" stroke="{c}" stroke-width="2"/>'
-    s += f'<text x="{x}" y="{y+5}" text-anchor="middle" font-size="16" font-weight="700" fill="{c}">{sign}</text>'
+    fs = 16 if r >= 13 else round(r * 1.15)   # 작은 원에서는 기호가 원 테두리를 넘지 않게
+    s = f'<circle cx="{x}" cy="{y}" r="{r}" fill="#fff"/><circle cx="{x}" cy="{y}" r="{r}" fill="{c}" fill-opacity=".15" stroke="{c}" stroke-width="2"/>'
+    s += f'<text x="{x}" y="{y + fs * .32:.1f}" text-anchor="middle" font-size="{fs}" font-weight="700" fill="{c}">{sign}</text>'
     if label: s += f'<text x="{x}" y="{y+r+16}" text-anchor="middle" font-size="13" fill="{INK}">{_sub(label)}</text>'
     return s
 
@@ -43,8 +59,10 @@ def line(x1, y1, x2, y2, color=None, w=2, dash=""):
     return f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{c}" stroke-width="{w}"{d}/>'
 
 def text(x, y, t, size=14, color=None, anchor="start", bold=False):
+    """글자에는 흰 테두리(halo)를 둘러 선 옆에서도 읽히게 한다 — 겹침 자체는 fig_check 로 0건을 만든다"""
     c = color or INK
-    return f'<text x="{x}" y="{y}" font-size="{size}" fill="{c}" text-anchor="{anchor}"{" font-weight=\"700\"" if bold else ""}>{_sub(t)}</text>'
+    return (f'<text x="{x}" y="{y}" font-size="{size}" fill="{c}" text-anchor="{anchor}"{" font-weight=\"700\"" if bold else ""}'
+            f' paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">{_sub(t)}</text>')
 
 def circle(x, y, r, color=None, dash="", fill="none", w=2):
     c = color or INK
@@ -59,11 +77,11 @@ def rect(x, y, w, h, color=None, dash="", fill="none", sw=2, rx=0):
 def gauss(x, y, r, label="가우스면"):
     return circle(x, y, r, PINK, dash="6 5") + (text(x + r + 6, y - r + 4, label, 12, PINK) if label else "")
 
-def radial(x, y, n=8, r0=18, r1=48, color=None, inward=False):
+def radial(x, y, n=8, r0=18, r1=48, color=None, inward=False, a0=0):
     import math
     c = color or GREEN; s = ""
     for i in range(n):
-        a = 2 * math.pi * i / n
+        a = 2 * math.pi * i / n + math.radians(a0)
         p0 = (x + r0 * math.cos(a), y + r0 * math.sin(a)); p1 = (x + r1 * math.cos(a), y + r1 * math.sin(a))
         if inward: p0, p1 = p1, p0
         s += arrow(round(p0[0], 1), round(p0[1], 1), round(p1[0], 1), round(p1[1], 1), c, w=1.6)
@@ -81,11 +99,12 @@ def path(d, color=None, w=2, fill="none", dash=""):
     return f'<path d="{d}" fill="{fill}" stroke="{c}" stroke-width="{w}"{dd}/>'
 
 def plate(x, y, w, h, sign="+", n=6):
-    """평행판: 가로 판 + 전하 기호 n개"""
+    """평행판: 가로 판 + 전하 기호 n개 (기호 크기는 판 두께에 맞춰 테두리를 넘지 않게)"""
     c = RED if sign == "+" else BLUE
     s = rect(x, y, w, h, INK, fill="#F1F3F5", sw=1.5)
+    fs = max(8, round(h * .6))
     for i in range(n):
-        s += text(x + w * (i + .5) / n, y + h / 2 + 5, sign, 13, c, "middle", True)
+        s += text(x + w * (i + .5) / n, y + h / 2 + fs * .34, sign, fs, c, "middle", True)
     return s
 
 def brace_label(x1, x2, y, label, color=None):
@@ -98,7 +117,8 @@ def axes3d(ox, oy, L=90, xl="x", yl="y", zl="z", color=None):
     """오른손 좌표계 사시도: z 위 · y 오른쪽 · x 앞(왼쪽 아래)"""
     c = color or INK
     s = arrow(ox, oy, ox + L, oy, c, w=1.5) + arrow(ox, oy, ox, oy - L, c, w=1.5) + arrow(ox, oy, ox - L * .6, oy + L * .5, c, w=1.5)
-    s += text(ox + L + 6, oy + 5, yl, 13, c) + text(ox - 4, oy - L - 6, zl, 13, c, "end") + text(ox - L * .6 - 16, oy + L * .5 + 8, xl, 13, c)
+    # x 축 라벨은 화살촉 왼쪽·살짝 위(캔버스 아래로 나가지 않게)
+    s += text(ox + L + 6, oy + 5, yl, 13, c) + text(ox - 4, oy - L - 6, zl, 13, c, "end") + text(ox - L * .6 - 6, oy + L * .5 - 10, xl, 13, c, "end")
     return s
 
 def p3(ox, oy, x, y, z, s=1.0):
@@ -143,11 +163,12 @@ def fplot(fn, x0, x1, X, Y, n=80, color=None, w=2.2, dash="", ylim=None):
     return out + polyline(pts, color, w, dash)
 
 def fbox(x, y, w, h, label, color=None, fill=None, size=13, sub="", bold=True):
-    """흐름도 상자: label 가운데, sub 는 아래 작은 글씨"""
+    """흐름도 상자: label 가운데, sub 는 아래 작은 글씨. 글자가 상자보다 넓으면 자동으로 줄인다"""
     c = color or INK
     s = rect(x, y, w, h, c, fill=fill or "rgba(255,255,255,.75)", sw=1.6, rx=9)
+    size = _fit(label, size, w - 14)
     s += text(x + w / 2, y + h / 2 + (5 if not sub else -2), label, size, c, "middle", bold)
-    if sub: s += text(x + w / 2, y + h / 2 + 14, sub, 11, GRAY, "middle")
+    if sub: s += text(x + w / 2, y + h / 2 + 14, sub, _fit(sub, 11, w - 12), GRAY, "middle")
     return s
 
 def mat(x, y, rows, cw=30, ch=26, color=None, size=13, hl=None, bars=False):

@@ -20,11 +20,13 @@ fig_re = canvas(560, 200,
     cap="가우스면 3종으로 지난 시간 적분 결과를 한 줄에 다시 얻는다. 무한 평면은 전기력선이 양쪽으로 나가므로 2A.")
 
 def dots_in(cx, cy, R, n=14, color=RED):
-    import math, random
-    random.seed(7); s = ""
-    for i in range(n):
-        a = random.random() * 2 * math.pi; rr = R * 0.85 * math.sqrt(random.random())
-        s += f'<text x="{cx+rr*math.cos(a):.1f}" y="{cy+rr*math.sin(a)+4:.1f}" font-size="11" fill="{color}" text-anchor="middle">+</text>'
+    """구 안에 고르게 — 동심원 두 겹(0.42R·0.78R)에 결정적으로 배치해 기호끼리·점선 원(≈0.53R)과 겹치지 않는다"""
+    import math; s = ""
+    m1 = max(4, round(n * .38)); per = [(0.42, m1), (0.78, n - m1)]
+    for ring, m in per:
+        for i in range(m):
+            a = 2 * math.pi * i / m + (0.3 if ring > 0.5 else 0.9)
+            s += f'<text x="{cx+R*ring*math.cos(a):.1f}" y="{cy+R*ring*math.sin(a)+4:.1f}" font-size="11" fill="{color}" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="2">+</text>'
     return s
 def dots_on(cx, cy, R, n=14, color=RED):
     import math; s = ""
@@ -35,37 +37,36 @@ def dots_on(cx, cy, R, n=14, color=RED):
 
 fig_cond = canvas(560, 240,
     circle(150, 120, 70, INK, w=2.5, fill="rgba(31,42,68,.05)"), dots_on(150, 120, 62), text(150, 210, "도체구: 전하는 표면에만", 13, INK, "middle"),
-    circle(150, 120, 34, PINK, dash="6 4"), text(150, 124, "E = 0", 13, GREEN, "middle", True), text(150, 90, "r < R", 11, PINK, "middle"),
+    circle(150, 120, 34, PINK, dash="6 4"), text(150, 128, "E = 0", 13, GREEN, "middle", True), text(150, 104, "r < R", 11, PINK, "middle"),
     circle(410, 120, 70, INK, w=2.5, fill="rgba(31,42,68,.05)"), dots_on(410, 120, 62),
     circle(410, 120, 100, PINK, dash="6 4"), radial(410, 120, 8, 74, 108, GREEN), text(410, 236, "r ≥ R: E·4πr² = q/ε₀ → 점전하와 같다", 12.5, INK, "middle"),
     cap="고립 도체구: 안쪽 가우스면에는 전하가 없어 \\(E=0\\), 바깥에서는 중심에 점전하 \\(q\\)가 있는 것과 같다.")
 
 fig_ins = canvas(560, 250,
     circle(150, 120, 75, RED, w=2.5, fill="rgba(224,49,49,.05)"), dots_in(150, 120, 75, 22), text(150, 214, "부도체구: 전하가 안에도 균일", 13, INK, "middle"),
-    circle(150, 120, 40, PINK, dash="6 4"), text(194, 112, "r", 12, PINK), line(150, 120, 190, 120, PINK, 1.2),
+    circle(150, 120, 40, PINK, dash="6 4"), text(184, 84, "r", 12, PINK),
     text(150, 236, "안의 전하 q′ = (r³/R³) q → E ∝ r", 12.5, INK, "middle"),
     axis(300, 200, 540, 200, "r", "E"), line(300, 200, 400, 90, GREEN, 3), path("M400 90 C 440 150, 490 175, 540 185", GREEN, 3),
-    line(400, 90, 400, 200, GRAY, 1, "4 4"), text(400, 216, "R", 13, INK, "middle"), text(350, 150, "∝ r", 12, GREEN, "middle"), text(470, 130, "∝ 1/r²", 12, GREEN, "middle"),
+    line(400, 90, 400, 200, GRAY, 1, "4 4"), text(400, 216, "R", 13, INK, "middle"), text(326, 124, "∝ r", 12, GREEN, "middle"), text(470, 130, "∝ 1/r²", 12, GREEN, "middle"),
     cap="부도체구의 E–r 그래프: 안에서는 직선으로 오르다 표면에서 최대, 밖에서는 \\(1/r^2\\)로 준다.")
 
-fig_shell = canvas(560, 240,
+fig_shell = canvas(560, 244,
     circle(280, 120, 95, INK, w=2.5, fill="rgba(31,42,68,.06)"), circle(280, 120, 78, INK, w=2.5, fill="#FFFFFF"),
     circle(280, 120, 40, RED, w=2.5, fill="rgba(224,49,49,.08)"), dots_in(280, 120, 40, 12),
     text(280, 124, "+q", 13, RED, "middle", True),
-    text(280, 108 - 40 - 8, "", 1),
     text(370, 60, "도체 껍질 (알짜 −q)", 12.5, INK), line(360, 66, 345, 78, GRAY, 1),
-    text(280, 190, "b", 12, GRAY, "middle"), text(280, 218, "c", 12, GRAY, "middle"),
-    line(280, 120, 320, 120, GRAY, 1.2), text(300, 114, "a", 12, GRAY, "middle"),
+    text(280, 189, "b", 12, GRAY, "middle"), text(280, 232, "c", 12, GRAY, "middle"),
+    text(280, 68, "a", 12, GRAY, "middle"),
     text(470, 120, "영역별로 q_enc를 다시 센다", 12.5, INK, "middle"), text(470, 140, "r<a: (r³/a³)q · a~b: q", 12, INK, "middle"), text(470, 158, "b~c(도체 안): 0 · r>c: q−q=0", 12, INK, "middle"),
     cap="교재 23장 31번 유형: 부도체 공 + 동심 도체 껍질. 껍질 안쪽 표면에 \\(-q\\)가 유도되어 도체 내부를 0으로 만든다.")
 
 fig_da = canvas(560, 200,
-    path("M120 40 C 220 10, 330 30, 400 70 C 470 110, 440 180, 340 185 C 240 190, 130 175, 100 120 C 80 85, 90 55, 120 40 Z", PINK, 2.5, "rgba(255,77,141,.05)", "7 5"),
+    path("M120 40 C 220 10, 330 30, 390 70 C 450 105, 430 180, 340 185 C 240 190, 130 175, 100 120 C 80 85, 90 55, 120 40 Z", PINK, 2.5, "rgba(255,77,141,.05)", "7 5"),
     charge(230, 110, "+", "", 12, RED), charge(290, 95, "+", "", 12, RED), charge(260, 140, "−", "", 12, BLUE), text(260, 172, "q_enc = 안의 알짜 (+e)", 12, INK, "middle"),
-    rect(392, 62, 16, 16, INK, fill="rgba(255,255,255,.7)", sw=1.5), text(384, 56, "dA", 12, INK, "end"),
-    arrow(400, 70, 448, 42, INK, "n̂", 2, 12, -2),
-    arrow(300, 100, 396, 66, GREEN, "E", 2, -6, -10),
-    text(470, 150, "모양은 아무거나", 13, PINK, "middle"), text(470, 170, "안의 알짜전하만 센다", 13, INK, "middle"),
+    rect(386, 72, 16, 16, INK, fill="rgba(255,255,255,.7)", sw=1.5), text(394, 106, "dA", 12, INK, "middle"),
+    arrow(402, 72, 450, 44, INK, "n̂", 2, 16, 12),
+    arrow(330, 110, 378, 84, GREEN, "E", 2, -6, -10),
+    text(496, 150, "모양은 아무거나", 13, PINK, "middle"), text(496, 170, "안의 알짜전하만 센다", 13, INK, "middle"),
     cap="폐곡면(가우스면)은 모양이 어떻든 상관없다. 미소면적 \\(dA\\)의 법선벡터 \\(\\hat n\\)과 그곳의 전기력선이 평행이면 \\(\\vec E\\cdot\\hat n=E\\).")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일반물리학2 · 9/16 가우스 법칙 — 3종 · 도체구 · 부도체구</title></head><body>

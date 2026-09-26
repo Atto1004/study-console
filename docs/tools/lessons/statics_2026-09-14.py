@@ -20,7 +20,7 @@ fig_proj = canvas(560, 230,
     arrow(120, 170, 380, 50, BLUE, "", 3), text(240, 96, "U", 16, BLUE, "middle", True),
     arc(120, 170, 46, -25, 0, GRAY, 1.5, "θ", 58),
     line(380, 50, 380, 170, GRAY, 1.2, "5 4"),
-    arrow(120, 156, 380, 156, RED, "", 2.6), text(250, 146, "U_p = (U·e) e   |U_p| = |U| cos θ", 13, RED, "middle"),
+    arrow(120, 156, 380, 156, RED, "", 2.6), text(250, 146, "U_p = (U·e) e", 13, RED, "middle"), text(300, 196, "|U_p| = |U| cos θ", 13, RED, "middle"),
     arrow(394, 170, 394, 50, PINK, "", 2.6), text(408, 112, "U_n = U − U_p", 13, PINK, "start"),
     cap="정사영: 벡터 \\(\\mathbf U\\)를 직선 L에 <b>평행한 성분</b> \\(\\mathbf U_p\\)와 <b>수직한 성분</b> \\(\\mathbf U_n\\)으로. 크기는 내적으로, 방향은 단위벡터 \\(\\mathbf e\\)로.")
 
@@ -39,7 +39,7 @@ fig_cross = canvas(560, 250,
     cap="외적은 <b>벡터</b>. 크기 = 두 벡터가 만드는 평행사변형의 넓이, 방향 = 두 벡터가 이루는 평면에 수직(오른손 법칙). 평행이면 sin θ = 0 → 0.")
 
 fig_cyc = canvas(560, 190,
-    circle(150, 95, 60, INK, w=2), text(150, 30, "i", 16, RED, "middle", True), text(206, 128, "j", 16, RED, "middle", True), text(94, 128, "k", 16, RED, "middle", True),
+    circle(150, 95, 60, INK, w=2), text(150, 30, "i", 16, RED, "middle", True), text(214, 136, "j", 16, RED, "middle", True), text(86, 136, "k", 16, RED, "middle", True),
     arc(150, 95, 60, -60, 20, GREEN, 2.5), arc(150, 95, 60, 60, 140, GREEN, 2.5), arc(150, 95, 60, 180, 260, GREEN, 2.5),
     text(150, 100, "순환 → +", 12.5, GREEN, "middle", True),
     text(400, 50, "i × j = k,  j × k = i,  k × i = j", 15, INK, "middle", True),
@@ -58,7 +58,7 @@ fig_comp = canvas(560, 205,
     text(130, 30, "i 끼리", 11.5, GRAY, "middle"), text(220, 30, "j 끼리", 11.5, GRAY, "middle"), text(310, 30, "k 끼리", 11.5, GRAY, "middle"),
     text(370, 150, "→ 더하면 U·V = 4", 15, GREEN, "start", True),
     text(440, 60, "|U| = √(1+4+4) = 3", 13, INK, "middle"), text(440, 84, "|V| = √(4+0+1) = √5", 13, INK, "middle"),
-    text(440, 118, "cos θ = 4 / (3√5) = 0.596", 13.5, INK, "middle", True), text(440, 140, "θ ≈ 53.4°", 15, GREEN, "middle", True),
+    text(440, 118, "cos θ = 4 / (3√5) = 0.596", 13.5, INK, "middle", True), text(440, 166, "θ ≈ 53.4°", 15, GREEN, "middle", True),
     text(280, 190, "성분끼리 곱해서 더한다 — 교차항(i·j 등)은 0이라 사라졌다", 12.5, GRAY, "middle"),
     cap="성분 내적의 흐름: 같은 축 성분끼리 곱해 더하면 스칼라 하나. 정의식과 붙이면 사이각이 나온다.")
 

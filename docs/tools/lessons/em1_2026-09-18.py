@@ -24,12 +24,14 @@ fig_cases = canvas(560, 185,
     panel(380, "III  복소근 (진동)", lambda x: math.exp(-0.2 * x) * math.sin(3 * x), 0, 10, (-1, 1), GREEN, "y = e^(−0.2x) sin 3x (Ex.5)"),
     cap="특성방정식의 근이 세 가지 → 해의 모양이 세 가지. 감쇠 진동 시스템(2.4)의 과감쇠·임계·저감쇠가 바로 이 셋.")
 
+_A = 1.0
+_px, _py = 120 + 70 * math.cos(_A), 100 - 70 * math.sin(_A)
 fig_euler = canvas(560, 190,
     circle(120, 100, 70, INK, w=1.6), line(40, 100, 200, 100, GRAY, 1), line(120, 20, 120, 180, GRAY, 1),
-    arrow(120, 100, 120 + 70 * math.cos(0.7), 100 - 70 * math.sin(0.7), RED, "", 2.4), dot(120 + 70 * math.cos(0.7), 100 - 70 * math.sin(0.7), "", 5, RED),
-    line(120 + 70 * math.cos(0.7), 100, 120 + 70 * math.cos(0.7), 100 - 70 * math.sin(0.7), GREEN, 1.4, "4 3"), text(120 + 70 * math.cos(0.7) + 6, 100 - 35 * math.sin(0.7) + 4, "sin t", 11.5, GREEN),
-    text(120 + 35 * math.cos(0.7), 114, "cos t", 11.5, BLUE, "middle"), arc(120, 100, 26, -40, 0, GRAY, 1.2, "t", 36),
-    text(120 + 70 * math.cos(0.7) + 10, 100 - 70 * math.sin(0.7) - 8, "e^(it)", 13, RED, "start", True),
+    arrow(120, 100, _px, _py, RED, "", 2.4), dot(_px, _py, "", 5, RED),
+    line(_px, 100, _px, _py, GREEN, 1.4, "4 3"), text(172, 46, "sin t", 11.5, GREEN, "start"),
+    text(139, 114, "cos t", 11.5, BLUE, "middle"), arc(120, 100, 26, -57, 0, GRAY, 1.2, "t", 36),
+    text(_px + 6, _py - 14, "e^(it)", 13, RED, "start", True),
     text(390, 60, "e^(it) = cos t + i sin t", 16, INK, "middle", True),
     text(390, 90, "e^((p ± iq)x) = e^(px)(cos qx ± i sin qx)", 13, INK, "middle"),
     text(390, 118, "실수 해 둘: e^(px)cos qx,  e^(px)sin qx", 13, GREEN, "middle", True),
@@ -38,9 +40,9 @@ fig_euler = canvas(560, 190,
 
 fig_D = canvas(560, 130,
     fbox(14, 30, 70, 50, "y", INK, size=16), arrow(86, 55, 116, 55, GREEN, "", 2), fbox(120, 30, 70, 50, "D", BLUE, sub="d/dx", size=16), arrow(192, 55, 222, 55, GREEN, "", 2), fbox(226, 30, 70, 50, "y′", INK, size=16),
-    text(400, 44, "y″ − 3y′ − 40y = 0", 13.5, INK, "middle"), text(400, 66, "(D² − 3D − 40)y = (D − 8)(D + 5)y = 0", 13.5, INK, "middle", True),
-    text(400, 92, "→ y = c₁e^(8x) + c₂e^(−5x)", 14, RED, "middle", True),
-    text(160, 110, "연산자 = 함수를 다른 함수로 바꾸는 변환. P(D) 의 인수분해 = 특성근", 12, GRAY, "middle"),
+    text(430, 44, "y″ − 3y′ − 40y = 0", 13.5, INK, "middle"), text(430, 66, "(D² − 3D − 40)y = (D − 8)(D + 5)y = 0", 12.5, INK, "middle", True),
+    text(430, 92, "→ y = c₁e^(8x) + c₂e^(−5x)", 14, RED, "middle", True),
+    text(280, 116, "연산자 = 함수를 다른 함수로 바꾸는 변환. P(D) 의 인수분해 = 특성근", 12, GRAY, "middle"),
     cap="2.3 미분연산자 D. 새 내용이 아니라 2.2 를 기호로 다시 쓴 것(과제 2.3 #8 유형).")
 
 fig_steps = canvas(560, 120,
