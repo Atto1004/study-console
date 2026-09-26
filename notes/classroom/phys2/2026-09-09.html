@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>22장 전기장 계산 ①~④ — 점전하 · 점전하군 · 쌍극자 · 직선 도선</title>
-<!-- 교실 모드 템플릿 v1 (대표님 2026-09-26 결정: 초록 칠판 + 스앵님(김주영 미니버전) 캐릭터가 알려주는 느낌 · 목차/챕터 · 듀오링고식 XP·스트릭·하트·호감도 · 시스템은 최대한 심플)
+<!-- 교실 모드 템플릿 v1.1 (캐릭터 = docs/tools/tutor.svg 인라인, 이름 김주영 스앵님) (대표님 2026-09-26 결정: 초록 칠판 + 스앵님(김주영 미니버전) 캐릭터가 알려주는 느낌 · 목차/챕터 · 듀오링고식 XP·스트릭·하트·호감도 · 시스템은 최대한 심플)
      build_classroom.py 가 제목·자료(JSON)·교재 경로 자리를 채운다. 저장: localStorage mc-tutor(전역 XP·스트릭·하트·호감도·회차 위치) + mc-lesson-<id>(읽음·문제, 교재 페이지·앱 V52 와 공유) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
@@ -170,11 +170,6 @@ main{max-width:1000px;margin:0 auto;padding:14px 16px 20px;display:flex;flex-dir
 #ov li.cur button{border-color:var(--du-yel);background:#FFF8DC}
 #ov li small{margin-left:auto;color:var(--ink-3);font-weight:700;white-space:nowrap}
 #ov .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-/* ---------- 스앵님 ---------- */
-.chibi .f{display:none}
-.chibi[data-face="neutral"] .f-neutral,.chibi[data-face="sharp"] .f-sharp,.chibi[data-face="smile"] .f-smile,.chibi[data-face="angry"] .f-angry,.chibi[data-face="wide"] .f-wide,.chibi[data-face="proud"] .f-proud{display:block}
-.chibi .eye{transform-box:fill-box;transform-origin:center;animation:blink 4.6s ease-in-out infinite}
-@keyframes blink{0%,91%,100%{transform:scaleY(1)}95%{transform:scaleY(.08)}}
 /* ---------- 폰 ---------- */
 @media(max-width:640px){
   :root{--fs:16.5px;--hud:50px}
@@ -212,68 +207,93 @@ main{max-width:1000px;margin:0 auto;padding:14px 16px 20px;display:flex;flex-dir
     <div class="tray"><i class="w"></i><i class="y"></i><i class="p"></i><i class="er"></i></div>
   </div>
   <div id="dlg">
-    <div id="tutor">
-      <svg class="chibi" id="chibi" data-face="neutral" viewBox="0 0 220 260" aria-label="스앵님">
-        <circle cx="158" cy="94" r="24" fill="#1B1A21" stroke="#0E0D12" stroke-width="2"/>
-        <rect x="132" y="86" width="10" height="16" rx="3" fill="#B08D57"/>
-        <rect x="98" y="172" width="24" height="26" fill="#EBCDB8"/>
-        <path d="M48 258 C50 214 68 198 110 194 C152 198 170 214 172 258 Z" fill="#17161C"/>
-        <path d="M96 194 L110 228 L124 194 Z" fill="#F7F3EE"/>
-        <path d="M96 194 L82 234 L106 214 Z" fill="#26252E"/><path d="M124 194 L138 234 L114 214 Z" fill="#26252E"/>
-        <circle cx="136" cy="222" r="3" fill="#C9A24A"/>
-        <ellipse cx="47" cy="124" rx="7" ry="10" fill="#F2D9C6" stroke="#2A2325" stroke-width="1.5"/>
-        <ellipse cx="173" cy="124" rx="7" ry="10" fill="#F2D9C6" stroke="#2A2325" stroke-width="1.5"/>
-        <ellipse cx="110" cy="118" rx="64" ry="68" fill="#F7E4D4" stroke="#2A2325" stroke-width="1.8"/>
-        <path d="M46 114 C40 60 78 38 112 40 C150 42 182 66 176 120 C170 100 160 90 150 84 C138 78 126 84 120 94 C112 78 96 72 84 80 C72 88 60 102 46 114 Z" fill="#1B1A21"/>
-        <path d="M120 94 C130 86 142 86 150 90" fill="none" stroke="#2C2B35" stroke-width="1.2"/>
-        <path d="M108 136 q3 4 0 6" fill="none" stroke="#B08A78" stroke-width="1.5" stroke-linecap="round"/>
-        <!-- 무표정 -->
-        <g class="f f-neutral">
-          <g class="eye"><ellipse cx="86" cy="125" rx="9" ry="10" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="87" cy="126" r="5.5" fill="#2E2A33"/><circle cx="84.5" cy="123" r="1.7" fill="#fff"/><path d="M77 118 Q86 110 95 118" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/></g>
-          <g class="eye"><ellipse cx="134" cy="125" rx="9" ry="10" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="135" cy="126" r="5.5" fill="#2E2A33"/><circle cx="132.5" cy="123" r="1.7" fill="#fff"/><path d="M125 118 Q134 110 143 118" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/></g>
-          <path d="M73 105 Q86 100 99 105" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/><path d="M121 105 Q134 100 147 105" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/>
-          <path d="M100 152 Q110 156 120 152" fill="none" stroke="#9B3B4E" stroke-width="2.2" stroke-linecap="round"/>
-        </g>
-        <!-- 날카로움 -->
-        <g class="f f-sharp">
-          <g class="eye"><ellipse cx="86" cy="126" rx="10" ry="7.5" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="87" cy="127" r="5" fill="#2E2A33"/><circle cx="85" cy="124.5" r="1.4" fill="#fff"/><path d="M75 122 Q86 112 97 122 L97 117 Q86 108 75 117 Z" fill="#1B1A21"/></g>
-          <g class="eye"><ellipse cx="134" cy="126" rx="10" ry="7.5" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="135" cy="127" r="5" fill="#2E2A33"/><circle cx="133" cy="124.5" r="1.4" fill="#fff"/><path d="M123 122 Q134 112 145 122 L145 117 Q134 108 123 117 Z" fill="#1B1A21"/></g>
-          <path d="M72 102 L98 109" fill="none" stroke="#2A2325" stroke-width="2.6" stroke-linecap="round"/><path d="M122 109 L148 102" fill="none" stroke="#2A2325" stroke-width="2.6" stroke-linecap="round"/>
-          <path d="M100 153 L120 153" fill="none" stroke="#9B3B4E" stroke-width="2.2" stroke-linecap="round"/>
-        </g>
-        <!-- 미소 -->
-        <g class="f f-smile">
-          <path d="M77 126 Q86 116 95 126" fill="none" stroke="#2A2325" stroke-width="2.6" stroke-linecap="round"/><path d="M125 126 Q134 116 143 126" fill="none" stroke="#2A2325" stroke-width="2.6" stroke-linecap="round"/>
-          <path d="M73 106 Q86 101 99 106" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/><path d="M121 106 Q134 101 147 106" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/>
-          <ellipse cx="72" cy="140" rx="8" ry="4" fill="#F5B5B5" opacity=".6"/><ellipse cx="148" cy="140" rx="8" ry="4" fill="#F5B5B5" opacity=".6"/>
-          <path d="M99 150 Q110 161 121 150" fill="none" stroke="#9B3B4E" stroke-width="2.4" stroke-linecap="round"/>
-        </g>
-        <!-- 화남 -->
-        <g class="f f-angry">
-          <g class="eye"><ellipse cx="86" cy="126" rx="10" ry="7" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="87" cy="127" r="5" fill="#2E2A33"/><path d="M75 122 Q86 111 97 122 L97 117 Q86 106 75 117 Z" fill="#1B1A21"/></g>
-          <g class="eye"><ellipse cx="134" cy="126" rx="10" ry="7" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="135" cy="127" r="5" fill="#2E2A33"/><path d="M123 122 Q134 111 145 122 L145 117 Q134 106 123 117 Z" fill="#1B1A21"/></g>
-          <path d="M71 99 L99 111" fill="none" stroke="#2A2325" stroke-width="2.8" stroke-linecap="round"/><path d="M121 111 L149 99" fill="none" stroke="#2A2325" stroke-width="2.8" stroke-linecap="round"/>
-          <path d="M100 157 Q110 150 120 157" fill="none" stroke="#9B3B4E" stroke-width="2.4" stroke-linecap="round"/>
-          <path d="M156 70 l6 -6 M160 78 l8 -2 M152 64 l2 -8" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round"/>
-        </g>
-        <!-- 놀람 -->
-        <g class="f f-wide">
-          <g class="eye"><ellipse cx="86" cy="125" rx="10" ry="12" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="87" cy="126" r="6" fill="#2E2A33"/><circle cx="84" cy="122.5" r="2" fill="#fff"/></g>
-          <g class="eye"><ellipse cx="134" cy="125" rx="10" ry="12" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="135" cy="126" r="6" fill="#2E2A33"/><circle cx="132" cy="122.5" r="2" fill="#fff"/></g>
-          <path d="M73 100 Q86 93 99 100" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/><path d="M121 100 Q134 93 147 100" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/>
-          <ellipse cx="110" cy="154" rx="4.5" ry="5.5" fill="#6B2F3A"/>
-        </g>
-        <!-- 흡족 -->
-        <g class="f f-proud">
-          <g><ellipse cx="86" cy="125" rx="9" ry="9" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="87" cy="127" r="5" fill="#2E2A33"/><path d="M76 125 Q86 113 96 125 L96 116 Q86 105 76 116 Z" fill="#1B1A21"/></g>
-          <g><ellipse cx="134" cy="125" rx="9" ry="9" fill="#fff" stroke="#2A2325" stroke-width="1.5"/><circle cx="135" cy="127" r="5" fill="#2E2A33"/><path d="M124 125 Q134 113 144 125 L144 116 Q134 105 124 116 Z" fill="#1B1A21"/></g>
-          <path d="M73 106 Q86 101 99 106" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/><path d="M121 106 Q134 101 147 106" fill="none" stroke="#2A2325" stroke-width="2.4" stroke-linecap="round"/>
-          <ellipse cx="72" cy="140" rx="8" ry="4" fill="#F5B5B5" opacity=".45"/><ellipse cx="148" cy="140" rx="8" ry="4" fill="#F5B5B5" opacity=".45"/>
-          <path d="M99 152 Q112 157 122 148" fill="none" stroke="#9B3B4E" stroke-width="2.4" stroke-linecap="round"/>
-        </g>
-      </svg>
-    </div>
-    <div class="box"><div class="name" id="dName">스앵님</div><div class="text" id="dText"></div><div class="choices" id="dCh"></div></div>
+    <div id="tutor"><svg class="chibi" data-face="neutral" viewBox="0 0 220 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="김주영 스앵님">
+
+<style>
+.chibi .f{display:none}
+.chibi[data-face="neutral"] .f-neutral,.chibi[data-face="sharp"] .f-sharp,.chibi[data-face="smile"] .f-smile,.chibi[data-face="angry"] .f-angry,.chibi[data-face="wide"] .f-wide,.chibi[data-face="proud"] .f-proud{display:block}
+.chibi .eye{transform-box:fill-box;transform-origin:center;animation:chibi-blink 4.8s ease-in-out infinite}
+@keyframes chibi-blink{0%,92%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.08)}}
+</style>
+
+<path d="M42 132 C28 56 68 24 110 24 C152 24 192 56 178 132 C174 104 152 82 110 82 C68 82 46 104 42 132 Z" fill="#1E1B22"/>
+<circle cx="161" cy="136" r="21" fill="#1E1B22" stroke="#141218" stroke-width="1.5"/>
+<path d="M148 126 C156 120 168 122 174 132 M150 142 C158 146 168 146 176 140" fill="none" stroke="#3A3642" stroke-width="1.5" stroke-linecap="round"/>
+<rect x="139" y="122" width="9" height="17" rx="3" fill="#B08D57"/>
+
+<rect x="96" y="172" width="28" height="26" fill="#EBCDB8"/>
+<path d="M96 172 C100 182 120 182 124 172 L124 186 L96 186 Z" fill="#D9B39C" opacity=".55"/>
+<path d="M90 194 C92 182 128 182 130 194 L110 236 Z" fill="#2B2A33"/>
+<path d="M92 190 C92 178 128 178 128 190 C124 198 96 198 92 190 Z" fill="#2B2A33"/>
+<path d="M42 258 C44 218 60 200 90 194 L110 236 L130 194 C160 200 176 218 178 258 Z" fill="#17161C"/>
+<path d="M90 194 L110 236 L98 244 L76 218 Z" fill="#201F27"/>
+<path d="M130 194 L110 236 L122 244 L144 218 Z" fill="#201F27"/>
+<path d="M90 194 L110 236 M130 194 L110 236" fill="none" stroke="#3A3642" stroke-width="1.2"/>
+<circle cx="140" cy="226" r="3.4" fill="#C9A24A"/><circle cx="139" cy="225" r="1.1" fill="#F2DDA0"/>
+
+<ellipse cx="48" cy="126" rx="7" ry="10" fill="#F2D9C6" stroke="#2A2325" stroke-width="1.4"/>
+<ellipse cx="172" cy="126" rx="7" ry="10" fill="#F2D9C6" stroke="#2A2325" stroke-width="1.4"/>
+<circle cx="48" cy="136" r="3.2" fill="#FFFFFF" stroke="#9A9AA0" stroke-width="1"/><circle cx="47" cy="135" r="1" fill="#FFFFFF"/>
+<circle cx="172" cy="136" r="3.2" fill="#FFFFFF" stroke="#9A9AA0" stroke-width="1"/><circle cx="171" cy="135" r="1" fill="#FFFFFF"/>
+
+<path d="M48 118 C48 64 78 42 110 42 C142 42 172 64 172 118 C172 152 148 184 110 184 C72 184 48 152 48 118 Z" fill="#F7E4D4" stroke="#2A2325" stroke-width="1.6"/>
+<path d="M74 166 C88 182 132 182 146 166 C132 174 88 174 74 166 Z" fill="#E6C2AE" opacity=".5"/>
+
+<path d="M48 112 C48 60 78 40 110 40 C142 40 172 60 172 112 C168 86 150 62 110 62 C70 62 52 86 48 112 Z" fill="#1E1B22"/>
+<path d="M110 42 C109 48 109 54 110 62" fill="none" stroke="#3A3642" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M78 52 C90 46 104 44 118 46" fill="none" stroke="#4A4553" stroke-width="1.6" stroke-linecap="round" opacity=".85"/>
+<path d="M60 74 C56 88 54 102 56 116" fill="none" stroke="#1E1B22" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M160 74 C164 88 166 102 164 116" fill="none" stroke="#1E1B22" stroke-width="2.2" stroke-linecap="round"/>
+
+<path d="M108 136 q2 4 4 0" fill="none" stroke="#C89A86" stroke-width="1.4" stroke-linecap="round"/>
+
+<g class="f f-neutral">
+  <g class="eye"><path d="M70 126 C75 115 93 115 98 126 C93 135 75 135 70 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="85" cy="127" r="5.2" fill="#3A2A28"/><circle cx="85" cy="127" r="2.4" fill="#14100F"/><circle cx="83" cy="124.5" r="1.6" fill="#FFFFFF"/><circle cx="87.5" cy="129.5" r=".8" fill="#FFFFFF"/><path d="M70 126 C75 115 93 115 98 126" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/><path d="M98 126 L102 122" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <g class="eye"><path d="M122 126 C127 115 145 115 150 126 C145 135 127 135 122 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="135" cy="127" r="5.2" fill="#3A2A28"/><circle cx="135" cy="127" r="2.4" fill="#14100F"/><circle cx="133" cy="124.5" r="1.6" fill="#FFFFFF"/><circle cx="137.5" cy="129.5" r=".8" fill="#FFFFFF"/><path d="M122 126 C127 115 145 115 150 126" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/><path d="M122 126 L118 122" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <path d="M70 108 C78 103 90 103 98 107" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/><path d="M122 107 C130 103 142 103 150 108" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M101 152 C105 150 115 150 119 152 C115 156.5 105 156.5 101 152 Z" fill="#A8323F"/><path d="M104 151.5 C108 150.5 112 150.5 116 151.5" fill="none" stroke="#7E1F2C" stroke-width="1"/>
+</g>
+
+<g class="f f-sharp">
+  <g class="eye"><path d="M70 127 C76 119 92 119 98 127 C92 133 76 133 70 127 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="85" cy="127.5" r="4.8" fill="#3A2A28"/><circle cx="85" cy="127.5" r="2.2" fill="#14100F"/><circle cx="83.2" cy="125.4" r="1.3" fill="#FFFFFF"/><path d="M70 127 C76 119 92 119 98 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M98 127 L103 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <g class="eye"><path d="M122 127 C128 119 144 119 150 127 C144 133 128 133 122 127 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="135" cy="127.5" r="4.8" fill="#3A2A28"/><circle cx="135" cy="127.5" r="2.2" fill="#14100F"/><circle cx="133.2" cy="125.4" r="1.3" fill="#FFFFFF"/><path d="M122 127 C128 119 144 119 150 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M122 127 L117 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <path d="M70 106 C80 104 90 106 98 111" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/><path d="M122 111 C130 106 140 104 150 106" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M101 153 L119 153" fill="none" stroke="#A8323F" stroke-width="2.8" stroke-linecap="round"/>
+</g>
+
+<g class="f f-smile">
+  <path d="M71 127 C76 118 92 118 97 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M97 127 L102 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M123 127 C128 118 144 118 149 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M123 127 L118 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M70 108 C78 103 90 103 98 107" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/><path d="M122 107 C130 103 142 103 150 108" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/>
+  <ellipse cx="70" cy="142" rx="8" ry="4" fill="#F2B4B4" opacity=".5"/><ellipse cx="150" cy="142" rx="8" ry="4" fill="#F2B4B4" opacity=".5"/>
+  <path d="M100 151 C106 157.5 114 157.5 120 151 C114 154.5 106 154.5 100 151 Z" fill="#A8323F"/>
+</g>
+
+<g class="f f-angry">
+  <g class="eye"><path d="M70 127 C76 119 92 119 98 127 C92 132 76 132 70 127 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="85" cy="127.5" r="4.6" fill="#3A2A28"/><circle cx="85" cy="127.5" r="2.1" fill="#14100F"/><path d="M70 127 C76 119 92 119 98 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M98 127 L103 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <g class="eye"><path d="M122 127 C128 119 144 119 150 127 C144 132 128 132 122 127 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="135" cy="127.5" r="4.6" fill="#3A2A28"/><circle cx="135" cy="127.5" r="2.1" fill="#14100F"/><path d="M122 127 C128 119 144 119 150 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M122 127 L117 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <path d="M68 102 L98 112" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M122 112 L152 102" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/>
+  <path d="M101 156 C106 151 114 151 119 156 C114 154.5 106 154.5 101 156 Z" fill="#A8323F"/>
+  <path d="M160 66 l6 -6 M164 74 l8 -2 M156 60 l2 -8" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round"/>
+</g>
+
+<g class="f f-wide">
+  <g class="eye"><path d="M70 126 C74 112 96 112 100 126 C96 140 74 140 70 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="85" cy="127" r="5.8" fill="#3A2A28"/><circle cx="85" cy="127" r="2.6" fill="#14100F"/><circle cx="82.6" cy="124" r="2" fill="#FFFFFF"/><path d="M70 126 C74 112 96 112 100 126" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/></g>
+  <g class="eye"><path d="M120 126 C124 112 146 112 150 126 C146 140 124 140 120 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="135" cy="127" r="5.8" fill="#3A2A28"/><circle cx="135" cy="127" r="2.6" fill="#14100F"/><circle cx="132.6" cy="124" r="2" fill="#FFFFFF"/><path d="M120 126 C124 112 146 112 150 126" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/></g>
+  <path d="M70 102 C78 97 90 97 98 101" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/><path d="M122 101 C130 97 142 97 150 102" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/>
+  <ellipse cx="110" cy="154" rx="4.6" ry="5.6" fill="#A8323F"/><ellipse cx="110" cy="155.5" rx="2.6" ry="3" fill="#5A1B25"/>
+</g>
+
+<g class="f f-proud">
+  <g><path d="M70 126 C75 115 93 115 98 126 C93 135 75 135 70 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="85" cy="128" r="5" fill="#3A2A28"/><circle cx="85" cy="128" r="2.2" fill="#14100F"/><circle cx="83.2" cy="126" r="1.2" fill="#FFFFFF"/><path d="M70 126 C75 115 93 115 98 126 L98 125 C93 119 75 119 70 125 Z" fill="#F7E4D4"/><path d="M70 125 C75 119 93 119 98 125" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/><path d="M98 125 L103 121" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <g><path d="M122 126 C127 115 145 115 150 126 C145 135 127 135 122 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="135" cy="128" r="5" fill="#3A2A28"/><circle cx="135" cy="128" r="2.2" fill="#14100F"/><circle cx="133.2" cy="126" r="1.2" fill="#FFFFFF"/><path d="M122 126 C127 115 145 115 150 126 L150 125 C145 119 127 119 122 125 Z" fill="#F7E4D4"/><path d="M122 125 C127 119 145 119 150 125" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/><path d="M122 125 L117 121" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <path d="M70 108 C78 103 90 103 98 107" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/><path d="M122 104 C130 99 142 100 150 106" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/>
+  <ellipse cx="70" cy="142" rx="8" ry="4" fill="#F2B4B4" opacity=".4"/><ellipse cx="150" cy="142" rx="8" ry="4" fill="#F2B4B4" opacity=".4"/>
+  <path d="M100 152 C106 156 114 155 121 148" fill="none" stroke="#A8323F" stroke-width="2.8" stroke-linecap="round"/>
+</g>
+</svg></div>
+    
+    <div class="box"><div class="name" id="dName">김주영 스앵님</div><div class="text" id="dText"></div><div class="choices" id="dCh"></div></div>
   </div>
 </main>
 <div id="ov"><div class="pn"><h2>목차</h2><div class="mt" id="ovMeta"></div><ul id="ovList"></ul><div class="row"><button class="cbt g" id="ovClose" type="button">닫기</button><span class="sp" style="flex:1"></span><button class="cbt g" id="ovBook" type="button">교재 보기</button><button class="cbt g" id="ovReset" type="button">이 회차 기록 지우기</button></div></div></div>
@@ -364,8 +384,8 @@ const warm=()=>T.aff>=60;
 /* ---------- 타자 ---------- */
 let typing=null, fullText="";
 function say(text,face,name){
-  $("#chibi").setAttribute("data-face",face||"neutral");
-  const nm=$("#dName"); nm.textContent=name||"스앵님"; nm.classList.toggle("prof",name==="교수님");
+  const ch=$("#tutor .chibi"); if(ch) ch.setAttribute("data-face",face||"neutral");
+  const nm=$("#dName"); nm.textContent=name||"김주영 스앵님"; nm.classList.toggle("prof",name==="교수님");
   const el=$("#dText"); if(typing){ clearInterval(typing); typing=null; }
   fullText=text; el.innerHTML=""; let i=0; const cur=document.createElement("i"); cur.className="cur";
   typing=setInterval(()=>{ i++; el.textContent=text.slice(0,i); if(i<text.length) el.appendChild(cur); else { clearInterval(typing); typing=null; } },22);

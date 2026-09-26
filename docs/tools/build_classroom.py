@@ -100,7 +100,12 @@ def build(src, slug, date, minutes=18):
     data = {"id": lesson_id, "slug": slug, "course": course, "date": date, "sess": sess, "title": title, "lead": lead_html, "minutes": minutes, "chapters": chapters, "quiz": quiz}
     js = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
     tpl = io.open(os.path.join(HERE, "classroom_tpl.html"), encoding="utf-8").read()
-    page = (tpl.replace("__TITLE__", title.replace("<", "&lt;")).replace("__DATA__", js)
+    # 김주영 스앵님 캐릭터: 원본 docs/tools/tutor.svg 하나 → 교실 페이지에 인라인 + notes/classroom/_assets/tutor.svg (앱이 fetch)
+    tutor = io.open(os.path.join(HERE, "tutor.svg"), encoding="utf-8").read()
+    tutor = re.sub(r"<!--.*?-->", "", tutor, flags=re.S).strip()
+    assets = os.path.join(ROOT, "notes", "classroom", "_assets"); os.makedirs(assets, exist_ok=True)
+    io.open(os.path.join(assets, "tutor.svg"), "w", encoding="utf-8", newline="\n").write(tutor + "\n")
+    page = (tpl.replace("__TITLE__", title.replace("<", "&lt;")).replace("__DATA__", js).replace("__TUTOR__", tutor)
                .replace("__LESSON__", f"../../lessons/{slug}/{date}.html").replace("__APPLESSON__", f"notes/lessons/{slug}/{date}.html"))
     out_dir = os.path.join(ROOT, "notes", "classroom", slug); os.makedirs(out_dir, exist_ok=True)
     out = os.path.join(out_dir, f"{date}.html")

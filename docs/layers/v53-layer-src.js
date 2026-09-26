@@ -33,7 +33,7 @@
   V53.registerNotes=function(){
     if(!Array.isArray(window.NOTES)||!window.V52||!V52.L||!V52.L.courses) return;
     Object.keys(V52.L.courses).forEach(function(cn){ var m=V52.L.courses[cn]; Object.keys(m).sort().forEach(function(d){ var l=m[d], r=V53.room(l); if(!r) return;
-      if(!NOTES.some(function(x){ return x.file===r; })) NOTES.push({course:cn,type:"교실",title:"교실 · "+(+d.slice(5,7))+"/"+(+d.slice(8,10))+" · "+l.title,file:r,week:l.week||weekOf(d)||1,date:d,sub:"스앵님 교실 · 챕터 "+(l.chapters||0)+" · 확인 문제 "+(l.qids||[]).length}); }); });
+      if(!NOTES.some(function(x){ return x.file===r; })) NOTES.push({course:cn,type:"교실",title:"교실 · "+(+d.slice(5,7))+"/"+(+d.slice(8,10))+" · "+l.title,file:r,week:l.week||weekOf(d)||1,date:d,sub:"김주영 스앵님 교실 · 챕터 "+(l.chapters||0)+" · 확인 문제 "+(l.qids||[]).length}); }); });
   };
   if(typeof NOTE_TYPE_CLS==="object") NOTE_TYPE_CLS["교실"]="e";
   if(window.V52&&V52.registerNotes&&!V52.registerNotes._v53){ var _reg=V52.registerNotes; V52.registerNotes=function(){ _reg(); V53.registerNotes(); }; V52.registerNotes._v53=true; if(V52.L) V53.registerNotes(); }
