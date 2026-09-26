@@ -120,3 +120,36 @@ def arc(cx, cy, r, a0, a1, color=None, w=1.5, label="", lr=None):
 def block(x, y, w, h, label="", color=None, fill="#F1F3F5"):
     c = color or INK
     return rect(x, y, w, h, c, fill=fill, sw=2, rx=6) + (text(x + w / 2, y + h / 2 + 5, label, 13, c, "middle", True) if label else "")
+
+# ---- 공업수학용 (2026-09-26): 그래프 · 흐름도 ----
+def polyline(pts, color=None, w=2, dash="", close=False):
+    c = color or INK
+    if not pts: return ""
+    d = "M" + " L".join(f"{x:.1f} {y:.1f}" for x, y in pts) + (" Z" if close else "")
+    return path(d, c, w, dash=dash)
+
+def fplot(fn, x0, x1, X, Y, n=80, color=None, w=2.2, dash="", ylim=None):
+    """fn(x) 의 그래프. X(x)·Y(y) 는 수학 좌표 → 화면 좌표 함수. ylim=(lo,hi) 밖은 끊는다"""
+    pts = []; out = ""
+    for i in range(n + 1):
+        x = x0 + (x1 - x0) * i / n
+        try: y = fn(x)
+        except Exception: y = None
+        if y is None or y != y or abs(y) > 1e6 or (ylim and not (ylim[0] <= y <= ylim[1])):
+            if pts: out += polyline(pts, color, w, dash); pts = []
+            continue
+        pts.append((X(x), Y(y)))
+    return out + polyline(pts, color, w, dash)
+
+def fbox(x, y, w, h, label, color=None, fill=None, size=13, sub="", bold=True):
+    """흐름도 상자: label 가운데, sub 는 아래 작은 글씨"""
+    c = color or INK
+    s = rect(x, y, w, h, c, fill=fill or "rgba(255,255,255,.75)", sw=1.6, rx=9)
+    s += text(x + w / 2, y + h / 2 + (5 if not sub else -2), label, size, c, "middle", bold)
+    if sub: s += text(x + w / 2, y + h / 2 + 14, sub, 11, GRAY, "middle")
+    return s
+
+def diamond(cx, cy, w, h, label, color=None, size=12.5):
+    c = color or INK
+    s = path(f"M{cx} {cy - h/2} L{cx + w/2} {cy} L{cx} {cy + h/2} L{cx - w/2} {cy} Z", c, 1.6, "rgba(255,255,255,.75)")
+    return s + text(cx, cy + 5, label, size, c, "middle", True)
