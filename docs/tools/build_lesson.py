@@ -83,8 +83,10 @@ io.open(out, "w", encoding="utf-8", newline="\n").write(page)
 # lessons.json
 lp = os.path.join(ROOT, "knowledge", "lessons.json")
 L = json.load(io.open(lp, encoding="utf-8")) if os.path.exists(lp) else {"courses": {}}
-L.setdefault("courses", {}).setdefault(course, {})[date] = {"id": lesson_id, "file": f"notes/lessons/{slug}/{date}.html", "title": title, "minutes": minutes,
-                                                          "sids": sids, "qids": [q["id"] for q in quiz], "week": wk}
+# 기존 항목과 병합 — classroom 등 다른 빌더가 넣은 키를 지우지 않는다(오타 설계 회의 2026-09-27)
+_rec = L.setdefault("courses", {}).setdefault(course, {}).setdefault(date, {})
+_rec.update({"id": lesson_id, "file": f"notes/lessons/{slug}/{date}.html", "title": title, "minutes": minutes,
+             "sids": sids, "qids": [q["id"] for q in quiz], "week": wk})
 L["generated"] = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 io.open(lp, "w", encoding="utf-8", newline="\n").write(json.dumps(L, ensure_ascii=False, indent=1))
 print(f"{lesson_id}: 섹션 {len(sids)} · 문제 {len(quiz)} · {minutes}분 → {out}")

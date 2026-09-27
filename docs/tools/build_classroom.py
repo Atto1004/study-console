@@ -33,6 +33,87 @@ def outer(el):
 def cls_of(el):
     return (el.get("class") or "").split()
 
+# ---------- 교실 v2: 판서 파일(BOARD) · 분필 그림 (대표님 2026-09-27 · 오타 설계 회의 1·2차 조건 반영) ----------
+BOARD_DIR = os.path.join(HERE, "lessons", "board")
+CHALK = {"#1F2A44": "#F4F1E8", "#E03131": "#FFB09C", "#1971C2": "#9ADCFF", "#2F9E44": "#B8F2D0", "#FF4D8D": "#FFA3C7", "#8A97A6": "#C8C4B8", "#F59F00": "#FFE27A", "#F1F3F5": "rgba(255,255,255,.08)"}
+FIGCHK_DIR = os.path.join(os.environ.get("USERPROFILE") or os.environ.get("HOME") or "", ".claude", "scratch", "sc_test", "_figchk")
+
+def load_board(path):
+    ns = {}
+    exec(compile(io.open(path, encoding="utf-8").read(), path, "exec"), ns)
+    if "BOARD" not in ns or not isinstance(ns["BOARD"], dict): raise SystemExit(f"{path}: BOARD 딕셔너리가 없음")
+    ver = str(ns.get("VERSION") or "").strip()
+    if not ver: raise SystemExit(f"{path}: VERSION 이 없음 — 저장 위치 이전 규칙에 필요")
+    return {"VERSION": ver, "BOARD": ns["BOARD"]}
+
+def chalkify(fig_html, fid):
+    """읽기용 그림(SVG)을 칠판용으로 — 분필 팔레트 · 흰 채움은 칠판색 · 글자 halo 제거 · 글꼴 Gaegu · 선 요소(글자 제외)에 class ck +
+    그림마다 고유 id 의 filter/marker/style(reduced-motion 이면 같은 우선순위로 filter:none)."""
+    s = fig_html
+    s = s.replace('<figure class="fig"', '<figure class="fig chalk"', 1)
+    s = s.replace('fill="#fff"', 'fill="#2F5D4B"').replace('fill="#FFFFFF"', 'fill="#2F5D4B"').replace('fill="rgba(255,255,255,.7)"', 'fill="#2F5D4B"')
+    for k, v in CHALK.items(): s = s.replace(k, v).replace(k.lower(), v)
+    s = re.sub(r'rgba\((\d+),(\d+),(\d+),(0?\.\d+)\)', lambda m: 'rgba(255,255,255,.07)' if float(m.group(4)) < 0.5 else m.group(0), s)
+    s = s.replace(' paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round"', '').replace(' paint-order="stroke" stroke="#fff" stroke-width="2"', '')
+    s = s.replace('font-family="Pretendard,-apple-system,sans-serif"', 'font-family="Gaegu,Pretendard,sans-serif"')
+    s = re.sub(r'<(line|path|circle|ellipse|rect|polyline|polygon)\b', r'<\1 class="ck"', s)
+    s = re.sub(r'(<marker[^>]*>)(.*?)(</marker>)', lambda m: m.group(1) + m.group(2).replace(' class="ck"', '') + m.group(3), s, flags=re.S)
+    s = s.replace('id="ah"', f'id="ah-{fid}"').replace('url(#ah)', f'url(#ah-{fid})')
+    # 필터 영역은 요소 상자 기준 % 가 아니라 캔버스 전체(userSpaceOnUse) — 작은 요소(점·짧은 선)는 4% 가 변위 1.6px 보다 작아 가장자리가 잘린다 (오타 설계 회의 2차 「필터 잘림 검사」)
+    vb = re.search(r'viewBox="\s*([-\d.]+)[ ,]+([-\d.]+)[ ,]+([\d.]+)[ ,]+([\d.]+)\s*"', s)
+    if vb:
+        x0, y0, w, h = (float(v) for v in vb.groups()); m = 8
+        region = f'filterUnits="userSpaceOnUse" x="{x0 - m:g}" y="{y0 - m:g}" width="{w + 2 * m:g}" height="{h + 2 * m:g}"'
+    else:
+        region = 'x="-10%" y="-10%" width="120%" height="120%"'
+    filt = (f'<defs><filter id="chalk-{fid}" {region} color-interpolation-filters="sRGB">'
+            f'<feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="7" result="n"/>'
+            f'<feDisplacementMap in="SourceGraphic" in2="n" scale="1.6" xChannelSelector="R" yChannelSelector="G"/></filter></defs>'
+            f'<style>#fig-{fid} .ck{{filter:url(#chalk-{fid});stroke-linecap:round;stroke-linejoin:round}}'
+            f'@media (prefers-reduced-motion: reduce){{#fig-{fid} .ck{{filter:none}}}}</style>')
+    s = re.sub(r'(<svg\b[^>]*)(>)', lambda m: m.group(1) + f' id="fig-{fid}"' + m.group(2) + filt, s, count=1)
+    return s
+
+def board_line(line):
+    """판서 줄 → {"k": 종류, "h": HTML}. 접두: # 소제목 · = 식(KaTeX display) · ! 함정 · ☆ 시험/비유 · → 결론 · ■ 외울 것 · • 기본. __글__ 은 밑줄."""
+    t = str(line).strip(); kind, body = "li", t
+    for pre, k in (("#", "h"), ("=", "f"), ("!", "pit"), ("☆", "star"), ("→", "res"), ("■", "memo"), ("•", "li")):
+        if t.startswith(pre): kind, body = k, t[len(pre):].strip(); break
+    if kind == "f": h = "\\[" + body + "\\]"
+    else: h = re.sub(r"__(.+?)__", r'<span class="ul">\1</span>', escape(body))
+    return {"k": kind, "h": h}
+
+def build_v2(doc, chapters, v2, slug, date):
+    """챕터 = 원문 섹션(순서·id 그대로), 단계 = BOARD[섹션][n] (id = 섹션id-n 고정), 그림 = 그 섹션의 figure[data-fig] 를 분필로.
+    검사: 섹션 1:1 · b/s 비어 있지 않음 · fig 존재 · fs 정수 1~최대 단계 · 단계 id 유일. 실패는 빌드 중단."""
+    BOARD = v2["BOARD"]; out = []; ids_all = set()
+    sec_ids = [c["id"] for c in chapters]
+    extra = sorted(set(BOARD) - set(sec_ids))
+    if extra: raise SystemExit(f"BOARD 에만 있는 섹션: {extra}")
+    for c in chapters:
+        sid = c["id"]
+        if sid not in BOARD: raise SystemExit(f"BOARD 에 섹션 {sid} 없음 — 판서 파일의 챕터는 원문 섹션과 1:1")
+        sec = doc.xpath(f'//section[@data-id="{sid}"]')[0]
+        figs = {}
+        for f in sec.xpath('.//figure[contains(@class,"fig")][@data-fig]'):
+            name = f.get("data-fig"); html_ = LH.tostring(f, encoding="unicode", with_tail=False)
+            steps_n = [int(x) for x in re.findall(r'data-step="(\d+)"', html_)]
+            figs[name] = {"svg": chalkify(html_, f"{slug}-{date}-{sid}-{name}"), "max": max(steps_n) if steps_n else 1}
+        steps = []
+        for n, st in enumerate(BOARD[sid], 1):
+            stid = str(st.get("id") or f"{sid}-{n}")
+            b = st.get("b") or []; s = str(st.get("s") or "")
+            if not b or not s.strip(): raise SystemExit(f"{stid}: 판서(b)와 대사(s)가 비면 안 됨")
+            fig = st.get("fig"); fs = st.get("fs")
+            if fig:
+                if fig not in figs: raise SystemExit(f"{stid}: 그림 {fig} 이 섹션 {sid} 에 없음 (figure data-fig)")
+                if not isinstance(fs, int) or isinstance(fs, bool) or fs < 1 or fs > figs[fig]["max"]: raise SystemExit(f"{stid}: fs 는 1~{figs[fig]['max']} 정수 ({fs!r})")
+            if stid in ids_all: raise SystemExit(f"{stid}: 단계 id 중복")
+            ids_all.add(stid)
+            steps.append({"id": stid, "t": "v2", "b": [board_line(x) for x in b], "braw": [str(x) for x in b], "s": s, "fig": fig or None, "fs": int(fs) if fig else 0})
+        out.append({"id": sid, "title": c["title"], "steps": steps, "figs": figs, "say": c.get("say")})
+    return out
+
 def build(src, slug, date, minutes=18):
     course = COURSE[slug]; lesson_id = f"{slug}-{date}"
     doc = LH.fromstring(io.open(src, encoding="utf-8").read())
@@ -91,6 +172,16 @@ def build(src, slug, date, minutes=18):
             steps.append(st)
         flush()
         chapters.append({"id": sid, "title": ctitle, "steps": steps, "say": sec.get("data-tutor")})
+    # ---- 교실 v2: 판서 파일이 있으면 그것으로 챕터 단계를 만든다 (없으면 v1 = 원문 문단 그대로, 화면에 「구버전 판서」 표시) ----
+    v2 = None
+    bpath = os.path.join(BOARD_DIR, f"{slug}_{date}.py")
+    if os.path.exists(bpath):
+        v2 = load_board(bpath)
+        chapters = build_v2(doc, chapters, v2, slug, date)
+        os.makedirs(FIGCHK_DIR, exist_ok=True)   # 분필 그림 검사용 하네스 파일(저장소 밖) — node fig_check.cjs <이 파일> 로 겹침 검사
+        figs_html = "".join(f["svg"] for c in chapters for f in c["figs"].values())
+        io.open(os.path.join(FIGCHK_DIR, f"classroom_{slug}_{date}.html"), "w", encoding="utf-8", newline="\n").write(
+            '<!doctype html><meta charset="utf-8"><body class="chalk-bg" style="background:#2F5D4B">' + figs_html)
     quiz = []
     for k, q in enumerate(doc.xpath('//div[contains(concat(" ",normalize-space(@class)," ")," q ")]'), 1):
         qid = q.get("data-qid") or f"q{k}"
@@ -102,7 +193,8 @@ def build(src, slug, date, minutes=18):
             assert sum(1 for c in choices if c["ok"]) == 1, "정답은 정확히 하나: " + qn
         ans = q.xpath('./div[@class="ans"]'); ans_html = inner(ans[0]) if ans else ""
         quiz.append({"id": qid, "qn": qn, "html": qhtml, "choices": choices, "ans": ans_html})
-    data = {"id": lesson_id, "slug": slug, "course": course, "date": date, "sess": sess, "title": title, "lead": lead_html, "minutes": minutes, "chapters": chapters, "quiz": quiz}
+    data = {"id": lesson_id, "slug": slug, "course": course, "date": date, "sess": sess, "title": title, "lead": lead_html, "minutes": minutes, "chapters": chapters, "quiz": quiz,
+            "v": 2 if v2 else 1, "ver": v2["VERSION"] if v2 else ""}
     js = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
     tpl = io.open(os.path.join(HERE, "classroom_tpl.html"), encoding="utf-8").read()
     # 김주영 스앵님 캐릭터: 원본 docs/tools/tutor.svg 하나 → 교실 페이지에 인라인 + notes/classroom/assets/tutor.svg (앱이 fetch)

@@ -98,7 +98,7 @@
     "week": 3,
     "classroom": "notes/classroom/phys2/2026-09-16.html",
     "chapters": 5,
-    "steps": 42
+    "steps": 30
    },
    "2026-09-18": {
     "id": "phys2-2026-09-18",
@@ -612,5 +612,5 @@
    }
   }
  },
- "generated": "2026-09-27T02:23:23"
+ "generated": "2026-09-27T21:01:14"
 }

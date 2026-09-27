@@ -24,13 +24,19 @@ def band(x1, y1, x2, y2, w=8, color=None, alpha=.16):
     pts = [(x1 + nx, y1 + ny), (x2 + nx, y2 + ny), (x2 - nx, y2 - ny), (x1 - nx, y1 - ny)]
     return '<path d="M' + ' L'.join(f'{x:.1f} {y:.1f}' for x, y in pts) + f' Z" fill="{c}" fill-opacity="{alpha}" stroke="none"/>'
 
-def canvas(w, h, *parts, cap=""):
+def canvas(w, h, *parts, cap="", name=""):
+    """name 을 주면 <figure data-fig="name"> — 교실 v2 판서 파일(BOARD)이 그림을 이름으로 가리킨다"""
     body = "".join(parts)
     defs = ('<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
             '<path d="M0 0 L10 5 L0 10 z" fill="context-stroke"/></marker></defs>')
     svg = (f'<svg class="fig-svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" role="img" xmlns="http://www.w3.org/2000/svg" '
            f'font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="{INK}">{defs}{body}</svg>')
-    return f'<figure class="fig">{svg}' + (f'<figcaption>{cap}</figcaption>' if cap else "") + '</figure>'
+    attr = f' data-fig="{name}"' if name else ""
+    return f'<figure class="fig"{attr}>{svg}' + (f'<figcaption>{cap}</figcaption>' if cap else "") + '</figure>'
+
+def step(n, *parts):
+    """교실 v2 단계 애니메이션: 감싼 요소들이 그림 단계 n 에서 나타난다(<g data-step="n">). 읽기용 노트에서는 그냥 그룹."""
+    return f'<g data-step="{int(n)}">' + "".join(parts) + '</g>'
 
 def charge(x, y, sign="+", label="", r=14, color=None):
     c = color or (RED if sign == "+" else BLUE)
