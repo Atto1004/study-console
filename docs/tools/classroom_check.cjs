@@ -14,6 +14,12 @@ function all() { const out = []; const base = path.join(ROOT, "notes", "classroo
 const files = process.argv.slice(2).length ? process.argv.slice(2).map(f => f.replace(/\\/g, "/")) : all();
 const norm = s => String(s || "").replace(/\s+/g, " ").trim();
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const until = async (fn, ms) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (fn()) return true; await sleep(40); } return fn(); };
+/* build_classroom.board_line() 과 같은 변환(xml.sax.saxutils.escape = & < > 만) — 페이지의 b[].k/h 가 이 결과와 같아야 한다 */
+const escH = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function boardLine(line) { const t = String(line).trim(); let kind = "li", body = t;
+  for (const [pre, k] of [["#", "h"], ["=", "f"], ["!", "pit"], ["☆", "star"], ["→", "res"], ["■", "memo"], ["•", "li"]]) { if (t.startsWith(pre)) { kind = k; body = t.slice(pre.length).trim(); break; } }
+  const h = kind === "f" ? "\\[" + escH(body) + "\\]" : escH(body).replace(/__(.+?)__/g, '<span class="ul">$1</span>'); return { k: kind, h }; }
 let fail = 0, total = { steps: 0, quiz: 0, v2: 0 };
 function loadBoard(slug, date) {
   const p = path.join(__dirname, "lessons", "board", `${slug}_${date}.py`); if (!fs.existsSync(p)) return null;
@@ -40,6 +46,8 @@ async function check(file) {
       if (V2) { /* 판서 누적: 이 단계까지의 줄이 순서대로 전부, 그림은 이 단계의 것만, 미래 그림 단계는 숨김 */
         const want = c.steps.slice(0, si + 1).flatMap(s => s.b.map((_, j) => s.id + "#" + j)); const got = [...doc.querySelectorAll("#bc .bl")].map(l => l.getAttribute("data-step") + "#" + l.getAttribute("data-ln"));
         if (want.join(",") !== got.join(",")) problems.push(`CH${ci + 1} 단계 ${si + 1} 판서 줄 누적이 다름: ${got.length}/${want.length}`);
+        /* 화면의 줄 내용이 자료 b[].h 그대로인지(오타 R1: 개수만 세면 내용이 틀려도 통과) */
+        { const wantH = c.steps.slice(0, si + 1).flatMap(s => s.b.map(l => l.h)); const gotH = [...doc.querySelectorAll("#bc .bl")].map(l => l.innerHTML); const k = gotH.findIndex((h, i) => h !== wantH[i]); if (k >= 0) problems.push(`CH${ci + 1} 단계 ${si + 1} 판서 줄 ${k + 1} 내용이 자료와 다름: ${gotH[k].slice(0, 40)} ≠ ${String(wantH[k]).slice(0, 40)}`); }
         if (![...doc.querySelectorAll("#bc .bl")].every(l => l.classList.contains("now"))) problems.push(`CH${ci + 1} 단계 ${si + 1} 즉시 표시인데 줄이 가려짐`);
         const figs = doc.querySelectorAll("#bc .bd-fig"); if (figs.length !== (st.fig ? 1 : 0)) problems.push(`CH${ci + 1} 단계 ${si + 1} 그림 수 ${figs.length} (기대 ${st.fig ? 1 : 0})`);
         if (st.fig) { const gs = [...doc.querySelectorAll("#bc .bd-fig [data-step]")]; if (!gs.length) problems.push(`CH${ci + 1} 단계 ${si + 1} 그림에 data-step 없음`);
@@ -98,8 +106,16 @@ async function check(file) {
       r = go({ mode: "step", cid: C1.id, sid: S1.id, qi: 0, ver: "old-" + D.ver }); if (r.mode !== "step" || r.ci !== D.chapters.indexOf(C1) || r.si !== 0) problems.push("버전 불일치 → 챕터 처음 이 아님: " + JSON.stringify(r));
       r = go({ mode: "step", cid: "no-such-chapter", sid: S1.id, qi: 0, ver: D.ver }); if (r.mode !== "intro") problems.push("챕터 id 없음 → 목차 가 아님: " + JSON.stringify(r));
       r = go({ mode: "step", cid: C1.id, sid: "no-such-step", qi: 0, ver: D.ver }); if (r.mode !== "step" || r.ci !== D.chapters.indexOf(C1) || r.si !== 0) problems.push("단계 id 없음 → 챕터 처음 이 아님: " + JSON.stringify(r));
-      if (D.quiz.length) { X.ST.done = {}; X.ST.correct = {}; X.ST.answer = {}; X.T.hearts = 3; r = go({ mode: "quiz", cid: C1.id, sid: S1.id, qi: 2, ver: D.ver }); if (r.mode !== "quiz" || r.qi !== 0) problems.push("문제 위치 이전(미완 첫 문제) 실패: " + JSON.stringify(r));
-        r = go({ mode: "quiz", qi: 999, ver: D.ver }); if (r.mode !== "quiz" || r.qi !== 0) problems.push("문제 번호 범위 밖 보정 실패: " + JSON.stringify(r)); }
+      /* 오타 R4: 저장한 문제 위치는 그대로(범위 안이면), #resume 와 「이어서 하기」가 같은 곳으로, 전부 채점됐으면 둘 다 결과 */
+      if (D.quiz.length) { X.ST.done = {}; X.ST.correct = {}; X.ST.answer = {}; X.T.hearts = 3; const qk = Math.min(2, D.quiz.length - 1);
+        r = go({ mode: "quiz", cid: C1.id, sid: S1.id, qi: qk, ver: D.ver }); if (r.mode !== "quiz" || r.qi !== qk) problems.push("문제 위치 이전(저장한 qi 유지) 실패: " + JSON.stringify(r));
+        X.L.pos = { mode: "quiz", cid: C1.id, sid: S1.id, qi: qk, ver: D.ver }; X.L.done = false; X.S.mode = "intro"; X.render(); const rb = [...doc.querySelectorAll("#dCh .cbt")].find(b => /이어서 하기/.test(b.textContent)); if (!rb) problems.push("문제 위치 저장 뒤 「이어서 하기」 없음"); else { rb.click(); if (X.S.mode !== "quiz" || X.S.qi !== qk) problems.push("「이어서 하기」가 #resume 와 다른 곳으로 감: " + X.S.mode + " " + X.S.qi); }
+        r = go({ mode: "quiz", qi: 999, ver: D.ver }); if (r.mode !== "quiz" || r.qi !== 0) problems.push("문제 번호 범위 밖 보정 실패: " + JSON.stringify(r));
+        D.quiz.forEach(q => { X.ST.done[q.id] = true; X.ST.correct[q.id] = true; }); r = go({ mode: "quiz", cid: C1.id, sid: S1.id, qi: qk, ver: D.ver }); if (r.mode !== "result") problems.push("전부 채점됐는데 #resume 가 결과가 아님: " + JSON.stringify(r));
+        X.ST.done = {}; X.ST.correct = {}; X.ST.answer = {}; }
+      r = go({ mode: "step", cid: C1.id, sid: S1.id, ci: "1junk", qi: 0, ver: D.ver }); if (r.mode !== "step" || r.ci !== D.chapters.indexOf(C1) || r.si !== C1.steps.indexOf(S1)) problems.push("v2 저장값에 섞인 잘못된 ci 가 위치를 바꿈: " + JSON.stringify(r));
+      r = go({ mode: "step", ci: "1junk", si: 0 }); if (r.mode !== "intro") problems.push("구버전 저장값 ci=\"1junk\" 를 숫자로 받아들임: " + JSON.stringify(r));
+      r = go({ mode: "step", cid: null, ci: 1, si: 2, ver: D.ver }); if (r.mode !== "intro") problems.push("손상된 v2 저장값(cid null)을 숫자 위치로 복원함: " + JSON.stringify(r));
       if (X.anim || X.pending) problems.push("이전 뒤 예약 작업 남음");
       /* 애니메이션: 동작 줄이기 꺼도 미래 단계는 숨김, Enter 한 번 = 즉시 완료(단계 그대로), 두 번째 Enter = 다음 한 단계, 이동하면 예약 작업 0 */
       X.reduce = false;
@@ -130,6 +146,46 @@ async function check(file) {
       await sleep(1200);
       if (norm(doc.querySelector("#bc .bd-title").textContent) !== title0 || X.S.ci !== other) problems.push("이동 1.2초 뒤 화면이 바뀜");
       const stale = [...doc.querySelectorAll("#bc .bl")].filter(l => l.getAttribute("data-step").indexOf(D.chapters[other].id + "-") !== 0); if (stale.length) problems.push("이동 뒤 다른 챕터 판서 줄이 섞임: " + stale.length);
+      /* 오타 R3: 이 단계에서 새로 나올 그림 단계는 대사 중에 가려져 있고(class pre), 즉시 완료 뒤 풀린다 */
+      if (withFig.length) { const t2 = withFig.find(x => x.si > 0 && x.s.fig === D.chapters[x.ci].steps[x.si - 1].fig && x.s.fs > D.chapters[x.ci].steps[x.si - 1].fs) || withFig[0];
+        X.S.mode = "step"; X.S.ci = t2.ci; X.S.si = t2.si; X.S.resume = false; X.render();
+        const prevFs = (() => { for (let k = t2.si - 1; k >= 0; k--) { const p = D.chapters[t2.ci].steps[k]; if (p.fig === t2.s.fig) return p.fs; } return 0; })();
+        const fresh = [...doc.querySelectorAll("#bc .bd-fig [data-step]")].filter(g => { const n = +g.getAttribute("data-step"); return n > prevFs && n <= t2.s.fs; });
+        if (!fresh.length) problems.push("검사 전제 실패: 새로 나올 그림 단계 없음 " + t2.s.id); if (fresh.some(g => !g.classList.contains("pre"))) problems.push("대사 중인데 새 그림 단계가 벌써 보임(pre 없음): " + t2.s.id);
+        X.enter(); if (doc.querySelector("#bc .bd-fig .pre")) problems.push("즉시 완료 뒤에도 그림 단계가 가려져 있음(pre 남음)"); }
+      /* 오타 R2: 챕터 경계 — 챕터 완료 안내 대사가 다음 단계의 완료 콜백을 지우지 않는다(대사 뒤 판서·그림이 이어진다) */
+      { X.S.mode = "step"; X.S.ci = 0; X.S.si = D.chapters[0].steps.length - 1; X.S.resume = false; X.render(); X.enter(); X.enter();
+        if (X.S.ci !== 1 || X.S.si !== 0) problems.push("챕터 경계 뒤 위치가 CH2 1단계가 아님: " + X.S.ci + "/" + X.S.si);
+        else { if (!X.typing) problems.push("챕터 경계 뒤 대사가 타자 중이 아님"); doc.querySelector("#dText").click();
+          if (!X.anim || X.anim.phase !== "board" || !X.pending) problems.push("챕터 경계 뒤 대사를 끝냈는데 판서 단계로 안 넘어감: " + JSON.stringify({ anim: X.anim && X.anim.phase, pending: X.pending }));
+          if (!/^.+/.test(norm(doc.querySelector("#dText").textContent)) || !norm(doc.querySelector("#dText").textContent).includes(D.chapters[1].steps[0].s.slice(0, 12))) problems.push("챕터 경계 대사에 다음 단계 대사가 없음");
+          X.enter(); if (![...doc.querySelectorAll("#bc .bl")].every(l => l.classList.contains("now"))) problems.push("챕터 경계 뒤 즉시 완료가 판서를 못 보임"); } }
+      /* 오타 R2: 대사 중 「질문할게요」 — 진행 중 단계를 먼저 완료하고 질문 대사로(판서·그림이 사라지지 않음) */
+      { X.S.mode = "step"; X.S.ci = tgt.ci; X.S.si = tgt.si; X.S.resume = false; X.render(); const ab = [...doc.querySelectorAll("#dCh .cbt")].find(b => /질문할게요/.test(b.textContent)); if (!ab) problems.push("「질문할게요」 없음"); else { ab.click();
+          if (X.anim || X.pending) problems.push("질문 뒤 예약 작업 남음"); if (![...doc.querySelectorAll("#bc .bl")].every(l => l.classList.contains("now"))) problems.push("질문 뒤 판서 줄이 가려짐"); if (doc.querySelector("#bc .bd-fig .pre")) problems.push("질문 뒤 그림 단계가 가려져 있음"); } }
+      /* 자연 완료: 타자 1ms 로 놓고 기다리면 대사 → 판서 → 그림이 스스로 끝난다(예약 0 · 줄 전부 보임 · pre/draw/fade 없음 · 화살촉 복원) */
+      { X.speed = 1; X.S.mode = "step"; X.S.ci = tgt.ci; X.S.si = tgt.si; X.S.resume = false; X.render();
+        const ok = await until(() => !X.anim && !X.typing, 8000); if (!ok) problems.push("자연 완료가 8초 안에 안 끝남: " + JSON.stringify({ anim: X.anim && X.anim.phase, typing: X.typing, pending: X.pending }));
+        else { if (X.pending) problems.push("자연 완료 뒤 예약 작업 남음: " + X.pending); if (![...doc.querySelectorAll("#bc .bl")].every(l => l.classList.contains("now") || l.classList.contains("on"))) problems.push("자연 완료 뒤 판서 줄이 가려짐");
+          if (doc.querySelector("#bc .bd-fig .pre, #bc .bd-fig .draw, #bc .bd-fig .fade, #bc .bd-fig [data-mk]")) problems.push("자연 완료 뒤 그림 요소에 애니메이션 잔여(pre/draw/fade/화살촉 미복원)"); }
+        X.speed = 22; }
+      /* 오타 R5: 「이 회차 기록 지우기」 뒤 같은 정답·같은 챕터로 XP 를 다시 받지 않는다 */
+      if (D.quiz.length && D.quiz[0].choices) { X.reduce = true; const q0 = D.quiz[0]; X.T.hearts = 3; X.ST.done = {}; X.ST.correct = {}; X.ST.answer = {}; X.L.rew = {}; X.S.mode = "quiz"; X.S.qi = 0; X.render(); doc.querySelectorAll("#bc .cb")[q0.choices.findIndex(c => c.ok)].click();
+        X.S.mode = "step"; X.S.ci = 0; X.S.si = D.chapters[0].steps.length - 1; X.S.rev = true; X.render(); X.next(); const xpR = X.T.xp;
+        doc.querySelector("#hToc").click(); doc.querySelector("#ovReset").click(); if (X.S.mode !== "intro") problems.push("기록 지우기 뒤 목차가 아님: " + X.S.mode);
+        const Lr = X.L; if (!Lr.rew || !Lr.rew[q0.id] || !Lr.rew["ch:" + D.chapters[0].id]) problems.push("기록 지우기가 보상 기록(L.rew)까지 지움: " + JSON.stringify(Lr.rew));
+        X.T.hearts = 3; X.S.mode = "quiz"; X.S.qi = 0; X.render(); doc.querySelectorAll("#bc .cb")[q0.choices.findIndex(c => c.ok)].click(); if (X.T.xp !== xpR) problems.push("기록 지우기 뒤 같은 정답에 XP 를 또 줌: +" + (X.T.xp - xpR));
+        X.S.mode = "step"; X.S.ci = 0; X.S.si = D.chapters[0].steps.length - 1; X.S.rev = true; X.render(); X.next(); if (X.T.xp !== xpR) problems.push("기록 지우기 뒤 같은 챕터 완료에 XP 를 또 줌: +" + (X.T.xp - xpR)); }
+      /* 오타 R6: 입력형 문제를 「답 보기」만 하고 채점 안 하면 완료 보상(20 XP)·L.done 없음, 채점하면 한 번 */
+      { const qin = D.quiz.find(q => !q.choices); if (qin) { X.reduce = true; X.T.hearts = 3; X.ST.done = {}; X.ST.correct = {}; X.ST.answer = {}; X.L.rew = {}; X.L.done = false;
+          D.quiz.forEach(q => { if (q !== qin) { X.ST.done[q.id] = true; X.ST.correct[q.id] = true; } });
+          X.S.mode = "quiz"; X.S.qi = D.quiz.indexOf(qin); X.render(); const ta = doc.querySelector("#myans"); if (!ta) problems.push("입력형 문제 입력칸 없음"); else { ta.value = "x"; doc.querySelector("#reveal").click(); }
+          const xpU = X.T.xp; X.S.mode = "result"; X.render(); if (X.T.xp !== xpU || X.L.done || (X.L.rew && X.L.rew.done)) problems.push("채점 전인데 완료 보상·L.done 이 기록됨: xp+" + (X.T.xp - xpU) + " done=" + X.L.done);
+          if (![...doc.querySelectorAll("#dCh .cbt")].some(b => /채점 안 한 문제/.test(b.textContent))) problems.push("결과 화면에 「채점 안 한 문제」 버튼 없음");
+          X.S.mode = "quiz"; X.S.qi = D.quiz.indexOf(qin); X.render(); const g = doc.querySelector("#bc [data-g='1']"); if (!g) problems.push("자기 채점 버튼 없음"); else g.click();
+          const xpG = X.T.xp;   /* 채점(정답 15) 뒤 기준 — 완료 보상은 여기서 +20 한 번 */
+          X.S.mode = "result"; X.render(); if (X.T.xp !== xpG + 20 || !X.L.done) problems.push("채점 뒤 완료 보상 20 이 아님: +" + (X.T.xp - xpG) + " done=" + X.L.done);
+          X.S.mode = "result"; X.render(); if (X.T.xp !== xpG + 20) problems.push("결과 화면을 다시 열자 완료 보상을 또 줌"); } }
       X.cancelAll(); X.reduce = true;
     }
   } catch (e) { problems.push("예외: " + (e && e.stack || e).split("\n").slice(0, 2).join(" ")); }
@@ -148,6 +204,8 @@ async function check(file) {
           bs.forEach((b, j) => { const s = c.steps[j]; if (!s) return; const id = b.id || `${sid}-${j + 1}`;
             if (s.id !== id) problems.push(`CH${i + 1} 단계 ${j + 1} id ${s.id} ≠ ${id}`);
             if (JSON.stringify(s.braw) !== JSON.stringify((b.b || []).map(String))) problems.push(`CH${i + 1} 단계 ${j + 1} 판서 줄이 판서 파일과 다름`);
+            /* 화면에 쓰는 b[].k/h 도 board_line() 과 같은 변환으로 다시 만들어 비교(오타 R1 — 원문만 비교하면 변환 결과가 틀려도 통과) */
+            { const exp = (b.b || []).map(boardLine); if (JSON.stringify(s.b) !== JSON.stringify(exp)) problems.push(`CH${i + 1} 단계 ${j + 1} 판서 줄 변환(k/h)이 board_line 과 다름: ${JSON.stringify(s.b[0])} ≠ ${JSON.stringify(exp[0])}`); }
             if (s.s !== String(b.s || "")) problems.push(`CH${i + 1} 단계 ${j + 1} 대사가 판서 파일과 다름`);
             if ((s.fig || null) !== (b.fig || null)) problems.push(`CH${i + 1} 단계 ${j + 1} 그림 ${s.fig} ≠ ${b.fig}`);
             if (b.fig) { if (!Number.isInteger(s.fs) || s.fs < 1 || s.fs > (figMax[b.fig] || 0) || s.fs !== b.fs) problems.push(`CH${i + 1} 단계 ${j + 1} 그림 단계 ${s.fs} (판서 파일 ${b.fs}, 최대 ${figMax[b.fig]})`); if (!(c.figs && c.figs[b.fig])) problems.push(`CH${i + 1} 그림 ${b.fig} 이 페이지에 없음`); }

@@ -79,7 +79,7 @@ def board_line(line):
     t = str(line).strip(); kind, body = "li", t
     for pre, k in (("#", "h"), ("=", "f"), ("!", "pit"), ("☆", "star"), ("→", "res"), ("■", "memo"), ("•", "li")):
         if t.startswith(pre): kind, body = k, t[len(pre):].strip(); break
-    if kind == "f": h = "\\[" + body + "\\]"
+    if kind == "f": h = "\\[" + escape(body) + "\\]"   # 식도 이스케이프 — r<R 의 <R 이 태그로 읽혀 식이 통째로 사라졌다(2026-09-27 검사기 R1 이 잡음). KaTeX 는 textContent 를 읽으므로 &lt; 로 두어도 된다
     else: h = re.sub(r"__(.+?)__", r'<span class="ul">\1</span>', escape(body))
     return {"k": kind, "h": h}
 

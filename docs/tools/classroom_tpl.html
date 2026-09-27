@@ -69,6 +69,7 @@ main{max-width:1040px;margin:0 auto;padding:16px 20px 24px}
 .bd-fig{margin:14px auto 4px;max-width:640px;width:100%}
 .bd-fig figure{margin:0}.bd-fig svg{width:100%;height:auto;display:block;overflow:visible}.bd-fig figcaption{display:none}
 .bd-fig [data-step][hidden]{display:none}
+.bd-fig .pre{opacity:0}   /* 이 단계에서 새로 나올 그림 단계는 그림 차례까지 가림 */
 .bd-fig .ck{stroke-linecap:round;stroke-linejoin:round}
 .bd-fig .draw{transition:stroke-dashoffset var(--dur,1s) ease-out}
 .bd-fig .fade{opacity:0;transition:opacity .35s ease-out}.bd-fig .fade.on{opacity:1}
@@ -215,21 +216,32 @@ let ST=load(LKEY,{read:{},done:{},correct:{},answer:{},ts:0});
 const CH=D.chapters, QZ=D.quiz||[], NCH=CH.length+(QZ.length?1:0);
 const EMB=window.parent!==window;
 let REDUCE=false; try{ REDUCE=!!(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches); }catch(e){}
-let S={mode:"intro",ci:0,si:0,qi:0,rev:false,again:0,resume:false};
+let S={mode:"intro",ci:0,si:0,qi:0,rev:false,again:0,resume:false,pre:"",preFace:""};   /* pre = 다음 화면 대사 앞에 붙일 안내 대사 */
 /* ---------- 저장 위치: 정수·범위 정리 + v2 는 고정 id·버전 (오타 v55 1 · 설계 2차 5) ----------
    규칙: v2 — ver 불일치 → 그 챕터 처음(cid 없으면 목차) · sid 없음 → 챕터 처음 · v1 저장값(ci/si) 은 범위 안이면 그대로 · qi 는 항상 범위로 · fs 는 저장하지 않고 단계에서 다시 계산 */
+const toInt=v=>Number.isInteger(v)?v:((typeof v==="string"&&/^-?\d+$/.test(v))?parseInt(v,10):NaN);   /* "1junk" 같은 값은 숫자로 안 본다 */
 function posOf(){ const p=(L.pos&&typeof L.pos==="object")?L.pos:{}; const mode=(p.mode==="quiz"||p.mode==="step"||p.mode==="result")?p.mode:"step";
-  let qi=parseInt(p.qi,10); if(!Number.isInteger(qi)||qi<0||qi>=QZ.length) qi=0;
+  let qi=toInt(p.qi); if(!Number.isInteger(qi)||qi<0||qi>=QZ.length) qi=0;
   let ci=-1, si=0, note="";
-  if(V2){ if(typeof p.cid==="string") ci=CH.findIndex(c=>c.id===p.cid);
-    if(ci<0){ const c2=parseInt(p.ci,10); if(Number.isInteger(c2)&&c2>=0&&c2<CH.length&&p.cid==null) ci=c2; }
-    if(ci<0) return {mode:mode==="quiz"?"quiz":"intro",ci:0,si:0,qi:qi,note:"챕터 못 찾음"};
-    if(String(p.ver||"")!==VER){ si=0; note="판서가 바뀌어 챕터 처음부터"; }
-    else if(typeof p.sid==="string"){ si=CH[ci].steps.findIndex(s=>s.id===p.sid); if(si<0){ si=0; note="단계 못 찾음"; } }
-    else si=0; }
-  else { ci=parseInt(p.ci,10); if(!Number.isInteger(ci)||ci<0||ci>=CH.length) ci=0;
-    const n=(CH[ci]||{steps:[]}).steps.length; si=parseInt(p.si,10); if(!Number.isInteger(si)||si<0) si=0; else if(si>=n) si=Math.max(0,n-1); }
+  if(V2){ const v2save=("ver" in p)||("cid" in p)||("sid" in p);   /* v2 저장값(손상 포함)과 구버전(v1: ci/si 만) 저장값을 구분 */
+    if(v2save){ if(typeof p.cid==="string") ci=CH.findIndex(c=>c.id===p.cid);
+      if(ci<0) return {mode:mode==="quiz"?"quiz":"intro",ci:0,si:0,qi:qi,note:"챕터 못 찾음"};
+      if(String(p.ver||"")!==VER){ si=0; note="판서가 바뀌어 챕터 처음부터"; }
+      else if(typeof p.sid==="string"){ si=CH[ci].steps.findIndex(s=>s.id===p.sid); if(si<0){ si=0; note="단계 못 찾음"; } }
+      else { si=0; note="단계 못 찾음"; } }
+    else { const c2=toInt(p.ci); if(!Number.isInteger(c2)||c2<0||c2>=CH.length) return {mode:mode==="quiz"?"quiz":"intro",ci:0,si:0,qi:qi,note:"구버전 저장값"};
+      ci=c2; si=0; note="구버전 저장값이라 챕터 처음부터"; } }
+  else { ci=toInt(p.ci); if(!Number.isInteger(ci)||ci<0||ci>=CH.length) ci=0;
+    const n=(CH[ci]||{steps:[]}).steps.length; si=toInt(p.si); if(!Number.isInteger(si)||si<0) si=0; else if(si>=n) si=Math.max(0,n-1); }
   return {mode:mode,ci:ci,si:si,qi:qi,note:note}; }
+/* 저장 위치로 화면을 옮긴다 — #resume 해시와 목차의 「이어서 하기」가 같은 함수를 쓴다(오타 R4). 문제 위치는 저장한 qi 그대로(범위는 posOf 가 정리), 전부 채점됐으면 결과 */
+function resumeTo(p){ cancelAll(); S=Object.assign(S,{mode:p.mode,ci:p.ci,si:p.si,qi:p.qi,rev:false,again:0,resume:true,pre:"",preFace:""});
+  if(S.mode==="quiz"){ if(!QZ.length) S.mode="result"; else if(QZ.every(q=>typeof ST.correct[q.id]==="boolean")) S.mode="result"; }
+  if(S.mode==="step"&&!CH.length) S.mode="intro";
+  if(S.mode==="intro"||S.mode==="result") S.resume=false;
+  render(); if(p.note) $("#dTip").textContent=p.note; }
+/* 안내 대사(챕터 완료·문제 시작)는 다음 화면 대사 앞에 붙인다 — render 뒤 say() 를 또 부르면 단계의 완료 콜백이 사라진다(오타 R2) */
+function preLine(line,face){ if(S.pre){ line=S.pre+" "+line; face=S.preFace||face; S.pre=""; S.preFace=""; } return [line,face]; }
 function savePos(){ if(S.mode!=="step"&&S.mode!=="quiz") return; const ch=CH[S.ci]||{}, st=(ch.steps||[])[S.si]||{};
   L.pos= V2? {mode:S.mode,cid:ch.id||null,sid:st.id||null,qi:S.qi,ver:VER,ci:S.ci,si:S.si} : {mode:S.mode,ci:S.ci,si:S.si,qi:S.qi}; }
 /* ---------- 저장 ---------- */
@@ -303,12 +315,15 @@ function pick(pool,seed,vars){ const arr=LINES[pool]||[]; if(!arr.length) return
 const warm=()=>T.aff>=60;
 /* ---------- 애니메이션 예약 관리: 타이머·RAF·전환 콜백을 한 곳에서 취소 (설계 2차 4) ---------- */
 const pend={t:[],raf:[],tr:[]}; let anim=null;   /* anim = {phase, finish} 진행 중 단계 */
-function later(fn,ms){ const id=setTimeout(fn,ms); pend.t.push(id); return id; }
-function onEnd(el,dur,fn){ let done=false; const go=()=>{ if(done) return; done=true; el.removeEventListener("transitionend",h); fn(); }; const h=e=>{ if(e.target===el) go(); }; el.addEventListener("transitionend",h); pend.tr.push({el:el,fn:h}); later(go,dur+80); }
+/* 실행된 예약은 목록에서 빼서 pending 이 실제 미실행 수가 되게 한다(오타 구현 검수 1차) */
+function later(fn,ms){ const id=setTimeout(()=>{ const k=pend.t.indexOf(id); if(k>=0) pend.t.splice(k,1); fn(); },ms); pend.t.push(id); return id; }
+function raf(fn){ const id=requestAnimationFrame(()=>{ const k=pend.raf.indexOf(id); if(k>=0) pend.raf.splice(k,1); fn(); }); pend.raf.push(id); return id; }
+/* fn(real): real=true 는 실제 transitionend, false 는 예비 타임아웃(탭이 숨겨져 RAF·전환이 멈춘 경우) */
+function onEnd(el,dur,fn){ let done=false; const ent={el:el,fn:null}; const go=real=>{ if(done) return; done=true; el.removeEventListener("transitionend",ent.fn); const k=pend.tr.indexOf(ent); if(k>=0) pend.tr.splice(k,1); fn(real); }; ent.fn=e=>{ if(e.target===el) go(true); }; el.addEventListener("transitionend",ent.fn); pend.tr.push(ent); later(()=>go(false),dur+80); }
 function cancelAll(){ pend.t.forEach(clearTimeout); pend.t=[]; pend.raf.forEach(id=>cancelAnimationFrame(id)); pend.raf=[]; pend.tr.forEach(x=>x.el.removeEventListener("transitionend",x.fn)); pend.tr=[]; if(typing){ clearInterval(typing); typing=null; } anim=null; }
 function finishNow(){ const a=anim; if(typing){ clearInterval(typing); typing=null; $("#dText").textContent=fullText; typeDone=null; } cancelAll(); if(a&&a.finish) a.finish(); }
 /* ---------- 타자 ---------- */
-let typing=null, fullText="", typeDone=null;
+let typing=null, fullText="", typeDone=null, TYPE_MS=22;   /* TYPE_MS 는 검사기가 빠르게 돌릴 때 줄인다(__cr.speed) */
 function say(text,face,name,onDone){
   const ch=$("#tutor .chibi"); if(ch) ch.setAttribute("data-face",face||"neutral"); $("#dFace").textContent=FACEN[face||"neutral"]||"";
   const nm=$("#dNameTag"); nm.textContent=name||"김주영 스앵님"; nm.classList.toggle("prof",name==="교수님");
@@ -316,7 +331,7 @@ function say(text,face,name,onDone){
   fullText=text; typeDone=onDone||null; el.innerHTML="";
   if(REDUCE||S.resume){ el.textContent=text; const f=typeDone; typeDone=null; if(f) f(); return; }
   let i=0; const cur=document.createElement("i"); cur.className="cur";
-  typing=setInterval(()=>{ i++; el.textContent=text.slice(0,i); if(i<text.length) el.appendChild(cur); else { clearInterval(typing); typing=null; const f=typeDone; typeDone=null; if(f) f(); } },22);
+  typing=setInterval(()=>{ i++; el.textContent=text.slice(0,i); if(i<text.length) el.appendChild(cur); else { clearInterval(typing); typing=null; const f=typeDone; typeDone=null; if(f) f(); } },TYPE_MS);
 }
 function skipTyping(){ if(!typing) return false; clearInterval(typing); typing=null; $("#dText").textContent=fullText; const f=typeDone; typeDone=null; if(f) f(); return true; }
 $("#dText").onclick=()=>{ skipTyping(); };
@@ -357,7 +372,7 @@ function renderIntro(){
   const line= L.done? pick("done_intro","i") : resume? pick("again_intro","i") : pick("intro","i",{n:CH.length,min:D.minutes||18});
   say(line, L.done?"proud":"neutral");
   const cs=[];
-  if(resume) cs.push({t:"이어서 하기",cls:"p",primary:1,key:"Enter",f:()=>{ const p=posOf(); S=Object.assign(S,{mode:p.mode,ci:p.ci,si:p.si,qi:p.qi,rev:false,again:0,resume:true}); if(S.mode==="quiz"){ const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; } if(S.mode==="result"||S.mode==="intro") S.mode= p.mode==="intro"?"intro":"step"; if(S.mode==="intro"){ S.resume=false; } render(); if(p.note) $("#dTip").textContent=p.note; }});
+  if(resume) cs.push({t:"이어서 하기",cls:"p",primary:1,key:"Enter",f:()=>resumeTo(posOf())});
   cs.push({t:resume?"처음부터":"시작하기",cls:resume?"g":"p",primary:resume?0:1,key:resume?"":"Enter",f:()=>{ S=Object.assign(S,{mode:"step",ci:0,si:0,rev:false,again:0,resume:false}); render(); }});
   cs.push({t:"교재 보기",cls:"g",f:()=>openBook((CH[0]||{}).id)});
   choices(cs);
@@ -370,7 +385,7 @@ function renderStep(){
   board(stepHTML(st,S.rev),'<span>CH '+(S.ci+1)+' · '+esc(ch.title)+'</span><small>'+(S.si+1)+' / '+ch.steps.length+'</small><span class="old">구버전 판서 · 판서 정리 전</span>',true);
   const seed=S.ci+":"+S.si+":"+S.again; let line, face=LINES.chapter_face[st.t]||"neutral";
   if(S.again>0){ line=pick("again",seed); face="sharp"; } else if(st.say){ line=st.say; } else if(S.si===0){ line=pick("chapter",seed,{c:S.ci+1,title:ch.title}); face="sharp"; } else if(st.t==="ex"&&S.rev){ line=pick("exopen",seed); } else line=pick(st.t in LINES?st.t:"talk",seed);
-  say(line,face); S.resume=false;
+  [line,face]=preLine(line,face); say(line,face); S.resume=false;
   const cs=[];
   if(st.t==="ex"&&!S.rev) cs.push({t:"풀이 보기",cls:"p",primary:1,key:"Enter",f:()=>{ S.rev=true; S.again=0; render(); }});
   else cs.push({t:"이해했어요",cls:"p",primary:1,key:"Enter",f:()=>next()});
@@ -396,30 +411,33 @@ function renderStepV2(){
   const prevFs=(()=>{ for(let k=S.si-1;k>=0;k--){ const p=ch.steps[k]; if(p.fig===st.fig) return p.fs||0; } return 0; })();
   let newEls=[];
   /* SVG 요소에는 hidden IDL 속성이 없다 — 속성으로 직접 (CSS .bd-fig [data-step][hidden]) */
-  if(fig){ const root=$("#bc .bd-fig"); $$("[data-step]",root).forEach(g=>{ const n=+g.getAttribute("data-step")||0; if(n>st.fs){ g.setAttribute("hidden",""); g.setAttribute("aria-hidden","true"); } else { g.removeAttribute("hidden"); g.removeAttribute("aria-hidden"); if(n>prevFs&&!instant) newEls.push(g); } }); }
+  /* 이 단계에서 새로 나올 그림 단계는 대사·판서가 끝나 그림 차례가 올 때까지 가린다(class pre, 오타 R3) */
+  if(fig){ const root=$("#bc .bd-fig"); $$("[data-step]",root).forEach(g=>{ const n=+g.getAttribute("data-step")||0; if(n>st.fs){ g.setAttribute("hidden",""); g.setAttribute("aria-hidden","true"); } else { g.removeAttribute("hidden"); g.removeAttribute("aria-hidden"); if(n>prevFs&&!instant){ g.classList.add("pre"); newEls.push(g); } } }); }
   const wrap=$("#bwrap"); if(instant&&wrap) wrap.scrollTop=wrap.scrollHeight;
   const finishBoard=()=>{ $$("#bc .bl").forEach(l=>{ l.classList.add("now"); l.classList.remove("on"); }); };
-  const finishFig=()=>{ newEls.forEach(g=>{ $$(".draw,.fade",g).forEach(el=>{ el.classList.remove("draw","fade"); el.style.strokeDasharray=""; el.style.strokeDashoffset=""; el.style.opacity=""; el.style.transition=""; if(el.dataset.mk){ el.setAttribute("marker-end",el.dataset.mk); delete el.dataset.mk; } }); }); };
+  const finishFig=()=>{ newEls.forEach(g=>{ g.classList.remove("pre"); $$(".draw,.fade",g).forEach(el=>{ el.classList.remove("draw","fade"); el.style.strokeDasharray=""; el.style.strokeDashoffset=""; el.style.opacity=""; el.style.transition=""; if(el.dataset.mk){ el.setAttribute("marker-end",el.dataset.mk); delete el.dataset.mk; } }); }); };
   const seed=S.ci+":"+S.si+":"+S.again; let line=st.s, face= /반은 틀립|틀립니다|찍지/.test(st.s)?"angry": /정리|외우세요|외울 것/.test(st.s)?"sharp": /좋|맞습|됐/.test(st.s)?"smile":"neutral";
   if(S.again>0){ line=pick("again",seed)+" "+st.s; face="sharp"; }
+  [line,face]=preLine(line,face);
   if(!instant) anim={phase:"say",finish:()=>{ finishBoard(); finishFig(); }};
   say(line,face,null,()=>{ if(instant){ finishBoard(); finishFig(); anim=null; return; }
     /* 판서 줄 쓰기 */
     anim={phase:"board",finish:()=>{ finishBoard(); finishFig(); }};
     const lines=$$("#bc .bl:not(.now)"); lines.forEach((l,i)=>{ later(()=>{ l.classList.add("on"); if(wrap) wrap.scrollTop=wrap.scrollHeight; },i*220); });
     later(()=>{ /* 그림 단계 */
-      if(!newEls.length){ anim=null; return; }
-      anim={phase:"fig",finish:()=>{ finishFig(); }};
+      if(!newEls.length){ finishBoard(); anim=null; return; }
+      anim={phase:"fig",finish:()=>{ finishBoard(); finishFig(); }};
       let longest=null, longestDur=0;
       newEls.forEach(g=>{ $$("line,path,circle,ellipse,polyline,polygon,text,tspan,rect",g).forEach(el=>{ if(el.closest("defs")) return;
         const stroked=el.getAttribute("stroke")&&el.getAttribute("stroke")!=="none", filled=el.getAttribute("fill")&&el.getAttribute("fill")!=="none", dashed=!!el.getAttribute("stroke-dasharray"), isText=/^(text|tspan)$/i.test(el.tagName);
         if(stroked&&!filled&&!dashed&&!isText&&typeof el.getTotalLength==="function"){ let len=0; try{ len=el.getTotalLength(); }catch(e){} if(len>0){ const dur=Math.min(1200,Math.max(400,len*4)); if(el.getAttribute("marker-end")){ el.dataset.mk=el.getAttribute("marker-end"); el.removeAttribute("marker-end"); }
-          el.style.strokeDasharray=len; el.style.strokeDashoffset=len; el.style.setProperty("--dur",dur+"ms"); el.classList.add("draw"); pend.raf.push(requestAnimationFrame(()=>{ pend.raf.push(requestAnimationFrame(()=>{ el.style.strokeDashoffset="0"; })); }));
-          onEnd(el,dur,()=>{ if(el.dataset.mk){ el.setAttribute("marker-end",el.dataset.mk); delete el.dataset.mk; } }); if(dur>longestDur){ longestDur=dur; longest=el; } return; } }
-        el.classList.add("fade"); pend.raf.push(requestAnimationFrame(()=>{ pend.raf.push(requestAnimationFrame(()=>{ el.classList.add("on"); })); })); }); });
+          el.style.strokeDasharray=len; el.style.strokeDashoffset=len; el.style.setProperty("--dur",dur+"ms"); el.classList.add("draw"); raf(()=>raf(()=>{ el.style.strokeDashoffset="0"; }));
+          /* 화살촉은 선이 실제로 다 그려진 사건(transitionend)에서만 — 예비 타임아웃(전환이 멈춘 탭)이면 그림 단계 완료(finishFig)에서 한꺼번에 */
+          onEnd(el,dur,real=>{ if(real&&el.dataset.mk){ el.setAttribute("marker-end",el.dataset.mk); delete el.dataset.mk; } }); if(dur>longestDur){ longestDur=dur; longest=el; } return; } }
+        el.classList.add("fade"); raf(()=>raf(()=>{ el.classList.add("on"); })); }); g.classList.remove("pre"); /* 자식이 전부 초기(안 보임) 상태가 된 뒤 가림을 푼다 */ });
       if(wrap) wrap.scrollTop=wrap.scrollHeight;
-      const settle=()=>{ finishFig(); anim=null; };
-      if(longest) onEnd(longest,longestDur,settle); else later(settle,400);
+      const settleFig=()=>{ finishBoard(); finishFig(); anim=null; };   /* 이름은 문제 채점 settle(q,ok) 와 겹치지 않게 */
+      if(longest) onEnd(longest,longestDur,settleFig); else later(settleFig,400);
     },lines.length*220+120);
   });
   S.resume=false; S.again=0;
@@ -431,13 +449,15 @@ function finishChapter(){
   const ch=CH[S.ci]; if(!ch){ S.mode="intro"; return render(); } const was=!!L.ch[ch.id]; dayReset();
   L.ch[ch.id]=true; ST.read[ch.id]=true; touchStreak();
   let extra="";
-  if(!was){ gainXP(10); gainAff(2); } else if(T.hearts<3){ T.hearts++; extra=" "+pick("heartback",S.ci); pop("#hHearts","+1"); }
+  /* 보상은 회차 기록을 지워도 한 번만(L.rew 는 초기화에서 남긴다, 오타 R5). 하트 회복은 이미 끝낸 챕터를 다시 읽었을 때 */
+  if(!L.rew["ch:"+ch.id]){ L.rew["ch:"+ch.id]=true; gainXP(10); gainAff(2); } else if(was&&T.hearts<3){ T.hearts++; extra=" "+pick("heartback",S.ci); pop("#hHearts","+1"); }
   save(); hud();
   S.si=0; S.ci++; S.resume=false;
   if(S.ci>=CH.length){ if(QZ.length){ S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; } else S.mode="result"; }
   const line=(warm()?pick("chdone_warm",S.ci):pick("chdone",S.ci,{c:S.ci}))+extra;
-  if(S.mode==="quiz"&&S.ci===CH.length){ render(); say(pick("quiz","q",{n:QZ.length,h:T.hearts}),"sharp"); return; }
-  render(); say(line,"proud");
+  /* 안내 대사는 다음 화면 대사 앞에 붙인다(render 뒤 say 를 또 부르면 새 단계의 완료 콜백이 사라진다, 오타 R2) */
+  if(S.mode==="quiz"&&S.ci===CH.length){ S.pre=pick("quiz","q",{n:QZ.length,h:T.hearts}); S.preFace="sharp"; } else { S.pre=line; S.preFace="proud"; }
+  render();
 }
 function renderQuiz(){
   cancelAll();
@@ -456,8 +476,8 @@ function renderQuiz(){
   const rv=$("#reveal"); if(rv) rv.onclick=()=>{ dayReset(); if(T.hearts<=0){ S.mode="nohearts"; return render(); } const ta=$("#myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); render(); say("해설과 비교하세요. 스스로 채점합니다. 봐주지 마세요.","sharp"); };
   $$("#bc [data-g]").forEach(b=>{ b.onclick=()=>grade(q,b.dataset.g==="1"); });
   S.resume=false;
-  if(!rev){ say(mc?pick("q",S.qi,{k:S.qi+1}):pick("qin",S.qi),"neutral"); choices([{t:"질문할게요",cls:"t",f:ask},{tip:mc?"숫자 키 1~"+q.choices.length+" 로 고를 수 있습니다":""}]); }
-  else { const last=S.qi>=QZ.length-1;
+  if(!rev){ const [ql,qf]=preLine(mc?pick("q",S.qi,{k:S.qi+1}):pick("qin",S.qi),"neutral"); say(ql,qf); choices([{t:"질문할게요",cls:"t",f:ask},{tip:mc?"숫자 키 1~"+q.choices.length+" 로 고를 수 있습니다":""}]); }
+  else { const last=S.qi>=QZ.length-1; const [rl,rf]=preLine(c===true?"맞힌 문제입니다. 다음.":c===false?"틀렸던 문제입니다. 해설을 다시 읽으세요.":"답은 봤고 채점이 남았습니다. 봐주지 말고 스스로 채점하세요.", c===true?"neutral":"sharp"); say(rl,rf);
     choices([{t:last?"결과 보기":"다음 문제",cls:"p",primary:1,key:"Enter",f:()=>{ if(last){ S.mode="result"; } else S.qi++; render(); }},{t:"다시 풀기",cls:"g",f:()=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; save(); render(); }},{t:"질문할게요",cls:"t",f:ask}]); }
 }
 function settle(q,ok){
@@ -476,14 +496,16 @@ function renderNoHearts(){
 }
 function renderResult(){
   cancelAll();
-  const n=QZ.length, ok=QZ.filter(q=>ST.correct[q.id]===true).length, wrong=QZ.filter(q=>ST.correct[q.id]===false), dn=QZ.filter(q=>ST.done[q.id]).length;
-  const first=!L.done&&dn>=n; if(first){ L.done=true; gainXP(20); touchStreak(); save(); }
+  /* 완료 보상은 전부 채점된 뒤에만 — 입력형은 「답 보기」만 하고 자기 채점을 안 하면 채점 전(오타 구현 검수 1차) */
+  const n=QZ.length, ok=QZ.filter(q=>ST.correct[q.id]===true).length, wrong=QZ.filter(q=>ST.correct[q.id]===false), ung=QZ.filter(q=>typeof ST.correct[q.id]!=="boolean"), graded=n-ung.length;
+  if(graded>=n) L.done=true; const first=graded>=n&&!L.rew.done; if(first){ L.rew.done=true; gainXP(20); touchStreak(); save(); }   /* 완료 보상도 회차당 한 번(L.rew, 오타 R5·R6) */
   const ratio=n?ok/n:1, good=ratio>=.8, mid=ratio>=.5;
   const badge='<svg class="badge" viewBox="0 0 120 120" fill="none" stroke="#FFE27A" stroke-width="2.5" stroke-linejoin="round"><circle cx="60" cy="60" r="50" stroke-dasharray="4 3"/><circle cx="60" cy="60" r="40"/><path d="M60 30l8.8 18 19.8 2.9-14.3 13.9 3.4 19.7L60 75.2l-17.7 9.3 3.4-19.7L31.4 50.9l19.8-2.9z" fill="rgba(255,226,122,.18)"/></svg><div class="bl2">'+esc(D.course)+' · '+esc(D.sess)+' · 챕터 '+CH.length+'</div>';
-  board('<div class="res"><div class="big">'+(good?"수고했습니다":mid?"절반은 넘겼습니다":"다시 합니다")+'</div><div class="stats"><div><b>'+ok+'/'+n+'</b><span>정답</span></div><div><b>+'+(L.xp||0)+'</b><span>이 회차 XP</span></div><div><b>'+T.streak+'</b><span>연속일</span></div><div><b>'+T.aff+'</b><span>호감도 · '+affName()+'</span></div></div>'+badge+(wrong.length?'<div class="wrong">틀린 문제 '+wrong.length+'개 — 해설을 읽고 다시 푸세요.</div>':'')+'</div>','<span>오늘의 결과</span>',true);
-  say(pick(good?"res_good":mid?"res_mid":"res_bad","r",{ok:ok,n:n}), good?"proud":mid?"sharp":"angry");
+  board('<div class="res"><div class="big">'+(ung.length?"채점이 남았습니다":good?"수고했습니다":mid?"절반은 넘겼습니다":"다시 합니다")+'</div><div class="stats"><div><b>'+ok+'/'+n+'</b><span>정답</span></div><div><b>+'+(L.xp||0)+'</b><span>이 회차 XP</span></div><div><b>'+T.streak+'</b><span>연속일</span></div><div><b>'+T.aff+'</b><span>호감도 · '+affName()+'</span></div></div>'+badge+(ung.length?'<div class="wrong">채점 전 '+ung.length+'개 — 답 보기 뒤 「맞았어요/틀렸어요」까지 눌러야 완료입니다.</div>':'')+(wrong.length?'<div class="wrong">틀린 문제 '+wrong.length+'개 — 해설을 읽고 다시 푸세요.</div>':'')+'</div>','<span>오늘의 결과</span>',true);
+  { const [rl,rf]=preLine(ung.length?"채점을 안 한 문제가 있습니다. 봐주지 말고 스스로 채점하세요. 그래야 끝난 겁니다.":pick(good?"res_good":mid?"res_mid":"res_bad","r",{ok:ok,n:n}), ung.length?"sharp":good?"proud":mid?"sharp":"angry"); say(rl,rf); }
   const cs=[];
-  if(wrong.length) cs.push({t:"틀린 문제 다시 ("+wrong.length+")",cls:"p",primary:1,key:"Enter",f:()=>{ wrong.forEach(q=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; }); save(); S.mode="quiz"; S.qi=QZ.findIndex(q=>!ST.done[q.id]); render(); }});
+  if(ung.length) cs.push({t:"채점 안 한 문제 ("+ung.length+")",cls:"p",primary:1,key:"Enter",f:()=>{ S.mode="quiz"; S.qi=QZ.indexOf(ung[0]); render(); }});
+  if(wrong.length) cs.push({t:"틀린 문제 다시 ("+wrong.length+")",cls:ung.length?"g":"p",primary:ung.length?0:1,key:ung.length?"":"Enter",f:()=>{ wrong.forEach(q=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; }); save(); S.mode="quiz"; S.qi=QZ.findIndex(q=>!ST.done[q.id]); render(); }});
   cs.push({t:"교재 보기",cls:"g",f:()=>openBook(null)}); cs.push({t:"목차",cls:"g",f:openToc});
   if(EMB) cs.push({t:"앱으로",cls:wrong.length?"g":"p",primary:wrong.length?0:1,f:()=>post({type:"mc-close",v:1})});
   choices(cs);
@@ -497,10 +519,12 @@ function openToc(){ const ov=$("#ov"); $("#ovMeta").textContent=D.course+" · "+
   ov.classList.add("on"); }
 $("#hToc").onclick=openToc; $("#ovClose").onclick=()=>$("#ov").classList.remove("on"); $("#ov").onclick=e=>{ if(e.target.id==="ov") $("#ov").classList.remove("on"); };
 $("#ovBook").onclick=()=>openBook(S.mode==="step"?(CH[S.ci]||{}).id:null);
-$("#ovReset").onclick=()=>{ if(!confirm("이 회차의 챕터·문제 기록을 지울까요? (XP·스트릭은 남습니다)")) return; cancelAll(); L={pos:null,ch:{},done:false,xp:0,rew:{}}; ST={read:{},done:{},correct:{},answer:{},ts:0}; S=Object.assign(S,{mode:"intro",ci:0,si:0,qi:0,rev:false,again:0,resume:false}); $("#ov").classList.remove("on"); render(); };
+/* 학습 기록(챕터·문제)과 보상 기록(L.rew·L.xp)을 분리 — 초기화해도 같은 챕터·문제로 XP 를 다시 받지 않는다(오타 R5) */
+$("#ovReset").onclick=()=>{ if(!confirm("이 회차의 챕터·문제 기록을 지울까요? (XP·연속일과 이미 받은 보상은 그대로 — 같은 챕터·문제로 XP 를 다시 받지는 않습니다)")) return; cancelAll(); L={pos:null,ch:{},done:false,xp:L.xp||0,rew:(L.rew&&typeof L.rew==="object")?L.rew:{}}; ST={read:{},done:{},correct:{},answer:{},ts:0}; S=Object.assign(S,{mode:"intro",ci:0,si:0,qi:0,rev:false,again:0,resume:false,pre:"",preFace:""}); $("#ov").classList.remove("on"); render(); };
 function post(m){ try{ window.parent.postMessage(m,location.origin); }catch(e){} }
 function openBook(sid){ const hash=sid?"#s="+sid:""; if(EMB){ post({type:"mc-open",v:1,file:LESSON_APP+hash,title:document.title}); } else location.href=LESSON_REL+hash; }
-function ask(){ if(EMB){ post({type:"mc-ask",v:1}); say(pick("ask",S.ci+":"+S.si),"wide"); gainAff(1); save(); hud(); } else say(pick("askoff",S.ci),"sharp"); }
+function ask(){ if(anim||typing) finishNow();   /* 질문 대사가 진행 중인 단계의 완료 콜백을 지우지 않게 먼저 즉시 완료(오타 R2) */
+  if(EMB){ post({type:"mc-ask",v:1}); say(pick("ask",S.ci+":"+S.si),"wide"); gainAff(1); save(); hud(); } else say(pick("askoff",S.ci),"sharp"); }
 /* ---------- 앱 질문 패널 문맥 (V45 규약) ---------- */
 let CTX_GEN=null;
 function ctx(){ if(!CTX_GEN||!EMB) return; let label="", q=null, sid="";
@@ -518,12 +542,12 @@ document.addEventListener("keydown",e=>{ if(e.target&&/TEXTAREA|INPUT/.test(e.ta
 /* ---------- 시작 ---------- */
 /* 해시: #resume(저장 위치) · #ch=N(챕터 N) · #ch=N.M(챕터 N 의 M 단계) · #quiz · #result */
 function boot(){ const m=/^#(resume|ch=(\d+)(?:\.(\d+))?|quiz|result)$/.exec(location.hash||"");
-  if(m&&m[1]==="resume"&&L.pos&&!L.done){ const p=posOf(); S=Object.assign(S,{mode:p.mode,ci:p.ci,si:p.si,qi:p.qi,resume:true}); if(S.mode==="quiz"){ const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; if(k<0&&QZ.every(q=>ST.done[q.id])) S.mode="result"; } if(S.mode==="step"&&!CH.length) S.mode="intro"; if(S.mode==="intro") S.resume=false; }
+  if(m&&m[1]==="resume"&&L.pos&&!L.done){ return resumeTo(posOf()); }
   else if(m&&m[2]){ const ci=Math.max(0,Math.min(CH.length-1,+m[2]-1)); const si=m[3]?Math.max(0,Math.min(CH[ci].steps.length-1,+m[3]-1)):0; S=Object.assign(S,{mode:"step",ci:ci,si:si,rev:(CH[ci].steps[si]||{}).t==="ex"&&/\.\d+r$/.test(location.hash),resume:!!m[3]}); }
   else if(m&&m[1]==="quiz"&&QZ.length){ S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; }
   else if(m&&m[1]==="result"){ S.mode="result"; }
   render(); }
-window.__cr={get D(){return D;},get S(){return S;},set S(v){S=v;},get T(){return T;},get L(){return L;},set L(v){L=v;T.lessons[D.id]=L;},get ST(){return ST;},set ST(v){ST=v;},get fullText(){return fullText;},get anim(){return anim;},get pending(){return pend.t.length+pend.raf.length+pend.tr.length;},set reduce(v){REDUCE=!!v;},get reduce(){return REDUCE;},
+window.__cr={get D(){return D;},get S(){return S;},set S(v){S=v;},get T(){return T;},get L(){return L;},set L(v){L=v;T.lessons[D.id]=L;},get ST(){return ST;},set ST(v){ST=v;},get fullText(){return fullText;},get anim(){return anim;},get pending(){return pend.t.length+pend.raf.length+pend.tr.length;},set reduce(v){REDUCE=!!v;},get reduce(){return REDUCE;},set speed(v){TYPE_MS=Math.max(1,+v||22);},get typing(){return !!typing;},
   render:function(){ return render(); },next:function(){ return next(); },boot:function(){ return boot(); },enter:function(){ return enter(); },cancelAll:function(){ return cancelAll(); },posOf:function(){ return posOf(); }};  /* 검사기(classroom_check.cjs)용 창구 */
 (function wait(){ if(window.renderMathInElement) boot(); else setTimeout(wait,40); })();
 </script>
