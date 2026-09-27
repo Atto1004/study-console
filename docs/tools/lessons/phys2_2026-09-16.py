@@ -100,6 +100,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <section class="s" data-id="s2">
 <h2>2. 3종으로 지난 결과를 한 줄에 다시 얻는다</h2>
 {fig_re}
+<p><b>약속</b>: 이 절부터는 \\(\\sigma,\\lambda,q&gt;0\\)(양전하)로 두고 <b>크기 \\(E\\)</b>만 쓴다 — 전속이 나가는 면에서 \\(E_n=+E\\)다. 음전하면 크기 식은 \\(|\\sigma|,|\\lambda|,|q|\\)로 같고 방향만 반대(안쪽)다.</p>
 <p><b>무한 평면</b>: 지난 시간 원판에서 \\(R\\to\\infty\\)로 얻은 \\(\\sigma/2\\varepsilon_0\\). 가우스 법칙으로는 — 전기력선이 판 <b>양쪽</b>으로 나가므로 가우스면(앞·뒤 두 장)의 넓이는 \\(2A\\): \\(E\\cdot2A=q/\\varepsilon_0\\) → \\(E=q/2\\varepsilon_0A=\\sigma/2\\varepsilon_0\\) ✓.</p>
 <p><b>직선 도선</b>: 원통 옆면 \\(2\\pi rL\\), 안의 전하 \\(\\lambda L\\): \\(E\\cdot2\\pi rL=\\lambda L/\\varepsilon_0\\) → \\(E=\\lambda/(2\\pi\\varepsilon_0 r)\\) — <b>무한히 긴</b> 도선을 <b>옆</b>에서 본 결과. 9/9의 유한 도선(연장선 위 점, \\(q/a(a+L)\\))과는 배치가 다르다. 적분으로 하면 반 페이지, 가우스로는 한 줄.</p>
 <p><b>도체 표면 한쪽</b>: \\(EA=q/\\varepsilon_0\\) → \\(\\sigma/\\varepsilon_0\\). 무한 평면(\\(2A\\))과 두 배 차이가 나는 이유가 "양쪽이냐 한쪽이냐"다.</p>
@@ -118,7 +119,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 <p>수업의 실 매단 도체구 실험은 전기장을 걸어 + −가 양끝으로 갈라지는 유도 분리를 보여 주는 그림이다(장을 없애면 전하는 다시 섞인다). 책의 <b>고립도체</b>는 밖과 전하를 주고받지 않는 도체를 말한다. 정전평형에서는 도체 안에서 전하가 더 움직이지 않으므로 <b>내부 전기장이 0</b>이고, 결론 하나: <b>도체의 과잉 전하는 표면에만 있고 내부의 알짜 전하밀도는 0이다</b>.</p>
 {fig_cond}
 <div class="formula">\\[r&lt;R:\\ E=0\\qquad r\\ge R:\\ E\\cdot4\\pi r^2=\\frac{{q}}{{\\varepsilon_0}}\\ \\Rightarrow\\ E=\\frac{{q}}{{4\\pi\\varepsilon_0 r^2}}\\]</div>
-<div class="why">순서에 주의: 정전평형이라 도체 안 \\(E=0\\) → 안쪽 가우스면(반지름 \\(r&lt;R\\))의 왼쪽이 0 → \\(q_{{enc}}=0\\), 즉 과잉 전하는 전부 표면에 있다. 바깥 가우스면은 전하 \\(q\\)를 전부 품으므로 중심에 점전하 \\(q\\)가 있는 것과 구별이 안 된다.</div>
+<div class="why">순서에 주의: 정전평형이라 도체 안 \\(E=0\\) → 안쪽 가우스면(반지름 \\(r&lt;R\\))의 왼쪽이 0 → \\(q_{{enc}}=0\\), 즉 과잉 전하는 전부 표면에 있다. 바깥 가우스면은 전하 \\(q\\)를 전부 품으므로 중심에 점전하 \\(q\\)가 있는 것과 구별이 안 된다(\\(q&gt;0\\)으로 두고 크기만 쓴 식 — 음전하면 크기는 \\(|q|\\), 방향은 안쪽).</div>
 <div class="say">"문제에 '반지름 R인 도체구'가 나오면 바로 이 정리가 떠올라야 한다. 이게 제일 중요한 내용."</div>
 <div class="analogy">도체는 사람이 자유롭게 걸어 다니는 광장. 같은 부호끼리 서로 밀어내니 최대한 멀리 — 가장자리(표면)로 흩어지고 가운데는 빈다. 부도체는 좌석이 고정된 극장 — 전하가 자리에 박혀 안에도 그대로 있다.</div>
 <div class="memo"><b>외울 것</b> 도체구: 전하는 표면에만 · 안 \\(E=0\\) · 밖 \\(E=q/4\\pi\\varepsilon_0r^2\\)(점전하와 같다) · 도체·부도체 둘 다 전하는 있다</div>
@@ -127,7 +128,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 
 <section class="s" data-id="s4">
 <h2>4. 부도체구 — 제일 어렵고 마지막: 안에서는 r에 비례</h2>
-<p>반지름 \\(R\\), 전하 \\(q\\)가 <b>부피에 균일</b>하게 퍼져 있다. 바깥(\\(r\\ge R\\))은 도체구와 같은 \\(q/4\\pi\\varepsilon_0r^2\\). 안(\\(r&lt;R\\))은 가우스면 안에 든 전하 \\(q'\\)만 센다.</p>
+<p>반지름 \\(R\\), 전하 \\(q\\)(\\(&gt;0\\))가 <b>부피에 균일</b>하게 퍼져 있다. 바깥(\\(r\\ge R\\))은 도체구와 같은 \\(q/4\\pi\\varepsilon_0r^2\\). 안(\\(r&lt;R\\))은 가우스면 안에 든 전하 \\(q'\\)만 센다.</p>
 {fig_ins}
 <div class="why">균일하니까 부피전하밀도 \\(\\rho=q/V\\)가 어디서나 같다: \\(\\dfrac{{q}}{{\\frac43\\pi R^3}}=\\dfrac{{q'}}{{\\frac43\\pi r^3}}\\) → \\(q'=\\dfrac{{r^3}}{{R^3}}q\\). 이걸 \\(E\\cdot4\\pi r^2=q'/\\varepsilon_0\\)에 넣으면 \\(r^3/r^2=r\\)이 남는다.</div>
 <div class="formula">\\[E_{{in}}=\\frac{{q\\,r}}{{4\\pi\\varepsilon_0R^3}}\\ (\\propto r),\\qquad E_{{out}}=\\frac{{q}}{{4\\pi\\varepsilon_0r^2}}\\]</div>
@@ -156,11 +157,11 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일
 </section>
 
 <div class="q" data-qid="q1"><div class="qn">확인 1 · 가우스 법칙</div><div class="qb">가우스 법칙으로 옳은 것은?</div><ol class="choices"><li data-ok="1">\\(\\oint\\vec E\\cdot\\hat n\\,dA=q_{{enc}}/\\varepsilon_0\\)</li><li>\\(\\oint\\vec E\\cdot\\hat n\\,dA=\\varepsilon_0q_{{enc}}\\)</li><li>\\(\\oint\\vec E\\,dA=q_{{enc}}\\)</li><li>\\(\\int\\vec E\\cdot d\\vec r=q_{{enc}}/\\varepsilon_0\\)</li></ol><div class="ans">폐곡면 면적분 = 안의 알짜전하/ε₀. 선적분 \\(\\int\\vec E\\cdot d\\vec r\\)은 전위(24장).</div></div>
-<div class="q" data-qid="q2"><div class="qn">확인 2 · 도체구 내부</div><div class="qb">반지름 \\(R\\), 전하 \\(q\\)인 도체구의 내부(\\(r&lt;R\\)) 전기장은?</div><ol class="choices"><li data-ok="1">0 — 전하가 표면에만 있어 가우스면 안 전하가 없다</li><li>\\(q/(4\\pi\\varepsilon_0 r^2)\\)</li><li>\\(qr/(4\\pi\\varepsilon_0 R^3)\\)</li><li>\\(q/(4\\pi\\varepsilon_0 R^2)\\), 일정</li></ol><div class="ans">정전평형이라 도체 안 \\(E=0\\) → 안쪽 가우스면의 \\(q_{{enc}}=0\\), 과잉 전하는 표면에만. 외부는 점전하와 같다.</div></div>
-<div class="q" data-qid="q3"><div class="qn">확인 3 · 부도체구 내부</div><div class="qb">반지름 \\(R\\)에 전하 \\(q\\)가 균일하게 퍼진 부도체구의 내부(\\(r&lt;R\\)) 전기장은?</div><ol class="choices"><li data-ok="1">\\(\\dfrac{{qr}}{{4\\pi\\varepsilon_0R^3}}\\) — r에 비례</li><li>0</li><li>\\(\\dfrac{{q}}{{4\\pi\\varepsilon_0 r^2}}\\)</li><li>\\(\\dfrac{{q}}{{4\\pi\\varepsilon_0 R^2}}\\), 일정</li></ol><div class="ans">가우스면 안 전하 \\(q'=(r^3/R^3)q\\) → \\(E\\cdot4\\pi r^2=q'/\\varepsilon_0\\).</div></div>
+<div class="q" data-qid="q2"><div class="qn">확인 2 · 도체구 내부</div><div class="qb">반지름 \\(R\\), 전하 \\(q\\)(\\(&gt;0\\))인 도체구의 내부(\\(r&lt;R\\)) 전기장은?</div><ol class="choices"><li data-ok="1">0 — 전하가 표면에만 있어 가우스면 안 전하가 없다</li><li>\\(q/(4\\pi\\varepsilon_0 r^2)\\)</li><li>\\(qr/(4\\pi\\varepsilon_0 R^3)\\)</li><li>\\(q/(4\\pi\\varepsilon_0 R^2)\\), 일정</li></ol><div class="ans">정전평형이라 도체 안 \\(E=0\\) → 안쪽 가우스면의 \\(q_{{enc}}=0\\), 과잉 전하는 표면에만. 외부는 점전하와 같다.</div></div>
+<div class="q" data-qid="q3"><div class="qn">확인 3 · 부도체구 내부</div><div class="qb">반지름 \\(R\\)에 전하 \\(q\\)(\\(&gt;0\\))가 균일하게 퍼진 부도체구의 내부(\\(r&lt;R\\)) 전기장은?</div><ol class="choices"><li data-ok="1">\\(\\dfrac{{qr}}{{4\\pi\\varepsilon_0R^3}}\\) — r에 비례</li><li>0</li><li>\\(\\dfrac{{q}}{{4\\pi\\varepsilon_0 r^2}}\\)</li><li>\\(\\dfrac{{q}}{{4\\pi\\varepsilon_0 R^2}}\\), 일정</li></ol><div class="ans">가우스면 안 전하 \\(q'=(r^3/R^3)q\\) → \\(E\\cdot4\\pi r^2=q'/\\varepsilon_0\\).</div></div>
 <div class="q" data-qid="q4"><div class="qn">확인 4 · 무한 평면에 2A</div><div class="qb">무한 평면(부도체, 면밀도 σ)에 가우스 법칙을 쓸 때 넓이를 \\(2A\\)로 잡는 이유는?</div><ol class="choices"><li data-ok="1">전기력선이 판 양쪽으로 나가 가우스면 앞·뒤 두 장을 모두 지난다</li><li>평면이 두 장이기 때문</li><li>전하가 두 배이기 때문</li><li>원판 공식의 2를 맞추기 위한 약속</li></ol><div class="ans">\\(E\\cdot2A=q/\\varepsilon_0\\) → \\(\\sigma/2\\varepsilon_0\\). 도체 표면 한쪽만이면 \\(\\sigma/\\varepsilon_0\\).</div></div>
 <div class="q" data-qid="q5"><div class="qn">확인 5 · 껍질의 유도 전하</div><div class="qb">부도체 공(+q) 바깥에 알짜 −q인 동심 도체 껍질이 있다. 껍질 <b>안쪽 표면</b>과 <b>바깥 표면</b>의 전하는?</div><ol class="choices"><li data-ok="1">안쪽 −q, 바깥 0</li><li>안쪽 0, 바깥 −q</li><li>안쪽 −q/2, 바깥 −q/2</li><li>안쪽 +q, 바깥 −2q</li></ol><div class="ans">도체 내부 \\(E=0\\)이 되려면 껍질 안쪽 표면이 \\(-q\\)로 안의 \\(+q\\)를 상쇄해야 한다. 알짜 \\(-q\\)를 다 써서 바깥은 0.</div></div>
-<div class="q" data-qid="q6"><div class="qn">확인 6 · 직선 도선을 가우스로</div><div class="qb">선전하밀도 λ인 무한 직선 도선에서 거리 r인 점의 전기장을 원통 가우스면(길이 L)으로 유도하라.</div><div class="ans">옆면에서 \\(\\vec E\\parallel\\hat n\\), 윗면·아랫면 기여 0. \\(E\\cdot2\\pi rL=\\lambda L/\\varepsilon_0\\) → \\(E=\\dfrac{{\\lambda}}{{2\\pi\\varepsilon_0 r}}\\). 점 P를 도선 옆에 두고 \\(-\\infty\\sim\\infty\\)로 적분해도 같은 값(9/9의 유한 도선·연장선 배치와는 다른 문제).</div></div>
+<div class="q" data-qid="q6"><div class="qn">확인 6 · 직선 도선을 가우스로</div><div class="qb">선전하밀도 λ(&gt;0)인 무한 직선 도선에서 거리 r인 점의 전기장을 원통 가우스면(길이 L)으로 유도하라.</div><div class="ans">옆면에서 \\(\\vec E\\parallel\\hat n\\)이고 밖으로 나가므로 \\(E_n=+E\\), 윗면·아랫면 기여 0. \\(E\\cdot2\\pi rL=\\lambda L/\\varepsilon_0\\) → \\(E=\\dfrac{{\\lambda}}{{2\\pi\\varepsilon_0 r}}\\) (λ&lt;0 이면 크기는 \\(|\\lambda|/2\\pi\\varepsilon_0 r\\), 방향은 도선 쪽). 점 P를 도선 옆에 두고 \\(-\\infty\\sim\\infty\\)로 적분해도 같은 값(9/9의 유한 도선·연장선 배치와는 다른 문제).</div></div>
 </body></html>'''
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 io.open(OUT, "w", encoding="utf-8", newline="\n").write(html)
