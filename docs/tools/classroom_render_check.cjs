@@ -20,6 +20,8 @@ const INJ = `<script>
      out.steps.push({id:s.id,fig:s.fig||null,fs:s.fs,kerr:bc.querySelectorAll(".katex-error").length,katex:bc.querySelectorAll(".katex").length,
        kover:[...bc.querySelectorAll(".katex-display")].filter(k=>k.scrollWidth>k.clientWidth+1).length,
        lover:[...bc.querySelectorAll(".bl")].filter(l=>l.scrollWidth>l.clientWidth+1).length, lines:bc.querySelectorAll(".bl").length,
+       /* 줄 접힘(오타 2차 「판서 한 줄」): 식(k-f)은 제외, 상자(k-pit·k-memo)는 2줄까지, 나머지는 1줄. 이 단계에서 새로 쓴 줄만 센다(누적 줄은 앞 단계에서 이미 셈) */
+       wrap:[...bc.querySelectorAll('.bl[data-step="'+s.id+'"]')].filter(l=>!l.classList.contains("k-f")).map(l=>{ const cs=getComputedStyle(l); const lh=parseFloat(cs.lineHeight)||parseFloat(cs.fontSize)*1.5; const inner=l.getBoundingClientRect().height-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom)-parseFloat(cs.borderTopWidth||0)-parseFloat(cs.borderBottomWidth||0); const n=Math.round(inner/lh); const box=l.classList.contains("k-pit")||l.classList.contains("k-memo"); return n>(box?2:1)?{n:n,t:(l.textContent||"").trim().slice(0,40)}:null; }).filter(Boolean),
        svg:!!svg, svgw:svg?svg.getBoundingClientRect().width:0, filt:bc.querySelectorAll(".bd-fig filter").length, hidden:bc.querySelectorAll(".bd-fig [data-step][hidden]").length, shown:bc.querySelectorAll(".bd-fig [data-step]:not([hidden])").length,
        /* 기대값: 그림 단계 번호 > fs 인 묶음 수 = 숨김 수, ≤ fs = 보임 수, 즉시 표시라 pre(가림)·계산 opacity 0 은 없어야 */
        expHidden:svg?[...svg.querySelectorAll("[data-step]")].filter(g=>+g.getAttribute("data-step")>s.fs).length:0, expShown:svg?[...svg.querySelectorAll("[data-step]")].filter(g=>+g.getAttribute("data-step")<=s.fs).length:0,
@@ -49,6 +51,7 @@ for (const rel of files) {
       if (s.kerr) issues.push(tag + " katex-error " + s.kerr); if (s.kover) issues.push(tag + " 식 가로 넘침 " + s.kover); if (s.lover) issues.push(tag + " 판서 줄 넘침 " + s.lover);
       if (!s.lines) issues.push(tag + " 판서 줄 0"); if (s.fig && !s.svg) issues.push(tag + " 그림 svg 없음"); if (s.fig && !s.filt) issues.push(tag + " 분필 필터 없음"); if (s.fig && s.svgw < 200) issues.push(tag + " 그림 폭 " + Math.round(s.svgw));
       if (s.anim || s.pending) issues.push(tag + " 즉시 표시인데 예약 작업"); if (s.bubble) issues.push(tag + " 말풍선 가로 넘침"); if (!s.say) issues.push(tag + " 대사 없음");
+      if (res.w >= 900 && s.wrap && s.wrap.length) issues.push(tag + " 판서 줄 접힘 " + s.wrap.map(x => x.n + "줄「" + x.t + "」").join(" · "));   /* 아이패드 기준 한 줄 규칙(폰은 접힘 허용) */
       if (s.fig) { if (s.hidden !== s.expHidden || s.shown !== s.expShown) issues.push(tag + ` 그림 단계 숨김/보임 ${s.hidden}/${s.shown} ≠ 기대 ${s.expHidden}/${s.expShown}`); if (!s.expShown) issues.push(tag + " 보이는 그림 단계 0"); if (s.pre) issues.push(tag + " 즉시 표시인데 가림(pre) " + s.pre); if (s.invisible) issues.push(tag + " 보여야 할 그림 단계의 opacity 0: " + s.invisible); } });
     (res.quiz || []).forEach(q => { if (q.kerr) issues.push("문제 " + q.id + " katex-error " + q.kerr); if (q.kover) issues.push("문제 " + q.id + " 식 가로 넘침 " + q.kover); if (q.over) issues.push("문제 " + q.id + " 보기 가로 넘침 " + q.over); });
     fs.writeFileSync(path.join(OUTDIR, "render_" + path.basename(rel, ".html") + "_" + W + ".json"), JSON.stringify(res, null, 1), "utf8");

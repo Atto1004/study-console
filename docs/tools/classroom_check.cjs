@@ -186,6 +186,24 @@ async function check(file) {
           const xpG = X.T.xp;   /* 채점(정답 15) 뒤 기준 — 완료 보상은 여기서 +20 한 번 */
           X.S.mode = "result"; X.render(); if (X.T.xp !== xpG + 20 || !X.L.done) problems.push("채점 뒤 완료 보상 20 이 아님: +" + (X.T.xp - xpG) + " done=" + X.L.done);
           X.S.mode = "result"; X.render(); if (X.T.xp !== xpG + 20) problems.push("결과 화면을 다시 열자 완료 보상을 또 줌"); } }
+      /* 오타 2차 R2: 하트 0 → 마지막 챕터 완료 → nohearts → 다른 챕터 pill — 안내 대사가 새 챕터 대사에 붙지 않는다 */
+      if (D.quiz.length) { X.reduce = true; const last = D.chapters.length - 1; X.T.hearts = 0; delete X.L.rew["ch:" + D.chapters[last].id]; delete X.L.ch[D.chapters[last].id]; X.ST.done = {}; X.ST.correct = {}; X.ST.answer = {};
+        X.S.mode = "step"; X.S.ci = last; X.S.si = D.chapters[last].steps.length - 1; X.S.rev = true; X.S.resume = false; X.render(); X.next();
+        if (X.S.mode !== "nohearts") problems.push("하트 0 마지막 챕터 완료 뒤 nohearts 가 아님: " + X.S.mode);
+        else { doc.querySelector('#chpills [data-pill="0"]').click(); const t = norm(doc.querySelector("#dText").textContent); const own = norm(D.chapters[0].steps[0].s);
+          if (t !== own) problems.push("nohearts 뒤 pill 이동한 챕터 대사에 안내 대사가 붙음: 「" + t.slice(0, 30) + "」"); if (X.S.pre) problems.push("S.pre 가 남아 있음"); }
+        X.T.hearts = 3; }
+      /* 오타 2차 R5: 구버전(.79 이전) 저장값(L.ch/L.done 만 있고 L.rew 에 챕터·완료 키 없음)으로 재진입해도 챕터 +10·완료 +20 을 다시 주지 않는다 — 새 창으로 다시 열어 이행을 본다 */
+      { const T0 = JSON.parse(w.localStorage.getItem("mc-tutor")); const Lold = T0.lessons[D.id]; Lold.ch = {}; D.chapters.forEach(c => { Lold.ch[c.id] = true; }); Lold.done = true; Lold.rew = {}; D.quiz.forEach(q => { Lold.rew[q.id] = true; });
+        const T1 = Object.assign({}, T0, { xp: 500 }); T1.lessons[D.id] = Lold;
+        const html2 = fs.readFileSync(path.join(ROOT, file), "utf8"); const vc2 = new VirtualConsole(); const dom2 = new JSDOM(html2, { runScripts: "dangerously", pretendToBeVisual: true, virtualConsole: vc2, url: "http://localhost/study/" + file, beforeParse(w2) { w2.renderMathInElement = () => {}; w2.confirm = () => true; w2.localStorage.setItem("mc-tutor", JSON.stringify(T1)); w2.localStorage.setItem("mc-lesson-" + D.id, JSON.stringify({ read: {}, done: Object.fromEntries(D.quiz.map(q => [q.id, true])), correct: Object.fromEntries(D.quiz.map(q => [q.id, true])), answer: {}, ts: 1 })); } });
+        const w2 = dom2.window, d2 = w2.document, X2 = w2.__cr; X2.reduce = true;
+        if (!X2.L.rew["ch:" + D.chapters[0].id] || !X2.L.rew.done) problems.push("구버전 지급 이력이 새 보상 키로 이행되지 않음: " + JSON.stringify(X2.L.rew));
+        const xpL = X2.T.xp; X2.S.mode = "step"; X2.S.ci = 0; X2.S.si = D.chapters[0].steps.length - 1; X2.S.rev = true; X2.render(); X2.next(); if (X2.T.xp !== xpL) problems.push("구버전 저장값 재진입에서 챕터 XP 를 또 줌: +" + (X2.T.xp - xpL));
+        X2.S.mode = "result"; X2.render(); if (X2.T.xp !== xpL) problems.push("구버전 저장값 재진입에서 완료 XP 를 또 줌: +" + (X2.T.xp - xpL));
+        /* 오타 2차 R6: 초기화 뒤 재학습 → 전부 채점 → 결과: 보상은 없어도 완료 상태(done)가 저장된다 */
+        X2.L.done = false; X2.S.mode = "result"; X2.render(); const Tsaved = JSON.parse(w2.localStorage.getItem("mc-tutor")); if (!X2.L.done || !Tsaved.lessons[D.id].done) problems.push("재완료 뒤 완료 상태가 저장되지 않음: 메모리 " + X2.L.done + " 저장 " + Tsaved.lessons[D.id].done);
+        try { w2.close(); } catch (e) {} }
       X.cancelAll(); X.reduce = true;
     }
   } catch (e) { problems.push("예외: " + (e && e.stack || e).split("\n").slice(0, 2).join(" ")); }

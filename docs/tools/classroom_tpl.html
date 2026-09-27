@@ -42,12 +42,12 @@ main{max-width:1040px;margin:0 auto;padding:16px 20px 24px}
 #room{display:grid;grid-template-columns:minmax(0,1fr) 296px;gap:16px;align-items:start}
 #board{position:relative}
 .frame{padding:12px;border-radius:14px;background:linear-gradient(180deg,#8B5A2B,#6E4321);box-shadow:0 14px 34px rgba(60,40,20,.2),inset 0 2px 0 rgba(255,255,255,.18);position:relative}
-.green{position:relative;border-radius:6px;min-height:560px;background:radial-gradient(ellipse at 18% 22%,rgba(255,255,255,.06),transparent 42%),repeating-linear-gradient(115deg,rgba(255,255,255,.015) 0 3px,transparent 3px 9px),linear-gradient(160deg,#366B57,#2A5847 55%,#254E3F);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25),inset 0 0 90px rgba(0,0,0,.28);overflow:hidden}
-/* 칠판 머리표(챕터·단계): 스크롤 칸 안에 sticky — 판서가 스크롤돼도 글자가 머리표와 겹치지 않는다(2026-09-27 캡처에서 겹침) */
-.chk{position:sticky;top:0;z-index:2;margin:0 -30px 10px;padding:12px 30px 8px;font-family:var(--fk);font-weight:700;font-size:20px;color:var(--yel);background:linear-gradient(180deg,#2E5B49 78%,rgba(46,91,73,0));flex:0 0 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.green{position:relative;border-radius:6px;min-height:560px;max-height:max(560px,70vh);display:flex;flex-direction:column;background:radial-gradient(ellipse at 18% 22%,rgba(255,255,255,.06),transparent 42%),repeating-linear-gradient(115deg,rgba(255,255,255,.015) 0 3px,transparent 3px 9px),linear-gradient(160deg,#366B57,#2A5847 55%,#254E3F);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25),inset 0 0 90px rgba(0,0,0,.28);overflow:hidden}
+/* 칠판 머리표(챕터·단계): 스크롤 칸(#bwrap) 밖, 칠판 위쪽 고정 띠 — 판서가 어디까지 스크롤돼도 글자가 머리표 밑으로 지나가지 않는다(대표님 2026-09-27 「글자 겹쳤다」: sticky 반투명 띠 밑으로 식 윗부분이 비쳤음) */
+.chk{flex:0 0 auto;padding:12px 30px 8px;font-family:var(--fk);font-weight:700;font-size:20px;line-height:1.3;color:var(--yel);border-bottom:1px dashed rgba(244,241,232,.22);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chk small{font-family:var(--fn);font-size:11px;font-weight:700;color:var(--chalk-2);margin-left:8px;letter-spacing:.04em;vertical-align:middle}
 .chk .old{font-family:var(--fb);font-size:11px;color:var(--pink);margin-left:8px;vertical-align:middle;border:1px dashed var(--pink);border-radius:6px;padding:1px 6px}
-#bwrap{max-height:70vh;min-height:560px;overflow:auto;padding:0 30px 26px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent;display:flex;flex-direction:column}
+#bwrap{flex:1 1 auto;min-height:0;overflow:auto;padding:12px 30px 26px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent;display:flex;flex-direction:column}
 #bwrap::-webkit-scrollbar{width:8px}#bwrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,.22);border-radius:99px}
 #bc{color:var(--chalk);font-family:var(--fk);font-weight:700;font-size:24px;line-height:1.5;width:100%;margin:auto 0}
 #bc.v1{font-family:var(--fb);font-weight:400;font-size:18px;line-height:1.75}
@@ -155,12 +155,18 @@ main{max-width:1040px;margin:0 auto;padding:16px 20px 24px}
 #ov li button:hover{border-color:var(--blue)}#ov li .st{flex:0 0 30px;height:30px;border-radius:50%;border:2px solid #CFCFCF;display:grid;place-items:center;font-family:var(--fn);font-size:13px;font-weight:700;color:var(--ink-3)}
 #ov li.done .st{background:var(--green);border-color:var(--green);color:#fff}#ov li.cur button{border-color:var(--amber);background:#FFF8DC}#ov li small{margin-left:auto;color:var(--ink-3);font-weight:700;white-space:nowrap}
 #ov .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}#ov .row .cbt{width:auto}
+/* ---------- 아이패드 세로(768~900): 두 칸은 유지하되 옆 칸을 줄이고 판서 글자를 한 단계 낮춘다 ---------- */
+@media(max-width:900px) and (min-width:761px){
+  #room{grid-template-columns:minmax(0,1fr) 240px;gap:12px}#tutor{width:120px;height:140px}
+  #bc{font-size:21px}.bl.k-h{font-size:25px}.bd-title{font-size:26px}.bl.k-f{font-size:22px}.bl.k-f .katex{font-size:1.05em}.chk{font-size:18px;padding:10px 22px 6px}#bwrap{padding:10px 22px 22px}
+  .cbt{font-size:14px;padding:10px 12px}.text{font-size:14.5px}
+}
 /* ---------- 폰 ---------- */
 @media(max-width:760px){
   :root{--hud:50px}
   #hud .in{gap:6px;padding:0 8px}#hud .hl{display:none}#hud .hc{flex:1 1 auto;min-width:70px;gap:6px}#hud .chp{font-size:11px}#hud .hr{gap:4px;flex:0 0 auto}.stat{padding:3px 6px;font-size:11.5px;gap:3px}.stat svg{width:13px;height:13px}.stat .gauge{width:30px;height:7px}#hToc{padding:5px 8px;font-size:12px}
   main{padding:10px 8px 12px}#room{grid-template-columns:minmax(0,1fr);gap:10px}#board,#side{min-width:0}
-  .frame{padding:8px;border-radius:10px}#bwrap{padding:0 14px 18px;min-height:340px;max-height:56vh}.green{min-height:340px}.chk{margin:0 -14px 8px;padding:8px 14px 6px;font-size:17px}
+  .frame{padding:8px;border-radius:10px}.green{min-height:340px;max-height:max(340px,56vh)}#bwrap{padding:8px 14px 18px}.chk{padding:8px 14px 6px;font-size:17px}
   #bc{font-size:19px}.bl.k-h{font-size:23px}.bd-title{font-size:24px}#bc.v1{font-size:16.5px}#bc .ttl{font-size:32px}#bc .res .big{font-size:44px}
   #bc .paper{overflow-x:auto}#bc .paper svg{min-width:460px}.bd-fig{overflow-x:auto}.bd-fig svg{min-width:420px}.bl.k-f .katex{font-size:1em}.bl.k-f{font-size:21px}
   #side{position:static;flex-direction:column}#tutorCard{flex-direction:row;align-items:flex-end;gap:10px;padding:8px 10px}#tutorCard .nm{width:auto;flex-direction:column;align-items:flex-start;gap:0}#tutor{width:84px;height:98px}
@@ -182,7 +188,7 @@ main{max-width:1040px;margin:0 auto;padding:16px 20px 24px}
 </div></div>
 <main><div id="room">
   <div id="board">
-    <div class="frame"><div class="green"><div id="bwrap"><div class="chk" id="chk"></div><div id="bc"></div></div></div></div>
+    <div class="frame"><div class="green"><div class="chk" id="chk"></div><div id="bwrap"><div id="bc"></div></div></div></div>
     <div class="tray"><i class="w"></i><i class="y"></i><i class="p"></i><i class="er"></i></div>
     <div class="card" id="chpills"></div>
   </div>
@@ -211,7 +217,9 @@ if(!T.lessons||typeof T.lessons!=="object") T.lessons={};
 function dayReset(){ const td=TODAY(); if(T.hday!==td){ T.hearts=3; T.hday=td; } if(T.last&&T.last!==td&&T.last!==YDAY()) T.streak=0; }
 dayReset();
 let L=T.lessons[D.id]||(T.lessons[D.id]={pos:null,ch:{},done:false,xp:0,rew:{}});
-if(!L.rew||typeof L.rew!=="object") L.rew={};
+if(!L.rew||typeof L.rew!=="object") L.rew={}; if(!L.ch||typeof L.ch!=="object") L.ch={};
+/* 구버전(.79 이전) 지급 이력 이행: 그때는 L.ch/L.done 이 곧 지급 기록이었다 → 새 보상 키로 옮겨 재진입 때 챕터 +10·완료 +20 을 다시 주지 않는다(오타 2차 R5). 문제 키 rew[qid] 는 그대로 */
+Object.keys(L.ch).forEach(id=>{ if(L.ch[id]&&!L.rew["ch:"+id]) L.rew["ch:"+id]=true; }); if(L.done&&!L.rew.done) L.rew.done=true;
 let ST=load(LKEY,{read:{},done:{},correct:{},answer:{},ts:0});
 const CH=D.chapters, QZ=D.quiz||[], NCH=CH.length+(QZ.length?1:0);
 const EMB=window.parent!==window;
@@ -359,11 +367,13 @@ function tocHTML(){
 /* ---------- 화면 ---------- */
 function render(){
   hud(); savePos(); save();
-  if(S.mode==="intro") return renderIntro();
-  if(S.mode==="step") return V2?renderStepV2():renderStep();
-  if(S.mode==="quiz") return renderQuiz();
-  if(S.mode==="nohearts") return renderNoHearts();
-  if(S.mode==="result") return renderResult();
+  try{
+    if(S.mode==="intro") renderIntro();
+    else if(S.mode==="step"){ if(V2) renderStepV2(); else renderStep(); }
+    else if(S.mode==="quiz") renderQuiz();
+    else if(S.mode==="nohearts") renderNoHearts();
+    else if(S.mode==="result") renderResult();
+  } finally { S.pre=""; S.preFace=""; }   /* 안내 대사는 바로 다음 화면 한 번만 — 하트 0·목차·pill 이동으로 다른 화면이 뜨면 버린다(오타 2차 R2) */
 }
 function renderIntro(){
   const dc=CH.filter(c=>L.ch[c.id]).length, p0=(L.pos&&typeof L.pos==="object")?posOf():null;
@@ -498,7 +508,8 @@ function renderResult(){
   cancelAll();
   /* 완료 보상은 전부 채점된 뒤에만 — 입력형은 「답 보기」만 하고 자기 채점을 안 하면 채점 전(오타 구현 검수 1차) */
   const n=QZ.length, ok=QZ.filter(q=>ST.correct[q.id]===true).length, wrong=QZ.filter(q=>ST.correct[q.id]===false), ung=QZ.filter(q=>typeof ST.correct[q.id]!=="boolean"), graded=n-ung.length;
-  if(graded>=n) L.done=true; const first=graded>=n&&!L.rew.done; if(first){ L.rew.done=true; gainXP(20); touchStreak(); save(); }   /* 완료 보상도 회차당 한 번(L.rew, 오타 R5·R6) */
+  const wasDone=!!L.done; if(graded>=n) L.done=true; const first=graded>=n&&!L.rew.done; if(first){ L.rew.done=true; gainXP(20); touchStreak(); }   /* 완료 보상도 회차당 한 번(L.rew, 오타 R5·R6) */
+  if(first||L.done!==wasDone) save();   /* 보상과 별개로 완료 상태 변화는 바로 저장 — render() 의 save 는 이보다 앞이라 재완료가 안 남았다(오타 2차 R6) */
   const ratio=n?ok/n:1, good=ratio>=.8, mid=ratio>=.5;
   const badge='<svg class="badge" viewBox="0 0 120 120" fill="none" stroke="#FFE27A" stroke-width="2.5" stroke-linejoin="round"><circle cx="60" cy="60" r="50" stroke-dasharray="4 3"/><circle cx="60" cy="60" r="40"/><path d="M60 30l8.8 18 19.8 2.9-14.3 13.9 3.4 19.7L60 75.2l-17.7 9.3 3.4-19.7L31.4 50.9l19.8-2.9z" fill="rgba(255,226,122,.18)"/></svg><div class="bl2">'+esc(D.course)+' · '+esc(D.sess)+' · 챕터 '+CH.length+'</div>';
   board('<div class="res"><div class="big">'+(ung.length?"채점이 남았습니다":good?"수고했습니다":mid?"절반은 넘겼습니다":"다시 합니다")+'</div><div class="stats"><div><b>'+ok+'/'+n+'</b><span>정답</span></div><div><b>+'+(L.xp||0)+'</b><span>이 회차 XP</span></div><div><b>'+T.streak+'</b><span>연속일</span></div><div><b>'+T.aff+'</b><span>호감도 · '+affName()+'</span></div></div>'+badge+(ung.length?'<div class="wrong">채점 전 '+ung.length+'개 — 답 보기 뒤 「맞았어요/틀렸어요」까지 눌러야 완료입니다.</div>':'')+(wrong.length?'<div class="wrong">틀린 문제 '+wrong.length+'개 — 해설을 읽고 다시 푸세요.</div>':'')+'</div>','<span>오늘의 결과</span>',true);
