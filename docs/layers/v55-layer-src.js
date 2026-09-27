@@ -17,6 +17,15 @@
     V55.loading=fetch("notes/classroom/assets/tutor.svg",{cache:"force-cache"}).then(function(r){ return r.ok?r.text():""; }).then(function(t){ V55.svg=String(t).replace(/<!--[\s\S]*?-->/g,"").replace(/<\?xml[^>]*>/,""); return V55.svg; }).catch(function(){ V55.svg=""; return ""; });
     return V55.loading;
   };
+  /* 김주영 스앵님 실사풍 일러스트(힉스필드, 2026-09-28): notes/classroom/assets/tutor/<face>.png 6장. neutral 이 로드되면 그림, 아니면 SVG 치비. 끄기: localStorage mc-tutor-svg=1 또는 ?tutor=svg */
+  V55.TUTOR_IMG="notes/classroom/assets/tutor/"; V55.FACES=["neutral","sharp","smile","angry","wide","proud"];
+  V55.tutorImg=function(){
+    if(V55.rasterP) return V55.rasterP;
+    var off=false; try{ off=localStorage.getItem("mc-tutor-svg")==="1"||/[?&]tutor=svg\b/.test(location.search); }catch(e){}
+    V55.rasterP=off?Promise.resolve(false):new Promise(function(res){ var im=new Image(); im.onload=function(){ res(true); }; im.onerror=function(){ res(false); }; im.src=V55.TUTOR_IMG+"neutral.png"; });
+    return V55.rasterP;
+  };
+  V55.faceSrc=function(face){ return V55.TUTOR_IMG+(V55.FACES.indexOf(face)>=0?face:"neutral")+".png"; };
   V55.T=function(){ try{ return JSON.parse(localStorage.getItem("mc-tutor")||"null")||{}; }catch(e){ return {}; } };
   /* ---------- 단원(knowledge/units.json): 회차를 장 단위로 묶는다 (대표님 2026-09-27 "단원별로 진도 구분") ---------- */
   V55.U=null; V55.uErr=null; V55.uLoading=null; V55.showAll={};
@@ -159,7 +168,10 @@
     var notes=$("#cNotes",v), card=notes&&notes.closest(".card"); if(card&&!card._v55){ card._v55=true; card.classList.add("v55-table"); var ha=card.querySelector(".card-h .ha")||card.querySelector(".card-h"); var b=document.createElement("button"); b.type="button"; b.className="btn xs"; b.id="v55TableTg"; ha.insertBefore(b,ha.firstChild);
       var apply=function(){ var open=localStorage.getItem("mc-v55-table")==="1"; card.classList.toggle("v55-fold",!open); b.textContent=open?"접기":"회차 표 펼치기"; }; b.onclick=function(){ try{ localStorage.setItem("mc-v55-table",card.classList.contains("v55-fold")?"1":"0"); }catch(e){} apply(); }; apply(); }
     V55.bind(c,v);
-    V55.tutor().then(function(svg){ if(!svg) return; $$(".v55-tutor",v).forEach(function(el){ if(el.querySelector("svg")) return; el.innerHTML=svg; var s=el.querySelector("svg"); if(s){ s.setAttribute("data-face",el.getAttribute("data-face")||"neutral"); s.removeAttribute("id"); } }); });
+    V55.tutorImg().then(function(raster){
+      if(raster){ $$(".v55-tutor",v).forEach(function(el){ if(el.querySelector("img,svg")) return; var f=el.getAttribute("data-face")||"neutral"; el.innerHTML='<img src="'+V55.faceSrc(f)+'" alt="" decoding="async" draggable="false">'; }); return; }
+      V55.tutor().then(function(svg){ if(!svg) return; $$(".v55-tutor",v).forEach(function(el){ if(el.querySelector("img,svg")) return; el.innerHTML=svg; var s=el.querySelector("svg"); if(s){ s.setAttribute("data-face",el.getAttribute("data-face")||"neutral"); s.removeAttribute("id"); } }); });
+    });
     if(window.V50&&!V50.S&&!V50.err&&V50.load){ V50.load().then(function(){ if(ui.view==="course") V55.render(); }); }
     if(window.V47&&!V47.M&&!V47.err&&V47.load){ try{ V47.load().then(function(){ if(ui.view==="course") V55.render(); }); }catch(e){} }
   };
@@ -194,7 +206,7 @@
     ".v55-hr{flex:0 0 200px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;min-width:0}",
     ".v55-bubble{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:9px 12px;font-size:13px;font-weight:700;line-height:1.45;width:100%;text-align:center}",
     ".v55-bubble::after{content:\"\";position:absolute;left:50%;bottom:-9px;margin-left:-6px;border:6px solid transparent;border-top-color:var(--line);border-bottom:0}",
-    ".v55-tutor{width:120px;height:140px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.14))}.v55-tutor svg{width:100%;height:100%;display:block;overflow:visible}.v55-tutor.big{width:150px;height:176px}",
+    ".v55-tutor{width:120px;height:140px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.14))}.v55-tutor svg{width:100%;height:100%;display:block;overflow:visible}.v55-tutor img{width:100%;height:100%;display:block;object-fit:contain;object-position:center bottom;-webkit-user-select:none;user-select:none}.v55-tutor.big{width:150px;height:176px}",
     /* 경로 */
     ".v55-path{position:relative;padding:6px 0 10px;overflow:hidden}",
     ".v55-wk{display:flex;align-items:center;gap:10px;margin:14px 0 14px;font-weight:800;font-size:12.5px;color:var(--ink-3);letter-spacing:.01em}.v55-wk::before,.v55-wk::after{content:\"\";flex:1;height:2px;background:var(--line);border-radius:2px}.v55-wk span{max-width:70%;text-align:center}",
