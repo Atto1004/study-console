@@ -10,57 +10,59 @@ o = (120, 190); V = (150, 0); W = (60, -40); U = (30, -95)
 def add(*ps): return (sum(p[0] for p in ps), sum(p[1] for p in ps))
 pV, pW, pU = add(o, V), add(o, W), add(o, U); pVW = add(o, V, W); pUV = add(o, U, V); pUW = add(o, U, W); pUVW = add(o, U, V, W)
 fig_box = canvas(560, 240,
-    path(f"M{o[0]} {o[1]} L{pV[0]} {pV[1]} L{pVW[0]} {pVW[1]} L{pW[0]} {pW[1]} Z", GRAY, 1.5, "rgba(138,151,166,.15)"),
-    path(f"M{pU[0]} {pU[1]} L{pUV[0]} {pUV[1]} L{pUVW[0]} {pUVW[1]} L{pUW[0]} {pUW[1]} Z", GRAY, 1.5, "rgba(138,151,166,.06)"),
-    line(pV[0], pV[1], pUV[0], pUV[1], GRAY, 1.5), line(pVW[0], pVW[1], pUVW[0], pUVW[1], GRAY, 1.5), line(pW[0], pW[1], pUW[0], pUW[1], GRAY, 1.5),
-    arrow(o[0], o[1], pV[0], pV[1], BLUE, "", 3), text(195, 212, "V", 15, BLUE, "middle", True),
-    arrow(o[0], o[1], pW[0], pW[1], RED, "", 3), text(190, 166, "W", 15, RED, "start", True),
-    arrow(o[0], o[1], pU[0], pU[1], GREEN, "", 3), text(118, 120, "U", 15, GREEN, "end", True),
-    text(240, 178, "밑면 |V×W|", 12, INK, "middle"),
-    text(462, 44, "U·(V×W)", 13, INK, "middle", True), text(462, 66, "= |V×W| × (U의 수직 높이)", 11.5, INK, "middle"), text(462, 90, "= 평행육면체의 부피 (절댓값)", 11.5, INK, "middle", True),
-    text(462, 126, "세 벡터가 한 평면에 있으면", 12, RED, "middle"), text(462, 146, "높이 0 → 부피 0 → U·(V×W) = 0", 11.5, RED, "middle", True),
-    cap="혼합삼중적의 기하: 밑면(평행사변형 \\(\\mathbf V,\\mathbf W\\)) 넓이에 \\(\\mathbf U\\)의 수직 높이 성분을 곱한 것. 필기본 옆 한글 메모 「평행육면체」.")
+    step(1, path(f"M{o[0]} {o[1]} L{pV[0]} {pV[1]} L{pVW[0]} {pVW[1]} L{pW[0]} {pW[1]} Z", GRAY, 1.5, "rgba(138,151,166,.15)"),
+        arrow(o[0], o[1], pV[0], pV[1], BLUE, "", 3), text(195, 212, "V", 15, BLUE, "middle", True),
+        arrow(o[0], o[1], pW[0], pW[1], RED, "", 3), text(190, 166, "W", 15, RED, "start", True),
+        text(240, 178, "밑면 |V×W|", 12, INK, "middle")),
+    step(2, path(f"M{pU[0]} {pU[1]} L{pUV[0]} {pUV[1]} L{pUVW[0]} {pUVW[1]} L{pUW[0]} {pUW[1]} Z", GRAY, 1.5, "rgba(138,151,166,.06)"),
+        line(pV[0], pV[1], pUV[0], pUV[1], GRAY, 1.5), line(pVW[0], pVW[1], pUVW[0], pUVW[1], GRAY, 1.5), line(pW[0], pW[1], pUW[0], pUW[1], GRAY, 1.5),
+        arrow(o[0], o[1], pU[0], pU[1], GREEN, "", 3), text(118, 120, "U", 15, GREEN, "end", True)),
+    step(3, text(462, 44, "U·(V×W)", 13, INK, "middle", True), text(462, 66, "= |V×W| × (U의 수직 높이)", 11.5, INK, "middle"), text(462, 90, "= 평행육면체의 부피 (절댓값)", 11.5, INK, "middle", True)),
+    step(4, text(462, 126, "세 벡터가 한 평면에 있으면", 12, RED, "middle"), text(462, 146, "높이 0 → 부피 0 → U·(V×W) = 0", 11.5, RED, "middle", True)),
+    cap="혼합삼중적의 기하: 밑면(평행사변형 \\(\\mathbf V,\\mathbf W\\)) 넓이에 \\(\\mathbf U\\)의 수직 높이 성분을 곱한 것. 필기본 옆 한글 메모 「평행육면체」.", name="box")
 
 fig_forces = canvas(560, 210,
-    block(200, 70, 160, 90, "", INK), text(280, 88, "물체", 13, INK, "middle", True),
-    arrow(120, 115, 194, 115, GREEN, "외력 (다른 물체가)", 2.8, -10, -12),
-    arrow(280, 20, 280, 64, BLUE, "표면력: 접촉", 2.4, 70, 0),
-    arrow(280, 160, 280, 200, RED, "체적력: 중력 W = mg", 2.6, 90, 0),
-    line(280, 96, 280, 154, GRAY, 1.2, "4 3"), text(255, 108, "내력", 11.5, GRAY, "end"), text(255, 122, "(같은 물체의", 10.5, GRAY, "end"), text(255, 134, "다른 부분이)", 10.5, GRAY, "end"),
-    cap="힘의 분류 두 가지. 외력/내력은 「물체」를 어디까지로 잡느냐에 따라 달라지고, 체적력(부피 전체)/표면력(표면)은 힘이 걸리는 자리로 나눈다.")
+    step(1, block(200, 70, 160, 90, "", INK), text(280, 88, "물체", 13, INK, "middle", True)),
+    step(2, arrow(120, 115, 194, 115, GREEN, "외력 (다른 물체가)", 2.8, -10, -12)),
+    step(3, arrow(280, 20, 280, 64, BLUE, "표면력: 접촉", 2.4, 70, 0),
+        arrow(280, 160, 280, 200, RED, "체적력: 중력 W = mg", 2.6, 90, 0)),
+    step(4, line(280, 96, 280, 154, GRAY, 1.2, "4 3"), text(255, 108, "내력", 11.5, GRAY, "end"), text(255, 122, "(같은 물체의", 10.5, GRAY, "end"), text(255, 134, "다른 부분이)", 10.5, GRAY, "end")),
+    cap="힘의 분류 두 가지. 외력/내력은 「물체」를 어디까지로 잡느냐에 따라 달라지고, 체적력(부피 전체)/표면력(표면)은 힘이 걸리는 자리로 나눈다.", name="forces")
 
 fig_contact = canvas(560, 220,
-    path("M40 190 L 420 190 L 420 90 Z", INK, 2, "rgba(31,42,68,.05)"),
-    # 경사면 위 블록 (회전 없이 단순화)
-    rect(230, 108, 70, 44, INK, fill="#F1F3F5", sw=2, rx=5),
-    arrow(265, 130, 285, 60, GREEN, "N (면에 수직)", 2.8, 60, -4),
-    arrow(265, 130, 190, 150, PINK, "", 2.8), text(160, 148, "f (면에 평행)", 12, PINK, "end"),
-    arrow(265, 130, 265, 200, RED, "W", 2.4, 14, 10),
-    text(120, 60, "접촉력 F = N + f", 15, INK, "middle", True), text(120, 84, "곡면이면 접점의 접평면 기준", 12, GRAY, "middle"),
-    text(480, 150, "손 ⇄ 벽", 13, INK, "middle", True), text(480, 170, "F(손→벽) = −F(벽→손)", 12, INK, "middle"), text(480, 188, "뉴턴 제3법칙", 12, RED, "middle", True),
-    cap="면과 면이 닿을 때 접촉력은 <b>수직력 N</b>과 <b>마찰력 f</b>로 나뉜다. (그림의 경사면은 방향을 보이기 위한 예)")
+    step(1, path("M40 190 L 420 190 L 420 90 Z", INK, 2, "rgba(31,42,68,.05)"),
+        # 경사면 위 블록 (회전 없이 단순화)
+        rect(230, 108, 70, 44, INK, fill="#F1F3F5", sw=2, rx=5)),
+    step(2, arrow(265, 130, 285, 60, GREEN, "N (면에 수직)", 2.8, 60, -4)),
+    step(3, arrow(265, 130, 190, 150, PINK, "", 2.8), text(160, 148, "f (면에 평행)", 12, PINK, "end")),
+    step(4, arrow(265, 130, 265, 200, RED, "W", 2.4, 14, 10),
+        text(120, 60, "접촉력 F = N + f", 15, INK, "middle", True), text(120, 84, "곡면이면 접점의 접평면 기준", 12, GRAY, "middle")),
+    step(5, text(480, 150, "손 ⇄ 벽", 13, INK, "middle", True), text(480, 170, "F(손→벽) = −F(벽→손)", 12, INK, "middle"), text(480, 188, "뉴턴 제3법칙", 12, RED, "middle", True)),
+    cap="면과 면이 닿을 때 접촉력은 <b>수직력 N</b>과 <b>마찰력 f</b>로 나뉜다. (그림의 경사면은 방향을 보이기 위한 예)", name="contact")
 
 fig_pulley = canvas(560, 230,
-    line(60, 30, 240, 30, INK, 3), line(150, 30, 150, 70, INK, 2), circle(150, 95, 26, INK, w=2.5, fill="#F1F3F5"), dot(150, 95, "", 4, INK),
-    line(124, 95, 124, 160, GRAY, 2), line(176, 95, 176, 150, GRAY, 2),
-    block(94, 160, 60, 44, "m", INK), arrow(124, 158, 124, 120, GREEN, "T₁", 2.6, -14, 0),
-    arrow(176, 150, 176, 112, GREEN, "T₂", 2.6, 16, 0), text(200, 176, "사람이 당김", 11.5, GRAY, "start"),
-    text(150, 222, "도르래: 방향만 바꾼다, T₁ = T₂ (케이블 질량 0)", 12.5, INK, "middle", True),
+    step(1, line(60, 30, 240, 30, INK, 3), line(150, 30, 150, 70, INK, 2), circle(150, 95, 26, INK, w=2.5, fill="#F1F3F5"), dot(150, 95, "", 4, INK),
+        line(124, 95, 124, 160, GRAY, 2), line(176, 95, 176, 150, GRAY, 2),
+        block(94, 160, 60, 44, "m", INK), text(200, 176, "사람이 당김", 11.5, GRAY, "start")),
+    step(2, arrow(124, 158, 124, 120, GREEN, "T₁", 2.6, -14, 0),
+        arrow(176, 150, 176, 112, GREEN, "T₂", 2.6, 16, 0),
+        text(150, 222, "도르래: 방향만 바꾼다, T₁ = T₂ (케이블 질량 0)", 12.5, INK, "middle", True)),
     # 스프링
-    line(340, 60, 340, 200, INK, 2), path("M340 80 l 20 8 l -40 8 l 40 8 l -40 8 l 40 8 l -40 8 l 20 8", INK, 2), line(340, 136, 340, 150, INK, 2),
-    line(340, 60, 500, 60, GRAY, 1, "4 3"), line(340, 150, 500, 150, GRAY, 1, "4 3"), text(470, 108, "L₀ (자연 길이)", 12, GRAY, "middle"),
-    text(430, 176, "F = k |L − L₀|   [k: N/m]", 13.5, INK, "middle", True), text(430, 196, "늘리면 당기고, 누르면 민다", 12, GRAY, "middle"),
-    cap="장력 T의 작용선은 케이블과 일직선. 도르래를 지나도 크기는 그대로. 선형 스프링은 늘어난 길이에 비례해 원래 길이로 돌아가려 한다.")
+    step(3, line(340, 60, 340, 200, INK, 2), path("M340 80 l 20 8 l -40 8 l 40 8 l -40 8 l 40 8 l -40 8 l 20 8", INK, 2), line(340, 136, 340, 150, INK, 2),
+        line(340, 60, 500, 60, GRAY, 1, "4 3"), line(340, 150, 500, 150, GRAY, 1, "4 3"), text(470, 108, "L₀ (자연 길이)", 12, GRAY, "middle"),
+        text(430, 176, "F = k |L − L₀|   [k: N/m]", 13.5, INK, "middle", True), text(430, 196, "늘리면 당기고, 누르면 민다", 12, GRAY, "middle")),
+    cap="장력 T의 작용선은 케이블과 일직선. 도르래를 지나도 크기는 그대로. 선형 스프링은 늘어난 길이에 비례해 원래 길이로 돌아가려 한다.", name="pulley")
 
 fig_fbd = canvas(560, 200,
     # 왼쪽: 실제 상황
-    line(40, 30, 200, 30, INK, 3), line(120, 30, 120, 90, GRAY, 2), block(90, 90, 60, 44, "상자", INK), text(120, 160, "① 분리할 물체 = 상자", 12, INK, "middle"),
-    arrow(220, 100, 270, 100, INK, "", 1.8), text(245, 88, "떼어낸다", 11, GRAY, "middle"),
-    # 오른쪽: FBD
-    block(300, 80, 60, 44, "상자", INK), arrow(330, 78, 330, 30, GREEN, "T (케이블)", 2.8, 46, 0), arrow(330, 126, 330, 176, RED, "W = mg", 2.8, 44, 0),
-    text(330, 196, "② 그 물체만 그리고 ③ 모든 외력 표시", 12, INK, "middle"),
-    text(480, 70, "평형 → ΣF = 0", 14, INK, "middle", True), text(480, 94, "T − mg = 0", 13.5, GREEN, "middle"), text(480, 116, "T = mg", 13.5, GREEN, "middle", True),
-    cap="자유물체도 3단계. 케이블·바닥·다른 물체는 지우고 그것들이 주던 <b>힘</b>만 남긴다. 그 다음 합력 0.")
+    step(1, line(40, 30, 200, 30, INK, 3), line(120, 30, 120, 90, GRAY, 2), block(90, 90, 60, 44, "상자", INK), text(120, 160, "① 분리할 물체 = 상자", 12, INK, "middle")),
+    step(2, arrow(220, 100, 270, 100, INK, "", 1.8), text(245, 88, "떼어낸다", 11, GRAY, "middle"),
+        # 오른쪽: FBD
+        block(300, 80, 60, 44, "상자", INK)),
+    step(3, arrow(330, 78, 330, 30, GREEN, "T (케이블)", 2.8, 46, 0), arrow(330, 126, 330, 176, RED, "W = mg", 2.8, 44, 0),
+        text(330, 196, "② 그 물체만 그리고 ③ 모든 외력 표시", 12, INK, "middle")),
+    step(4, text(480, 70, "평형 → ΣF = 0", 14, INK, "middle", True), text(480, 94, "T − mg = 0", 13.5, GREEN, "middle"), text(480, 116, "T = mg", 13.5, GREEN, "middle", True)),
+    cap="자유물체도 3단계. 케이블·바닥·다른 물체는 지우고 그것들이 주던 <b>힘</b>만 남긴다. 그 다음 합력 0.", name="fbd")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>정역학 · 9/16 혼합삼중적 · Ch.3 힘 — 종류 · 평형 · 자유물체도</title></head><body>
 <header>

@@ -6,47 +6,48 @@ from figs import *
 OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\정역학\_수업노트\2026-09-07.html"
 
 fig_tree = canvas(560, 190,
-    rect(160, 26, 240, 46, INK, fill="rgba(31,42,68,.06)", sw=2, rx=10), text(280, 46, "Mechanics 역학", 15, INK, "middle", True), text(280, 63, "힘(力)이 물체에 가해졌을 때 생기는 변화 전부", 11, GRAY, "middle"),
-    line(280, 72, 280, 96, INK, 1.5), line(150, 96, 410, 96, INK, 1.5), arrow(150, 96, 150, 116, INK, "", 1.5), arrow(410, 96, 410, 116, INK, "", 1.5),
-    rect(60, 118, 180, 58, GREEN, fill="rgba(47,158,68,.08)", sw=2, rx=10), text(150, 140, "Statics 정역학", 14, GREEN, "middle", True), text(150, 161, "\"equilibrium\" 평형 · 정지 · 이번 학기", 11.5, INK, "middle"),
-    rect(320, 118, 180, 58, GRAY, fill="rgba(138,151,166,.10)", sw=2, rx=10), text(410, 140, "Dynamics 동역학", 14, GRAY, "middle", True), text(410, 161, "운동(motion) · 나중", 11.5, INK, "middle"),
-    cap="판서 ①의 구조. 교수님이 Mechanics·divided 아래 점선을 긋고 equilibrium 에 따옴표를 쳤다 — 이번 학기의 핵심어.")
+    step(1, rect(160, 26, 240, 46, INK, fill="rgba(31,42,68,.06)", sw=2, rx=10), text(280, 46, "Mechanics 역학", 15, INK, "middle", True), text(280, 63, "힘(力)이 물체에 가해졌을 때 생기는 변화 전부", 11, GRAY, "middle")),
+    step(2, line(280, 72, 280, 96, INK, 1.5), line(150, 96, 410, 96, INK, 1.5), arrow(150, 96, 150, 116, INK, "", 1.5), arrow(410, 96, 410, 116, INK, "", 1.5),
+        rect(60, 118, 180, 58, GREEN, fill="rgba(47,158,68,.08)", sw=2, rx=10), text(150, 140, "Statics 정역학", 14, GREEN, "middle", True), text(150, 161, "\"equilibrium\" 평형 · 정지 · 이번 학기", 11.5, INK, "middle")),
+    step(3, rect(320, 118, 180, 58, GRAY, fill="rgba(138,151,166,.10)", sw=2, rx=10), text(410, 140, "Dynamics 동역학", 14, GRAY, "middle", True), text(410, 161, "운동(motion) · 나중", 11.5, INK, "middle")),
+    cap="판서 ①의 구조. 교수님이 Mechanics·divided 아래 점선을 긋고 equilibrium 에 따옴표를 쳤다 — 이번 학기의 핵심어.", name="tree")
 
 fig_unit = canvas(560, 150,
-    line(60, 110, 500, 110, INK, 2), block(200, 60, 60, 50, "1 kg"),
-    arrow(130, 85, 196, 85, GREEN, "F = 1 N", 2.6, 0, -10),
-    arrow(270, 40, 340, 40, BLUE, "a = 1 m/s²", 2.2, 0, -8),
-    text(280, 138, "1 N = 1 kg · 1 m/s²   (kN = 10³ N · MN = 10⁶ N)", 13.5, INK, "middle", True),
-    cap="힘의 단위 뉴턴: 1 kg 을 1 m/s² 로 가속하는 힘. 각도는 rad — 한 바퀴 2π rad = 360°.")
+    step(1, line(60, 110, 500, 110, INK, 2), block(200, 60, 60, 50, "1 kg")),
+    step(2, arrow(130, 85, 196, 85, GREEN, "F = 1 N", 2.6, 0, -10)),
+    step(3, arrow(270, 40, 340, 40, BLUE, "a = 1 m/s²", 2.2, 0, -8)),
+    step(4, text(280, 138, "1 N = 1 kg · 1 m/s²   (kN = 10³ N · MN = 10⁶ N)", 13.5, INK, "middle", True)),
+    cap="힘의 단위 뉴턴: 1 kg 을 1 m/s² 로 가속하는 힘. 각도는 rad — 한 바퀴 2π rad = 360°.", name="unit")
 
 fig_particle = canvas(560, 200,
-    dot(130, 100, "", 7, INK), arrow(40, 100, 122, 100, GREEN, "F", 2.6, 0, -10), text(130, 150, "입자(particle): 크기 없음", 13, INK, "middle"), text(130, 170, "작용선이 항상 중심을 지난다 → 회전 없음", 12, GRAY, "middle"),
-    block(340, 60, 120, 80, "", INK), dot(400, 100, "", 4, GRAY),
-    arrow(250, 72, 332, 72, GREEN, "F", 2.6, 0, -10), line(332, 72, 470, 72, GRAY, 1, "4 3"), text(478, 76, "작용선", 11, GRAY),
-    arc(400, 100, 34, 200, 340, RED, 2, "회전(모멘트)", 50),
-    text(400, 178, "크기가 있으면 작용선 위치에 따라 돈다", 12.5, INK, "middle"),
-    cap="1장에서 「입자」로 두는 이유: 크기가 있으면 힘의 작용선이 중심에서 비껴 모멘트가 생긴다. 모멘트는 4장에서.")
+    step(1, dot(130, 100, "", 7, INK), arrow(40, 100, 122, 100, GREEN, "F", 2.6, 0, -10), text(130, 150, "입자(particle): 크기 없음", 13, INK, "middle"), text(130, 170, "작용선이 항상 중심을 지난다 → 회전 없음", 12, GRAY, "middle")),
+    step(2, block(340, 60, 120, 80, "", INK), dot(400, 100, "", 4, GRAY),
+        arrow(250, 72, 332, 72, GREEN, "F", 2.6, 0, -10), line(332, 72, 470, 72, GRAY, 1, "4 3"), text(478, 76, "작용선", 11, GRAY)),
+    step(3, arc(400, 100, 34, 200, 340, RED, 2, "회전(모멘트)", 50),
+        text(400, 178, "크기가 있으면 작용선 위치에 따라 돈다", 12.5, INK, "middle")),
+    cap="1장에서 「입자」로 두는 이유: 크기가 있으면 힘의 작용선이 중심에서 비껴 모멘트가 생긴다. 모멘트는 4장에서.", name="particle")
 
 fig_vec = canvas(560, 180,
-    arrow(60, 130, 200, 50, BLUE, "", 3), text(112, 78, "u", 16, BLUE, "middle", True), text(150, 158, "길이 ∝ 크기 |u| · 화살표 방향 = 방향", 12.5, INK, "middle"),
-    dot(330, 130, "", 5, INK), text(318, 152, "A (시작)", 12, INK, "middle"), dot(500, 60, "", 5, INK), text(500, 48, "B (끝)", 12, INK, "middle"),
-    arrow(336, 126, 494, 64, GREEN, "", 2.6), text(430, 70, "r_AB", 14, GREEN, "middle", True),
-    text(420, 168, "앞 첨자 = 시작점, 뒤 첨자 = 끝점", 12.5, INK, "middle"),
-    cap="벡터는 크기와 방향이 둘 다 같아야 같은 벡터. 위치벡터 \\(\\mathbf r_{AB}\\)는 A에서 B로 쏘는 벡터.")
+    step(1, arrow(60, 130, 200, 50, BLUE, "", 3), text(112, 78, "u", 16, BLUE, "middle", True), text(150, 158, "길이 ∝ 크기 |u| · 화살표 방향 = 방향", 12.5, INK, "middle")),
+    step(2, dot(330, 130, "", 5, INK), text(318, 152, "A (시작)", 12, INK, "middle"), dot(500, 60, "", 5, INK), text(500, 48, "B (끝)", 12, INK, "middle")),
+    step(3, arrow(336, 126, 494, 64, GREEN, "", 2.6), text(430, 70, "r_AB", 14, GREEN, "middle", True),
+        text(420, 168, "앞 첨자 = 시작점, 뒤 첨자 = 끝점", 12.5, INK, "middle")),
+    cap="벡터는 크기와 방향이 둘 다 같아야 같은 벡터. 위치벡터 \\(\\mathbf r_{AB}\\)는 A에서 B로 쏘는 벡터.", name="vec")
 
 fig_add = canvas(560, 225,
-    arrow(40, 170, 160, 130, BLUE, "u", 2.6, 0, -8), arrow(160, 130, 210, 50, RED, "v", 2.6, 12, 0), arrow(40, 170, 210, 50, GREEN, "u + v", 3, -40, -4),
-    text(130, 208, "삼각형 법칙: u 꼬리에서 v 머리로", 12.5, INK, "middle"),
-    arrow(300, 170, 420, 130, BLUE, "u", 2.6, 0, -8), arrow(300, 170, 350, 90, RED, "v", 2.6, -12, 0),
-    line(420, 130, 470, 50, GRAY, 1.2, "4 3"), line(350, 90, 470, 50, GRAY, 1.2, "4 3"), arrow(300, 170, 470, 50, GREEN, "u + v", 3, 61, 18),
-    text(390, 208, "평행사변형 법칙: 결과는 같다 (교환법칙)", 12.5, INK, "middle"),
-    cap="덧셈 두 가지 그림. \\(\\mathbf u+\\mathbf v=\\mathbf v+\\mathbf u\\), 묶는 순서도 상관없다(결합법칙). 뺄셈은 \\(-\\mathbf v\\)를 더한다.")
+    step(1, arrow(40, 170, 160, 130, BLUE, "u", 2.6, 0, -8), arrow(160, 130, 210, 50, RED, "v", 2.6, 12, 0)),
+    step(2, arrow(40, 170, 210, 50, GREEN, "u + v", 3, -40, -4),
+        text(130, 208, "삼각형 법칙: u 꼬리에서 v 머리로", 12.5, INK, "middle")),
+    step(3, arrow(300, 170, 420, 130, BLUE, "u", 2.6, 0, -8), arrow(300, 170, 350, 90, RED, "v", 2.6, -12, 0)),
+    step(4, line(420, 130, 470, 50, GRAY, 1.2, "4 3"), line(350, 90, 470, 50, GRAY, 1.2, "4 3"), arrow(300, 170, 470, 50, GREEN, "u + v", 3, 61, 18),
+        text(390, 208, "평행사변형 법칙: 결과는 같다 (교환법칙)", 12.5, INK, "middle")),
+    cap="덧셈 두 가지 그림. \\(\\mathbf u+\\mathbf v=\\mathbf v+\\mathbf u\\), 묶는 순서도 상관없다(결합법칙). 뺄셈은 \\(-\\mathbf v\\)를 더한다.", name="add")
 
 fig_unitv = canvas(560, 150,
-    arrow(60, 100, 300, 40, BLUE, "", 3), text(180, 56, "u = |u| e", 15, BLUE, "middle", True),
-    arrow(60, 100, 120, 85, GREEN, "", 3.4), text(96, 122, "e (크기 1)", 13, GREEN, "middle"),
-    text(420, 58, "e = u / |u|", 16, INK, "middle", True), text(420, 82, "방향만 남긴다", 13, GRAY, "middle"), text(420, 102, "크기가 1이라 곱해도 크기가 안 바뀐다", 12, GRAY, "middle"),
-    cap="단위벡터: 크기 1, 방향만 지정. 어떤 벡터든 「크기 × 방향」으로 쪼갠다 — 3장에서 케이블 힘을 성분으로 쓸 때의 핵심.")
+    step(1, arrow(60, 100, 300, 40, BLUE, "", 3), text(180, 56, "u = |u| e", 15, BLUE, "middle", True)),
+    step(2, arrow(60, 100, 120, 85, GREEN, "", 3.4), text(96, 122, "e (크기 1)", 13, GREEN, "middle")),
+    step(3, text(420, 58, "e = u / |u|", 16, INK, "middle", True), text(420, 82, "방향만 남긴다", 13, GRAY, "middle"), text(420, 102, "크기가 1이라 곱해도 크기가 안 바뀐다", 12, GRAY, "middle")),
+    cap="단위벡터: 크기 1, 방향만 지정. 어떤 벡터든 「크기 × 방향」으로 쪼갠다 — 3장에서 케이블 힘을 성분으로 쓸 때의 핵심.", name="unitv")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>정역학 · 9/7 역학의 정의 · 뉴턴 법칙 · 벡터 시작</title></head><body>
 <header>

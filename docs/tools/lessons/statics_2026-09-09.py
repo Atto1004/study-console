@@ -6,52 +6,52 @@ from figs import *
 OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\정역학\_수업노트\2026-09-09.html"
 
 fig_2d = canvas(560, 220,
-    axis(60, 180, 300, 180, "x", "y") + arrow(60, 180, 60, 30, INK, "", 1.5),
-    arrow(60, 180, 240, 70, BLUE, "", 3), text(160, 112, "U", 16, BLUE, "middle", True),
-    line(240, 70, 240, 180, GRAY, 1.2, "5 4"), line(60, 70, 240, 70, GRAY, 1.2, "5 4"),
-    arrow(60, 190, 240, 190, RED, "", 2.2), text(150, 208, "Uₓ i", 13, RED, "middle"),
-    arrow(46, 180, 46, 70, GREEN, "", 2.2), text(30, 128, "U_y j", 13, GREEN, "end"),
-    text(420, 70, "U = Uₓ i + U_y j", 16, INK, "middle", True), text(420, 100, "|U| = √(Uₓ² + U_y²)", 15, INK, "middle"),
-    text(420, 140, "i, j = +x, +y 방향 단위벡터", 12.5, GRAY, "middle"), text(420, 160, "Uₓ, U_y = 스칼라 성분", 12.5, GRAY, "middle"),
-    cap="직교좌표(Cartesian)에 놓으면 벡터가 x·y 성분으로 갈라진다. 크기는 피타고라스.")
+    step(1, axis(60, 180, 300, 180, "x", "y") + arrow(60, 180, 60, 30, INK, "", 1.5)),
+    step(2, arrow(60, 180, 240, 70, BLUE, "", 3), text(160, 112, "U", 16, BLUE, "middle", True),
+        line(240, 70, 240, 180, GRAY, 1.2, "5 4"), line(60, 70, 240, 70, GRAY, 1.2, "5 4")),
+    step(3, arrow(60, 190, 240, 190, RED, "", 2.2), text(150, 208, "Uₓ i", 13, RED, "middle"),
+        arrow(46, 180, 46, 70, GREEN, "", 2.2), text(30, 128, "U_y j", 13, GREEN, "end")),
+    step(4, text(420, 70, "U = Uₓ i + U_y j", 16, INK, "middle", True), text(420, 100, "|U| = √(Uₓ² + U_y²)", 15, INK, "middle"),
+        text(420, 140, "i, j = +x, +y 방향 단위벡터", 12.5, GRAY, "middle"), text(420, 160, "Uₓ, U_y = 스칼라 성분", 12.5, GRAY, "middle")),
+    cap="직교좌표(Cartesian)에 놓으면 벡터가 x·y 성분으로 갈라진다. 크기는 피타고라스.", name="2d")
 
 fig_pos = canvas(560, 200,
-    axis(50, 160, 330, 160, "x", "y") + arrow(50, 160, 50, 30, INK, "", 1.5),
-    dot(120, 130, "", 5, INK), text(112, 152, "A (x_A, y_A)", 12, INK, "middle"), dot(290, 55, "", 5, INK), text(290, 44, "B (x_B, y_B)", 12, INK, "middle"),
-    arrow(126, 127, 286, 58, GREEN, "", 2.8), text(196, 70, "r_AB", 14, GREEN, "middle", True),
-    line(120, 130, 290, 130, GRAY, 1.2, "5 4"), line(290, 130, 290, 55, GRAY, 1.2, "5 4"), text(205, 146, "x_B − x_A", 12, GRAY, "middle"), text(300, 96, "y_B − y_A", 12, GRAY),
-    text(450, 80, "r_AB = (x_B − x_A) i", 14, INK, "middle", True), text(450, 102, "      + (y_B − y_A) j", 14, INK, "middle", True), text(450, 140, "\"끝점 − 시작점\"", 15, GREEN, "middle", True),
-    cap="두 점 사이 위치벡터: 성분마다 <b>끝점에서 시작점을 뺀다</b>. 3D는 \\(z\\) 성분이 하나 더 붙을 뿐.")
+    step(1, axis(50, 160, 330, 160, "x", "y") + arrow(50, 160, 50, 30, INK, "", 1.5),
+        dot(120, 130, "", 5, INK), text(112, 152, "A (x_A, y_A)", 12, INK, "middle"), dot(290, 55, "", 5, INK), text(290, 44, "B (x_B, y_B)", 12, INK, "middle")),
+    step(2, arrow(126, 127, 286, 58, GREEN, "", 2.8), text(196, 70, "r_AB", 14, GREEN, "middle", True)),
+    step(3, line(120, 130, 290, 130, GRAY, 1.2, "5 4"), line(290, 130, 290, 55, GRAY, 1.2, "5 4"), text(205, 146, "x_B − x_A", 12, GRAY, "middle"), text(300, 96, "y_B − y_A", 12, GRAY)),
+    step(4, text(450, 80, "r_AB = (x_B − x_A) i", 14, INK, "middle", True), text(450, 102, "      + (y_B − y_A) j", 14, INK, "middle", True), text(450, 140, "\"끝점 − 시작점\"", 15, GREEN, "middle", True)),
+    cap="두 점 사이 위치벡터: 성분마다 <b>끝점에서 시작점을 뺀다</b>. 3D는 \\(z\\) 성분이 하나 더 붙을 뿐.", name="pos")
 
 ox, oy = 200, 170
 tip = p3(ox, oy, 50, 110, 90); px = p3(ox, oy, 50, 0, 0); py = p3(ox, oy, 0, 110, 0); pz = p3(ox, oy, 0, 0, 90)
 fig_3d = canvas(560, 250,
-    axes3d(ox, oy, 100),
-    arrow(ox, oy, tip[0], tip[1], BLUE, "", 3), text(tip[0] + 14, tip[1] - 4, "U", 16, BLUE, "start", True),
-    line(ox, oy, px[0], px[1], RED, 1.6, "5 4"), line(ox, oy, py[0], py[1], RED, 1.6, "5 4"), line(ox, oy, pz[0], pz[1], RED, 1.6, "5 4"),
-    text(px[0] - 24, px[1] + 2, "Uₓ", 12, RED, "end"), text(py[0], py[1] + 16, "U_y", 12, RED, "middle"), text(pz[0] - 12, pz[1] + 4, "U_z", 12, RED, "end"),
-    text(216, 118, "θ_z", 12, GRAY), text(258, 158, "θ_y", 12, GRAY), text(174, 168, "θₓ", 12, GRAY, "end"),
-    text(430, 60, "Uₓ = |U| cos θₓ", 14, INK, "middle"), text(430, 84, "U_y = |U| cos θ_y", 14, INK, "middle"), text(430, 108, "U_z = |U| cos θ_z", 14, INK, "middle"),
-    text(430, 150, "cos²θₓ + cos²θ_y + cos²θ_z = 1", 15, RED, "middle", True), text(430, 176, "세 각은 독립이 아니다", 12.5, GRAY, "middle"),
-    cap="3D에서 방향은 각 하나로 못 정한다 — +x, +y, +z 축과 이루는 각 \\(\\theta_x,\\theta_y,\\theta_z\\) 셋. 그 코사인이 <b>방향여현</b>.")
+    step(1, axes3d(ox, oy, 100),
+        arrow(ox, oy, tip[0], tip[1], BLUE, "", 3), text(tip[0] + 14, tip[1] - 4, "U", 16, BLUE, "start", True)),
+    step(2, line(ox, oy, px[0], px[1], RED, 1.6, "5 4"), line(ox, oy, py[0], py[1], RED, 1.6, "5 4"), line(ox, oy, pz[0], pz[1], RED, 1.6, "5 4"),
+        text(px[0] - 24, px[1] + 2, "Uₓ", 12, RED, "end"), text(py[0], py[1] + 16, "U_y", 12, RED, "middle"), text(pz[0] - 12, pz[1] + 4, "U_z", 12, RED, "end")),
+    step(3, text(216, 118, "θ_z", 12, GRAY), text(258, 158, "θ_y", 12, GRAY), text(174, 168, "θₓ", 12, GRAY, "end"),
+        text(430, 60, "Uₓ = |U| cos θₓ", 14, INK, "middle"), text(430, 84, "U_y = |U| cos θ_y", 14, INK, "middle"), text(430, 108, "U_z = |U| cos θ_z", 14, INK, "middle")),
+    step(4, text(430, 150, "cos²θₓ + cos²θ_y + cos²θ_z = 1", 15, RED, "middle", True), text(430, 176, "세 각은 독립이 아니다", 12.5, GRAY, "middle")),
+    cap="3D에서 방향은 각 하나로 못 정한다 — +x, +y, +z 축과 이루는 각 \\(\\theta_x,\\theta_y,\\theta_z\\) 셋. 그 코사인이 <b>방향여현</b>.", name="3d")
 
 fig_cable = canvas(560, 200,
-    line(40, 170, 520, 170, INK, 2), block(90, 110, 60, 60, "A", INK),
-    line(430, 170, 430, 40, INK, 4), dot(430, 40, "", 5, INK), text(446, 44, "B", 13, INK),
-    line(150, 122, 430, 40, GRAY, 1.5), text(280, 72, "케이블 (A → B)", 12, GRAY, "middle"),
-    arrow(150, 122, 262, 89, GREEN, "", 3), text(230, 146, "F = |F| e_AB", 14, GREEN, "middle", True),
-    text(300, 192, "e_AB = r_AB / |r_AB|  ← 방향은 두 점의 좌표로", 13, INK, "middle"),
-    cap="정역학의 기본 동작: 케이블·로프의 힘은 <b>두 점의 좌표</b>로 방향(단위벡터)을 만들고 크기를 곱한다. 3장 평형에서 계속 쓴다.")
+    step(1, line(40, 170, 520, 170, INK, 2), block(90, 110, 60, 60, "A", INK),
+        line(430, 170, 430, 40, INK, 4), dot(430, 40, "", 5, INK), text(446, 44, "B", 13, INK)),
+    step(2, line(150, 122, 430, 40, GRAY, 1.5), text(280, 72, "케이블 (A → B)", 12, GRAY, "middle")),
+    step(3, arrow(150, 122, 262, 89, GREEN, "", 3), text(230, 146, "F = |F| e_AB", 14, GREEN, "middle", True),
+        text(300, 192, "e_AB = r_AB / |r_AB|  ← 방향은 두 점의 좌표로", 13, INK, "middle")),
+    cap="정역학의 기본 동작: 케이블·로프의 힘은 <b>두 점의 좌표</b>로 방향(단위벡터)을 만들고 크기를 곱한다. 3장 평형에서 계속 쓴다.", name="cable")
 
 fig_dot = canvas(560, 190,
-    arrow(60, 140, 220, 140, BLUE, "", 3), text(140, 162, "U", 15, BLUE, "middle", True),
-    arrow(60, 140, 170, 50, RED, "", 3), text(100, 88, "V", 15, RED, "middle", True),
-    arc(60, 140, 40, -39, 0, GRAY, 1.5, "θ", 52),
-    text(150, 30, "꼬리를 맞대고 사이각 θ", 12.5, GRAY, "middle"),
-    text(400, 50, "U · V = |U||V| cos θ  (스칼라)", 15, INK, "middle", True),
-    text(400, 84, "θ = 0°  → +|U||V| (최대)", 13, GREEN, "middle"), text(400, 108, "θ = 90° → 0", 13, INK, "middle", True), text(400, 132, "θ = 180° → −|U||V|", 13, RED, "middle"),
-    text(400, 164, "\"얼마나 같은 방향을 향하는가\"의 척도", 12.5, GRAY, "middle"),
-    cap="내적의 정의. 단위는 두 벡터 단위의 곱(둘 다 힘이면 N²). 방향이 없는 스칼라다.")
+    step(1, arrow(60, 140, 220, 140, BLUE, "", 3), text(140, 162, "U", 15, BLUE, "middle", True),
+        arrow(60, 140, 170, 50, RED, "", 3), text(100, 88, "V", 15, RED, "middle", True),
+        arc(60, 140, 40, -39, 0, GRAY, 1.5, "θ", 52),
+        text(150, 30, "꼬리를 맞대고 사이각 θ", 12.5, GRAY, "middle")),
+    step(2, text(400, 50, "U · V = |U||V| cos θ  (스칼라)", 15, INK, "middle", True)),
+    step(3, text(400, 84, "θ = 0°  → +|U||V| (최대)", 13, GREEN, "middle"), text(400, 108, "θ = 90° → 0", 13, INK, "middle", True), text(400, 132, "θ = 180° → −|U||V|", 13, RED, "middle")),
+    step(4, text(400, 164, "\"얼마나 같은 방향을 향하는가\"의 척도", 12.5, GRAY, "middle")),
+    cap="내적의 정의. 단위는 두 벡터 단위의 곱(둘 다 힘이면 N²). 방향이 없는 스칼라다.", name="dot")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>정역학 · 9/9 성분 · 위치벡터 · 방향여현 · 내적 정의</title></head><body>
 <header>

@@ -6,61 +6,62 @@ from figs import *
 OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\정역학\_수업노트\2026-09-14.html"
 
 fig_ijk = canvas(560, 200,
-    axes3d(150, 150, 90), arrow(150, 150, 150, 92, RED, "", 3.2), text(160, 96, "k", 14, RED, "start", True),
-    arrow(150, 150, 210, 150, RED, "", 3.2), text(206, 170, "j", 14, RED, "middle", True),
-    arrow(150, 150, 114, 180, RED, "", 3.2), text(102, 196, "i", 14, RED, "middle", True),
-    text(400, 50, "i·i = j·j = k·k = 1", 15, INK, "middle", True), text(400, 76, "i·j = j·k = k·i = 0", 15, INK, "middle", True),
-    text(400, 110, "같은 방향 → cos 0° = 1", 12.5, GRAY, "middle"), text(400, 130, "수직 → cos 90° = 0", 12.5, GRAY, "middle"),
-    text(400, 168, "그래서 성분 전개에서 교차항이 사라진다", 12.5, GREEN, "middle", True),
-    cap="단위벡터끼리의 내적 표. 필기본에서 x·y·z 축에 \\(\\mathbf i,\\mathbf j,\\mathbf k\\)를 빨간색으로 표시한 그림.")
+    step(1, axes3d(150, 150, 90), arrow(150, 150, 150, 92, RED, "", 3.2), text(160, 96, "k", 14, RED, "start", True),
+        arrow(150, 150, 210, 150, RED, "", 3.2), text(206, 170, "j", 14, RED, "middle", True),
+        arrow(150, 150, 114, 180, RED, "", 3.2), text(102, 196, "i", 14, RED, "middle", True)),
+    step(2, text(400, 50, "i·i = j·j = k·k = 1", 15, INK, "middle", True), text(400, 76, "i·j = j·k = k·i = 0", 15, INK, "middle", True)),
+    step(3, text(400, 110, "같은 방향 → cos 0° = 1", 12.5, GRAY, "middle"), text(400, 130, "수직 → cos 90° = 0", 12.5, GRAY, "middle"),
+        text(400, 168, "그래서 성분 전개에서 교차항이 사라진다", 12.5, GREEN, "middle", True)),
+    cap="단위벡터끼리의 내적 표. 필기본에서 x·y·z 축에 \\(\\mathbf i,\\mathbf j,\\mathbf k\\)를 빨간색으로 표시한 그림.", name="ijk")
 
 fig_proj = canvas(560, 230,
-    line(40, 170, 520, 170, INK, 2.2), text(500, 192, "직선 L", 13, INK, "end"),
-    arrow(120, 170, 200, 170, GREEN, "", 3.4), text(160, 192, "e (|e| = 1)", 13, GREEN, "middle"),
-    arrow(120, 170, 380, 50, BLUE, "", 3), text(240, 96, "U", 16, BLUE, "middle", True),
-    arc(120, 170, 46, -25, 0, GRAY, 1.5, "θ", 58),
-    line(380, 50, 380, 170, GRAY, 1.2, "5 4"),
-    arrow(120, 156, 380, 156, RED, "", 2.6), text(250, 146, "U_p = (U·e) e", 13, RED, "middle"), text(300, 196, "|U_p| = |U| cos θ", 13, RED, "middle"),
-    arrow(394, 170, 394, 50, PINK, "", 2.6), text(408, 112, "U_n = U − U_p", 13, PINK, "start"),
-    cap="정사영: 벡터 \\(\\mathbf U\\)를 직선 L에 <b>평행한 성분</b> \\(\\mathbf U_p\\)와 <b>수직한 성분</b> \\(\\mathbf U_n\\)으로. 크기는 내적으로, 방향은 단위벡터 \\(\\mathbf e\\)로.")
+    step(1, line(40, 170, 520, 170, INK, 2.2), text(500, 192, "직선 L", 13, INK, "end"),
+        arrow(120, 170, 200, 170, GREEN, "", 3.4), text(160, 192, "e (|e| = 1)", 13, GREEN, "middle")),
+    step(2, arrow(120, 170, 380, 50, BLUE, "", 3), text(240, 96, "U", 16, BLUE, "middle", True),
+        arc(120, 170, 46, -25, 0, GRAY, 1.5, "θ", 58)),
+    step(3, line(380, 50, 380, 170, GRAY, 1.2, "5 4"),
+        arrow(120, 156, 380, 156, RED, "", 2.6), text(250, 146, "U_p = (U·e) e", 13, RED, "middle"), text(300, 196, "|U_p| = |U| cos θ", 13, RED, "middle")),
+    step(4, arrow(394, 170, 394, 50, PINK, "", 2.6), text(408, 112, "U_n = U − U_p", 13, PINK, "start")),
+    cap="정사영: 벡터 \\(\\mathbf U\\)를 직선 L에 <b>평행한 성분</b> \\(\\mathbf U_p\\)와 <b>수직한 성분</b> \\(\\mathbf U_n\\)으로. 크기는 내적으로, 방향은 단위벡터 \\(\\mathbf e\\)로.", name="proj")
 
 fig_cross = canvas(560, 250,
     # 평면 (평행사변형)
-    path("M120 200 L 300 200 L 380 120 L 200 120 Z", GRAY, 1.5, "rgba(138,151,166,.12)", "4 3"),
-    arrow(120, 200, 300, 200, BLUE, "", 3), text(210, 222, "U", 15, BLUE, "middle", True),
-    arrow(120, 200, 200, 120, RED, "", 3), text(146, 150, "V", 15, RED, "middle", True),
-    arc(120, 200, 44, -45, 0, GRAY, 1.5, "θ", 56),
-    line(200, 120, 200, 200, GRAY, 1.2, "3 3"), text(214, 166, "|V| sin θ", 11.5, GRAY),
-    arrow(120, 200, 120, 40, GREEN, "", 3.4), text(134, 46, "U × V = |U||V| sin θ · e", 14, GREEN, "start", True),
-    text(134, 66, "e ⊥ U, e ⊥ V (평면에 수직)", 12, GREEN, "start"),
-    text(250, 90, "|U × V| = 평행사변형의 넓이", 13, INK, "middle"),
-    text(470, 150, "오른손 법칙", 13.5, INK, "middle", True), text(470, 170, "손가락 U → V 로 감으면", 12, GRAY, "middle"), text(470, 188, "엄지가 U × V", 12, GRAY, "middle"),
-    text(470, 218, "V × U = −(U × V)", 13.5, RED, "middle", True),
-    cap="외적은 <b>벡터</b>. 크기 = 두 벡터가 만드는 평행사변형의 넓이, 방향 = 두 벡터가 이루는 평면에 수직(오른손 법칙). 평행이면 sin θ = 0 → 0.")
+    step(1, path("M120 200 L 300 200 L 380 120 L 200 120 Z", GRAY, 1.5, "rgba(138,151,166,.12)", "4 3"),
+        arrow(120, 200, 300, 200, BLUE, "", 3), text(210, 222, "U", 15, BLUE, "middle", True),
+        arrow(120, 200, 200, 120, RED, "", 3), text(146, 150, "V", 15, RED, "middle", True),
+        arc(120, 200, 44, -45, 0, GRAY, 1.5, "θ", 56)),
+    step(2, line(200, 120, 200, 200, GRAY, 1.2, "3 3"), text(214, 166, "|V| sin θ", 11.5, GRAY),
+        text(250, 90, "|U × V| = 평행사변형의 넓이", 13, INK, "middle")),
+    step(3, arrow(120, 200, 120, 40, GREEN, "", 3.4), text(134, 46, "U × V = |U||V| sin θ · e", 14, GREEN, "start", True),
+        text(134, 66, "e ⊥ U, e ⊥ V (평면에 수직)", 12, GREEN, "start")),
+    step(4, text(470, 150, "오른손 법칙", 13.5, INK, "middle", True), text(470, 170, "손가락 U → V 로 감으면", 12, GRAY, "middle"), text(470, 188, "엄지가 U × V", 12, GRAY, "middle"),
+        text(470, 218, "V × U = −(U × V)", 13.5, RED, "middle", True)),
+    cap="외적은 <b>벡터</b>. 크기 = 두 벡터가 만드는 평행사변형의 넓이, 방향 = 두 벡터가 이루는 평면에 수직(오른손 법칙). 평행이면 sin θ = 0 → 0.", name="cross")
 
 fig_cyc = canvas(560, 190,
-    circle(150, 95, 60, INK, w=2), text(150, 30, "i", 16, RED, "middle", True), text(214, 136, "j", 16, RED, "middle", True), text(86, 136, "k", 16, RED, "middle", True),
-    arc(150, 95, 60, -60, 20, GREEN, 2.5), arc(150, 95, 60, 60, 140, GREEN, 2.5), arc(150, 95, 60, 180, 260, GREEN, 2.5),
-    text(150, 100, "순환 → +", 12.5, GREEN, "middle", True),
-    text(400, 50, "i × j = k,  j × k = i,  k × i = j", 15, INK, "middle", True),
-    text(400, 80, "거꾸로 가면 −:  j × i = −k,  k × j = −i,  i × k = −j", 13, RED, "middle"),
-    text(400, 110, "같은 것끼리: i × i = j × j = k × k = 0", 13, INK, "middle"),
-    text(400, 150, "\"같은 방향은 0, 반대로 하면 마이너스\"", 12.5, GRAY, "middle"),
-    cap="i → j → k → i 순환 순서대로면 +, 거꾸로면 −. 오른손으로 확인해도 된다.")
+    step(1, circle(150, 95, 60, INK, w=2), text(150, 30, "i", 16, RED, "middle", True), text(214, 136, "j", 16, RED, "middle", True), text(86, 136, "k", 16, RED, "middle", True)),
+    step(2, arc(150, 95, 60, -60, 20, GREEN, 2.5), arc(150, 95, 60, 60, 140, GREEN, 2.5), arc(150, 95, 60, 180, 260, GREEN, 2.5),
+        text(150, 100, "순환 → +", 12.5, GREEN, "middle", True)),
+    step(3, text(400, 50, "i × j = k,  j × k = i,  k × i = j", 15, INK, "middle", True),
+        text(400, 80, "거꾸로 가면 −:  j × i = −k,  k × j = −i,  i × k = −j", 13, RED, "middle"),
+        text(400, 110, "같은 것끼리: i × i = j × j = k × k = 0", 13, INK, "middle"),
+        text(400, 150, "\"같은 방향은 0, 반대로 하면 마이너스\"", 12.5, GRAY, "middle")),
+    cap="i → j → k → i 순환 순서대로면 +, 거꾸로면 −. 오른손으로 확인해도 된다.", name="cyc")
 
 fig_comp = canvas(560, 205,
-    text(60, 52, "U =", 15, BLUE, "end", True), text(60, 96, "V =", 15, RED, "end", True), text(60, 150, "곱 =", 15, INK, "end", True),
-    text(130, 52, "1", 17, BLUE, "middle"), text(220, 52, "2", 17, BLUE, "middle"), text(310, 52, "2", 17, BLUE, "middle"),
-    text(130, 96, "2", 17, RED, "middle"), text(220, 96, "0", 17, RED, "middle"), text(310, 96, "1", 17, RED, "middle"),
-    arrow(130, 62, 130, 84, GRAY, "", 1.2), arrow(220, 62, 220, 84, GRAY, "", 1.2), arrow(310, 62, 310, 84, GRAY, "", 1.2),
-    arrow(130, 106, 130, 132, GRAY, "", 1.2), arrow(220, 106, 220, 132, GRAY, "", 1.2), arrow(310, 106, 310, 132, GRAY, "", 1.2),
-    text(130, 150, "2", 17, INK, "middle", True), text(220, 150, "0", 17, INK, "middle", True), text(310, 150, "2", 17, INK, "middle", True),
-    text(130, 30, "i 끼리", 11.5, GRAY, "middle"), text(220, 30, "j 끼리", 11.5, GRAY, "middle"), text(310, 30, "k 끼리", 11.5, GRAY, "middle"),
-    text(370, 150, "→ 더하면 U·V = 4", 15, GREEN, "start", True),
-    text(440, 60, "|U| = √(1+4+4) = 3", 13, INK, "middle"), text(440, 84, "|V| = √(4+0+1) = √5", 13, INK, "middle"),
-    text(440, 118, "cos θ = 4 / (3√5) = 0.596", 13.5, INK, "middle", True), text(440, 166, "θ ≈ 53.4°", 15, GREEN, "middle", True),
-    text(280, 190, "성분끼리 곱해서 더한다 — 교차항(i·j 등)은 0이라 사라졌다", 12.5, GRAY, "middle"),
-    cap="성분 내적의 흐름: 같은 축 성분끼리 곱해 더하면 스칼라 하나. 정의식과 붙이면 사이각이 나온다.")
+    step(1, text(130, 30, "i 끼리", 11.5, GRAY, "middle"), text(220, 30, "j 끼리", 11.5, GRAY, "middle"), text(310, 30, "k 끼리", 11.5, GRAY, "middle"),
+        text(60, 52, "U =", 15, BLUE, "end", True), text(60, 96, "V =", 15, RED, "end", True),
+        text(130, 52, "1", 17, BLUE, "middle"), text(220, 52, "2", 17, BLUE, "middle"), text(310, 52, "2", 17, BLUE, "middle"),
+        text(130, 96, "2", 17, RED, "middle"), text(220, 96, "0", 17, RED, "middle"), text(310, 96, "1", 17, RED, "middle")),
+    step(2, arrow(130, 62, 130, 84, GRAY, "", 1.2), arrow(220, 62, 220, 84, GRAY, "", 1.2), arrow(310, 62, 310, 84, GRAY, "", 1.2),
+        arrow(130, 106, 130, 132, GRAY, "", 1.2), arrow(220, 106, 220, 132, GRAY, "", 1.2), arrow(310, 106, 310, 132, GRAY, "", 1.2),
+        text(60, 150, "곱 =", 15, INK, "end", True),
+        text(130, 150, "2", 17, INK, "middle", True), text(220, 150, "0", 17, INK, "middle", True), text(310, 150, "2", 17, INK, "middle", True)),
+    step(3, text(370, 150, "→ 더하면 U·V = 4", 15, GREEN, "start", True),
+        text(440, 60, "|U| = √(1+4+4) = 3", 13, INK, "middle"), text(440, 84, "|V| = √(4+0+1) = √5", 13, INK, "middle")),
+    step(4, text(440, 118, "cos θ = 4 / (3√5) = 0.596", 13.5, INK, "middle", True), text(440, 166, "θ ≈ 53.4°", 15, GREEN, "middle", True),
+        text(280, 190, "성분끼리 곱해서 더한다 — 교차항(i·j 등)은 0이라 사라졌다", 12.5, GRAY, "middle")),
+    cap="성분 내적의 흐름: 같은 축 성분끼리 곱해 더하면 스칼라 하나. 정의식과 붙이면 사이각이 나온다.", name="comp")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>정역학 · 9/14 내적 마무리 · 정사영 · 외적 · 행렬식</title></head><body>
 <header>
