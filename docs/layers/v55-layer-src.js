@@ -20,8 +20,12 @@
   /* 김주영 스앵님 실사풍 일러스트(힉스필드, 2026-09-28): notes/classroom/assets/tutor/<face>.png 6장. neutral 이 로드되면 그림, 아니면 SVG 치비. 끄기: localStorage mc-tutor-svg=1 또는 ?tutor=svg */
   V55.TUTOR_IMG="notes/classroom/assets/tutor/"; V55.FACES=["neutral","sharp","smile","angry","wide","proud"];
   /* 과목 표지 일러스트(힉스필드 한 시트를 4장으로 자름): 과목 이름 → 파일. 없는 과목은 표지 없음(칩·히어로 그대로) */
-  V55.COVER={"일반물리학2":"phys2","정역학":"statics","공업수학1":"em1","미분적분학2":"calc2"};
+  V55.COVER={"일반물리학2":"phys2","정역학":"statics","공업수학1":"em1","미분적분학2":"calc2","아카데믹글쓰기":"writing","CADD":"cadd","창업아이디어탐색":"startup","사회봉사":"service"};   /* 앞 5개 = 대표님이 보낸 교재 PDF 표지, 뒤 3개 = 힉스필드 생성(교재 없음) */
   V55.coverOf=function(c){ var k=c&&V55.COVER[String(c.name||"").replace(/\s+/g,"")]; return k?"notes/classroom/assets/covers/"+k+".jpg":""; };
+  /* 앱 글꼴(대표님 2026-09-27 확정 · 9/28 「학습 경로 한글 폰트 별로」): 본문 Gowun Dodum · 제목 Gothic A1 ExtraBold · 숫자 Inter. 교실과 같은 구글 폰트를 앱에도 싣는다 */
+  (function(){ try{ if(document.getElementById("v55fonts")) return; var l=document.createElement("link"); l.id="v55fonts"; l.rel="stylesheet"; l.href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Gothic+A1:wght@700;800&family=Inter:wght@500;600;700&display=swap"; (document.head||document.documentElement).appendChild(l); }catch(e){} })();
+  /* 과목 현황 표: 자료 업로드율은 knowledge/coverage.json(공개 저장소에 있음 — PC 인벤토리 library.json 은 atom 안에서만) */
+  V55.coverage=function(){ if(V55.covP) return V55.covP; V55.covP=fetch("knowledge/coverage.json",{cache:"no-cache"}).then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; }); return V55.covP; };
   V55.tutorImg=function(){
     if(V55.rasterP) return V55.rasterP;
     var off=false; try{ off=localStorage.getItem("mc-tutor-svg")==="1"||/[?&]tutor=svg\b/.test(location.search); }catch(e){}
@@ -91,11 +95,12 @@
   };
   V55.planHTML=function(u){ return '<div class="v55-plan"><span class="v55-un">단원 '+(u.n||"")+'</span><span class="v55-ut">'+esc(u.title||"")+'</span>'+(u.planned?'<small>'+esc(u.planned)+'</small>':'')+'</div>'; };
   V55.scopeHTML=function(ex){ return '<div class="v55-scope"><b>'+esc(ex.kind||"시험")+' 범위'+(ex.weight?' · '+ex.weight+'%':'')+(ex.time?' · '+esc(ex.time):'')+'</b><div>'+esc(ex.scope||"범위 미입력 — 편집에서 채우세요")+'</div>'+(ex.assumed?'<div class="hint">날짜는 학사 일정 기준 추정</div>':'')+'</div>'; };
+  /* 김주영 스앵님 말투 = 일타강사 구어체 존댓말(대표님 2026-09-27 확정, 9/28 「말투 수정 안 됨」 → 전부 다시): 짧게 끊고, 이유를 붙이고, 다음 행동 하나를 짚는다. 명령·협박조 금지 */
   V55.line=function(c,cur,todo,done,judged){
-    if(todo>0) return "밀린 회차 "+todo+"개. 오늘 하나는 끝냅니다. 핑계는 안 받습니다.";
-    if(cur&&cur.st==="today") return "오늘 수업분입니다. 잊기 전에 지금 여세요.";
-    if(judged>0&&done===judged) return "여기까지 따라왔군요. 이 속도로. 시험 범위는 제가 챙깁니다.";
-    return "자료가 들어오면 제가 정리해 둡니다. 그 전엔 교재부터.";
+    if(todo>0) return "자, 밀린 회차가 "+todo+"개예요. 다 하려고 하지 말고 오늘은 딱 하나만 끝내 봅시다. 하나가 끝나면 나머지는 훨씬 가벼워져요.";
+    if(cur&&cur.st==="today") return "오늘 배운 거, 기억이 살아 있을 때 한 번만 훑어 두면 시험 전에 반은 벌어 두는 겁니다. 지금 열어 볼까요?";
+    if(judged>0&&done===judged) return "여기까지 빠짐없이 따라왔네요. 이 속도면 시험 범위는 제가 챙겨 드릴 수 있어요. 다음 회차도 이렇게만 갑시다.";
+    return "자료가 들어오는 대로 제가 정리해 둘게요. 그 전엔 교재를 먼저 펴 두세요. 미리 한 번 본 눈이 수업에서 달라집니다.";
   };
   /* ---------- 히어로 ---------- */
   V55.heroHTML=function(c,nodes){
@@ -197,7 +202,28 @@
   var _rc=renderCourse;
   renderCourse=function(){ var y=window.scrollY||0; _rc(); try{ V55.render(); }catch(e){ if(window.console) console.warn("V55",e); } try{ if(Math.abs((window.scrollY||0)-y)>2) window.scrollTo(0,y); }catch(e2){} };
   /* 책장 과목 행: 표지가 있는 과목은 색 칩 대신 표지 썸네일(V44 renderShelf 뒤에 덧씌움 — V44 는 손대지 않는다) */
-  if(typeof renderShelf==="function"){ var _rs=renderShelf; renderShelf=function(){ _rs(); try{ $$(".crow[aria-label]").forEach(function(row){ var chip=row.querySelector(".crow-chip"); if(!chip||chip.classList.contains("cover")) return; var src=V55.coverOf({name:row.getAttribute("aria-label")}); if(!src) return; var keep=chip.innerHTML, im=document.createElement("img"); im.src=src; im.alt=""; im.decoding="async"; im.draggable=false; im.onerror=function(){ chip.classList.remove("cover"); chip.innerHTML=keep; }; chip.classList.add("cover"); chip.innerHTML=""; chip.appendChild(im); }); }catch(e){ if(window.console) console.warn("V55 cover",e); } }; }
+  /* 과목 현황 표(대표님 9/28): 이수·학습모드 빼고 출결(출석·지각·결석) + 자료 업로드율(진도 나간 회차 중 자료가 올라온 회차, coverage.json) + 이해도 */
+  V55.statusTable=function(){
+    var tbl=$("#courseTbl"), tt=$("#stTblT"); if(!tbl||!tt||tt.textContent!=="과목 현황") return;
+    var cs=[]; $$("#courseTbl tbody tr[data-c]").forEach(function(r){ var c=(typeof course==="function")?course(r.getAttribute("data-c")):null; if(c&&c.shelf!=="personal") cs.push(c); });
+    if(!cs.length) return; var td=todayS();
+    V55.coverage().then(function(cov){
+      if(!$("#courseTbl")||$("#stTblT").textContent!=="과목 현황") return;
+      var byName={}; ((cov&&cov.rows)||[]).forEach(function(r){ byName[String(r.subject||"").replace(/\s+/g,"")]=r; });
+      tbl.classList.add("v55-st");
+      tbl.innerHTML="<thead><tr><th>과목</th><th class='n'>학점</th><th>출결</th><th>자료 업로드</th><th class='n'>이해</th></tr></thead><tbody>"+cs.map(function(c){
+        var at=(typeof attStats==="function")?attStats(c):{held:0,n:{}}, n=at.n||{}, held=at.held||0, late=(n.late||0)+(n.vlate||0);
+        var r=byName[String(c.name||"").replace(/\s+/g,"")], cells=r?(r.cells||[]).filter(function(x){ return x.date<=td&&x.state!=="수업없음"&&x.state!=="휴강"; }):[];
+        var up=cells.filter(function(x){ return x.state==="정리"||x.state==="자료"; }).length, org=cells.filter(function(x){ return x.state==="정리"; }).length, tot=cells.length, pct=tot?Math.round(up/tot*100):null;
+        var cv=(typeof coverage==="function")?coverage(c):null;
+        return "<tr data-c='"+c.id+"' style='cursor:pointer'><td><b>"+esc(c.name)+"</b></td><td class='n'>"+c.credits+(c.creditsUnsure?"?":"")+"</td>"+
+          "<td class='att'>"+(held?("출석 <b>"+(n.present||0)+"</b>/"+held+" · <span class='late'>지각 <b>"+late+"</b>회</span> · <span class='abs'>결석 <b>"+(n.absent||0)+"</b>회</span>"+(n.excused?" · <span class='exc'>인정결석 "+n.excused+"</span>":"")+(n.ghost?" · <span class='exc'>출튀 "+n.ghost+"</span>":"")):"<span style='color:var(--ink-3)'>아직 수업 없음</span>")+"</td>"+
+          "<td>"+(pct===null?"<span style='color:var(--ink-3)'>—</span>":("<b class='num'>"+pct+"%</b> <small style='color:var(--ink-3)'>"+up+"/"+tot+"회차"+(org<up?" · 정리 "+org:"")+"</small><span class='bar'><i style='width:"+pct+"%'></i></span>"))+"</td>"+
+          "<td class='n'>"+(cv&&cv.started?cv.mastery+"%":"—")+"</td></tr>"; }).join("")+"</tbody>";
+      $$("#courseTbl tbody tr[data-c]").forEach(function(r){ r.onclick=function(){ go("course",r.getAttribute("data-c")); }; });
+    });
+  };
+  if(typeof renderShelf==="function"){ var _rs=renderShelf; renderShelf=function(){ _rs(); try{ V55.statusTable(); }catch(e0){ if(window.console) console.warn("V55 status",e0); } try{ $$(".crow[aria-label]").forEach(function(row){ var chip=row.querySelector(".crow-chip"); if(!chip||chip.classList.contains("cover")) return; var src=V55.coverOf({name:row.getAttribute("aria-label")}); if(!src) return; var keep=chip.innerHTML, im=document.createElement("img"); im.src=src; im.alt=""; im.decoding="async"; im.draggable=false; im.onerror=function(){ chip.classList.remove("cover"); chip.innerHTML=keep; }; chip.classList.add("cover"); chip.innerHTML=""; chip.appendChild(im); }); }catch(e){ if(window.console) console.warn("V55 cover",e); } }; }
   var css=document.createElement("style"); css.id="v55css";
   css.textContent=[
     "#v-course .v55-hide{display:none!important}",
@@ -217,7 +243,13 @@
     ".v55-tutor{width:120px;height:140px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.14))}.v55-tutor svg{width:100%;height:100%;display:block;overflow:visible}.v55-tutor img{width:100%;height:100%;display:block;object-fit:contain;object-position:center bottom;-webkit-user-select:none;user-select:none}.v55-tutor.big{width:150px;height:176px}.v55-tutor.big.pose{width:140px;height:250px}",
     /* 과목 표지(힉스필드 2026-09-28): 히어로 오른쪽에 연하게 깔고, 책장 과목 행 칩은 표지 썸네일로 */
     ".v55-hero{position:relative;overflow:hidden}.v55-hero::before{content:\"\";position:absolute;inset:0;background:var(--cover) center right/cover no-repeat;opacity:.14;pointer-events:none;-webkit-mask-image:linear-gradient(to right,transparent 42%,#000 78%);mask-image:linear-gradient(to right,transparent 42%,#000 78%)}.v55-hero>*{position:relative}",
-    ".crow-chip.cover{padding:0;overflow:hidden;background:#F2F2F7}.crow-chip.cover img{width:100%;height:100%;display:block;object-fit:cover}",
+    ".crow-chip.cover{padding:0;overflow:hidden;background:#F2F2F7;border-radius:6px}.crow-chip.cover img{width:100%;height:100%;display:block;object-fit:cover}",
+    /* 글꼴: 본문 Gowun Dodum · 제목 Gothic A1 800 · 숫자 Inter (V54 의 Pretendard 토큰을 덮는다) */
+    "html.v54{--font-body:\"Gowun Dodum\",\"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Apple SD Gothic Neo\",\"Malgun Gothic\",sans-serif;--font-num:Inter,\"Pretendard Variable\",Pretendard,-apple-system,system-ui,sans-serif;--font-head:\"Gothic A1\",\"Gowun Dodum\",Pretendard,sans-serif}",
+    "html.v54 body{font-family:var(--font-body);font-weight:400;letter-spacing:0}html.v54 h1,html.v54 h2,html.v54 h3,html.v54 .card-h h3,html.v54 .crow-t,html.v54 .v55-hl>b,html.v54 .v55-unit b,html.v54 .v55-lbl b,html.v54 .chead h2,html.v54 .brand b{font-family:var(--font-head);font-weight:800;letter-spacing:-.01em}",
+    "html.v54 .num,html.v54 .gauge-v,html.v54 .tile-v,html.v54 .v55-stats b,html.v54 .v55-stat b,html.v54 .chip.crit,html.v54 .chip.warn{font-family:var(--font-num);font-variant-numeric:tabular-nums}html.v54 .btn,html.v54 .cbt,html.v54 .pill{font-family:var(--font-body);font-weight:700}",
+    /* 과목 현황 표(대표님 9/28 「출결·지각·결석 · 자료 업로드율」) */
+    ".v55-st td,.v55-st th{white-space:nowrap}.v55-st .att b{font-family:var(--font-num)}.v55-st .att .late{color:#B85C00}.v55-st .att .abs{color:#D42020}.v55-st .att .exc{color:var(--ink-3)}.v55-st .bar{display:inline-block;width:64px;height:6px;border-radius:3px;background:#E5E5EA;vertical-align:middle;margin-left:6px;overflow:hidden}.v55-st .bar i{display:block;height:100%;background:#1B7A2E}",
     /* 경로 */
     ".v55-path{position:relative;padding:6px 0 10px;overflow:hidden}",
     ".v55-wk{display:flex;align-items:center;gap:10px;margin:14px 0 14px;font-weight:800;font-size:12.5px;color:var(--ink-3);letter-spacing:.01em}.v55-wk::before,.v55-wk::after{content:\"\";flex:1;height:2px;background:var(--line);border-radius:2px}.v55-wk span{max-width:70%;text-align:center}",

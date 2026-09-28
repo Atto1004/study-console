@@ -291,37 +291,38 @@ function gainXP(n){ T.xp+=n; L.xp=(L.xp||0)+n; pop("#sXp","+"+n+" XP"); }
 function gainAff(n){ T.aff=Math.max(0,Math.min(100,T.aff+n)); pop("#sAf",(n>0?"+":"")+n,n<0); }
 function touchStreak(){ dayReset(); const td=TODAY(); if(T.last===td) return; T.streak=(T.last===YDAY())?T.streak+1:1; T.last=td; pop("#sSk","+1"); }
 /* ---------- 대사 풀 (v1 회차 · 공통 안내) — 일타강사 구어체 존댓말 ---------- */
+/* 말투 = 일타강사 구어체 존댓말(대표님 2026-09-27 확정, 9/28 「말투 수정 안 됨」 → 전부 다시 씀): 「자, ~해 볼게요 / ~예요 / ~입니다」, 짧게 끊고 이유 한 줄과 다음 행동 하나. 명령·협박·비꼼 금지 */
 const LINES={
-  intro:["앉으세요. 오늘은 {n}챕터, 약 {min}분입니다. 눈으로 훑는 건 공부가 아닙니다. 한 장씩 넘기세요.","오늘 분량 {n}챕터. 핑계는 안 받습니다. 시작하면 끝까지 갑니다.","저를 전적으로 믿으셔야 합니다. 오늘 {n}챕터, 순서대로만 따라오면 됩니다."],
-  again_intro:["다시 왔군요. 지난번 자리에서 이어갑니다. 앞이 흐릿하면 목차에서 돌아가세요.","이어서 합니다. 어제 한 건 어제 것이고, 오늘은 오늘 것입니다."],
-  done_intro:["이 회차는 이미 끝냈습니다. 다시 보는 건 좋은 습관입니다. 틀렸던 문제부터 보세요.","복습이군요. 두 번째는 빠르게, 대신 외울 것 상자는 눈 감고 말할 수 있을 때까지."],
-  chapter:["챕터 {c}. {title}. 여기서부터 시험 문제가 나옵니다.","{title}. 이 챕터를 이해 못 하면 다음 챕터는 읽어도 소용없습니다.","챕터 {c}입니다. 제목을 한 번 소리 내 읽고 시작하세요."],
-  talk:["읽으세요. 굵은 글씨는 시험에 그대로 나옵니다.","한 문장씩. 이해 안 되는 문장이 있으면 넘기지 말고 「다시」를 누르세요.","여기까지 읽고, 방금 읽은 걸 한 줄로 말해 보세요. 못 하면 안 읽은 겁니다.","천천히. 빨리 넘기는 학생이 제일 먼저 틀립니다."],
-  fig:["글보다 그림이 먼저입니다. 그림을 보세요.","이 그림을 백지에 다시 그릴 수 있어야 아는 겁니다.","화살표 방향과 글자 위치까지 눈에 넣으세요. 시험 문제는 이 그림에서 나옵니다."],
-  why:["왜 그런지 묻는 학생만 남습니다. 이유를 읽으세요.","「왜」를 알면 공식을 잊어도 다시 만들 수 있습니다."],
-  analogy:["비유입니다. 비유로 이해하고, 공식은 비유 없이 쓸 수 있어야 합니다.","이해가 안 될 때 돌아올 자리입니다. 지금은 가볍게 읽으세요."],
-  formula:["외우세요. 이해했다고 안 외우면 시험장에서 손이 안 움직입니다.","이 식은 시험지에 없습니다. 머릿속에서 나와야 합니다. 세 번 쓰세요."],
-  pitfall:["여기서 절반이 틀립니다. 눈에 새기세요.","채점할 때 가장 많이 감점되는 지점입니다. 실수라고 부르지 마세요. 준비 부족입니다."],
-  memo:["정리입니다. 이 상자는 시험 전날 다시 봅니다.","여기 있는 것만 외워도 기본 점수는 나옵니다. 하나도 빼지 마세요."],
-  say:["교수님이 직접 한 말입니다. 강조한 건 그대로 시험에 나옵니다.","교수의 말은 출제 의도입니다. 문장 그대로 기억하세요."],
-  ex:["예제입니다. 답부터 보지 말고 30초 생각하세요. 그다음 풀이를 여세요.","풀이를 보기 전에 첫 식을 세워 보세요. 못 세우면 앞 챕터로 돌아갑니다."],
-  exopen:["풀이입니다. 식이 왜 그렇게 세워졌는지만 보세요. 계산은 나중입니다.","한 줄 한 줄 「왜」를 붙이세요. 답만 맞는 건 의미 없습니다."],
-  again:["다시 봅시다. 이번엔 굵은 글씨만 먼저 읽고, 그다음 문장을 읽으세요.","좋습니다. 모른다고 말하는 건 부끄러운 게 아닙니다. 한 번 더.","한 번 더. 이번엔 판서를 손가락으로 짚으면서 읽으세요."],
-  ask:["물어보세요. 애매하게 넘어가는 게 제일 나쁩니다.","질문은 구체적으로. 「모르겠어요」는 질문이 아닙니다. 어디서 막혔는지 말하세요."],
-  askoff:["질문은 앱 안에서 열었을 때 받습니다. 지금은 막힌 곳을 적어 두세요."],
-  chdone:["챕터 {c} 끝. 넘어갑니다.","됐습니다. 다음.","나쁘지 않습니다. 이 속도로."],
-  chdone_warm:["잘 따라오고 있습니다. 다음 챕터.","좋습니다. 오늘 집중이 괜찮군요."],
-  quiz:["확인 문제 {n}개. 하트 {h}개. 틀리면 하트가 줄어듭니다. 찍지 마세요.","이제 확인합니다. 읽은 게 남았는지, 지나갔는지."],
-  q:["문제 {k}. 읽고, 고르세요.","{k}번. 보기를 다 읽고 나서 고르세요.","문제 {k}. 서두르지 마세요."],
-  qin:["답을 쓰는 문제입니다. 답만 간단히 쓰고 「답 보기」를 누르세요."],
-  ok:["맞습니다.","정답. 왜 맞았는지도 말할 수 있어야 합니다.","좋습니다. 계속."],
-  ok_warm:["맞습니다. 이런 학생이면 가르칠 맛이 납니다.","정답. 오늘 눈빛이 다르군요."],
-  bad:["틀렸습니다. 해설을 읽으세요. 같은 문제를 두 번 틀리면 그건 실력입니다.","아닙니다. 어디서 틀렸는지 해설에서 찾으세요."],
-  nohearts:["하트가 없습니다. 챕터 하나를 다시 보고 오세요. 그러면 하트 하나를 돌려드립니다."],
-  heartback:["하트 하나 돌려드립니다. 이번엔 읽은 대로 푸세요."],
-  res_good:["오늘은 됐습니다. 이 결과는 운이 아니라 순서대로 한 결과입니다.","{ok}/{n}. 인정합니다. 내일도 같은 시간에 오세요."],
-  res_mid:["{ok}/{n}. 반은 넘겼지만 아직입니다. 틀린 문제를 지금 다시 푸세요."],
-  res_bad:["{ok}/{n}. 읽은 게 아니라 본 겁니다. 챕터부터 다시."],
+  intro:["자, 앉으세요. 오늘은 {n}챕터, 대략 {min}분이면 됩니다. 눈으로만 훑으면 남는 게 없으니까 한 장씩 같이 넘겨 볼게요.","오늘 분량은 {n}챕터예요. 길지 않아요. 시작하면 끝까지 한 번에 가는 게 제일 편합니다.","오늘 {n}챕터, 순서대로만 따라오시면 됩니다. 막히면 「다시 설명」 누르세요. 그러라고 있는 버튼이에요."],
+  again_intro:["다시 오셨네요. 지난번 자리에서 이어갈게요. 앞이 흐릿하면 목차에서 한 챕터 앞으로 돌아가도 됩니다.","이어서 해요. 어제 한 건 어제 것이고, 오늘은 오늘 몫만 하면 됩니다."],
+  done_intro:["이 회차는 이미 끝내셨어요. 다시 보는 건 아주 좋은 습관이에요. 틀렸던 문제부터 보면 효율이 제일 좋습니다.","복습이네요. 두 번째는 빠르게 가고, 대신 외울 것 상자는 눈 감고 말할 수 있는지만 확인해 봅시다."],
+  chapter:["자, 챕터 {c}. {title}. 여기서부터 시험 문제가 나오기 시작해요.","{title}입니다. 이 챕터가 잡혀야 다음 챕터가 읽히니까, 여기서 천천히 갈게요.","챕터 {c}예요. 제목을 한 번 소리 내 읽고 시작해 보세요. 그게 목차를 머리에 심는 방법이에요."],
+  talk:["자, 읽어 볼게요. 굵은 글씨는 시험에 그대로 나오는 말이에요.","한 문장씩이요. 이해 안 되는 문장이 있으면 넘기지 말고 「다시 설명」을 눌러 주세요.","여기까지 읽고, 방금 읽은 걸 한 줄로 말해 보세요. 말로 나오면 아는 거예요.","천천히 가도 됩니다. 빨리 넘기는 것보다 한 번 제대로 읽는 게 훨씬 빨라요."],
+  fig:["글보다 그림이 먼저예요. 그림부터 보세요.","이 그림을 백지에 다시 그릴 수 있으면 이 챕터는 끝난 거예요.","화살표 방향이랑 글자 위치까지 눈에 넣어 두세요. 시험 그림이 바로 이 그림입니다."],
+  why:["왜 그런지 한 번만 붙잡고 가요. 「왜」를 알면 공식을 잊어도 다시 만들 수 있어요.","이유를 읽는 학생이 끝까지 남습니다. 여기가 그 부분이에요."],
+  analogy:["비유예요. 비유로 감을 잡고, 식은 비유 없이도 쓸 수 있어야 해요.","이해가 안 될 때 돌아올 자리예요. 지금은 가볍게 읽고 넘어가도 됩니다."],
+  formula:["이 식은 외우셔야 해요. 이해했다고 안 외우면 시험장에서 손이 안 움직입니다. 세 번만 써 보세요.","시험지에는 이 식이 안 적혀 있어요. 머릿속에서 나와야 합니다."],
+  pitfall:["여기서 반은 틀려요. 눈에 새겨 두세요.","채점할 때 제일 많이 깎이는 자리예요. 실수가 아니라 준비 부족이니까, 지금 준비해 두면 됩니다."],
+  memo:["정리예요. 이 상자는 시험 전날 한 번 더 봅니다.","여기 있는 것만 외워도 기본 점수는 나와요. 하나도 빼지 마세요."],
+  say:["교수님이 직접 하신 말이에요. 강조한 건 그대로 시험에 나옵니다.","교수님 말은 출제 의도예요. 문장 그대로 기억해 두세요."],
+  ex:["예제예요. 답부터 보지 말고 30초만 생각해 보세요. 그다음 풀이를 열어요.","풀이 보기 전에 첫 식부터 세워 볼까요. 안 세워지면 앞 챕터로 잠깐 돌아가도 됩니다."],
+  exopen:["풀이예요. 식이 왜 그렇게 세워졌는지만 보세요. 계산은 나중이에요.","한 줄 한 줄 「왜」를 붙여 보세요. 답만 맞는 건 의미가 없어요."],
+  again:["자, 다시 볼게요. 이번엔 굵은 글씨만 먼저 읽고, 그다음 문장을 읽어 보세요.","좋아요. 모른다고 말하는 게 실력이 느는 시작이에요. 한 번 더 갑니다.","한 번 더요. 이번엔 판서를 손가락으로 짚으면서 읽어 보세요."],
+  ask:["물어보세요. 애매하게 넘어가는 게 제일 손해예요.","질문은 구체적으로요. 어디서 막혔는지 말해 주시면 거기서부터 풀어 드릴게요."],
+  askoff:["질문은 앱 안에서 열었을 때 받을 수 있어요. 지금은 막힌 곳만 적어 두세요."],
+  chdone:["챕터 {c} 끝. 넘어갈게요.","됐어요. 다음이요.","좋아요. 이 속도로 가면 됩니다."],
+  chdone_warm:["잘 따라오고 있어요. 다음 챕터 갑니다.","좋아요. 오늘 집중이 괜찮네요."],
+  quiz:["자, 확인 문제 {n}개예요. 하트는 {h}개. 틀리면 하나씩 줄어드니까 찍지 말고 풀어 보세요.","이제 확인해 볼게요. 읽은 게 남았는지, 지나갔는지 여기서 갈립니다."],
+  q:["문제 {k}. 읽고 고르세요.","{k}번이에요. 보기를 다 읽고 나서 고르세요.","문제 {k}. 서두를 것 없어요."],
+  qin:["답을 쓰는 문제예요. 답만 간단히 쓰고 「답 보기」를 눌러 주세요."],
+  ok:["맞아요.","정답. 왜 맞았는지도 말할 수 있으면 완전히 아는 거예요.","좋아요. 계속 가요."],
+  ok_warm:["맞아요. 이런 학생이면 가르칠 맛이 나요.","정답. 오늘 눈빛이 다르네요."],
+  bad:["틀렸어요. 해설을 읽어 보세요. 같은 문제를 두 번 틀리지 않게만 하면 됩니다.","아니에요. 어디서 갈렸는지 해설에서 찾아보세요. 거기가 오늘 배운 자리예요."],
+  nohearts:["하트가 없네요. 챕터 하나를 다시 보고 오면 하트 하나 돌려드릴게요."],
+  heartback:["하트 하나 돌려드릴게요. 이번엔 읽은 대로 풀어 보세요."],
+  res_good:["오늘은 됐어요. 이 결과는 운이 아니라 순서대로 한 결과예요.","{ok}/{n}. 인정합니다. 내일도 같은 시간에 봐요."],
+  res_mid:["{ok}/{n}. 반은 넘겼지만 아직이에요. 틀린 문제를 지금 바로 다시 풀어 볼까요."],
+  res_bad:["{ok}/{n}. 읽은 게 아니라 본 거예요. 괜찮아요, 챕터부터 다시 가면 됩니다."],
   chapter_face:{talk:"neutral",fig:"neutral",why:"sharp",analogy:"smile",formula:"sharp",pitfall:"angry",memo:"neutral",say:"neutral",ex:"sharp",exopen:"neutral",board:"neutral",v2:"neutral"}
 };
 const FACEN={neutral:"무표정",sharp:"날카로움",smile:"미소",angry:"화남",wide:"놀람",proud:"흡족"};
@@ -499,11 +500,11 @@ function renderQuiz(){
   h+='</div>';
   board(h,'<span>확인 문제</span><small>'+(S.qi+1)+' / '+QZ.length+'</small>',true);
   $$("#bc .cb").forEach(b=>{ b.onclick=()=>answer(q,+b.dataset.i); });
-  const rv=$("#reveal"); if(rv) rv.onclick=()=>{ dayReset(); if(T.hearts<=0){ S.mode="nohearts"; return render(); } const ta=$("#myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); render(); say("해설과 비교하세요. 스스로 채점합니다. 봐주지 마세요.","sharp"); };
+  const rv=$("#reveal"); if(rv) rv.onclick=()=>{ dayReset(); if(T.hearts<=0){ S.mode="nohearts"; return render(); } const ta=$("#myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); render(); say("자, 해설이랑 비교해 보세요. 채점은 본인이 하는 거예요. 봐주지만 마세요.","sharp"); };
   $$("#bc [data-g]").forEach(b=>{ b.onclick=()=>grade(q,b.dataset.g==="1"); });
   S.resume=false;
   if(!rev){ const [ql,qf]=preLine(mc?pick("q",S.qi,{k:S.qi+1}):pick("qin",S.qi),"neutral"); say(ql,qf); choices([{t:"질문할게요",cls:"t",f:ask},{tip:mc?"숫자 키 1~"+q.choices.length+" 로 고를 수 있습니다":""}]); }
-  else { const last=S.qi>=QZ.length-1; const [rl,rf]=preLine(c===true?"맞힌 문제입니다. 다음.":c===false?"틀렸던 문제입니다. 해설을 다시 읽으세요.":"답은 봤고 채점이 남았습니다. 봐주지 말고 스스로 채점하세요.", c===true?"neutral":"sharp"); say(rl,rf);
+  else { const last=S.qi>=QZ.length-1; const [rl,rf]=preLine(c===true?"맞힌 문제예요. 다음으로 갈게요.":c===false?"틀렸던 문제예요. 해설을 한 번 더 읽고 가요.":"답은 봤고 채점이 남았어요. 봐주지 말고 본인이 채점해 주세요.", c===true?"neutral":"sharp"); say(rl,rf);
     choices([{t:last?"결과 보기":"다음 문제",cls:"p",primary:1,key:"Enter",f:()=>{ if(last){ S.mode="result"; } else S.qi++; render(); }},{t:"다시 풀기",cls:"g",f:()=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; save(); render(); }},{t:"질문할게요",cls:"t",f:ask}]); }
 }
 function settle(q,ok){
@@ -531,7 +532,7 @@ function renderResult(){
   /* 스티커를 먼저 쓰고 못 열면 SVG 배지로 — RASTER 탐색(비동기)이 끝나기 전에 결과 화면이 뜰 수 있어 탐색 결과에 기대지 않는다 */
   const badge='<img class="stk" alt="" src="../assets/stickers/'+(good?"trophy":"laurel")+'.png" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"><svg class="badge" style="display:none" viewBox="0 0 120 120" fill="none" stroke="#FFE27A" stroke-width="2.5" stroke-linejoin="round"><circle cx="60" cy="60" r="50" stroke-dasharray="4 3"/><circle cx="60" cy="60" r="40"/><path d="M60 30l8.8 18 19.8 2.9-14.3 13.9 3.4 19.7L60 75.2l-17.7 9.3 3.4-19.7L31.4 50.9l19.8-2.9z" fill="rgba(255,226,122,.18)"/></svg><div class="bl2">'+esc(D.course)+' · '+esc(D.sess)+' · 챕터 '+CH.length+'</div>';
   board('<div class="res"><div class="big">'+(ung.length?"채점이 남았습니다":good?"수고했습니다":mid?"절반은 넘겼습니다":"다시 합니다")+'</div><div class="stats"><div><b>'+ok+'/'+n+'</b><span>정답</span></div><div><b>+'+(L.xp||0)+'</b><span>이 회차 XP</span></div><div><b>'+T.streak+'</b><span>연속일</span></div><div><b>'+T.aff+'</b><span>호감도 · '+affName()+'</span></div></div>'+badge+(ung.length?'<div class="wrong">채점 전 '+ung.length+'개 — 답 보기 뒤 「맞았어요/틀렸어요」까지 눌러야 완료입니다.</div>':'')+(wrong.length?'<div class="wrong">틀린 문제 '+wrong.length+'개 — 해설을 읽고 다시 푸세요.</div>':'')+'</div>','<span>오늘의 결과</span>',true);
-  { const [rl,rf]=preLine(ung.length?"채점을 안 한 문제가 있습니다. 봐주지 말고 스스로 채점하세요. 그래야 끝난 겁니다.":pick(good?"res_good":mid?"res_mid":"res_bad","r",{ok:ok,n:n}), ung.length?"sharp":good?"proud":mid?"sharp":"angry"); say(rl,rf); }
+  { const [rl,rf]=preLine(ung.length?"채점을 안 한 문제가 있어요. 봐주지 말고 본인이 채점해 주세요. 그래야 오늘 공부가 끝난 거예요.":pick(good?"res_good":mid?"res_mid":"res_bad","r",{ok:ok,n:n}), ung.length?"sharp":good?"proud":mid?"sharp":"angry"); say(rl,rf); }
   const cs=[];
   if(ung.length) cs.push({t:"채점 안 한 문제 ("+ung.length+")",cls:"p",primary:1,key:"Enter",f:()=>{ S.mode="quiz"; S.qi=QZ.indexOf(ung[0]); render(); }});
   if(wrong.length) cs.push({t:"틀린 문제 다시 ("+wrong.length+")",cls:ung.length?"g":"p",primary:ung.length?0:1,key:ung.length?"":"Enter",f:()=>{ wrong.forEach(q=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; }); save(); S.mode="quiz"; S.qi=QZ.findIndex(q=>!ST.done[q.id]); render(); }});

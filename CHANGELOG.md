@@ -4,6 +4,13 @@
 
 ## 2026-09-28
 
+### .87 — 대표님 피드백 5건 중 1~4 반영: 교재 표지 · 과목 현황 표 · 앱 글꼴 · 스앵님 말투
+- ① 과목 표지 = 대표님이 보낸 전공 교재 PDF 첫 장(일물2 Halliday 11판 · 정역학 Pytel 4판 · 공수1 Kreyszig 10판 상 · 미적2 Stewart 9판 · 아카데믹글쓰기), 교재 없는 CADD·창업·사회봉사는 힉스필드로 과목이 연상되는 표지 생성(2크레딧, 한 시트). `notes/classroom/assets/covers/{phys2,statics,em1,calc2,writing,cadd,startup,service}.jpg`, `V55.COVER` 8과목.
+- ② 과목 현황 표(`#courseTbl`): 이수·학습모드·학습% 열 제거 → 출석 n/m · 지각 n회 · 결석 n회 · 인정결석 / 자료 업로드율(진도 나간 회차 중 정리·자료 상태인 회차, `knowledge/coverage.json`, 막대) / 이해도. `V55.statusTable()` 이 `renderShelf` 뒤에 덧씌움(개인 공부 현황일 때는 건드리지 않음).
+- ③ 앱 글꼴: `html.v54` 토큰을 본문 Gowun Dodum · 제목 Gothic A1 800 · 숫자 Inter 로 덮고 구글 폰트 링크를 V55 가 삽입(교실과 동일).
+- ④ 스앵님 말투: `V55.line` 4문장과 교실 템플릿 `LINES` 33묶음·하드코딩 4문장을 일타강사 구어체 존댓말로 전면 재작성(명령·협박조 제거). 24회차 재빌드.
+- ⑤ 교실 전면 재설계(메가스터디식 판서·글꼴·설명 문체·물리 애니메이션)는 디자인 규칙대로 시안 먼저 — 별도 진행.
+
 ### .86 — 디자인 개편 2단계(힉스필드): 전신 포즈 · 과목 표지 · 스티커
 - 대표님 「이 얼굴로 확정 · 다른 그림도 뽑아서 디자인 개편」(9/28 02:1x). 확정된 얼굴 시트를 참조 이미지로 전신 포즈 3종(지시봉·팔짱·노트, `notes/classroom/assets/tutor/pose-*.png`), 과목 표지 4장 한 시트(`notes/classroom/assets/covers/*.jpg`), 스티커 6종 한 시트(`notes/classroom/assets/stickers/*.png`, `docs/tools/sticker_cut.py` 가 채도·명도로 본체를 뽑고 흰 테두리를 다시 그림). 전부 Marketing Studio Image 2k(장당 2크레딧), 배경 제거 1회(1크레딧, 종이 카드까지 전경으로 남겨 못 씀). 크레딧 사용 9.
 - 교실: 목차 = 지시봉 전신, 결과 = 팔짱 전신, 단계·문제 = 표정 흉상(`faceImg` 가 화면 모드로 고름, 포즈 파일이 없으면 흉상). 결과 배지 = 스티커(전부 정답 트로피, 아니면 월계관), 없으면 SVG.
