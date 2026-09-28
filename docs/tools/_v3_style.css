@@ -1,5 +1,5 @@
 :root{--bg:#F3F4F7;--card:#fff;--line:#E6E8EE;--ink:#151A24;--ink-2:#5B6373;--ink-3:#8A92A3;--navy:#0F1B33;--navy2:#1D2C4D;--green:#1B7A2E;--green-soft:#E8F7EA;--blue:#1F5FBF;--blue-soft:#EEF3FC;--amber:#C2780A;--amber-soft:#FFF6E5;--red:#D9342B;--red-soft:#FFF3F2;--mark:#FFF3A3;
-  --fh:"Gothic A1","Pretendard Variable",Pretendard,sans-serif;--fb:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;--ft:"Gowun Dodum","Pretendard Variable",Pretendard,sans-serif;--fn:Inter,"Pretendard Variable",Pretendard,sans-serif;--hud:56px}
+  --fh:"Gothic A1","Gowun Dodum",Pretendard,sans-serif;--fb:"Gowun Dodum","Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;--ft:"Gowun Dodum","Pretendard Variable",Pretendard,sans-serif;--fn:Inter,"Pretendard Variable",Pretendard,sans-serif;--hud:56px}   /* 본문 = 앱과 같은 Gowun Dodum (대표님 2026-09-28 「앱과 같은 걸로」) */
 *{box-sizing:border-box}
 html{background:var(--bg)}
 body{margin:0;font-family:var(--fb);font-size:16px;color:var(--ink);word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased;line-height:1.6;min-height:100vh}

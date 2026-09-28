@@ -15,8 +15,10 @@ assert i0 > 0 and i1 > i0
 s = s[:i0] + "<style>\n" + CSS + s[i1:]
 # 3) 칠판 마크업 → 슬라이드
 old_board = re.search(r'    <div class="frame">.*?<div class="tray">.*?</div>\n', s, flags=re.S)
-assert old_board, "칠판 마크업을 못 찾음"
-s = s[:old_board.start()] + '    <div class="slide"><div class="chk" id="chk"></div><div id="bwrap"><div id="bc"></div></div></div>\n' + s[old_board.end():]
+if old_board:
+    s = s[:old_board.start()] + '    <div class="slide"><div class="chk" id="chk"></div><div id="bwrap"><div id="bc"></div></div></div>\n' + s[old_board.end():]
+else:
+    assert s.count('<div class="slide">') == 1, "칠판 마크업도 슬라이드 마크업도 없음"   # 이미 이식됨 — CSS 만 갱신(멱등)
 assert s.count('id="bwrap"') == 1 and s.count('class="tray"') == 0 and s.count('class="green"') == 0
 io.open(TPL, "w", encoding="utf-8", newline="\n").write(s)
 print("v3 splice ok · size", len(s))
