@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-28.89";
+var BUILD="2026-09-28.90";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,16 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-28.90",d:"09-28",items:[
+    "교실 v4 = 인강 전자칠판(대표님 9/28 레퍼런스): 초록 칠판 + 흰 활자 판서, 민트 테두리 식 상자에 (식 챕터-번호), 그림 캡션 【그림 챕터-번호】, 칠판 오른쪽에 전신으로 서서 지시봉으로 판서를 가리키는 스앵님, 대사는 아래 자막(표정 얼굴), 조작은 칠판 아래 줄",
+    "오타 디자인 검수 반영: 글자 대비 전부 4.5 이상(칠판 가장 밝은 곳·노이즈 최대 기준 실측), 지난 단계 글자 흐림 제거, 미채점 결과엔 배지 없이 채점 완료 n/m, 스크롤은 이번 단계 기준 + 위 판서 버튼(머리글 안)",
+    "폰 교실: 화면 높이에 맞춤(조작 버튼 늘 화면 안), 가로로 늘어선 비교 그림은 세로 칸으로 쌓기, 한 장짜리 그림은 크게 보기(글자 14px), 긴 식은 75%까지 줄여 한 줄에, 자막 네 줄 + 전체 보기, 터치 화면에선 Enter 안내 숨김",
+    "정역학 9/7·9/9·9/14·9/16 · 공업수학1 9/2~9/23 7회차 교실 v2 판서 + 스앵님 대사 신규(물리 6 포함 v2 17회차). 미적2 7회차는 그림 단계 그룹까지(판서 파일은 다음)",
+    "학습 로비: 안내문 테두리 상자 제거, 교실 열기 버튼 모서리 12px, 장식 점은 카드 뒤 빈자리로, 폰은 스앵님 얼굴·이름·레벨 한 줄 + 통계 네 칸. 과목 화면: 선명한 표지 썸네일, 폰은 얼굴 + 말풍선 한 줄",
+    "앱 조작 규격: 오늘·학습·과목 화면의 버튼은 높이 44px 이상(수업 따라가기 교실 열기·교재 26px 이던 것), 교실 작은 버튼도 누르는 자리 44px — 실제 누르는 높이를 재서 확인",
+    "그림 크게 보기 창이 열린 동안에는 Enter·Space 가 뒤 교실을 진행시키지 않음(닫기는 Esc·닫기 버튼, 포커스는 연 버튼으로 복귀). 자기 채점 틀렸어요 버튼·채점 전 표시·해설 이름표 대비 보강",
+    "검사기 추가: classroom_design_audit.cjs(대비·확대창 입력·폰 배치·누르는 높이·실제 글꼴 실측, --app 앱 버튼) — 17회차 대비 미달 0 · 조작 버튼 화면 밖 0 · 식 가로 넘침 0"
+  ]},
   {v:"2026-09-28.89",d:"09-28",items:[
     "일물2 9/4·9/9·9/11·9/18·9/23 교실 v2 판서 + 스앵님 대사 신규 — 9/16 포함 물리 6회차 전부 v2(단계 200 · 그림 28개를 단계 그룹으로 나눠 판서와 같이 그려짐). 판서 파일 docs/tools/lessons/board/phys2_*.py VERSION 2026-09-28a · 논리·렌더(1040/800/500)·그림 검사 0",
     "긴 식은 폰 폭(500px)에서 넘치지 않게 두 줄로 분리(원형 도선 E_z · 원판 dE_z · 쌍극자 전위 근사 · 직선 도선 ln · 평행판 예제)",
@@ -11117,8 +11127,8 @@ var V33={};
     var pct=judged?Math.round(done/judged*100):0;
     var units=V55.units(c), uk=(cur&&cur.st!=="future")?V55.unitOf(c,cur,units):-1, unitChip=uk>=0?'<span class="chip v55-uchip" style="--uc:'+V55.ucOf(uk)+'">단원 '+(units[uk].n||uk+1)+' · '+esc(V55.shortT(units[uk].title))+'</span>':'';
     return '<div class="v55-hero t-'+esc(c.typeA||"NONE")+'"'+(V55.coverOf(c)?' style="--cover:url('+V55.coverOf(c)+')"':'')+'><div class="v55-hl">'+
-      '<div class="v55-title"><h1>'+(c.isRetake?'<span class="v55-re">(재)</span>':'')+esc(c.name)+' <small>'+c.credits+'학점</small></h1><div class="v55-meta">'+unitChip+(c.prof?'<span class="chip mut">'+esc(c.prof)+' 교수님</span>':'')+(days?'<span class="chip acc">'+esc(days)+'</span>':'')+
-        '<span class="chip mut">출석 '+(a.n.present||0)+' · 지각 '+(a.lateN||0)+' · 결석 '+(a.n.absent||0)+'</span>'+(c.status==="pending"?'<span class="chip warn">증원 대기</span>':'')+'</div></div>'+
+      '<div class="v55-title">'+(V55.coverOf(c)?'<img class="v55-cov" src="'+V55.coverOf(c)+'" alt="" decoding="async" onerror="this.remove()">':'')+'<div class="v55-tt"><h1>'+(c.isRetake?'<span class="v55-re">(재)</span>':'')+esc(c.name)+' <small>'+c.credits+'학점</small></h1><div class="v55-meta">'+unitChip+(c.prof?'<span class="chip mut">'+esc(c.prof)+' 교수님</span>':'')+(days?'<span class="chip acc">'+esc(days)+'</span>':'')+
+        '<span class="chip mut">출석 '+(a.n.present||0)+' · 지각 '+(a.lateN||0)+' · 결석 '+(a.n.absent||0)+'</span>'+(c.status==="pending"?'<span class="chip warn">증원 대기</span>':'')+'</div></div></div>'+
       '<div class="v55-stats"><div><b class="v55-ok">'+done+'<small>/'+judged+'</small></b><span>따라감</span></div><div><b class="'+(todo?"v55-crit":"")+'">'+todo+'</b><span>밀림</span></div><div><b class="v55-xp">'+xp+'</b><span>이 과목 XP</span></div>'+(ex?'<div><b class="'+(dd!=null&&dd<=14?"v55-crit":"")+'">D-'+dd+'</b><span>'+esc(ex.kind||"시험")+' '+esc(md(ex.date))+'</span></div>':'')+'</div>'+
       '<div class="v55-bar" title="따라감 '+done+'/'+judged+'"><i style="width:'+pct+'%"></i></div>'+
       '<div class="v55-act">'+cta+'<span class="v55-actsp"></span></div></div>'+
@@ -11180,7 +11190,7 @@ var V33={};
     V55.tutorImg().then(function(raster){
       if(raster){ $$(".v55-tutor",v).forEach(function(el){ if(el.querySelector("img,svg")) return; var f=el.getAttribute("data-face")||"neutral", p=el.getAttribute("data-pose");
           /* 히어로는 전신 포즈(pose-point · 완료면 pose-cross), 경로 마디는 표정 흉상. 포즈 파일이 없으면 흉상으로 */
-          if(p){ el.classList.add("pose"); el.innerHTML='<img src="'+V55.TUTOR_IMG+'pose-'+(p==="cross"?"cross":"point")+'.png" alt="" decoding="async" draggable="false">'; el.querySelector("img").onerror=function(){ el.classList.remove("pose"); el.innerHTML='<img src="'+V55.faceSrc(f)+'" alt="" decoding="async" draggable="false">'; }; }
+          if(p){ el.classList.add("pose"); el.innerHTML='<img src="'+V55.TUTOR_IMG+'pose-'+(p==="cross"?"cross":"point")+'.png" alt="" decoding="async" draggable="false"><img class="v55-fc" src="'+V55.faceSrc(f)+'" alt="" decoding="async" draggable="false">'; el.querySelector("img").onerror=function(){ el.classList.remove("pose"); el.innerHTML='<img src="'+V55.faceSrc(f)+'" alt="" decoding="async" draggable="false">'; }; }
           else el.innerHTML='<img src="'+V55.faceSrc(f)+'" alt="" decoding="async" draggable="false">'; }); return; }
       V55.tutor().then(function(svg){ if(!svg) return; $$(".v55-tutor",v).forEach(function(el){ if(el.querySelector("img,svg")) return; el.innerHTML=svg; var s=el.querySelector("svg"); if(s){ s.setAttribute("data-face",el.getAttribute("data-face")||"neutral"); s.removeAttribute("id"); } }); });
     });
@@ -11241,9 +11251,9 @@ var V33={};
     ".v55-hr{flex:0 0 200px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;min-width:0}",
     ".v55-bubble{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:9px 12px;font-size:13px;font-weight:700;line-height:1.45;width:100%;text-align:center}",
     ".v55-bubble::after{content:\"\";position:absolute;left:50%;bottom:-9px;margin-left:-6px;border:6px solid transparent;border-top-color:var(--line);border-bottom:0}",
-    ".v55-tutor{width:120px;height:140px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.14))}.v55-tutor svg{width:100%;height:100%;display:block;overflow:visible}.v55-tutor img{width:100%;height:100%;display:block;object-fit:contain;object-position:center bottom;-webkit-user-select:none;user-select:none}.v55-tutor.big{width:150px;height:176px}.v55-tutor.big.pose{width:140px;height:250px}",
+    ".v55-tutor .v55-fc{display:none}.v55-tutor{width:120px;height:140px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.14))}.v55-tutor svg{width:100%;height:100%;display:block;overflow:visible}.v55-tutor img{width:100%;height:100%;display:block;object-fit:contain;object-position:center bottom;-webkit-user-select:none;user-select:none}.v55-tutor.big{width:150px;height:176px}.v55-tutor.big.pose{width:140px;height:250px}",
     /* 과목 표지(힉스필드 2026-09-28): 히어로 오른쪽에 연하게 깔고, 책장 과목 행 칩은 표지 썸네일로 */
-    ".v55-hero{position:relative;overflow:hidden}.v55-hero::before{content:\"\";position:absolute;inset:0;background:var(--cover) center right/cover no-repeat;opacity:.14;pointer-events:none;-webkit-mask-image:linear-gradient(to right,transparent 42%,#000 78%);mask-image:linear-gradient(to right,transparent 42%,#000 78%)}.v55-hero>*{position:relative}",
+    ".v55-hero{position:relative;overflow:hidden}.v55-hero>*{position:relative}.v55-title{display:flex;align-items:center;gap:14px}.v55-tt{min-width:0}.v55-cov{flex:0 0 58px;width:58px;height:78px;object-fit:cover;border-radius:8px;border:1px solid var(--line);box-shadow:0 6px 14px rgba(15,27,51,.14);background:#F2F2F7}",   /* 표지는 번진 배경 대신 선명한 책 썸네일로(오타 디자인 1차 R7, 2026-09-28) */
     ".crow-chip.cover{padding:0;overflow:hidden;background:#F2F2F7;border-radius:6px}.crow-chip.cover img{width:100%;height:100%;display:block;object-fit:cover}",
     /* 글꼴: 본문 Gowun Dodum · 제목 Gothic A1 800 · 숫자 Inter (V54 의 Pretendard 토큰을 덮는다) */
     "html.v54{--font-body:\"Gowun Dodum\",\"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Apple SD Gothic Neo\",\"Malgun Gothic\",sans-serif;--font-num:Inter,\"Pretendard Variable\",Pretendard,-apple-system,system-ui,sans-serif;--font-head:\"Gothic A1\",\"Gowun Dodum\",Pretendard,sans-serif}",
@@ -11295,9 +11305,13 @@ var V33={};
     ".v55-scope{margin-top:10px;background:var(--surface);border:2px solid #F1E3A8;border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.5;max-width:520px;text-align:left}.v55-scope b{display:block;margin-bottom:4px}",
     /* 회차 표 접기 */
     ".v55-table.v55-fold .card-b{display:none}",
-    "@media(max-width:640px){.v55-hero{flex-direction:column;padding:14px 14px 12px;gap:12px}.v55-hr{flex:0 0 auto;flex-direction:row;align-items:flex-end;gap:8px}.v55-bubble{flex:1}.v55-bubble::after{left:auto;right:-9px;bottom:14px;margin:0;border:6px solid transparent;border-left-color:var(--line);border-right:0}.v55-tutor.big{width:96px;height:112px;flex:0 0 96px}",
+    "@media(max-width:640px){.v55-cov{flex-basis:44px;width:44px;height:60px}.v55-title{gap:10px}.v55-hero{flex-direction:column;padding:14px 14px 12px;gap:12px}.v55-hr{flex:0 0 auto;flex-direction:row;align-items:flex-end;gap:8px}.v55-bubble{flex:1}.v55-bubble::after{left:auto;right:-9px;bottom:14px;margin:0;border:6px solid transparent;border-left-color:var(--line);border-right:0}.v55-tutor.big{width:96px;height:112px;flex:0 0 96px}.v55-hr .v55-tutor.big.pose{width:56px;height:56px;flex:0 0 56px;filter:none}.v55-hr .v55-tutor.big.pose img{display:none}.v55-hr .v55-tutor.big.pose img.v55-fc{display:block;width:56px;height:56px;border-radius:50%;object-fit:cover;object-position:50% 12%;background:var(--surface-2,#EEF2F5);border:2px solid var(--line)}.v55-hr{align-items:center}.v55-bubble::after{bottom:auto;top:50%;margin-top:-6px}",
     ".v55-unit{padding:10px 12px 8px}.v55-ut{font-size:13.5px}.v55-up{font-size:13px}.v55-fut .v55-node{width:96px}",
-    ".v55-node{width:190px;transform:translateX(calc(var(--dx,0) * .55))}.v55-node .v55-tutor{width:84px;height:98px;top:-28px}.v55-node .v55-tutor.r{left:calc(50% + 48px)}.v55-node .v55-tutor.l{right:calc(50% + 48px)}.v55-lbl{max-width:180px;font-size:12px}.v55-stats b{font-size:20px}}"
+    ".v55-node{width:190px;transform:translateX(calc(var(--dx,0) * .55))}.v55-node .v55-tutor{width:84px;height:98px;top:-28px}.v55-node .v55-tutor.r{left:calc(50% + 48px)}.v55-node .v55-tutor.l{right:calc(50% + 48px)}.v55-lbl{max-width:180px;font-size:12px}.v55-stats b{font-size:20px}}",
+    /* 조작 규격(오타 디자인 2차 R7): 오늘·학습 로비·과목의 행동 버튼 = 높이 44px 이상 · 모서리 12px (로비 미션 .ow-cta · 교실 조작 줄 .cbt 와 같은 규격) */
+    "button.btn[data-v50open]{min-height:44px;border-radius:12px;padding:0 14px;font-size:14px;line-height:1.2}.v55-act .btn{min-height:44px;border-radius:12px}",
+    /* 누르는 자리 44px: 오늘·학습·과목 화면의 버튼은 실제 높이 44px 이상(글자 세로 가운데). 투명 ::before 로 넓히는 방식은 .btn 의 overflow:hidden(말줄임표)에 잘려 소용없었다 */
+    ":is(#v-today,#v-study,#v-course) button{min-height:44px;align-items:center}"
   ].join("\n"); document.head.appendChild(css);
 })();
 /* ============================================================
@@ -11328,7 +11342,7 @@ var V33={};
     var T=V56.T(), xp=+T.xp||0, lv=1+Math.floor(xp/150), pct=Math.round((xp%150)/150*100), streak=+T.streak||0, hearts=(T.hearts==null?3:+T.hearts), aff=(T.aff==null?20:+T.aff);
     var ms=V56.mission(); var r=44, c=2*Math.PI*r, off=c*(1-pct/100);
     return '<div class="ow-hero"><div class="ow-grid"></div><i class="ow-p p1"></i><i class="ow-p p2"></i><i class="ow-p p3"></i><i class="ow-p p4"></i>'+
-      '<div class="ow-l"><div class="ow-tag">LOBBY · 학습 공간</div>'+
+      '<div class="ow-l"><div class="ow-tag">LOBBY · 학습 공간</div><div class="ow-mhead"><img src="notes/classroom/assets/tutor/neutral.png" alt="" decoding="async" onerror="this.style.display=\'none\'"><b>김주영 스앵님</b><span>Lv '+lv+' · '+xp+' XP</span></div>'+
         '<div class="ow-pl"><svg class="ow-ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="'+r+'" class="bg"/><circle cx="50" cy="50" r="'+r+'" class="fg" style="stroke-dasharray:'+c.toFixed(1)+';stroke-dashoffset:'+off.toFixed(1)+'"/><text x="50" y="46" text-anchor="middle" class="lv">Lv '+lv+'</text><text x="50" y="62" text-anchor="middle" class="xp">'+xp+' XP</text></svg>'+
           '<div class="ow-stats"><span class="ow-st"><b>'+streak+'</b>연속일</span><span class="ow-st"><b>'+hearts+'/3</b>하트</span><span class="ow-st"><b>'+aff+'</b>호감도</span><span class="ow-st"><b>'+(150-xp%150)+'</b>다음 레벨까지</span></div></div>'+
         '<div class="ow-mis"><div class="ow-mt">다음 미션</div>'+(ms?'<div class="ow-mn">'+esc(ms.name||"수업 따라가기")+'</div><div class="ow-ml">'+esc(ms.line)+(ms.min?' <small>약 '+esc(ms.min)+'분</small>':'')+'</div><button type="button" class="ow-cta" id="v56Go">교실 열기 <span>▶</span></button>':'<div class="ow-mn">오늘은 미션이 없어요</div><div class="ow-ml">자료가 들어오면 스앵님이 정리해서 올려 둘게요.</div>')+'</div>'+
@@ -11350,19 +11364,19 @@ var V33={};
     "#v-study.ow>*{position:relative}",
     /* 로비 안에서는 앱 색 토큰 자체를 어둡게 — var(--ink-2) 같은 인라인·하위 규칙까지 따라온다 */
     "#v-study.ow{--ink:#E6ECFA;--ink-2:#C9D3EA;--ink-3:#9FB0D0;--surface:rgba(16,24,44,.72);--surface-2:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--bg:transparent}",
-    "#v-study.ow .hint{background:rgba(255,255,255,.06);color:#C9D3EA;border:1px solid rgba(255,255,255,.10)}#v-study.ow .hint b{color:#fff}",
+    "#v-study.ow .hint{background:none;border:0;padding:0;color:#AEBBD6}#v-study.ow .hint b{color:#fff}",   /* 안내 문구는 글자만 — 테두리 상자가 디버그 화면처럼 보였다(오타 디자인 1차 R7) */
     /* 플레이어 카드 */
     ".ow-hero{position:relative;overflow:hidden;border-radius:18px;padding:22px 24px 18px;margin:0 0 16px;background:linear-gradient(135deg,rgba(20,32,60,.92),rgba(12,20,40,.88));border:1px solid rgba(53,199,255,.22);box-shadow:0 0 0 1px rgba(53,199,255,.06) inset,0 0 40px rgba(53,199,255,.10),0 16px 40px rgba(0,0,0,.35);display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:end;clip-path:polygon(0 0,calc(100% - 26px) 0,100% 26px,100% 100%,26px 100%,0 calc(100% - 26px))}",
     ".ow-hero::after{content:\"\";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,#35C7FF 30%,#FF8A3D 70%,transparent);opacity:.9}",
     ".ow-grid{position:absolute;inset:0;pointer-events:none;background:radial-gradient(500px 220px at 80% 100%,rgba(255,138,61,.16),transparent 70%)}",
-    ".ow-p{position:absolute;width:6px;height:6px;border-radius:50%;background:#35C7FF;box-shadow:0 0 12px #35C7FF;opacity:.7;animation:owfloat 9s ease-in-out infinite;pointer-events:none}.ow-p.p1{left:12%;top:70%}.ow-p.p2{left:38%;top:20%;animation-delay:-3s;background:#FF8A3D;box-shadow:0 0 12px #FF8A3D}.ow-p.p3{left:58%;top:80%;animation-delay:-6s;width:4px;height:4px}.ow-p.p4{left:90%;top:30%;animation-delay:-1.5s;width:4px;height:4px;background:#FF8A3D;box-shadow:0 0 10px #FF8A3D}",
+    ".ow-p{position:absolute;z-index:0;width:6px;height:6px;border-radius:50%;background:#35C7FF;box-shadow:0 0 12px #35C7FF;opacity:.7;animation:owfloat 9s ease-in-out infinite;pointer-events:none}.ow-p.p1{left:34%;top:5%}.ow-p.p2{left:52%;top:3%;animation-delay:-3s;background:#FF8A3D;box-shadow:0 0 12px #FF8A3D}.ow-p.p3{right:3%;top:58%;animation-delay:-6s;width:4px;height:4px}.ow-p.p4{right:29%;top:34%;animation-delay:-1.5s;width:4px;height:4px;background:#FF8A3D;box-shadow:0 0 10px #FF8A3D}",
     "@keyframes owfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}",
-    ".ow-l{min-width:0;position:relative}.ow-tag{font-family:var(--font-num,Inter,sans-serif);font-weight:700;font-size:11px;letter-spacing:.18em;color:#35C7FF;text-transform:uppercase;margin-bottom:12px}",
+    ".ow-l{min-width:0;position:relative;z-index:1}.ow-tag{font-family:var(--font-num,Inter,sans-serif);font-weight:700;font-size:11px;letter-spacing:.18em;color:#35C7FF;text-transform:uppercase;margin-bottom:12px}",
     ".ow-pl{display:flex;align-items:center;gap:16px;margin-bottom:16px}.ow-ring{width:104px;height:104px;flex:0 0 104px;filter:drop-shadow(0 0 10px rgba(53,199,255,.35))}.ow-ring .bg{fill:none;stroke:rgba(255,255,255,.10);stroke-width:8}.ow-ring .fg{fill:none;stroke:#35C7FF;stroke-width:8;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset .6s}.ow-ring .lv{font-family:var(--font-head,\"Gothic A1\",sans-serif);font-weight:800;font-size:16px;fill:#fff}.ow-ring .xp{font-family:var(--font-num,Inter,sans-serif);font-weight:600;font-size:9px;fill:#9FB0D0;letter-spacing:.06em}",
     ".ow-stats{display:flex;gap:8px;flex-wrap:wrap}.ow-st{display:inline-flex;flex-direction:column;align-items:flex-start;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);font-size:11px;color:#9FB0D0;min-width:78px}.ow-st b{font-family:var(--font-num,Inter,sans-serif);font-weight:700;font-size:18px;color:#fff;line-height:1.1}",
     ".ow-mis{padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,138,61,.28);box-shadow:0 0 24px rgba(255,138,61,.10) inset}.ow-mt{font-family:var(--font-num,Inter,sans-serif);font-weight:700;font-size:11px;letter-spacing:.16em;color:#FF8A3D;text-transform:uppercase}.ow-mn{font-family:var(--font-head,\"Gothic A1\",sans-serif);font-weight:800;font-size:20px;color:#fff;margin:4px 0 2px}.ow-ml{font-size:13.5px;color:#C9D3EA;margin-bottom:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ow-ml small{color:#9FB0D0}",
-    ".ow-cta{font:inherit;font-weight:800;font-size:15px;color:#04121F;background:linear-gradient(90deg,#35C7FF,#6FE0FF);border:0;border-radius:12px;padding:12px 22px;cursor:pointer;box-shadow:0 0 22px rgba(53,199,255,.45),0 8px 18px rgba(0,0,0,.3);display:inline-flex;align-items:center;gap:10px;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}.ow-cta span{font-size:12px}.ow-cta:hover{filter:brightness(1.06)}.ow-cta:active{transform:translateY(1px)}",
-    ".ow-r{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-height:280px}.ow-r img{height:300px;width:auto;position:relative;filter:drop-shadow(0 10px 20px rgba(0,0,0,.5));-webkit-user-select:none;user-select:none}.ow-glow{position:absolute;left:50%;bottom:24px;width:220px;height:220px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(53,199,255,.35),rgba(53,199,255,0) 65%);filter:blur(4px)}.ow-nm{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-family:var(--font-num,Inter,sans-serif);font-weight:700;font-size:11px;letter-spacing:.12em;color:#9FB0D0;background:rgba(10,17,32,.8);padding:3px 10px;border-radius:999px;border:1px solid rgba(53,199,255,.25);white-space:nowrap}",
+    ".ow-cta{font:inherit;font-weight:800;font-size:15px;color:#04121F;background:linear-gradient(90deg,#35C7FF,#6FE0FF);border:0;border-radius:12px;padding:12px 22px;cursor:pointer;box-shadow:0 4px 0 #1B8DB8,0 0 18px rgba(53,199,255,.3);display:inline-flex;align-items:center;gap:10px;min-height:46px}.ow-cta span{font-size:12px}.ow-cta:hover{filter:brightness(1.06)}.ow-cta:active{transform:translateY(3px);box-shadow:0 1px 0 #1B8DB8}",
+    ".ow-r{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-height:280px}.ow-r img{height:300px;width:auto;position:relative;filter:drop-shadow(0 10px 20px rgba(0,0,0,.5));-webkit-user-select:none;user-select:none}.ow-glow{position:absolute;left:50%;bottom:24px;width:220px;height:220px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(53,199,255,.35),rgba(53,199,255,0) 65%);filter:blur(4px)}.ow-nm{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-family:var(--font-num,Inter,sans-serif);font-weight:700;font-size:11px;letter-spacing:.12em;color:#9FB0D0;background:rgba(10,17,32,.8);padding:3px 10px;border-radius:999px;border:1px solid rgba(53,199,255,.25);white-space:nowrap}",
     /* 기존 카드 재스킨 */
     "#v-study.ow .card{background:rgba(16,24,44,.72);border:1px solid rgba(88,140,255,.18);color:#E6ECFA;box-shadow:0 0 0 1px rgba(53,199,255,.05) inset,0 10px 30px rgba(0,0,0,.35);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}",
     "#v-study.ow .card-h{border-color:rgba(255,255,255,.08)}#v-study.ow .card-h h3,#v-study.ow h1,#v-study.ow h2,#v-study.ow h3{color:#fff}#v-study.ow .hs,#v-study.ow .hint,#v-study.ow .smut,#v-study.ow .sub,#v-study.ow small{color:#9FB0D0}",
@@ -11370,8 +11384,9 @@ var V33={};
     "#v-study.ow .chip{background:rgba(255,255,255,.08);color:#E6ECFA;border-color:rgba(255,255,255,.12)}#v-study.ow .chip.crit{background:rgba(217,52,43,.25);color:#FFB4AE}#v-study.ow .chip.warn{background:rgba(255,138,61,.22);color:#FFC9A3}#v-study.ow .chip.ok,#v-study.ow .chip.acc{background:rgba(53,199,255,.18);color:#9FE4FF}",
     "#v-study.ow table{color:#E6ECFA}#v-study.ow th{color:#9FB0D0;border-color:rgba(255,255,255,.08)}#v-study.ow td{border-color:rgba(255,255,255,.06)}#v-study.ow .bar{background:rgba(255,255,255,.12)}#v-study.ow a{color:#6FE0FF}",
     "#v-study.ow input,#v-study.ow select,#v-study.ow textarea{background:rgba(255,255,255,.06);color:#E6ECFA;border-color:rgba(255,255,255,.14)}",
+    ".ow-mhead{display:none;align-items:center;gap:10px;margin:0 0 10px}.ow-mhead img{width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:50% 12%;background:#1A2640;border:2px solid rgba(53,199,255,.5)}.ow-mhead b{font-family:var(--font-head,\"Gothic A1\",sans-serif);font-weight:800;font-size:15px;color:#fff}.ow-mhead span{font-size:12px;color:#9FB0D0}",
     "@media(prefers-reduced-motion:reduce){#v-study.ow::before{animation:none}.ow-p{animation:none}}",
-    "@media(max-width:760px){#v-study.ow{padding:12px 10px 20px;border-radius:16px}.ow-hero{grid-template-columns:1fr;padding:16px 14px 0;clip-path:none}.ow-r{min-height:0;order:-1;flex-direction:row;justify-content:flex-start;gap:10px;margin-bottom:-6px}.ow-r img{height:150px}.ow-glow{display:none}.ow-nm{position:static;transform:none}.ow-ring{width:84px;height:84px;flex-basis:84px}.ow-ml{white-space:normal}.ow-cta{width:100%;justify-content:center}}"
+    "@media(max-width:760px){#v-study.ow{padding:12px 10px 20px;border-radius:16px}.ow-hero{grid-template-columns:1fr;padding:14px 14px 16px;clip-path:none;gap:12px}.ow-r{display:none}.ow-tag{margin-bottom:8px}.ow-pl{gap:10px;margin-bottom:12px}.ow-ring{display:none}.ow-p.p3,.ow-p.p4{display:none}.ow-p.p1{left:auto;right:22%;top:2%}.ow-p.p2{left:auto;right:9%;top:4%}.ow-stats{flex-wrap:nowrap;gap:6px;flex:1;min-width:0}.ow-st{min-width:0;flex:1;padding:7px 8px;font-size:11px;word-break:keep-all}.ow-st b{font-size:15px}.ow-mhead{display:flex}.ow-ml{white-space:normal}.ow-cta{width:100%;justify-content:center}}"
   ].join("\n");
   var st=document.createElement("style"); st.id="v56css"; st.textContent=css; document.head.appendChild(st);
   try{ if($("#v-study")&&$("#v-study").classList.contains("on")) V56.apply(); }catch(e){}   /* 화면 표시 클래스는 .view.on */

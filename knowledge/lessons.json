@@ -260,7 +260,7 @@
     "id": "em1-2026-09-02",
     "file": "notes/lessons/em1/2026-09-02.html",
     "title": "미분방정식이란 — 모델화 3단계와 분류 (ODE · 계 · 선형)",
-    "minutes": 15,
+    "minutes": 18,
     "sids": [
      "s1",
      "s2",
@@ -279,13 +279,13 @@
     "week": 1,
     "classroom": "notes/classroom/em1/2026-09-02.html",
     "chapters": 5,
-    "steps": 31
+    "steps": 29
    },
    "2026-09-04": {
     "id": "em1-2026-09-04",
     "file": "notes/lessons/em1/2026-09-04.html",
     "title": "해의 가족에서 하나를 고르기 — 초기값 문제, 변수분리, y = ux 치환",
-    "minutes": 20,
+    "minutes": 18,
     "sids": [
      "s1",
      "s2",
@@ -304,13 +304,13 @@
     "week": 1,
     "classroom": "notes/classroom/em1/2026-09-04.html",
     "chapters": 5,
-    "steps": 32
+    "steps": 30
    },
    "2026-09-09": {
     "id": "em1-2026-09-09",
     "file": "notes/lessons/em1/2026-09-09.html",
     "title": "완전미분방정식 — \"어떤 함수 u의 등고선인가\", 그리고 적분인자",
-    "minutes": 20,
+    "minutes": 18,
     "sids": [
      "s1",
      "s2",
@@ -330,13 +330,13 @@
     "week": 2,
     "classroom": "notes/classroom/em1/2026-09-09.html",
     "chapters": 6,
-    "steps": 36
+    "steps": 33
    },
    "2026-09-11": {
     "id": "em1-2026-09-11",
     "file": "notes/lessons/em1/2026-09-11.html",
     "title": "1.5 선형 ODE — \"이거 하고 이거는 기억을 하라\"",
-    "minutes": 20,
+    "minutes": 18,
     "sids": [
      "s1",
      "s2",
@@ -356,13 +356,13 @@
     "week": 2,
     "classroom": "notes/classroom/em1/2026-09-11.html",
     "chapters": 6,
-    "steps": 37
+    "steps": 32
    },
    "2026-09-16": {
     "id": "em1-2026-09-16",
     "file": "notes/lessons/em1/2026-09-16.html",
     "title": "1장을 닫고 2장을 열다 — 베르누이 연습, 해법 총정리, 중첩 원리와 기저",
-    "minutes": 22,
+    "minutes": 18,
     "sids": [
      "s1",
      "s2",
@@ -382,13 +382,13 @@
     "week": 3,
     "classroom": "notes/classroom/em1/2026-09-16.html",
     "chapters": 6,
-    "steps": 43
+    "steps": 38
    },
    "2026-09-18": {
     "id": "em1-2026-09-18",
     "file": "notes/lessons/em1/2026-09-18.html",
     "title": "2.2 상수계수 제차 선형 ODE — 특성방정식 하나로 세 가지 해",
-    "minutes": 20,
+    "minutes": 18,
     "sids": [
      "s1",
      "s2",
@@ -407,13 +407,13 @@
     "week": 3,
     "classroom": "notes/classroom/em1/2026-09-18.html",
     "chapters": 5,
-    "steps": 29
+    "steps": 27
    },
    "2026-09-23": {
     "id": "em1-2026-09-23",
     "file": "notes/lessons/em1/2026-09-23.html",
     "title": "2.5 오일러-코시 — 지수 대신 거듭제곱, 그리고 2.6 론스키안",
-    "minutes": 20,
+    "minutes": 18,
     "sids": [
      "s1",
      "s2",
@@ -432,7 +432,7 @@
     "week": 4,
     "classroom": "notes/classroom/em1/2026-09-23.html",
     "chapters": 5,
-    "steps": 29
+    "steps": 28
    }
   },
   "미분적분학2": {
@@ -612,5 +612,5 @@
    }
   }
  },
- "generated": "2026-09-28T13:14:53"
+ "generated": "2026-09-28T16:01:33"
 }

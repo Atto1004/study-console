@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """교실 판서 + 김주영 스앵님 대사 — 정역학 9/14 내적 마무리 · 정사영 · 외적 · 행렬식 (원문: docs/tools/lessons/statics_2026-09-14.py)"""
-VERSION = "2026-09-28a"
+VERSION = "2026-09-28b"
 BOARD = {
  "s1": [
   {"b": ["# 내적의 성질과 단위벡터 표", r"= \mathbf U\cdot\mathbf V=\mathbf V\cdot\mathbf U,\quad a(\mathbf U\cdot\mathbf V)=(a\mathbf U)\cdot\mathbf V=\mathbf U\cdot(a\mathbf V)", r"= \mathbf U\cdot(\mathbf V+\mathbf W)=\mathbf U\cdot\mathbf V+\mathbf U\cdot\mathbf W"],
@@ -71,8 +71,8 @@ BOARD = {
    "s": "i 에서 j, j 에서 k, k 에서 i, 순환 순서대로 가면 플러스."},
   {"b": ["• i × j = k, j × k = i, k × i = j", "! 거꾸로 가면 − : j × i = −k · 같은 것끼리 i × i = 0"], "fig": "cyc", "fs": 3,
    "s": "i 곱하기 j 는 k, j 곱하기 k 는 i, k 곱하기 i 는 j. 거꾸로 가면 마이너스, 같은 것끼리는 0. 같은 방향은 0, 반대로 하면 마이너스. 오른손으로 확인해도 돼요."},
-  {"b": ["• 성분 전개 : 9항 중 3항이 0", r"= \mathbf U\times\mathbf V=(U_yV_z-U_zV_y)\,\mathbf i-(U_xV_z-U_zV_x)\,\mathbf j", r"= \qquad\qquad +(U_xV_y-U_yV_x)\,\mathbf k"],
-   "s": "U 와 V 를 성분으로 쓰고 위 표로 전개하면 9항 중 3항이 0이 되고 이렇게 남아요."},
+  {"b": ["• 성분 전개 : 9항 중 3항이 0 — 성분별로 쓰면", r"= (\mathbf U\times\mathbf V)_x=U_yV_z-U_zV_y", r"= (\mathbf U\times\mathbf V)_y=-(U_xV_z-U_zV_x)", r"= (\mathbf U\times\mathbf V)_z=U_xV_y-U_yV_x"],
+   "s": "U 와 V 를 성분으로 쓰고 위 표로 전개하면 9항 중 3항이 0이 되고 성분별로 이렇게 남아요. y 성분 앞의 마이너스를 눈여겨보세요."},
   {"b": [r"= \mathbf U\times\mathbf V=\begin{vmatrix}\mathbf i&\mathbf j&\mathbf k\\U_x&U_y&U_z\\V_x&V_y&V_z\end{vmatrix}", "→ 3×3 행렬식을 첫 행으로 전개 (2×2 는 ad − bc)"],
    "s": "행렬 배우셨죠? 3 곱하기 3 행렬식을 첫 행으로 전개하면 위 식이 그대로 나와요. i, j, k 각각에 대해 그 행과 열을 지우고 남는 2 곱하기 2 행렬식, ad 빼기 bc 를 붙입니다."},
   {"b": ["! j 항은 마이너스다. 플러스가 아니라 마이너스 — 두 번 반복, 「조심해라」"],

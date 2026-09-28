@@ -6,54 +6,58 @@ from figs import *
 OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\공업수학1\_수업노트\2026-09-16.html"
 
 fig_b1 = canvas(560, 160,
-    fbox(14, 30, 150, 56, "xy′ + y = 1/y²", INK, sub="÷x → y′ + (1/x)y = (1/x)y⁻²", size=14), arrow(166, 58, 200, 58, GREEN, "", 2), text(183, 46, "a = −2", 11.5, GREEN, "middle", True),
-    fbox(204, 30, 120, 56, "u = y³", BLUE, sub="u′ = 3y²y′", size=15), arrow(326, 58, 360, 58, GREEN, "", 2),
-    fbox(364, 30, 186, 56, "u′ + (3/x)u = 3/x", RED, sub="「착한」 선형 — 또는 변수분리", size=14),
-    arrow(457, 88, 457, 108, GREEN, "", 2), fbox(330, 110, 220, 40, "u = 1 + c/x³  →  y³ = 1 + c/x³", RED, size=13.5),
-    text(165, 134, "두 길: 변수분리 du/(u−1) = −3dx/x · 선형 공식 h = 3 ln x", 11, GRAY, "middle"),
-    cap="연습 1 — 전형적인 베르누이. 마지막에 u 를 y 로 되돌린다.")
+    step(1, fbox(14, 30, 150, 56, "xy′ + y = 1/y²", INK, sub="÷x → y′ + (1/x)y = (1/x)y⁻²", size=14)),
+    step(2, arrow(166, 58, 200, 58, GREEN, "", 2), text(183, 46, "a = −2", 11.5, GREEN, "middle", True),
+        fbox(204, 30, 120, 56, "u = y³", BLUE, sub="u′ = 3y²y′", size=15)),
+    step(3, arrow(326, 58, 360, 58, GREEN, "", 2),
+        fbox(364, 30, 186, 56, "u′ + (3/x)u = 3/x", RED, sub="「착한」 선형 — 또는 변수분리", size=14)),
+    step(4, arrow(457, 88, 457, 108, GREEN, "", 2), fbox(330, 110, 220, 40, "u = 1 + c/x³  →  y³ = 1 + c/x³", RED, size=13.5),
+        text(165, 134, "두 길: 변수분리 du/(u−1) = −3dx/x · 선형 공식 h = 3 ln x", 11, GRAY, "middle")),
+    cap="연습 1 — 전형적인 베르누이. 마지막에 u 를 y 로 되돌린다.", name="b1")
 
 fig_sub = canvas(560, 150,
-    fbox(14, 26, 250, 50, "(2) y′ = (x + y + 2)²", INK, sub="u = x + y + 2 → u′ = 1 + y′ = 1 + u²", size=14),
-    arrow(139, 78, 139, 98, GREEN, "", 1.8), fbox(14, 100, 250, 40, "∫du/(1+u²) = ∫dx → tan⁻¹u = x + c", BLUE, size=12.5),
-    fbox(296, 26, 250, 50, "(3) y′ = 1 + e^(y − x + 3)", INK, sub="u = y − x + 3 → u′ = y′ − 1 = e^u", size=14),
-    arrow(421, 78, 421, 98, GREEN, "", 1.8), fbox(296, 100, 250, 40, "∫e^(−u)du = ∫dx → −e^(−u) = x + c", BLUE, size=12.5),
-    cap="연습 2·3 — 식 안의 덩어리를 통째로 u 로 놓으면 변수분리형이 된다. 베르누이 꼴은 아니다.")
+    step(1, fbox(14, 26, 250, 50, "(2) y′ = (x + y + 2)²", INK, sub="u = x + y + 2 → u′ = 1 + y′ = 1 + u²", size=14)),
+    step(2, arrow(139, 78, 139, 98, GREEN, "", 1.8), fbox(14, 100, 250, 40, "∫du/(1+u²) = ∫dx → tan⁻¹u = x + c", BLUE, size=12.5)),
+    step(3, fbox(296, 26, 250, 50, "(3) y′ = 1 + e^(y − x + 3)", INK, sub="u = y − x + 3 → u′ = y′ − 1 = e^u", size=14)),
+    step(4, arrow(421, 78, 421, 98, GREEN, "", 1.8), fbox(296, 100, 250, 40, "∫e^(−u)du = ∫dx → −e^(−u) = x + c", BLUE, size=12.5)),
+    cap="연습 2·3 — 식 안의 덩어리를 통째로 u 로 놓으면 변수분리형이 된다. 베르누이 꼴은 아니다.", name="sub")
 
 fig_sum = canvas(560, 250,
-    fbox(16, 20, 250, 40, "① 변수분리  g(y)dy = f(x)dx", GREEN, size=13), fbox(16, 66, 250, 40, "② 동차  y = ux (또는 x = vy)", GREEN, size=13),
-    fbox(16, 112, 250, 40, "③ 완전미방  M_y = N_x → u = c", GREEN, size=13), fbox(16, 158, 250, 40, "   완전 아니면 적분인자 F(x)·F(y)", GRAY, size=12.5),
-    fbox(294, 20, 250, 40, "④ 선형  y′ + py = r → 공식", RED, size=13), fbox(294, 66, 250, 40, "⑤ 베르누이  u = y^(1−a) → ④", RED, size=13),
-    fbox(294, 112, 250, 40, "⑥ 치환  dy/dx = f(ax + by + c)", RED, size=13),
-    text(419, 178, "u = ax + by + c", 12, GRAY, "middle"),
-    text(280, 228, "「1장이 다 끝났다」 — 형태를 보고 어느 칸인지 고르는 것이 실력의 반", 12.5, INK, "middle", True),
-    cap="1장 해법 총정리(슬라이드 p.10 표). 시험 문제는 이 여섯 중 하나로 풀린다.")
+    step(1, fbox(16, 20, 250, 40, "① 변수분리  g(y)dy = f(x)dx", GREEN, size=13), fbox(16, 66, 250, 40, "② 동차  y = ux (또는 x = vy)", GREEN, size=13)),
+    step(2, fbox(16, 112, 250, 40, "③ 완전미방  M_y = N_x → u = c", GREEN, size=13), fbox(16, 158, 250, 40, "   완전 아니면 적분인자 F(x)·F(y)", GRAY, size=12.5)),
+    step(3, fbox(294, 20, 250, 40, "④ 선형  y′ + py = r → 공식", RED, size=13), fbox(294, 66, 250, 40, "⑤ 베르누이  u = y^(1−a) → ④", RED, size=13)),
+    step(4, fbox(294, 112, 250, 40, "⑥ 치환  dy/dx = f(ax + by + c)", RED, size=13),
+        text(419, 178, "u = ax + by + c", 12, GRAY, "middle"),
+        text(280, 228, "「1장이 다 끝났다」 — 형태를 보고 어느 칸인지 고르는 것이 실력의 반", 12.5, INK, "middle", True)),
+    cap="1장 해법 총정리(슬라이드 p.10 표). 시험 문제는 이 여섯 중 하나로 풀린다.", name="sum")
 
 fig_super = canvas(560, 200,
-    arrow(60, 170, 300, 170, BLUE, "", 2.4), text(300, 190, "y₁ 방향", 12, BLUE, "middle"), arrow(60, 170, 150, 40, RED, "", 2.4), text(120, 34, "y₂ 방향", 12, RED, "middle"),
-    line(150, 40, 390, 40, GRAY, 1.2, "4 3"), line(300, 170, 390, 40, GRAY, 1.2, "4 3"),
-    arrow(60, 170, 390, 40, GREEN, "", 3), text(262, 128, "c₁y₁ + c₂y₂", 14, GREEN, "middle", True),
-    text(180, 182, "c₁y₁", 12, BLUE, "middle"), text(80, 100, "c₂y₂", 12, RED, "end"),
-    text(470, 90, "해의 중첩 원리", 13.5, INK, "middle", True), text(470, 112, "해끼리 더해도 해,", 12.5, INK, "middle"), text(470, 130, "상수배도 해", 12.5, INK, "middle"),
-    text(470, 160, "제차 선형에만!", 13, RED, "middle", True),
-    cap="판서 ④의 그림: 두 해 y₁, y₂ 가 만드는 평행사변형 안이 전부 해(해 공간). 비제차·비선형에서는 무너진다.")
+    step(1, arrow(60, 170, 300, 170, BLUE, "", 2.4), text(300, 190, "y₁ 방향", 12, BLUE, "middle"), arrow(60, 170, 150, 40, RED, "", 2.4), text(120, 34, "y₂ 방향", 12, RED, "middle"),
+        text(180, 182, "c₁y₁", 12, BLUE, "middle"), text(80, 100, "c₂y₂", 12, RED, "end")),
+    step(2, line(150, 40, 390, 40, GRAY, 1.2, "4 3"), line(300, 170, 390, 40, GRAY, 1.2, "4 3"),
+        arrow(60, 170, 390, 40, GREEN, "", 3), text(262, 128, "c₁y₁ + c₂y₂", 14, GREEN, "middle", True)),
+    step(3, text(470, 90, "해의 중첩 원리", 13.5, INK, "middle", True), text(470, 112, "해끼리 더해도 해,", 12.5, INK, "middle"), text(470, 130, "상수배도 해", 12.5, INK, "middle")),
+    step(4, text(470, 160, "제차 선형에만!", 13, RED, "middle", True)),
+    cap="판서 ④의 그림: 두 해 y₁, y₂ 가 만드는 평행사변형 안이 전부 해(해 공간). 비제차·비선형에서는 무너진다.", name="super")
 
 X1 = lambda x: 60 + (x + 2) * 55; Y1 = lambda y: 160 - y * 18
 fig_indep = canvas(560, 190,
-    axis(60, 160, 300, 160, "x", "y") + arrow(60, 160, 60, 20, INK, "", 1.5),
-    fplot(lambda x: math.exp(x), -2, 2.1, X1, Y1, color=BLUE, w=2.4, ylim=(0, 7.5)), fplot(lambda x: math.exp(-x), -2.1, 2, X1, Y1, color=RED, w=2.4, ylim=(0, 7.5)),
-    text(200, 36, "y₁ = eˣ", 13, BLUE, "start", True), text(70, 40, "y₂ = e⁻ˣ", 13, RED, "start", True),
-    text(430, 50, "y₁/y₂ = e^(2x)  — 상수 아님", 13.5, INK, "middle", True), text(430, 74, "→ 비례 관계 X → 1차독립 → 기저", 13, GREEN, "middle", True),
-    text(430, 110, "y₁ = eˣ, y₂ = 3eˣ 라면 y₁/y₂ = 1/3", 12.5, GRAY, "middle"), text(430, 130, "→ 비례 → 1차종속 (기저 못 됨)", 12.5, RED, "middle"),
-    text(430, 166, "「비례하면 종속, 안 하면 독립」 (교수 정정)", 12, INK, "middle"),
-    cap="1차독립 판별: 두 해의 비가 상수인지 본다. 기저가 있어야 일반해 c₁y₁ + c₂y₂ 가 「모든」 해를 덮는다.")
+    step(1, axis(60, 160, 300, 160, "x", "y") + arrow(60, 160, 60, 20, INK, "", 1.5),
+        fplot(lambda x: math.exp(x), -2, 2.1, X1, Y1, color=BLUE, w=2.4, ylim=(0, 7.5)), fplot(lambda x: math.exp(-x), -2.1, 2, X1, Y1, color=RED, w=2.4, ylim=(0, 7.5)),
+        text(200, 36, "y₁ = eˣ", 13, BLUE, "start", True), text(70, 40, "y₂ = e⁻ˣ", 13, RED, "start", True)),
+    step(2, text(430, 50, "y₁/y₂ = e^(2x)  — 상수 아님", 13.5, INK, "middle", True), text(430, 74, "→ 비례 관계 X → 1차독립 → 기저", 13, GREEN, "middle", True)),
+    step(3, text(430, 110, "y₁ = eˣ, y₂ = 3eˣ 라면 y₁/y₂ = 1/3", 12.5, GRAY, "middle"), text(430, 130, "→ 비례 → 1차종속 (기저 못 됨)", 12.5, RED, "middle")),
+    step(4, text(430, 166, "「비례하면 종속, 안 하면 독립」 (교수 정정)", 12, INK, "middle")),
+    cap="1차독립 판별: 두 해의 비가 상수인지 본다. 기저가 있어야 일반해 c₁y₁ + c₂y₂ 가 「모든」 해를 덮는다.", name="indep")
 
 fig_red = canvas(560, 150,
-    fbox(14, 30, 120, 56, "y₁ 을 안다", INK, sub="예: y₁ = x", size=14), arrow(136, 58, 170, 58, GREEN, "", 2),
-    fbox(174, 30, 120, 56, "y₂ = u·y₁", BLUE, sub="u 를 찾는다", size=14), arrow(296, 58, 330, 58, GREEN, "", 2),
-    fbox(334, 20, 216, 76, "y₂ = y₁ ∫ (1/y₁²)·e^(−∫p dx) dx", RED, sub="☆ 판서 ⑧·⑨ (지수에 − 있음)", size=13.5),
-    text(280, 130, "2계 식이 u′ 에 대한 1계 식으로 「낮아진다」 — 그래서 차수축소", 12.5, GRAY, "middle"),
-    cap="차수축소법. 표준형에서 p(x) 를 읽고 공식에 넣는다. 예제 1 은 설정까지, 계산은 9/18.")
+    step(1, fbox(14, 30, 120, 56, "y₁ 을 안다", INK, sub="예: y₁ = x", size=14)),
+    step(2, arrow(136, 58, 170, 58, GREEN, "", 2),
+        fbox(174, 30, 120, 56, "y₂ = u·y₁", BLUE, sub="u 를 찾는다", size=14)),
+    step(3, arrow(296, 58, 330, 58, GREEN, "", 2),
+        fbox(334, 20, 216, 76, "y₂ = y₁ ∫ (1/y₁²)·e^(−∫p dx) dx", RED, sub="☆ 판서 ⑧·⑨ (지수에 − 있음)", size=13.5)),
+    step(4, text(280, 130, "2계 식이 u′ 에 대한 1계 식으로 「낮아진다」 — 그래서 차수축소", 12.5, GRAY, "middle")),
+    cap="차수축소법. 표준형에서 p(x) 를 읽고 공식에 넣는다. 예제 1 은 설정까지, 계산은 9/18.", name="red")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공업수학1 · 9/16 베르누이 연습 · 1장 총정리 · 2.1 2계 선형 ODE</title></head><body>
 <header>

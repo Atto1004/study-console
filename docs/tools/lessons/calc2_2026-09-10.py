@@ -8,42 +8,44 @@ OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\미분적분학
 ox, oy = 170, 170
 P = p3(ox, oy, 70, 100, 90); Pxy = p3(ox, oy, 70, 100, 0); Px = p3(ox, oy, 70, 0, 0); Py = p3(ox, oy, 0, 100, 0)
 fig_axes = canvas(560, 250,
-    axes3d(ox, oy, 110),
-    line(Px[0], Px[1], Pxy[0], Pxy[1], GRAY, 1.2, "4 3"), line(Py[0], Py[1], Pxy[0], Pxy[1], GRAY, 1.2, "4 3"),
-    dot(Pxy[0], Pxy[1], "", 5, BLUE), text(Pxy[0] + 8, Pxy[1] + 16, "P(x₁, y₁, 0)  ① 먼저 찍고", 12, BLUE),
-    line(Pxy[0], Pxy[1], P[0], P[1], GRAY, 1.2, "4 3"), arrow(Pxy[0] + 14, Pxy[1] - 6, P[0] + 14, P[1] + 8, GREEN, "② z₁ 만큼 올린다", 1.8, 62, -30),
-    dot(P[0], P[1], "", 6, PINK), text(P[0] + 10, P[1] - 6, "P(x₁, y₁, z₁)", 13, PINK, "start", True),
-    arrow(ox, oy, Pxy[0], Pxy[1], YEL, "", 2.4), text(200, 226, "r (동경)", 12, "#B26A00", "middle"),
-    arc(ox, oy, 30, 0, 22, GRAY, 1.2, "θ", 40),
-    text(450, 60, "직교좌표  P(x, y, z)  ✓", 13.5, INK, "middle", True), text(450, 84, "원주좌표  P(r, θ, z)  ✓", 13.5, INK, "middle", True), text(450, 108, "구면좌표  (ρ, θ, φ)  ✗ 뺀다", 13, GRAY, "middle"),
-    text(450, 150, "원주좌표 = xy 평면의 극좌표 + 높이 z", 12, GRAY, "middle"), text(450, 170, "x = r cos θ, y = r sin θ, z = z", 12.5, INK, "middle"),
-    cap="판서 ①의 그림: 공간의 점은 「z = 0 인 xy 평면에 먼저 찍고, z 만큼 올린다」. 같은 점을 (x, y, z) 로도 (r, θ, z) 로도 쓴다.")
+    step(1, axes3d(ox, oy, 110)),
+    step(2, line(Px[0], Px[1], Pxy[0], Pxy[1], GRAY, 1.2, "4 3"), line(Py[0], Py[1], Pxy[0], Pxy[1], GRAY, 1.2, "4 3"),
+        dot(Pxy[0], Pxy[1], "", 5, BLUE), text(Pxy[0] + 8, Pxy[1] + 16, "P(x₁, y₁, 0)  ① 먼저 찍고", 12, BLUE)),
+    step(3, line(Pxy[0], Pxy[1], P[0], P[1], GRAY, 1.2, "4 3"), arrow(Pxy[0] + 14, Pxy[1] - 6, P[0] + 14, P[1] + 8, GREEN, "② z₁ 만큼 올린다", 1.8, 62, -30),
+        dot(P[0], P[1], "", 6, PINK), text(P[0] + 10, P[1] - 6, "P(x₁, y₁, z₁)", 13, PINK, "start", True)),
+    step(4, arrow(ox, oy, Pxy[0], Pxy[1], YEL, "", 2.4), text(200, 226, "r (동경)", 12, "#B26A00", "middle"),
+        arc(ox, oy, 30, 0, 22, GRAY, 1.2, "θ", 40)),
+    step(5, text(450, 60, "직교좌표  P(x, y, z)  ✓", 13.5, INK, "middle", True), text(450, 84, "원주좌표  P(r, θ, z)  ✓", 13.5, INK, "middle", True), text(450, 108, "구면좌표  (ρ, θ, φ)  ✗ 뺀다", 13, GRAY, "middle"),
+        text(450, 150, "원주좌표 = xy 평면의 극좌표 + 높이 z", 12, GRAY, "middle"), text(450, 170, "x = r cos θ, y = r sin θ, z = z", 12.5, INK, "middle")),
+    cap="판서 ①의 그림: 공간의 점은 「z = 0 인 xy 평면에 먼저 찍고, z 만큼 올린다」. 같은 점을 (x, y, z) 로도 (r, θ, z) 로도 쓴다.", name="axes")
 
 fig_polar = canvas(560, 200,
-    axis(60, 150, 260, 150, "x (θ=0)", "") + arrow(160, 150, 160, 30, INK, "", 1.5) + line(60, 150, 260, 150, INK, 1.5),
-    text(160, 24, "y (θ=π/2)", 12, INK, "middle"), text(66, 166, "θ=π", 11, GRAY), text(160, 178, "θ=3π/2 (아래)", 11, GRAY, "middle"),
-    dot(230, 80, "", 5, PINK), text(238, 72, "P(x, y) = P(r, θ)", 12.5, PINK),
-    arrow(160, 150, 228, 82, YEL, "", 2.6), text(186, 108, "r", 13, "#B26A00", "middle", True), arc(160, 150, 32, -45, 0, GRAY, 1.2, "θ", 42),
-    line(230, 80, 230, 150, GRAY, 1, "3 3"), line(160, 80, 230, 80, GRAY, 1, "3 3"),
-    text(420, 70, "판서 우측 그림 — xy 평면만 떼어 놓은 것", 12.5, INK, "middle"), text(420, 96, "θ 기준각 4개: 0 · π/2 · π · 3π/2", 12.5, INK, "middle"),
-    text(420, 130, "「문제는 주로 원주좌표계로 다룬다」", 12.5, RED, "middle", True), text(420, 152, "x² + y² = 1 이 r = 1 이 되는 이유 (9/15)", 11.5, GRAY, "middle"),
-    cap="극좌표 복습. 원주좌표의 r 은 높이와 무관하게 xy 평면 안에서만 잰다.")
+    step(1, axis(60, 150, 260, 150, "x (θ=0)", "") + arrow(160, 150, 160, 30, INK, "", 1.5) + line(60, 150, 260, 150, INK, 1.5),
+        text(160, 24, "y (θ=π/2)", 12, INK, "middle"), text(66, 166, "θ=π", 11, GRAY), text(160, 178, "θ=3π/2 (아래)", 11, GRAY, "middle")),
+    step(2, dot(230, 80, "", 5, PINK), text(238, 72, "P(x, y) = P(r, θ)", 12.5, PINK)),
+    step(3, arrow(160, 150, 228, 82, YEL, "", 2.6), text(186, 108, "r", 13, "#B26A00", "middle", True), arc(160, 150, 32, -45, 0, GRAY, 1.2, "θ", 42),
+        line(230, 80, 230, 150, GRAY, 1, "3 3"), line(160, 80, 230, 80, GRAY, 1, "3 3")),
+    step(4, text(420, 70, "판서 우측 그림 — xy 평면만 떼어 놓은 것", 12.5, INK, "middle"), text(420, 96, "θ 기준각 4개: 0 · π/2 · π · 3π/2", 12.5, INK, "middle"),
+        text(420, 130, "「문제는 주로 원주좌표계로 다룬다」", 12.5, RED, "middle", True), text(420, 152, "x² + y² = 1 이 r = 1 이 되는 이유 (9/15)", 11.5, GRAY, "middle")),
+    cap="극좌표 복습. 원주좌표의 r 은 높이와 무관하게 xy 평면 안에서만 잰다.", name="polar")
 
 X1 = lambda x: 60 + x * 28; Y1 = lambda y: 160 - y * 28
 fig_cs = canvas(560, 210,
-    axis(60, 160, 220, 160, "x", "y") + arrow(60, 160, 60, 40, INK, "", 1.5),
-    fplot(lambda x: 1.5 + 1.2 * math.sin(x), 0, 5.4, X1, Y1, color=RED, w=2.6), text(140, 190, "① R² : 곡선 (x, y)", 12.5, INK, "middle", True),
-    line(280, 40, 280, 180, GRAY, 1, "3 3"),
-    axes3d(360, 150, 70), path("M330 108 C 380 40, 470 50, 500 98 C 470 128, 380 138, 330 108 Z", RED, 2.2, "rgba(224,49,49,.10)"),
-    text(430, 190, "★② R³ : 곡면 (x, y, z)", 12.5, INK, "middle", True),
-    cap="변수 개수가 도형의 차원을 정한다. 이 과목의 대상은 곡면(판서 ② 앞의 별표는 교수님 분필).")
+    step(1, axis(60, 160, 220, 160, "x", "y") + arrow(60, 160, 60, 40, INK, "", 1.5),
+        fplot(lambda x: 1.5 + 1.2 * math.sin(x), 0, 5.4, X1, Y1, color=RED, w=2.6), text(140, 190, "① R² : 곡선 (x, y)", 12.5, INK, "middle", True)),
+    step(2, line(280, 40, 280, 180, GRAY, 1, "3 3"),
+        axes3d(360, 150, 70), path("M330 108 C 380 40, 470 50, 500 98 C 470 128, 380 138, 330 108 Z", RED, 2.2, "rgba(224,49,49,.10)"),
+        text(430, 190, "★② R³ : 곡면 (x, y, z)", 12.5, INK, "middle", True)),
+    cap="변수 개수가 도형의 차원을 정한다. 이 과목의 대상은 곡면(판서 ② 앞의 별표는 교수님 분필).", name="cs")
 
 fig_step = canvas(560, 120,
-    fbox(14, 24, 160, 54, "① 바닥에 찍기", BLUE, sub="xy 평면에 (x₁, y₁, 0)", size=13.5), arrow(176, 51, 206, 51, GREEN, "", 2),
-    fbox(210, 24, 160, 54, "② 올리기", PINK, sub="z₁ 만큼 수직으로(음수면 아래)", size=13.5), arrow(372, 51, 402, 51, GREEN, "", 2),
-    fbox(406, 24, 144, 54, "③ 점선 직사각형", GRAY, sub="투영 관계가 보이게", size=13),
-    text(280, 106, "곡면(평면·원기둥·구)도 같은 순서 — 바닥 그림 먼저, 그다음 높이", 12, INK, "middle"),
-    cap="3차원 점 찍기 3단계. 9/15 곡면 그리기의 기본 동작.")
+    step(1, fbox(14, 24, 160, 54, "① 바닥에 찍기", BLUE, sub="xy 평면에 (x₁, y₁, 0)", size=13.5)),
+    step(2, arrow(176, 51, 206, 51, GREEN, "", 2),
+        fbox(210, 24, 160, 54, "② 올리기", PINK, sub="z₁ 만큼 수직으로(음수면 아래)", size=13.5)),
+    step(3, arrow(372, 51, 402, 51, GREEN, "", 2),
+        fbox(406, 24, 144, 54, "③ 점선 직사각형", GRAY, sub="투영 관계가 보이게", size=13),
+        text(280, 106, "곡면(평면·원기둥·구)도 같은 순서 — 바닥 그림 먼저, 그다음 높이", 12, INK, "middle")),
+    cap="3차원 점 찍기 3단계. 9/15 곡면 그리기의 기본 동작.", name="step")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미분적분학2 · 9/10 12.1 3차원 좌표계 도입</title></head><body>
 <header>

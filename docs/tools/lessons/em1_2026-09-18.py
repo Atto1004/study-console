@@ -6,12 +6,15 @@ from figs import *
 OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\공업수학1\_수업노트\2026-09-18.html"
 
 fig_red = canvas(560, 140,
-    fbox(14, 26, 118, 56, "y₁ = x", INK, sub="p = −1/(x−1)", size=14), arrow(134, 54, 166, 54, GREEN, "", 2),
-    fbox(170, 26, 150, 56, "U = (1/y₁²)e^(−∫p dx)", BLUE, sub="= (x−1)/x² = 1/x − 1/x²", size=13), arrow(322, 54, 354, 54, GREEN, "", 2),
-    fbox(358, 26, 90, 56, "u = ∫U dx", BLUE, sub="ln|x| + 1/x", size=13), arrow(450, 54, 482, 54, GREEN, "", 2),
-    fbox(486, 26, 64, 56, "y₂", RED, sub="x ln|x| + 1", size=15),
-    text(280, 120, "기저 {x, x ln|x| + 1} → 일반해 y = c₁x + c₂(x ln|x| + 1)", 12.5, INK, "middle", True),
-    cap="2.1 Ex.7 마무리 — 9/16 에 설정한 예제 1 의 계산.")
+    step(1, fbox(14, 26, 118, 56, "y₁ = x", INK, sub="p = −1/(x−1)", size=14)),
+    step(2, arrow(134, 54, 166, 54, GREEN, "", 2),
+        fbox(170, 26, 150, 56, "U = (1/y₁²)e^(−∫p dx)", BLUE, sub="= (x−1)/x² = 1/x − 1/x²", size=13)),
+    step(3, arrow(322, 54, 354, 54, GREEN, "", 2),
+        fbox(358, 26, 90, 56, "u = ∫U dx", BLUE, sub="ln|x| + 1/x", size=13)),
+    step(4, arrow(450, 54, 482, 54, GREEN, "", 2),
+        fbox(486, 26, 64, 56, "y₂", RED, sub="x ln|x| + 1", size=15),
+        text(280, 120, "기저 {x, x ln|x| + 1} → 일반해 y = c₁x + c₂(x ln|x| + 1)", 12.5, INK, "middle", True)),
+    cap="2.1 Ex.7 마무리 — 9/16 에 설정한 예제 1 의 계산.", name="red")
 
 X1 = lambda x: 40 + x * 26; Y1 = lambda y: 150 - y * 18
 def panel(ox, title, fn, x0, x1, ylim, color, sub):
@@ -19,39 +22,43 @@ def panel(ox, title, fn, x0, x1, ylim, color, sub):
     return (line(ox + 10, 150, ox + 160, 150, GRAY, 1) + line(X(0) if x0 <= 0 <= x1 else ox + 10, 50, X(0) if x0 <= 0 <= x1 else ox + 10, 150, GRAY, 1) +
             fplot(fn, x0, x1, X, Y, color=color, w=2.4, ylim=ylim) + text(ox + 85, 36, title, 12.5, INK, "middle", True) + text(ox + 85, 172, sub, 11.5, GRAY, "middle"))
 fig_cases = canvas(560, 185,
-    panel(10, "I  서로 다른 실근", lambda x: math.exp(x) + 3 * math.exp(-2 * x), 0, 2.2, (0, 8), RED, "y = eˣ + 3e⁻²ˣ (Ex.2)"),
-    panel(195, "II  중근 (x 가 붙는다)", lambda x: (3 - 2 * x) * math.exp(-0.5 * x), 0, 8, (-1.2, 3.2), BLUE, "y = (3 − 2x)e^(−0.5x) (Ex.4)"),
-    panel(380, "III  복소근 (진동)", lambda x: math.exp(-0.2 * x) * math.sin(3 * x), 0, 10, (-1, 1), GREEN, "y = e^(−0.2x) sin 3x (Ex.5)"),
-    cap="특성방정식의 근이 세 가지 → 해의 모양이 세 가지. 감쇠 진동 시스템(2.4)의 과감쇠·임계·저감쇠가 바로 이 셋.")
+    step(1, panel(10, "I  서로 다른 실근", lambda x: math.exp(x) + 3 * math.exp(-2 * x), 0, 2.2, (0, 8), RED, "y = eˣ + 3e⁻²ˣ (Ex.2)")),
+    step(2, panel(195, "II  중근 (x 가 붙는다)", lambda x: (3 - 2 * x) * math.exp(-0.5 * x), 0, 8, (-1.2, 3.2), BLUE, "y = (3 − 2x)e^(−0.5x) (Ex.4)")),
+    step(3, panel(380, "III  복소근 (진동)", lambda x: math.exp(-0.2 * x) * math.sin(3 * x), 0, 10, (-1, 1), GREEN, "y = e^(−0.2x) sin 3x (Ex.5)")),
+    cap="특성방정식의 근이 세 가지 → 해의 모양이 세 가지. 감쇠 진동 시스템(2.4)의 과감쇠·임계·저감쇠가 바로 이 셋.", name="cases")
 
 _A = 1.0
 _px, _py = 120 + 70 * math.cos(_A), 100 - 70 * math.sin(_A)
 fig_euler = canvas(560, 190,
-    circle(120, 100, 70, INK, w=1.6), line(40, 100, 200, 100, GRAY, 1), line(120, 20, 120, 180, GRAY, 1),
-    arrow(120, 100, _px, _py, RED, "", 2.4), dot(_px, _py, "", 5, RED),
-    line(_px, 100, _px, _py, GREEN, 1.4, "4 3"), text(172, 46, "sin t", 11.5, GREEN, "start"),
-    text(139, 114, "cos t", 11.5, BLUE, "middle"), arc(120, 100, 26, -57, 0, GRAY, 1.2, "t", 36),
-    text(_px + 6, _py - 14, "e^(it)", 13, RED, "start", True),
-    text(390, 60, "e^(it) = cos t + i sin t", 16, INK, "middle", True),
-    text(390, 90, "e^((p ± iq)x) = e^(px)(cos qx ± i sin qx)", 13, INK, "middle"),
-    text(390, 118, "실수 해 둘: e^(px)cos qx,  e^(px)sin qx", 13, GREEN, "middle", True),
-    text(390, 148, "(합과 차를 2, 2i 로 나눠 — 중첩 원리)", 12, GRAY, "middle"),
-    cap="오일러 공식: 복소 지수는 단위원 위의 회전. 그래서 복소근이면 해가 진동(cos·sin)한다.")
+    step(1, circle(120, 100, 70, INK, w=1.6), line(40, 100, 200, 100, GRAY, 1), line(120, 20, 120, 180, GRAY, 1)),
+    step(2, arrow(120, 100, _px, _py, RED, "", 2.4), dot(_px, _py, "", 5, RED),
+        arc(120, 100, 26, -57, 0, GRAY, 1.2, "t", 36),
+        text(_px + 6, _py - 14, "e^(it)", 13, RED, "start", True)),
+    step(3, line(_px, 100, _px, _py, GREEN, 1.4, "4 3"), text(172, 46, "sin t", 11.5, GREEN, "start"),
+        text(139, 114, "cos t", 11.5, BLUE, "middle"),
+        text(390, 60, "e^(it) = cos t + i sin t", 16, INK, "middle", True)),
+    step(4, text(390, 90, "e^((p ± iq)x) = e^(px)(cos qx ± i sin qx)", 13, INK, "middle"),
+        text(390, 118, "실수 해 둘: e^(px)cos qx,  e^(px)sin qx", 13, GREEN, "middle", True),
+        text(390, 148, "(합과 차를 2, 2i 로 나눠 — 중첩 원리)", 12, GRAY, "middle")),
+    cap="오일러 공식: 복소 지수는 단위원 위의 회전. 그래서 복소근이면 해가 진동(cos·sin)한다.", name="euler")
 
 fig_D = canvas(560, 130,
-    fbox(14, 30, 70, 50, "y", INK, size=16), arrow(86, 55, 116, 55, GREEN, "", 2), fbox(120, 30, 70, 50, "D", BLUE, sub="d/dx", size=16), arrow(192, 55, 222, 55, GREEN, "", 2), fbox(226, 30, 70, 50, "y′", INK, size=16),
-    text(430, 44, "y″ − 3y′ − 40y = 0", 13.5, INK, "middle"), text(430, 66, "(D² − 3D − 40)y = (D − 8)(D + 5)y = 0", 12.5, INK, "middle", True),
-    text(430, 92, "→ y = c₁e^(8x) + c₂e^(−5x)", 14, RED, "middle", True),
-    text(280, 116, "연산자 = 함수를 다른 함수로 바꾸는 변환. P(D) 의 인수분해 = 특성근", 12, GRAY, "middle"),
-    cap="2.3 미분연산자 D. 새 내용이 아니라 2.2 를 기호로 다시 쓴 것(과제 2.3 #8 유형).")
+    step(1, fbox(14, 30, 70, 50, "y", INK, size=16), arrow(86, 55, 116, 55, GREEN, "", 2), fbox(120, 30, 70, 50, "D", BLUE, sub="d/dx", size=16), arrow(192, 55, 222, 55, GREEN, "", 2), fbox(226, 30, 70, 50, "y′", INK, size=16)),
+    step(2, text(430, 44, "y″ − 3y′ − 40y = 0", 13.5, INK, "middle"), text(430, 66, "(D² − 3D − 40)y = (D − 8)(D + 5)y = 0", 12.5, INK, "middle", True)),
+    step(3, text(430, 92, "→ y = c₁e^(8x) + c₂e^(−5x)", 14, RED, "middle", True),
+        text(280, 116, "연산자 = 함수를 다른 함수로 바꾸는 변환. P(D) 의 인수분해 = 특성근", 12, GRAY, "middle")),
+    cap="2.3 미분연산자 D. 새 내용이 아니라 2.2 를 기호로 다시 쓴 것(과제 2.3 #8 유형).", name="D")
 
 fig_steps = canvas(560, 120,
-    fbox(14, 24, 118, 54, "① 특성방정식", INK, sub="λ² + aλ + b = 0", size=13), arrow(134, 51, 160, 51, GREEN, "", 1.8),
-    fbox(164, 24, 110, 54, "② 경우 판별", BLUE, sub="a² − 4b 의 부호", size=13), arrow(276, 51, 302, 51, GREEN, "", 1.8),
-    fbox(306, 24, 110, 54, "③ 일반해", BLUE, sub="표에서 꼴 선택", size=13), arrow(418, 51, 444, 51, GREEN, "", 1.8),
-    fbox(448, 24, 100, 54, "④ c₁, c₂", RED, sub="y(0), y′(0)", size=13),
-    text(280, 106, "y′(0) 조건은 y′ 을 먼저 정리해 두고 대입 — Case II·III 에서 곱의 미분 주의", 12, GRAY, "middle"),
-    cap="초기값 문제 수순. Ex.2·4·5 가 세 경우를 하나씩 보여 준다.")
+    step(1, fbox(14, 24, 118, 54, "① 특성방정식", INK, sub="λ² + aλ + b = 0", size=13)),
+    step(2, arrow(134, 51, 160, 51, GREEN, "", 1.8),
+        fbox(164, 24, 110, 54, "② 경우 판별", BLUE, sub="a² − 4b 의 부호", size=13)),
+    step(3, arrow(276, 51, 302, 51, GREEN, "", 1.8),
+        fbox(306, 24, 110, 54, "③ 일반해", BLUE, sub="표에서 꼴 선택", size=13)),
+    step(4, arrow(418, 51, 444, 51, GREEN, "", 1.8),
+        fbox(448, 24, 100, 54, "④ c₁, c₂", RED, sub="y(0), y′(0)", size=13),
+        text(280, 106, "y′(0) 조건은 y′ 을 먼저 정리해 두고 대입 — Case II·III 에서 곱의 미분 주의", 12, GRAY, "middle")),
+    cap="초기값 문제 수순. Ex.2·4·5 가 세 경우를 하나씩 보여 준다.", name="steps")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공업수학1 · 9/18 차수축소 마무리 · 2.2 상수계수 제차 · 2.3 미분연산자</title></head><body>
 <header>

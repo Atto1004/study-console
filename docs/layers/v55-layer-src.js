@@ -116,8 +116,8 @@
     var pct=judged?Math.round(done/judged*100):0;
     var units=V55.units(c), uk=(cur&&cur.st!=="future")?V55.unitOf(c,cur,units):-1, unitChip=uk>=0?'<span class="chip v55-uchip" style="--uc:'+V55.ucOf(uk)+'">단원 '+(units[uk].n||uk+1)+' · '+esc(V55.shortT(units[uk].title))+'</span>':'';
     return '<div class="v55-hero t-'+esc(c.typeA||"NONE")+'"'+(V55.coverOf(c)?' style="--cover:url('+V55.coverOf(c)+')"':'')+'><div class="v55-hl">'+
-      '<div class="v55-title"><h1>'+(c.isRetake?'<span class="v55-re">(재)</span>':'')+esc(c.name)+' <small>'+c.credits+'학점</small></h1><div class="v55-meta">'+unitChip+(c.prof?'<span class="chip mut">'+esc(c.prof)+' 교수님</span>':'')+(days?'<span class="chip acc">'+esc(days)+'</span>':'')+
-        '<span class="chip mut">출석 '+(a.n.present||0)+' · 지각 '+(a.lateN||0)+' · 결석 '+(a.n.absent||0)+'</span>'+(c.status==="pending"?'<span class="chip warn">증원 대기</span>':'')+'</div></div>'+
+      '<div class="v55-title">'+(V55.coverOf(c)?'<img class="v55-cov" src="'+V55.coverOf(c)+'" alt="" decoding="async" onerror="this.remove()">':'')+'<div class="v55-tt"><h1>'+(c.isRetake?'<span class="v55-re">(재)</span>':'')+esc(c.name)+' <small>'+c.credits+'학점</small></h1><div class="v55-meta">'+unitChip+(c.prof?'<span class="chip mut">'+esc(c.prof)+' 교수님</span>':'')+(days?'<span class="chip acc">'+esc(days)+'</span>':'')+
+        '<span class="chip mut">출석 '+(a.n.present||0)+' · 지각 '+(a.lateN||0)+' · 결석 '+(a.n.absent||0)+'</span>'+(c.status==="pending"?'<span class="chip warn">증원 대기</span>':'')+'</div></div></div>'+
       '<div class="v55-stats"><div><b class="v55-ok">'+done+'<small>/'+judged+'</small></b><span>따라감</span></div><div><b class="'+(todo?"v55-crit":"")+'">'+todo+'</b><span>밀림</span></div><div><b class="v55-xp">'+xp+'</b><span>이 과목 XP</span></div>'+(ex?'<div><b class="'+(dd!=null&&dd<=14?"v55-crit":"")+'">D-'+dd+'</b><span>'+esc(ex.kind||"시험")+' '+esc(md(ex.date))+'</span></div>':'')+'</div>'+
       '<div class="v55-bar" title="따라감 '+done+'/'+judged+'"><i style="width:'+pct+'%"></i></div>'+
       '<div class="v55-act">'+cta+'<span class="v55-actsp"></span></div></div>'+
@@ -179,7 +179,7 @@
     V55.tutorImg().then(function(raster){
       if(raster){ $$(".v55-tutor",v).forEach(function(el){ if(el.querySelector("img,svg")) return; var f=el.getAttribute("data-face")||"neutral", p=el.getAttribute("data-pose");
           /* 히어로는 전신 포즈(pose-point · 완료면 pose-cross), 경로 마디는 표정 흉상. 포즈 파일이 없으면 흉상으로 */
-          if(p){ el.classList.add("pose"); el.innerHTML='<img src="'+V55.TUTOR_IMG+'pose-'+(p==="cross"?"cross":"point")+'.png" alt="" decoding="async" draggable="false">'; el.querySelector("img").onerror=function(){ el.classList.remove("pose"); el.innerHTML='<img src="'+V55.faceSrc(f)+'" alt="" decoding="async" draggable="false">'; }; }
+          if(p){ el.classList.add("pose"); el.innerHTML='<img src="'+V55.TUTOR_IMG+'pose-'+(p==="cross"?"cross":"point")+'.png" alt="" decoding="async" draggable="false"><img class="v55-fc" src="'+V55.faceSrc(f)+'" alt="" decoding="async" draggable="false">'; el.querySelector("img").onerror=function(){ el.classList.remove("pose"); el.innerHTML='<img src="'+V55.faceSrc(f)+'" alt="" decoding="async" draggable="false">'; }; }
           else el.innerHTML='<img src="'+V55.faceSrc(f)+'" alt="" decoding="async" draggable="false">'; }); return; }
       V55.tutor().then(function(svg){ if(!svg) return; $$(".v55-tutor",v).forEach(function(el){ if(el.querySelector("img,svg")) return; el.innerHTML=svg; var s=el.querySelector("svg"); if(s){ s.setAttribute("data-face",el.getAttribute("data-face")||"neutral"); s.removeAttribute("id"); } }); });
     });
@@ -240,9 +240,9 @@
     ".v55-hr{flex:0 0 200px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;min-width:0}",
     ".v55-bubble{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:9px 12px;font-size:13px;font-weight:700;line-height:1.45;width:100%;text-align:center}",
     ".v55-bubble::after{content:\"\";position:absolute;left:50%;bottom:-9px;margin-left:-6px;border:6px solid transparent;border-top-color:var(--line);border-bottom:0}",
-    ".v55-tutor{width:120px;height:140px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.14))}.v55-tutor svg{width:100%;height:100%;display:block;overflow:visible}.v55-tutor img{width:100%;height:100%;display:block;object-fit:contain;object-position:center bottom;-webkit-user-select:none;user-select:none}.v55-tutor.big{width:150px;height:176px}.v55-tutor.big.pose{width:140px;height:250px}",
+    ".v55-tutor .v55-fc{display:none}.v55-tutor{width:120px;height:140px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.14))}.v55-tutor svg{width:100%;height:100%;display:block;overflow:visible}.v55-tutor img{width:100%;height:100%;display:block;object-fit:contain;object-position:center bottom;-webkit-user-select:none;user-select:none}.v55-tutor.big{width:150px;height:176px}.v55-tutor.big.pose{width:140px;height:250px}",
     /* 과목 표지(힉스필드 2026-09-28): 히어로 오른쪽에 연하게 깔고, 책장 과목 행 칩은 표지 썸네일로 */
-    ".v55-hero{position:relative;overflow:hidden}.v55-hero::before{content:\"\";position:absolute;inset:0;background:var(--cover) center right/cover no-repeat;opacity:.14;pointer-events:none;-webkit-mask-image:linear-gradient(to right,transparent 42%,#000 78%);mask-image:linear-gradient(to right,transparent 42%,#000 78%)}.v55-hero>*{position:relative}",
+    ".v55-hero{position:relative;overflow:hidden}.v55-hero>*{position:relative}.v55-title{display:flex;align-items:center;gap:14px}.v55-tt{min-width:0}.v55-cov{flex:0 0 58px;width:58px;height:78px;object-fit:cover;border-radius:8px;border:1px solid var(--line);box-shadow:0 6px 14px rgba(15,27,51,.14);background:#F2F2F7}",   /* 표지는 번진 배경 대신 선명한 책 썸네일로(오타 디자인 1차 R7, 2026-09-28) */
     ".crow-chip.cover{padding:0;overflow:hidden;background:#F2F2F7;border-radius:6px}.crow-chip.cover img{width:100%;height:100%;display:block;object-fit:cover}",
     /* 글꼴: 본문 Gowun Dodum · 제목 Gothic A1 800 · 숫자 Inter (V54 의 Pretendard 토큰을 덮는다) */
     "html.v54{--font-body:\"Gowun Dodum\",\"Pretendard Variable\",Pretendard,-apple-system,BlinkMacSystemFont,\"Apple SD Gothic Neo\",\"Malgun Gothic\",sans-serif;--font-num:Inter,\"Pretendard Variable\",Pretendard,-apple-system,system-ui,sans-serif;--font-head:\"Gothic A1\",\"Gowun Dodum\",Pretendard,sans-serif}",
@@ -294,8 +294,12 @@
     ".v55-scope{margin-top:10px;background:var(--surface);border:2px solid #F1E3A8;border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.5;max-width:520px;text-align:left}.v55-scope b{display:block;margin-bottom:4px}",
     /* 회차 표 접기 */
     ".v55-table.v55-fold .card-b{display:none}",
-    "@media(max-width:640px){.v55-hero{flex-direction:column;padding:14px 14px 12px;gap:12px}.v55-hr{flex:0 0 auto;flex-direction:row;align-items:flex-end;gap:8px}.v55-bubble{flex:1}.v55-bubble::after{left:auto;right:-9px;bottom:14px;margin:0;border:6px solid transparent;border-left-color:var(--line);border-right:0}.v55-tutor.big{width:96px;height:112px;flex:0 0 96px}",
+    "@media(max-width:640px){.v55-cov{flex-basis:44px;width:44px;height:60px}.v55-title{gap:10px}.v55-hero{flex-direction:column;padding:14px 14px 12px;gap:12px}.v55-hr{flex:0 0 auto;flex-direction:row;align-items:flex-end;gap:8px}.v55-bubble{flex:1}.v55-bubble::after{left:auto;right:-9px;bottom:14px;margin:0;border:6px solid transparent;border-left-color:var(--line);border-right:0}.v55-tutor.big{width:96px;height:112px;flex:0 0 96px}.v55-hr .v55-tutor.big.pose{width:56px;height:56px;flex:0 0 56px;filter:none}.v55-hr .v55-tutor.big.pose img{display:none}.v55-hr .v55-tutor.big.pose img.v55-fc{display:block;width:56px;height:56px;border-radius:50%;object-fit:cover;object-position:50% 12%;background:var(--surface-2,#EEF2F5);border:2px solid var(--line)}.v55-hr{align-items:center}.v55-bubble::after{bottom:auto;top:50%;margin-top:-6px}",
     ".v55-unit{padding:10px 12px 8px}.v55-ut{font-size:13.5px}.v55-up{font-size:13px}.v55-fut .v55-node{width:96px}",
-    ".v55-node{width:190px;transform:translateX(calc(var(--dx,0) * .55))}.v55-node .v55-tutor{width:84px;height:98px;top:-28px}.v55-node .v55-tutor.r{left:calc(50% + 48px)}.v55-node .v55-tutor.l{right:calc(50% + 48px)}.v55-lbl{max-width:180px;font-size:12px}.v55-stats b{font-size:20px}}"
+    ".v55-node{width:190px;transform:translateX(calc(var(--dx,0) * .55))}.v55-node .v55-tutor{width:84px;height:98px;top:-28px}.v55-node .v55-tutor.r{left:calc(50% + 48px)}.v55-node .v55-tutor.l{right:calc(50% + 48px)}.v55-lbl{max-width:180px;font-size:12px}.v55-stats b{font-size:20px}}",
+    /* 조작 규격(오타 디자인 2차 R7): 오늘·학습 로비·과목의 행동 버튼 = 높이 44px 이상 · 모서리 12px (로비 미션 .ow-cta · 교실 조작 줄 .cbt 와 같은 규격) */
+    "button.btn[data-v50open]{min-height:44px;border-radius:12px;padding:0 14px;font-size:14px;line-height:1.2}.v55-act .btn{min-height:44px;border-radius:12px}",
+    /* 누르는 자리 44px: 오늘·학습·과목 화면의 버튼은 실제 높이 44px 이상(글자 세로 가운데). 투명 ::before 로 넓히는 방식은 .btn 의 overflow:hidden(말줄임표)에 잘려 소용없었다 */
+    ":is(#v-today,#v-study,#v-course) button{min-height:44px;align-items:center}"
   ].join("\n"); document.head.appendChild(css);
 })();

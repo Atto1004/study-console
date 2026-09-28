@@ -6,48 +6,48 @@ from figs import *
 OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\미분적분학2\_수업노트\2026-09-17.html"
 
 fig_ab = canvas(560, 200,
-    dot(80, 160, "", 5, INK), text(64, 178, "O", 13, INK, "middle", True),
-    dot(220, 60, "", 5, PINK), text(196, 44, "A(x₁, y₁, z₁)", 12, PINK, "middle"), dot(420, 120, "", 5, PINK), text(430, 116, "B(x₂, y₂, z₂)", 12, PINK),
-    arrow(86, 156, 214, 64, YEL, "", 2.6), text(130, 100, "OA⃗", 13, "#B26A00", "middle", True), arrow(86, 158, 414, 121, YEL, "", 2.6), text(250, 152, "OB⃗", 13, "#B26A00", "middle", True),
-    arrow(226, 62, 414, 118, GREEN, "", 3), text(330, 60, "AB⃗ = OB⃗ − OA⃗", 14, GREEN, "middle", True),
-    text(330, 184, "= (x₂−x₁, y₂−y₁, z₂−z₁)   「끝점 − 시작점」 — 거리 공식에서 루트만 안 씌운 것", 12, INK, "middle"),
-    cap="원점이 없는 두 점 벡터를 위치벡터로 환원(판서 ①). BA 로 읽으면 안 된다 — 확 바뀐다.")
+    step(1, dot(80, 160, "", 5, INK), text(64, 178, "O", 13, INK, "middle", True),
+        dot(220, 60, "", 5, PINK), text(196, 44, "A(x₁, y₁, z₁)", 12, PINK, "middle"), dot(420, 120, "", 5, PINK), text(430, 116, "B(x₂, y₂, z₂)", 12, PINK)),
+    step(2, arrow(86, 156, 214, 64, YEL, "", 2.6), text(130, 100, "OA⃗", 13, "#B26A00", "middle", True), arrow(86, 158, 414, 121, YEL, "", 2.6), text(250, 152, "OB⃗", 13, "#B26A00", "middle", True)),
+    step(3, arrow(226, 62, 414, 118, GREEN, "", 3), text(330, 60, "AB⃗ = OB⃗ − OA⃗", 14, GREEN, "middle", True),
+        text(330, 184, "= (x₂−x₁, y₂−y₁, z₂−z₁)   「끝점 − 시작점」 — 거리 공식에서 루트만 안 씌운 것", 12, INK, "middle")),
+    cap="원점이 없는 두 점 벡터를 위치벡터로 환원(판서 ①). BA 로 읽으면 안 된다 — 확 바뀐다.", name="ab")
 
 fig_mag = canvas(560, 190,
-    axes3d(150, 150, 85), arrow(150, 150, *p3(150, 150, 50, 90, 70), GREEN, "", 3), dot(*p3(150, 150, 50, 90, 70), "", 5, PINK),
-    line(*p3(150, 150, 50, 90, 0), *p3(150, 150, 50, 90, 70), GRAY, 1, "4 3"), line(*p3(150, 150, 50, 0, 0), *p3(150, 150, 50, 90, 0), GRAY, 1, "4 3"), line(*p3(150, 150, 0, 90, 0), *p3(150, 150, 50, 90, 0), GRAY, 1, "4 3"),
-    text(p3(150, 150, 50, 90, 70)[0] + 8, p3(150, 150, 50, 90, 70)[1] - 4, "(a₁, a₂, a₃)", 12, PINK),
-    text(400, 60, "|a⃗| = √(a₁² + a₂² + a₃²)", 15, INK, "middle", True), text(400, 86, "= 원점에서 끝점까지 거리", 12.5, GRAY, "middle"),
-    text(400, 116, "읽기: 「a 벡터의 크기」", 12.5, INK, "middle"), text(400, 140, "성분 → 크기는 성분 제곱합의 제곱근", 12, GRAY, "middle"),
-    cap="벡터의 크기(magnitude) = 직육면체의 대각선 = 거리 공식(판서 ②).")
+    step(1, axes3d(150, 150, 85), arrow(150, 150, *p3(150, 150, 50, 90, 70), GREEN, "", 3), dot(*p3(150, 150, 50, 90, 70), "", 5, PINK),
+        text(p3(150, 150, 50, 90, 70)[0] + 8, p3(150, 150, 50, 90, 70)[1] - 4, "(a₁, a₂, a₃)", 12, PINK)),
+    step(2, line(*p3(150, 150, 50, 90, 0), *p3(150, 150, 50, 90, 70), GRAY, 1, "4 3"), line(*p3(150, 150, 50, 0, 0), *p3(150, 150, 50, 90, 0), GRAY, 1, "4 3"), line(*p3(150, 150, 0, 90, 0), *p3(150, 150, 50, 90, 0), GRAY, 1, "4 3")),
+    step(3, text(400, 60, "|a⃗| = √(a₁² + a₂² + a₃²)", 15, INK, "middle", True), text(400, 86, "= 원점에서 끝점까지 거리", 12.5, GRAY, "middle"),
+        text(400, 116, "읽기: 「a 벡터의 크기」", 12.5, INK, "middle"), text(400, 140, "성분 → 크기는 성분 제곱합의 제곱근", 12, GRAY, "middle")),
+    cap="벡터의 크기(magnitude) = 직육면체의 대각선 = 거리 공식(판서 ②).", name="mag")
 
 fig_ijk = canvas(560, 200,
-    axes3d(150, 150, 90), arrow(150, 150, *p3(150, 150, 0, 40, 0), RED, "", 3.4), text(p3(150, 150, 0, 40, 0)[0] + 2, p3(150, 150, 0, 40, 0)[1] + 18, "j⃗", 14, RED, "middle", True),
-    arrow(150, 150, *p3(150, 150, 0, 0, 40), RED, "", 3.4), text(p3(150, 150, 0, 0, 40)[0] - 12, p3(150, 150, 0, 0, 40)[1] + 4, "k⃗", 14, RED, "end", True),
-    arrow(150, 150, *p3(150, 150, 40, 0, 0), RED, "", 3.4), text(p3(150, 150, 40, 0, 0)[0] - 14, p3(150, 150, 40, 0, 0)[1] + 4, "i⃗", 14, RED, "end", True),
-    text(400, 46, "i⃗ = (1,0,0),  j⃗ = (0,1,0),  k⃗ = (0,0,1)", 13, INK, "middle", True),
-    text(400, 76, "a⃗ = (a₁, a₂, a₃) = (a₁,0,0) + (0,a₂,0) + (0,0,a₃)", 12, INK, "middle"), text(400, 98, "= a₁(1,0,0) + a₂(0,1,0) + a₃(0,0,1)", 12, INK, "middle"),
-    text(400, 126, "= a₁ i⃗ + a₂ j⃗ + a₃ k⃗", 15, RED, "middle", True),
-    text(400, 160, "★ 「시험 문제와 연관되는 건 여기부터」", 12.5, GRAY, "middle"),
-    cap="표준기저벡터(standard basis vector): 각 축에서 크기 1 인 점. i, j, k 앞의 값이 곧 성분 — 두 표기를 자유롭게 오간다.")
+    step(1, axes3d(150, 150, 90), arrow(150, 150, *p3(150, 150, 0, 40, 0), RED, "", 3.4), text(p3(150, 150, 0, 40, 0)[0] + 2, p3(150, 150, 0, 40, 0)[1] + 18, "j⃗", 14, RED, "middle", True),
+        arrow(150, 150, *p3(150, 150, 0, 0, 40), RED, "", 3.4), text(p3(150, 150, 0, 0, 40)[0] - 12, p3(150, 150, 0, 0, 40)[1] + 4, "k⃗", 14, RED, "end", True),
+        arrow(150, 150, *p3(150, 150, 40, 0, 0), RED, "", 3.4), text(p3(150, 150, 40, 0, 0)[0] - 14, p3(150, 150, 40, 0, 0)[1] + 4, "i⃗", 14, RED, "end", True)),
+    step(2, text(400, 46, "i⃗ = (1,0,0),  j⃗ = (0,1,0),  k⃗ = (0,0,1)", 13, INK, "middle", True)),
+    step(3, text(400, 76, "a⃗ = (a₁, a₂, a₃) = (a₁,0,0) + (0,a₂,0) + (0,0,a₃)", 12, INK, "middle"), text(400, 98, "= a₁(1,0,0) + a₂(0,1,0) + a₃(0,0,1)", 12, INK, "middle")),
+    step(4, text(400, 126, "= a₁ i⃗ + a₂ j⃗ + a₃ k⃗", 15, RED, "middle", True),
+        text(400, 160, "★ 「시험 문제와 연관되는 건 여기부터」", 12.5, GRAY, "middle")),
+    cap="표준기저벡터(standard basis vector): 각 축에서 크기 1 인 점. i, j, k 앞의 값이 곧 성분 — 두 표기를 자유롭게 오간다.", name="ijk")
 
 fig_unit = canvas(560, 150,
-    dot(40, 110, "", 5, INK), text(30, 128, "O", 12, INK, "middle", True),
-    arrow(46, 107, 300, 40, BLUE, "", 3), text(232, 96, "a⃗ = 2i − j − 2k,  |a⃗| = 3", 13, BLUE, "middle", True),
-    arrow(46, 107, 130, 85, GREEN, "", 3.4), text(88, 130, "u⃗ = (1/|a|) a⃗", 13, GREEN, "middle", True), text(88, 146, "같은 방향, 원점에서 1/3 지점", 11, GRAY, "middle"),
-    text(430, 60, "★⑤ 단위벡터 = 크기 1", 14, INK, "middle", True), text(430, 84, "u⃗ = a⃗ / |a⃗| = ⅔i − ⅓j − ⅔k (Ex04)", 12.5, INK, "middle"),
-    text(430, 112, "「u 라고만 쓰면 일반 벡터 — (1/|a|)a 꼴로 써야」", 11.5, RED, "middle"),
-    cap="어떤 벡터든 자기 크기로 나누면 같은 방향의 단위벡터. i, j, k 도 단위벡터.")
+    step(1, dot(40, 110, "", 5, INK), text(30, 128, "O", 12, INK, "middle", True),
+        arrow(46, 107, 300, 40, BLUE, "", 3), text(232, 96, "a⃗ = 2i − j − 2k,  |a⃗| = 3", 13, BLUE, "middle", True)),
+    step(2, arrow(46, 107, 130, 85, GREEN, "", 3.4), text(88, 130, "u⃗ = (1/|a|) a⃗", 13, GREEN, "middle", True), text(88, 146, "같은 방향, 원점에서 1/3 지점", 11, GRAY, "middle")),
+    step(3, text(430, 60, "★⑤ 단위벡터 = 크기 1", 14, INK, "middle", True), text(430, 84, "u⃗ = a⃗ / |a⃗| = ⅔i − ⅓j − ⅔k (Ex04)", 12.5, INK, "middle"),
+        text(430, 112, "「u 라고만 쓰면 일반 벡터 — (1/|a|)a 꼴로 써야」", 11.5, RED, "middle")),
+    cap="어떤 벡터든 자기 크기로 나누면 같은 방향의 단위벡터. i, j, k 도 단위벡터.", name="unit")
 
 fig_dot = canvas(560, 230,
-    dot(70, 170, "", 5, INK), text(56, 188, "O", 13, INK, "middle", True),
-    dot(260, 60, "", 5, PINK), text(260, 46, "A", 13, PINK, "middle"), dot(390, 150, "", 5, PINK), text(402, 156, "B", 13, PINK),
-    arrow(76, 166, 254, 64, BLUE, "", 3), text(128, 96, "a⃗ = OA⃗", 13, BLUE, "middle", True), arrow(76, 168, 384, 151, RED, "", 3), text(230, 182, "b⃗ = OB⃗", 13, RED, "middle", True),
-    arrow(384, 146, 266, 66, GREEN, "", 2.6), text(346, 74, "BA⃗ = a⃗ − b⃗", 13, GREEN, "middle", True),
-    arc(70, 170, 44, -30, -3, GRAY, 1.5, "θ", 54),
-    text(445, 34, "[Def 01] a⃗·b⃗ = a₁b₁ + a₂b₂ + a₃b₃", 12, INK, "middle", True), text(445, 54, "결과는 실수(스칼라) → scalar product", 11.5, GRAY, "middle"),
-    text(445, 190, "[Thm 01] a⃗·b⃗ = |a⃗||b⃗| cos θ", 12, INK, "middle", True), text(445, 210, "삼각형 OAB, 일각삼변 → 코사인 제2법칙", 11.5, GRAY, "middle"),
-    cap="12.3 내적 도입. 점은 진하게(× 금지), 순서 무관. 증명(코사인 법칙)은 9/22.")
+    step(1, text(445, 34, "[Def 01] a⃗·b⃗ = a₁b₁ + a₂b₂ + a₃b₃", 12, INK, "middle", True), text(445, 54, "결과는 실수(스칼라) → scalar product", 11.5, GRAY, "middle")),
+    step(2, dot(70, 170, "", 5, INK), text(56, 188, "O", 13, INK, "middle", True),
+        dot(260, 60, "", 5, PINK), text(260, 46, "A", 13, PINK, "middle"), dot(390, 150, "", 5, PINK), text(402, 156, "B", 13, PINK),
+        arrow(76, 166, 254, 64, BLUE, "", 3), text(128, 96, "a⃗ = OA⃗", 13, BLUE, "middle", True), arrow(76, 168, 384, 151, RED, "", 3), text(230, 182, "b⃗ = OB⃗", 13, RED, "middle", True),
+        arc(70, 170, 44, -30, -3, GRAY, 1.5, "θ", 54)),
+    step(3, arrow(384, 146, 266, 66, GREEN, "", 2.6), text(346, 74, "BA⃗ = a⃗ − b⃗", 13, GREEN, "middle", True)),
+    step(4, text(445, 190, "[Thm 01] a⃗·b⃗ = |a⃗||b⃗| cos θ", 12, INK, "middle", True), text(445, 210, "삼각형 OAB, 일각삼변 → 코사인 제2법칙", 11.5, GRAY, "middle")),
+    cap="12.3 내적 도입. 점은 진하게(× 금지), 순서 무관. 증명(코사인 법칙)은 9/22.", name="dot")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미분적분학2 · 9/17 벡터 계산 — 두 점 벡터 · 크기 · 표준기저 · 단위벡터 · 내적 도입</title></head><body>
 <header>

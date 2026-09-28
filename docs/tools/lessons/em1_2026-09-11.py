@@ -6,53 +6,58 @@ from figs import *
 OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\공업수학1\_수업노트\2026-09-11.html"
 
 fig_std = canvas(560, 180,
-    fbox(20, 30, 150, 54, "입력 r(x)", GREEN, sub="구동함수 · 힘 · 기전력", size=13.5), arrow(172, 57, 212, 57, INK, "", 2),
-    fbox(216, 22, 190, 70, "y′ + p(x)y = r(x)", INK, sub="계(system) — 표준형", size=15), arrow(408, 57, 448, 57, INK, "", 2),
-    fbox(452, 30, 98, 54, "출력 y", RED, sub="응답 · 변위 · 전류", size=13.5),
-    text(310, 120, "r(x) = 0 → 제차(homogeneous) · r(x) ≠ 0 → 비제차(nonhomogeneous)", 12.5, INK, "middle"),
-    text(310, 145, "y′ 에 계수가 붙어 있으면 먼저 나눠서 표준형으로", 12.5, RED, "middle", True),
-    cap="선형 1계 ODE 의 공학적 그림: 입력(r)을 넣으면 계(p)가 출력(y)을 내놓는다.")
+    step(1, fbox(216, 22, 190, 70, "y′ + p(x)y = r(x)", INK, sub="계(system) — 표준형", size=15)),
+    step(2, fbox(20, 30, 150, 54, "입력 r(x)", GREEN, sub="구동함수 · 힘 · 기전력", size=13.5), arrow(172, 57, 212, 57, INK, "", 2)),
+    step(3, arrow(408, 57, 448, 57, INK, "", 2),
+        fbox(452, 30, 98, 54, "출력 y", RED, sub="응답 · 변위 · 전류", size=13.5)),
+    step(4, text(310, 120, "r(x) = 0 → 제차(homogeneous) · r(x) ≠ 0 → 비제차(nonhomogeneous)", 12.5, INK, "middle"),
+        text(310, 145, "y′ 에 계수가 붙어 있으면 먼저 나눠서 표준형으로", 12.5, RED, "middle", True)),
+    cap="선형 1계 ODE 의 공학적 그림: 입력(r)을 넣으면 계(p)가 출력(y)을 내놓는다.", name="std")
 
 fig_formula = canvas(560, 150,
-    fbox(30, 40, 130, 60, "h = ∫p(x)dx", BLUE, size=15), arrow(162, 70, 202, 70, GREEN, "", 2.2),
-    fbox(206, 30, 324, 80, "y = e^(−h) [ ∫ e^h · r(x) dx + c ]", RED, sub="적분인자 F = e^h 를 곱해 완전미분형으로 만든 결과", size=16),
-    text(280, 136, "☆ 교수님이 네모로 묶고 별표 — 「이거 하고 이거는 기억을 하라」", 12.5, INK, "middle", True),
-    cap="1.5 절의 전부. p 와 r 만 읽어 내면 대입으로 끝난다.")
+    step(1, fbox(30, 40, 130, 60, "h = ∫p(x)dx", BLUE, size=15)),
+    step(2, arrow(162, 70, 202, 70, GREEN, "", 2.2),
+        fbox(206, 30, 324, 80, "y = e^(−h) [ ∫ e^h · r(x) dx + c ]", RED, sub="적분인자 F = e^h 를 곱해 완전미분형으로 만든 결과", size=16)),
+    step(3, text(280, 136, "☆ 교수님이 네모로 묶고 별표 — 「이거 하고 이거는 기억을 하라」", 12.5, INK, "middle", True)),
+    cap="1.5 절의 전부. p 와 r 만 읽어 내면 대입으로 끝난다.", name="formula")
 
 fig_flow = canvas(560, 250,
-    diamond(90, 50, 150, 52, "M dx + N dy = 0 ?", INK, 11.5), arrow(165, 50, 210, 50, GREEN, "예", 1.6, 0, -6),
-    diamond(300, 50, 160, 52, "∂M/∂y = ∂N/∂x ?", INK, 11.5), arrow(380, 50, 430, 50, GREEN, "예", 1.6, 0, -6), fbox(434, 32, 116, 36, "완전미방", GREEN, size=12.5),
-    arrow(300, 76, 300, 100, RED, "아니오", 1.6, 30, 0),
-    diamond(300, 126, 150, 48, "동차인가?", INK, 12), arrow(375, 126, 430, 126, GREEN, "예", 1.6, 0, -6), fbox(434, 108, 116, 36, "y/x = u 치환", GREEN, size=12.5),
-    arrow(300, 150, 300, 172, RED, "아니오", 1.6, 30, 0),
-    fbox(210, 174, 180, 40, "적분인자 F (시간 많이 걸림)", GRAY, size=12),
-    arrow(90, 76, 90, 170, RED, "아니오", 1.6, -32, 0), fbox(20, 174, 140, 40, "y′ + p y = r ?", RED, size=13), arrow(90, 216, 90, 236, GREEN, "", 1.6), text(90, 246, "★ 공식 한 방 (h 구하고 대입)", 12, RED, "middle", True),
-    cap="교수님의 판별 순서 — 「머릿속에 그림을 쫙 그려가면서. 플로차트를 그리는 건 어려운 게 아니에요.」")
+    step(1, diamond(90, 50, 150, 52, "M dx + N dy = 0 ?", INK, 11.5), arrow(165, 50, 210, 50, GREEN, "예", 1.6, 0, -6),
+        diamond(300, 50, 160, 52, "∂M/∂y = ∂N/∂x ?", INK, 11.5), arrow(380, 50, 430, 50, GREEN, "예", 1.6, 0, -6), fbox(434, 32, 116, 36, "완전미방", GREEN, size=12.5)),
+    step(2, arrow(300, 76, 300, 100, RED, "아니오", 1.6, 30, 0),
+        diamond(300, 126, 150, 48, "동차인가?", INK, 12), arrow(375, 126, 430, 126, GREEN, "예", 1.6, 0, -6), fbox(434, 108, 116, 36, "y/x = u 치환", GREEN, size=12.5)),
+    step(3, arrow(300, 150, 300, 172, RED, "아니오", 1.6, 30, 0),
+        fbox(210, 174, 180, 40, "적분인자 F (시간 많이 걸림)", GRAY, size=12)),
+    step(4, arrow(90, 76, 90, 170, RED, "아니오", 1.6, -32, 0), fbox(20, 174, 140, 40, "y′ + p y = r ?", RED, size=13), arrow(90, 216, 90, 236, GREEN, "", 1.6), text(90, 246, "★ 공식 한 방 (h 구하고 대입)", 12, RED, "middle", True)),
+    cap="교수님의 판별 순서 — 「머릿속에 그림을 쫙 그려가면서. 플로차트를 그리는 건 어려운 게 아니에요.」", name="flow")
 
 fig_recip = canvas(560, 150,
-    fbox(20, 40, 200, 60, "y′ = 1/(x + y²)", INK, sub="y 에 대해 비선형 (y² 이 분모에)", size=15),
-    arrow(222, 70, 282, 70, GREEN, "", 2.2), text(252, 56, "역수를 취한다", 12, GREEN, "middle", True),
-    fbox(286, 40, 260, 60, "dx/dy = x + y²  →  x′ − x = y²", RED, sub="x 를 y 의 함수로 보면 선형!  p(y) = −1, r(y) = y²", size=15),
-    text(280, 130, "「이것만 봐서는 비선형인데 이렇게 바꿔버리면 선형이 된다」", 12.5, GRAY, "middle"),
-    cap="연습 2 의 핵심 기술: 독립변수와 종속변수를 바꿔 본다.")
+    step(1, fbox(20, 40, 200, 60, "y′ = 1/(x + y²)", INK, sub="y 에 대해 비선형 (y² 이 분모에)", size=15)),
+    step(2, arrow(222, 70, 282, 70, GREEN, "", 2.2), text(252, 56, "역수를 취한다", 12, GREEN, "middle", True),
+        fbox(286, 40, 260, 60, "dx/dy = x + y²  →  x′ − x = y²", RED, sub="x 를 y 의 함수로 보면 선형!  p(y) = −1, r(y) = y²", size=15)),
+    step(3, text(280, 130, "「이것만 봐서는 비선형인데 이렇게 바꿔버리면 선형이 된다」", 12.5, GRAY, "middle")),
+    cap="연습 2 의 핵심 기술: 독립변수와 종속변수를 바꿔 본다.", name="recip")
 
 fig_rl = canvas(560, 220,
-    rect(40, 40, 200, 130, INK, fill="none", sw=2.2),
-    line(40, 95, 40, 115, "#fff", 6), line(30, 95, 50, 95, INK, 2.5), line(35, 115, 45, 115, INK, 3.5), text(18, 110, "E", 13, INK, "end", True), text(4, 126, "48 V", 11, GRAY, "start"),
-    rect(120, 30, 50, 20, INK, fill="#F1F3F5", sw=2), text(145, 22, "R = 11 Ω", 12, INK, "middle"), text(145, 66, "전압강하 iR", 11, GRAY, "middle"),
-    path("M240 80 c 12 0 12 14 0 14 c 12 0 12 14 0 14 c 12 0 12 14 0 14", INK, 2.5), text(268, 104, "L = 0.1 H", 12, INK), text(268, 120, "L·di/dt", 11, GRAY),
-    arrow(80, 170, 120, 170, GREEN, "i(t)", 2.2, 0, 14),
-    axis(330, 180, 540, 180, "t", "i") + arrow(330, 180, 330, 60, INK, "", 1.5),
-    fplot(lambda t: 4.36 * (1 - math.exp(-110 * t)), 0, 0.05, lambda t: 330 + t * 4000, lambda i: 180 - i * 24, color=RED, w=2.6),
-    line(330, 180 - 4.36 * 24, 540, 180 - 4.36 * 24, GRAY, 1, "4 3"), text(536, 180 - 4.36 * 24 - 6, "E/R = 4.36 A", 11.5, GRAY, "end"),
-    text(435, 210, "L·i′ + R·i = E  →  i′ + (R/L)i = E/L", 12.5, INK, "middle", True),
-    cap="RL 회로(KVL): 전압강하 합 = 기전력. 독립변수만 t 로 바뀐 같은 선형 공식. 전류는 E/R 로 수렴.")
+    step(1, rect(40, 40, 200, 130, INK, fill="none", sw=2.2),
+        line(40, 95, 40, 115, "#fff", 6), line(30, 95, 50, 95, INK, 2.5), line(35, 115, 45, 115, INK, 3.5), text(18, 110, "E", 13, INK, "end", True), text(4, 126, "48 V", 11, GRAY, "start"),
+        rect(120, 30, 50, 20, INK, fill="#F1F3F5", sw=2), text(145, 22, "R = 11 Ω", 12, INK, "middle"),
+        path("M240 80 c 12 0 12 14 0 14 c 12 0 12 14 0 14 c 12 0 12 14 0 14", INK, 2.5), text(268, 104, "L = 0.1 H", 12, INK),
+        arrow(80, 170, 120, 170, GREEN, "i(t)", 2.2, 0, 14)),
+    step(2, text(145, 66, "전압강하 iR", 11, GRAY, "middle"), text(268, 120, "L·di/dt", 11, GRAY),
+        text(435, 210, "L·i′ + R·i = E  →  i′ + (R/L)i = E/L", 12.5, INK, "middle", True)),
+    step(3, axis(330, 180, 540, 180, "t", "i") + arrow(330, 180, 330, 60, INK, "", 1.5),
+        fplot(lambda t: 4.36 * (1 - math.exp(-110 * t)), 0, 0.05, lambda t: 330 + t * 4000, lambda i: 180 - i * 24, color=RED, w=2.6),
+        line(330, 180 - 4.36 * 24, 540, 180 - 4.36 * 24, GRAY, 1, "4 3"), text(536, 180 - 4.36 * 24 - 6, "E/R = 4.36 A", 11.5, GRAY, "end")),
+    cap="RL 회로(KVL): 전압강하 합 = 기전력. 독립변수만 t 로 바뀐 같은 선형 공식. 전류는 E/R 로 수렴.", name="rl")
 
 fig_bern = canvas(560, 140,
-    fbox(20, 34, 180, 60, "y′ + p y = g·y^a", INK, sub="a ≠ 0, 1 이면 비선형", size=15), arrow(202, 64, 250, 64, GREEN, "", 2.2), text(226, 24, "u = y^(1−a)", 12, GREEN, "middle", True),
-    fbox(254, 34, 200, 60, "u′ + (1−a)p·u = (1−a)g", RED, sub="u 에 대한 비제차 선형 → 공식", size=14), arrow(456, 64, 500, 64, GREEN, "", 2.2), text(478, 50, "되돌리기", 11.5, GREEN, "middle"),
-    fbox(504, 40, 46, 48, "y", INK, size=15),
-    cap="베르누이 방정식(다음 주 연습). 「u 를 다시 y 로 바꿔야 돼. 이게 끝이 아니죠.」")
+    step(1, fbox(20, 34, 180, 60, "y′ + p y = g·y^a", INK, sub="a ≠ 0, 1 이면 비선형", size=15)),
+    step(2, arrow(202, 64, 250, 64, GREEN, "", 2.2), text(226, 24, "u = y^(1−a)", 12, GREEN, "middle", True),
+        fbox(254, 34, 200, 60, "u′ + (1−a)p·u = (1−a)g", RED, sub="u 에 대한 비제차 선형 → 공식", size=14)),
+    step(3, arrow(456, 64, 500, 64, GREEN, "", 2.2), text(478, 50, "되돌리기", 11.5, GREEN, "middle"),
+        fbox(504, 40, 46, 48, "y", INK, size=15)),
+    cap="베르누이 방정식(다음 주 연습). 「u 를 다시 y 로 바꿔야 돼. 이게 끝이 아니죠.」", name="bern")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공업수학1 · 9/11 선형 상미분방정식 · 베르누이 예고</title></head><body>
 <header>

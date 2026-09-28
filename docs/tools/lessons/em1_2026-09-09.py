@@ -10,55 +10,60 @@ def _lvl(c, color, w):
     pts = [(X1(2.5 + c * 0.55 * math.cos(a) * 1.6), Y1(2.5 + c * 0.55 * math.sin(a))) for a in [2 * math.pi * i / 60 for i in range(61)]]
     return polyline(pts, color, w)
 fig_exact = canvas(560, 200,
-    axis(40, 170, 300, 170, "x", "y") + arrow(40, 170, 40, 20, INK, "", 1.5),
-    *[_lvl(c, GRAY if c != 2 else RED, 1.4 if c != 2 else 2.6) for c in (1, 2, 3, 4)],
-    text(115, 99, "u = 1", 10.5, GRAY, "middle"), text(115, 74, "u = 2", 10, RED, "middle", True), text(250, 52, "u = c 등고선", 11.5, RED, "middle", True),
-    text(430, 50, "M dx + N dy = du", 15, INK, "middle", True), text(430, 76, "M = ∂u/∂x,  N = ∂u/∂y", 13, INK, "middle"),
-    text(430, 106, "du = 0  ⇒  u(x, y) = c", 14, RED, "middle", True), text(430, 130, "해 = 어떤 함수 u 의 등고선", 12.5, GRAY, "middle"),
-    text(430, 160, "그 u 를 찾는 것이 1.4 의 전부", 12.5, GREEN, "middle", True),
-    cap="완전미분방정식의 뜻: 좌변이 어떤 u(x, y) 의 전미분이면, 해는 u = c — 언덕 u 의 등고선이다.")
+    step(1, axis(40, 170, 300, 170, "x", "y") + arrow(40, 170, 40, 20, INK, "", 1.5),
+        *[_lvl(c, GRAY, 1.4) for c in (1, 3, 4)], text(115, 99, "u = 1", 10.5, GRAY, "middle")),
+    step(2, _lvl(2, RED, 2.6), text(115, 74, "u = 2", 10, RED, "middle", True), text(250, 52, "u = c 등고선", 11.5, RED, "middle", True)),
+    step(3, text(430, 50, "M dx + N dy = du", 15, INK, "middle", True), text(430, 76, "M = ∂u/∂x,  N = ∂u/∂y", 13, INK, "middle")),
+    step(4, text(430, 106, "du = 0  ⇒  u(x, y) = c", 14, RED, "middle", True), text(430, 130, "해 = 어떤 함수 u 의 등고선", 12.5, GRAY, "middle"),
+        text(430, 160, "그 u 를 찾는 것이 1.4 의 전부", 12.5, GREEN, "middle", True)),
+    cap="완전미분방정식의 뜻: 좌변이 어떤 u(x, y) 의 전미분이면, 해는 u = c — 언덕 u 의 등고선이다.", name="exact")
 
 fig_cases = canvas(560, 210,
-    diamond(90, 60, 130, 56, "∂M/∂y = ∂N/∂x ?", INK, 11.5),
-    arrow(155, 60, 200, 60, GREEN, "예", 1.8, 0, -6), arrow(90, 88, 90, 150, RED, "아니오", 1.8, 26, 0), fbox(30, 152, 120, 44, "적분인자 F", RED, sub="§4~5 로", size=12.5),
-    fbox(204, 36, 150, 48, "Case 1: x 로 적분", BLUE, sub="u = ∫M dx + k(y)", size=12.5), arrow(356, 60, 396, 60, GREEN, "", 1.8),
-    fbox(400, 36, 150, 48, "∂u/∂y = N", BLUE, sub="→ k′(y) → k(y)", size=12.5),
-    fbox(204, 96, 150, 48, "Case 2: y 로 적분", GRAY, sub="u = ∫N dy + l(x)", size=12.5), arrow(356, 120, 396, 120, GREEN, "", 1.8),
-    fbox(400, 96, 150, 48, "∂u/∂x = M", GRAY, sub="→ l′(x) → l(x)", size=12.5),
-    arrow(475, 146, 475, 166, GREEN, "", 1.8), fbox(380, 168, 170, 34, "u(x, y) = c  → 검증", RED, size=12.5),
-    text(280, 200, "둘 중 적분이 쉬운 쪽을 고른다", 12, GRAY, "middle"),
-    cap="판별 → 해 → 검증. 교수님의 Step 형식이 곧 채점 형식(과제 제출용 규칙과 같다).")
+    step(1, diamond(90, 60, 130, 56, "∂M/∂y = ∂N/∂x ?", INK, 11.5)),
+    step(2, arrow(155, 60, 200, 60, GREEN, "예", 1.8, 0, -6),
+        fbox(204, 36, 150, 48, "Case 1: x 로 적분", BLUE, sub="u = ∫M dx + k(y)", size=12.5), arrow(356, 60, 396, 60, GREEN, "", 1.8),
+        fbox(400, 36, 150, 48, "∂u/∂y = N", BLUE, sub="→ k′(y) → k(y)", size=12.5)),
+    step(3, fbox(204, 96, 150, 48, "Case 2: y 로 적분", GRAY, sub="u = ∫N dy + l(x)", size=12.5), arrow(356, 120, 396, 120, GREEN, "", 1.8),
+        fbox(400, 96, 150, 48, "∂u/∂x = M", GRAY, sub="→ l′(x) → l(x)", size=12.5),
+        text(280, 200, "둘 중 적분이 쉬운 쪽을 고른다", 12, GRAY, "middle")),
+    step(4, arrow(475, 146, 475, 166, GREEN, "", 1.8), fbox(380, 168, 170, 34, "u(x, y) = c  → 검증", RED, size=12.5)),
+    step(5, arrow(90, 88, 90, 150, RED, "아니오", 1.8, 26, 0), fbox(30, 152, 120, 44, "적분인자 F", RED, sub="§4~5 로", size=12.5)),
+    cap="판별 → 해 → 검증. 교수님의 Step 형식이 곧 채점 형식(과제 제출용 규칙과 같다).", name="cases")
 
 fig_if = canvas(560, 170,
-    fbox(20, 40, 170, 60, "−y dx + x dy = 0", INK, sub="M_y = −1 ≠ N_x = 1  ✗", size=13),
-    arrow(192, 70, 246, 70, GREEN, "", 2.2), text(219, 56, "× F = 1/x²", 12, GREEN, "middle", True),
-    fbox(250, 40, 190, 60, "−(y/x²)dx + (1/x)dy = 0", BLUE, sub="M_y = −1/x² = N_x  ✓ 완전", size=13),
-    arrow(442, 70, 490, 70, GREEN, "", 2.2), fbox(494, 46, 56, 48, "y/x = c", RED, size=13),
-    text(280, 140, "완전이 아닌 식에 어떤 함수 F 를 곱해 완전으로 만든다 — 그 F 가 적분인자", 12.5, GRAY, "middle"),
-    cap="Ex.3 적분인자의 뜻. 어려운 것은 「어떤 F 를 곱하나」 — 그래서 한 변수만의 F 를 찾는 정리 1·2 가 있다.")
+    step(1, fbox(20, 40, 170, 60, "−y dx + x dy = 0", INK, sub="M_y = −1 ≠ N_x = 1  ✗", size=13)),
+    step(2, arrow(192, 70, 246, 70, GREEN, "", 2.2), text(219, 56, "× F = 1/x²", 12, GREEN, "middle", True),
+        fbox(250, 40, 190, 60, "−(y/x²)dx + (1/x)dy = 0", BLUE, sub="M_y = −1/x² = N_x  ✓ 완전", size=13)),
+    step(3, arrow(442, 70, 490, 70, GREEN, "", 2.2), fbox(494, 46, 56, 48, "y/x = c", RED, size=13),
+        text(280, 140, "완전이 아닌 식에 어떤 함수 F 를 곱해 완전으로 만든다 — 그 F 가 적분인자", 12.5, GRAY, "middle")),
+    cap="Ex.3 적분인자의 뜻. 어려운 것은 「어떤 F 를 곱하나」 — 그래서 한 변수만의 F 를 찾는 정리 1·2 가 있다.", name="if")
 
 fig_thm = canvas(560, 190,
-    fbox(20, 30, 250, 70, "정리 1 · F = F(x)", GREEN, sub="R(x) = (1/Q)(∂P/∂y − ∂Q/∂x)", size=14), text(145, 118, "F(x) = exp(∫R dx)   ← R 이 x 만의 함수일 때", 12, INK, "middle"),
-    fbox(290, 30, 250, 70, "정리 2 · F = F(y)", BLUE, sub="R*(y) = (1/P)(∂Q/∂x − ∂P/∂y)", size=14), text(415, 118, "F*(y) = exp(∫R* dy)   ← R* 이 y 만의 함수일 때", 12, INK, "middle"),
-    text(280, 152, "외우는 법: 분모는 「곱해지지 않는 쪽」 — F(x) 면 Q, F(y) 면 P. 괄호 안 부호는 서로 반대", 12, RED, "middle", True),
-    text(280, 172, "R 이 x 만의 함수가 아니면 정리 1 포기 → R* 시도", 12, GRAY, "middle"),
-    cap="적분인자 공식 두 개(시험 공식). 9/11 교수님 정정: 정리 1 의 분모는 p 가 아니라 q.")
+    step(1, fbox(20, 30, 250, 70, "정리 1 · F = F(x)", GREEN, sub="R(x) = (1/Q)(∂P/∂y − ∂Q/∂x)", size=14), text(145, 118, "F(x) = exp(∫R dx)   ← R 이 x 만의 함수일 때", 12, INK, "middle")),
+    step(2, fbox(290, 30, 250, 70, "정리 2 · F = F(y)", BLUE, sub="R*(y) = (1/P)(∂Q/∂x − ∂P/∂y)", size=14), text(415, 118, "F*(y) = exp(∫R* dy)   ← R* 이 y 만의 함수일 때", 12, INK, "middle")),
+    step(3, text(280, 152, "외우는 법: 분모는 「곱해지지 않는 쪽」 — F(x) 면 Q, F(y) 면 P. 괄호 안 부호는 서로 반대", 12, RED, "middle", True),
+        text(280, 172, "R 이 x 만의 함수가 아니면 정리 1 포기 → R* 시도", 12, GRAY, "middle")),
+    cap="적분인자 공식 두 개(시험 공식). 9/11 교수님 정정: 정리 1 의 분모는 p 가 아니라 q.", name="thm")
 
 fig_check = canvas(560, 120,
-    fbox(20, 30, 130, 56, "u 후보", INK, sub="∫M dx + k(y)", size=14), arrow(152, 58, 196, 58, GREEN, "", 2),
-    fbox(200, 30, 150, 56, "∂u/∂x = M ?", BLUE, sub="x 로 미분해 대조", size=13.5), arrow(352, 58, 396, 58, GREEN, "", 2),
-    fbox(400, 30, 150, 56, "∂u/∂y = N ?", BLUE, sub="k′ 에 x 가 남으면 오류", size=13.5),
-    text(280, 110, "둘 다 ✓ 이면 u(x, y) = c 가 답 — 검산까지가 풀이", 12.5, RED, "middle", True),
-    cap="예제 (1)(2)의 검산 틀. 답을 미분해 M, N 으로 돌아오는지 본다.")
+    step(1, fbox(20, 30, 130, 56, "u 후보", INK, sub="∫M dx + k(y)", size=14)),
+    step(2, arrow(152, 58, 196, 58, GREEN, "", 2),
+        fbox(200, 30, 150, 56, "∂u/∂x = M ?", BLUE, sub="x 로 미분해 대조", size=13.5)),
+    step(3, arrow(352, 58, 396, 58, GREEN, "", 2),
+        fbox(400, 30, 150, 56, "∂u/∂y = N ?", BLUE, sub="k′ 에 x 가 남으면 오류", size=13.5)),
+    step(4, text(280, 110, "둘 다 ✓ 이면 u(x, y) = c 가 답 — 검산까지가 풀이", 12.5, RED, "middle", True)),
+    cap="예제 (1)(2)의 검산 틀. 답을 미분해 M, N 으로 돌아오는지 본다.", name="check")
 
 fig_ex5 = canvas(560, 150,
-    fbox(14, 20, 100, 50, "판별", INK, sub="P_y ≠ Q_x ✗", size=13), arrow(116, 45, 146, 45, GREEN, "", 1.8),
-    fbox(150, 20, 110, 50, "R(x) 시도", GRAY, sub="y 남음 ✗", size=13), arrow(262, 45, 292, 45, GREEN, "", 1.8),
-    fbox(296, 20, 110, 50, "R*(y) 시도", GREEN, sub="= −1 ✓", size=13), arrow(408, 45, 438, 45, GREEN, "", 1.8),
-    fbox(442, 20, 104, 50, "× e^(−y)", GREEN, sub="재검증 ✓", size=13),
-    arrow(494, 72, 494, 92, GREEN, "", 1.8), fbox(300, 94, 246, 46, "u = eˣ + xy + e^(−y) = c", RED, sub="y(0) = −1 → c = 1 + e", size=13.5),
-    text(150, 122, "판별 → R → R* → 곱하기 → 일반해 → 특수해", 12.5, GRAY, "middle"),
-    cap="Ex.5 의 여섯 단계. 정리 1 이 실패한 것을 확인하는 줄도 답안에 쓴다.")
+    step(1, fbox(14, 20, 100, 50, "판별", INK, sub="P_y ≠ Q_x ✗", size=13)),
+    step(2, arrow(116, 45, 146, 45, GREEN, "", 1.8),
+        fbox(150, 20, 110, 50, "R(x) 시도", GRAY, sub="y 남음 ✗", size=13)),
+    step(3, arrow(262, 45, 292, 45, GREEN, "", 1.8),
+        fbox(296, 20, 110, 50, "R*(y) 시도", GREEN, sub="= −1 ✓", size=13), arrow(408, 45, 438, 45, GREEN, "", 1.8),
+        fbox(442, 20, 104, 50, "× e^(−y)", GREEN, sub="재검증 ✓", size=13)),
+    step(4, arrow(494, 72, 494, 92, GREEN, "", 1.8), fbox(300, 94, 246, 46, "u = eˣ + xy + e^(−y) = c", RED, sub="y(0) = −1 → c = 1 + e", size=13.5),
+        text(150, 122, "판별 → R → R* → 곱하기 → 일반해 → 특수해", 12.5, GRAY, "middle")),
+    cap="Ex.5 의 여섯 단계. 정리 1 이 실패한 것을 확인하는 줄도 답안에 쓴다.", name="ex5")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공업수학1 · 9/9 완전상미분방정식 · 적분인자</title></head><body>
 <header>

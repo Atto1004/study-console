@@ -6,49 +6,54 @@ from figs import *
 OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\공업수학1\_수업노트\2026-09-02.html"
 
 fig_model = canvas(560, 150,
-    fbox(20, 40, 120, 60, "물리 상황", INK, sub="탱크·회로·낙하"), arrow(142, 70, 176, 70, GREEN, "", 2), text(159, 30, "① 모델 설정", 11, GREEN, "middle"),
-    fbox(180, 40, 130, 60, "미분방정식", BLUE, sub="y′ = f(x, y)"), arrow(312, 70, 346, 70, GREEN, "", 2), text(329, 30, "② 해법", 11, GREEN, "middle"),
-    fbox(350, 40, 90, 60, "해 y(x)", BLUE, sub="식 하나"), arrow(442, 70, 476, 70, GREEN, "", 2), text(459, 30, "③ 해석", 11, GREEN, "middle"),
-    fbox(480, 40, 70, 60, "답", RED, sub="몇 시간?"),
-    text(280, 130, "이 과목 전체가 ②(해법)이고, 과제·시험은 ①③까지 묻는다", 12.5, GRAY, "middle"),
-    cap="모델화 3단계: 물리 법칙으로 식을 세우고(설정), 수학으로 풀고(해법), 그 해가 무슨 뜻인지 되돌린다(해석).")
+    step(1, fbox(20, 40, 120, 60, "물리 상황", INK, sub="탱크·회로·낙하")),
+    step(2, arrow(142, 70, 176, 70, GREEN, "", 2), text(159, 30, "① 모델 설정", 11, GREEN, "middle"),
+        fbox(180, 40, 130, 60, "미분방정식", BLUE, sub="y′ = f(x, y)")),
+    step(3, arrow(312, 70, 346, 70, GREEN, "", 2), text(329, 30, "② 해법", 11, GREEN, "middle"),
+        fbox(350, 40, 90, 60, "해 y(x)", BLUE, sub="식 하나")),
+    step(4, arrow(442, 70, 476, 70, GREEN, "", 2), text(459, 30, "③ 해석", 11, GREEN, "middle"),
+        fbox(480, 40, 70, 60, "답", RED, sub="몇 시간?"),
+        text(280, 130, "이 과목 전체가 ②(해법)이고, 과제·시험은 ①③까지 묻는다", 12.5, GRAY, "middle")),
+    cap="모델화 3단계: 물리 법칙으로 식을 세우고(설정), 수학으로 풀고(해법), 그 해가 무슨 뜻인지 되돌린다(해석).", name="model")
 
 def _cool(X, Y):
     return fplot(lambda t: 20 + 60 * math.exp(-0.4 * t), 0, 10, X, Y, color=RED, w=2.4)
 X1 = lambda t: 30 + t * 14; Y1 = lambda T: 150 - (T - 20) * 1.4
 fig_models = canvas(560, 170,
-    axis(30, 150, 180, 150, "t", "T") + arrow(30, 150, 30, 40, INK, "", 1.5), line(30, 150, 180, 150, GRAY, 1, "3 3"),
-    _cool(X1, Y1), text(105, 44, "뉴턴 냉각", 12.5, INK, "middle", True), text(105, 60, "T′ = −k(T − T_a)", 12, RED, "middle"), text(46, 141, "T_a", 11, GRAY, "middle"),
-    line(230, 40, 230, 160, GRAY, 1, "3 3"),
-    circle(300, 90, 16, INK, w=2, fill="#F1F3F5"), arrow(300, 108, 300, 150, RED, "mg", 2.2, 16, 0), arrow(300, 72, 300, 34, BLUE, "kv (저항)", 2.2, 30, 0), text(300, 168, "낙하 + 공기저항", 12.5, INK, "middle", True), text(300, 22, "m v′ = mg − kv", 12, RED, "middle"),
-    line(390, 40, 390, 160, GRAY, 1, "3 3"),
-    fplot(lambda x: -0.012 * (x - 60) ** 2 + 60, 0, 120, lambda x: 410 + x * 1.1, lambda y: 150 - y * 1.6, color=RED, w=2.4), text(476, 168, "투사체", 12.5, INK, "middle", True), text(476, 40, "x″ = 0, y″ = −g", 12, RED, "middle"),
-    cap="슬라이드의 세 모델. 셋 다 「변화율(도함수) = 지금 상태의 함수」 꼴이라 미분방정식이 된다.")
+    step(1, axis(30, 150, 180, 150, "t", "T") + arrow(30, 150, 30, 40, INK, "", 1.5), line(30, 150, 180, 150, GRAY, 1, "3 3"),
+        _cool(X1, Y1), text(105, 44, "뉴턴 냉각", 12.5, INK, "middle", True), text(105, 60, "T′ = −k(T − T_a)", 12, RED, "middle"), text(46, 141, "T_a", 11, GRAY, "middle")),
+    step(2, line(230, 40, 230, 160, GRAY, 1, "3 3"),
+        circle(300, 90, 16, INK, w=2, fill="#F1F3F5"), arrow(300, 108, 300, 150, RED, "mg", 2.2, 16, 0), arrow(300, 72, 300, 34, BLUE, "kv (저항)", 2.2, 30, 0), text(300, 168, "낙하 + 공기저항", 12.5, INK, "middle", True), text(300, 22, "m v′ = mg − kv", 12, RED, "middle")),
+    step(3, line(390, 40, 390, 160, GRAY, 1, "3 3"),
+        fplot(lambda x: -0.012 * (x - 60) ** 2 + 60, 0, 120, lambda x: 410 + x * 1.1, lambda y: 150 - y * 1.6, color=RED, w=2.4), text(476, 168, "투사체", 12.5, INK, "middle", True), text(476, 40, "x″ = 0, y″ = −g", 12, RED, "middle")),
+    cap="슬라이드의 세 모델. 셋 다 「변화율(도함수) = 지금 상태의 함수」 꼴이라 미분방정식이 된다.", name="models")
 
 fig_tree = canvas(560, 190,
-    fbox(200, 20, 160, 44, "미분방정식", INK, sub="도함수가 들어 있는 식"),
-    line(280, 64, 280, 82, INK, 1.5), line(150, 82, 410, 82, INK, 1.5), arrow(150, 82, 150, 98, INK, "", 1.5), arrow(410, 82, 410, 98, INK, "", 1.5),
-    fbox(60, 100, 180, 50, "상미분방정식 ODE", GREEN, sub="독립변수 하나: y(x), i(t)"),
-    fbox(320, 100, 180, 50, "편미분방정식 PDE", GRAY, sub="독립변수 둘 이상: u(x, t)"),
-    text(150, 172, "이 과목은 전부 ODE", 12.5, GREEN, "middle", True), text(410, 172, "∂ 기호가 보이면 PDE (공수2)", 12, GRAY, "middle"),
-    cap="ODE 와 PDE 의 구분은 독립변수의 개수. 계(order)는 그 식에 나오는 가장 높은 도함수의 차수.")
+    step(1, fbox(200, 20, 160, 44, "미분방정식", INK, sub="도함수가 들어 있는 식")),
+    step(2, line(280, 64, 280, 82, INK, 1.5), line(150, 82, 410, 82, INK, 1.5), arrow(150, 82, 150, 98, INK, "", 1.5), arrow(410, 82, 410, 98, INK, "", 1.5),
+        fbox(60, 100, 180, 50, "상미분방정식 ODE", GREEN, sub="독립변수 하나: y(x), i(t)"),
+        text(150, 172, "이 과목은 전부 ODE", 12.5, GREEN, "middle", True)),
+    step(3, fbox(320, 100, 180, 50, "편미분방정식 PDE", GRAY, sub="독립변수 둘 이상: u(x, t)"),
+        text(410, 172, "∂ 기호가 보이면 PDE (공수2)", 12, GRAY, "middle")),
+    cap="ODE 와 PDE 의 구분은 독립변수의 개수. 계(order)는 그 식에 나오는 가장 높은 도함수의 차수.", name="tree")
 
 fig_lin = canvas(560, 200,
-    text(30, 34, "선형인가? — y, y′, y″ 가 각각 1제곱으로만, 계수는 x 만의 함수", 13, INK, "start", True),
-    text(40, 70, "y′ + 2x·y = eˣ", 14, INK), text(330, 70, "✓ 선형 (1계)", 13, GREEN, "start", True),
-    text(40, 98, "y″ + y = 0", 14, INK), text(330, 98, "✓ 선형 (2계)", 13, GREEN, "start", True),
-    text(40, 126, "(y′)³ + y = x", 14, INK), text(330, 126, "✗ 비선형 — y′ 의 세제곱 (계는 1계)", 13, RED, "start", True),
-    text(40, 154, "y·y′ = x", 14, INK), text(330, 154, "✗ 비선형 — y 와 y′ 의 곱", 13, RED, "start", True),
-    text(40, 182, "y″ + sin y = 0", 14, INK), text(330, 182, "✗ 비선형 — sin y", 13, RED, "start", True),
-    cap="선형 판별. 「y 쪽」이 1차식이면 선형. 계수에 x 가 들어가는 것은 상관없다(변수계수 선형).")
+    step(1, text(30, 34, "선형인가? — y, y′, y″ 가 각각 1제곱으로만, 계수는 x 만의 함수", 13, INK, "start", True)),
+    step(2, text(40, 70, "y′ + 2x·y = eˣ", 14, INK), text(330, 70, "✓ 선형 (1계)", 13, GREEN, "start", True),
+        text(40, 98, "y″ + y = 0", 14, INK), text(330, 98, "✓ 선형 (2계)", 13, GREEN, "start", True)),
+    step(3, text(40, 126, "(y′)³ + y = x", 14, INK), text(330, 126, "✗ 비선형 — y′ 의 세제곱 (계는 1계)", 13, RED, "start", True),
+        text(40, 154, "y·y′ = x", 14, INK), text(330, 154, "✗ 비선형 — y 와 y′ 의 곱", 13, RED, "start", True),
+        text(40, 182, "y″ + sin y = 0", 14, INK), text(330, 182, "✗ 비선형 — sin y", 13, RED, "start", True)),
+    cap="선형 판별. 「y 쪽」이 1차식이면 선형. 계수에 x 가 들어가는 것은 상관없다(변수계수 선형).", name="lin")
 
 X2 = lambda x: 60 + x * 60; Y2 = lambda y: 160 - y * 26
 fig_family = canvas(560, 180,
-    axis(60, 160, 540, 160, "x", "y") + arrow(60, 160, 60, 20, INK, "", 1.5),
-    *[fplot(lambda x, c=c: c * math.exp(-0.5 * x), 0, 7.5, X2, Y2, color=GRAY if c != 3 else RED, w=1.6 if c != 3 else 2.6) for c in (1, 2, 3, 4, 5)],
-    dot(60, Y2(3), "", 5, RED), text(230, 44, "y(0) = 3 → 이 곡선 하나 (빨강)", 12.5, RED),
-    text(430, 60, "y = c·e^(−x/2)  (c 마다 곡선 하나)", 13, INK, "middle"), text(430, 80, "= 일반해 (가족)", 12.5, GRAY, "middle"),
-    cap="미분방정식의 해는 하나가 아니라 「가족」이다. 조건 하나(초기값)가 그중 한 곡선을 고른다 — 9/4 의 주제.")
+    step(1, axis(60, 160, 540, 160, "x", "y") + arrow(60, 160, 60, 20, INK, "", 1.5)),
+    step(2, *[fplot(lambda x, c=c: c * math.exp(-0.5 * x), 0, 7.5, X2, Y2, color=GRAY, w=1.6) for c in (1, 2, 4, 5)],
+        text(430, 60, "y = c·e^(−x/2)  (c 마다 곡선 하나)", 13, INK, "middle"), text(430, 80, "= 일반해 (가족)", 12.5, GRAY, "middle")),
+    step(3, fplot(lambda x: 3 * math.exp(-0.5 * x), 0, 7.5, X2, Y2, color=RED, w=2.6),
+        dot(60, Y2(3), "", 5, RED), text(230, 44, "y(0) = 3 → 이 곡선 하나 (빨강)", 12.5, RED)),
+    cap="미분방정식의 해는 하나가 아니라 「가족」이다. 조건 하나(초기값)가 그중 한 곡선을 고른다 — 9/4 의 주제.", name="family")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공업수학1 · 9/2 모델화와 미분방정식의 기본 개념</title></head><body>
 <header>

@@ -6,47 +6,51 @@ from figs import *
 OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\미분적분학2\_수업노트\2026-09-22.html"
 
 fig_cos = canvas(560, 190,
-    dot(70, 150, "", 5, INK), text(56, 168, "O", 13, INK, "middle", True), dot(270, 50, "", 5, PINK), text(270, 38, "A", 13, PINK, "middle"), dot(400, 140, "", 5, PINK), text(412, 144, "B", 13, PINK),
-    arrow(76, 146, 264, 54, BLUE, "", 3), text(150, 92, "|a⃗|", 13, BLUE, "middle", True), arrow(76, 149, 394, 141, RED, "", 3), text(230, 162, "|b⃗|", 13, RED, "middle", True),
-    arrow(394, 136, 276, 56, GREEN, "", 2.6), text(307, 138, "|a⃗ − b⃗|", 13, GREEN, "middle", True), arc(70, 150, 44, -27, -2, GRAY, 1.5, "θ", 54),
-    text(452, 40, "코사인 제2법칙 (일각삼변)", 12.5, INK, "middle", True), text(452, 62, "|a−b|² = |a|² + |b|² − 2|a||b|cos θ", 11, INK, "middle"),
-    text(452, 96, "한편 |a−b|² = (a−b)·(a−b)", 12, INK, "middle"), text(452, 116, "= |a|² − 2 a·b + |b|²", 12, INK, "middle"),
-    text(452, 174, "∴ a⃗·b⃗ = |a⃗||b⃗| cos θ", 14, RED, "middle", True),
-    cap="Thm 01 의 증명(교재) — 지각 구간(9:05~9:45)의 내용으로 추정. 두 식의 |a|², |b|² 이 지워지고 내적만 남는다.")
+    step(1, dot(70, 150, "", 5, INK), text(56, 168, "O", 13, INK, "middle", True), dot(270, 50, "", 5, PINK), text(270, 38, "A", 13, PINK, "middle"), dot(400, 140, "", 5, PINK), text(412, 144, "B", 13, PINK),
+        arrow(76, 146, 264, 54, BLUE, "", 3), text(150, 92, "|a⃗|", 13, BLUE, "middle", True), arrow(76, 149, 394, 141, RED, "", 3), text(230, 162, "|b⃗|", 13, RED, "middle", True),
+        arc(70, 150, 44, -27, -2, GRAY, 1.5, "θ", 54)),
+    step(2, arrow(394, 136, 276, 56, GREEN, "", 2.6), text(307, 138, "|a⃗ − b⃗|", 13, GREEN, "middle", True)),
+    step(3, text(452, 40, "코사인 제2법칙 (일각삼변)", 12.5, INK, "middle", True), text(452, 62, "|a−b|² = |a|² + |b|² − 2|a||b|cos θ", 11, INK, "middle")),
+    step(4, text(452, 96, "한편 |a−b|² = (a−b)·(a−b)", 12, INK, "middle"), text(452, 116, "= |a|² − 2 a·b + |b|²", 12, INK, "middle")),
+    step(5, text(452, 174, "∴ a⃗·b⃗ = |a⃗||b⃗| cos θ", 14, RED, "middle", True)),
+    cap="Thm 01 의 증명(교재) — 지각 구간(9:05~9:45)의 내용으로 추정. 두 식의 |a|², |b|² 이 지워지고 내적만 남는다.", name="cos")
 
 ox, oy = 150, 160
 T = p3(ox, oy, 45, 95, 80)
 fig_dir = canvas(560, 220,
-    axes3d(ox, oy, 100), arrow(ox, oy, T[0], T[1], GREEN, "", 3), dot(T[0], T[1], "", 5, PINK), text(T[0] + 8, T[1] - 6, "a⃗ = (a₁, a₂, a₃)", 12.5, PINK),
-    text(ox + 46, oy - 10, "β", 13, RED, "middle", True), text(ox - 4, oy - 60, "γ", 13, RED, "middle", True), text(ox - 30, oy + 12, "α", 13, RED, "middle", True),
-    text(430, 44, "방향각 α, β, γ = a⃗ 가 x·y·z 축(i, j, k)과 이루는 각", 12, INK, "middle"),
-    text(430, 74, "cos α = (a⃗·i⃗)/(|a⃗||i⃗|) = a₁/|a⃗|", 13, INK, "middle", True), text(430, 96, "cos β = a₂/|a⃗|,   cos γ = a₃/|a⃗|", 13, INK, "middle", True),
-    text(430, 126, "ㄱ cos²α + cos²β + cos²γ = 1", 13, RED, "middle", True), text(430, 148, "ㄴ u⃗ = a⃗/|a⃗| = (cos α, cos β, cos γ)", 13, RED, "middle", True),
-    text(430, 180, "사이각 공식에 b = i, j, k 를 넣은 것 (|i| = 1 이 지워진다)", 11.5, GRAY, "middle"),
-    cap="방향각·방향코사인(판서 ①②). 단위벡터의 성분이 곧 방향코사인 — 정역학 9/9 와 같은 내용.")
+    step(1, axes3d(ox, oy, 100), arrow(ox, oy, T[0], T[1], GREEN, "", 3), dot(T[0], T[1], "", 5, PINK), text(T[0] + 8, T[1] - 6, "a⃗ = (a₁, a₂, a₃)", 12.5, PINK)),
+    step(2, text(ox + 46, oy - 10, "β", 13, RED, "middle", True), text(ox - 4, oy - 60, "γ", 13, RED, "middle", True), text(ox - 30, oy + 12, "α", 13, RED, "middle", True),
+        text(430, 44, "방향각 α, β, γ = a⃗ 가 x·y·z 축(i, j, k)과 이루는 각", 12, INK, "middle")),
+    step(3, text(430, 74, "cos α = (a⃗·i⃗)/(|a⃗||i⃗|) = a₁/|a⃗|", 13, INK, "middle", True), text(430, 96, "cos β = a₂/|a⃗|,   cos γ = a₃/|a⃗|", 13, INK, "middle", True)),
+    step(4, text(430, 126, "ㄱ cos²α + cos²β + cos²γ = 1", 13, RED, "middle", True), text(430, 148, "ㄴ u⃗ = a⃗/|a⃗| = (cos α, cos β, cos γ)", 13, RED, "middle", True),
+        text(430, 180, "사이각 공식에 b = i, j, k 를 넣은 것 (|i| = 1 이 지워진다)", 11.5, GRAY, "middle")),
+    cap="방향각·방향코사인(판서 ①②). 단위벡터의 성분이 곧 방향코사인 — 정역학 9/9 와 같은 내용.", name="dir")
 
 fig_ex04 = canvas(560, 150,
-    fbox(14, 26, 120, 56, "a⃗ = (3, 4, 5)", INK, sub="i) |a| = √50 = 5√2", size=14), arrow(136, 54, 166, 54, GREEN, "", 2),
-    fbox(170, 20, 380, 68, "cos α = 3/(5√2) = 3√2/10 · cos β = 4/(5√2) = 2√2/5 · cos γ = 5/(5√2) = √2/2", RED, sub="α = cos⁻¹(3√2/10), β = cos⁻¹(2√2/5), γ = π/4", size=12),
-    text(280, 122, "검산 ㄱ: 18/100 + 32/100 + 50/100 = 1 ✓ · 답은 cos⁻¹( ) 꼴 그대로, 특수각만 값으로", 12, GRAY, "middle"),
-    cap="Ex04 (판서 ②③, 답 분홍 박스). 분모의 근호는 유리화해 정리.")
+    step(1, fbox(14, 26, 120, 56, "a⃗ = (3, 4, 5)", INK, sub="i) |a| = √50 = 5√2", size=14)),
+    step(2, arrow(136, 54, 166, 54, GREEN, "", 2),
+        fbox(170, 20, 380, 68, "cos α = 3/(5√2) = 3√2/10 · cos β = 4/(5√2) = 2√2/5 · cos γ = 5/(5√2) = √2/2", RED, sub="α = cos⁻¹(3√2/10), β = cos⁻¹(2√2/5), γ = π/4", size=12)),
+    step(3, text(280, 122, "검산 ㄱ: 18/100 + 32/100 + 50/100 = 1 ✓ · 답은 cos⁻¹( ) 꼴 그대로, 특수각만 값으로", 12, GRAY, "middle")),
+    cap="Ex04 (판서 ②③, 답 분홍 박스). 분모의 근호는 유리화해 정리.", name="ex04")
 
 fig_cross = canvas(560, 230,
-    path("M50 195 L 270 195 L 330 135 L 110 135 Z", GRAY, 1.5, "rgba(138,151,166,.12)", "4 3"),
-    arrow(110, 178, 250, 178, BLUE, "", 3), text(180, 214, "a⃗", 15, BLUE, "middle", True), arrow(110, 178, 190, 142, RED, "", 3), text(150, 150, "b⃗", 15, RED, "middle", True),
-    arrow(110, 178, 110, 40, GREEN, "", 3.4), text(124, 46, "c⃗ = a⃗ × b⃗  ⊥ a⃗, ⊥ b⃗", 14, GREEN, "start", True),
-    text(440, 60, "[Def 01] 외적 (cross / outer product)", 13, INK, "middle", True),
-    text(440, 88, "a⃗ × b⃗ = (a₂b₃ − a₃b₂,  a₃b₁ − a₁b₃,  a₁b₂ − a₂b₁)", 10.5, INK, "middle"),
-    mat(340, 104, [["a_2", "a_3"], ["b_2", "b_3"]], 30, 24, bars=True), mat(410, 104, [["a_3", "a_1"], ["b_3", "b_1"]], 30, 24, bars=True), mat(480, 104, [["a_1", "a_2"], ["b_1", "b_2"]], 30, 24, bars=True),
-    text(440, 176, "결과는 벡터 — 내적(스칼라)과 다르다", 11.5, RED, "middle"), text(440, 196, "자기 번호 뺀 두 번호 = 순환 (2,3)(3,1)(1,2)", 11, GRAY, "middle"),
-    cap="12.4 외적의 정의(판서 ④). 2×2 행렬식 세 개 — 9/3 의 ad − bc 가 여기서 쓰인다.")
+    step(1, path("M50 195 L 270 195 L 330 135 L 110 135 Z", GRAY, 1.5, "rgba(138,151,166,.12)", "4 3"),
+        arrow(110, 178, 250, 178, BLUE, "", 3), text(180, 214, "a⃗", 15, BLUE, "middle", True), arrow(110, 178, 190, 142, RED, "", 3), text(150, 150, "b⃗", 15, RED, "middle", True)),
+    step(2, arrow(110, 178, 110, 40, GREEN, "", 3.4), text(124, 46, "c⃗ = a⃗ × b⃗  ⊥ a⃗, ⊥ b⃗", 14, GREEN, "start", True)),
+    step(3, text(440, 60, "[Def 01] 외적 (cross / outer product)", 13, INK, "middle", True),
+        text(440, 88, "a⃗ × b⃗ = (a₂b₃ − a₃b₂,  a₃b₁ − a₁b₃,  a₁b₂ − a₂b₁)", 10.5, INK, "middle"),
+        mat(340, 104, [["a_2", "a_3"], ["b_2", "b_3"]], 30, 24, bars=True), mat(410, 104, [["a_3", "a_1"], ["b_3", "b_1"]], 30, 24, bars=True), mat(480, 104, [["a_1", "a_2"], ["b_1", "b_2"]], 30, 24, bars=True)),
+    step(4, text(440, 176, "결과는 벡터 — 내적(스칼라)과 다르다", 11.5, RED, "middle"), text(440, 196, "자기 번호 뺀 두 번호 = 순환 (2,3)(3,1)(1,2)", 11, GRAY, "middle")),
+    cap="12.4 외적의 정의(판서 ④). 2×2 행렬식 세 개 — 9/3 의 ad − bc 가 여기서 쓰인다.", name="cross")
 
 fig_der = canvas(560, 150,
-    fbox(14, 24, 150, 56, "a⃗ ⊥ c⃗, b⃗ ⊥ c⃗", INK, sub="a·c = 0 (ㄱ), b·c = 0 (ㄴ)", size=13), arrow(166, 52, 196, 52, GREEN, "", 2),
-    fbox(200, 24, 150, 56, "ㄱ×b₃ − ㄴ×a₃", BLUE, sub="c₃ 항 소거", size=13), arrow(352, 52, 382, 52, GREEN, "", 2),
-    fbox(386, 24, 164, 56, "p·c₁ + q·c₂ = 0", RED, sub="c₁ = q, c₂ = −p 로 택함", size=13),
-    text(280, 118, "p = a₁b₃ − a₃b₁,  q = a₂b₃ − a₃b₂  →  c = (a₂b₃−a₃b₂, a₃b₁−a₁b₃, a₁b₂−a₂b₁) = Def 01 ✓", 11.5, GRAY, "middle"),
-    cap="[유도] (판서 ⑤⑥) 외적 = 두 벡터에 모두 수직인 벡터를 내적 0 조건으로 구한 것. 칠판의 「ㄱ×b₂」는 ×b₃ 가 맞다.")
+    step(1, fbox(14, 24, 150, 56, "a⃗ ⊥ c⃗, b⃗ ⊥ c⃗", INK, sub="a·c = 0 (ㄱ), b·c = 0 (ㄴ)", size=13)),
+    step(2, arrow(166, 52, 196, 52, GREEN, "", 2),
+        fbox(200, 24, 150, 56, "ㄱ×b₃ − ㄴ×a₃", BLUE, sub="c₃ 항 소거", size=13)),
+    step(3, arrow(352, 52, 382, 52, GREEN, "", 2),
+        fbox(386, 24, 164, 56, "p·c₁ + q·c₂ = 0", RED, sub="c₁ = q, c₂ = −p 로 택함", size=13)),
+    step(4, text(280, 118, "p = a₁b₃ − a₃b₁,  q = a₂b₃ − a₃b₂  →  c = (a₂b₃−a₃b₂, a₃b₁−a₁b₃, a₁b₂−a₂b₁) = Def 01 ✓", 11.5, GRAY, "middle")),
+    cap="[유도] (판서 ⑤⑥) 외적 = 두 벡터에 모두 수직인 벡터를 내적 0 조건으로 구한 것. 칠판의 「ㄱ×b₂」는 ×b₃ 가 맞다.", name="der")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미분적분학2 · 9/22 내적 정리 · 방향각·방향코사인 · 외적 정의·유도</title></head><body>
 <header>

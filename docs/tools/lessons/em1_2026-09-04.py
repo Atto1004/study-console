@@ -7,51 +7,55 @@ OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\공업수학1\_
 
 X1 = lambda x: 60 + x * 130; Y1 = lambda y: 165 - y * 9
 fig_ivp = canvas(560, 190,
-    axis(60, 165, 330, 165, "x", "y") + arrow(60, 165, 60, 20, INK, "", 1.5),
-    *[fplot(lambda x, c=c: c * math.exp(3 * x), 0, 1.3, X1, Y1, color=GRAY, w=1.5, ylim=(0, 16)) for c in (1, 2, 3.5, 9)],
-    fplot(lambda x: 5.7 * math.exp(3 * x), 0, 1.3, X1, Y1, color=RED, w=2.8, ylim=(0, 16)),
-    dot(60, Y1(5.7), "", 5, RED), text(56, Y1(5.7) + 4, "(0, 5.7)", 12.5, RED, "end"), text(56, Y1(5.7) + 20, "초기조건", 11.5, RED, "end"),
-    text(440, 60, "y′ = 3y", 15, INK, "middle", True), text(440, 84, "일반해 y = c·e³ˣ", 13, GRAY, "middle"), text(440, 108, "y(0) = 5.7 → c = 5.7", 13, INK, "middle"),
-    text(440, 132, "특수해 y = 5.7e³ˣ", 14, RED, "middle", True),
-    cap="초기값 문제(IVP): 일반해(회색 가족)에서 초기조건이 지나는 곡선 하나(빨강)를 고른다.")
+    step(1, axis(60, 165, 330, 165, "x", "y") + arrow(60, 165, 60, 20, INK, "", 1.5),
+        *[fplot(lambda x, c=c: c * math.exp(3 * x), 0, 1.3, X1, Y1, color=GRAY, w=1.5, ylim=(0, 16)) for c in (1, 2, 3.5, 9)]),
+    step(2, fplot(lambda x: 5.7 * math.exp(3 * x), 0, 1.3, X1, Y1, color=RED, w=2.8, ylim=(0, 16)),
+        dot(60, Y1(5.7), "", 5, RED), text(56, Y1(5.7) + 4, "(0, 5.7)", 12.5, RED, "end"), text(56, Y1(5.7) + 20, "초기조건", 11.5, RED, "end")),
+    step(3, text(440, 60, "y′ = 3y", 15, INK, "middle", True), text(440, 84, "일반해 y = c·e³ˣ", 13, GRAY, "middle"), text(440, 108, "y(0) = 5.7 → c = 5.7", 13, INK, "middle"),
+        text(440, 132, "특수해 y = 5.7e³ˣ", 14, RED, "middle", True)),
+    cap="초기값 문제(IVP): 일반해(회색 가족)에서 초기조건이 지나는 곡선 하나(빨강)를 고른다.", name="ivp")
 
 X2 = lambda t: 60 + t * 44; Y2 = lambda y: 160 - y * 240
 fig_decay = canvas(560, 190,
-    axis(60, 160, 540, 160, "t", "y") + arrow(60, 160, 60, 20, INK, "", 1.5),
-    fplot(lambda t: 0.5 * math.exp(-0.35 * t), 0, 10.5, X2, Y2, color=RED, w=2.6),
-    dot(60, Y2(0.5), "", 5, RED), text(74, Y2(0.5) - 6, "y(0) = 0.5 g", 12.5, RED),
-    line(60, Y2(0.25), X2(1.98), Y2(0.25), GRAY, 1, "4 3"), line(X2(1.98), Y2(0.25), X2(1.98), 160, GRAY, 1, "4 3"), text(X2(1.98), 176, "반감기", 11.5, GRAY, "middle"),
-    text(400, 50, "dy/dt = −k·y  (줄어드니까 −)", 13.5, INK, "middle", True), text(400, 74, "y = 0.5·e^(−kt)", 13.5, RED, "middle"),
-    cap="Ex.5 방사능 붕괴: 남은 양에 비례해 줄어든다. 해는 지수 감소 곡선 — 처음이 가장 가파르다.")
+    step(1, axis(60, 160, 540, 160, "t", "y") + arrow(60, 160, 60, 20, INK, "", 1.5),
+        fplot(lambda t: 0.5 * math.exp(-0.35 * t), 0, 10.5, X2, Y2, color=RED, w=2.6),
+        dot(60, Y2(0.5), "", 5, RED), text(74, Y2(0.5) - 6, "y(0) = 0.5 g", 12.5, RED)),
+    step(2, line(60, Y2(0.25), X2(1.98), Y2(0.25), GRAY, 1, "4 3"), line(X2(1.98), Y2(0.25), X2(1.98), 160, GRAY, 1, "4 3"), text(X2(1.98), 176, "반감기", 11.5, GRAY, "middle")),
+    step(3, text(400, 50, "dy/dt = −k·y  (줄어드니까 −)", 13.5, INK, "middle", True), text(400, 74, "y = 0.5·e^(−kt)", 13.5, RED, "middle")),
+    cap="Ex.5 방사능 붕괴: 남은 양에 비례해 줄어든다. 해는 지수 감소 곡선 — 처음이 가장 가파르다.", name="decay")
 
 fig_sep = canvas(560, 150,
-    fbox(20, 30, 200, 56, "g(y)·y′ = f(x)", INK, sub="y 는 왼쪽, x 는 오른쪽으로"), arrow(222, 58, 262, 58, GREEN, "", 2), text(242, 46, "dy 로", 11, GREEN, "middle"),
-    fbox(266, 30, 120, 56, "g(y)dy = f(x)dx", BLUE, sub="변수 분리"), arrow(388, 58, 428, 58, GREEN, "", 2), text(408, 46, "∫ 양변", 11, GREEN, "middle"),
-    fbox(432, 30, 118, 56, "∫g dy = ∫f dx + c", RED, sub="상수는 한쪽에"),
-    text(280, 120, "적분 도구 셋이 반복된다: ∫du/(u²+a²) = (1/a)tan⁻¹(u/a) · 부분분수 · 부분적분", 12.5, GRAY, "middle"),
-    cap="변수분리형 풀이 틀: 분리 → 양변 적분 → 적분상수 정리 → (조건 있으면) 대입.")
+    step(1, fbox(20, 30, 200, 56, "g(y)·y′ = f(x)", INK, sub="y 는 왼쪽, x 는 오른쪽으로")),
+    step(2, arrow(222, 58, 262, 58, GREEN, "", 2), text(242, 46, "dy 로", 11, GREEN, "middle"),
+        fbox(266, 30, 120, 56, "g(y)dy = f(x)dx", BLUE, sub="변수 분리")),
+    step(3, arrow(388, 58, 428, 58, GREEN, "", 2), text(408, 46, "∫ 양변", 11, GREEN, "middle"),
+        fbox(432, 30, 118, 56, "∫g dy = ∫f dx + c", RED, sub="상수는 한쪽에")),
+    step(4, text(280, 120, "적분 도구 셋이 반복된다: ∫du/(u²+a²) = (1/a)tan⁻¹(u/a) · 부분분수 · 부분적분", 12.5, GRAY, "middle")),
+    cap="변수분리형 풀이 틀: 분리 → 양변 적분 → 적분상수 정리 → (조건 있으면) 대입.", name="sep")
 
 X3 = lambda x: 40 + x * 26; Y3 = lambda y: 110 - y * 26
 def _circ(c, color, w):
     r = c / 2; pts = [(X3(r + r * math.cos(a)), Y3(r * math.sin(a))) for a in [2 * math.pi * i / 60 for i in range(61)]]
     return polyline(pts, color, w)
 fig_circles = canvas(560, 220,
-    axis(40, 110, 330, 110, "x", "y") + arrow(40, 110, 40, 10, INK, "", 1.5) + line(40, 110, 40, 210, INK, 1.5),
-    *[_circ(c, GRAY, 1.5) for c in (2, 4, 6, 8)], _circ(6, RED, 2.6), dot(40, 110, "", 5, INK),
-    text(430, 70, "2xy·y′ = y² − x²", 15, INK, "middle", True), text(430, 96, "y = ux 치환 →", 12.5, GRAY, "middle"),
-    text(430, 120, "x² + y² = c·x", 14, RED, "middle", True), text(430, 144, "(x − c/2)² + y² = (c/2)²", 13, INK, "middle"),
-    text(430, 172, "원점을 지나고 중심이 x 축 위인 원들", 12, GRAY, "middle"),
-    cap="Ex.8 의 해 가족: c 가 달라지면 반지름이 다른 원. 해를 「그림」으로 읽는 연습 — 정리하면 강점이 된다.")
+    step(1, axis(40, 110, 330, 110, "x", "y") + arrow(40, 110, 40, 10, INK, "", 1.5) + line(40, 110, 40, 210, INK, 1.5),
+        *[_circ(c, GRAY, 1.5) for c in (2, 4, 6, 8)], dot(40, 110, "", 5, INK)),
+    step(2, _circ(6, RED, 2.6),
+        text(430, 70, "2xy·y′ = y² − x²", 15, INK, "middle", True), text(430, 96, "y = ux 치환 →", 12.5, GRAY, "middle"),
+        text(430, 120, "x² + y² = c·x", 14, RED, "middle", True)),
+    step(3, text(430, 144, "(x − c/2)² + y² = (c/2)²", 13, INK, "middle"),
+        text(430, 172, "원점을 지나고 중심이 x 축 위인 원들", 12, GRAY, "middle")),
+    cap="Ex.8 의 해 가족: c 가 달라지면 반지름이 다른 원. 해를 「그림」으로 읽는 연습 — 정리하면 강점이 된다.", name="circles")
 
 X4 = lambda t: 60 + t * 0.0095; Y4 = lambda h: 150 - h * 0.55
 fig_tank = canvas(560, 192,
-    rect(40, 40, 110, 110, INK, fill="none", sw=2), rect(41, 70, 108, 79, BLUE, fill="rgba(25,113,194,.18)", sw=0), text(95, 62, "h(t)", 13, BLUE, "middle", True),
-    rect(148, 140, 10, 6, INK, fill="#fff", sw=1), arrow(160, 143, 200, 143, BLUE, "", 2), text(180, 166, "유출 v = 0.6√(2gh)", 11, BLUE, "middle"),
-    text(95, 184, "지름 2 m 탱크 · 지름 1 cm 구멍", 11.5, GRAY, "middle"),
-    axis(260, 150, 540, 150, "t", "h [cm]") + arrow(260, 150, 260, 30, INK, "", 1.5),
-    fplot(lambda t: (15 - 0.000332 * t) ** 2, 0, 45181, lambda t: 260 + t * 0.006, lambda h: 150 - h * 0.5, color=RED, w=2.6),
-    text(275, 42, "225 cm", 11.5, GRAY), text(400, 168, "45 181 s ≈ 12.6 h 에 바닥", 11.5, RED, "middle"),
-    cap="Ex.7 토리첼리: 물 높이 h 가 √h 에 비례해 줄어든다 → 포물선 모양으로 비어 12.6시간 뒤 바닥(교재 수치).")
+    step(1, rect(40, 40, 110, 110, INK, fill="none", sw=2), rect(41, 70, 108, 79, BLUE, fill="rgba(25,113,194,.18)", sw=0), text(95, 62, "h(t)", 13, BLUE, "middle", True),
+        rect(148, 140, 10, 6, INK, fill="#fff", sw=1), arrow(160, 143, 200, 143, BLUE, "", 2), text(180, 166, "유출 v = 0.6√(2gh)", 11, BLUE, "middle"),
+        text(95, 184, "지름 2 m 탱크 · 지름 1 cm 구멍", 11.5, GRAY, "middle")),
+    step(2, axis(260, 150, 540, 150, "t", "h [cm]") + arrow(260, 150, 260, 30, INK, "", 1.5),
+        fplot(lambda t: (15 - 0.000332 * t) ** 2, 0, 45181, lambda t: 260 + t * 0.006, lambda h: 150 - h * 0.5, color=RED, w=2.6),
+        text(275, 42, "225 cm", 11.5, GRAY), text(400, 168, "45 181 s ≈ 12.6 h 에 바닥", 11.5, RED, "middle")),
+    cap="Ex.7 토리첼리: 물 높이 h 가 √h 에 비례해 줄어든다 → 포물선 모양으로 비어 12.6시간 뒤 바닥(교재 수치).", name="tank")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공업수학1 · 9/4 해와 초기값 문제 · 변수분리형 · 동차형</title></head><body>
 <header>

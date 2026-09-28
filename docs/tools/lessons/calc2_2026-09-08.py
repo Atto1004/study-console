@@ -6,51 +6,59 @@ from figs import *
 OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\미분적분학2\_수업노트\2026-09-08.html"
 
 fig_cof = canvas(560, 200,
-    band(30, 44, 162, 44, 14, RED, .13), band(96, 30, 96, 114, 14, RED, .13),
-    mat(30, 30, [["a_11", "a_12", "a_13"], ["a_21", "a_22", "a_23"], ["a_31", "a_32", "a_33"]], 44, 28, bars=True, hl=(0, 1)),
-    text(96, 138, "a₁₂ 의 행·열을 지우면", 12, INK, "middle"), text(96, 156, "남는 2×2 = 소행렬식 M₁₂", 12, INK, "middle", True),
-    mat(230, 40, [["+", "−", "+"], ["−", "+", "−"], ["+", "−", "+"]], 30, 26, bars=True), text(275, 130, "부호판 (−1)^(i+j)", 12, INK, "middle"),
-    text(430, 44, "M_ij : 소행렬식 (minor)", 13, INK, "middle"), text(430, 68, "A_ij = (−1)^(i+j) M_ij : 여인수", 13.5, RED, "middle", True),
-    text(430, 100, "det A = a₁₁A₁₁ + a₁₂A₁₂ + a₁₃A₁₃", 13, INK, "middle", True), text(430, 122, "(1행 기준 전개 — 어느 행·열이든 값은 같다)", 11.5, GRAY, "middle"),
-    text(430, 152, "0 이 많은 행·열을 고르면 계산이 준다", 12, GREEN, "middle"),
-    cap="여인수 전개: 3차를 2차 셋으로 쪼갠다. 부호는 여인수(부호판)가 결정.")
+    step(1, band(30, 44, 162, 44, 14, RED, .13), band(96, 30, 96, 114, 14, RED, .13),
+        mat(30, 30, [["a_11", "a_12", "a_13"], ["a_21", "a_22", "a_23"], ["a_31", "a_32", "a_33"]], 44, 28, bars=True, hl=(0, 1)),
+        text(96, 138, "a₁₂ 의 행·열을 지우면", 12, INK, "middle"), text(96, 156, "남는 2×2 = 소행렬식 M₁₂", 12, INK, "middle", True)),
+    step(2, mat(230, 40, [["+", "−", "+"], ["−", "+", "−"], ["+", "−", "+"]], 30, 26, bars=True), text(275, 130, "부호판 (−1)^(i+j)", 12, INK, "middle")),
+    step(3, text(430, 44, "M_ij : 소행렬식 (minor)", 13, INK, "middle"), text(430, 68, "A_ij = (−1)^(i+j) M_ij : 여인수", 13.5, RED, "middle", True)),
+    step(4, text(430, 100, "det A = a₁₁A₁₁ + a₁₂A₁₂ + a₁₃A₁₃", 13, INK, "middle", True), text(430, 122, "(1행 기준 전개 — 어느 행·열이든 값은 같다)", 11.5, GRAY, "middle"),
+        text(430, 152, "0 이 많은 행·열을 고르면 계산이 준다", 12, GREEN, "middle")),
+    cap="여인수 전개: 3차를 2차 셋으로 쪼갠다. 부호는 여인수(부호판)가 결정.", name="cof")
 
 fig_inv2 = canvas(560, 130,
-    mat(30, 26, [["a", "b"], ["c", "d"]], 34, 28), text(64, 104, "A", 13, INK, "middle"),
-    arrow(106, 54, 140, 54, GREEN, "⁻¹", 2, 0, -8),
-    text(146, 60, "1/(ad − bc)", 14, INK, "start"), mat(236, 26, [["d", "−b"], ["−c", "a"]], 34, 28, hl=[(0, 0), (1, 1)]),
-    text(250, 104, "주대각 맞바꾸고, 부대각에 −", 12, INK, "middle"),
-    text(450, 46, "det A = 0 이면 역행렬 없음", 13, RED, "middle", True), text(450, 70, "AA⁻¹ = A⁻¹A = I", 13, INK, "middle"), text(450, 94, "Ex07 [4 1; 6 2] → det 2 → [1 −½; −3 2]", 11.5, GRAY, "middle"),
-    cap="2×2 역행렬: 외워 두는 공식 하나. 나눗셈 대신 「역행렬을 곱한다」.")
+    step(1, mat(30, 26, [["a", "b"], ["c", "d"]], 34, 28), text(64, 104, "A", 13, INK, "middle")),
+    step(2, arrow(106, 54, 140, 54, GREEN, "⁻¹", 2, 0, -8),
+        text(146, 60, "1/(ad − bc)", 14, INK, "start"), mat(236, 26, [["d", "−b"], ["−c", "a"]], 34, 28, hl=[(0, 0), (1, 1)]),
+        text(250, 104, "주대각 맞바꾸고, 부대각에 −", 12, INK, "middle")),
+    step(3, text(450, 46, "det A = 0 이면 역행렬 없음", 13, RED, "middle", True), text(450, 70, "AA⁻¹ = A⁻¹A = I", 13, INK, "middle"), text(450, 94, "Ex07 [4 1; 6 2] → det 2 → [1 −½; −3 2]", 11.5, GRAY, "middle")),
+    cap="2×2 역행렬: 외워 두는 공식 하나. 나눗셈 대신 「역행렬을 곱한다」.", name="inv2")
 
 fig_adj = canvas(560, 140,
-    fbox(14, 26, 100, 56, "det A", INK, sub="≠ 0 확인", size=14), arrow(116, 54, 146, 54, GREEN, "", 2),
-    fbox(150, 26, 120, 56, "여인수 9개", BLUE, sub="A_ij = (−1)^(i+j)M_ij", size=13), arrow(272, 54, 302, 54, GREEN, "", 2),
-    fbox(306, 26, 110, 56, "adj(A)", BLUE, sub="여인수 행렬의 전치", size=14), arrow(418, 54, 448, 54, GREEN, "", 2),
-    fbox(452, 26, 98, 56, "÷ det A", RED, sub="A⁻¹ = adj/det", size=13),
-    text(280, 118, "「행렬은 괄호, 행렬식은 세로줄」 · 「선언 필수」(A, X, B 가 무엇인지 먼저)", 12, GRAY, "middle"),
-    cap="3×3 역행렬의 수순(Ex8 ★). det → 여인수 → 전치 → 나누기.")
+    step(1, fbox(14, 26, 100, 56, "det A", INK, sub="≠ 0 확인", size=14)),
+    step(2, arrow(116, 54, 146, 54, GREEN, "", 2),
+        fbox(150, 26, 120, 56, "여인수 9개", BLUE, sub="A_ij = (−1)^(i+j)M_ij", size=13)),
+    step(3, arrow(272, 54, 302, 54, GREEN, "", 2),
+        fbox(306, 26, 110, 56, "adj(A)", BLUE, sub="여인수 행렬의 전치", size=14)),
+    step(4, arrow(418, 54, 448, 54, GREEN, "", 2),
+        fbox(452, 26, 98, 56, "÷ det A", RED, sub="A⁻¹ = adj/det", size=13),
+        text(280, 118, "「행렬은 괄호, 행렬식은 세로줄」 · 「선언 필수」(A, X, B 가 무엇인지 먼저)", 12, GRAY, "middle")),
+    cap="3×3 역행렬의 수순(Ex8 ★). det → 여인수 → 전치 → 나누기.", name="adj")
 
 fig_cramer = canvas(560, 170,
-    mat(30, 30, [["a_11", "a_12", "a_13"], ["a_21", "a_22", "a_23"], ["a_31", "a_32", "a_33"]], 42, 26, bars=True), text(93, 128, "det A", 13, INK, "middle", True),
-    mat(200, 30, [["b_1", "a_12", "a_13"], ["b_2", "a_22", "a_23"], ["b_3", "a_32", "a_33"]], 42, 26, bars=True, hl=[(0, 0), (1, 0), (2, 0)]), text(263, 128, "det A₁ (1열 → B)", 13, RED, "middle", True),
-    text(430, 50, "x_j = det(A_j) / det(A)", 15, INK, "middle", True), text(430, 76, "A_j = A 의 j 열을 상수항 B 로 교체", 12.5, INK, "middle"),
-    text(430, 104, "조건 det A ≠ 0", 13, RED, "middle", True), text(430, 130, "j = 1 이면 b 가 맨 앞 열, j = n 이면 맨 뒤 열", 11.5, GRAY, "middle"),
-    text(280, 158, "Ex10: det A = 9, det A₁ = 20, det A₂ = −3, det A₃ = 22 → x = (20/9, −1/3, 22/9)", 12, GRAY, "middle"),
-    cap="크래머의 법칙: 열 하나를 상수항으로 바꾼 행렬식을 원래 행렬식으로 나눈다.")
+    step(1, mat(30, 30, [["a_11", "a_12", "a_13"], ["a_21", "a_22", "a_23"], ["a_31", "a_32", "a_33"]], 42, 26, bars=True), text(93, 128, "det A", 13, INK, "middle", True)),
+    step(2, mat(200, 30, [["b_1", "a_12", "a_13"], ["b_2", "a_22", "a_23"], ["b_3", "a_32", "a_33"]], 42, 26, bars=True, hl=[(0, 0), (1, 0), (2, 0)]), text(263, 128, "det A₁ (1열 → B)", 13, RED, "middle", True)),
+    step(3, text(430, 50, "x_j = det(A_j) / det(A)", 15, INK, "middle", True), text(430, 76, "A_j = A 의 j 열을 상수항 B 로 교체", 12.5, INK, "middle"),
+        text(430, 104, "조건 det A ≠ 0", 13, RED, "middle", True)),
+    step(4, text(430, 130, "j = 1 이면 b 가 맨 앞 열, j = n 이면 맨 뒤 열", 11.5, GRAY, "middle"),
+        text(280, 158, "Ex10: det A = 9, det A₁ = 20, det A₂ = −3, det A₃ = 22 → x = (20/9, −1/3, 22/9)", 12, GRAY, "middle")),
+    cap="크래머의 법칙: 열 하나를 상수항으로 바꾼 행렬식을 원래 행렬식으로 나눈다.", name="cramer")
 
 fig_solve = canvas(560, 120,
-    fbox(14, 24, 110, 54, "선언", INK, sub="A, X, B 가 무엇인지", size=13), arrow(126, 51, 152, 51, GREEN, "", 1.8),
-    fbox(156, 24, 90, 54, "AX = B", BLUE, size=14), arrow(248, 51, 274, 51, GREEN, "", 1.8),
-    fbox(278, 24, 120, 54, "왼쪽에 A⁻¹", BLUE, sub="교환법칙 ✗ — 위치 주의", size=13), arrow(400, 51, 426, 51, GREEN, "", 1.8),
-    fbox(430, 24, 120, 54, "X = A⁻¹B → 검산", RED, sub="대입해 확인", size=13),
-    cap="역행렬로 연립방정식 풀기(Ex9). 행렬은 괄호, 행렬식은 세로줄.")
+    step(1, fbox(14, 24, 110, 54, "선언", INK, sub="A, X, B 가 무엇인지", size=13)),
+    step(2, arrow(126, 51, 152, 51, GREEN, "", 1.8),
+        fbox(156, 24, 90, 54, "AX = B", BLUE, size=14)),
+    step(3, arrow(248, 51, 274, 51, GREEN, "", 1.8),
+        fbox(278, 24, 120, 54, "왼쪽에 A⁻¹", BLUE, sub="교환법칙 ✗ — 위치 주의", size=13)),
+    step(4, arrow(400, 51, 426, 51, GREEN, "", 1.8),
+        fbox(430, 24, 120, 54, "X = A⁻¹B → 검산", RED, sub="대입해 확인", size=13)),
+    cap="역행렬로 연립방정식 풀기(Ex9). 행렬은 괄호, 행렬식은 세로줄.", name="solve")
 
 fig_types = canvas(560, 130,
-    fbox(10, 20, 104, 44, "3차 행렬식", INK, sub="사루스", size=12), fbox(120, 20, 104, 44, "det = 0 인 x", INK, sub="2차방정식", size=12),
-    fbox(230, 20, 104, 44, "여인수 전개", INK, sub="기준 줄 선언", size=12), fbox(340, 20, 104, 44, "3×3 역행렬 ★", RED, sub="det→여인수→전치→÷", size=11.5), fbox(450, 20, 100, 44, "연립방정식", RED, sub="A⁻¹B · 크래머", size=12),
-    text(280, 92, "한 도구(행렬식)의 다섯 쓰임 — 표기 감점: det·세로줄 · 괄호 · × 금지", 12, GRAY, "middle"),
-    cap="중간고사 행렬 파트 2~3문제의 유형(9/3 발언 기준). 답을 구했으면 대입 검산까지.")
+    step(1, fbox(10, 20, 104, 44, "3차 행렬식", INK, sub="사루스", size=12), fbox(120, 20, 104, 44, "det = 0 인 x", INK, sub="2차방정식", size=12)),
+    step(2, fbox(230, 20, 104, 44, "여인수 전개", INK, sub="기준 줄 선언", size=12)),
+    step(3, fbox(340, 20, 104, 44, "3×3 역행렬 ★", RED, sub="det→여인수→전치→÷", size=11.5), fbox(450, 20, 100, 44, "연립방정식", RED, sub="A⁻¹B · 크래머", size=12)),
+    step(4, text(280, 92, "한 도구(행렬식)의 다섯 쓰임 — 표기 감점: det·세로줄 · 괄호 · × 금지", 12, GRAY, "middle")),
+    cap="중간고사 행렬 파트 2~3문제의 유형(9/3 발언 기준). 답을 구했으면 대입 검산까지.", name="types")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미분적분학2 · 9/8 여인수 전개 · 역행렬 · 크래머의 법칙</title></head><body>
 <header>

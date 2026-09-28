@@ -7,46 +7,49 @@ OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\공업수학1\_
 
 X1 = lambda x: 50 + x * 90; Y1 = lambda y: 160 - y * 14
 fig_ec = canvas(560, 190,
-    axis(50, 160, 300, 160, "x (> 0)", "y") + arrow(50, 160, 50, 20, INK, "", 1.5),
-    fplot(lambda x: x ** 2, 0, 2.6, X1, Y1, color=BLUE, w=2.4, ylim=(0, 9.5)), fplot(lambda x: x ** 3, 0, 2.2, X1, Y1, color=RED, w=2.4, ylim=(0, 9.5)),
-    text(300, 68, "x²", 13, BLUE, "start", True), text(252, 40, "x³", 13, RED, "start", True),
-    text(430, 50, "x²y″ + axy′ + by = 0", 14.5, INK, "middle", True), text(430, 76, "y = xᵐ 대입 → x 가 전부 빠진다", 12.5, GRAY, "middle"),
-    text(430, 104, "m² + (a − 1)m + b = 0", 15, RED, "middle", True), text(430, 126, "보조방정식 (auxiliary equation)", 12, GRAY, "middle"),
-    text(430, 158, "(1) 실근 m₁ ≠ m₂ → y = c₁x^m₁ + c₂x^m₂", 12.5, INK, "middle"),
-    cap="오일러-코시: 계수가 x², x, 1 로 「차수를 맞춘」 변수계수 방정식. 거듭제곱 xᵐ 이 e^λx 의 자리를 맡는다.")
+    step(1, axis(50, 160, 300, 160, "x (> 0)", "y") + arrow(50, 160, 50, 20, INK, "", 1.5),
+        fplot(lambda x: x ** 2, 0, 2.6, X1, Y1, color=BLUE, w=2.4, ylim=(0, 9.5)), fplot(lambda x: x ** 3, 0, 2.2, X1, Y1, color=RED, w=2.4, ylim=(0, 9.5)),
+        text(300, 68, "x²", 13, BLUE, "start", True), text(252, 40, "x³", 13, RED, "start", True)),
+    step(2, text(430, 50, "x²y″ + axy′ + by = 0", 14.5, INK, "middle", True), text(430, 76, "y = xᵐ 대입 → x 가 전부 빠진다", 12.5, GRAY, "middle")),
+    step(3, text(430, 104, "m² + (a − 1)m + b = 0", 15, RED, "middle", True), text(430, 126, "보조방정식 (auxiliary equation)", 12, GRAY, "middle")),
+    step(4, text(430, 158, "(1) 실근 m₁ ≠ m₂ → y = c₁x^m₁ + c₂x^m₂", 12.5, INK, "middle")),
+    cap="오일러-코시: 계수가 x², x, 1 로 「차수를 맞춘」 변수계수 방정식. 거듭제곱 xᵐ 이 e^λx 의 자리를 맡는다.", name="ec")
 
 fig_dbl = canvas(560, 140,
-    fbox(14, 26, 130, 56, "중근 m = (1−a)/2", INK, sub="y₁ = x^m 하나뿐", size=13), arrow(146, 54, 178, 54, GREEN, "", 2),
-    fbox(182, 26, 130, 56, "y₂ = u·y₁", BLUE, sub="차수축소 (2.1)", size=13.5), arrow(314, 54, 346, 54, GREEN, "", 2),
-    fbox(350, 26, 96, 56, "u″x² + u′x = 0", BLUE, sub="→ u′ = 1/x", size=12.5), arrow(448, 54, 480, 54, GREEN, "", 2),
-    fbox(484, 26, 66, 56, "u = ln x", RED, size=14),
-    text(280, 118, "y = (c₁ + c₂ ln x)·x^((1−a)/2)   —   2.2 의 「x 가 붙는다」가 여기서는 「ln x 가 붙는다」", 12.5, INK, "middle", True),
-    cap="(2) 중근 유도의 뼈대. 판서에서 괄호 계산 2xy₁′ + ay₁ 이 정확히 y₁ 이 되어 식이 u″x² + u′x = 0 으로 줄었다.")
+    step(1, fbox(14, 26, 130, 56, "중근 m = (1−a)/2", INK, sub="y₁ = x^m 하나뿐", size=13)),
+    step(2, arrow(146, 54, 178, 54, GREEN, "", 2),
+        fbox(182, 26, 130, 56, "y₂ = u·y₁", BLUE, sub="차수축소 (2.1)", size=13.5)),
+    step(3, arrow(314, 54, 346, 54, GREEN, "", 2),
+        fbox(350, 26, 96, 56, "u″x² + u′x = 0", BLUE, sub="→ u′ = 1/x", size=12.5)),
+    step(4, arrow(448, 54, 480, 54, GREEN, "", 2),
+        fbox(484, 26, 66, 56, "u = ln x", RED, size=14),
+        text(280, 118, "y = (c₁ + c₂ ln x)·x^((1−a)/2)   —   2.2 의 「x 가 붙는다」가 여기서는 「ln x 가 붙는다」", 12.5, INK, "middle", True)),
+    cap="(2) 중근 유도의 뼈대. 판서에서 괄호 계산 2xy₁′ + ay₁ 이 정확히 y₁ 이 되어 식이 u″x² + u′x = 0 으로 줄었다.", name="dbl")
 
 X2 = lambda x: 40 + x * 60; Y2 = lambda y: 100 - y * 60
 fig_osc = canvas(560, 200,
-    axis(40, 100, 540, 100, "x", "y") + arrow(40, 100, 40, 20, INK, "", 1.5),
-    fplot(lambda x: math.cos(2 * math.log(x)), 0.25, 8.2, X2, Y2, n=400, color=GREEN, w=2.4),
-    text(300, 34, "y = cos(2 ln x)   — 진동하지만 x 가 커질수록 느려진다 (ln x)", 12.5, INK, "middle", True),
-    text(300, 186, "x^p 배가 곱해지면 진폭이 x^p 로 커지거나 줄어든다", 12, GRAY, "middle"),
-    cap="(3) 복소근 m = p ± iq 의 해 xᵖ cos(q ln x), xᵖ sin(q ln x). 2.2 의 cos qx 에서 x 가 ln x 로 바뀐 꼴.")
+    step(1, axis(40, 100, 540, 100, "x", "y") + arrow(40, 100, 40, 20, INK, "", 1.5),
+        fplot(lambda x: math.cos(2 * math.log(x)), 0.25, 8.2, X2, Y2, n=400, color=GREEN, w=2.4)),
+    step(2, text(300, 34, "y = cos(2 ln x)   — 진동하지만 x 가 커질수록 느려진다 (ln x)", 12.5, INK, "middle", True)),
+    step(3, text(300, 186, "x^p 배가 곱해지면 진폭이 x^p 로 커지거나 줄어든다", 12, GRAY, "middle")),
+    cap="(3) 복소근 m = p ± iq 의 해 xᵖ cos(q ln x), xᵖ sin(q ln x). 2.2 의 cos qx 에서 x 가 ln x 로 바뀐 꼴.", name="osc")
 
 fig_flow = canvas(560, 150,
-    fbox(14, 20, 200, 50, "보조방정식 m² + (a−1)m + b = 0", INK, size=12.5),
-    arrow(214, 45, 250, 45, GREEN, "", 1.8),
-    fbox(254, 8, 296, 36, "(1) 실근 둘 → c₁x^m₁ + c₂x^m₂", GREEN, size=12.5),
-    fbox(254, 50, 296, 36, "(2) 중근 → (c₁ + c₂ ln x)x^m", BLUE, size=12.5),
-    fbox(254, 92, 296, 36, "(3) p ± iq → x^p[c₁cos(q ln x) + c₂sin(q ln x)]", RED, size=12),
-    text(114, 100, "예제 (1) m²−4m+4 → 중근 2", 11.5, BLUE, "middle"), text(114, 118, "(2) m²−5m+6 → 2, 3", 11.5, GREEN, "middle"), text(114, 136, "(3) m²+6m+13 → −3 ± 2i", 11.5, RED, "middle"),
-    cap="예제 세 개가 세 경우를 하나씩. 4주차 과제 2.5 #3·5·7·13 도 이 흐름.")
+    step(1, fbox(14, 20, 200, 50, "보조방정식 m² + (a−1)m + b = 0", INK, size=12.5)),
+    step(2, arrow(214, 45, 250, 45, GREEN, "", 1.8),
+        fbox(254, 8, 296, 36, "(1) 실근 둘 → c₁x^m₁ + c₂x^m₂", GREEN, size=12.5),
+        fbox(254, 50, 296, 36, "(2) 중근 → (c₁ + c₂ ln x)x^m", BLUE, size=12.5),
+        fbox(254, 92, 296, 36, "(3) p ± iq → x^p[c₁cos(q ln x) + c₂sin(q ln x)]", RED, size=12)),
+    step(3, text(114, 100, "예제 (1) m²−4m+4 → 중근 2", 11.5, BLUE, "middle"), text(114, 118, "(2) m²−5m+6 → 2, 3", 11.5, GREEN, "middle"), text(114, 136, "(3) m²+6m+13 → −3 ± 2i", 11.5, RED, "middle")),
+    cap="예제 세 개가 세 경우를 하나씩. 4주차 과제 2.5 #3·5·7·13 도 이 흐름.", name="flow")
 
 fig_W = canvas(560, 170,
-    text(120, 40, "W(y₁, y₂) =", 15, INK, "middle", True),
-    line(196, 22, 196, 62, INK, 2), line(300, 22, 300, 62, INK, 2), text(222, 36, "y₁", 14, INK, "middle"), text(274, 36, "y₂", 14, INK, "middle"), text(222, 58, "y₁′", 14, INK, "middle"), text(274, 58, "y₂′", 14, INK, "middle"),
-    text(400, 42, "= y₁y₂′ − y₂y₁′", 14, INK, "middle"),
-    fbox(40, 90, 230, 44, "W ≠ 0  →  1차독립 (기저)  ☆", GREEN, size=13.5), fbox(300, 90, 230, 44, "W = 0  →  1차종속", RED, size=13.5),
-    text(280, 156, "eg1) cos ωx, sin ωx: W = ω ≠ 0      eg2) eˣ, xeˣ: W = e^(2x) ≠ 0", 12.5, GRAY, "middle"),
-    cap="2.6 론스키안(Wronskian). 비례 판정을 행렬식 하나로 — 판서 별표 자리.")
+    step(1, text(120, 40, "W(y₁, y₂) =", 15, INK, "middle", True),
+        line(196, 22, 196, 62, INK, 2), line(300, 22, 300, 62, INK, 2), text(222, 36, "y₁", 14, INK, "middle"), text(274, 36, "y₂", 14, INK, "middle"), text(222, 58, "y₁′", 14, INK, "middle"), text(274, 58, "y₂′", 14, INK, "middle")),
+    step(2, text(400, 42, "= y₁y₂′ − y₂y₁′", 14, INK, "middle")),
+    step(3, fbox(40, 90, 230, 44, "W ≠ 0  →  1차독립 (기저)  ☆", GREEN, size=13.5), fbox(300, 90, 230, 44, "W = 0  →  1차종속", RED, size=13.5)),
+    step(4, text(280, 156, "eg1) cos ωx, sin ωx: W = ω ≠ 0      eg2) eˣ, xeˣ: W = e^(2x) ≠ 0", 12.5, GRAY, "middle")),
+    cap="2.6 론스키안(Wronskian). 비례 판정을 행렬식 하나로 — 판서 별표 자리.", name="W")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공업수학1 · 9/23 오일러-코시 방정식 · 론스키안</title></head><body>
 <header>
