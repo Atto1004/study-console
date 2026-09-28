@@ -40,8 +40,15 @@ def main():
     rows = bands(A.sum(1), max(4, H // 100), W * 0.01)
     cells = []
     ratio = float(opts.get("ratio", "0.85"))   # 칸 폭 = 행 높이 × ratio (어깨가 이웃과 닿아 있어도 머리 중심 기준으로 자른다)
+    mode = opts.get("mode", "head")            # head = 머리 위치로 열 분할(어깨가 닿는 흉상 시트) · cols = 빈 띠로 열 분할 + 내용 상자(떨어져 있는 전신·스티커 시트)
     for (r0, r1) in rows:
         rh = r1 - r0; sub = A[r0:r1]
+        if mode == "cols":
+            for (c0, c1) in bands(sub.sum(0), max(4, W // 200), rh * 0.01):
+                blk = sub[:, c0:c1]; ys, xs = np.where(blk > 0.05)
+                if len(xs) == 0 or (xs.max() - xs.min()) < W * 0.04: continue
+                cells.append((c0 + xs.min(), r0 + ys.min(), c0 + xs.max() + 1, r0 + ys.max() + 1))
+            continue
         head = sub[: int(rh * 0.5)]   # 위쪽 절반(머리·목)에서만 열을 나눈다 — 아래쪽 어깨는 서로 닿는다
         for (c0, c1) in bands(head.sum(0), max(4, W // 200), rh * 0.5 * 0.01):
             if (c1 - c0) < W * 0.06: continue   # 부스러기 제외

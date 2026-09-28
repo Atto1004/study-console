@@ -19,6 +19,9 @@
   };
   /* 김주영 스앵님 실사풍 일러스트(힉스필드, 2026-09-28): notes/classroom/assets/tutor/<face>.png 6장. neutral 이 로드되면 그림, 아니면 SVG 치비. 끄기: localStorage mc-tutor-svg=1 또는 ?tutor=svg */
   V55.TUTOR_IMG="notes/classroom/assets/tutor/"; V55.FACES=["neutral","sharp","smile","angry","wide","proud"];
+  /* 과목 표지 일러스트(힉스필드 한 시트를 4장으로 자름): 과목 이름 → 파일. 없는 과목은 표지 없음(칩·히어로 그대로) */
+  V55.COVER={"일반물리학2":"phys2","정역학":"statics","공업수학1":"em1","미분적분학2":"calc2"};
+  V55.coverOf=function(c){ var k=c&&V55.COVER[String(c.name||"").replace(/\s+/g,"")]; return k?"notes/classroom/assets/covers/"+k+".jpg":""; };
   V55.tutorImg=function(){
     if(V55.rasterP) return V55.rasterP;
     var off=false; try{ off=localStorage.getItem("mc-tutor-svg")==="1"||/[?&]tutor=svg\b/.test(location.search); }catch(e){}
@@ -107,13 +110,13 @@
       : (cur&&cur.st==="note"? '<button type="button" class="btn a v55-cta" data-v55note="'+esc(cur.date)+'">회차 정리 보기 · '+esc(md(cur.date))+'</button>' : next? '<span class="chip mut">다음 수업 '+esc(md(next.date))+'</span>':'');
     var pct=judged?Math.round(done/judged*100):0;
     var units=V55.units(c), uk=(cur&&cur.st!=="future")?V55.unitOf(c,cur,units):-1, unitChip=uk>=0?'<span class="chip v55-uchip" style="--uc:'+V55.ucOf(uk)+'">단원 '+(units[uk].n||uk+1)+' · '+esc(V55.shortT(units[uk].title))+'</span>':'';
-    return '<div class="v55-hero t-'+esc(c.typeA||"NONE")+'"><div class="v55-hl">'+
+    return '<div class="v55-hero t-'+esc(c.typeA||"NONE")+'"'+(V55.coverOf(c)?' style="--cover:url('+V55.coverOf(c)+')"':'')+'><div class="v55-hl">'+
       '<div class="v55-title"><h1>'+(c.isRetake?'<span class="v55-re">(재)</span>':'')+esc(c.name)+' <small>'+c.credits+'학점</small></h1><div class="v55-meta">'+unitChip+(c.prof?'<span class="chip mut">'+esc(c.prof)+' 교수님</span>':'')+(days?'<span class="chip acc">'+esc(days)+'</span>':'')+
         '<span class="chip mut">출석 '+(a.n.present||0)+' · 지각 '+(a.lateN||0)+' · 결석 '+(a.n.absent||0)+'</span>'+(c.status==="pending"?'<span class="chip warn">증원 대기</span>':'')+'</div></div>'+
       '<div class="v55-stats"><div><b class="v55-ok">'+done+'<small>/'+judged+'</small></b><span>따라감</span></div><div><b class="'+(todo?"v55-crit":"")+'">'+todo+'</b><span>밀림</span></div><div><b class="v55-xp">'+xp+'</b><span>이 과목 XP</span></div>'+(ex?'<div><b class="'+(dd!=null&&dd<=14?"v55-crit":"")+'">D-'+dd+'</b><span>'+esc(ex.kind||"시험")+' '+esc(md(ex.date))+'</span></div>':'')+'</div>'+
       '<div class="v55-bar" title="따라감 '+done+'/'+judged+'"><i style="width:'+pct+'%"></i></div>'+
       '<div class="v55-act">'+cta+'<span class="v55-actsp"></span></div></div>'+
-      '<div class="v55-hr"><div class="v55-bubble">'+esc(V55.line(c,cur,todo,done,judged))+'</div><div class="v55-tutor big" data-face="'+(todo?"sharp":(judged&&done===judged)?"proud":"neutral")+'"></div></div></div>';
+      '<div class="v55-hr"><div class="v55-bubble">'+esc(V55.line(c,cur,todo,done,judged))+'</div><div class="v55-tutor big" data-pose="'+((judged&&done===judged)?"cross":"point")+'" data-face="'+(todo?"sharp":(judged&&done===judged)?"proud":"neutral")+'"></div></div></div>';
   };
   /* ---------- 경로 ---------- */
   /* 단원 정보가 없는 과목(units.json 미등록)은 주차 머리말로 */
@@ -169,7 +172,10 @@
       var apply=function(){ var open=localStorage.getItem("mc-v55-table")==="1"; card.classList.toggle("v55-fold",!open); b.textContent=open?"접기":"회차 표 펼치기"; }; b.onclick=function(){ try{ localStorage.setItem("mc-v55-table",card.classList.contains("v55-fold")?"1":"0"); }catch(e){} apply(); }; apply(); }
     V55.bind(c,v);
     V55.tutorImg().then(function(raster){
-      if(raster){ $$(".v55-tutor",v).forEach(function(el){ if(el.querySelector("img,svg")) return; var f=el.getAttribute("data-face")||"neutral"; el.innerHTML='<img src="'+V55.faceSrc(f)+'" alt="" decoding="async" draggable="false">'; }); return; }
+      if(raster){ $$(".v55-tutor",v).forEach(function(el){ if(el.querySelector("img,svg")) return; var f=el.getAttribute("data-face")||"neutral", p=el.getAttribute("data-pose");
+          /* 히어로는 전신 포즈(pose-point · 완료면 pose-cross), 경로 마디는 표정 흉상. 포즈 파일이 없으면 흉상으로 */
+          if(p){ el.classList.add("pose"); el.innerHTML='<img src="'+V55.TUTOR_IMG+'pose-'+(p==="cross"?"cross":"point")+'.png" alt="" decoding="async" draggable="false">'; el.querySelector("img").onerror=function(){ el.classList.remove("pose"); el.innerHTML='<img src="'+V55.faceSrc(f)+'" alt="" decoding="async" draggable="false">'; }; }
+          else el.innerHTML='<img src="'+V55.faceSrc(f)+'" alt="" decoding="async" draggable="false">'; }); return; }
       V55.tutor().then(function(svg){ if(!svg) return; $$(".v55-tutor",v).forEach(function(el){ if(el.querySelector("img,svg")) return; el.innerHTML=svg; var s=el.querySelector("svg"); if(s){ s.setAttribute("data-face",el.getAttribute("data-face")||"neutral"); s.removeAttribute("id"); } }); });
     });
     if(window.V50&&!V50.S&&!V50.err&&V50.load){ V50.load().then(function(){ if(ui.view==="course") V55.render(); }); }
@@ -190,6 +196,8 @@
   /* 회차 표(V37)가 현재 주차를 scrollIntoView 하면서 페이지가 경로 아래로 확 내려가던 것 → 그리기 전 위치로 되돌린다(go() 는 먼저 맨 위로 보내므로 화면 진입은 맨 위, 다시 그릴 때는 제자리) */
   var _rc=renderCourse;
   renderCourse=function(){ var y=window.scrollY||0; _rc(); try{ V55.render(); }catch(e){ if(window.console) console.warn("V55",e); } try{ if(Math.abs((window.scrollY||0)-y)>2) window.scrollTo(0,y); }catch(e2){} };
+  /* 책장 과목 행: 표지가 있는 과목은 색 칩 대신 표지 썸네일(V44 renderShelf 뒤에 덧씌움 — V44 는 손대지 않는다) */
+  if(typeof renderShelf==="function"){ var _rs=renderShelf; renderShelf=function(){ _rs(); try{ $$(".crow[aria-label]").forEach(function(row){ var chip=row.querySelector(".crow-chip"); if(!chip||chip.classList.contains("cover")) return; var src=V55.coverOf({name:row.getAttribute("aria-label")}); if(!src) return; var keep=chip.innerHTML, im=document.createElement("img"); im.src=src; im.alt=""; im.decoding="async"; im.draggable=false; im.onerror=function(){ chip.classList.remove("cover"); chip.innerHTML=keep; }; chip.classList.add("cover"); chip.innerHTML=""; chip.appendChild(im); }); }catch(e){ if(window.console) console.warn("V55 cover",e); } }; }
   var css=document.createElement("style"); css.id="v55css";
   css.textContent=[
     "#v-course .v55-hide{display:none!important}",
@@ -206,7 +214,10 @@
     ".v55-hr{flex:0 0 200px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;min-width:0}",
     ".v55-bubble{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:9px 12px;font-size:13px;font-weight:700;line-height:1.45;width:100%;text-align:center}",
     ".v55-bubble::after{content:\"\";position:absolute;left:50%;bottom:-9px;margin-left:-6px;border:6px solid transparent;border-top-color:var(--line);border-bottom:0}",
-    ".v55-tutor{width:120px;height:140px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.14))}.v55-tutor svg{width:100%;height:100%;display:block;overflow:visible}.v55-tutor img{width:100%;height:100%;display:block;object-fit:contain;object-position:center bottom;-webkit-user-select:none;user-select:none}.v55-tutor.big{width:150px;height:176px}",
+    ".v55-tutor{width:120px;height:140px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.14))}.v55-tutor svg{width:100%;height:100%;display:block;overflow:visible}.v55-tutor img{width:100%;height:100%;display:block;object-fit:contain;object-position:center bottom;-webkit-user-select:none;user-select:none}.v55-tutor.big{width:150px;height:176px}.v55-tutor.big.pose{width:140px;height:250px}",
+    /* 과목 표지(힉스필드 2026-09-28): 히어로 오른쪽에 연하게 깔고, 책장 과목 행 칩은 표지 썸네일로 */
+    ".v55-hero{position:relative;overflow:hidden}.v55-hero::before{content:\"\";position:absolute;inset:0;background:var(--cover) center right/cover no-repeat;opacity:.14;pointer-events:none;-webkit-mask-image:linear-gradient(to right,transparent 42%,#000 78%);mask-image:linear-gradient(to right,transparent 42%,#000 78%)}.v55-hero>*{position:relative}",
+    ".crow-chip.cover{padding:0;overflow:hidden;background:#F2F2F7}.crow-chip.cover img{width:100%;height:100%;display:block;object-fit:cover}",
     /* 경로 */
     ".v55-path{position:relative;padding:6px 0 10px;overflow:hidden}",
     ".v55-wk{display:flex;align-items:center;gap:10px;margin:14px 0 14px;font-weight:800;font-size:12.5px;color:var(--ink-3);letter-spacing:.01em}.v55-wk::before,.v55-wk::after{content:\"\";flex:1;height:2px;background:var(--line);border-radius:2px}.v55-wk span{max-width:70%;text-align:center}",

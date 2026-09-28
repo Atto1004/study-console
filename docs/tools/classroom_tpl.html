@@ -132,6 +132,10 @@ main{max-width:1040px;margin:0 auto;padding:16px 20px 24px}
 /* 실사풍 일러스트(힉스필드, 2026-09-28): ../assets/tutor/<face>.png 이 열리면 그림, 아니면 SVG 치비. 끄기 ?tutor=svg */
 #tutorImg{display:none;width:100%;height:100%;object-fit:contain;object-position:center bottom;-webkit-user-select:none;user-select:none}
 #tutor.raster #tutorImg{display:block}#tutor.raster svg{display:none}
+/* 목차·결과 화면은 전신 포즈(pose-point · pose-cross), 단계·문제는 흉상 표정 */
+#tutor.raster.pose{width:170px;height:330px;animation:none}
+/* 결과 화면 배지 = 스티커(트로피·월계관), 없으면 SVG 배지 */
+#bc .res .stk{display:block;width:150px;height:150px;margin:2px auto 0;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))}
 .box{padding:14px 16px 12px;position:relative;min-height:120px}
 .box::before{content:"";position:absolute;left:50%;top:-9px;margin-left:-6px;border:6px solid transparent;border-bottom-color:var(--line);border-top:0}
 .name{font-family:var(--fh);font-weight:800;font-size:12px;color:var(--green);margin-bottom:4px}.name.prof{color:#7A2E52}
@@ -337,7 +341,11 @@ function finishNow(){ const a=anim; if(typing){ clearInterval(typing); typing=nu
 let typing=null, fullText="", typeDone=null, TYPE_MS=22;   /* TYPE_MS 는 검사기가 빠르게 돌릴 때 줄인다(__cr.speed) */
 /* 김주영 스앵님 실사풍 일러스트: notes/classroom/assets/tutor/<face>.png (이 페이지 기준 ../assets/tutor/). neutral 이 열리면 그림으로, 아니면 SVG 치비 그대로. 끄기: ?tutor=svg 또는 localStorage mc-tutor-svg=1 */
 const TUTOR_IMG="../assets/tutor/", FACES=["neutral","sharp","smile","angry","wide","proud"]; let curFace="neutral", RASTER=false;
-function faceImg(face){ const im=$("#tutorImg"); if(!im||!RASTER) return; const f=FACES.indexOf(face)>=0?face:"neutral"; const src=TUTOR_IMG+f+".png"; if(im.getAttribute("src")!==src) im.setAttribute("src",src); }
+/* 목차 = 지시봉 전신(pose-point) · 결과 = 팔짱 전신(pose-cross) · 그 밖(단계·문제) = 표정 흉상. 포즈 파일이 없으면 흉상으로 */
+const POSE_OK={}; function poseFile(mode){ return mode==="intro"?"pose-point":mode==="result"?"pose-cross":null; }
+function faceImg(face){ const im=$("#tutorImg"), box=$("#tutor"); if(!im||!RASTER) return; const p=poseFile(S.mode); const usePose=!!(p&&POSE_OK[p]!==false);
+  const src=TUTOR_IMG+(usePose?p:(FACES.indexOf(face)>=0?face:"neutral"))+".png"; box.classList.toggle("pose",usePose);
+  if(im.getAttribute("src")!==src){ im.onerror=usePose?function(){ POSE_OK[p]=false; im.onerror=null; box.classList.remove("pose"); faceImg(face); }:null; im.setAttribute("src",src); } }
 (function(){ let off=false; try{ off=/[?&]tutor=svg\b/.test(location.search)||localStorage.getItem("mc-tutor-svg")==="1"; }catch(e){} if(off) return;
   const probe=new Image(); probe.onload=function(){ RASTER=true; $("#tutor").classList.add("raster"); faceImg(curFace); }; probe.onerror=function(){ RASTER=false; }; probe.src=TUTOR_IMG+"neutral.png"; })();
 function say(text,face,name,onDone){
@@ -519,7 +527,9 @@ function renderResult(){
   const wasDone=!!L.done; if(graded>=n) L.done=true; const first=graded>=n&&!L.rew.done; if(first){ L.rew.done=true; gainXP(20); touchStreak(); }   /* 완료 보상도 회차당 한 번(L.rew, 오타 R5·R6) */
   if(first||L.done!==wasDone) save();   /* 보상과 별개로 완료 상태 변화는 바로 저장 — render() 의 save 는 이보다 앞이라 재완료가 안 남았다(오타 2차 R6) */
   const ratio=n?ok/n:1, good=ratio>=.8, mid=ratio>=.5;
-  const badge='<svg class="badge" viewBox="0 0 120 120" fill="none" stroke="#FFE27A" stroke-width="2.5" stroke-linejoin="round"><circle cx="60" cy="60" r="50" stroke-dasharray="4 3"/><circle cx="60" cy="60" r="40"/><path d="M60 30l8.8 18 19.8 2.9-14.3 13.9 3.4 19.7L60 75.2l-17.7 9.3 3.4-19.7L31.4 50.9l19.8-2.9z" fill="rgba(255,226,122,.18)"/></svg><div class="bl2">'+esc(D.course)+' · '+esc(D.sess)+' · 챕터 '+CH.length+'</div>';
+  /* 배지: 그림 세트가 있으면 스티커(전부 맞히면 트로피, 아니면 월계관), 없으면 SVG 배지 */
+  /* 스티커를 먼저 쓰고 못 열면 SVG 배지로 — RASTER 탐색(비동기)이 끝나기 전에 결과 화면이 뜰 수 있어 탐색 결과에 기대지 않는다 */
+  const badge='<img class="stk" alt="" src="../assets/stickers/'+(good?"trophy":"laurel")+'.png" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"><svg class="badge" style="display:none" viewBox="0 0 120 120" fill="none" stroke="#FFE27A" stroke-width="2.5" stroke-linejoin="round"><circle cx="60" cy="60" r="50" stroke-dasharray="4 3"/><circle cx="60" cy="60" r="40"/><path d="M60 30l8.8 18 19.8 2.9-14.3 13.9 3.4 19.7L60 75.2l-17.7 9.3 3.4-19.7L31.4 50.9l19.8-2.9z" fill="rgba(255,226,122,.18)"/></svg><div class="bl2">'+esc(D.course)+' · '+esc(D.sess)+' · 챕터 '+CH.length+'</div>';
   board('<div class="res"><div class="big">'+(ung.length?"채점이 남았습니다":good?"수고했습니다":mid?"절반은 넘겼습니다":"다시 합니다")+'</div><div class="stats"><div><b>'+ok+'/'+n+'</b><span>정답</span></div><div><b>+'+(L.xp||0)+'</b><span>이 회차 XP</span></div><div><b>'+T.streak+'</b><span>연속일</span></div><div><b>'+T.aff+'</b><span>호감도 · '+affName()+'</span></div></div>'+badge+(ung.length?'<div class="wrong">채점 전 '+ung.length+'개 — 답 보기 뒤 「맞았어요/틀렸어요」까지 눌러야 완료입니다.</div>':'')+(wrong.length?'<div class="wrong">틀린 문제 '+wrong.length+'개 — 해설을 읽고 다시 푸세요.</div>':'')+'</div>','<span>오늘의 결과</span>',true);
   { const [rl,rf]=preLine(ung.length?"채점을 안 한 문제가 있습니다. 봐주지 말고 스스로 채점하세요. 그래야 끝난 겁니다.":pick(good?"res_good":mid?"res_mid":"res_bad","r",{ok:ok,n:n}), ung.length?"sharp":good?"proud":mid?"sharp":"angry"); say(rl,rf); }
   const cs=[];

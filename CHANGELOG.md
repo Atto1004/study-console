@@ -4,6 +4,11 @@
 
 ## 2026-09-28
 
+### .86 — 디자인 개편 2단계(힉스필드): 전신 포즈 · 과목 표지 · 스티커
+- 대표님 「이 얼굴로 확정 · 다른 그림도 뽑아서 디자인 개편」(9/28 02:1x). 확정된 얼굴 시트를 참조 이미지로 전신 포즈 3종(지시봉·팔짱·노트, `notes/classroom/assets/tutor/pose-*.png`), 과목 표지 4장 한 시트(`notes/classroom/assets/covers/*.jpg`), 스티커 6종 한 시트(`notes/classroom/assets/stickers/*.png`, `docs/tools/sticker_cut.py` 가 채도·명도로 본체를 뽑고 흰 테두리를 다시 그림). 전부 Marketing Studio Image 2k(장당 2크레딧), 배경 제거 1회(1크레딧, 종이 카드까지 전경으로 남겨 못 씀). 크레딧 사용 9.
+- 교실: 목차 = 지시봉 전신, 결과 = 팔짱 전신, 단계·문제 = 표정 흉상(`faceImg` 가 화면 모드로 고름, 포즈 파일이 없으면 흉상). 결과 배지 = 스티커(전부 정답 트로피, 아니면 월계관), 없으면 SVG.
+- 과목 화면(V55): 히어로 오른쪽에 과목 표지를 연하게(`--cover`, opacity .16), 히어로 스앵님은 전신 포즈(다 따라가면 팔짱), 책장 과목 행 색 칩 → 표지 썸네일(`renderShelf` 덧씌움, 실패 시 원래 칩). 표지 없는 과목은 그대로.
+
 ### .85 — 김주영 스앵님 실사풍 일러스트(힉스필드) 교실·과목 화면 적용
 - 대표님 「힉스필드 결제했으니 디자인 개편」(9/28 01:5x). 계정은 40크레딧 팩(플랜 무료)이라 GPT Image 2.5·Recraft 는 「Basic 플랜 필요」로 막히고 Z Image 는 두 번 실패(환불) → 무료 플랜에서 되는 Marketing Studio Image(2크레딧)로 표정 시트 한 장(7표정, 1376×768) 생성. `docs/tools/tutor_crop.py` 가 행·머리 위치로 잘라 여섯 표정(neutral·sharp·smile·angry·wide·proud, 334×389, 아래쪽 12% 페이드) → `notes/classroom/assets/tutor/`. 원본 시트·대조표는 `Desktop\학습시스템\디자인6-09-28_스앵님_힉스필드\`.
 - 교실 템플릿: `#tutor` 에 `<img id=tutorImg>` — neutral.png 가 열리면 `.raster`(그림), 아니면 SVG 치비 그대로; `say()` 의 표정이 그림도 바꾼다. 과목 화면 `V55`: `V55.tutorImg()` 가 같은 파일을 탐색해 경로 마디·히어로의 스앵님을 그림으로(없으면 SVG). 끄기: `?tutor=svg` 또는 localStorage `mc-tutor-svg=1`. 24회차 재빌드. 남은 크레딧 37.
