@@ -25,7 +25,7 @@
     "week": 1,
     "classroom": "notes/classroom/phys2/2026-09-04.html",
     "chapters": 6,
-    "steps": 46
+    "steps": 35
    },
    "2026-09-09": {
     "id": "phys2-2026-09-09",
@@ -49,7 +49,7 @@
     "week": 2,
     "classroom": "notes/classroom/phys2/2026-09-09.html",
     "chapters": 4,
-    "steps": 31
+    "steps": 23
    },
    "2026-09-11": {
     "id": "phys2-2026-09-11",
@@ -73,7 +73,7 @@
     "week": 2,
     "classroom": "notes/classroom/phys2/2026-09-11.html",
     "chapters": 4,
-    "steps": 41
+    "steps": 32
    },
    "2026-09-16": {
     "id": "phys2-2026-09-16",
@@ -124,7 +124,7 @@
     "week": 3,
     "classroom": "notes/classroom/phys2/2026-09-18.html",
     "chapters": 6,
-    "steps": 50
+    "steps": 45
    },
    "2026-09-23": {
     "id": "phys2-2026-09-23",
@@ -149,7 +149,7 @@
     "week": 4,
     "classroom": "notes/classroom/phys2/2026-09-23.html",
     "chapters": 5,
-    "steps": 36
+    "steps": 35
    }
   },
   "정역학": {
@@ -612,5 +612,5 @@
    }
   }
  },
- "generated": "2026-09-28T12:22:34"
+ "generated": "2026-09-28T12:54:05"
 }

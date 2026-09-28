@@ -10,50 +10,50 @@ def ellipse(cx, cy, rx, ry, color=INK, w=2, fill="none", dash=""):
     return f'<ellipse cx="{cx}" cy="{cy}" rx="{rx}" ry="{ry}" fill="{fill}" stroke="{color}" stroke-width="{w}"{d}/>'
 
 fig_pp = canvas(560, 210,
-    plate(150, 50, 260, 18, "+", 9), plate(150, 140, 260, 18, "−", 9),
-    text(120, 63, "+q, 넓이 A", 13, RED, "end"), text(120, 153, "−q", 13, BLUE, "end"),
-    rect(230, 36, 100, 50, PINK, dash="6 4"), text(345, 44, "가우스면(위판 감쌈)", 12, PINK),
-    arrow(200, 72, 200, 136, GREEN, "", 2), arrow(280, 72, 280, 136, GREEN, "E", 2.4, 14, 0), arrow(360, 72, 360, 136, GREEN, "", 2),
-    line(430, 68, 430, 140, GRAY, 1.2), text(442, 108, "d", 13, GRAY),
-    text(280, 190, "EA = q/ε₀ → E = σ/ε₀ · ΔV = Ed → C = ε₀A/d", 13, INK, "middle", True),
-    cap="평행판: 위판을 감싸는 가우스면(전기력선은 아래로만) → \\(E=\\sigma/\\varepsilon_0\\). 전위차는 \\(E\\)를 간격만큼 적분.")
+    step(1, plate(150, 50, 260, 18, "+", 9), plate(150, 140, 260, 18, "−", 9),
+        text(120, 63, "+q, 넓이 A", 13, RED, "end"), text(120, 153, "−q", 13, BLUE, "end")),
+    step(2, rect(230, 36, 100, 50, PINK, dash="6 4"), text(345, 44, "가우스면(위판 감쌈)", 12, PINK)),
+    step(3, arrow(200, 72, 200, 136, GREEN, "", 2), arrow(280, 72, 280, 136, GREEN, "E", 2.4, 14, 0), arrow(360, 72, 360, 136, GREEN, "", 2),
+        line(430, 68, 430, 140, GRAY, 1.2), text(442, 108, "d", 13, GRAY)),
+    step(4, text(280, 190, "EA = q/ε₀ → E = σ/ε₀ · ΔV = Ed → C = ε₀A/d", 13, INK, "middle", True)),
+    cap="평행판: 위판을 감싸는 가우스면(전기력선은 아래로만) → \\(E=\\sigma/\\varepsilon_0\\). 전위차는 \\(E\\)를 간격만큼 적분.", name="pp")
 
 fig_cyl = canvas(560, 220,
-    line(90, 60, 470, 60, INK, 3), line(90, 160, 470, 160, INK, 3), text(470, 50, "바깥 도체 (반지름 b)", 12, INK, "end"),
-    rect(90, 102, 380, 16, RED, fill="rgba(224,49,49,.25)", sw=1.5), text(476, 132, "안쪽 도체 a, +q", 12, RED, "end"),
-    rect(150, 82, 200, 56, PINK, dash="6 4", rx=6), text(250, 76, "가우스면: 반지름 r, 길이 L", 12, PINK, "middle"),
-    arrow(200, 100, 200, 86, GREEN, "", 1.8), arrow(300, 120, 300, 134, GREEN, "", 1.8), arrow(250, 100, 250, 86, GREEN, "E", 1.8, 12, 4),
-    brace_label(90, 470, 190, "L"),
-    cap="원통형(동축): 옆면 \\(2\\pi rL\\)로 \\(E=\\frac{q}{2\\pi\\varepsilon_0L}\\frac1r\\) → \\(\\Delta V=\\frac{q}{2\\pi\\varepsilon_0L}\\ln\\frac ba\\).")
+    step(1, line(90, 60, 470, 60, INK, 3), line(90, 160, 470, 160, INK, 3), text(470, 50, "바깥 도체 (반지름 b)", 12, INK, "end"),
+        rect(90, 102, 380, 16, RED, fill="rgba(224,49,49,.25)", sw=1.5), text(476, 132, "안쪽 도체 a, +q", 12, RED, "end"),
+        brace_label(90, 470, 190, "L")),
+    step(2, rect(150, 82, 200, 56, PINK, dash="6 4", rx=6), text(250, 76, "가우스면: 반지름 r, 길이 L", 12, PINK, "middle")),
+    step(3, arrow(200, 100, 200, 86, GREEN, "", 1.8), arrow(300, 120, 300, 134, GREEN, "", 1.8), arrow(250, 100, 250, 86, GREEN, "E", 1.8, 12, 4)),
+    cap="원통형(동축): 옆면 \\(2\\pi rL\\)로 \\(E=\\frac{q}{2\\pi\\varepsilon_0L}\\frac1r\\) → \\(\\Delta V=\\frac{q}{2\\pi\\varepsilon_0L}\\ln\\frac ba\\).", name="cyl")
 
 fig_sph = canvas(560, 220,
-    circle(160, 110, 90, INK, w=2.5), text(160, 214, "바깥 도체 껍질 b", 13, INK, "middle"),
-    circle(160, 110, 40, RED, w=2.5, fill="rgba(224,49,49,.1)"), text(160, 114, "a, +q", 13, RED, "middle", True),
-    circle(160, 110, 65, PINK, dash="6 4"), text(232, 74, "r", 12, PINK),
-    radial(160, 110, 8, 44, 62, GREEN),
-    text(400, 80, "E·4πr² = q/ε₀", 14, INK, "middle"), text(400, 105, "ΔV = (q/4πε₀)(1/a − 1/b)", 14, INK, "middle"),
-    text(400, 135, "C = 4πε₀·ab/(b−a)", 15, INK, "middle", True), text(400, 165, "b → ∞ : C = 4πε₀a (고립 도체구)", 13, GREEN, "middle", True),
-    cap="구형: 안쪽 구와 바깥 껍질 사이의 전위차. 바깥 껍질을 무한대로 보내면 <b>고립 도체구</b>의 용량이 된다.")
+    step(1, circle(160, 110, 90, INK, w=2.5), text(160, 214, "바깥 도체 껍질 b", 13, INK, "middle"),
+        circle(160, 110, 40, RED, w=2.5, fill="rgba(224,49,49,.1)"), text(160, 114, "a, +q", 13, RED, "middle", True)),
+    step(2, circle(160, 110, 65, PINK, dash="6 4"), text(232, 74, "r", 12, PINK),
+        radial(160, 110, 8, 44, 62, GREEN)),
+    step(3, text(400, 80, "E·4πr² = q/ε₀", 14, INK, "middle"), text(400, 105, "ΔV = (q/4πε₀)(1/a − 1/b)", 14, INK, "middle")),
+    step(4, text(400, 135, "C = 4πε₀·ab/(b−a)", 15, INK, "middle", True), text(400, 165, "b → ∞ : C = 4πε₀a (고립 도체구)", 13, GREEN, "middle", True)),
+    cap="구형: 안쪽 구와 바깥 껍질 사이의 전위차. 바깥 껍질을 무한대로 보내면 <b>고립 도체구</b>의 용량이 된다.", name="sph")
 
 fig_diel = canvas(560, 236,
-    plate(140, 40, 280, 16, "+", 9), plate(140, 164, 280, 16, "−", 9),
-    rect(140, 70, 280, 80, YEL, fill="rgba(245,159,0,.10)", sw=1.5), text(440, 92, "유전체(종이)", 12, "#B26A00", "start"),
-    text(280, 86, "− − − − − − − −  (−q′ 유도)", 12, BLUE, "middle"), text(280, 144, "+ + + + + + + +  (+q′ 유도)", 12, RED, "middle"),
-    arrow(160, 60, 160, 160, GREEN, "", 2.2), text(168, 116, "E₀", 13, GREEN, "start", True), arrow(400, 140, 400, 90, BLUE, "", 2.2), text(392, 118, "E′", 13, BLUE, "end", True),
-    text(280, 205, "E = E₀ − E′ = E₀/κ  → V 줄고 C = κC₀ 늘어난다", 13, INK, "middle", True),
-    text(280, 226, "E₀ = 판의 전하가 만드는 장 · E′ = 유도 전하가 만드는 반대 방향의 장", 11.5, GRAY, "middle"),
-    cap="유전체를 넣으면 분극으로 표면에 유도 전하가 생겨 판의 장을 일부 상쇄한다. 판의 \\(q\\)는 그대로인데 전위차가 줄어 용량이 는다.")
+    step(1, plate(140, 40, 280, 16, "+", 9), plate(140, 164, 280, 16, "−", 9)),
+    step(2, rect(140, 70, 280, 80, YEL, fill="rgba(245,159,0,.10)", sw=1.5), text(440, 92, "유전체(종이)", 12, "#B26A00", "start")),
+    step(3, text(280, 86, "− − − − − − − −  (−q′ 유도)", 12, BLUE, "middle"), text(280, 144, "+ + + + + + + +  (+q′ 유도)", 12, RED, "middle")),
+    step(4, arrow(160, 60, 160, 160, GREEN, "", 2.2), text(168, 116, "E₀", 13, GREEN, "start", True), arrow(400, 140, 400, 90, BLUE, "", 2.2), text(392, 118, "E′", 13, BLUE, "end", True),
+        text(280, 226, "E₀ = 판의 전하가 만드는 장 · E′ = 유도 전하가 만드는 반대 방향의 장", 11.5, GRAY, "middle")),
+    step(5, text(280, 205, "E = E₀ − E′ = E₀/κ  → V 줄고 C = κC₀ 늘어난다", 13, INK, "middle", True)),
+    cap="유전체를 넣으면 분극으로 표면에 유도 전하가 생겨 판의 장을 일부 상쇄한다. 판의 \\(q\\)는 그대로인데 전위차가 줄어 용량이 는다.", name="diel")
 
 fig_three = canvas(560, 195,
-    rect(40, 44, 90, 60, PINK, dash="6 4", fill="rgba(255,77,141,.06)"), text(85, 120, "면 A", 13, PINK, "middle"),
-    arrow(85, 126, 85, 146, GRAY, "", 1.4),
-    plate(45, 152, 80, 8, "+", 5), plate(45, 172, 80, 8, "−", 5), text(85, 30, "평행판", 13, INK, "middle", True),
-    ellipse(280, 50, 30, 10, PINK, 2, "rgba(255,77,141,.06)", "6 4"), ellipse(280, 98, 30, 10, PINK, 2, "none", "6 4"), line(250, 50, 250, 98, PINK, 2, "6 4"), line(310, 50, 310, 98, PINK, 2, "6 4"),
-    text(280, 122, "원통 2πrL", 13, PINK, "middle"), arrow(280, 128, 280, 146, GRAY, "", 1.4),
-    line(230, 154, 330, 154, INK, 2.5), line(230, 180, 330, 180, INK, 2.5), rect(230, 164, 100, 6, RED, fill="rgba(224,49,49,.3)", sw=1), text(280, 30, "원통형(동축)", 13, INK, "middle", True),
-    circle(470, 74, 32, PINK, dash="6 4", w=2), text(470, 122, "구 4πr²", 13, PINK, "middle"), arrow(470, 128, 470, 146, GRAY, "", 1.4),
-    circle(470, 168, 17, INK, w=2), circle(470, 168, 6, RED, w=2, fill="rgba(224,49,49,.3)"), text(470, 30, "구형(동심)", 13, INK, "middle", True),
-    cap="가우스면 3종이 곧 축전기 3종. 순서는 늘 같다: 가우스로 \\(E\\) → 선적분으로 \\(\\Delta V\\) → \\(C=q/\\Delta V\\).")
+    step(1, rect(40, 44, 90, 60, PINK, dash="6 4", fill="rgba(255,77,141,.06)"), text(85, 120, "면 A", 13, PINK, "middle"),
+        arrow(85, 126, 85, 146, GRAY, "", 1.4),
+        plate(45, 152, 80, 8, "+", 5), plate(45, 172, 80, 8, "−", 5), text(85, 30, "평행판", 13, INK, "middle", True)),
+    step(2, ellipse(280, 50, 30, 10, PINK, 2, "rgba(255,77,141,.06)", "6 4"), ellipse(280, 98, 30, 10, PINK, 2, "none", "6 4"), line(250, 50, 250, 98, PINK, 2, "6 4"), line(310, 50, 310, 98, PINK, 2, "6 4"),
+        text(280, 122, "원통 2πrL", 13, PINK, "middle"), arrow(280, 128, 280, 146, GRAY, "", 1.4),
+        line(230, 154, 330, 154, INK, 2.5), line(230, 180, 330, 180, INK, 2.5), rect(230, 164, 100, 6, RED, fill="rgba(224,49,49,.3)", sw=1), text(280, 30, "원통형(동축)", 13, INK, "middle", True)),
+    step(3, circle(470, 74, 32, PINK, dash="6 4", w=2), text(470, 122, "구 4πr²", 13, PINK, "middle"), arrow(470, 128, 470, 146, GRAY, "", 1.4),
+        circle(470, 168, 17, INK, w=2), circle(470, 168, 6, RED, w=2, fill="rgba(224,49,49,.3)"), text(470, 30, "구형(동심)", 13, INK, "middle", True)),
+    cap="가우스면 3종이 곧 축전기 3종. 순서는 늘 같다: 가우스로 \\(E\\) → 선적분으로 \\(\\Delta V\\) → \\(C=q/\\Delta V\\).", name="three")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일반물리학2 · 9/23 축전기 — 평행판 · 원통형 · 구형 · 유전체</title></head><body>
 <header>

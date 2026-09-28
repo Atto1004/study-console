@@ -6,43 +6,42 @@ from figs import *
 OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\일반물리학2\_수업노트\2026-09-09.html"
 
 fig_point = canvas(560, 200,
-    charge(120, 110, "+", "q", 20, RED),
-    dot(420, 60, "", 5, INK), text(414, 82, "P", 13, INK, "end"),
-    arrow(140, 106, 405, 63, INK, "", 1.8, dash="6 4"), text(270, 70, "r (q에서 P까지 위치벡터)", 13, INK, "middle"),
-    arrow(420, 60, 500, 47, GREEN, "E", 2.4, 6, -10),
-    text(120, 160, "장을 만드는 전하", 12, GRAY, "middle"), text(430, 95, "+1 C을 놓아 본 자리", 12, GRAY, "start"),
-    cap="점전하의 전기장: 크기는 \\(q/r^2\\)에 비례, 방향은 \\(q\\)에서 P를 향하는 단위벡터 \\(\\hat r=\\vec r/r\\). 그래서 \\(\\frac{q}{r^2}\\hat r=\\frac{q}{r^3}\\vec r\\).")
+    step(1, charge(120, 110, "+", "q", 20, RED), text(120, 160, "장을 만드는 전하", 12, GRAY, "middle"),
+        dot(420, 60, "", 5, INK), text(414, 82, "P", 13, INK, "end"), text(430, 95, "+1 C을 놓아 본 자리", 12, GRAY, "start")),
+    step(2, arrow(140, 106, 405, 63, INK, "", 1.8, dash="6 4"), text(270, 70, "r (q에서 P까지 위치벡터)", 13, INK, "middle")),
+    step(3, arrow(420, 60, 500, 47, GREEN, "E", 2.4, 6, -10)),
+    cap="점전하의 전기장: 크기는 \\(q/r^2\\)에 비례, 방향은 \\(q\\)에서 P를 향하는 단위벡터 \\(\\hat r=\\vec r/r\\). 그래서 \\(\\frac{q}{r^2}\\hat r=\\frac{q}{r^3}\\vec r\\).", name="point")
 
 fig_group = canvas(560, 280,
-    line(98, 200, 380, 200, GRAY, 1.2), arrow(420, 200, 520, 200, GRAY, "", 1.2), text(516, 218, "x", 13, INK, "end"), arrow(80, 182, 80, 84, GRAY, "", 1.2), text(66, 90, "y", 13, INK, "end"),
-    charge(80, 200, "+", "", 18, RED), text(80, 238, "q₁ = 20 C (0,0)", 12.5, INK, "middle"),
-    charge(400, 200, "−", "", 18, BLUE), text(400, 238, "q₂ = −3 C (4,0)", 12.5, INK, "middle"),
-    charge(80, 60, "−", "", 18, BLUE), text(104, 64, "q₃ = −4 C (0,3)", 12.5, INK, "start"),
-    brace_label(98, 382, 250, "4 m"), text(52, 130, "3 m", 12, GRAY, "middle"),
-    arrow(100, 200, 200, 200, GREEN, "", 2.4), text(150, 218, "F₂ (q₂ 쪽으로, 인력)", 12.5, GREEN, "middle"),
-    arrow(80, 180, 80, 100, GREEN, "", 2.4), text(100, 96, "F₃ (q₃ 쪽으로, 인력)", 12.5, GREEN, "start"),
-    arrow(96, 182, 126, 110, YEL, "", 2.6, dash="5 4"), text(134, 150, "합력", 13, "#B26A00", "start", True),
-    cap="필수문제 1: \\(q_1\\)이 받는 힘은 각 전하가 주는 힘을 <b>벡터로</b> 더한 것. 인력이면 상대 전하 쪽을 향한다.")
+    step(1, line(98, 200, 380, 200, GRAY, 1.2), arrow(420, 200, 520, 200, GRAY, "", 1.2), text(516, 218, "x", 13, INK, "end"), arrow(80, 182, 80, 84, GRAY, "", 1.2), text(66, 90, "y", 13, INK, "end"),
+        charge(80, 200, "+", "", 18, RED), text(80, 238, "q₁ = 20 C (0,0)", 12.5, INK, "middle"),
+        charge(400, 200, "−", "", 18, BLUE), text(400, 238, "q₂ = −3 C (4,0)", 12.5, INK, "middle"),
+        charge(80, 60, "−", "", 18, BLUE), text(104, 64, "q₃ = −4 C (0,3)", 12.5, INK, "start"),
+        brace_label(98, 382, 250, "4 m"), text(52, 130, "3 m", 12, GRAY, "middle")),
+    step(2, arrow(100, 200, 200, 200, GREEN, "", 2.4), text(150, 218, "F₂ (q₂ 쪽으로, 인력)", 12.5, GREEN, "middle")),
+    step(3, arrow(80, 180, 80, 100, GREEN, "", 2.4), text(100, 96, "F₃ (q₃ 쪽으로, 인력)", 12.5, GREEN, "start")),
+    step(4, arrow(96, 182, 126, 110, YEL, "", 2.6, dash="5 4"), text(134, 150, "합력", 13, "#B26A00", "start", True)),
+    cap="필수문제 1: \\(q_1\\)이 받는 힘은 각 전하가 주는 힘을 <b>벡터로</b> 더한 것. 인력이면 상대 전하 쪽을 향한다.", name="group")
 
 fig_dipole = canvas(560, 254,
-    line(280, 30, 280, 130, GRAY, 1.2, "5 4"),
-    charge(280, 150, "+", "", 16, RED), text(258, 154, "+q", 13, RED, "end"), charge(280, 195, "−", "", 16, BLUE), text(258, 199, "−q", 13, BLUE, "end"),
-    brace_label(300, 300, 172, "") , text(318, 176, "d", 13, GRAY),
-    dot(280, 50, "", 5, INK), text(292, 40, "P", 13, INK, "start"), text(296, 100, "축 위, 중심에서 z", 12, GRAY, "start"),
-    arrow(290, 50, 356, 50, GREEN, "E₊ (밖으로, 더 세다)", 2.4, 10, 20),
-    arrow(270, 50, 234, 50, GREEN, "E₋ (안으로)", 2.0, -14, -12),
-    text(280, 246, "가까운 +q가 조금 더 세다 → 차이만 남는다", 13, INK, "middle"),
-    cap="전기 쌍극자: 축 위 점에서 \\(+q\\)와 \\(-q\\)의 장이 거의 상쇄되고 <b>거리 차이</b> 때문에 남는 값이 \\(1/z^3\\)으로 준다.")
+    step(1, line(280, 30, 280, 130, GRAY, 1.2, "5 4"),
+        charge(280, 150, "+", "", 16, RED), text(258, 154, "+q", 13, RED, "end"), charge(280, 195, "−", "", 16, BLUE), text(258, 199, "−q", 13, BLUE, "end"),
+        brace_label(300, 300, 172, "") , text(318, 176, "d", 13, GRAY)),
+    step(2, dot(280, 50, "", 5, INK), text(292, 40, "P", 13, INK, "start"), text(296, 100, "축 위, 중심에서 z", 12, GRAY, "start")),
+    step(3, arrow(290, 50, 356, 50, GREEN, "E₊ (밖으로, 더 세다)", 2.4, 10, 20),
+        arrow(270, 50, 234, 50, GREEN, "E₋ (안으로)", 2.0, -14, -12)),
+    step(4, text(280, 246, "가까운 +q가 조금 더 세다 → 차이만 남는다", 13, INK, "middle")),
+    cap="전기 쌍극자: 축 위 점에서 \\(+q\\)와 \\(-q\\)의 장이 거의 상쇄되고 <b>거리 차이</b> 때문에 남는 값이 \\(1/z^3\\)으로 준다.", name="dipole")
 
 fig_rod = canvas(560, 190,
-    axis(40, 120, 530, 120, "x", ""),
-    dot(70, 120, "", 6, INK), text(70, 150, "P (원점)", 13, INK, "middle"),
-    rect(200, 108, 260, 24, RED, fill="rgba(224,49,49,.12)", sw=2), text(330, 100, "+ + + + + + + + + +", 13, RED, "middle"),
-    rect(300, 108, 14, 24, INK, fill="rgba(31,42,68,.35)", sw=1), text(307, 160, "dq = λ dx", 13, INK, "middle"),
-    brace_label(72, 198, 166, "a"), brace_label(200, 460, 166, "L (전하 q)"),
-    arrow(307, 88, 307, 60, GRAY, "", 1.2, dash="3 3"), text(307, 52, "x", 13, GRAY, "middle"),
-    arrow(66, 120, 20, 120, GREEN, "dE", 2.2, 0, -10),
-    cap="직선 도선: 위치 \\(x\\)의 조각 \\(dq=\\lambda dx\\)가 P에 만드는 장은 점전하 식 \\(\\frac{1}{4\\pi\\varepsilon_0}\\frac{dq}{x^2}\\). 이것을 \\(x=a\\)부터 \\(a+L\\)까지 더한다.")
+    step(1, axis(40, 120, 530, 120, "x", ""),
+        dot(70, 120, "", 6, INK), text(70, 150, "P (원점)", 13, INK, "middle"),
+        rect(200, 108, 260, 24, RED, fill="rgba(224,49,49,.12)", sw=2), text(330, 100, "+ + + + + + + + + +", 13, RED, "middle"),
+        brace_label(72, 198, 166, "a"), brace_label(200, 460, 166, "L (전하 q)")),
+    step(2, rect(300, 108, 14, 24, INK, fill="rgba(31,42,68,.35)", sw=1), text(307, 160, "dq = λ dx", 13, INK, "middle"),
+        arrow(307, 88, 307, 60, GRAY, "", 1.2, dash="3 3"), text(307, 52, "x", 13, GRAY, "middle")),
+    step(3, arrow(66, 120, 20, 120, GREEN, "dE", 2.2, 0, -10)),
+    cap="직선 도선: 위치 \\(x\\)의 조각 \\(dq=\\lambda dx\\)가 P에 만드는 장은 점전하 식 \\(\\frac{1}{4\\pi\\varepsilon_0}\\frac{dq}{x^2}\\). 이것을 \\(x=a\\)부터 \\(a+L\\)까지 더한다.", name="rod")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일반물리학2 · 9/9 전기장 계산 ①~④</title></head><body>
 <header>

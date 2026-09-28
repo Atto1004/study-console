@@ -8,56 +8,56 @@ OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\일반물리학
 
 # ---- 그림 ----
 fig_net = canvas(560, 200,
-    charge(80, 70, "+", "", 11, RED), charge(112, 70, "+", "", 11, RED),
-    charge(64, 118, "−", "", 11, BLUE), charge(96, 118, "−", "", 11, BLUE), charge(128, 118, "−", "", 11, BLUE), charge(80, 160, "−", "", 11, BLUE), charge(112, 160, "−", "", 11, BLUE),
-    rect(40, 40, 112, 145, GRAY, dash="4 4", rx=14), text(96, 32, "q₁ = 양성자 2 + 전자 5", 13, INK, "middle"),
-    arrow(200, 112, 250, 112, INK, "", 1.6), text(225, 100, "상쇄", 12, GRAY, "middle"),
-    charge(320, 100, "−", "", 22, BLUE), text(320, 170, "알짜 −3e", 14, BLUE, "middle", True),
-    radial(320, 100, 6, 44, 28, GREEN, inward=True), text(320, 190, "전기력선 3개가 들어온다", 12, GREEN, "middle"),
-    charge(470, 100, "+", "", 22, RED), text(470, 170, "알짜 +9e", 14, RED, "middle", True), radial(470, 100, 9, 28, 48, GREEN), text(470, 190, "9개가 나간다", 12, GREEN, "middle"),
-    cap="양성자 2개 + 전자 5개 → 2쌍은 중성으로 상쇄, 전자 3개만 남는다. 앞으로 「전하」는 전부 이 알짜(net) 전하다.")
+    step(1, charge(80, 70, "+", "", 11, RED), charge(112, 70, "+", "", 11, RED),
+        charge(64, 118, "−", "", 11, BLUE), charge(96, 118, "−", "", 11, BLUE), charge(128, 118, "−", "", 11, BLUE), charge(80, 160, "−", "", 11, BLUE), charge(112, 160, "−", "", 11, BLUE),
+        rect(40, 40, 112, 145, GRAY, dash="4 4", rx=14), text(96, 32, "q₁ = 양성자 2 + 전자 5", 13, INK, "middle")),
+    step(2, arrow(200, 112, 250, 112, INK, "", 1.6), text(225, 100, "상쇄", 12, GRAY, "middle"),
+        charge(320, 100, "−", "", 22, BLUE), text(320, 170, "알짜 −3e", 14, BLUE, "middle", True),
+        radial(320, 100, 6, 44, 28, GREEN, inward=True), text(320, 190, "전기력선 3개가 들어온다", 12, GREEN, "middle")),
+    step(3, charge(470, 100, "+", "", 22, RED), text(470, 170, "알짜 +9e", 14, RED, "middle", True), radial(470, 100, 9, 28, 48, GREEN), text(470, 190, "9개가 나간다", 12, GREEN, "middle")),
+    cap="양성자 2개 + 전자 5개 → 2쌍은 중성으로 상쇄, 전자 3개만 남는다. 앞으로 「전하」는 전부 이 알짜(net) 전하다.", name="net")
 
 fig_field = canvas(560, 210,
-    charge(150, 105, "+", "+q", 20, RED), radial(150, 105, 10, 28, 70, GREEN),
-    text(150, 195, "양전하: 밖으로", 13, INK, "middle"),
-    charge(410, 105, "−", "−q", 20, BLUE), radial(410, 105, 10, 70, 28, GREEN, inward=True),
-    text(410, 195, "음전하: 안으로", 13, INK, "middle"),
-    dot(280, 40, "", 5, INK), text(268, 30, "P에 +1 C", 12, INK, "end"), arrow(280, 40, 340, 40, GREEN, "E = 받는 힘", 2.2, 0, -8),
-    cap=r"전기장 \(ec E\) = 그 점에 +1 C 시험전하를 두었을 때 받는 힘. 화살표(전기력선)의 밀도가 세기, 접선이 방향.")
+    step(1, charge(150, 105, "+", "+q", 20, RED), radial(150, 105, 10, 28, 70, GREEN),
+        text(150, 195, "양전하: 밖으로", 13, INK, "middle")),
+    step(2, charge(410, 105, "−", "−q", 20, BLUE), radial(410, 105, 10, 70, 28, GREEN, inward=True),
+        text(410, 195, "음전하: 안으로", 13, INK, "middle")),
+    step(3, dot(280, 40, "", 5, INK), text(268, 30, "P에 +1 C", 12, INK, "end"), arrow(280, 40, 340, 40, GREEN, "E = 받는 힘", 2.2, 0, -8)),
+    cap=r"전기장 \(\vec E\) = 그 점에 +1 C 시험전하를 두었을 때 받는 힘. 화살표(전기력선)의 밀도가 세기, 접선이 방향.", name="field")
 
 fig_coulomb = canvas(560, 150,
-    charge(120, 75, "+", "q₁", 18, RED), charge(440, 75, "+", "q₂", 18, RED),
-    line(138, 75, 422, 75, GRAY, 1.2, "5 4"), brace_label(140, 420, 118, "r"),
-    arrow(100, 75, 40, 75, GREEN, "F⃗", 2.4, 0, -10), arrow(460, 75, 520, 75, GREEN, "F⃗", 2.4, 0, -10),
-    text(280, 40, "같은 부호 → 밀어낸다 (척력) · 다른 부호 → 당긴다 (인력)", 13, INK, "middle"),
-    cap="쿨롱 법칙: 힘은 두 전하 곱에 비례, 거리 제곱에 반비례. 만유인력과 똑같은 꼴(역제곱 법칙).")
+    step(1, charge(120, 75, "+", "q₁", 18, RED), charge(440, 75, "+", "q₂", 18, RED),
+        line(138, 75, 422, 75, GRAY, 1.2, "5 4"), brace_label(140, 420, 118, "r")),
+    step(2, arrow(100, 75, 40, 75, GREEN, "F⃗", 2.4, 0, -10), arrow(460, 75, 520, 75, GREEN, "F⃗", 2.4, 0, -10),
+        text(280, 40, "같은 부호 → 밀어낸다 (척력) · 다른 부호 → 당긴다 (인력)", 13, INK, "middle")),
+    cap="쿨롱 법칙: 힘은 두 전하 곱에 비례, 거리 제곱에 반비례. 만유인력과 똑같은 꼴(역제곱 법칙).", name="coulomb")
 
 fig_monopole = canvas(560, 160,
-    rect(60, 60, 160, 40, INK, fill="#F1F3F5", sw=1.5), text(95, 86, "N", 16, RED, "middle", True), text(185, 86, "S", 16, BLUE, "middle", True),
-    line(140, 50, 140, 110, RED, 2, "4 3"), text(140, 130, "자르면?", 13, GRAY, "middle"),
-    arrow(240, 80, 290, 80, INK, "", 1.6),
-    rect(310, 60, 100, 40, INK, fill="#F1F3F5", sw=1.5), text(335, 86, "N", 14, RED, "middle", True), text(385, 86, "S", 14, BLUE, "middle", True),
-    rect(430, 60, 100, 40, INK, fill="#F1F3F5", sw=1.5), text(455, 86, "N", 14, RED, "middle", True), text(505, 86, "S", 14, BLUE, "middle", True),
-    text(420, 130, "또 N·S — 자하는 혼자 못 산다", 13, INK, "middle"),
-    cap="자석은 아무리 잘라도 N·S가 붙어 나온다. 그래서 자기의 소스는 자하가 아니라 전류(I = dq/dt).")
+    step(1, rect(60, 60, 160, 40, INK, fill="#F1F3F5", sw=1.5), text(95, 86, "N", 16, RED, "middle", True), text(185, 86, "S", 16, BLUE, "middle", True),
+        line(140, 50, 140, 110, RED, 2, "4 3"), text(140, 130, "자르면?", 13, GRAY, "middle")),
+    step(2, arrow(240, 80, 290, 80, INK, "", 1.6),
+        rect(310, 60, 100, 40, INK, fill="#F1F3F5", sw=1.5), text(335, 86, "N", 14, RED, "middle", True), text(385, 86, "S", 14, BLUE, "middle", True),
+        rect(430, 60, 100, 40, INK, fill="#F1F3F5", sw=1.5), text(455, 86, "N", 14, RED, "middle", True), text(505, 86, "S", 14, BLUE, "middle", True),
+        text(420, 130, "또 N·S — 자하는 혼자 못 산다", 13, INK, "middle")),
+    cap="자석은 아무리 잘라도 N·S가 붙어 나온다. 그래서 자기의 소스는 자하가 아니라 전류(I = dq/dt).", name="monopole")
 
 fig_map = canvas(560, 170,
-    rect(30, 30, 230, 120, GRAY, dash="5 4", rx=12), text(145, 52, "불연속 → Σ (하나씩 더한다)", 13, INK, "middle", True),
-    charge(80, 100, "+", "점전하", 12, RED), charge(145, 100, "+", "", 10, RED), charge(175, 100, "−", "점전하군", 10, BLUE), charge(225, 92, "+", "", 9, RED), charge(225, 114, "−", "쌍극자", 9, BLUE),
-    rect(300, 30, 230, 120, GRAY, dash="5 4", rx=12), text(415, 52, "연속 → ∫dq (조각을 적분)", 13, INK, "middle", True),
-    rect(320, 96, 60, 8, RED, fill="rgba(224,49,49,.25)", sw=1), text(350, 126, "직선 λ", 12, INK, "middle"),
-    circle(430, 100, 18, RED, w=2.5), text(430, 136, "고리 λ", 12, INK, "middle"),
-    circle(500, 100, 20, RED, w=2, fill="rgba(224,49,49,.15)"), text(500, 136, "원판 σ", 12, INK, "middle"),
-    cap="22장의 목차 = 세는 방법 두 가지. 재료(전하 분포)만 바뀌고 레시피는 같다: 조각의 장 → 대칭 → 더하기.")
+    step(1, rect(30, 30, 230, 120, GRAY, dash="5 4", rx=12), text(145, 52, "불연속 → Σ (하나씩 더한다)", 13, INK, "middle", True),
+        charge(80, 100, "+", "점전하", 12, RED), charge(145, 100, "+", "", 10, RED), charge(175, 100, "−", "점전하군", 10, BLUE), charge(225, 92, "+", "", 9, RED), charge(225, 114, "−", "쌍극자", 9, BLUE)),
+    step(2, rect(300, 30, 230, 120, GRAY, dash="5 4", rx=12), text(415, 52, "연속 → ∫dq (조각을 적분)", 13, INK, "middle", True),
+        rect(320, 96, 60, 8, RED, fill="rgba(224,49,49,.25)", sw=1), text(350, 126, "직선 λ", 12, INK, "middle"),
+        circle(430, 100, 18, RED, w=2.5), text(430, 136, "고리 λ", 12, INK, "middle"),
+        circle(500, 100, 20, RED, w=2, fill="rgba(224,49,49,.15)"), text(500, 136, "원판 σ", 12, INK, "middle")),
+    cap="22장의 목차 = 세는 방법 두 가지. 재료(전하 분포)만 바뀌고 레시피는 같다: 조각의 장 → 대칭 → 더하기.", name="map")
 
 fig_ex4 = canvas(560, 250,
-    charge(280, 70, "+", "q₁", 16, RED), charge(170, 180, "+", "q₂", 16, RED), charge(390, 180, "+", "q₃", 16, RED),
-    line(266, 84, 184, 166, GRAY, 1, "4 3"), line(294, 84, 376, 166, GRAY, 1, "4 3"), line(190, 180, 370, 180, GRAY, 1, "4 3"),
-    arrow(290, 58, 345, 38, GREEN, "", 2.2), text(352, 44, "F₃ (q₃가 밀어냄)", 12, GREEN, "start"),
-    arrow(270, 58, 215, 38, GREEN, "", 2.2), text(200, 32, "F₂ (q₂가 밀어냄)", 12, GREEN, "end"),
-    arrow(280, 52, 280, 14, YEL, "", 2.6, dash="5 4"), text(296, 12, "합력 = 성분 합 (위쪽)", 12, "#B26A00", "start"),
-    text(280, 236, "크기를 더하지 말고 x·y 성분으로 나눠 더한다 → 좌우는 상쇄, 위쪽만 남는다", 12.5, INK, "middle"),
-    cap="예제 04 배치의 예(세 전하가 120° 간격, 전부 같은 부호일 때): \\(q_1\\)이 받는 두 힘은 좌우 성분이 지워지고 위쪽 성분만 더해진다.")
+    step(1, charge(280, 70, "+", "q₁", 16, RED), charge(170, 180, "+", "q₂", 16, RED), charge(390, 180, "+", "q₃", 16, RED),
+        line(266, 84, 184, 166, GRAY, 1, "4 3"), line(294, 84, 376, 166, GRAY, 1, "4 3"), line(190, 180, 370, 180, GRAY, 1, "4 3")),
+    step(2, arrow(290, 58, 345, 38, GREEN, "", 2.2), text(352, 44, "F₃ (q₃가 밀어냄)", 12, GREEN, "start"),
+        arrow(270, 58, 215, 38, GREEN, "", 2.2), text(200, 32, "F₂ (q₂가 밀어냄)", 12, GREEN, "end")),
+    step(3, arrow(280, 52, 280, 14, YEL, "", 2.6, dash="5 4"), text(296, 12, "합력 = 성분 합 (위쪽)", 12, "#B26A00", "start"),
+        text(280, 236, "크기를 더하지 말고 x·y 성분으로 나눠 더한다 → 좌우는 상쇄, 위쪽만 남는다", 12.5, INK, "middle")),
+    cap="예제 04 배치의 예(세 전하가 120° 간격, 전부 같은 부호일 때): \\(q_1\\)이 받는 두 힘은 좌우 성분이 지워지고 위쪽 성분만 더해진다.", name="ex4")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일반물리학2 · 9/4 전하와 전기장 서론</title></head><body>
 <header>

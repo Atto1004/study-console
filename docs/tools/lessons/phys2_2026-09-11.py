@@ -10,61 +10,62 @@ def ellipse(cx, cy, rx, ry, color=INK, w=2, fill="none", dash=""):
     return f'<ellipse cx="{cx}" cy="{cy}" rx="{rx}" ry="{ry}" fill="{fill}" stroke="{color}" stroke-width="{w}"{d}/>'
 
 fig_ring = canvas(560, 250,
-    ellipse(280, 190, 120, 34, RED, 2.5, "rgba(224,49,49,.06)"),
-    text(280, 236, "반지름 R 고리 (전하 q 균일)", 13, INK, "middle"),
-    line(280, 190, 280, 40, GRAY, 1.2, "5 4"), text(292, 120, "z", 13, GRAY),
-    dot(280, 40, "", 5, INK), text(296, 36, "P (축 위)", 13, INK),
-    dot(160, 190, "", 5, RED), text(150, 214, "dq", 12, RED, "middle"), dot(400, 190, "", 5, RED), text(418, 224, "dq (반대편)", 12, RED, "middle"),
-    line(160, 190, 280, 40, GRAY, 1, "3 3"), line(400, 190, 280, 40, GRAY, 1, "3 3"),
-    arrow(280, 40, 330, -22 + 62, GREEN, "", 2), arrow(280, 40, 230, 40, GREEN, "", 2), arrow(280, 40, 330, 40, GREEN, "", 2),
-    text(230, 24, "수평 성분: 서로 상쇄", 12, GREEN, "end"), text(336, 24, "z 성분만 살아남는다", 12, GREEN),
-    arrow(280, 40, 280, 6, GREEN, "", 2.6),
-    cap="고리의 정반대편 두 조각이 만드는 장: 수평 성분은 반대라 지워지고 \\(z\\) 성분만 남는다. \\(\\cos\\theta=z/\\sqrt{z^2+R^2}\\).")
+    step(1, ellipse(280, 190, 120, 34, RED, 2.5, "rgba(224,49,49,.06)"),
+        text(280, 236, "반지름 R 고리 (전하 q 균일)", 13, INK, "middle"),
+        line(280, 190, 280, 40, GRAY, 1.2, "5 4"), text(292, 120, "z", 13, GRAY),
+        dot(280, 40, "", 5, INK), text(296, 36, "P (축 위)", 13, INK)),
+    step(2, dot(160, 190, "", 5, RED), text(150, 214, "dq", 12, RED, "middle"), dot(400, 190, "", 5, RED), text(418, 224, "dq (반대편)", 12, RED, "middle"),
+        line(160, 190, 280, 40, GRAY, 1, "3 3"), line(400, 190, 280, 40, GRAY, 1, "3 3")),
+    step(3, arrow(280, 40, 230, 40, GREEN, "", 2), arrow(280, 40, 330, 40, GREEN, "", 2),
+        text(230, 24, "수평 성분: 서로 상쇄", 12, GREEN, "end")),
+    step(4, arrow(280, 40, 280, 6, GREEN, "", 2.6), text(336, 24, "z 성분만 살아남는다", 12, GREEN)),
+    cap="고리의 정반대편 두 조각이 만드는 장: 수평 성분은 반대라 지워지고 \\(z\\) 성분만 남는다. \\(\\cos\\theta=z/\\sqrt{z^2+R^2}\\).", name="ring")
 
 fig_disk = canvas(560, 254,
-    ellipse(280, 185, 150, 42, INK, 2, "rgba(31,42,68,.05)"),
-    ellipse(280, 185, 80, 22, RED, 2.5, "rgba(224,49,49,.08)"), ellipse(280, 185, 70, 19, RED, 2.5),
-    text(280, 246, "반지름 R 원판 (면밀도 σ) — 반지름 r, 폭 dr 인 고리 띠를 0~R까지 쌓는다", 12.5, INK, "middle"),
-    line(280, 185, 280, 40, GRAY, 1.2, "5 4"), text(292, 115, "z", 13, GRAY),
-    dot(280, 40, "", 5, INK), text(296, 36, "P", 13, INK),
-    line(206, 185, 280, 40, GRAY, 1, "3 3"), text(226, 108, "u = √(r²+z²)", 12, GRAY, "end"),
-    arrow(280, 40, 280, 6, GREEN, "dE_z", 2.4, 34, 0),
-    text(446, 160, "dq = σ·2πr dr", 12.5, RED, "start"),
-    cap="원판 = 원형 고리를 반지름 \\(0\\to R\\)로 적분한 것. 띠의 넓이 \\(dA=2\\pi r\\,dr\\).")
+    step(1, ellipse(280, 185, 150, 42, INK, 2, "rgba(31,42,68,.05)"),
+        ellipse(280, 185, 80, 22, RED, 2.5, "rgba(224,49,49,.08)"), ellipse(280, 185, 70, 19, RED, 2.5),
+        text(280, 246, "반지름 R 원판 (면밀도 σ) — 반지름 r, 폭 dr 인 고리 띠를 0~R까지 쌓는다", 12.5, INK, "middle")),
+    step(2, line(280, 185, 280, 40, GRAY, 1.2, "5 4"), text(292, 115, "z", 13, GRAY),
+        dot(280, 40, "", 5, INK), text(296, 36, "P", 13, INK),
+        line(206, 185, 280, 40, GRAY, 1, "3 3"), text(226, 108, "u = √(r²+z²)", 12, GRAY, "end")),
+    step(3, arrow(280, 40, 280, 6, GREEN, "dE_z", 2.4, 34, 0),
+        text(446, 160, "dq = σ·2πr dr", 12.5, RED, "start")),
+    cap="원판 = 원형 고리를 반지름 \\(0\\to R\\)로 적분한 것. 띠의 넓이 \\(dA=2\\pi r\\,dr\\).", name="disk")
 
 fig_plane = canvas(560, 170,
-    axis(60, 130, 520, 130, "z (판에서 거리)", "E"),
-    line(60, 60, 520, 60, GREEN, 3), text(300, 50, "무한 평면: E = σ/2ε₀, 거리와 무관", 13, GREEN, "middle"),
-    path("M60 60 C 200 62, 320 110, 520 125", RED, 2.5, dash="6 4"), text(400, 88, "유한 원판: 멀어지면 줄어든다", 12, RED, "middle"),
-    cap="원판 결과에서 \\(R\\to\\infty\\)이면 둘째 항이 0 → 어디서 재도 같은 \\(\\sigma/2\\varepsilon_0\\).")
+    step(1, axis(60, 130, 520, 130, "z (판에서 거리)", "E")),
+    step(2, line(60, 60, 520, 60, GREEN, 3), text(300, 50, "무한 평면: E = σ/2ε₀, 거리와 무관", 13, GREEN, "middle")),
+    step(3, path("M60 60 C 200 62, 320 110, 520 125", RED, 2.5, dash="6 4"), text(400, 88, "유한 원판: 멀어지면 줄어든다", 12, RED, "middle")),
+    cap="원판 결과에서 \\(R\\to\\infty\\)이면 둘째 항이 0 → 어디서 재도 같은 \\(\\sigma/2\\varepsilon_0\\).", name="plane")
 
 fig_gauss = canvas(560, 232,
-    circle(150, 110, 70, PINK, dash="7 5", w=2.5), text(150, 224, "가우스면(가상의 폐곡면)", 12.5, PINK, "middle"),
-    charge(150, 110, "+", "", 14, RED), text(129, 161, "+1 C", 12, RED, "middle"),
-    radial(150, 110, 8, 22, 100, GREEN),
-    rect(196, 82, 18, 18, INK, fill="rgba(255,255,255,.6)", sw=1.5), text(224, 62, "da (미소면적)", 12, INK),
-    arrow(214, 91, 250, 84, INK, "n̂", 2, 8, -6),
-    text(420, 70, "전기력선 하나 ↔ da 하나", 13, INK, "middle"), text(420, 92, "법선벡터 n̂ 와 전기력선이", 13, INK, "middle"), text(420, 112, "나란하다(평행) → E·n̂ = E", 13, GREEN, "middle", True),
-    text(420, 150, "∮ E da = q_enc / ε₀", 15, INK, "middle", True),
-    cap="축구공 비유: 중심의 +1 C이 뿜는 전기력선이 공 표면의 미소면적을 하나씩 수직으로 뚫고 나간다.")
+    step(1, circle(150, 110, 70, PINK, dash="7 5", w=2.5), text(150, 224, "가우스면(가상의 폐곡면)", 12.5, PINK, "middle"),
+        charge(150, 110, "+", "", 14, RED), text(129, 161, "+1 C", 12, RED, "middle")),
+    step(2, radial(150, 110, 8, 22, 100, GREEN)),
+    step(3, rect(196, 82, 18, 18, INK, fill="rgba(255,255,255,.6)", sw=1.5), text(224, 62, "da (미소면적)", 12, INK),
+        arrow(214, 91, 250, 84, INK, "n̂", 2, 8, -6),
+        text(420, 70, "전기력선 하나 ↔ da 하나", 13, INK, "middle")),
+    step(4, text(420, 92, "법선벡터 n̂ 와 전기력선이", 13, INK, "middle"), text(420, 112, "나란하다(평행) → E·n̂ = E", 13, GREEN, "middle", True),
+        text(420, 150, "∮ E da = q_enc / ε₀", 15, INK, "middle", True)),
+    cap="축구공 비유: 중심의 +1 C이 뿜는 전기력선이 공 표면의 미소면적을 하나씩 수직으로 뚫고 나간다.", name="gauss")
 
 fig_three = canvas(560, 180,
-    rect(50, 60, 110, 70, PINK, dash="6 4", fill="rgba(255,77,141,.06)"), text(105, 155, "면 · 넓이 A", 13, INK, "middle"),
-    ellipse(280, 60, 45, 14, PINK, 2, "rgba(255,77,141,.06)", "6 4"), ellipse(280, 130, 45, 14, PINK, 2, "none", "6 4"), line(235, 60, 235, 130, PINK, 2, "6 4"), line(325, 60, 325, 130, PINK, 2, "6 4"),
-    text(280, 165, "원통 · 옆면만 2πrL", 13, INK, "middle"), text(345, 100, "L", 12, GRAY),
-    circle(460, 95, 42, PINK, dash="6 4", w=2), line(460, 95, 502, 95, GRAY, 1), text(482, 88, "r", 12, GRAY),
-    text(460, 160, "구 · 4πr²", 13, INK, "middle"),
-    cap="교수님: 물리책의 가우스면은 딱 3개 — 표면적을 쉽게 구할 수 있는 것만 쓴다.")
+    step(1, rect(50, 60, 110, 70, PINK, dash="6 4", fill="rgba(255,77,141,.06)"), text(105, 155, "면 · 넓이 A", 13, INK, "middle")),
+    step(2, ellipse(280, 60, 45, 14, PINK, 2, "rgba(255,77,141,.06)", "6 4"), ellipse(280, 130, 45, 14, PINK, 2, "none", "6 4"), line(235, 60, 235, 130, PINK, 2, "6 4"), line(325, 60, 325, 130, PINK, 2, "6 4"),
+        text(280, 165, "원통 · 옆면만 2πrL", 13, INK, "middle"), text(345, 100, "L", 12, GRAY)),
+    step(3, circle(460, 95, 42, PINK, dash="6 4", w=2), line(460, 95, 502, 95, GRAY, 1), text(482, 88, "r", 12, GRAY),
+        text(460, 160, "구 · 4πr²", 13, INK, "middle")),
+    cap="교수님: 물리책의 가우스면은 딱 3개 — 표면적을 쉽게 구할 수 있는 것만 쓴다.", name="three")
 
 fig_map = canvas(560, 160,
-    rect(24, 20, 200, 116, GRAY, dash="5 4", rx=12), text(124, 46, "Σ · 불연속", 13, INK, "middle", True),
-    charge(60, 88, "+", "점전하", 11, RED), charge(118, 84, "+", "", 9, RED), charge(140, 94, "−", "점전하군", 9, BLUE), charge(196, 80, "+", "", 8, RED), charge(196, 100, "−", "쌍극자", 8, BLUE),
-    rect(244, 20, 200, 116, GRAY, dash="5 4", rx=12), text(344, 46, "∫dq · 연속", 13, INK, "middle", True),
-    rect(262, 86, 50, 7, RED, fill="rgba(224,49,49,.25)", sw=1), text(287, 112, "직선 λ", 11.5, INK, "middle"),
-    circle(344, 88, 15, RED, w=2.5), text(344, 118, "고리 λ", 11.5, INK, "middle"),
-    circle(404, 88, 17, RED, w=2, fill="rgba(224,49,49,.15)"), text(404, 118, "원판 σ", 11.5, INK, "middle"),
-    arrow(450, 74, 480, 74, INK, "", 1.6), text(518, 70, "다음:", 12, PINK, "middle"), text(518, 88, "가우스", 12, PINK, "middle", True), text(518, 104, "(부피 ρ)", 11, PINK, "middle"),
-    cap="오늘 위치: 연속 분포의 마지막 둘(고리·원판)을 끝내고 가우스 법칙으로 넘어간다.")
+    step(1, rect(24, 20, 200, 116, GRAY, dash="5 4", rx=12), text(124, 46, "Σ · 불연속", 13, INK, "middle", True),
+        charge(60, 88, "+", "점전하", 11, RED), charge(118, 84, "+", "", 9, RED), charge(140, 94, "−", "점전하군", 9, BLUE), charge(196, 80, "+", "", 8, RED), charge(196, 100, "−", "쌍극자", 8, BLUE)),
+    step(2, rect(244, 20, 200, 116, GRAY, dash="5 4", rx=12), text(344, 46, "∫dq · 연속", 13, INK, "middle", True),
+        rect(262, 86, 50, 7, RED, fill="rgba(224,49,49,.25)", sw=1), text(287, 112, "직선 λ", 11.5, INK, "middle"),
+        circle(344, 88, 15, RED, w=2.5), text(344, 118, "고리 λ", 11.5, INK, "middle"),
+        circle(404, 88, 17, RED, w=2, fill="rgba(224,49,49,.15)"), text(404, 118, "원판 σ", 11.5, INK, "middle")),
+    step(3, arrow(450, 74, 480, 74, INK, "", 1.6), text(518, 70, "다음:", 12, PINK, "middle"), text(518, 88, "가우스", 12, PINK, "middle", True), text(518, 104, "(부피 ρ)", 11, PINK, "middle")),
+    cap="오늘 위치: 연속 분포의 마지막 둘(고리·원판)을 끝내고 가우스 법칙으로 넘어간다.", name="map")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일반물리학2 · 9/11 원형 도선 · 원판 · 가우스 법칙 서론</title></head><body>
 <header>

@@ -10,73 +10,74 @@ def ellipse(cx, cy, rx, ry, color=INK, w=2, fill="none", dash=""):
     return f'<ellipse cx="{cx}" cy="{cy}" rx="{rx}" ry="{ry}" fill="{fill}" stroke="{color}" stroke-width="{w}"{d}/>'
 
 fig_gv = canvas(560, 250,
-    text(150, 30, "중력 (13장)", 14, INK, "middle", True),
-    circle(150, 190, 40, INK, w=2, fill="rgba(31,42,68,.08)"), text(150, 195, "M", 14, INK, "middle", True),
-    dot(150, 100, "", 6, INK), text(168, 96, "m", 13, INK),
-    arrow(150, 92, 150, 60, GRAY, "dr (밖으로)", 1.8, 46, 4, dash="4 3"),
-    arrow(150, 108, 150, 140, BLUE, "F (안으로 당김)", 2.4, 58, 4),
-    text(150, 246, "U(r) = −GMm/r", 13, INK, "middle"),
-    text(410, 30, "전기 (같은 부호)", 14, INK, "middle", True),
-    charge(410, 190, "+", "", 26, RED), text(446, 196, "q", 14, RED, "start", True),
-    dot(410, 100, "", 6, INK), text(428, 96, "q₀ (시험전하)", 13, INK),
-    arrow(418, 92, 418, 60, GRAY, "dr (밖으로)", 1.8, 46, 4, dash="4 3"),
-    arrow(402, 88, 402, 52, GREEN, "F (밖으로 밈)", 2.4, -58, 4),
-    text(410, 246, "U(r) = +(1/4πε₀)·q₀q/r", 13, INK, "middle"),
-    cap="같은 틀, 힘의 방향만 반대. 둘 다 \\(r\\)에서 무한대까지 옮기는 일을 재서 \\(U(\\infty)=0\\)으로 둔다.")
+    step(1, text(150, 30, "중력 (13장)", 14, INK, "middle", True),
+        circle(150, 190, 40, INK, w=2, fill="rgba(31,42,68,.08)"), text(150, 195, "M", 14, INK, "middle", True),
+        dot(150, 100, "", 6, INK), text(168, 96, "m", 13, INK)),
+    step(2, arrow(150, 92, 150, 60, GRAY, "dr (밖으로)", 1.8, 46, 4, dash="4 3"),
+        arrow(150, 108, 150, 140, BLUE, "F (안으로 당김)", 2.4, 58, 4),
+        text(150, 246, "U(r) = −GMm/r", 13, INK, "middle")),
+    step(3, text(410, 30, "전기 (같은 부호)", 14, INK, "middle", True),
+        charge(410, 190, "+", "", 26, RED), text(446, 196, "q", 14, RED, "start", True),
+        dot(410, 100, "", 6, INK), text(428, 96, "q₀ (시험전하)", 13, INK)),
+    step(4, arrow(418, 92, 418, 60, GRAY, "dr (밖으로)", 1.8, 46, 4, dash="4 3"),
+        arrow(402, 88, 402, 52, GREEN, "F (밖으로 밈)", 2.4, -58, 4),
+        text(410, 246, "U(r) = +(1/4πε₀)·q₀q/r", 13, INK, "middle")),
+    cap="같은 틀, 힘의 방향만 반대. 둘 다 \\(r\\)에서 무한대까지 옮기는 일을 재서 \\(U(\\infty)=0\\)으로 둔다.", name="gv")
 
 fig_sum = canvas(560, 220,
-    line(160, 40, 320, 40, GRAY, 1.2, "5 4"), line(160, 180, 320, 180, GRAY, 1.2, "5 4"), line(140, 60, 140, 160, GRAY, 1.2, "5 4"), line(340, 60, 340, 160, GRAY, 1.2, "5 4"), text(240, 30, "한 변 a", 13, GRAY, "middle"),
-    charge(140, 40, "+", "", 16, RED), text(118, 44, "q₁", 13, RED, "end"), charge(340, 40, "+", "", 16, RED), text(362, 44, "q₂", 13, RED, "start"),
-    charge(140, 180, "−", "", 16, BLUE), text(118, 184, "q₃", 13, BLUE, "end"), charge(340, 180, "+", "", 16, RED), text(362, 184, "q₄", 13, RED, "start"),
-    dot(240, 110, "", 6, INK), text(262, 115, "P (중심)", 12.5, INK, "start"),
-    line(152, 48, 228, 102, GRAY, 1, "3 3"), line(328, 48, 252, 102, GRAY, 1, "3 3"), line(152, 172, 228, 118, GRAY, 1, "3 3"), line(328, 172, 252, 118, GRAY, 1, "3 3"),
-    text(176, 80, "r", 12, GRAY), text(304, 80, "r", 12, GRAY), text(176, 146, "r", 12, GRAY), text(304, 146, "r", 12, GRAY),
-    text(460, 110, "V = (1/4πε₀)(q₁+q₂+q₃+q₄)/r", 11.5, INK, "middle"), text(460, 130, "부호만 넣고 더한다", 12.5, GREEN, "middle", True),
-    cap="여러 점전하의 전위: 방향이 없으니 각 전하의 \\(q_i/r_i\\)를 <b>부호를 포함해</b> 그냥 더한다. 단위벡터 금지.")
+    step(1, line(160, 40, 320, 40, GRAY, 1.2, "5 4"), line(160, 180, 320, 180, GRAY, 1.2, "5 4"), line(140, 60, 140, 160, GRAY, 1.2, "5 4"), line(340, 60, 340, 160, GRAY, 1.2, "5 4"), text(240, 30, "한 변 a", 13, GRAY, "middle"),
+        charge(140, 40, "+", "", 16, RED), text(118, 44, "q₁", 13, RED, "end"), charge(340, 40, "+", "", 16, RED), text(362, 44, "q₂", 13, RED, "start"),
+        charge(140, 180, "−", "", 16, BLUE), text(118, 184, "q₃", 13, BLUE, "end"), charge(340, 180, "+", "", 16, RED), text(362, 184, "q₄", 13, RED, "start")),
+    step(2, dot(240, 110, "", 6, INK), text(262, 115, "P (중심)", 12.5, INK, "start"),
+        line(152, 48, 228, 102, GRAY, 1, "3 3"), line(328, 48, 252, 102, GRAY, 1, "3 3"), line(152, 172, 228, 118, GRAY, 1, "3 3"), line(328, 172, 252, 118, GRAY, 1, "3 3"),
+        text(176, 80, "r", 12, GRAY), text(304, 80, "r", 12, GRAY), text(176, 146, "r", 12, GRAY), text(304, 146, "r", 12, GRAY)),
+    step(3, text(460, 110, "V = (1/4πε₀)(q₁+q₂+q₃+q₄)/r", 11.5, INK, "middle"), text(460, 130, "부호만 넣고 더한다", 12.5, GREEN, "middle", True)),
+    cap="여러 점전하의 전위: 방향이 없으니 각 전하의 \\(q_i/r_i\\)를 <b>부호를 포함해</b> 그냥 더한다. 단위벡터 금지.", name="sum")
 
 fig_dip = canvas(560, 250,
-    charge(220, 150, "+", "", 16, RED), text(198, 154, "+q", 13, RED, "end"), charge(220, 210, "−", "", 16, BLUE), text(198, 214, "−q", 13, BLUE, "end"),
-    text(200, 200, "d", 13, GRAY, "end"), dot(220, 180, "", 3, GRAY), text(208, 178, "O", 12, GRAY, "end"),
-    dot(440, 40, "P", 5, INK),
-    line(234, 143, 440, 40, RED, 1.5), text(320, 88, "r₊", 13, RED, "middle"),
-    line(233, 200, 440, 40, BLUE, 1.5), text(345, 140, "r₋", 13, BLUE, "middle"),
-    line(220, 180, 440, 40, GRAY, 1.2, "5 4"),
-    path("M220 180 A 22 22 0 0 0 238 167", GRAY, 1.2), text(248, 150, "θ", 12, GRAY),
-    line(232, 157, 243, 201, GREEN, 1.5, "3 3"), text(262, 210, "수선 → 차이 ≈ d cosθ", 12, GREEN),
-    cap="쌍극자 전위 증명의 핵심: \\(r_--r_+\\)를 \\(d\\cos\\theta\\)로 놓으려면 수선이 필요한데 삼각형이 이등변이라 정확히 수직이 아니다 → \\(r\\gg d\\) 근사.")
+    step(1, charge(220, 150, "+", "", 16, RED), text(198, 154, "+q", 13, RED, "end"), charge(220, 210, "−", "", 16, BLUE), text(198, 214, "−q", 13, BLUE, "end"),
+        text(200, 200, "d", 13, GRAY, "end"), dot(220, 180, "", 3, GRAY), text(208, 178, "O", 12, GRAY, "end"),
+        dot(440, 40, "P", 5, INK)),
+    step(2, line(234, 143, 440, 40, RED, 1.5), text(320, 88, "r₊", 13, RED, "middle"),
+        line(233, 200, 440, 40, BLUE, 1.5), text(345, 140, "r₋", 13, BLUE, "middle")),
+    step(3, line(220, 180, 440, 40, GRAY, 1.2, "5 4"),
+        path("M220 180 A 22 22 0 0 0 238 167", GRAY, 1.2), text(248, 150, "θ", 12, GRAY)),
+    step(4, line(232, 157, 243, 201, GREEN, 1.5, "3 3"), text(262, 210, "수선 → 차이 ≈ d cosθ", 12, GREEN)),
+    cap="쌍극자 전위 증명의 핵심: \\(r_--r_+\\)를 \\(d\\cos\\theta\\)로 놓으려면 수선이 필요한데 삼각형이 이등변이라 정확히 수직이 아니다 → \\(r\\gg d\\) 근사.", name="dip")
 
 fig_line = canvas(560, 205,
-    axis(40, 156, 530, 156, "x", ""),
-    rect(120, 120, 300, 24, RED, fill="rgba(224,49,49,.12)", sw=2), text(210, 138, "+ + + + +", 13, RED, "middle"), text(366, 138, "+ + + +", 13, RED, "middle"),
-    brace_label(120, 420, 172, "0 ~ L (선밀도 λ)"),
-    dot(120, 40, "", 6, INK), text(136, 36, "P (수직 거리 a)", 13, INK), line(120, 40, 120, 120, GRAY, 1.2, "5 4"), text(104, 86, "a", 13, GRAY, "middle"),
-    rect(300, 120, 12, 24, INK, fill="rgba(31,42,68,.35)", sw=1), text(318, 112, "dq = λ dx", 12, INK, "start"),
-    line(306, 120, 120, 40, GREEN, 1.5, "3 3"), text(222, 70, "√(x²+a²)", 12, GREEN, "middle"),
-    cap="직선 도선의 전위: 전기장 때(22장)와 배치를 바꿔 점 P를 도선 <b>옆</b>에 둔다. 각 조각까지 거리는 \\(\\sqrt{x^2+a^2}\\).")
+    step(1, axis(40, 156, 530, 156, "x", ""),
+        rect(120, 120, 300, 24, RED, fill="rgba(224,49,49,.12)", sw=2), text(210, 138, "+ + + + +", 13, RED, "middle"), text(366, 138, "+ + + +", 13, RED, "middle"),
+        brace_label(120, 420, 172, "0 ~ L (선밀도 λ)")),
+    step(2, dot(120, 40, "", 6, INK), text(136, 36, "P (수직 거리 a)", 13, INK), line(120, 40, 120, 120, GRAY, 1.2, "5 4"), text(104, 86, "a", 13, GRAY, "middle")),
+    step(3, rect(300, 120, 12, 24, INK, fill="rgba(31,42,68,.35)", sw=1), text(318, 112, "dq = λ dx", 12, INK, "start"),
+        line(306, 120, 120, 40, GREEN, 1.5, "3 3"), text(222, 70, "√(x²+a²)", 12, GREEN, "middle")),
+    cap="직선 도선의 전위: 전기장 때(22장)와 배치를 바꿔 점 P를 도선 <b>옆</b>에 둔다. 각 조각까지 거리는 \\(\\sqrt{x^2+a^2}\\).", name="line")
 
 fig_ring = canvas(560, 200,
-    ellipse(280, 150, 120, 32, RED, 2.5, "rgba(224,49,49,.06)"), text(280, 194, "고리 위 모든 dq → P까지 거리가 전부 같다", 13, INK, "middle"),
-    line(280, 150, 280, 40, GRAY, 1.2, "5 4"), text(292, 100, "z", 13, GRAY), dot(280, 40, "", 5, INK), text(296, 36, "P", 13, INK),
-    line(160, 150, 280, 40, GREEN, 1.2, "3 3"), line(400, 150, 280, 40, GREEN, 1.2, "3 3"), line(280, 182, 280, 40, GREEN, 1.2, "3 3"),
-    text(190, 92, "√(z²+R²)", 12, GREEN, "middle"), text(372, 92, "√(z²+R²)", 12, GREEN, "middle"),
-    cap="원형 도선의 전위가 교재에 따로 없는 이유: 스칼라라 상쇄가 없고 거리가 전부 같아 점전하 꼴 \\(q/\\sqrt{z^2+R^2}\\)이 바로 나온다.")
+    step(1, ellipse(280, 150, 120, 32, RED, 2.5, "rgba(224,49,49,.06)"),
+        line(280, 150, 280, 40, GRAY, 1.2, "5 4"), text(292, 100, "z", 13, GRAY), dot(280, 40, "", 5, INK), text(296, 36, "P", 13, INK)),
+    step(2, line(160, 150, 280, 40, GREEN, 1.2, "3 3"), line(400, 150, 280, 40, GREEN, 1.2, "3 3"), line(280, 182, 280, 40, GREEN, 1.2, "3 3"),
+        text(190, 92, "√(z²+R²)", 12, GREEN, "middle"), text(372, 92, "√(z²+R²)", 12, GREEN, "middle"),
+        text(280, 194, "고리 위 모든 dq → P까지 거리가 전부 같다", 13, INK, "middle")),
+    cap="원형 도선의 전위가 교재에 따로 없는 이유: 스칼라라 상쇄가 없고 거리가 전부 같아 점전하 꼴 \\(q/\\sqrt{z^2+R^2}\\)이 바로 나온다.", name="ring")
 
 fig_cap = canvas(560, 170,
-    plate(160, 50, 240, 16, "+", 8), plate(160, 110, 240, 16, "−", 8),
-    arrow(280, 70, 280, 106, GREEN, "E", 2.4, 14, 0), brace_label(410, 410, 0, ""), line(420, 66, 420, 110, GRAY, 1.2), text(432, 92, "d", 13, GRAY),
-    text(120, 62, "+q", 13, RED, "end"), text(120, 122, "−q", 13, BLUE, "end"),
-    text(280, 150, "C = q / V_C  [C/V = F(패럿)]", 14, INK, "middle", True),
-    cap="25장 도입: 전기 용량 = 전위차 1 V당 얼마나 많은 전하를 담는가. 1 μF = 10⁻⁶ F.")
+    step(1, plate(160, 50, 240, 16, "+", 8), plate(160, 110, 240, 16, "−", 8),
+        text(120, 62, "+q", 13, RED, "end"), text(120, 122, "−q", 13, BLUE, "end")),
+    step(2, arrow(280, 70, 280, 106, GREEN, "E", 2.4, 14, 0), line(420, 66, 420, 110, GRAY, 1.2), text(432, 92, "d", 13, GRAY)),
+    step(3, text(280, 150, "C = q / V_C  [C/V = F(패럿)]", 14, INK, "middle", True)),
+    cap="25장 도입: 전기 용량 = 전위차 1 V당 얼마나 많은 전하를 담는가. 1 μF = 10⁻⁶ F.", name="cap")
 
 fig_alt = canvas(560, 220,
-    charge(150, 110, "+", "", 16, RED),
-    circle(150, 110, 40, GRAY, dash="4 3", w=1.2), circle(150, 110, 65, GRAY, dash="4 3", w=1.2), circle(150, 110, 90, GRAY, dash="4 3", w=1.2),
-    text(150, 66, "V 높음", 11, INK, "middle"), text(150, 40, "V 낮음", 11, INK, "middle"), text(150, 16, "V → 0 (무한대)", 11, GRAY, "middle"),
-    arrow(196, 110, 250, 110, GREEN, "", 2.2), text(258, 116, "E (내리막)", 12.5, GREEN, "start"),
-    axis(320, 190, 540, 190, "r", ""), text(312, 40, "V, E", 12, INK, "end"),
-    path("M330 40 C 360 120, 420 150, 540 170", RED, 2.5), text(482, 152, "V ∝ 1/r", 12, RED),
-    path("M330 40 C 336 150, 360 186, 540 188", GREEN, 2.5), text(500, 178, "E ∝ 1/r²", 12, GREEN, "middle"),
-    cap="전위는 고도 지도(등고선), 전기장은 그 내리막의 기울기 \\(E=-dV/dr\\). 점전하에서 \\(V\\propto1/r\\), \\(E\\propto1/r^2\\) — 항상 전위가 한 차수 낮다.")
+    step(1, charge(150, 110, "+", "", 16, RED),
+        circle(150, 110, 40, GRAY, dash="4 3", w=1.2), circle(150, 110, 65, GRAY, dash="4 3", w=1.2), circle(150, 110, 90, GRAY, dash="4 3", w=1.2),
+        text(150, 66, "V 높음", 11, INK, "middle"), text(150, 40, "V 낮음", 11, INK, "middle"), text(150, 16, "V → 0 (무한대)", 11, GRAY, "middle")),
+    step(2, arrow(196, 110, 250, 110, GREEN, "", 2.2), text(258, 116, "E (내리막)", 12.5, GREEN, "start")),
+    step(3, axis(320, 190, 540, 190, "r", ""), text(312, 40, "V, E", 12, INK, "end"),
+        path("M330 40 C 360 120, 420 150, 540 170", RED, 2.5), text(482, 152, "V ∝ 1/r", 12, RED)),
+    step(4, path("M330 40 C 336 150, 360 186, 540 188", GREEN, 2.5), text(500, 178, "E ∝ 1/r²", 12, GREEN, "middle")),
+    cap="전위는 고도 지도(등고선), 전기장은 그 내리막의 기울기 \\(E=-dV/dr\\). 점전하에서 \\(V\\propto1/r\\), \\(E\\propto1/r^2\\) — 항상 전위가 한 차수 낮다.", name="alt")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>일반물리학2 · 9/18 전위 — 점전하 · 여러 점전하 · 증명 3제</title></head><body>
 <header>
