@@ -47,31 +47,12 @@ def load_board(path):
     return {"VERSION": ver, "BOARD": ns["BOARD"]}
 
 def chalkify(fig_html, fid):
-    """읽기용 그림(SVG)을 칠판용으로 — 분필 팔레트 · 흰 채움은 칠판색 · 글자 halo 제거 · 글꼴 Gaegu · 선 요소(글자 제외)에 class ck +
-    그림마다 고유 id 의 filter/marker/style(reduced-motion 이면 같은 우선순위로 filter:none)."""
+    """교실 v3(2026-09-28, 대표님 「칠판·손글씨 별로」): 읽기용 그림을 색·글꼴 그대로 흰 슬라이드에 싣는다. 분필 팔레트·질감 필터는 뺐다.
+    남는 일 = 그림마다 고유 id(화살촉 marker, svg id)와 class="fig slide" — 단계 애니메이션(data-step)·검사기는 그대로 쓴다."""
     s = fig_html
-    s = s.replace('<figure class="fig"', '<figure class="fig chalk"', 1)
-    s = s.replace('fill="#fff"', 'fill="#2F5D4B"').replace('fill="#FFFFFF"', 'fill="#2F5D4B"').replace('fill="rgba(255,255,255,.7)"', 'fill="#2F5D4B"')
-    for k, v in CHALK.items(): s = s.replace(k, v).replace(k.lower(), v)
-    s = re.sub(r'rgba\((\d+),(\d+),(\d+),(0?\.\d+)\)', lambda m: 'rgba(255,255,255,.07)' if float(m.group(4)) < 0.5 else m.group(0), s)
-    s = s.replace(' paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round"', '').replace(' paint-order="stroke" stroke="#fff" stroke-width="2"', '')
-    s = s.replace('font-family="Pretendard,-apple-system,sans-serif"', 'font-family="Gaegu,Pretendard,sans-serif"')
-    s = re.sub(r'<(line|path|circle|ellipse|rect|polyline|polygon)\b', r'<\1 class="ck"', s)
-    s = re.sub(r'(<marker[^>]*>)(.*?)(</marker>)', lambda m: m.group(1) + m.group(2).replace(' class="ck"', '') + m.group(3), s, flags=re.S)
+    s = s.replace('<figure class="fig"', '<figure class="fig lite"', 1)   # 이름 주의: 템플릿의 강의 슬라이드 상자가 .slide 라 겹치면 그림이 560px 로 늘어난다(2026-09-28 실측)
     s = s.replace('id="ah"', f'id="ah-{fid}"').replace('url(#ah)', f'url(#ah-{fid})')
-    # 필터 영역은 요소 상자 기준 % 가 아니라 캔버스 전체(userSpaceOnUse) — 작은 요소(점·짧은 선)는 4% 가 변위 1.6px 보다 작아 가장자리가 잘린다 (오타 설계 회의 2차 「필터 잘림 검사」)
-    vb = re.search(r'viewBox="\s*([-\d.]+)[ ,]+([-\d.]+)[ ,]+([\d.]+)[ ,]+([\d.]+)\s*"', s)
-    if vb:
-        x0, y0, w, h = (float(v) for v in vb.groups()); m = 8
-        region = f'filterUnits="userSpaceOnUse" x="{x0 - m:g}" y="{y0 - m:g}" width="{w + 2 * m:g}" height="{h + 2 * m:g}"'
-    else:
-        region = 'x="-10%" y="-10%" width="120%" height="120%"'
-    filt = (f'<defs><filter id="chalk-{fid}" {region} color-interpolation-filters="sRGB">'
-            f'<feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="7" result="n"/>'
-            f'<feDisplacementMap in="SourceGraphic" in2="n" scale="1.6" xChannelSelector="R" yChannelSelector="G"/></filter></defs>'
-            f'<style>#fig-{fid} .ck{{filter:url(#chalk-{fid});stroke-linecap:round;stroke-linejoin:round}}'
-            f'@media (prefers-reduced-motion: reduce){{#fig-{fid} .ck{{filter:none}}}}</style>')
-    s = re.sub(r'(<svg\b[^>]*)(>)', lambda m: m.group(1) + f' id="fig-{fid}"' + m.group(2) + filt, s, count=1)
+    s = re.sub(r'(<svg\b[^>]*)(>)', lambda m: m.group(1) + f' id="fig-{fid}"' + m.group(2), s, count=1)
     return s
 
 def board_line(line):
@@ -181,7 +162,7 @@ def build(src, slug, date, minutes=18):
         os.makedirs(FIGCHK_DIR, exist_ok=True)   # 분필 그림 검사용 하네스 파일(저장소 밖) — node fig_check.cjs <이 파일> 로 겹침 검사
         figs_html = "".join(f["svg"] for c in chapters for f in c["figs"].values())
         io.open(os.path.join(FIGCHK_DIR, f"classroom_{slug}_{date}.html"), "w", encoding="utf-8", newline="\n").write(
-            '<!doctype html><meta charset="utf-8"><body class="chalk-bg" style="background:#2F5D4B">' + figs_html)
+            '<!doctype html><meta charset="utf-8"><body style="background:#fff">' + figs_html)
     quiz = []
     for k, q in enumerate(doc.xpath('//div[contains(concat(" ",normalize-space(@class)," ")," q ")]'), 1):
         qid = q.get("data-qid") or f"q{k}"

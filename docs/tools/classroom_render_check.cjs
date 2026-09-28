@@ -49,7 +49,7 @@ for (const rel of files) {
     Object.entries(res.fonts).forEach(([k, v]) => { if (!v) issues.push("폰트 미로드 " + k); });
     res.steps.forEach(s => { const tag = s.id + (s.fig ? "(" + s.fig + "/" + s.fs + ")" : "");
       if (s.kerr) issues.push(tag + " katex-error " + s.kerr); if (s.kover) issues.push(tag + " 식 가로 넘침 " + s.kover); if (s.lover) issues.push(tag + " 판서 줄 넘침 " + s.lover);
-      if (!s.lines) issues.push(tag + " 판서 줄 0"); if (s.fig && !s.svg) issues.push(tag + " 그림 svg 없음"); if (s.fig && !s.filt) issues.push(tag + " 분필 필터 없음"); if (s.fig && s.svgw < 200) issues.push(tag + " 그림 폭 " + Math.round(s.svgw));
+      if (!s.lines) issues.push(tag + " 판서 줄 0"); if (s.fig && !s.svg) issues.push(tag + " 그림 svg 없음"); if (s.fig && s.svgw < 200) issues.push(tag + " 그림 폭 " + Math.round(s.svgw));
       if (s.anim || s.pending) issues.push(tag + " 즉시 표시인데 예약 작업"); if (s.bubble) issues.push(tag + " 말풍선 가로 넘침"); if (!s.say) issues.push(tag + " 대사 없음");
       if (res.w >= 900 && s.wrap && s.wrap.length) issues.push(tag + " 판서 줄 접힘 " + s.wrap.map(x => x.n + "줄「" + x.t + "」").join(" · "));   /* 아이패드 기준 한 줄 규칙(폰은 접힘 허용) */
       if (s.fig) { if (s.hidden !== s.expHidden || s.shown !== s.expShown) issues.push(tag + ` 그림 단계 숨김/보임 ${s.hidden}/${s.shown} ≠ 기대 ${s.expHidden}/${s.expShown}`); if (!s.expShown) issues.push(tag + " 보이는 그림 단계 0"); if (s.pre) issues.push(tag + " 즉시 표시인데 가림(pre) " + s.pre); if (s.invisible) issues.push(tag + " 보여야 할 그림 단계의 opacity 0: " + s.invisible); } });

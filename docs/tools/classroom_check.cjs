@@ -47,13 +47,13 @@ async function check(file) {
         const want = c.steps.slice(0, si + 1).flatMap(s => s.b.map((_, j) => s.id + "#" + j)); const got = [...doc.querySelectorAll("#bc .bl")].map(l => l.getAttribute("data-step") + "#" + l.getAttribute("data-ln"));
         if (want.join(",") !== got.join(",")) problems.push(`CH${ci + 1} 단계 ${si + 1} 판서 줄 누적이 다름: ${got.length}/${want.length}`);
         /* 화면의 줄 내용이 자료 b[].h 그대로인지(오타 R1: 개수만 세면 내용이 틀려도 통과) */
-        { const wantH = c.steps.slice(0, si + 1).flatMap(s => s.b.map(l => l.h)); const gotH = [...doc.querySelectorAll("#bc .bl")].map(l => l.innerHTML); const k = gotH.findIndex((h, i) => h !== wantH[i]); if (k >= 0) problems.push(`CH${ci + 1} 단계 ${si + 1} 판서 줄 ${k + 1} 내용이 자료와 다름: ${gotH[k].slice(0, 40)} ≠ ${String(wantH[k]).slice(0, 40)}`); }
+        { const wantH = c.steps.slice(0, si + 1).flatMap(s => s.b.map(l => l.h)); const gotH = [...doc.querySelectorAll("#bc .bl")].map(l => (l.querySelector(".bt") || l).innerHTML); const k = gotH.findIndex((h, i) => h !== wantH[i]); if (k >= 0) problems.push(`CH${ci + 1} 단계 ${si + 1} 판서 줄 ${k + 1} 내용이 자료와 다름: ${gotH[k].slice(0, 40)} ≠ ${String(wantH[k]).slice(0, 40)}`); }
         if (![...doc.querySelectorAll("#bc .bl")].every(l => l.classList.contains("now"))) problems.push(`CH${ci + 1} 단계 ${si + 1} 즉시 표시인데 줄이 가려짐`);
         const figs = doc.querySelectorAll("#bc .bd-fig"); if (figs.length !== (st.fig ? 1 : 0)) problems.push(`CH${ci + 1} 단계 ${si + 1} 그림 수 ${figs.length} (기대 ${st.fig ? 1 : 0})`);
         if (st.fig) { const gs = [...doc.querySelectorAll("#bc .bd-fig [data-step]")]; if (!gs.length) problems.push(`CH${ci + 1} 단계 ${si + 1} 그림에 data-step 없음`);
           gs.forEach(g => { const n = +g.getAttribute("data-step"); const hid = g.hasAttribute("hidden"); if ((n > st.fs) !== hid) problems.push(`CH${ci + 1} 단계 ${si + 1} 그림 단계 ${n} ${hid ? "숨김" : "보임"} (fs ${st.fs})`); });
           const svg = doc.querySelector("#bc .bd-fig svg"); if (!svg || !/^fig-/.test(svg.id)) problems.push(`CH${ci + 1} 단계 ${si + 1} 그림 svg id 없음`);
-          if (!doc.querySelector("#bc .bd-fig filter[id^='chalk-']")) problems.push(`CH${ci + 1} 단계 ${si + 1} 분필 필터 없음`); }
+          if (!doc.querySelector("#bc .bd-fig [data-replay]")) problems.push(`CH${ci + 1} 단계 ${si + 1} 그림 「다시 보기」 버튼 없음`); }
         if (X.anim || X.pending) problems.push(`CH${ci + 1} 단계 ${si + 1} 즉시 표시인데 예약 작업 남음`); }
     }));
     // 문제: 첫 문제 정답 → XP·호감도, 둘째 오답 → 하트, 입력형은 답 보기 → 채점
@@ -204,6 +204,14 @@ async function check(file) {
         /* 오타 2차 R6: 초기화 뒤 재학습 → 전부 채점 → 결과: 보상은 없어도 완료 상태(done)가 저장된다 */
         X2.L.done = false; X2.S.mode = "result"; X2.render(); const Tsaved = JSON.parse(w2.localStorage.getItem("mc-tutor")); if (!X2.L.done || !Tsaved.lessons[D.id].done) problems.push("재완료 뒤 완료 상태가 저장되지 않음: 메모리 " + X2.L.done + " 저장 " + Tsaved.lessons[D.id].done);
         try { w2.close(); } catch (e) {} }
+      /* v3 「다시 보기」: 같은 단계에서 그림 애니메이션만 다시 — 위치·XP 그대로, 대사는 완성 상태, 판서 전부 보임, 그림 예약 작업이 걸린다 */
+      if (withFig.length) { X.reduce = false; const t3 = withFig[0]; X.S.mode = "step"; X.S.ci = t3.ci; X.S.si = t3.si; X.S.resume = false; X.render(); X.enter();
+        const xpB = X.T.xp; X.replay();
+        if (X.S.ci !== t3.ci || X.S.si !== t3.si || X.T.xp !== xpB) problems.push("다시 보기가 위치·XP 를 바꿈");
+        if (X.typing || norm(doc.querySelector("#dText").textContent) !== norm(X.fullText)) problems.push("다시 보기 중 대사가 다시 타자됨");
+        if (![...doc.querySelectorAll("#bc .bl")].every(l => l.classList.contains("now"))) problems.push("다시 보기에서 판서 줄이 가려짐");
+        if (!X.pending && !X.anim) problems.push("다시 보기가 그림 애니메이션을 예약하지 않음");
+        X.enter(); if (X.pending || X.anim || doc.querySelector("#bc .bd-fig .pre")) problems.push("다시 보기 뒤 Enter 즉시 완료 실패"); }
       X.cancelAll(); X.reduce = true;
     }
   } catch (e) { problems.push("예외: " + (e && e.stack || e).split("\n").slice(0, 2).join(" ")); }
@@ -232,7 +240,7 @@ async function check(file) {
           Object.keys(c.figs || {}).forEach(n => { if (c.figs[n].max !== figMax[n]) problems.push(`CH${i + 1} 그림 ${n} 최대 단계 ${c.figs[n].max} ≠ 원본 ${figMax[n]}`); }); });
         /* id 유일성: 필터·화살촉·svg id 가 페이지 전체에서 한 번씩 */
         const ids = [...html.matchAll(/ id=\\?"((?:chalk|ah|fig)-[^"\\]+)\\?"/g)].map(x => x[1]); const dup = ids.filter((x, k) => ids.indexOf(x) !== k); if (dup.length) problems.push("그림 id 중복: " + [...new Set(dup)].slice(0, 3).join(", "));
-        if (!/fonts\.googleapis\.com\/css2\?family=Gaegu/.test(html)) problems.push("판서 글꼴(Gaegu) 링크 없음"); } }
+        if (!/pretendardvariable-dynamic-subset\.min\.css/.test(html) || !/fonts\.googleapis\.com\/css2\?family=Gowun\+Dodum&family=Gothic\+A1/.test(html)) problems.push("글꼴 링크(Pretendard · Gothic A1 · Gowun Dodum · Inter) 없음"); } }
     else secs.forEach((sec, i) => { const c = D.chapters[i]; if (!c) { problems.push(`원본 섹션 ${i + 1} 에 대응하는 챕터 없음`); return; }
       const clone = sec.cloneNode(true); clone.querySelectorAll("h2,.no,svg").forEach(x => x.remove());
       /* 양쪽 다 요소 경계마다 공백을 넣어 비교한다(원본 textContent 는 <p>a</p><div>b</div> 를 "ab" 로 붙인다) */
