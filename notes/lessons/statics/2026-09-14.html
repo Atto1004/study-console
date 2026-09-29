@@ -145,7 +145,7 @@ details.ex .body p{margin:8px 0}
 <p>덧셈 때 \(x\)·\(y\)로 나눴듯, 공학 문제에서는 <b>어떤 직선 L에 평행한 성분과 수직한 성분</b>으로 나누면 계산이 쉽다. 벡터 \(\mathbf U\)와 직선 L이 있으면 항상 \(\mathbf U=\mathbf U_p+\mathbf U_n\).</p>
 <figure class="fig" data-fig="proj"><svg class="fig-svg" viewbox="0 0 560 230" width="560" height="230" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><line x1="40" y1="170" x2="520" y2="170" stroke="#1F2A44" stroke-width="2.2"></line><text x="500" y="192" font-size="13" fill="#1F2A44" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">직선 L</text><line x1="120" y1="170" x2="200" y2="170" stroke="#2F9E44" stroke-width="3.4" marker-end="url(#ah)"></line><text x="160" y="192" font-size="13" fill="#2F9E44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">e (|e| = 1)</text></g><g data-step="2"><line x1="120" y1="170" x2="380" y2="50" stroke="#1971C2" stroke-width="3" marker-end="url(#ah)"></line><text x="240" y="96" font-size="16" fill="#1971C2" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">U</text><path d="M161.7 150.6 A 46 46 0 0 1 166.0 170.0" fill="none" stroke="#8A97A6" stroke-width="1.5"></path><text x="176.6" y="161.4" font-size="12" fill="#8A97A6" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">θ</text></g><g data-step="3"><line x1="380" y1="50" x2="380" y2="170" stroke="#8A97A6" stroke-width="1.2" stroke-dasharray="5 4"></line><line x1="120" y1="156" x2="380" y2="156" stroke="#E03131" stroke-width="2.6" marker-end="url(#ah)"></line><text x="250" y="146" font-size="13" fill="#E03131" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">U<tspan baseline-shift="sub" font-size="72%">p</tspan> = (U·e) e</text><text x="300" y="196" font-size="13" fill="#E03131" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">|U<tspan baseline-shift="sub" font-size="72%">p</tspan>| = |U| |cos θ|</text></g><g data-step="4"><line x1="394" y1="170" x2="394" y2="50" stroke="#FF4D8D" stroke-width="2.6" marker-end="url(#ah)"></line><text x="408" y="112" font-size="13" fill="#FF4D8D" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">U<tspan baseline-shift="sub" font-size="72%">n</tspan> = U − U<tspan baseline-shift="sub" font-size="72%">p</tspan></text></g></svg><figcaption>정사영: 벡터 \(\mathbf U\)를 직선 L에 <b>평행한 성분</b> \(\mathbf U_p\)와 <b>수직한 성분</b> \(\mathbf U_n\)으로. 크기는 내적으로, 방향은 단위벡터 \(\mathbf e\)로.</figcaption></figure>
 <div class="formula">\[|\mathbf U_p|=|\mathbf U\cdot\mathbf e|=|\mathbf U||\cos\theta|,\qquad \mathbf e\cdot\mathbf U=|\mathbf e||\mathbf U|\cos\theta=|\mathbf U|\cos\theta\ (\text{L 방향 스칼라 성분})\] \[\boxed{\ \mathbf U_p=(\mathbf U\cdot\mathbf e)\,\mathbf e\ }\qquad \mathbf U_n=\mathbf U-\mathbf U_p\]</div>
-<div class="say">"내적은 스칼라니까" 크기가 나오고, 방향은 단위벡터 \(\mathbf e\)로 — "<b>이게 크기, 이게 방향</b>."(정확히는 내적 \(\mathbf U\cdot\mathbf e\)가 부호 있는 성분이고, 그 절댓값이 크기)(정확히는 내적 \(\mathbf U\cdot\mathbf e\)가 부호 있는 성분이고, 그 절댓값이 크기) · 수직 성분은 "평행 성분을 구했으면 원래 벡터에서 빼면" 된다. · "2학년 올라가서 배울 <b>재료역학·동역학 다 똑같다</b>."</div>
+<div class="say">"내적은 스칼라니까" 크기가 나오고, 방향은 단위벡터 \(\mathbf e\)로 — "<b>이게 크기, 이게 방향</b>."(정확히는 내적 \(\mathbf U\cdot\mathbf e\)가 부호 있는 성분이고, 그 절댓값이 크기) · 수직 성분은 "평행 성분을 구했으면 원래 벡터에서 빼면" 된다. · "2학년 올라가서 배울 <b>재료역학·동역학 다 똑같다</b>."</div>
 <div class="why">\((\mathbf U\cdot\mathbf e)\)는 부호 있는 길이(L의 + 방향이면 +, 반대면 −), 여기에 \(\mathbf e\)를 곱하면 방향이 붙어 벡터가 된다. 완전히 수직이면 \(\mathbf U_p=0\), 평행이면 \(\mathbf U_n=0\). 필기본에서 <b>빨간 박스</b>를 친 시험 공식.</div>
 <details class="ex"><summary>연습 — \(\mathbf U=4\mathbf i+3\mathbf j\)를 직선 L(방향 \(\mathbf i+\mathbf j\))에 대해 분해</summary><div class="body"><p>① \(\mathbf e=(\mathbf i+\mathbf j)/\sqrt2\) ② \(\mathbf U\cdot\mathbf e=(4+3)/\sqrt2=7/\sqrt2\approx4.95\) ③ \(\mathbf U_p=(7/\sqrt2)\,(\mathbf i+\mathbf j)/\sqrt2=3.5\mathbf i+3.5\mathbf j\) ④ \(\mathbf U_n=\mathbf U-\mathbf U_p=0.5\mathbf i-0.5\mathbf j\). 검산: \(\mathbf U_n\cdot\mathbf e=(0.5-0.5)/\sqrt2=0\) ✓ 수직.</p></div></details>
 <div class="analogy">벡터 \(\mathbf U\)의 끝점에서 직선 L에 수선을 내리면, 그 발까지의 정사영이 평행 성분(부호 있는 길이 \(\mathbf U\cdot\mathbf e\)). 원래 벡터에서 평행 성분을 뺀 나머지가 수직 성분.</div>
@@ -183,59 +183,80 @@ details.ex .body p{margin:8px 0}
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
 <script>/* 김주영 스앵님 판정 (대표님 2026-09-29 「개념 마인드맵은 스앵님이 학습을 통해 내가 뭘 알고 뭘 모르는지 알아서 파악」) — 원본은 이 파일 하나.
-   빌더가 교실·수업 노트·학습 덱·암기노트 페이지에 그대로 넣고(__JUDGE__), learn.html·앱(V57)은 같은 글을 붙여 쓴다(docs/tools/sync_judge.py).
-   기록 = localStorage atto.evidence [{t, k, n:[노드], ok, v, lid, sid, qid, clean}] (최대 4000건)
+   빌더가 교실·수업 노트·학습 덱·암기노트 페이지에 그대로 넣고(__JUDGE__), learn.html 은 patch_learn_judge.py 가 TJ-START~TJ-END 사이를 이 파일로 갈아 끼운다.
+   기록 = localStorage atto.evidence [{t, k, n:[노드], ok, v, lid, sid, qid, a, clean}] (최대 4000건 — 넘치면 읽기·질문 기록부터 버리고 노드마다 최근 문제 6건은 남긴다)
      k: quiz(ok) 확인 문제 · read(clean) 챕터·섹션 끝(다시 설명·질문 없이 끝났으면 clean) · again 다시 설명 · ask 질문 · memo(ok) 암기노트 외움 · self(v) 카드 자가평가
-   판정 = 노드마다 atto.mastery[id] = {quiz:{correct,total,ts}, self, ts, score, state, auto} — learn.html · 앱 V47 · server.py 의 점수식이 그대로 읽는다.
+     a: 같은 시도 표시(카드 「다시 저장」) — 같은 a·qid 는 새 기록으로 바꿔 넣는다(정답 수가 늘지 않는다)
+   판정 = 노드마다 atto.mastery[id] = {quiz:{correct,total,ts}, self, sts, ts, score, state, auto} — learn.html 은 TJ.score 로 같은 식을 쓴다.
      quiz = 최근 6번 · self(설명할 수 있나 1~5) = 읽음 4 · 다시 설명·질문 2번 이상이면 3 · 외움 +1 · 카드 자가평가가 더 최근이면 그 값
-     → 문제 없이 읽기만 하면 최대 「흔들림」, 「안다」는 문제로만. 점수식 = (0.5·정답률 + 0.2·self/5)/0.7, 문제 없으면 self/5·0.6, 60일 감쇠(최저 0.4) */
+     → 문제 없이 읽기만 하면 최대 「흔들림」, 「안다」는 문제로만. 점수식 = (0.5·정답률·감쇠(quiz.ts) + 0.2·self/5·감쇠(sts))/0.7, 문제 없으면 self/5·0.6·감쇠(sts)
+     감쇠 = 60일에 걸쳐 1 → 0.4 (최저 0.4). 정답 근거와 읽기·암기 근거를 따로 감쇠한다 — 오늘 암기 체크 하나로 90일 전 정답이 새것처럼 되지 않게(오타 .91 설계 검수 ⑦)
+   저장이 막히면(용량·사생활 모드) 이 페이지 안에서는 메모리 사본으로 이어 가고 rec 은 false 를 돌려준다. */
 (function(g){
-  var EK="atto.evidence", MK="atto.mastery", CAP=4000;
-  function rd(k,d){ try{ var v=JSON.parse(localStorage.getItem(k)||"null"); return v==null?d:v; }catch(e){ return d; } }
+  var EK="atto.evidence", MK="atto.mastery", CAP=4000, KEEPQ=6, MEM={}, DIRTY={};
+  function rd(k,d){ if(DIRTY[k]) return MEM[k]; try{ var v=JSON.parse(localStorage.getItem(k)||"null"); return v==null?d:v; }catch(e){ return DIRTY[k]?MEM[k]:d; } }
+  function wr(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); DIRTY[k]=false; return true; }catch(e){ MEM[k]=v; DIRTY[k]=true; return false; } }
   function decay(ts){ if(!ts) return 1; var d=Math.max(0,(Date.now()/1000-ts)/86400); return Math.max(.4,1-d/60); }
-  function score(e){ var q=e.quiz||{}, tot=+q.total||0, cor=+q.correct||0, sv=e.self==null?null:Math.max(1,Math.min(5,+e.self));
+  function score(e){ if(!e||typeof e!=="object") return {score:0,state:"unrated"};
+    var q=e.quiz||{}, tot=+q.total||0, cor=+q.correct||0, sv=e.self==null?null:Math.max(1,Math.min(5,+e.self));
     if(tot<=0&&sv==null) return {score:0,state:"unrated"};
-    var raw=tot>0?(0.5*(cor/tot)+0.2*((sv||0)/5))/0.7:(sv/5)*0.6, s=Math.min(1,raw)*decay(Math.max(+e.ts||0,+q.ts||0)), st;
+    var dq=decay(+q.ts||+e.ts||0), ds=decay(+e.sts||+e.ts||0);
+    var raw=tot>0?(0.5*(cor/tot)*dq+0.2*((sv||0)/5)*ds)/0.7:(sv/5)*0.6*ds, s=Math.min(1,raw), st;
     if(tot<=0) st=(sv>=4&&s>=.4)?"shaky":"unknown"; else st=s>=.7?"known":s>=.4?"shaky":"unknown";
     return {score:Math.round(s*1000)/1000,state:st}; }
-  function why(evs){ var qz=evs.filter(function(e){return e.k==="quiz";}).slice(-6), r={q:qz.length,c:qz.filter(function(e){return e.ok;}).length,
+  function why(evs){ var qz=evs.filter(function(e){return e.k==="quiz";}).slice(-KEEPQ), r={q:qz.length,c:qz.filter(function(e){return e.ok;}).length,
       read:evs.filter(function(e){return e.k==="read";}).length, clean:evs.filter(function(e){return e.k==="read"&&e.clean;}).length,
       conf:evs.filter(function(e){return (e.k==="again"||e.k==="ask")&&Date.now()-e.t<21*864e5;}).length,
-      memo:null, self:null, last:0};
-    evs.forEach(function(e){ if(e.k==="memo") r.memo=!!e.ok; if(e.k==="self") r.self={v:+e.v,t:e.t}; if(e.t>r.last) r.last=e.t; });
+      memo:null, self:null, last:0, selfLast:0};
+    evs.forEach(function(e){ if(e.k==="memo") r.memo=!!e.ok; if(e.k==="self") r.self={v:+e.v,t:e.t}; if(e.t>r.last) r.last=e.t; if(e.k!=="quiz"&&e.t>r.selfLast) r.selfLast=e.t; });
     return r; }
   function judgeOne(id,L,M){ var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); if(!evs.length) return;
-    var r=why(evs), e=Object.assign({},M[id]||{}), qz=evs.filter(function(x){return x.k==="quiz";}).slice(-6);
+    var r=why(evs), e=Object.assign({},M[id]||{}), qz=evs.filter(function(x){return x.k==="quiz";}).slice(-KEEPQ);
     var self=null; if(r.read||r.conf||r.memo!=null){ self=r.read?4:3; if(r.conf>=2) self=3; if(r.memo) self=Math.min(5,self+1); }
     var autoLast=0; evs.forEach(function(x){ if(x.k!=="self"&&x.t>autoLast) autoLast=x.t; });
     if(r.self&&r.self.t>=autoLast) self=r.self.v;
     e.quiz=qz.length?{correct:r.c,total:qz.length,ts:Math.round(qz[qz.length-1].t/1000)}:undefined; if(!e.quiz) delete e.quiz;
-    e.self=self; if(self==null) delete e.self;
+    e.self=self; if(self==null){ delete e.self; delete e.sts; } else e.sts=Math.round(r.selfLast/1000);
     e.ts=Math.round(r.last/1000); e.auto={by:"tutor",q:r.q,c:r.c,read:r.read,clean:r.clean,conf:r.conf,memo:r.memo};
     var s=score(e); e.score=s.score; e.state=s.state; M[id]=e; }
-  function judge(ids){ var L=rd(EK,[]), M=rd(MK,{}); if(!Array.isArray(L)) L=[]; (ids||[]).forEach(function(id){ judgeOne(id,L,M); });
-    try{ localStorage.setItem(MK,JSON.stringify(M)); }catch(e){} return M; }
+  function judge(ids){ var L=rd(EK,[]), M=rd(MK,{}); if(!Array.isArray(L)) L=[]; if(!M||typeof M!=="object") M={}; (ids||[]).forEach(function(id){ judgeOne(id,L,M); });
+    wr(MK,M); return M; }
   function all(){ var L=rd(EK,[]), o={}; if(Array.isArray(L)) L.forEach(function(e){ (e&&e.n||[]).forEach(function(i){ o[i]=1; }); }); return judge(Object.keys(o)); }
-  function rec(ev){ if(!ev||!Array.isArray(ev.n)||!ev.n.length) return; var L=rd(EK,[]); if(!Array.isArray(L)) L=[];
-    ev.t=Date.now(); L.push(ev); if(L.length>CAP) L=L.slice(L.length-CAP);
-    try{ localStorage.setItem(EK,JSON.stringify(L)); }catch(e){ try{ L=L.slice(-Math.floor(CAP/2)); localStorage.setItem(EK,JSON.stringify(L)); }catch(x){} }
-    judge(ev.n); }
+  /* 상한 넘침: 노드마다 최근 문제 KEEPQ 건은 지키고, 나머지(읽기·질문·오래된 문제)에서 오래된 것부터 버린다 — 다른 노드 활동으로 정답 기록이 사라지지 않게 */
+  function trim(L,cap){ cap=cap||CAP; if(L.length<=cap) return L; var seen={}, keep=[], rest=[], i;
+    for(i=L.length-1;i>=0;i--){ var e=L[i], k=false; if(e&&e.k==="quiz") (e.n||[]).forEach(function(id){ seen[id]=(seen[id]||0)+1; if(seen[id]<=KEEPQ) k=true; }); (k?keep:rest).push(e); }
+    keep.reverse(); rest.reverse(); rest=rest.slice(Math.max(0,rest.length-Math.max(0,cap-keep.length)));
+    return keep.concat(rest).sort(function(a,b){ return (a.t||0)-(b.t||0); }); }
+  function rec(ev){ if(!ev||!Array.isArray(ev.n)||!ev.n.length) return false; var L=rd(EK,[]); if(!Array.isArray(L)) L=[];
+    ev.t=Date.now();
+    if(ev.a!=null&&ev.qid!=null){ for(var i=L.length-1;i>=0;i--){ var x=L[i]; if(x&&x.k===ev.k&&x.qid===ev.qid&&x.a===ev.a){ L.splice(i,1); break; } } }
+    L.push(ev); L=trim(L);
+    /* 저장 실패 → 절반 상한으로 다시(이때도 노드마다 최근 정답은 지킨다, 오타 설계 2차) · 그래도 실패면 메모리 사본은 자르지 않은 전체로 */
+    var ok=wr(EK,L); if(!ok){ var half=trim(L,Math.floor(CAP/2)); if(wr(EK,half)){ L=half; ok=true; } else { MEM[EK]=L; DIRTY[EK]=true; } }
+    judge(ev.n); return ok; }
   function reasons(id){ var L=rd(EK,[]); if(!Array.isArray(L)) return null; var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); return evs.length?why(evs):null; }
-  g.TJ={rec:rec,judge:judge,all:all,score:score,reasons:reasons};
+  g.TJ={rec:rec,judge:judge,all:all,score:score,reasons:reasons,trim:trim};
 })(typeof window!=="undefined"?window:this);
 </script>
 <script>/* 여러 식을 이은 식 줄 나누기(대표님 2026-09-29 「수식 한 줄로, 배치구조 신경」) — 원본은 이 파일 하나(수업 노트·암기노트 템플릿에 빌더가 넣는다, __SPLITTEX__).
    \[ A,\qquad B \] 처럼 서로 다른 식을 \qquad 또는 「,\quad」로 이어 붙인 줄은 식마다 한 줄(\[A\]\[B\])로 — 한 식 안은 가르지 않는다.
    괄호 { } 와 \begin…\end 안의 구분자는 건드리지 않고, 연결 기호만 남은 조각(\Rightarrow·\to·\Leftrightarrow·\therefore)은 다음 식 앞에 붙인다. */
+/* 괄호 깊이: ( ) [ ] 와 \left…\right 안에서는 나누지 않는다 — \left(a\qquad b\right) 가 갈렸다(오타 .91 설계 검수 ④) */
+function parenStep(t,i,p){
+  if(t.startsWith("\\left",i)&&!/[a-zA-Z]/.test(t[i+5]||"")) return p+1;
+  if(t.startsWith("\\right",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) return Math.max(0,p-1);
+  const c=t[i]; if(c==="("||c==="[") return p+1; if(c===")"||c==="]") return Math.max(0,p-1); return p;
+}
 function splitTex(t){
-  const parts=[]; let d=0, env=0, cur="", i=0;
+  const parts=[]; let d=0, env=0, p=0, cur="", i=0;
   while(i<t.length){
     if(t.startsWith("\\begin{",i)) env++;
     else if(t.startsWith("\\end{",i)) env=Math.max(0,env-1);
     const c=t[i];
     if(c==="\\"&&(t[i+1]==="{"||t[i+1]==="}")){ cur+=t.slice(i,i+2); i+=2; continue; }
     if(c==="{") d++; else if(c==="}") d=Math.max(0,d-1);
-    if(!d&&!env){
+    p=parenStep(t,i,p);
+    if(!d&&!env&&!p){
       let m=0;
       if(t.startsWith("\\qquad",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) m=6;
       else if(t.startsWith(",\\quad",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) m=6;
@@ -255,11 +276,12 @@ function splitTex(t){
 }
 /* 좁은 화면(폰)에서만: 글자 덩어리(\text{…})를 화살표(\to·\Rightarrow)로 이은 「흐름」 줄은 화살표 단위로 줄을 나눈다 — 수식이 아니라 단계 나열이라 나눠도 식이 갈리지 않는다 */
 function splitFlow(t){
-  const segs=[]; let d=0, cur="", i=0;
+  const segs=[]; let d=0, p=0, cur="", i=0;
   while(i<t.length){ const c=t[i];
     if(c==="\\"&&(t[i+1]==="{"||t[i+1]==="}")){ cur+=t.slice(i,i+2); i+=2; continue; }
     if(c==="{") d++; else if(c==="}") d=Math.max(0,d-1);
-    if(!d){ const m=/^\\ ?\\(to|Rightarrow)(?![a-zA-Z])\\ ?/.exec(t.slice(i))||/^\s*\\(to|Rightarrow)(?![a-zA-Z])\s*/.exec(t.slice(i)); if(m&&cur.trim()){ segs.push(cur); cur="\\"+m[1]+"\\ "; i+=m[0].length; continue; } }
+    p=parenStep(t,i,p);
+    if(!d&&!p){ const m=/^\\ ?\\(to|Rightarrow)(?![a-zA-Z])\\ ?/.exec(t.slice(i))||/^\s*\\(to|Rightarrow)(?![a-zA-Z])\s*/.exec(t.slice(i)); if(m&&cur.trim()){ segs.push(cur); cur="\\"+m[1]+"\\ "; i+=m[0].length; continue; } }
     cur+=c; i++; }
   segs.push(cur);
   const ok=segs.length>=3&&segs.every(s=>/^(\\(to|Rightarrow)\\ )?\s*\\text\{/.test(s.trim()));
@@ -270,7 +292,7 @@ function splitDisplays(html,narrow){
 }
 </script>
 <script>
-const LESSON_ID="statics-2026-09-14", QUIZ=[{"id": "q1", "qn": "확인 1 · 성분 내적", "html": "\\(\\mathbf U=(1,2,2)\\), \\(\\mathbf V=(2,0,1)\\)일 때 \\(\\mathbf U\\cdot\\mathbf V\\)는?", "choices": [{"html": "6", "ok": false, "k": 3}, {"html": "4", "ok": true, "k": 0}, {"html": "2", "ok": false, "k": 1}, {"html": "\\((2,0,2)\\)", "ok": false, "k": 2}], "ans": "\\(1\\cdot2+2\\cdot0+2\\cdot1=4\\). 4번은 성분끼리 곱만 하고 안 더한 것(내적은 스칼라)."}, {"id": "q2", "qn": "확인 2 · 사이각", "html": "위 두 벡터의 사이각은 약?", "choices": [{"html": "53°", "ok": true, "k": 0}, {"html": "90°", "ok": false, "k": 2}, {"html": "37°", "ok": false, "k": 1}, {"html": "0°", "ok": false, "k": 3}], "ans": "\\(\\cos\\theta=4/(3\\sqrt5)=0.596\\) → \\(53.4^\\circ\\)."}, {"id": "q3", "qn": "확인 3 · 정사영", "html": "직선 L 방향의 단위벡터가 \\(\\mathbf e\\)일 때, \\(\\mathbf U\\)의 L에 평행한 <b>벡터</b> 성분은?", "choices": [{"html": "\\(\\mathbf U_p=(\\mathbf U\\times\\mathbf e)\\,\\mathbf e\\)", "ok": false, "k": 3}, {"html": "\\(\\mathbf U_p=\\mathbf U\\cdot\\mathbf e\\)", "ok": false, "k": 1}, {"html": "\\(\\mathbf U_p=\\mathbf U/|\\mathbf e|\\)", "ok": false, "k": 2}, {"html": "\\(\\mathbf U_p=(\\mathbf U\\cdot\\mathbf e)\\,\\mathbf e\\)", "ok": true, "k": 0}], "ans": "크기 \\((\\mathbf U\\cdot\\mathbf e)\\)에 방향 \\(\\mathbf e\\). 2번은 스칼라 성분(크기)일 뿐."}, {"id": "q4", "qn": "확인 4 · 외적의 성질", "html": "외적에 대해 옳은 것은?", "choices": [{"html": "결과는 스칼라다", "ok": false, "k": 3}, {"html": "두 벡터가 평행일 때 크기가 최대다", "ok": false, "k": 2}, {"html": "\\(\\mathbf V\\times\\mathbf U=-(\\mathbf U\\times\\mathbf V)\\) — 교환법칙이 성립하지 않는다", "ok": true, "k": 0}, {"html": "\\(\\mathbf U\\times\\mathbf V=\\mathbf V\\times\\mathbf U\\)", "ok": false, "k": 1}], "ans": "오른손 법칙에서 순서를 바꾸면 엄지가 반대. 평행이면 \\(\\sin\\theta=0\\) → 0. 결과는 벡터."}, {"id": "q5", "qn": "확인 5 · 행렬식", "html": "\\(\\mathbf U=(1,2,3)\\), \\(\\mathbf V=(4,5,6)\\)일 때 \\(\\mathbf U\\times\\mathbf V\\)는?", "choices": [{"html": "\\((-3,\\,6,\\,-3)\\)", "ok": true, "k": 0}, {"html": "\\((3,\\,-6,\\,3)\\)", "ok": false, "k": 2}, {"html": "\\((-3,\\,-6,\\,-3)\\)", "ok": false, "k": 1}, {"html": "\\((4,\\,10,\\,18)\\)", "ok": false, "k": 3}], "ans": "3번은 \\(\\mathbf j\\) 항 부호를 빠뜨린 것, 2번은 \\(\\mathbf V\\times\\mathbf U\\), 4번은 성분끼리 곱한 것(외적 아님)."}, {"id": "q6", "qn": "확인 6 · 정사영 계산", "html": "\\(\\mathbf U=4\\mathbf i+3\\mathbf j\\)를 방향 \\(\\mathbf i+\\mathbf j\\)인 직선에 대해 \\(\\mathbf U_p\\), \\(\\mathbf U_n\\)으로 분해하라.", "choices": null, "ans": "\\(\\mathbf e=(\\mathbf i+\\mathbf j)/\\sqrt2\\), \\(\\mathbf U\\cdot\\mathbf e=7/\\sqrt2\\), \\(\\mathbf U_p=3.5\\mathbf i+3.5\\mathbf j\\), \\(\\mathbf U_n=0.5\\mathbf i-0.5\\mathbf j\\). 검산 \\(\\mathbf U_n\\cdot\\mathbf e=0\\)."}], NDS={"sec": {"s1": ["mech.dot_apps", "mech.projection"], "s2": ["mech.dot_apps", "mech.projection"], "s3": ["mech.projection"], "s4": ["mech.cross_apps"], "s5": ["mech.cross_apps"]}, "q": {"q1": ["mech.dot_apps"], "q2": ["mech.dot_apps"], "q3": ["mech.projection"], "q4": ["mech.cross_apps"], "q5": ["mech.cross_apps"], "q6": ["mech.projection"]}}, N_SEC=document.querySelectorAll("section.s[data-id]").length;
+const LESSON_ID="statics-2026-09-14", QUIZ=[{"id": "q1", "qn": "확인 1 · 성분 내적", "html": "\\(\\mathbf U=(1,2,2)\\), \\(\\mathbf V=(2,0,1)\\)일 때 \\(\\mathbf U\\cdot\\mathbf V\\)는?", "choices": [{"html": "6", "ok": false, "k": 3}, {"html": "4", "ok": true, "k": 0}, {"html": "2", "ok": false, "k": 1}, {"html": "\\((2,0,2)\\)", "ok": false, "k": 2}], "ans": "\\(1\\cdot2+2\\cdot0+2\\cdot1=4\\). 4번은 성분끼리 곱만 하고 안 더한 것(내적은 스칼라)."}, {"id": "q2", "qn": "확인 2 · 사이각", "html": "위 두 벡터의 사이각은 약?", "choices": [{"html": "53°", "ok": true, "k": 0}, {"html": "90°", "ok": false, "k": 2}, {"html": "37°", "ok": false, "k": 1}, {"html": "0°", "ok": false, "k": 3}], "ans": "\\(\\cos\\theta=4/(3\\sqrt5)=0.596\\) → \\(53.4^\\circ\\)."}, {"id": "q3", "qn": "확인 3 · 정사영", "html": "직선 L 방향의 단위벡터가 \\(\\mathbf e\\)일 때, \\(\\mathbf U\\)의 L에 평행한 <b>벡터</b> 성분은?", "choices": [{"html": "\\(\\mathbf U_p=(\\mathbf U\\times\\mathbf e)\\,\\mathbf e\\)", "ok": false, "k": 3}, {"html": "\\(\\mathbf U_p=\\mathbf U\\cdot\\mathbf e\\)", "ok": false, "k": 1}, {"html": "\\(\\mathbf U_p=\\mathbf U/|\\mathbf e|\\)", "ok": false, "k": 2}, {"html": "\\(\\mathbf U_p=(\\mathbf U\\cdot\\mathbf e)\\,\\mathbf e\\)", "ok": true, "k": 0}], "ans": "부호 있는 스칼라 성분 \\(\\mathbf U\\cdot\\mathbf e\\)에 단위벡터 \\(\\mathbf e\\)를 곱한다. 정사영의 크기는 \\(|\\mathbf U\\cdot\\mathbf e|\\). 2번은 스칼라 성분이라 벡터 성분의 답이 아니다."}, {"id": "q4", "qn": "확인 4 · 외적의 성질", "html": "외적에 대해 옳은 것은?", "choices": [{"html": "결과는 스칼라다", "ok": false, "k": 3}, {"html": "두 벡터가 평행일 때 크기가 최대다", "ok": false, "k": 2}, {"html": "\\(\\mathbf V\\times\\mathbf U=-(\\mathbf U\\times\\mathbf V)\\) — 교환법칙이 성립하지 않는다", "ok": true, "k": 0}, {"html": "\\(\\mathbf U\\times\\mathbf V=\\mathbf V\\times\\mathbf U\\)", "ok": false, "k": 1}], "ans": "오른손 법칙에서 순서를 바꾸면 엄지가 반대. 평행이면 \\(\\sin\\theta=0\\) → 0. 결과는 벡터."}, {"id": "q5", "qn": "확인 5 · 행렬식", "html": "\\(\\mathbf U=(1,2,3)\\), \\(\\mathbf V=(4,5,6)\\)일 때 \\(\\mathbf U\\times\\mathbf V\\)는?", "choices": [{"html": "\\((-3,\\,6,\\,-3)\\)", "ok": true, "k": 0}, {"html": "\\((3,\\,-6,\\,3)\\)", "ok": false, "k": 2}, {"html": "\\((-3,\\,-6,\\,-3)\\)", "ok": false, "k": 1}, {"html": "\\((4,\\,10,\\,18)\\)", "ok": false, "k": 3}], "ans": "3번은 \\(\\mathbf j\\) 항 부호를 빠뜨린 것, 2번은 \\(\\mathbf V\\times\\mathbf U\\), 4번은 성분끼리 곱한 것(외적 아님)."}, {"id": "q6", "qn": "확인 6 · 정사영 계산", "html": "\\(\\mathbf U=4\\mathbf i+3\\mathbf j\\)를 방향 \\(\\mathbf i+\\mathbf j\\)인 직선에 대해 \\(\\mathbf U_p\\), \\(\\mathbf U_n\\)으로 분해하라.", "choices": null, "ans": "\\(\\mathbf e=(\\mathbf i+\\mathbf j)/\\sqrt2\\), \\(\\mathbf U\\cdot\\mathbf e=7/\\sqrt2\\), \\(\\mathbf U_p=3.5\\mathbf i+3.5\\mathbf j\\), \\(\\mathbf U_n=0.5\\mathbf i-0.5\\mathbf j\\). 검산 \\(\\mathbf U_n\\cdot\\mathbf e=0\\)."}], NDS={"sec": {"s1": ["mech.dot_apps", "mech.projection"], "s2": ["mech.dot_apps", "mech.projection"], "s3": ["mech.projection"], "s4": ["mech.cross_apps"], "s5": ["mech.cross_apps"]}, "q": {"q1": ["mech.dot_apps"], "q2": ["mech.dot_apps"], "q3": ["mech.projection"], "q4": ["mech.cross_apps"], "q5": ["mech.cross_apps"], "q6": ["mech.projection"]}}, N_SEC=document.querySelectorAll("section.s[data-id]").length;
 const KEY="mc-lesson-"+LESSON_ID;
 let ST={read:{},done:{},correct:{},answer:{},ts:0};
 try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}

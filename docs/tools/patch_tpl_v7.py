@@ -46,5 +46,7 @@ sub('act.innerHTML=\'<button class="btn" id="ok">\'+(ST.done[s.id]?"다시 읽�
 sub("'<div class=\"sub\">오른쪽 아래 「다음」으로 언제든 넘어갈 수 있고, 페이지를 끝내면 「다음」이 실선이 됩니다. 기초 문제는 보기를 누르고, 답이 여러 개인 문제는 답을 씁니다. 왼쪽 아래 「힌트」는 그 파트의 한 줄 요약, 작은 사진은 출처(학습지·내 풀이본)입니다.</div>'+\n", "", "시작 장 설명")
 sub("(QUIZ?'문제 '+num(SLIDES.filter(x=>x.type===\"q\").length)+'개 · 보기를 누르면 바로 채점 · 끝 장에서 틀린 문제만 다시':", "(QUIZ?'문제 '+num(SLIDES.filter(x=>x.type===\"q\").length)+'개':", "시작 장 문제 안내")
 sub('(QUIZ?"문제만 풀기 · 시험 대비":"학습 슬라이드 · 가로 화면")', '(QUIZ?"문제만 풀기 · 시험 대비":"학습 슬라이드")', "시작 장 머리")
+# ⑤ 덱 파트 표지의 진행 안내(오타 .91 설계 검수 ⑧ — §24 부가 설명)
+sub('<div class="sub">개념 → 암기 vs 이해 → 기초 문제 → 응용 문제 순서로 갑니다.</div>', '', "파트 표지 안내")
 io.open(P, "w", encoding="utf-8", newline="\n").write(s)
 print("slides_tpl v7 ok")

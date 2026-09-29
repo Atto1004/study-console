@@ -98,7 +98,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 
 <section class="s" data-id="s4">
 <h2>4. 예제 — 별표 예제 1과 연습 3제 ★</h2>
-<details class="ex" open><summary>★ 교재 예제 1 \\(y'+y\\tan x=\\sin2x\\), \\(y(0)=1\\)(\\(-\\pi/2<x<\\pi/2\\)) — 판서에 별표</summary><div class="body"><p>\\(p=\\tan x\\), \\(r=\\sin2x=2\\sin x\\cos x\\). \\(h=\\int\\tan x\\,dx=-\\ln\\cos x=\\ln|\\sec x|\\), \\(e^h=\\sec x\\), \\(e^{{-h}}=\\cos x\\).</p><p>\\(y=\\cos x\\Big[\\int\\sec x\\cdot2\\sin x\\cos x\\,dx+c\\Big]=\\cos x\\Big[2\\int\\sin x\\,dx+c\\Big]=\\cos x(-2\\cos x+c)=c\\cos x-2\\cos^2x\\).</p><p>\\(y(0)=c-2=1\\) → \\(c=3\\) → <b>\\(y=3\\cos x-2\\cos^2x\\)</b>.</p></div></details>
+<details class="ex" open><summary>★ 교재 예제 1 \\(y'+y\\tan x=\\sin2x\\), \\(y(0)=1\\)(\\(-\\pi/2&lt;x&lt;\\pi/2\\)) — 판서에 별표</summary><div class="body"><p>\\(p=\\tan x\\), \\(r=\\sin2x=2\\sin x\\cos x\\). \\(h=\\int\\tan x\\,dx=-\\ln\\cos x=\\ln|\\sec x|\\), \\(e^h=\\sec x\\), \\(e^{{-h}}=\\cos x\\).</p><p>\\(y=\\cos x\\Big[\\int\\sec x\\cdot2\\sin x\\cos x\\,dx+c\\Big]=\\cos x\\Big[2\\int\\sin x\\,dx+c\\Big]=\\cos x(-2\\cos x+c)=c\\cos x-2\\cos^2x\\).</p><p>\\(y(0)=c-2=1\\) → \\(c=3\\) → <b>\\(y=3\\cos x-2\\cos^2x\\)</b>.</p></div></details>
 <div class="say">"탄젠트 적분이 \\(\\ln\\sec x\\)라는 거, <b>외울 필요는 없어요.</b> 중간·기말에 나오면 <b>내가 공식을 알려줄 거예요.</b>"</div>
 {fig_recip}
 <details class="ex"><summary>연습 3제 (p.5)</summary><div class="body">

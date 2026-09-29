@@ -426,7 +426,7 @@ function later(fn,ms){ const id=setTimeout(()=>{ const k=pend.t.indexOf(id); if(
 function raf(fn){ const id=requestAnimationFrame(()=>{ const k=pend.raf.indexOf(id); if(k>=0) pend.raf.splice(k,1); fn(); }); pend.raf.push(id); return id; }
 /* fn(real): real=true 는 실제 transitionend, false 는 예비 타임아웃(탭이 숨겨져 RAF·전환이 멈춘 경우) */
 function onEnd(el,dur,fn){ let done=false; const ent={el:el,fn:null}; const go=real=>{ if(done) return; done=true; el.removeEventListener("transitionend",ent.fn); const k=pend.tr.indexOf(ent); if(k>=0) pend.tr.splice(k,1); fn(real); }; ent.fn=e=>{ if(e.target===el) go(true); }; el.addEventListener("transitionend",ent.fn); pend.tr.push(ent); later(()=>go(false),dur+80); }
-function cancelAll(){ pend.t.forEach(clearTimeout); pend.t=[]; pend.raf.forEach(id=>cancelAnimationFrame(id)); pend.raf=[]; pend.tr.forEach(x=>x.el.removeEventListener("transitionend",x.fn)); pend.tr=[]; if(typing){ clearInterval(typing); typing=null; } anim=null; }
+function cancelAll(){ pend.t.forEach(clearTimeout); pend.t=[]; pend.raf.forEach(id=>cancelAnimationFrame(id)); pend.raf=[]; pend.tr.forEach(x=>x.el.removeEventListener("transitionend",x.fn)); pend.tr=[]; if(typing){ clearInterval(typing); typing=null; } anim=null; geRest(); }
 function finishNow(){ const a=anim; if(typing){ clearInterval(typing); typing=null; $("#dText").textContent=fullText; typeDone=null; moreChk(); } cancelAll(); if(a&&a.finish) a.finish(); }
 /* ---------- 타자 ---------- */
 let typing=null, fullText="", typeDone=null, TYPE_MS=22;   /* TYPE_MS 는 검사기가 빠르게 돌릴 때 줄인다(__cr.speed) */
@@ -454,7 +454,8 @@ function gePreload(){ let left=Object.keys(GE.has).length; const done=()=>{ if(-
 function geShow(n){ const box=$("#tutor"), a=$("#tg1"), b=$("#tg2"); if(!box||!a||!b||!box.classList.contains("gset")) return;
   const nx=GE.flip?a:b, pv=GE.flip?b:a, src=TUTOR_G+n+".png"; GE.cur=n;
   const go=()=>{ nx.classList.add("on"); pv.classList.remove("on"); box.classList.add("gon"); GE.flip^=1; };
-  if(nx.getAttribute("src")===src&&nx.complete) go(); else { nx.onload=()=>{ nx.onload=null; if(GE.cur===n) go(); }; nx.setAttribute("src",src); } }
+  /* 못 받은 그림은 세트에서 빼고 쉬는 자세로, 늦게 온 onload 는 지금 그림(GE.cur)이 아니면 무시(오타 .91 설계 검수 ⑥) */
+  if(nx.getAttribute("src")===src&&nx.complete&&nx.naturalWidth) go(); else { nx.onload=()=>{ nx.onload=null; nx.onerror=null; if(GE.cur===n) go(); }; nx.onerror=()=>{ nx.onload=null; nx.onerror=null; GE.has[n]=false; if(GE.cur===n) geRest(); }; nx.setAttribute("src",src); } }
 function geRest(){ clearInterval(GE.t); GE.t=null; clearTimeout(GE.h); GE.h=null; GE.cur=null; const box=$("#tutor"); if(box) box.classList.remove("gon"); $$("#tutor .gimg").forEach(g=>g.classList.remove("on")); }
 function geStart(face){ geRest(); if(REDUCE||!RASTER) return;
   const set=(S.mode==="quiz"||S.mode==="nohearts"?(face==="angry"?["strict","think"]:(face==="smile"||face==="proud")?["praise","book"]:["think","book"]):S.mode==="result"?(face==="angry"?["strict","cross"]:face==="proud"?["praise","cross"]:["talk","cross"]):(GEST[face]||GEST.neutral)).filter(n=>GE.has[n]===true);
@@ -489,7 +490,7 @@ let figRet=null;   /* 확대창을 연 버튼(닫으면 포커스를 돌려준�
 function closeFig(){ const ov=$("#figov"); if(!ov||ov.hidden) return; ov.hidden=true; const r=figRet; figRet=null; try{ if(r&&document.contains(r)) r.focus(); }catch(e){} }
 $("#figovX").onclick=()=>closeFig(); document.addEventListener("keyup",e=>{ if(!$("#figov").hidden&&(e.key==="Enter"||e.key===" ")) e.preventDefault(); },true);
 function choices(list){ const box=$("#dCh"); box.innerHTML=""; $("#dTip").textContent=""; list.forEach(c=>{ if("tip" in c){ if(c.tip) $("#dTip").textContent=c.tip; return; }
-  const b=document.createElement("button"); b.type="button"; b.className="cbt "+(c.cls||"g"); b.innerHTML=esc(c.t)+(c.key?'<kbd>'+c.key+'</kbd>':''); b.onclick=c.f; if(c.primary) b.dataset.primary="1"; box.appendChild(b); }); }
+  const b=document.createElement("button"); b.type="button"; b.className="cbt "+(c.cls||"g"); b.innerHTML=esc(c.t); b.onclick=c.f; if(c.primary) b.dataset.primary="1"; box.appendChild(b); }); }
 /* ---------- 칠판 ---------- */
 function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} }
 function board(html,tag,v1){ const ck=$("#chk"); ck.innerHTML=tag||""; if(UPH) ck.insertBefore(UPH,ck.querySelector("small")); const bc=$("#bc"); bc.classList.toggle("v1",!!v1); bc.style.counterReset=""; bc.innerHTML=html; typeset(bc); fitMath(bc); fitInline(bc); $("#bwrap").scrollTop=0; upHint(); }

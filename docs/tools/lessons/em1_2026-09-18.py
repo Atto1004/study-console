@@ -94,7 +94,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 <div class="formula">\\[\\text{{II: }}\\lambda_1=\\lambda_2=-\\tfrac a2\\ \\Rightarrow\\ y_1=e^{{-ax/2}}\\text{{ 하나뿐}}\\ \\Rightarrow\\ y_2=u\\,y_1,\\ \\text{{차수축소하면 }}u''=0\\ \\Rightarrow\\ u=x\\ \\Rightarrow\\ y_2=xe^{{-ax/2}}\\]</div>
 {fig_euler}
 <div class="formula">\\[\\text{{III: }}e^{{(p\\pm iq)x}}=e^{{px}}(\\cos qx\\pm i\\sin qx)\\ \\Rightarrow\\ \\tfrac12(y_1+y_2)=e^{{px}}\\cos qx,\\ \\tfrac1{{2i}}(y_1-y_2)=e^{{px}}\\sin qx\\]</div>
-<div class="why">중근이면 해가 하나라 기저가 안 된다 → 9/16 차수축소법이 여기서 바로 쓰인다(그래서 배웠다). \\(p=-a/2\\)에서 \\(2y_1'+py_1=-ay_1+ay_1=0\\)이 되어 \\(u''=0\\) — \\(u=x\\)가 가장 간단한 둘째 해. 복소근은 \\(e^{{i\\theta}}=\\cos\\theta+i\\sin\\theta\\)로 풀면 실수부·허수부가 각각 해(중첩 원리로 합·차를 취한 것)라, 결국 <b>진동 × 지수 인자</b>(\\(a>0\\)이면 감쇠, \\(a=0\\)이면 일정한 진폭, \\(a<0\\)이면 증폭).</div>
+<div class="why">중근이면 해가 하나라 기저가 안 된다 → 9/16 차수축소법이 여기서 바로 쓰인다(그래서 배웠다). 중근 \\(\\lambda=-a/2\\), \\(y_1=e^{{-ax/2}}\\)에서 \\(2y_1'+ay_1=-ay_1+ay_1=0\\)이 되어 차수축소식이 \\(u''=0\\) — \\(u=x\\)가 가장 간단한 둘째 해. 복소근은 \\(e^{{i\\theta}}=\\cos\\theta+i\\sin\\theta\\)로 풀면 실수부·허수부가 각각 해(중첩 원리로 합·차를 취한 것)라, 결국 <b>진동 × 지수 인자</b>(\\(a>0\\)이면 감쇠, \\(a=0\\)이면 일정한 진폭, \\(a<0\\)이면 증폭).</div>
 <div class="analogy">쌍둥이 근(중근)은 한 명처럼 보이니 \\(x\\)라는 명찰을 붙여 구별하고, 복소근은 "회전"이라 cos·sin으로 번역한다.</div>
 <div class="memo"><b>외울 것</b> 중근 → \\(x\\) 붙는 이유 = 차수축소 \\(u''=0\\) · 오일러 \\(e^{{it}}=\\cos t+i\\sin t\\) · 복소근 = 지수 인자 × 진동(\\(a>0\\)이면 감쇠)</div>
 </section>

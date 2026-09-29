@@ -247,7 +247,8 @@ sub1('function say(text,face,name,onDone){',
      'function geShow(n){ const box=$("#tutor"), a=$("#tg1"), b=$("#tg2"); if(!box||!a||!b||!box.classList.contains("gset")) return;\n'
      '  const nx=GE.flip?a:b, pv=GE.flip?b:a, src=TUTOR_G+n+".png"; GE.cur=n;\n'
      '  const go=()=>{ nx.classList.add("on"); pv.classList.remove("on"); box.classList.add("gon"); GE.flip^=1; };\n'
-     '  if(nx.getAttribute("src")===src&&nx.complete) go(); else { nx.onload=()=>{ nx.onload=null; if(GE.cur===n) go(); }; nx.setAttribute("src",src); } }\n'
+     '  /* 못 받은 그림은 세트에서 빼고 쉬는 자세로, 늦게 온 onload 는 지금 그림(GE.cur)이 아니면 무시(오타 .91 설계 검수 ⑥) */\n'
+     '  if(nx.getAttribute("src")===src&&nx.complete&&nx.naturalWidth) go(); else { nx.onload=()=>{ nx.onload=null; nx.onerror=null; if(GE.cur===n) go(); }; nx.onerror=()=>{ nx.onload=null; nx.onerror=null; GE.has[n]=false; if(GE.cur===n) geRest(); }; nx.setAttribute("src",src); } }\n'
      'function geRest(){ clearInterval(GE.t); GE.t=null; clearTimeout(GE.h); GE.h=null; GE.cur=null; const box=$("#tutor"); if(box) box.classList.remove("gon"); $$("#tutor .gimg").forEach(g=>g.classList.remove("on")); }\n'
      'function geStart(face){ geRest(); if(REDUCE||!RASTER) return;\n'
      '  const set=(S.mode==="quiz"||S.mode==="nohearts"?(face==="angry"?["strict","think"]:(face==="smile"||face==="proud")?["praise","book"]:["think","book"]):S.mode==="result"?(face==="angry"?["strict","cross"]:face==="proud"?["praise","cross"]:["talk","cross"]):(GEST[face]||GEST.neutral)).filter(n=>GE.has[n]===true);\n'
@@ -267,6 +268,10 @@ sub1('probe.onload=function(){ RASTER=true; $("#tutor").classList.add("raster");
 sub1('const src=usePose?TUTOR_IMG+p+".png":fsrc; box.classList.toggle("pose",usePose);',
      'const gn=p?p.replace("pose-",""):"", useG=!!(usePose&&GE.has[gn]===true);   /* 동작 세트가 있으면 쉬는 자세도 세트 그림(같은 캔버스) */\n'
      '  const src=usePose?(useG?TUTOR_G+gn+".png":TUTOR_IMG+p+".png"):fsrc; box.classList.toggle("pose",usePose); box.classList.toggle("gset",useG);', "쉬는 자세 = 동작 세트")
+# 14) 오타 .91 설계 검수: ⑥ 대사 건너뛰기(finishNow→cancelAll) 뒤에도 동작 타이머가 남았다 → 모든 예약을 지울 때 동작도 쉬는 자세로 · ⑧ 버튼의 Enter 안내(kbd)는 §24 부가 설명
+sub1('if(typing){ clearInterval(typing); typing=null; } anim=null; }',
+     'if(typing){ clearInterval(typing); typing=null; } anim=null; geRest(); }', "예약 취소 = 동작도 정지")
+sub1("b.innerHTML=esc(c.t)+(c.key?'<kbd>'+c.key+'</kbd>':'');", "b.innerHTML=esc(c.t);", "버튼 Enter 안내 제거")
 assert "wrap.scrollTop=wrap.scrollHeight" not in s.split("function renderStepV2")[1].split("function replayFig")[0], "renderStepV2 에 맨 아래 스크롤이 남음"
 assert s.index("stackFig();") < s.index('$$("[data-step]",root)'), "칸 쌓기가 단계 숨김보다 뒤"
 io.open(TPL, "w", encoding="utf-8", newline="\n").write(s)

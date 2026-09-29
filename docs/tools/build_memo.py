@@ -20,16 +20,24 @@ def inner(el):
 
 def split_top(html, sep=" · "):
     """식(\\( \\) · \\[ \\]) · 태그 · 괄호 밖의 sep 로만 나눈다 — 「근호 정리(√9 → 3)」가 괄호 안 → 에서 갈렸다(2026-09-29)"""
-    out, buf, i, depth, tag, par = [], "", 0, 0, False, 0
+    out, buf, i, depth, tag, par, opened = [], "", 0, 0, False, 0, 0
     while i < len(html):
         if html.startswith("\\(", i) or html.startswith("\\[", i): depth += 1; buf += html[i:i + 2]; i += 2; continue
         if html.startswith("\\)", i) or html.startswith("\\]", i): depth = max(0, depth - 1); buf += html[i:i + 2]; i += 2; continue
         c = html[i]
-        if c == "<": tag = True
+        if c == "<":
+            tag = True
+            # 열린 요소(<b>…</b>) 안에서는 나누지 않는다 — 「<b>A = B · C = D</b>」가 닫히지 않은 두 조각으로 갈렸다(오타 .91 설계 검수 ⑤)
+            m = re.match(r"<(/?)([A-Za-z][A-Za-z0-9]*)", html[i:])
+            if m and m.group(2).lower() not in ("br", "img", "hr", "wbr", "input"):
+                if m.group(1): opened = max(0, opened - 1)
+                else:
+                    end = html.find(">", i)
+                    if not (end > 0 and html[end - 1] == "/"): opened += 1
         elif c == ">": tag = False
         elif not depth and not tag and c in "(（「": par += 1
         elif not depth and not tag and c in ")）」": par = max(0, par - 1)
-        if not depth and not tag and not par and html.startswith(sep, i): out.append(buf); buf = ""; i += len(sep); continue
+        if not depth and not tag and not par and not opened and html.startswith(sep, i): out.append(buf); buf = ""; i += len(sep); continue
         buf += c; i += 1
     out.append(buf)
     return [x.strip() for x in out if x.strip()]

@@ -58,8 +58,13 @@ sub('$("#saveBtn").onclick=function(){var upd={},u={self:+$("#selfR").value,seen
     'var sb=$("#saveBtn");if(sb)sb.onclick=function(){var upd={},u={seen:true};', "채점 시작")
 sub("upd[id]=u;this.disabled=true;var btn=this;saveM(upd).then(function(){var r=score(M[id]);",
     "/* 카드 퀴즈도 스앵님 판정 기록 — 문항마다 quiz 한 건 */\n"
-    "      if(u.quiz&&window.TJ){c.quiz.forEach(function(q,i){var r=sh.querySelector('input[name=\"q'+i+'\"]:checked');if(r)TJ.rec({k:\"quiz\",ok:+r.value===q.answer,n:[id],lid:\"card\",qid:id+\"#\"+i})});try{var J=JSON.parse(localStorage.getItem(\"atto.mastery\")||\"{}\");if(J[id])u=Object.assign({},J[id],{seen:true})}catch(e){}}\n"
+    "      if(u.quiz&&window.TJ){c.quiz.forEach(function(q,i){var r=sh.querySelector('input[name=\"q'+i+'\"]:checked');if(r)TJ.rec({k:\"quiz\",ok:+r.value===q.answer,n:[id],lid:\"card\",qid:id+\"#\"+i,a:att})});try{var J=JSON.parse(localStorage.getItem(\"atto.mastery\")||\"{}\");if(J[id])u=Object.assign({},J[id],{seen:true})}catch(e){}}\n"
     "      upd[id]=u;this.disabled=true;var btn=this;saveM(upd).then(function(){var r=score(M[id]);renderJudge();", "카드 퀴즈 기록")
+# 같은 카드를 다시 채점(「다시 저장」)하면 같은 시도(a)로 기록해 정답 수가 불어나지 않게(오타 .91 설계 검수 ⑦) · 점수식은 TJ 하나만
+sub('var sb=$("#saveBtn");if(sb)sb.onclick=function(){var upd={},u={seen:true};',
+    'var att=String(Date.now());var sb=$("#saveBtn");if(sb)sb.onclick=function(){var upd={},u={seen:true};', "시도 표시")
+sub('function score(e){\n  if(!e||typeof e!=="object")return {score:0,state:"unrated"};',
+    'function score(e){\n  if(!e||typeof e!=="object")return {score:0,state:"unrated"};\n  if(window.TJ&&TJ.score)return TJ.score(e);', "점수식 = TJ")
 sub('$("#mode").textContent=SERVER?"atom 저장":"이 기기에만 저장";', '$("#mode").textContent="";', "저장 위치 안내")
 # 판정 패널의 「교실」 연결: knowledge/lesson_nodes.json 에서 노드가 처음 나온 회차·챕터
 sub('fetch("knowledge/progress.json").then(function(r){return r.ok?r.json():null}).catch(function(){return null}),probe]).then(function(a){',
