@@ -235,3 +235,18 @@ main{max-width:1040px;margin:0 auto;padding:14px 20px 18px}
   .bd-fig figure>svg{min-width:0;width:100%}.bd-fig figcaption{font-size:14px}
   #ctl{flex-wrap:wrap}.choices{width:100%}.cbt{flex:1 1 auto;font-size:14.5px;min-height:46px;padding:10px 12px}.cbt.p{min-width:0}.tip{display:none}#chpills{display:none}
 }
+/* 암기·이해 구분(대표님 2026-09-29): 판서 줄 앞 알약 — 암기(노랑) · 이해(하늘) · 시험(산호) · 연습(민트). 글자는 짙은 색(대비 7 이상) */
+.tg{display:inline-block;vertical-align:.12em;margin-right:8px;padding:1px 9px 2px;border-radius:99px;font-family:var(--fh);font-weight:800;font-size:12.5px;line-height:1.5;letter-spacing:.02em;white-space:nowrap}
+.tg-am{background:#FFE27A;color:#2B2A12}.tg-ih{background:#9ADCFF;color:#0B2A3A}.tg-ex{background:#FFB09C;color:#3A1510}.tg-pr{background:#B8F2D0;color:#173026}
+/* 인라인 식은 줄에서 끊지 않는다(대표님 2026-09-29 「수식 한 줄로, 중간에 들여쓰기 안 되게」) — 넘치면 fitInline 이 줄인다 */
+#bc .katex{white-space:nowrap}
+/* 스앵님 동작(대표님 2026-09-29 「팔은 안 움직이고 멀뚱히 서 있다 → 움직임·표정」): 동작 세트(assets/tutor/g, 640×1000 · 다리 가운데 x=260) 두 겹(#tg1·#tg2) 교차 페이드.
+   예전 전신 그림(459×1000 contain)과 같은 키·같은 자리 — 키 = min(칸 높이+44, 칸 폭×1000/459), 몸 중심 = 칸 폭 68.4%(좌우 반전 뒤) */
+#tutor{container-type:size}
+#tutor .gimg{display:none;position:absolute;bottom:-54px;-webkit-user-select:none;user-select:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.38));animation:stand 6s ease-in-out infinite;opacity:0;transition:opacity .22s ease}
+#tutor.raster.pose.gset .gimg{display:block}
+#tutor.raster.pose.gset #tutorImg,#tutor.raster.pose.gset .gimg{left:68.4%;right:auto;width:auto;max-width:none;height:min(calc(100cqh + 44px),217.86cqw);object-fit:fill;transform:translateX(-59.375%) scaleX(-1)}
+#tutorImg{transition:opacity .22s ease}
+#tutor.gon #tutorImg{opacity:0}
+#tutor .gimg.on{opacity:1}
+@media (prefers-reduced-motion: reduce){#tutor .gimg,#tutorImg{transition:none}#tutor .gimg{animation:none}}

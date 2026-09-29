@@ -25,7 +25,7 @@ fig_cases = canvas(560, 185,
     step(1, panel(10, "I  서로 다른 실근", lambda x: math.exp(x) + 3 * math.exp(-2 * x), 0, 2.2, (0, 8), RED, "y = eˣ + 3e⁻²ˣ (Ex.2)")),
     step(2, panel(195, "II  중근 (x 가 붙는다)", lambda x: (3 - 2 * x) * math.exp(-0.5 * x), 0, 8, (-1.2, 3.2), BLUE, "y = (3 − 2x)e^(−0.5x) (Ex.4)")),
     step(3, panel(380, "III  복소근 (진동)", lambda x: math.exp(-0.2 * x) * math.sin(3 * x), 0, 10, (-1, 1), GREEN, "y = e^(−0.2x) sin 3x (Ex.5)")),
-    cap="특성방정식의 근이 세 가지 → 해의 모양이 세 가지. 감쇠 진동 시스템(2.4)의 과감쇠·임계·저감쇠가 바로 이 셋.", name="cases")
+    cap="특성방정식의 근이 세 가지 → 해의 모양이 세 가지. 양의 질량·강성·감쇠를 가진 진동 시스템(2.4)의 과감쇠·임계·저감쇠가 바로 이 셋.", name="cases")
 
 _A = 1.0
 _px, _py = 120 + 70 * math.cos(_A), 100 - 70 * math.sin(_A)
@@ -70,7 +70,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 <section class="s" data-id="s1">
 <h2>1. 2.1 Ex.7 마무리 — 차수축소로 기저 완성</h2>
 {fig_red}
-<div class="formula">\\[p=-\\frac{{x}}{{x^2-x}}=-\\frac1{{x-1}},\\quad e^{{-\\int p\\,dx}}=e^{{\\ln|x-1|}}=x-1,\\quad U=\\frac{{x-1}}{{x^2}}=\\frac1x-\\frac1{{x^2}},\\quad y_2=x\\int U\\,dx=x\\Big(\\ln|x|+\\frac1x\\Big)=x\\ln|x|+1\\]</div>
+<div class="formula">\\[p=-\\frac{{x}}{{x^2-x}}=-\\frac1{{x-1}},\\quad e^{{-\\int p\\,dx}}=e^{{\\ln|x-1|}}=|x-1|=x-1\\ (x>1),\\quad U=\\frac{{x-1}}{{x^2}}=\\frac1x-\\frac1{{x^2}},\\quad y_2=x\\int U\\,dx=x\\Big(\\ln|x|+\\frac1x\\Big)=x\\ln|x|+1\\]</div>
 <div class="why">검산: \\(y_2'=\\ln|x|+1\\), \\(y_2''=1/x\\) → \\((x^2-x)\\cdot\\frac1x-x(\\ln|x|+1)+(x\\ln|x|+1)=(x-1)-x\\ln|x|-x+x\\ln|x|+1=0\\) ✓. \\(y_2/y_1=\\ln|x|+1/x\\)는 상수가 아니므로 \\(\\{{x,\\ x\\ln|x|+1\\}}\\)는 기저. 과제 2.1 #6·#9가 이 유형.</div>
 <div class="analogy">퍼즐 조각 하나(\\(y_1\\))의 모양을 알면 옆 조각(\\(y_2\\))의 모양이 정해진다 — 공식은 그 "맞물림 규칙", 검산은 끼워 보는 것.</div>
 <div class="memo"><b>외울 것</b> 표준형에서 \\(p\\) → \\(e^{{-\\int p}}\\) → \\(U=e^{{-\\int p}}/y_1^2\\) → \\(y_2=y_1\\int U\\) · 결과는 반드시 대입 검산</div>
@@ -85,7 +85,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 <tr><td>\\(&lt;0\\)</td><td>공액복소근 \\(-\\tfrac a2\\pm i\\omega\\), \\(\\omega=\\sqrt{{b-a^2/4}}\\)</td><td><b>\\(y=e^{{-ax/2}}(A\\cos\\omega x+B\\sin\\omega x)\\)</b></td></tr></table>
 {fig_cases}
 <div class="why">왜 \\(e^{{\\lambda x}}\\)를 넣나: 미분해도 모양이 안 변하는 유일한 함수라, 상수계수 식에 넣으면 \\(e^{{\\lambda x}}\\)가 공통으로 빠지고 <b>2차방정식</b>만 남는다. 미분방정식이 중학교 2차방정식으로 바뀌는 순간. 근이 둘이면 기저가 바로 나오고(중첩 원리로 일반해), 하나(중근)면 차수축소로 둘째 해를 만들고, 복소면 오일러 공식으로 실수 해를 뽑는다.</div>
-<div class="analogy">스프링에 매단 추(2.4): 기름이 걸쭉하면 스르륵 멈추고(과감쇠, I), 딱 맞으면 가장 빨리 멈추고(임계, II), 묽으면 흔들리며 잦아든다(저감쇠, III). 세 경우가 그림 그대로다.</div>
+<div class="analogy">스프링에 매단 추(2.4, 질량·강성·감쇠 모두 양수): 기름이 걸쭉하면 스르륵 멈추고(과감쇠, I), 딱 맞으면 가장 빨리 멈추고(임계, II), 묽으면 흔들리며 잦아든다(저감쇠, III). 세 경우가 그림 그대로다.</div>
 <div class="memo"><b>외울 것</b> \\(\\lambda^2+a\\lambda+b=0\\) · I \\(c_1e^{{\\lambda_1x}}+c_2e^{{\\lambda_2x}}\\) · II \\((c_1+c_2x)e^{{-ax/2}}\\) · III \\(e^{{-ax/2}}(A\\cos\\omega x+B\\sin\\omega x)\\), \\(\\omega=\\sqrt{{b-a^2/4}}\\)</div>
 </section>
 
@@ -94,9 +94,9 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 <div class="formula">\\[\\text{{II: }}\\lambda_1=\\lambda_2=-\\tfrac a2\\ \\Rightarrow\\ y_1=e^{{-ax/2}}\\text{{ 하나뿐}}\\ \\Rightarrow\\ y_2=u\\,y_1,\\ \\text{{차수축소하면 }}u''=0\\ \\Rightarrow\\ u=x\\ \\Rightarrow\\ y_2=xe^{{-ax/2}}\\]</div>
 {fig_euler}
 <div class="formula">\\[\\text{{III: }}e^{{(p\\pm iq)x}}=e^{{px}}(\\cos qx\\pm i\\sin qx)\\ \\Rightarrow\\ \\tfrac12(y_1+y_2)=e^{{px}}\\cos qx,\\ \\tfrac1{{2i}}(y_1-y_2)=e^{{px}}\\sin qx\\]</div>
-<div class="why">중근이면 해가 하나라 기저가 안 된다 → 9/16 차수축소법이 여기서 바로 쓰인다(그래서 배웠다). \\(p=-a/2\\)에서 \\(2y_1'+py_1=-ay_1+ay_1=0\\)이 되어 \\(u''=0\\) — \\(u=x\\)가 가장 간단한 둘째 해. 복소근은 \\(e^{{i\\theta}}=\\cos\\theta+i\\sin\\theta\\)로 풀면 실수부·허수부가 각각 해(중첩 원리로 합·차를 취한 것)라, 결국 <b>진동 × 지수 감쇠</b>.</div>
+<div class="why">중근이면 해가 하나라 기저가 안 된다 → 9/16 차수축소법이 여기서 바로 쓰인다(그래서 배웠다). \\(p=-a/2\\)에서 \\(2y_1'+py_1=-ay_1+ay_1=0\\)이 되어 \\(u''=0\\) — \\(u=x\\)가 가장 간단한 둘째 해. 복소근은 \\(e^{{i\\theta}}=\\cos\\theta+i\\sin\\theta\\)로 풀면 실수부·허수부가 각각 해(중첩 원리로 합·차를 취한 것)라, 결국 <b>진동 × 지수 인자</b>(\\(a>0\\)이면 감쇠, \\(a=0\\)이면 일정한 진폭, \\(a<0\\)이면 증폭).</div>
 <div class="analogy">쌍둥이 근(중근)은 한 명처럼 보이니 \\(x\\)라는 명찰을 붙여 구별하고, 복소근은 "회전"이라 cos·sin으로 번역한다.</div>
-<div class="memo"><b>외울 것</b> 중근 → \\(x\\) 붙는 이유 = 차수축소 \\(u''=0\\) · 오일러 \\(e^{{it}}=\\cos t+i\\sin t\\) · 복소근 = 지수 감쇠 × 진동</div>
+<div class="memo"><b>외울 것</b> 중근 → \\(x\\) 붙는 이유 = 차수축소 \\(u''=0\\) · 오일러 \\(e^{{it}}=\\cos t+i\\sin t\\) · 복소근 = 지수 인자 × 진동(\\(a>0\\)이면 감쇠)</div>
 </section>
 
 <section class="s" data-id="s4">
@@ -115,7 +115,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 {fig_D}
 <div class="formula">\\[D=\\frac{{d}}{{dx}},\\quad Dy=y',\\ D^2y=y''\\qquad y''+ay'+by=0\\ \\Leftrightarrow\\ (D^2+aD+b)y=P(D)y=0\\qquad \\text{{Ex.1 }}P(D)=D^2-3D-40I=(D-8)(D+5)\\]</div>
 <div class="why">연산자는 함수를 다른 함수로 바꾸는 변환. \\(P(D)\\)를 다항식처럼 인수분해하면 인수 \\((D-\\lambda)\\)의 \\(\\lambda\\)가 곧 특성근 — 2.2와 같은 답 \\(y=c_1e^{{8x}}+c_2e^{{-5x}}\\). 새 계산이 아니라 <b>표기법</b>이고, 3장 고계·6장 라플라스에서 이 기호가 편해진다. 과제 2.3 #8이 이 유형.</div>
-<div class="analogy">"x로 미분"이라는 긴 말을 D라는 도장으로 찍는 것. 도장을 두 번 찍으면 \\(D^2\\), 도장끼리는 다항식처럼 곱하고 나눈다.</div>
+<div class="analogy">"x로 미분"이라는 긴 말을 D라는 도장으로 찍는 것. 도장을 두 번 찍으면 \\(D^2\\). 상수계수 미분연산자는 다항식처럼 전개·인수분해할 수 있다(약분은 해를 잃을 수 있어 조심).</div>
 <div class="memo"><b>외울 것</b> \\(D=d/dx\\) · \\(P(D)y=0\\) · 인수분해 \\((D-\\lambda_1)(D-\\lambda_2)\\) = 특성근 · 과제 2.3 #8</div>
 </section>
 

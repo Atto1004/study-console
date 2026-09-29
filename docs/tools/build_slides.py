@@ -17,6 +17,14 @@ if _bad:
     for _qn, _und, _refs in _bad: print("!! " + _qn + " | 정의 없는 기호: " + ",".join(_und) + " | 참조 문구: " + ",".join(_refs))
     print("자기완결 위반 %d건 — 슬라이드 생성 중단. 정리노트의 문제 본문을 고쳐라." % len(_bad)); sys.exit(1)
 doc = LH.fromstring(io.open(src, encoding="utf-8").read())
+from quizmix import Mixer, renum   # 객관식 보기 섞기 — 원문은 정답이 늘 1번(대표님 2026-09-29 「객관식 답이 다 1번」, 중간 대비 덱 85문제 전부 1번 실측)
+mixer = Mixer(deck_id)
+# 스앵님 판정: 덱 문제·파트 → 개념 노드(knowledge/lesson_nodes.json decks — build_lesson_nodes.py) + 판정 스크립트(tutor_judge.js)
+_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_ln = os.path.join(_ROOT, "knowledge", "lesson_nodes.json")
+_drec = (json.load(io.open(_ln, encoding="utf-8")).get("decks") or {}).get(deck_id) if os.path.exists(_ln) else None
+NODES_JS = json.dumps({"q": (_drec or {}).get("q") or {}, "parts": (_drec or {}).get("parts") or {}}, ensure_ascii=False)
+JUDGE_JS = io.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tutor_judge.js"), encoding="utf-8").read().replace("</", "<\\/")
 
 def inner(el):
     s = (el.text or "")
@@ -75,17 +83,21 @@ for pi, sec in enumerate(parts, 1):
             q_index += 1
             # 선택지: ol.choices > li (정답 li[data-ok]). 있으면 버튼형 문제, 없으면 텍스트 답
             ch = el.xpath('./ol[contains(@class,"choices")]')
-            choices = None
+            choices = None; newpos = None
+            qsid = f"p{pi}-{'b' if mode=='b' else 'a'}{q_index}"
             if ch:
                 choices = [{"html": inner(li), "ok": li.get("data-ok") == "1"} for li in ch[0].xpath('./li')]
                 assert sum(1 for c in choices if c["ok"]) == 1, "선택지 정답은 정확히 하나: " + qn
+                choices, newpos = mixer.mix(choices, qsid)   # 보기의 k = 원문 순서 → 덱은 고른 보기를 k 로 저장
                 body = [LH.tostring(x, encoding="unicode") for x in el if x.tag not in ("details", "ol") and "qn" not in (x.get("class") or "")]
             q_exam = list(pending_exam); pending_exam = []
             for a in el.xpath('./aside[contains(@class,"exam")]'):
                 q_exam.append({"level": a.get("data-level") or "강조", "when": a.get("data-when") or "", "quote": a.text_content().strip()})
             body = [x for x in body if not (x.startswith("<aside") and 'class="exam' in x[:40])]
-            slides.append({"id": f"p{pi}-{'b' if mode=='b' else 'a'}{q_index}", "type": "q", "part": pi, "kind": "기초" if mode == "b" else "응용",
-                           "qn": qn, "html": "".join(body), "ans": inner(ans[0]) if ans else "", "choices": choices, "exam": q_exam})
+            ans_html = inner(ans[0]) if ans else ""
+            if newpos: ans_html = renum(ans_html, newpos)
+            slides.append({"id": qsid, "type": "q", "part": pi, "kind": "기초" if mode == "b" else "응용",
+                           "qn": qn, "html": "".join(body), "ans": ans_html, "choices": choices, "exam": q_exam})
     # 개념 슬라이드는 표지 바로 뒤에 삽입
     cover_idx = next(i for i, s in enumerate(slides) if s["id"] == f"p{pi}-cover")
     # V4-SPLIT: 개념 장을 글자량으로 나눈다 (한 장 ≈ 420자, 표·수식 블록은 무겁게 셈)
@@ -190,7 +202,7 @@ def _hint(sec):
 parts_meta = [{"n": i, "title": p.xpath('./h2')[0].text_content().replace(p.xpath('./h2/span[@class="no"]/text()')[0], "").strip(), "hint": _hint(p)} for i, p in enumerate(parts, 1)]
 
 tpl = io.open(__file__.replace("build_slides.py", "slides_tpl.html"), encoding="utf-8").read()
-page = tpl.replace("__TITLE__", title).replace("__DECK_ID__", deck_id).replace("__SLIDES__", json.dumps(slides, ensure_ascii=False)).replace("__PARTS__", json.dumps(parts_meta, ensure_ascii=False))
+page = tpl.replace("__JUDGE__", JUDGE_JS).replace("__NODES__", NODES_JS).replace("__TITLE__", title).replace("__DECK_ID__", deck_id).replace("__SLIDES__", json.dumps(slides, ensure_ascii=False)).replace("__PARTS__", json.dumps(parts_meta, ensure_ascii=False))
 io.open(out, "w", encoding="utf-8", newline="\n").write(page)
 print("slides", len(slides), "→", out)
 
@@ -216,7 +228,7 @@ if "--no-check" not in sys.argv:
         ids = set(l.split(" ")[0] for l in lst.splitlines() if l.strip())
         for sl in slides:
             if sl["id"] in ids: sl["scroll"] = True
-        page2 = tpl.replace("__TITLE__", title).replace("__DECK_ID__", deck_id).replace("__SLIDES__", json.dumps(slides, ensure_ascii=False)).replace("__PARTS__", json.dumps(parts_meta, ensure_ascii=False))
+        page2 = tpl.replace("__JUDGE__", JUDGE_JS).replace("__NODES__", NODES_JS).replace("__TITLE__", title).replace("__DECK_ID__", deck_id).replace("__SLIDES__", json.dumps(slides, ensure_ascii=False)).replace("__PARTS__", json.dumps(parts_meta, ensure_ascii=False))
         io.open(out, "w", encoding="utf-8", newline="\n").write(page2)
         print("--soft: 넘친 " + str(len(ids)) + "장을 스크롤 허용으로 표시하고 통과 (임시 덱)"); sys.exit(0)
     if bad:

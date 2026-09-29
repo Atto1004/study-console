@@ -82,13 +82,13 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>정
 
 <section class="s" data-id="s3">
 <h2>3. 3차원 성분과 방향여현 ★★</h2>
-<p>\\(\\mathbf U=U_x\\mathbf i+U_y\\mathbf j+U_z\\mathbf k\\), \\(|\\mathbf U|=\\sqrt{{U_x^2+U_y^2+U_z^2}}\\). 축은 <b>오른손 좌표계</b>(그림: \\(z\\) 위, \\(y\\) 오른쪽, \\(x\\) 앞). 2D는 각 하나로 방향이 정해졌지만 3D는 각이 <b>셋</b> 필요하다.</p>
+<p>\\(\\mathbf U=U_x\\mathbf i+U_y\\mathbf j+U_z\\mathbf k\\), \\(|\\mathbf U|=\\sqrt{{U_x^2+U_y^2+U_z^2}}\\). 축은 <b>오른손 좌표계</b>(그림: \\(z\\) 위, \\(y\\) 오른쪽, \\(x\\) 앞). 2D는 각 하나로 방향이 정해졌지만 3D는 <b>세 방향각</b>으로 나타낸다(독립인 것은 둘).</p>
 {fig_3d}
 <div class="formula">\\[U_x=|\\mathbf U|\\cos\\theta_x,\\quad U_y=|\\mathbf U|\\cos\\theta_y,\\quad U_z=|\\mathbf U|\\cos\\theta_z\\qquad\\Rightarrow\\qquad \\cos^2\\theta_x+\\cos^2\\theta_y+\\cos^2\\theta_z=1\\]</div>
-<div class="why">관계식이 나오는 이유: 세 성분을 크기 식에 넣으면 \\(|\\mathbf U|^2=|\\mathbf U|^2(\\cos^2\\theta_x+\\cos^2\\theta_y+\\cos^2\\theta_z)\\) → 괄호가 1. 그래서 세 각은 <b>독립이 아니다</b> — 둘을 알면 나머지 하나가 정해진다(부호는 따로). 필기본에서 빨간색으로 강조한 식.</div>
+<div class="why">관계식이 나오는 이유: 세 성분을 크기 식에 넣으면 \\(|\\mathbf U|^2=|\\mathbf U|^2(\\cos^2\\theta_x+\\cos^2\\theta_y+\\cos^2\\theta_z)\\) → 괄호가 1. 그래서 세 각은 <b>독립이 아니다</b> — 둘을 알면 남은 코사인의 <b>절댓값</b>만 정해진다(부호는 따로). 필기본에서 빨간색으로 강조한 식.</div>
 <div class="say">"방향여현 들어봤어요? 왜 쓰는지 지금은 모르겠지만 차차 설명." · "\\(\\theta_x\\)가 바뀌면 나머지도 같이 바뀐다."</div>
 <details class="ex"><summary>예 — \\(\\mathbf U=2\\mathbf i+3\\mathbf j+6\\mathbf k\\)의 방향여현</summary><div class="body"><p>\\(|\\mathbf U|=\\sqrt{{4+9+36}}=7\\) → \\(\\cos\\theta_x=2/7\\), \\(\\cos\\theta_y=3/7\\), \\(\\cos\\theta_z=6/7\\). 검산: \\(\\dfrac{{4+9+36}}{{49}}=1\\) ✓. 각으로 바꾸면 \\(\\theta_x\\approx73.4^\\circ\\), \\(\\theta_y\\approx64.6^\\circ\\), \\(\\theta_z\\approx31.0^\\circ\\) — \\(z\\) 쪽으로 가장 기울어 있다(성분이 가장 크니까).</p></div></details>
-<div class="analogy">막대에 손전등을 세 방향(앞·옆·위)에서 비추면 세 벽에 그림자가 생긴다. 그림자 길이가 성분 \\(U_x,U_y,U_z\\), "막대 길이 × 각의 코사인"이고, 세 그림자의 제곱합은 막대 길이의 제곱 — 그래서 코사인 제곱합이 1.</div>
+<div class="analogy">막대 끝에서 세 좌표축으로 수선을 내리면 축 위에 정사영이 생긴다. 그 부호 있는 길이가 성분 \\(U_x,U_y,U_z\\), "막대 길이 × 각의 코사인"이고, 세 좌표축에 정사영한 부호 있는 성분의 제곱합이 벡터 크기의 제곱 — 그래서 코사인 제곱합이 1.</div>
 <div class="memo"><b>외울 것</b> \\(\\cos^2\\theta_x+\\cos^2\\theta_y+\\cos^2\\theta_z=1\\) · 성분 = 크기 × 방향여현 · 오른손 좌표계</div>
 </section>
 

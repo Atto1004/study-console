@@ -38,7 +38,7 @@ fig_super = canvas(560, 200,
         arrow(60, 170, 390, 40, GREEN, "", 3), text(262, 128, "c₁y₁ + c₂y₂", 14, GREEN, "middle", True)),
     step(3, text(470, 90, "해의 중첩 원리", 13.5, INK, "middle", True), text(470, 112, "해끼리 더해도 해,", 12.5, INK, "middle"), text(470, 130, "상수배도 해", 12.5, INK, "middle")),
     step(4, text(470, 160, "제차 선형에만!", 13, RED, "middle", True)),
-    cap="판서 ④의 그림: 두 해 y₁, y₂ 가 만드는 평행사변형 안이 전부 해(해 공간). 비제차·비선형에서는 무너진다.", name="super")
+    cap="판서 ④의 그림: 독립인 두 해 y₁, y₂ 가 기저 — 임의의 실수 계수 1차결합이 전부 해(해 공간). 비제차·비선형에서는 무너진다.", name="super")
 
 X1 = lambda x: 60 + (x + 2) * 55; Y1 = lambda y: 160 - y * 18
 fig_indep = canvas(560, 190,
@@ -71,7 +71,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 <p>복습: 표준형 \\(y'+p(x)y=r(x)\\) → \\(h=\\int p\\,dx\\), \\(y=e^{{-h}}[\\int e^hr\\,dx+c]\\). 베르누이 \\(y'+p(x)y=g(x)y^a\\)는 \\(a=0,1\\)이면 선형, 아니면 <b>\\(u=y^{{1-a}}\\)</b> 치환으로 선형이 된다.</p>
 <div class="say">"꼭 \\(y^{{1-a}}\\)로 치환해야 되느냐, 꼭 그렇지는 않아요. <b>형태를 따라서 여러분들이 취사선택</b>을 해야 돼요."</div>
 {fig_b1}
-<details class="ex" open><summary>연습 1 \\(xy'+y=1/y^2\\) — 교수님 순서 그대로</summary><div class="body"><p>① \\(1/y^2\\) → 비선형. \\(x\\)로 나눠 표준형 \\(y'+\\frac1xy=\\frac1xy^{{-2}}\\) → \\(a=-2\\). ② \\(u=y^{{1-(-2)}}=y^3\\), \\(u'=3y^2y'=3y^2\\big(-\\frac yx+\\frac{{y^{{-2}}}}x\\big)=-\\frac{{3y^3}}x+\\frac3x\\) → ③ <b>\\(u'+\\frac3xu=\\frac3x\\)</b> — "아침에 배웠던 착한 형태". ④ (a) 변수분리 \\(\\frac{{du}}{{u-1}}=-\\frac{{3\\,dx}}x\\) → \\(\\ln|u-1|=-3\\ln x+c\\) → \\(u-1=c/x^3\\). (b) 선형 공식 \\(h=3\\ln x\\), \\(u=x^{{-3}}[\\int x^3\\cdot\\frac3x\\,dx+c]=x^{{-3}}[x^3+c]\\). 같은 답. ⑤ 되돌리기 <b>\\(y^3=1+c/x^3\\)</b>.</p></div></details>
+<details class="ex" open><summary>연습 1 \\(xy'+y=1/y^2\\) — 교수님 순서 그대로</summary><div class="body"><p>① \\(1/y^2\\) → 비선형. \\(x\\)로 나눠 표준형 \\(y'+\\frac1xy=\\frac1xy^{{-2}}\\) → \\(a=-2\\). ② \\(u=y^{{1-(-2)}}=y^3\\), \\(u'=3y^2y'=3y^2\\big(-\\frac yx+\\frac{{y^{{-2}}}}x\\big)=-\\frac{{3y^3}}x+\\frac3x\\) → ③ <b>\\(u'+\\frac3xu=\\frac3x\\)</b> — "아침에 배웠던 착한 형태". ④ (a) 변수분리 \\(\\frac{{du}}{{u-1}}=-\\frac{{3\\,dx}}x\\) → \\(\\ln|u-1|=-3\\ln x+c\\)(\\(x>0\\)) → \\(u-1=c/x^3\\). (b) 선형 공식 \\(h=3\\ln x\\), \\(u=x^{{-3}}[\\int x^3\\cdot\\frac3x\\,dx+c]=x^{{-3}}[x^3+c]\\). 같은 답. ⑤ 되돌리기 <b>\\(y^3=1+c/x^3\\)</b>.</p></div></details>
 <div class="say">"착한 선형 1계 미방으로 풀어도 되고 변수분리로 풀어도 된다. 여러분들이 선택해서 하는 거예요." · "해를 구할 때는 <b>예쁘게 좀 정리</b>를 해보는 게 좋죠. 정리하면 강점이 되겠지."</div>
 <div class="why">치환의 목적은 "\\(y^{{-2}}\\)이 붙은 비선형"을 "\\(u\\)의 1차식"으로 바꾸는 것. \\(u'\\) 계산에 원래 식의 \\(y'\\)을 대입하는 것이 핵심 한 줄이고, 판서에서 \\(-\\frac1x\\) 항의 \\(y\\)를 생략해 적었으니 필기는 \\(-\\frac1xy\\)로 고쳐 둘 것.</div>
 <div class="analogy">외국 돈(\\(y\\))으로는 계산이 안 되는 가게 — 환전(\\(u=y^3\\))해서 계산하고, 나올 때 다시 환전(\\(y=u^{{1/3}}\\))한다. 환전을 안 하고 나오면 답이 아니다.</div>
@@ -110,7 +110,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 <p>예: \\(y''+25y=e^{{-x}}\\cos x\\) 비제차 · \\(xy''+y'+xy=0\\) → \\(x\\)로 나눠 \\(y''+\\frac1xy'+y=0\\) 제차 · \\(yy''+y'^2=0\\) 계수에 \\(y\\), \\(y'\\)의 제곱 → <b>비선형</b>("정말 쉽지가 않아").</p>
 {fig_super}
 <div class="formula">\\[\\textbf{{정리 1(중첩·선형성의 원리)}}:\\ y_1,y_2\\text{{ 가 제차 선형 ODE의 해이면 }}c_1y_1+c_2y_2\\text{{ 도 해}}\\]</div>
-<div class="why">2계는 두 번 적분 → 상수 2개 → 해가 2개(\\(y_1,y_2\\))이고, 그 1차결합 전체가 해 공간. <b>빨간 글씨</b>: 제차 선형에만. 비제차 반례 \\(y''+y=1\\): \\(1+\\cos x\\), \\(1+\\sin x\\)는 각각 해지만 합(\\(2+\\cos x+\\sin x\\))이나 \\(2(1+\\cos x)\\)는 해가 아니다. 비선형 반례 \\(y''y-xy'=0\\): \\(x^2\\), \\(1\\)은 해지만 \\(x^2+1\\), \\(-x^2\\)은 아니다.</div>
+<div class="why">적절한 조건의 2계 제차 선형은 독립인 두 해(\\(y_1,y_2\\))를 기저로 갖고, 임의의 실수 계수로 만든 모든 1차결합이 해 공간. <b>빨간 글씨</b>: 제차 선형에만. 비제차 반례 \\(y''+y=1\\): \\(1+\\cos x\\), \\(1+\\sin x\\)는 각각 해지만 합(\\(2+\\cos x+\\sin x\\))이나 \\(2(1+\\cos x)\\)는 해가 아니다. 비선형 반례 \\(y''y-xy'=0\\): \\(x^2\\), \\(1\\)은 해지만 \\(x^2+1\\), \\(-x^2\\)은 아니다.</div>
 <div class="say">"진도가 빠른 이유: 2학기는 추석·10월 휴일이 많아 중간까지 8주 강의가 <b>실질 7주</b>." · 2계 선형의 쓰임: 3학년 <b>진동공학·제어공학 → 로봇</b>, 라플라스 변환, 회로 해석.</div>
 <div class="analogy">제차 선형은 "레고": 해 두 개를 붙이거나 늘려도 여전히 조립품(해). 비제차·비선형은 "찰흙": 두 덩이를 합치면 다른 것이 된다.</div>
 <div class="memo"><b>외울 것</b> 표준형 \\(y''+py'+qy=r\\) · 중첩 원리는 <b>제차 선형에만</b> · 반례 \\(y''+y=1\\), \\(y''y-xy'=0\\)</div>
@@ -119,7 +119,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 <section class="s" data-id="s5">
 <h2>5. 초기값 문제 · 1차독립 · 기저 ★ (교수님 정정)</h2>
 <div class="formula">\\[\\text{{IVP: }}y(x_0)=K_0,\\ y'(x_0)=K_1\\qquad \\text{{Ex.4 }}y''+y=0,\\ y(0)=3.0,\\ y'(0)=-0.5:\\ y=c_1\\cos x+c_2\\sin x\\ \\Rightarrow\\ y=3.0\\cos x-0.5\\sin x\\]</div>
-<div class="why">상수 2개 → 초기조건 2개(값과 기울기). 공학에서 초기치 = 시간 \\(t=0\\) 문제, 공간이면(\\(x=0\\)과 \\(x=L\\)) <b>경계치 문제</b>(2·3학년). 일반해 \\(c_1y_1+c_2y_2\\)가 "모든 해"이려면 \\(y_1,y_2\\)가 <b>1차독립</b>이어야 하고, 그런 쌍을 <b>기저(basis)</b>·기본계라 한다.</div>
+<div class="why">상수 2개 → 초기조건 2개(값과 기울기). 한 점에서 조건을 주면 초기값 문제, 구간의 서로 다른 두 끝점(예: \\(x=0\\)과 \\(x=L\\))에서 주면 <b>경계값 문제</b>(2·3학년). 일반해 \\(c_1y_1+c_2y_2\\)가 "모든 해"이려면 \\(y_1,y_2\\)가 <b>1차독립</b>이어야 하고, 그런 쌍을 <b>기저(basis)</b>·기본계라 한다.</div>
 {fig_indep}
 <div class="formula">\\[\\text{{1차독립: }}k_1y_1+k_2y_2=0\\ \\Rightarrow\\ k_1=k_2=0\\ \\text{{일 때만}}\\qquad\\Leftrightarrow\\qquad y_1/y_2\\ne\\text{{const}}\\]</div>
 <div class="say">(50:14 정정) "비례 관계가 되면 1차 <b>종속</b>이 되고, 비례 관계가 없으면 1차 <b>독립</b>이에요. <b>반대로 얘기했어요.</b>" — 판서 ⑤에 취소선과 별표로 남은 자리.</div>
@@ -133,7 +133,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 {fig_red}
 <div class="formula">\\[y_2=u\\,y_1\\ \\Rightarrow\\ u''y_1+u'(2y_1'+py_1)+u\\underbrace{{(y_1''+py_1'+qy_1)}}_{{=0}}=0\\ \\Rightarrow\\ U=u':\\ U'+\\Big(\\frac{{2y_1'}}{{y_1}}+p\\Big)U=0\\ \\Rightarrow\\ \\boxed{{\\,y_2=y_1\\int\\frac{{1}}{{y_1^2}}e^{{-\\int p\\,dx}}dx\\,}}\\]</div>
 <div class="why">\\(y_1\\)이 해라서 \\(u\\)의 계수가 0으로 사라지고, \\(u'\\)에 대한 1계 변수분리형만 남는다 — 2계가 1계로 "낮아진다". 적분해 \\(U\\), 다시 적분해 \\(u\\), 곱해서 \\(y_2\\). 이 공식은 9/18 2.2 중근(Case II)과 9/23 오일러-코시 중근에서 그대로 다시 쓰인다.</div>
-<details class="ex"><summary>예제 1 \\((x^2-x)y''-xy'+y=0\\), \\(y_1=x\\) — 설정까지(계산은 9/18)</summary><div class="body"><p>표준형: \\(y''-\\dfrac{{x}}{{x^2-x}}y'+\\dfrac{{1}}{{x^2-x}}y=0\\) → \\(p=-\\dfrac{{x}}{{x^2-x}}=-\\dfrac{{1}}{{x-1}}\\), \\(q=\\dfrac{{1}}{{x^2-x}}\\), \\(y_1=x\\), \\(y_1^2=x^2\\). (슬라이드 p.19 답: \\(y_2=x\\ln|x|+1\\).)</p></div></details>
+<details class="ex"><summary>예제 1 \\((x^2-x)y''-xy'+y=0\\), \\(y_1=x\\)(\\(x=0,1\\)을 뺀 구간) — 설정까지(계산은 9/18)</summary><div class="body"><p>표준형: \\(y''-\\dfrac{{x}}{{x^2-x}}y'+\\dfrac{{1}}{{x^2-x}}y=0\\) → \\(p=-\\dfrac{{x}}{{x^2-x}}=-\\dfrac{{1}}{{x-1}}\\), \\(q=\\dfrac{{1}}{{x^2-x}}\\), \\(y_1=x\\), \\(y_1^2=x^2\\). (슬라이드 p.19 답: \\(y_2=x\\ln|x|+1\\).)</p></div></details>
 <div class="say">"이 해(\\(y_1\\))를 알면 여기에 집어넣고 \\(y_2\\)를 만들어낼 수 있다." · "이걸 기억하고 있는 게 낫겠죠." · 금요일(9/18)에 유도 다시 + 상수계수로.</div>
 <div class="analogy">한쪽 신발(\\(y_1\\))을 찾았으면 짝(\\(y_2\\))은 그 모양에 맞춰 만들 수 있다 — 공식이 그 "맞추는 법".</div>
 <div class="memo"><b>외울 것</b> \\(y_2=y_1\\int\\frac1{{y_1^2}}e^{{-\\int p\\,dx}}dx\\)(지수에 −) · 표준형에서 \\(p\\) 읽기 · 과제: 1.5 #23·#28 (2.1 #6·#9는 "한번 해보세")</div>
@@ -144,7 +144,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 <div class="q" data-qid="q3"><div class="qn">확인 3 · 중첩 원리</div><div class="qb">"두 해의 1차결합도 해"가 성립하는 경우는?</div><ol class="choices"><li data-ok="1">제차 선형 ODE에서만</li><li>모든 선형 ODE(비제차 포함)</li><li>모든 ODE</li><li>비선형 ODE에서만</li></ol><div class="ans">빨간 글씨. \\(y''+y=1\\)(비제차), \\(y''y-xy'=0\\)(비선형)이 반례.</div></div>
 <div class="q" data-qid="q4"><div class="qn">확인 4 · 1차독립</div><div class="qb">두 해 \\(y_1,y_2\\)가 1차독립인지 판별하는 기준은?</div><ol class="choices"><li data-ok="1">\\(y_1/y_2\\)가 상수가 아니면(비례하지 않으면) 독립</li><li>\\(y_1/y_2\\)가 상수이면 독립</li><li>\\(y_1+y_2\\)가 해이면 독립</li><li>\\(y_1y_2=0\\)이면 독립</li></ol><div class="ans">교수님이 정정한 지점: 비례 → 종속, 비례 아님 → 독립.</div></div>
 <div class="q" data-qid="q5"><div class="qn">확인 5 · Ex.4</div><div class="qb">\\(y''+y=0\\), \\(y(0)=3.0\\), \\(y'(0)=-0.5\\)의 해는?</div><ol class="choices"><li data-ok="1">\\(y=3.0\\cos x-0.5\\sin x\\)</li><li>\\(y=3.0\\sin x-0.5\\cos x\\)</li><li>\\(y=3.0e^{{x}}-0.5e^{{-x}}\\)</li><li>\\(y=-0.5\\cos x+3.0\\sin x\\)</li></ol><div class="ans">\\(y=c_1\\cos x+c_2\\sin x\\), \\(y(0)=c_1\\), \\(y'(0)=c_2\\).</div></div>
-<div class="q" data-qid="q6"><div class="qn">확인 6 · 차수축소</div><div class="qb">차수축소법 공식을 쓰고, \\((x^2-x)y''-xy'+y=0\\), \\(y_1=x\\)에서 \\(p(x)\\)와 \\(y_2\\)를 구하라.</div><div class="ans">\\(y_2=y_1\\int\\frac1{{y_1^2}}e^{{-\\int p\\,dx}}dx\\). \\(p=-\\frac{{x}}{{x^2-x}}=-\\frac1{{x-1}}\\) → \\(e^{{-\\int p}}=e^{{\\ln|x-1|}}=x-1\\) → \\(U=\\frac{{x-1}}{{x^2}}=\\frac1x-\\frac1{{x^2}}\\) → \\(y_2=x(\\ln|x|+\\frac1x)=x\\ln|x|+1\\).</div></div>
+<div class="q" data-qid="q6"><div class="qn">확인 6 · 차수축소</div><div class="qb">차수축소법 공식을 쓰고, \\((x^2-x)y''-xy'+y=0\\), \\(y_1=x\\)에서 \\(p(x)\\)와 \\(y_2\\)를 구하라.</div><div class="ans">\\(y_2=y_1\\int\\frac1{{y_1^2}}e^{{-\\int p\\,dx}}dx\\). \\(p=-\\frac{{x}}{{x^2-x}}=-\\frac1{{x-1}}\\) → \\(e^{{-\\int p}}=e^{{\\ln|x-1|}}=|x-1|=x-1\\)(\\(x>1\\)) → \\(U=\\frac{{x-1}}{{x^2}}=\\frac1x-\\frac1{{x^2}}\\) → \\(y_2=x(\\ln|x|+\\frac1x)=x\\ln|x|+1\\).</div></div>
 </body></html>'''
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 io.open(OUT, "w", encoding="utf-8", newline="\n").write(html)

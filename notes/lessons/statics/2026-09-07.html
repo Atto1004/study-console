@@ -42,12 +42,18 @@ section.s p{margin:0 0 10px}
 section.s.read::after{content:"읽음";position:absolute;right:16px;top:14px;font-size:12px;color:var(--accent);font-weight:700;border:1px solid rgba(21,128,61,.35);border-radius:999px;padding:1px 9px;background:rgba(21,128,61,.06)}
 /* 상자들 */
 .why,.say,.analogy,.formula,.pitfall,.memo{margin:12px 0;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:var(--paper-2);font-size:17px}
-.why{border-left:5px solid var(--blue)}.why::before{content:"왜 그런가";display:block;font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:4px}
-.say{border-left:5px solid var(--pink);background:rgba(255,77,141,.06)}.say::before{content:"교수님 말";display:block;font-size:12.5px;font-weight:700;color:var(--pink);margin-bottom:4px}
-.analogy{border-left:5px solid var(--yel);background:rgba(245,159,0,.07)}.analogy::before{content:"비유";display:block;font-size:12.5px;font-weight:700;color:#B26A00;margin-bottom:4px}
-.formula{border-left:5px solid var(--green);background:rgba(47,158,68,.06)}.formula::before{content:"외울 것";display:block;font-size:12.5px;font-weight:700;color:var(--green);margin-bottom:4px}
-.pitfall{border-left:5px solid var(--red);background:rgba(224,49,49,.05)}.pitfall::before{content:"함정";display:block;font-size:12.5px;font-weight:700;color:var(--red);margin-bottom:4px}
+/* 암기·이해 구분(대표님 2026-09-29): 상자 머리말 = 알약. 암기(주황) = 공식·외울 것, 이해(파랑) = 왜·비유 */
+.why::before,.analogy::before,.formula::before,.pitfall::before,.say::before,.memo.am::before{display:table;font-size:12px;font-weight:800;line-height:1;padding:5px 10px;border-radius:999px;margin:0 0 8px;color:#fff;letter-spacing:.02em}
+.why{border-left:5px solid var(--blue)}.why::before{content:"이해 · 왜";background:#1D4ED8}
+.say{border-left:5px solid var(--pink);background:rgba(255,77,141,.06)}.say::before{content:"교수님 말";background:#A61E4D}
+.analogy{border-left:5px solid var(--yel);background:rgba(245,159,0,.07)}.analogy{border-left-color:var(--blue)}.analogy::before{content:"이해 · 비유";background:#1D4ED8}
+.formula{border-left:5px solid var(--green);background:rgba(47,158,68,.06)}.formula{border-left-color:#D97706;background:rgba(217,119,6,.06)}.formula::before{content:"암기 · 공식";background:#B45309}
+.pitfall{border-left:5px solid var(--red);background:rgba(224,49,49,.05)}.pitfall::before{content:"함정";background:#C92A2A}
 .memo{border-left:5px solid var(--ink-3)}
+.memo.am{border-left-color:#D97706;background:rgba(217,119,6,.06)}.memo.am::before{content:"암기";background:#B45309}
+/* 인라인 식은 줄에서 끊지 않는다(대표님 2026-09-29 「수식 한 줄로」) — 넘치면 fitInline 이 줄인다 */
+.katex{white-space:nowrap}
+#top a.memo-l{color:var(--ink);font-weight:700;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:rgba(255,255,255,.6);min-height:32px;display:inline-flex;align-items:center}
 .katex-display{margin:10px 0;overflow-x:auto;overflow-y:hidden}
 /* 그림 */
 figure.fig{margin:14px auto;text-align:center;max-width:560px}
@@ -100,7 +106,7 @@ details.ex .body p{margin:8px 0}
   section.s,.q,#result,header.h .lead{border-color:rgba(255,255,255,.1);box-shadow:0 12px 34px rgba(0,0,0,.35)}
   .choice{background:rgba(255,255,255,.06)}.q .ans{background:rgba(255,255,255,.06)}.q .myans{background:rgba(255,255,255,.06)}
   .btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}.btn.a{color:#052E16}
-  .say{background:rgba(255,77,141,.10)}.analogy{background:rgba(245,159,0,.10)}.formula{background:rgba(47,158,68,.10)}.pitfall{background:rgba(224,49,49,.10)}
+  .say{background:rgba(255,77,141,.10)}.analogy{background:rgba(59,130,246,.10)}.formula{background:rgba(217,119,6,.12)}.memo.am{background:rgba(217,119,6,.12)}.pitfall{background:rgba(224,49,49,.10)}#top a.memo-l{background:rgba(255,255,255,.08)}
   figure.fig svg{filter:invert(1) hue-rotate(180deg) saturate(1.2)}
 }
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#top{background:#FFFFFF}section.s,.q,#result{background:#FFFFFF}}
@@ -110,7 +116,7 @@ details.ex .body p{margin:8px 0}
 </style>
 </head>
 <body>
-<div id="top"><div class="in"><b id="tCourse">정역학</b><span id="tSess">9/7(월) · 2주차 · 약 18분</span><span class="sp"></span><span id="tRead">읽음 0/0</span><span class="pct" id="tPct">0%</span></div><div id="bar"><i id="barI"></i></div></div>
+<div id="top"><div class="in"><b id="tCourse">정역학</b><span id="tSess">9/7(월) · 2주차 · 약 18분</span><span class="sp"></span><span id="tRead">읽음 0/0</span><span class="pct" id="tPct">0%</span><a class="memo-l" href="../../memo/statics.html#d2026-09-07">암기노트</a></div><div id="bar"><i id="barI"></i></div></div>
 <main>
 <header class="h"><div class="kicker">정역학 · 9/7(월) · 2주차 · 약 18분</div><h1>역학이란 무엇인가 — 그리고 벡터의 첫걸음</h1><div class="meta"><span>녹음 53분</span><span>판서 1장</span><span>강의자료 W11 (Ch.1~2)</span><span>2주차 · 월</span></div><div class="lead">첫 수업의 절반은 <b>Ch.1 소개</b>(역학의 정의·단위·뉴턴 법칙), 나머지는 <b>Ch.2 벡터</b>의 시작(표기·덧셈·단위벡터)이다. 교수님이 두 번 말한 한 학기의 뼈대는 딱 두 개 — <b>평형방정식</b>과 <b>모멘트</b>. 영어 강의 + 한국어 요약으로 진행된다.</div></header>
 <section class="s" data-id="s1">
@@ -121,7 +127,7 @@ details.ex .body p{margin:8px 0}
 <div class="why">정역학(Statics)은 <b>정지해 있는</b>(평형 상태의) 물체를, 동역학(Dynamics)은 <b>운동하는</b> 물체를 다룬다. 이번 학기는 정역학 — 움직이지 않으니 "왜 안 움직이는가"를 힘의 균형으로 설명하는 것이 전부다.</div>
 <div class="say">"결국에는 <b>평형(equilibrium)이 가장 중요</b>합니다. <b>평형방정식을 잘 세우는 것</b>이 제일 중요하고요. 그리고 <b>모멘트</b>, 이 두 가지 가지고 한 학기 동안 하는 거예요." — 두 번 반복.</div>
 <div class="analogy">다리·건물·크레인은 서 있는 채로 힘을 받는다. 무너지지 않는 이유를 설명하는 것이 정역학, 자동차·로켓처럼 움직이는 것을 설명하는 것이 동역학. 같은 「힘」을 다루지만 질문이 다르다.</div>
-<div class="memo"><b>외울 것</b> Mechanics = Statics(평형) + Dynamics(운동) · 정역학의 두 기둥 = <b>평형방정식</b> · <b>모멘트</b> · 이번 학기 = 정역학</div>
+<div class="memo am">Mechanics = Statics(평형) + Dynamics(운동) · 정역학의 두 기둥 = <b>평형방정식</b> · <b>모멘트</b> · 이번 학기 = 정역학</div>
 <figure class="board"><img alt="판서 1" src="../_private/statics/2026-09-07/%ED%8C%90%EC%84%9C_1_%EC%97%AD%ED%95%99%EC%A0%95%EC%9D%98_%EC%A0%95%EC%97%AD%ED%95%99%EB%8F%99%EC%97%AD%ED%95%99.jpg" loading="lazy"><figcaption>판서 ① 역학의 정의 — Statics / Dynamics (15:08, 태블릿 화면)</figcaption></figure>
 </section>
 
@@ -130,16 +136,16 @@ details.ex .body p{margin:8px 0}
 <p>주로 <b>SI 단위</b>를 쓴다(US customary 는 참고만). 힘의 단위 뉴턴은 정의부터 기억한다.</p>
 <figure class="fig" data-fig="unit"><svg class="fig-svg" viewbox="0 0 560 150" width="560" height="150" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><line x1="60" y1="110" x2="500" y2="110" stroke="#1F2A44" stroke-width="2"></line><rect x="200" y="60" width="60" height="50" rx="6" fill="#F1F3F5" stroke="#1F2A44" stroke-width="2"></rect><text x="230.0" y="90.0" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">1 kg</text></g><g data-step="2"><line x1="130" y1="85" x2="196" y2="85" stroke="#2F9E44" stroke-width="2.6" marker-end="url(#ah)"></line><text x="163.0" y="75.0" text-anchor="middle" font-size="13" fill="#2F9E44">F = 1 N</text></g><g data-step="3"><line x1="270" y1="40" x2="340" y2="40" stroke="#1971C2" stroke-width="2.2" marker-end="url(#ah)"></line><text x="305.0" y="32.0" text-anchor="middle" font-size="13" fill="#1971C2">a = 1 m/s²</text></g><g data-step="4"><text x="280" y="138" font-size="13.5" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">1 N = 1 kg · 1 m/s²   (kN = 10³ N · MN = 10⁶ N)</text></g></svg><figcaption>힘의 단위 뉴턴: 1 kg 을 1 m/s² 로 가속하는 힘. 각도는 rad — 한 바퀴 2π rad = 360°.</figcaption></figure>
 <div class="formula">\[1\ \mathrm{N}=1\ \mathrm{kg\cdot m/s^2},\qquad \mathrm{kN}=10^3\ \mathrm N,\quad \mathrm{MN}=10^6\ \mathrm N,\qquad 2\pi\ \mathrm{rad}=360^\circ\]</div>
-<div class="why">뉴턴 2법칙 \(F=ma\)에서 나온 단위다. 그래서 힘 문제의 답이 kg·m/s² 로 떨어지면 맞게 계산한 것 — 단위 검산에 쓴다.</div>
+<div class="why">뉴턴 2법칙 \(F=ma\)에서 나온 단위다. 그래서 힘 문제의 답이 kg·m/s² 로 떨어지면 힘의 차원은 맞은 것 — 단위 검산에 쓴다(수치·부호·계산은 따로 검산).</div>
 <div class="analogy">사과 하나(약 100 g)를 손에 올렸을 때 느끼는 무게가 대략 1 N. "kN" 이 나오면 사과 천 개, 자동차 한 대 무게가 10 kN 남짓.</div>
-<div class="memo"><b>외울 것</b> \(1\ \mathrm N=1\ \mathrm{kg\,m/s^2}\) · 속도 = 위치의 변화율, 가속도 = 속도의 변화율 · 각도는 rad</div>
+<div class="memo am">\(1\ \mathrm N=1\ \mathrm{kg\,m/s^2}\) · 속도 = 위치의 변화율, 가속도 = 속도의 변화율 · 각도는 rad</div>
 </section>
 
 <section class="s" data-id="s3">
 <div class="no">3 / 6</div><h2>3. 뉴턴의 법칙 — 정역학은 항상 ΣF = 0</h2>
 <table><tr><th></th><th>내용</th><th>정역학에서의 뜻</th></tr>
 <tr><td><b>1법칙</b></td><td>\(\sum\mathbf F=0\)이면 속도가 일정</td><td>정지해 있으면 계속 정지. <b>정역학은 항상 \(\sum\mathbf F=0\)</b></td></tr>
-<tr><td><b>2법칙</b></td><td>\(\sum\mathbf F=d\mathbf p/dt\) (선운동량의 변화율)</td><td>합력이 0이라 안 쓴다 — 동역학 개념</td></tr>
+<tr><td><b>2법칙</b></td><td>\(\sum\mathbf F=d\mathbf p/dt\) (선운동량의 변화율)</td><td>정역학은 여기에 가속도 0 을 넣어 쓴다(ΣF = 0)</td></tr>
 <tr><td><b>3법칙</b></td><td>\(\mathbf F_{A\to B}=-\mathbf F_{B\to A}\), 크기 같고 방향 반대</td><td>자유물체도(3장)의 근거</td></tr></table>
 <div class="say">"we study statics right so <b>always the summation of forces will be zero</b>"</div>
 <h3>왜 「입자(particle)」라고 하는가 — 교수님이 질문으로 짚은 포인트</h3>
@@ -148,7 +154,7 @@ details.ex .body p{margin:8px 0}
 <div class="why">크기가 있는 물체는 같은 힘이라도 <b>어디에</b> 걸리느냐에 따라 회전한다. 1장에서는 그 복잡함을 일단 빼려고 물체를 크기 없는 점(입자)으로 본다. 회전(모멘트)은 4장에서 정식으로 다룬다.</div>
 <div class="analogy">문을 경첩 바로 옆에서 밀면 안 열리고, 손잡이 쪽에서 밀면 쉽게 돈다. 힘은 같은데 <b>작용선의 위치</b>가 다르기 때문 — 이것이 모멘트.</div>
 <p>만유인력 \(F=G\dfrac{m_1m_2}{r^2}\) — 두 입자 사이, 크기 같고 방향 반대. "이 중력이 사실상 만유인력이랑 똑같잖아요." 지표면 근처에서는 \(W=mg\)로 쓴다(3장).</p>
-<div class="memo"><b>외울 것</b> 정역학 = \(\sum\mathbf F=0\) · 입자 = 크기 없음 → 모멘트 없음 · 3법칙 = 작용·반작용(자유물체도) · \(W=mg\)</div>
+<div class="memo am">정역학 = \(\sum\mathbf F=0\) · 입자 = 크기 없음 → 모멘트 없음 · 3법칙 = 작용·반작용(자유물체도) · \(W=mg\)</div>
 </section>
 
 <section class="s" data-id="s4">
@@ -158,7 +164,7 @@ details.ex .body p{margin:8px 0}
 <div class="memo"><b>표기</b> 벡터는 볼드체 \(\mathbf u\)(손글씨는 화살표·밑줄) · 크기는 \(|\mathbf u|\) — 방향이 사라지고 크기만 남는다 · 그림은 화살표: <b>길이 ∝ 크기</b>, 화살표 방향 = 벡터 방향</div>
 <div class="why"><b>위치벡터 \(\mathbf r_{AB}\)</b> = 점 A에서 점 B로 쏘는 벡터. 앞 첨자가 시작점, 뒤 첨자가 끝점. 다음 시간 "끝점 − 시작점" 계산의 뿌리이고, 4장 모멘트 \(\mathbf M=\mathbf r\times\mathbf F\)의 \(\mathbf r\)이 바로 이것.</div>
 <div class="analogy">"서울에서 부산까지 400 km"는 스칼라(거리), "서울에서 부산 쪽으로 400 km"는 벡터(변위). 방향을 뒤집으면 다른 벡터가 된다.</div>
-<div class="memo"><b>외울 것</b> 벡터 = 크기 + 방향 · \(|\mathbf u|\) = 크기(스칼라) · \(\mathbf r_{AB}\): A → B</div>
+<div class="memo am">벡터 = 크기 + 방향 · \(|\mathbf u|\) = 크기(스칼라) · \(\mathbf r_{AB}\): A → B</div>
 </section>
 
 <section class="s" data-id="s5">
@@ -168,28 +174,115 @@ details.ex .body p{margin:8px 0}
 <div class="say">"당장은 어디다 써먹을지 모르겠지만 나중에 문제를 풀면 (쓰인다)" — \(\mathbf r_{AC}=\mathbf r_{AB}+\mathbf r_{BC}\)에 대해.</div>
 <div class="why"><b>스칼라배</b> \(a\mathbf u\)도 벡터. 크기는 \(|a||\mathbf u|\), 방향은 \(a\)의 부호에 따라 — \(a&lt;0\)이면 반대 방향. 결합·분배법칙이 성립하고, 스칼라로 나누기는 \(1/a\)를 곱하는 것. <b>뺄셈</b>은 \(\mathbf u-\mathbf v=\mathbf u+(-\mathbf v)\) — "반대 방향 벡터를 더한다고 생각하면 된다".</div>
 <div class="analogy">지도에서 A → B → C로 돌아가나 A → C로 직행하나 도착지는 같다. 그것이 \(\mathbf r_{AC}=\mathbf r_{AB}+\mathbf r_{BC}\). 어느 길로 묶어 더하든 결과가 같다는 것이 결합법칙.</div>
-<div class="memo"><b>외울 것</b> 삼각형 법칙(꼬리→머리) = 평행사변형 법칙 · \(a\mathbf u\): 부호가 방향 · \(\mathbf u-\mathbf v=\mathbf u+(-\mathbf v)\)</div>
+<div class="memo am">삼각형 법칙(꼬리→머리) = 평행사변형 법칙 · \(a\mathbf u\): 부호가 방향 · \(\mathbf u-\mathbf v=\mathbf u+(-\mathbf v)\)</div>
 </section>
 
 <section class="s" data-id="s6">
 <div class="no">6 / 6</div><h2>6. 단위벡터 — 크기 1, 방향만 남긴다 ★</h2>
-<figure class="fig" data-fig="unitv"><svg class="fig-svg" viewbox="0 0 560 150" width="560" height="150" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><line x1="60" y1="100" x2="300" y2="40" stroke="#1971C2" stroke-width="3" marker-end="url(#ah)"></line><text x="180" y="56" font-size="15" fill="#1971C2" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">u = |u| e</text></g><g data-step="2"><line x1="60" y1="100" x2="120" y2="85" stroke="#2F9E44" stroke-width="3.4" marker-end="url(#ah)"></line><text x="96" y="122" font-size="13" fill="#2F9E44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">e (크기 1)</text></g><g data-step="3"><text x="420" y="58" font-size="16" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">e = u / |u|</text><text x="420" y="82" font-size="13" fill="#8A97A6" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">방향만 남긴다</text><text x="420" y="102" font-size="12" fill="#8A97A6" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">크기가 1이라 곱해도 크기가 안 바뀐다</text></g></svg><figcaption>단위벡터: 크기 1, 방향만 지정. 어떤 벡터든 「크기 × 방향」으로 쪼갠다 — 3장에서 케이블 힘을 성분으로 쓸 때의 핵심.</figcaption></figure>
-<div class="formula">\[\mathbf e=\frac{\mathbf u}{|\mathbf u|},\quad |\mathbf e|=1,\qquad \mathbf u=|\mathbf u|\,\mathbf e\ (\text{크기}\times\text{방향})\]</div>
-<div class="why">쓰는 이유는 하나 — <b>방향만 지정</b>하려고. 크기가 1이라 어떤 수를 곱해도 방향은 그대로고 크기만 그 수가 된다. "케이블이 A에서 B 방향으로 500 N을 당긴다"를 식으로 쓰려면 \(500\,\mathbf e_{AB}\)가 필요하다.</div>
+<figure class="fig" data-fig="unitv"><svg class="fig-svg" viewbox="0 0 560 150" width="560" height="150" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><line x1="60" y1="100" x2="300" y2="40" stroke="#1971C2" stroke-width="3" marker-end="url(#ah)"></line><text x="180" y="56" font-size="15" fill="#1971C2" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">u = |u| e</text></g><g data-step="2"><line x1="60" y1="100" x2="120" y2="85" stroke="#2F9E44" stroke-width="3.4" marker-end="url(#ah)"></line><text x="96" y="122" font-size="13" fill="#2F9E44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">e (크기 1)</text></g><g data-step="3"><text x="420" y="58" font-size="16" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">e = u / |u|</text><text x="420" y="82" font-size="13" fill="#8A97A6" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">방향만 남긴다</text><text x="420" y="102" font-size="12" fill="#8A97A6" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">양수배는 같은 방향, 음수배는 반대 방향</text></g></svg><figcaption>단위벡터: 크기 1, 방향만 지정. 영벡터가 아닌 벡터는 「크기 × 방향」으로 쪼갠다 — 3장에서 케이블 힘을 성분으로 쓸 때의 핵심.</figcaption></figure>
+<div class="formula">\[\mathbf e=\frac{\mathbf u}{|\mathbf u|}\ (\mathbf u\ne\mathbf 0),\quad |\mathbf e|=1,\qquad \mathbf u=|\mathbf u|\,\mathbf e\ (\text{크기}\times\text{방향})\]</div>
+<div class="why">쓰는 이유는 하나 — <b>방향만 지정</b>하려고. 크기가 1이라 양수를 곱하면 방향은 그대로고 크기만 그 수가 된다(음수배는 반대 방향, 크기는 절댓값). "케이블이 A에서 B 방향으로 500 N을 당긴다"를 식으로 쓰려면 \(500\,\mathbf e_{AB}\)가 필요하다.</div>
 <div class="say">"안 쓸 것 같지만 생각보다 많이 쓰이고 <b>고체역학 가서도 많이 쓰기 때문에</b> 한 번씩 (봐 두세요)"</div>
 <div class="analogy">나침반 바늘은 길이가 아니라 방향만 알려 준다. 단위벡터는 그 바늘 — "얼마나 세게"(크기)는 따로 곱한다.</div>
-<div class="memo"><b>외울 것</b> \(\mathbf e=\mathbf u/|\mathbf u|\) · \(\mathbf u=|\mathbf u|\mathbf e\) · 다음 시간: 성분 \(\mathbf i,\mathbf j,\mathbf k\)와 방향여현</div>
+<div class="memo am">\(\mathbf e=\mathbf u/|\mathbf u|\) · \(\mathbf u=|\mathbf u|\mathbf e\) · 다음 시간: 성분 \(\mathbf i,\mathbf j,\mathbf k\)와 방향여현</div>
 <p>수업 운영: "1장은 그냥 가볍게 introduction". 교수님이 강의 녹화를 처음 시도 — LMS 녹화본·PDF 확인.</p>
 </section>
 
 
-<section id="quiz"><h2>확인 문제</h2><div class="hint">보기를 누르면 바로 채점됩니다. 답을 쓰는 문제는 「답 보기」 뒤에 맞음/틀림을 스스로 표시합니다.</div><div id="qlist"></div><div id="result"></div></section>
+<section id="quiz"><h2>확인 문제</h2><div id="qlist"></div><div id="result"></div></section>
 <div id="done"></div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script>/* 김주영 스앵님 판정 (대표님 2026-09-29 「개념 마인드맵은 스앵님이 학습을 통해 내가 뭘 알고 뭘 모르는지 알아서 파악」) — 원본은 이 파일 하나.
+   빌더가 교실·수업 노트·학습 덱·암기노트 페이지에 그대로 넣고(__JUDGE__), learn.html·앱(V57)은 같은 글을 붙여 쓴다(docs/tools/sync_judge.py).
+   기록 = localStorage atto.evidence [{t, k, n:[노드], ok, v, lid, sid, qid, clean}] (최대 4000건)
+     k: quiz(ok) 확인 문제 · read(clean) 챕터·섹션 끝(다시 설명·질문 없이 끝났으면 clean) · again 다시 설명 · ask 질문 · memo(ok) 암기노트 외움 · self(v) 카드 자가평가
+   판정 = 노드마다 atto.mastery[id] = {quiz:{correct,total,ts}, self, ts, score, state, auto} — learn.html · 앱 V47 · server.py 의 점수식이 그대로 읽는다.
+     quiz = 최근 6번 · self(설명할 수 있나 1~5) = 읽음 4 · 다시 설명·질문 2번 이상이면 3 · 외움 +1 · 카드 자가평가가 더 최근이면 그 값
+     → 문제 없이 읽기만 하면 최대 「흔들림」, 「안다」는 문제로만. 점수식 = (0.5·정답률 + 0.2·self/5)/0.7, 문제 없으면 self/5·0.6, 60일 감쇠(최저 0.4) */
+(function(g){
+  var EK="atto.evidence", MK="atto.mastery", CAP=4000;
+  function rd(k,d){ try{ var v=JSON.parse(localStorage.getItem(k)||"null"); return v==null?d:v; }catch(e){ return d; } }
+  function decay(ts){ if(!ts) return 1; var d=Math.max(0,(Date.now()/1000-ts)/86400); return Math.max(.4,1-d/60); }
+  function score(e){ var q=e.quiz||{}, tot=+q.total||0, cor=+q.correct||0, sv=e.self==null?null:Math.max(1,Math.min(5,+e.self));
+    if(tot<=0&&sv==null) return {score:0,state:"unrated"};
+    var raw=tot>0?(0.5*(cor/tot)+0.2*((sv||0)/5))/0.7:(sv/5)*0.6, s=Math.min(1,raw)*decay(Math.max(+e.ts||0,+q.ts||0)), st;
+    if(tot<=0) st=(sv>=4&&s>=.4)?"shaky":"unknown"; else st=s>=.7?"known":s>=.4?"shaky":"unknown";
+    return {score:Math.round(s*1000)/1000,state:st}; }
+  function why(evs){ var qz=evs.filter(function(e){return e.k==="quiz";}).slice(-6), r={q:qz.length,c:qz.filter(function(e){return e.ok;}).length,
+      read:evs.filter(function(e){return e.k==="read";}).length, clean:evs.filter(function(e){return e.k==="read"&&e.clean;}).length,
+      conf:evs.filter(function(e){return (e.k==="again"||e.k==="ask")&&Date.now()-e.t<21*864e5;}).length,
+      memo:null, self:null, last:0};
+    evs.forEach(function(e){ if(e.k==="memo") r.memo=!!e.ok; if(e.k==="self") r.self={v:+e.v,t:e.t}; if(e.t>r.last) r.last=e.t; });
+    return r; }
+  function judgeOne(id,L,M){ var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); if(!evs.length) return;
+    var r=why(evs), e=Object.assign({},M[id]||{}), qz=evs.filter(function(x){return x.k==="quiz";}).slice(-6);
+    var self=null; if(r.read||r.conf||r.memo!=null){ self=r.read?4:3; if(r.conf>=2) self=3; if(r.memo) self=Math.min(5,self+1); }
+    var autoLast=0; evs.forEach(function(x){ if(x.k!=="self"&&x.t>autoLast) autoLast=x.t; });
+    if(r.self&&r.self.t>=autoLast) self=r.self.v;
+    e.quiz=qz.length?{correct:r.c,total:qz.length,ts:Math.round(qz[qz.length-1].t/1000)}:undefined; if(!e.quiz) delete e.quiz;
+    e.self=self; if(self==null) delete e.self;
+    e.ts=Math.round(r.last/1000); e.auto={by:"tutor",q:r.q,c:r.c,read:r.read,clean:r.clean,conf:r.conf,memo:r.memo};
+    var s=score(e); e.score=s.score; e.state=s.state; M[id]=e; }
+  function judge(ids){ var L=rd(EK,[]), M=rd(MK,{}); if(!Array.isArray(L)) L=[]; (ids||[]).forEach(function(id){ judgeOne(id,L,M); });
+    try{ localStorage.setItem(MK,JSON.stringify(M)); }catch(e){} return M; }
+  function all(){ var L=rd(EK,[]), o={}; if(Array.isArray(L)) L.forEach(function(e){ (e&&e.n||[]).forEach(function(i){ o[i]=1; }); }); return judge(Object.keys(o)); }
+  function rec(ev){ if(!ev||!Array.isArray(ev.n)||!ev.n.length) return; var L=rd(EK,[]); if(!Array.isArray(L)) L=[];
+    ev.t=Date.now(); L.push(ev); if(L.length>CAP) L=L.slice(L.length-CAP);
+    try{ localStorage.setItem(EK,JSON.stringify(L)); }catch(e){ try{ L=L.slice(-Math.floor(CAP/2)); localStorage.setItem(EK,JSON.stringify(L)); }catch(x){} }
+    judge(ev.n); }
+  function reasons(id){ var L=rd(EK,[]); if(!Array.isArray(L)) return null; var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); return evs.length?why(evs):null; }
+  g.TJ={rec:rec,judge:judge,all:all,score:score,reasons:reasons};
+})(typeof window!=="undefined"?window:this);
+</script>
+<script>/* 여러 식을 이은 식 줄 나누기(대표님 2026-09-29 「수식 한 줄로, 배치구조 신경」) — 원본은 이 파일 하나(수업 노트·암기노트 템플릿에 빌더가 넣는다, __SPLITTEX__).
+   \[ A,\qquad B \] 처럼 서로 다른 식을 \qquad 또는 「,\quad」로 이어 붙인 줄은 식마다 한 줄(\[A\]\[B\])로 — 한 식 안은 가르지 않는다.
+   괄호 { } 와 \begin…\end 안의 구분자는 건드리지 않고, 연결 기호만 남은 조각(\Rightarrow·\to·\Leftrightarrow·\therefore)은 다음 식 앞에 붙인다. */
+function splitTex(t){
+  const parts=[]; let d=0, env=0, cur="", i=0;
+  while(i<t.length){
+    if(t.startsWith("\\begin{",i)) env++;
+    else if(t.startsWith("\\end{",i)) env=Math.max(0,env-1);
+    const c=t[i];
+    if(c==="\\"&&(t[i+1]==="{"||t[i+1]==="}")){ cur+=t.slice(i,i+2); i+=2; continue; }
+    if(c==="{") d++; else if(c==="}") d=Math.max(0,d-1);
+    if(!d&&!env){
+      let m=0;
+      if(t.startsWith("\\qquad",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) m=6;
+      else if(t.startsWith(",\\quad",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) m=6;
+      if(m){ parts.push(cur); cur=""; i+=m; continue; }
+    }
+    cur+=c; i++;
+  }
+  parts.push(cur);
+  const out=[]; let carry="";
+  parts.map(p=>p.trim().replace(/^,\s*/,"").replace(/,\s*$/,"")).forEach(p=>{
+    if(!p) return;
+    if(/^(\\(Rightarrow|Leftarrow|Leftrightarrow|to|therefore|because|implies|iff)\s*)+$/.test(p)){ carry+=p+" "; return; }
+    out.push(carry+p); carry="";
+  });
+  if(carry&&out.length) out[out.length-1]+=" "+carry.trim();
+  return out.length?out:[t];
+}
+/* 좁은 화면(폰)에서만: 글자 덩어리(\text{…})를 화살표(\to·\Rightarrow)로 이은 「흐름」 줄은 화살표 단위로 줄을 나눈다 — 수식이 아니라 단계 나열이라 나눠도 식이 갈리지 않는다 */
+function splitFlow(t){
+  const segs=[]; let d=0, cur="", i=0;
+  while(i<t.length){ const c=t[i];
+    if(c==="\\"&&(t[i+1]==="{"||t[i+1]==="}")){ cur+=t.slice(i,i+2); i+=2; continue; }
+    if(c==="{") d++; else if(c==="}") d=Math.max(0,d-1);
+    if(!d){ const m=/^\\ ?\\(to|Rightarrow)(?![a-zA-Z])\\ ?/.exec(t.slice(i))||/^\s*\\(to|Rightarrow)(?![a-zA-Z])\s*/.exec(t.slice(i)); if(m&&cur.trim()){ segs.push(cur); cur="\\"+m[1]+"\\ "; i+=m[0].length; continue; } }
+    cur+=c; i++; }
+  segs.push(cur);
+  const ok=segs.length>=3&&segs.every(s=>/^(\\(to|Rightarrow)\\ )?\s*\\text\{/.test(s.trim()));
+  return ok?segs.map(s=>s.trim()):[t];
+}
+function splitDisplays(html,narrow){
+  return String(html).replace(/\\\[([\s\S]*?)\\\]/g,(m,tex)=>{ let ps=splitTex(tex); if(narrow) ps=[].concat(...ps.map(splitFlow)); return ps.length>1?ps.map(p=>"\\["+p+"\\]").join(""):m; });
+}
+</script>
 <script>
-const LESSON_ID="statics-2026-09-07", QUIZ=[{"id": "q1", "qn": "확인 1 · 정역학의 정의", "html": "정역학(Statics)이 다루는 것은?", "choices": [{"html": "평형(정지) 상태에 있는 물체와 그에 작용하는 힘", "ok": true}, {"html": "운동하는 물체의 가속도", "ok": false}, {"html": "기계(machine)의 설계", "ok": false}, {"html": "물체의 온도 변화", "ok": false}], "ans": "Statics = study of objects in \"equilibrium\". 운동은 Dynamics."}, {"id": "q2", "qn": "확인 2 · 뉴턴 법칙", "html": "정역학에서 <b>항상</b> 성립하는 식은?", "choices": [{"html": "\\(\\sum\\mathbf F=0\\)", "ok": true}, {"html": "\\(\\sum\\mathbf F=d\\mathbf p/dt\\ne0\\)", "ok": false}, {"html": "\\(\\sum\\mathbf F=m\\mathbf a,\\ \\mathbf a\\ne0\\)", "ok": false}, {"html": "\\(\\mathbf F_{A\\to B}=\\mathbf F_{B\\to A}\\)", "ok": false}], "ans": "정지(평형)이므로 합력 0. 3법칙은 부호가 반대(\\(-\\)). 2법칙은 동역학."}, {"id": "q3", "qn": "확인 3 · 단위", "html": "1 N의 정의는?", "choices": [{"html": "1 kg 물체에 \\(1\\ \\mathrm{m/s^2}\\)의 가속도를 만드는 힘", "ok": true}, {"html": "1 kg 물체의 무게", "ok": false}, {"html": "1 g 물체에 \\(1\\ \\mathrm{m/s^2}\\)의 가속도를 만드는 힘", "ok": false}, {"html": "1 m를 1 s에 가는 속도", "ok": false}], "ans": "\\(1\\ \\mathrm N=1\\ \\mathrm{kg\\,m/s^2}\\). 1 kg의 무게는 9.81 N."}, {"id": "q4", "qn": "확인 4 · 왜 입자인가", "html": "1장에서 물체를 「입자」로 보는 이유는?", "choices": [{"html": "크기가 있으면 힘의 작용선 위치에 따라 회전(모멘트)이 생기는데, 이를 일단 배제하려고", "ok": true}, {"html": "모든 물체는 실제로 크기가 없기 때문", "ok": false}, {"html": "입자는 힘을 받지 않기 때문", "ok": false}, {"html": "질량을 무시하기 위해", "ok": false}], "ans": "\"부피가 있으면 힘의 작용선이 달라져 회전 — 모멘트가 생기기 때문\". 모멘트는 4장."}, {"id": "q5", "qn": "확인 5 · 위치벡터", "html": "\\(\\mathbf r_{AB}\\)는?", "choices": [{"html": "점 A에서 점 B로 향하는 벡터", "ok": true}, {"html": "점 B에서 점 A로 향하는 벡터", "ok": false}, {"html": "A와 B 사이의 거리(스칼라)", "ok": false}, {"html": "A와 B의 중점", "ok": false}], "ans": "앞 첨자 = 시작, 뒤 첨자 = 끝. \\(\\mathbf r_{BA}=-\\mathbf r_{AB}\\)."}, {"id": "q6", "qn": "확인 6 · 단위벡터", "html": "단위벡터 \\(\\mathbf e\\)의 정의와, 벡터 \\(\\mathbf u\\)를 단위벡터로 나타내는 식, 그리고 단위벡터를 쓰는 이유를 한 줄로 쓰라.", "choices": null, "ans": "\\(\\mathbf e=\\mathbf u/|\\mathbf u|\\), 크기 1. \\(\\mathbf u=|\\mathbf u|\\,\\mathbf e\\)(크기 × 방향). 이유: <b>방향만</b> 지정하기 위해 — 크기가 1이라 곱해도 크기가 안 바뀐다."}], N_SEC=document.querySelectorAll("section.s[data-id]").length;
+const LESSON_ID="statics-2026-09-07", QUIZ=[{"id": "q1", "qn": "확인 1 · 정역학의 정의", "html": "정역학(Statics)이 다루는 것은?", "choices": [{"html": "기계(machine)의 설계", "ok": false, "k": 2}, {"html": "평형(정지) 상태에 있는 물체와 그에 작용하는 힘", "ok": true, "k": 0}, {"html": "운동하는 물체의 가속도", "ok": false, "k": 1}, {"html": "물체의 온도 변화", "ok": false, "k": 3}], "ans": "Statics = study of objects in \"equilibrium\". 운동은 Dynamics."}, {"id": "q2", "qn": "확인 2 · 뉴턴 법칙", "html": "정역학에서 <b>항상</b> 성립하는 식은?", "choices": [{"html": "\\(\\mathbf F_{A\\to B}=\\mathbf F_{B\\to A}\\)", "ok": false, "k": 3}, {"html": "\\(\\sum\\mathbf F=d\\mathbf p/dt\\ne0\\)", "ok": false, "k": 1}, {"html": "\\(\\sum\\mathbf F=0\\)", "ok": true, "k": 0}, {"html": "\\(\\sum\\mathbf F=m\\mathbf a,\\ \\mathbf a\\ne0\\)", "ok": false, "k": 2}], "ans": "정지(평형)이므로 합력 0. 3법칙은 부호가 반대(\\(-\\)). 2법칙은 정역학에도 가속도 0 으로 적용한다(그래서 합력 0)."}, {"id": "q3", "qn": "확인 3 · 단위", "html": "1 N의 정의는?", "choices": [{"html": "1 m를 1 s에 가는 속도", "ok": false, "k": 3}, {"html": "1 kg 물체의 무게", "ok": false, "k": 1}, {"html": "1 g 물체에 \\(1\\ \\mathrm{m/s^2}\\)의 가속도를 만드는 힘", "ok": false, "k": 2}, {"html": "1 kg 물체에 \\(1\\ \\mathrm{m/s^2}\\)의 가속도를 만드는 힘", "ok": true, "k": 0}], "ans": "\\(1\\ \\mathrm N=1\\ \\mathrm{kg\\,m/s^2}\\). 1 kg의 무게는 9.81 N."}, {"id": "q4", "qn": "확인 4 · 왜 입자인가", "html": "1장에서 물체를 「입자」로 보는 이유는?", "choices": [{"html": "크기가 있으면 힘의 작용선 위치에 따라 회전(모멘트)이 생기는데, 이를 일단 배제하려고", "ok": true, "k": 0}, {"html": "질량을 무시하기 위해", "ok": false, "k": 3}, {"html": "입자는 힘을 받지 않기 때문", "ok": false, "k": 2}, {"html": "모든 물체는 실제로 크기가 없기 때문", "ok": false, "k": 1}], "ans": "\"부피가 있으면 힘의 작용선이 달라져 회전 — 모멘트가 생기기 때문\". 모멘트는 4장."}, {"id": "q5", "qn": "확인 5 · 위치벡터", "html": "\\(\\mathbf r_{AB}\\)는?", "choices": [{"html": "A와 B의 중점", "ok": false, "k": 3}, {"html": "점 A에서 점 B로 향하는 벡터", "ok": true, "k": 0}, {"html": "A와 B 사이의 거리(스칼라)", "ok": false, "k": 2}, {"html": "점 B에서 점 A로 향하는 벡터", "ok": false, "k": 1}], "ans": "앞 첨자 = 시작, 뒤 첨자 = 끝. \\(\\mathbf r_{BA}=-\\mathbf r_{AB}\\)."}, {"id": "q6", "qn": "확인 6 · 단위벡터", "html": "단위벡터 \\(\\mathbf e\\)의 정의와, 벡터 \\(\\mathbf u\\)를 단위벡터로 나타내는 식, 그리고 단위벡터를 쓰는 이유를 한 줄로 쓰라.", "choices": null, "ans": "\\(\\mathbf e=\\mathbf u/|\\mathbf u|\\), 크기 1. \\(\\mathbf u=|\\mathbf u|\\,\\mathbf e\\)(크기 × 방향). 이유: <b>방향만</b> 지정하기 위해 — 크기가 1이라 양수배는 같은 방향·그 크기, 음수배는 반대 방향(영벡터는 제외)."}], NDS={"sec": {"s1": ["mech.statics_intro"], "s2": ["mech.statics_intro", "mech.force_types"], "s3": ["mech.statics_intro"], "s4": ["mech.force_vector"], "s5": ["mech.force_vector"], "s6": ["mech.force_vector"]}, "q": {"q1": ["mech.statics_intro"], "q2": ["mech.statics_intro", "mech.force_types"], "q3": ["mech.statics_intro"], "q4": ["mech.statics_intro"], "q5": ["mech.force_vector"], "q6": ["mech.force_vector"]}}, N_SEC=document.querySelectorAll("section.s[data-id]").length;
 const KEY="mc-lesson-"+LESSON_ID;
 let ST={read:{},done:{},correct:{},answer:{},ts:0};
 try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}
@@ -198,7 +291,14 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 function save(){ ST.ts=Date.now(); try{ localStorage.setItem(KEY,JSON.stringify(ST)); const qs=QUIZ.length, qd=QUIZ.filter(q=>ST.done[q.id]).length, rd=Object.keys(ST.read).length;
   const li={deck:LESSON_ID,title:document.title,href:location.href.split("#")[0],idx:Math.max(0,rd-1),n:N_SEC,sid:curSec||"",part:null,partTitle:document.title.slice(0,60),where:(rd>=N_SEC?"확인 문제":"읽는 중 · "+(curTitle||"")),qDone:qd,qN:qs,ts:Date.now()};
   const j=JSON.stringify(li); localStorage.setItem("mc-slides-last",j); localStorage.setItem("mc-slides-last-"+LESSON_ID,j); }catch(e){} }
-function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} }
+/* 스앵님 판정 기록(대표님 2026-09-29) — 섹션 읽음 · 문제 채점 → 개념 노드(knowledge/lesson_nodes.json) */
+function ev(k,x){ try{ if(!window.TJ) return; const o=Object.assign({k:k,lid:LESSON_ID},x||{}); if(o.n&&o.n.length) TJ.rec(o); }catch(e){} }
+/* 객관식 보기는 빌드 때 섞인다(quizmix) — 고른 보기를 원문 순서 k 로 저장 */
+const ck=(c,i)=>String(c&&c.k!=null?c.k:i);
+/* 인라인 식이 줄보다 길면 글자를 줄여 한 줄에(14px 까지) */
+function fitInline(root){ $$(".katex",root).forEach(k=>{ if(k.closest(".katex-display")) return; k.style.fontSize=""; const box=k.parentElement&&k.parentElement.closest("p,li,div,summary,button,td"); if(!box) return; const cw=box.clientWidth, w=k.getBoundingClientRect().width; if(!(cw>0&&w>cw-2)) return; const fs=parseFloat(getComputedStyle(k).fontSize)||17; k.style.fontSize=Math.max(14,Math.floor(fs*(cw-6)/w))+"px"; }); }
+window.addEventListener("resize",()=>fitInline(document.querySelector("main")),{passive:true});
+function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} fitInline(el); }
 /* ---- 읽음: 섹션이 화면의 절반 이상 1.2초 보이면 읽음 ---- */
 let curSec=null, curTitle="";
 function renderTop(){ const rd=Object.keys(ST.read).filter(k=>ST.read[k]).length, qd=QUIZ.filter(q=>ST.done[q.id]).length, tot=N_SEC+QUIZ.length;
@@ -206,30 +306,30 @@ function renderTop(){ const rd=Object.keys(ST.read).filter(k=>ST.read[k]).length
   $$("section.s[data-id]").forEach(s=>s.classList.toggle("read",!!ST.read[s.dataset.id]));
   /* 따라감 기준은 앱(V52)과 같다: 섹션 전부 + 문제 90% 풀고 60% 정답 */
   const okN=QUIZ.filter(q=>ST.correct[q.id]===true).length, need=Math.ceil(QUIZ.length*.6);
-  $("#done").textContent= rd>=N_SEC&&qd>=QUIZ.length&&QUIZ.length? (okN>=need? "이 회차 끝 — 정답 "+okN+"/"+QUIZ.length+". 앱의 「수업 따라가기」에서 따라감으로 표시됩니다." : "다 풀었지만 정답 "+okN+"/"+QUIZ.length+" — 틀린 문제를 다시 풀어 "+need+"개 이상 맞히면 따라감으로 표시됩니다.") : ""; }
+  $("#done").textContent= rd>=N_SEC&&qd>=QUIZ.length&&QUIZ.length? (okN>=need? "완료 · 정답 "+okN+"/"+QUIZ.length : "정답 "+okN+"/"+QUIZ.length+" · "+need+"개 이상이면 완료") : ""; }
 const timers={};
 const io=new IntersectionObserver(es=>{ es.forEach(e=>{ const id=e.target.dataset.id; if(e.isIntersecting){ curSec=id; curTitle=(e.target.querySelector("h2")||{}).textContent||""; postCtx(e.target);
-    if(!ST.read[id]&&!timers[id]) timers[id]=setTimeout(()=>{ ST.read[id]=true; save(); renderTop(); },1200); } else { if(timers[id]){ clearTimeout(timers[id]); delete timers[id]; } } }); },{threshold:.5});
+    if(!ST.read[id]&&!timers[id]) timers[id]=setTimeout(()=>{ ST.read[id]=true; save(); renderTop(); ev("read",{sid:id,n:(NDS.sec||{})[id]||[],clean:true}); },1200); } else { if(timers[id]){ clearTimeout(timers[id]); delete timers[id]; } } }); },{threshold:.5});
 $$("section.s[data-id]").forEach(s=>io.observe(s));
 /* 짧은 섹션(화면보다 작아 50%가 금방 차는) 은 그대로, 긴 섹션은 끝까지 스크롤하면 읽음 */
-window.addEventListener("scroll",()=>{ $$("section.s[data-id]").forEach(s=>{ if(ST.read[s.dataset.id]) return; const r=s.getBoundingClientRect(); if(r.bottom<window.innerHeight*.6&&r.bottom>-2000){ ST.read[s.dataset.id]=true; save(); renderTop(); } }); },{passive:true});
+window.addEventListener("scroll",()=>{ $$("section.s[data-id]").forEach(s=>{ if(ST.read[s.dataset.id]) return; const r=s.getBoundingClientRect(); if(r.bottom<window.innerHeight*.6&&r.bottom>-2000){ ST.read[s.dataset.id]=true; save(); renderTop(); ev("read",{sid:s.dataset.id,n:(NDS.sec||{})[s.dataset.id]||[],clean:true}); } }); },{passive:true});
 /* ---- 판서 사진: atom 안에서만 (없으면 숨김) ---- */
 $$("figure.board img").forEach(img=>{ img.addEventListener("error",()=>{ img.closest("figure").hidden=true; }); });
 /* ---- 문제 카드 ---- */
 function qHTML(q,i){ const mc=Array.isArray(q.choices)&&q.choices.length, rev=!!ST.done[q.id], my=ST.answer[q.id];
   let inner='<div class="qn">'+esc(q.qn||("문제 "+(i+1)))+'</div><div class="qb">'+q.html+'</div>';
-  if(mc){ inner+='<ol class="choices">'+q.choices.map((c,ci)=>{ const sel=String(my)===String(ci); const cls=rev?(c.ok?" ok":(sel?" bad":"")):""; return '<li><button class="choice'+cls+'" data-ci="'+ci+'"'+(rev?" disabled":"")+'><span class="cn">'+(ci+1)+'</span><span>'+c.html+'</span></button></li>'; }).join("")+'</ol>'; }
+  if(mc){ inner+='<ol class="choices">'+q.choices.map((c,ci)=>{ const sel=my!=null&&String(my)===ck(c,ci); const cls=rev?(c.ok?" ok":(sel?" bad":"")):""; return '<li><button class="choice'+cls+'" data-ci="'+ci+'"'+(rev?" disabled":"")+'><span class="cn">'+(ci+1)+'</span><span>'+c.html+'</span></button></li>'; }).join("")+'</ol>'; }
   else { inner+= rev? '<div class="memo"><b>내 답</b> '+esc(my||"")+'</div>' : '<textarea class="myans" placeholder="답만 간단히">'+esc(my||"")+'</textarea><div class="row"><button class="btn a" data-reveal>답 보기</button></div>'; }
   if(rev){ const c=ST.correct[q.id]; inner+='<span class="verdict '+(c===true?"ok":c===false?"bad":"")+'">'+(c===true?"정답":c===false?"오답":"채점 전")+'</span>';
     if(!mc&&c==null) inner+='<div class="row"><button class="btn" data-grade="1">맞았어요</button><button class="btn" data-grade="0">틀렸어요</button></div>';
     inner+='<div class="row"><button class="btn xs" data-retry>다시 풀기</button></div>'; }
-  inner+='<div class="ans"><b>답 · 풀이</b><div>'+(q.ans||"")+'</div></div>';
+  inner+='<div class="ans"><b>답 · 풀이</b><div>'+splitDisplays(q.ans||"",innerWidth<700)+'</div></div>';
   return '<div class="q'+(rev?" rev":"")+'" data-q="'+q.id+'">'+inner+'</div>'; }
 function bindQ(){ const box=$("#qlist"); box.innerHTML=QUIZ.map(qHTML).join(""); typeset(box);
   $$("#qlist .q").forEach(el=>{ const q=QUIZ.find(x=>x.id===el.dataset.q);
-    $$(".choice",el).forEach(b=>{ b.onclick=()=>{ if(ST.done[q.id]) return; const ci=+b.dataset.ci; ST.answer[q.id]=ci; ST.done[q.id]=true; ST.correct[q.id]=!!(q.choices[ci]&&q.choices[ci].ok); save(); bindQ(); renderTop(); }; });
+    $$(".choice",el).forEach(b=>{ b.onclick=()=>{ if(ST.done[q.id]) return; const ci=+b.dataset.ci, c=q.choices[ci]; ST.answer[q.id]=(c&&c.k!=null)?c.k:ci; ST.done[q.id]=true; ST.correct[q.id]=!!(c&&c.ok); save(); bindQ(); renderTop(); ev("quiz",{qid:q.id,ok:ST.correct[q.id],n:(NDS.q||{})[q.id]||[]}); }; });
     const rv=el.querySelector("[data-reveal]"); if(rv) rv.onclick=()=>{ const ta=el.querySelector(".myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); bindQ(); renderTop(); };
-    $$("[data-grade]",el).forEach(b=>{ b.onclick=()=>{ ST.correct[q.id]=b.dataset.grade==="1"; save(); bindQ(); renderTop(); }; });
+    $$("[data-grade]",el).forEach(b=>{ b.onclick=()=>{ ST.correct[q.id]=b.dataset.grade==="1"; save(); bindQ(); renderTop(); ev("quiz",{qid:q.id,ok:ST.correct[q.id],n:(NDS.q||{})[q.id]||[]}); }; });
     const rt=el.querySelector("[data-retry]"); if(rt) rt.onclick=()=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; save(); bindQ(); renderTop(); };
   });
   const done=QUIZ.filter(q=>ST.done[q.id]).length, ok=QUIZ.filter(q=>ST.correct[q.id]===true).length, wrong=QUIZ.filter(q=>ST.correct[q.id]===false);
@@ -243,7 +343,10 @@ function postCtx(sec){ try{ if(!CTX_GEN||window.parent===window) return; const s
   window.parent.postMessage({type:"mc-slide",v:1,gen:CTX_GEN,deck:LESSON_ID,title:document.title.slice(0,80),sid:s.dataset.id,stype:"concept",part:null,partTitle:document.title.slice(0,60),label:"읽는 중 · "+t.slice(0,60),q:{qn:t.slice(0,80),kind:"개념",text:txt,choices:[],my:null,revealed:true,correct:null,answer:null}},location.origin); }catch(e){} }
 window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; postCtx(); } });
 /* ---- 시작 ---- */
-function boot(){ typeset(document.querySelector("main")); bindQ(); renderTop(); save();
+/* 넘치는 식 줄은 글자를 줄여 한 줄에(14px 까지) — 그래도 넘치면 식 칸 안에서 민다 */
+function fitDisplay(root){ $$(".katex-display",root).forEach(k=>{ k.style.fontSize=""; const cw=k.clientWidth, sw=k.scrollWidth; if(!(cw>0&&sw>cw+1)) return; const kx=k.querySelector(".katex"), fz=parseFloat(getComputedStyle(kx||k).fontSize)||20, lo=Math.min(1,Math.max(.6,14/fz)); k.style.fontSize=Math.max(lo,Math.floor(cw/sw*100)/100)+"em"; }); }
+window.addEventListener("resize",()=>fitDisplay(document.querySelector("main")),{passive:true});
+function boot(){ $$("section.s").forEach(s=>{ const h=s.innerHTML, n=splitDisplays(h,innerWidth<700); if(n!==h) s.innerHTML=n; }); typeset(document.querySelector("main")); fitDisplay(document.querySelector("main")); try{ document.fonts.ready.then(()=>fitDisplay(document.querySelector("main"))); }catch(e){} bindQ(); renderTop(); save();
   const m=/^#s=([\w-]+)$/.exec(location.hash||""); if(m){ const el=document.querySelector('section.s[data-id="'+m[1]+'"]'); if(el) el.scrollIntoView(); }
   else if(location.hash==="#resume"){ const ids=$$("section.s[data-id]").map(s=>s.dataset.id); const next=ids.find(id=>!ST.read[id]); if(next){ const el=document.querySelector('section.s[data-id="'+next+'"]'); if(el) el.scrollIntoView(); } else if(QUIZ.length){ $("#quiz").scrollIntoView(); } } }
 (function wait(){ if(window.renderMathInElement) boot(); else setTimeout(wait,40); })();

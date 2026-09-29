@@ -59,11 +59,11 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미
 <div class="why">미지수가 2~3개면 중학교식 소거법으로 풀지만, 4개 이상이면 복잡하고 느리다. 계수만 <b>직사각형 배열</b>로 뽑아 놓고 그 배열을 해석하는 것이 행렬. 뒤에서 배울 행렬식·역행렬·크래머 법칙이 전부 "이 배열로 연립방정식을 푸는 법"이다.</p></div>
 <div class="say">"예전엔 4차까지 시험에 냈지만 손으로 푸는 건 3차까지, 그 이상은 컴퓨터의 몫." · "교재가 없으니 도서관에서 행렬·행렬식 교재를 빌려 풀어 보길."</div>
 <div class="analogy">엑셀 표. 문제의 숫자를 표에 넣어 두면 "몇 번째 줄, 몇 번째 칸"으로 부를 수 있고, 표 전체를 한 덩어리로 다룰 수 있다.</div>
-<div class="memo"><b>외울 것</b> 행렬 = 연립방정식의 계수 배열 · 손계산은 3차까지 · 학습지 = 유일한 교재(시험 출처)</div>
+<div class="memo"><b>외울 것</b> 행렬 = 수의 직사각형 배열(연립방정식의 계수를 배열하면 계수행렬) · 손계산은 3차까지 · 학습지 = 유일한 교재(시험 출처)</div>
 </section>
 
 <section class="s" data-id="s2">
-<h2>2. 정의 — m×n 행렬과 성분 a_ij</h2>
+<h2>2. 정의 — m×n 행렬과 성분 aᵢⱼ</h2>
 {fig_def}
 <div class="formula">\\[A=(a_{{ij}})=\\begin{{bmatrix}}a_{{11}}&a_{{12}}&\\cdots&a_{{1n}}\\\\a_{{21}}&a_{{22}}&\\cdots&a_{{2n}}\\\\\\vdots&&&\\vdots\\\\a_{{m1}}&a_{{m2}}&\\cdots&a_{{mn}}\\end{{bmatrix}}\\qquad(\\text{{행 }}m\\text{{개}}\\times\\text{{열 }}n\\text{{개}})\\]</div>
 <div class="why"><b>행(row)</b>은 가로, <b>열(column)</b>은 세로. 성분 \\(a_{{ij}}\\)의 첨자는 <b>i = 행, j = 열</b> 순서 — "집합은 대문자, 원소는 소문자"와 같은 이치로 행렬은 대문자 \\(A\\), 성분은 소문자 \\(a_{{ij}}\\). 괄호는 \\([\\ ]\\) 또는 \\((\\ )\\).</div>
@@ -77,13 +77,13 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미
 <h2>3. 다섯 가지 기본 행렬 (정의02)</h2>
 {fig_kinds}
 <table><tr><th>종류</th><th>영어</th><th>정의</th><th>비고</th></tr>
-<tr><td>정사각행렬</td><td>square matrix</td><td>행 = 열, \\(n\\times n\\) → \\(n\\)차</td><td>2차·3차부터(1차는 없음)</td></tr>
+<tr><td>정사각행렬</td><td>square matrix</td><td>행 = 열, \\(n\\times n\\) → \\(n\\)차</td><td>이 수업에서는 주로 2차·3차를 다룬다</td></tr>
 <tr><td>단위(항등)행렬</td><td>identity / unit, \\(I_n\\)</td><td>대각(\\(i=j\\)) 1, 나머지 0</td><td>숫자 1의 역할: \\(AI=A\\)</td></tr>
 <tr><td>영행렬</td><td>zero matrix, \\(O\\)</td><td>모든 성분 0</td><td>숫자 0의 역할: \\(AO=O\\). 대문자 O</td></tr>
 <tr><td>전치행렬</td><td>transpose, \\(A^T\\)</td><td>행 ↔ 열 (\\(a_{{ij}}\\to a_{{ji}}\\))</td><td>\\(m\\times n\\to n\\times m\\), 어떤 행렬이든 가능</td></tr>
 <tr><td>대칭행렬</td><td>symmetric</td><td>\\(A^T=A\\)</td><td>정사각행렬에서만 의미. 대각선 기준 대칭</td></tr></table>
-<div class="why">단위행렬과 영행렬은 숫자 세계의 1과 0을 행렬 세계로 옮긴 것 — 곱해도 안 바뀌고(\\(AI=A\\)), 곱하면 0(\\(AO=O\\)). 전치는 "뒤집기"라 아무 행렬에나 되지만, 대칭은 "뒤집어도 같다"라서 정사각형 모양이어야 비교가 된다.</div>
-<div class="analogy">거울 앞에 선 사람: 좌우를 바꾼 것이 전치, 바꿔도 똑같이 보이면 대칭. 직사각형 그림은 거울에 비추면 모양(가로세로)이 바뀌어 "똑같다"를 말할 수 없다.</div>
+<div class="why">단위행렬과 영행렬은 숫자 세계의 1과 0을 행렬 세계로 옮긴 것 — 곱해도 안 바뀌고(\\(AI=A\\)), 곱하면 0(\\(AO=O\\)). 전치는 행과 열을 맞바꾸는 것이라 아무 행렬에나 되지만, 대칭은 "전치해도 같다"라서 정사각행렬이어야 비교가 된다.</div>
+<div class="analogy">주대각선을 접는 선으로 삼아 뒤집기: 정사각행렬에서 전치는 주대각선에 대한 반사이고, 뒤집어도 그대로면 대칭. 직사각형 행렬은 전치하면 꼴(m×n → n×m)이 바뀌어 "똑같다"를 말할 수 없다.</div>
 <div class="memo"><b>외울 것</b> 정사각 · 단위 \\(I\\) · 영 \\(O\\) · 전치 \\(A^T\\) · 대칭 \\(A^T=A\\) · \\(AI=A,\\ AO=O\\)</div>
 </section>
 

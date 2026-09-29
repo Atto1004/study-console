@@ -132,7 +132,7 @@ async function pagePhone() {   /* 단계마다 글꼴 로드·두 프레임 뒤�
     const endOk = !first || !er || (er.bottom - fr.top) > wr.height - 4 || er.bottom <= wr.bottom + 1;   /* 이번 단계 전체가 창에 들어갈 수 있으면 끝까지 보여야 */
     const up = document.getElementById("upHint"), upVis = !!up && !up.hidden && getComputedStyle(up).display !== "none";
     const fig = document.querySelector("#bc .bd-fig"), texts = fig ? [...fig.querySelectorAll("figure>svg text")] : [];
-    const minfp = texts.length ? Math.min(...texts.map(t => { const m = t.getScreenCTM(); return m ? (parseFloat(getComputedStyle(t).fontSize) || 14) * Math.hypot(m.a, m.b) : 99; })) : 0;
+    const minfp = texts.length ? Math.min(...texts.map(t => { const m = t.getScreenCTM(), z = parseFloat(getComputedStyle(t).fontSize) || 14; return m && z >= 6 ? z * Math.hypot(m.a, m.b) : 99; })) : 0;
     const dt = document.getElementById("dText"), lh = parseFloat(getComputedStyle(dt).lineHeight), over = dt.scrollHeight > dt.clientHeight + 3, tm = document.getElementById("tMore"), tmVis = !!tm && !tm.hidden && getComputedStyle(tm).display !== "none";
     out.push({ id: s.id, fig: s.fig || null,
       ctlOk: btns.length > 0 && btns.every(inView), kbd: [...document.querySelectorAll("#dCh kbd")].filter(k => getComputedStyle(k).display !== "none").length,

@@ -325,11 +325,14 @@ body::after{width:60vw;height:60vw;max-width:760px;max-height:760px;right:-20vw;
     <button class="btn primary" id="next" aria-label="다음">다음 →</button>
   </footer>
   <div id="hintBox" hidden></div>
-  <div id="padPanel"><div class="pad"><div class="pad-bar"><span>풀이 메모장</span><span class="hint">애플펜슬로 쓰세요</span><button data-tool="pen" class="on">펜</button><button data-tool="eraser">지우개</button><button data-act="undo">되돌리기</button><button data-act="clear">지우기</button><button data-act="finger">손가락도</button><button data-act="close">닫기</button></div><canvas id="pad"></canvas></div></div>
+  <div id="padPanel"><div class="pad"><div class="pad-bar"><span>풀이 메모장</span><button data-tool="pen" class="on">펜</button><button data-tool="eraser">지우개</button><button data-act="undo">되돌리기</button><button data-act="clear">지우기</button><button data-act="finger">손가락도</button><button data-act="close">닫기</button></div><canvas id="pad"></canvas></div></div>
   <div id="chk"></div>
 </div>
+<script>__JUDGE__</script>
 <script>
 const DECK_ID="__DECK_ID__";
+const NDS=__NODES__, qNd=s=>((NDS.q||{})[s.id]||(NDS.parts||{})[String(s.part)]||[]), pNd=s=>((NDS.parts||{})[String(s.part)]||[]);
+function ev(k,x){ try{ if(!window.TJ) return; const o=Object.assign({k:k,lid:DECK_ID},x||{}); if(o.n&&o.n.length) TJ.rec(o); }catch(e){} }
 const SLIDES=__SLIDES__;
 const PARTS=__PARTS__;
 /* V6E-QUIZ: #quiz 로 열면 문제 장만(시작·전체 결과 포함). 저장 키를 분리하고 이어서-학습 위치는 건드리지 않는다 (대표님 2026-09-24 시험 대비) */
@@ -448,7 +451,7 @@ function openSrc(list,i){
   const x=list[i];
   lb.innerHTML='<div class="src-top"><b>출처</b><span>'+esc(x.label||"")+'</span><span class="src-pos">'+(i+1)+' / '+list.length+'</span><button class="src-x" aria-label="닫기">✕</button></div>'+
     '<div class="src-body"><img src="'+esc(x.img)+'" alt="'+esc(x.label||"")+'"></div>'+
-    '<div class="src-foot"><button class="btn xs" id="srcPrev"'+(i<=0?" disabled":"")+'>← 이전 출처</button><span class="hint">사진을 누르면 확대 · 드래그로 이동</span><button class="btn xs" id="srcNext"'+(i>=list.length-1?" disabled":"")+'>다음 출처 →</button></div>';
+    '<div class="src-foot"><button class="btn xs" id="srcPrev"'+(i<=0?" disabled":"")+'>← 이전 출처</button><span class="sp" style="flex:1"></span><button class="btn xs" id="srcNext"'+(i>=list.length-1?" disabled":"")+'>다음 출처 →</button></div>';
   lb.classList.add("on");
   const img=lb.querySelector(".src-body img"), bd=lb.querySelector(".src-body");
   img.onclick=()=>{ const z=img.classList.toggle("zoom"); if(!z) bd.scrollTo(0,0); };
@@ -457,10 +460,12 @@ function openSrc(list,i){
 }
 
 /* ---------- 답·풀이 판 ---------- */
+/* v7: 보기는 빌드 때 섞인다(quizmix). 저장값 = 원문 순서 k → 화면 칸 찾기 */
+const ckey=(c,i)=>String(c&&c.k!=null?c.k:i), cpick=(s,my)=>(s.choices||[]).findIndex((c,i)=>my!=null&&my!==""&&ckey(c,i)===String(my));
 function openAns(s){
   let lb=$("#anslb"); if(!lb){ lb=document.createElement("div"); lb.id="anslb"; $("#stage").appendChild(lb); }
   const my=(ST.answer||{})[s.id]; const mc=Array.isArray(s.choices)&&s.choices.length>0;
-  const mine= mc ? (s.choices[+my]?'<span class="num">'+(+my+1)+'</span>번 — '+s.choices[+my].html:'') : esc(my||"");
+  const mi=mc?cpick(s,my):-1; const mine= mc ? (mi>=0?'<span class="num">'+(mi+1)+'</span>번 — '+s.choices[mi].html:'') : esc(my||"");
   lb.innerHTML='<div class="ans-top"><span class="kicker">'+esc(s.qn)+'</span><span class="verdict '+(ST.correct[s.id]===true?"ok":ST.correct[s.id]===false?"bad":"")+'">'+(ST.correct[s.id]===true?"정답":ST.correct[s.id]===false?"오답":"내 답")+'</span><button class="src-x" id="ansX" aria-label="닫기">✕</button></div>'+
     '<div class="myans-show"><div class="kicker">내 답</div><div class="myans-txt">'+mine+'</div></div>'+
     '<div class="ans"><div class="kicker">답 · 풀이</div>'+s.ans+'</div>';
@@ -484,9 +489,8 @@ function render(){
   body.classList.remove("q-mode","rev","scrollable"); closePad(); $("#padBtn").hidden=true;
   renderTop(s); if(s.scroll) body.classList.add("scrollable");   /* --soft 임시 덱: 넘친 장만 스크롤 */
   if(s.type==="start"){
-    body.innerHTML='<div class="cover"><div class="kicker">'+(QUIZ?"문제만 풀기 · 시험 대비":"학습 슬라이드 · 가로 화면")+'</div><div class="big">__TITLE__</div>'+
-      '<div class="sub">오른쪽 아래 「다음」으로 언제든 넘어갈 수 있고, 페이지를 끝내면 「다음」이 실선이 됩니다. 기초 문제는 보기를 누르고, 답이 여러 개인 문제는 답을 씁니다. 왼쪽 아래 「힌트」는 그 파트의 한 줄 요약, 작은 사진은 출처(학습지·내 풀이본)입니다.</div>'+
-      '<div class="sub">'+(QUIZ?'문제 '+num(SLIDES.filter(x=>x.type==="q").length)+'개 · 보기를 누르면 바로 채점 · 끝 장에서 틀린 문제만 다시':'파트 '+num(PARTS.length)+'개 · 문제 '+num(SLIDES.filter(x=>x.type==="q").length)+'개')+'</div></div>';
+    body.innerHTML='<div class="cover"><div class="kicker">'+(QUIZ?"문제만 풀기 · 시험 대비":"학습 슬라이드")+'</div><div class="big">__TITLE__</div>'+
+            '<div class="sub">'+(QUIZ?'문제 '+num(SLIDES.filter(x=>x.type==="q").length)+'개':'파트 '+num(PARTS.length)+'개 · 문제 '+num(SLIDES.filter(x=>x.type==="q").length)+'개')+'</div></div>';
     act.innerHTML='<button class="btn xs" id="reset">진행 기록 지우기</button>';
     $("#reset").onclick=()=>{ if(confirm("진행 기록을 지울까요?")){ ST={idx:0,done:{},correct:{},revealed:{},answer:{},ink:{},finger:false,padBig:false,skip:{}}; save(); render(); } };
     ST.done[s.id]=true;
@@ -500,13 +504,13 @@ function render(){
     act.innerHTML='<button class="btn" id="ok">시작</button>'; $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); go(1); };
   } else if(s.type==="concept"){
     body.innerHTML=examHTML(s)+'<div class="kicker">'+(s.part?'파트 '+num(s.part)+' · 개념':'')+'</div><h2>'+esc(s.title)+'</h2>'+s.html;
-    act.innerHTML='<button class="btn" id="ok">'+(ST.done[s.id]?"다시 읽음 표시":"읽었어요 — 이해했습니다")+'</button>';
-    $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); render(); };
+    act.innerHTML='<button class="btn" id="ok">'+(ST.done[s.id]?"다시 읽음 표시":"이해했어요")+'</button>';
+    $("#ok").onclick=()=>{ const was=!!ST.done[s.id]; ST.done[s.id]=true; save(); render(); if(!was) ev("read",{sid:s.id,n:pNd(s),clean:true}); };
   } else if(s.type==="mu"){
     const li=xs=>xs.map(x=>'<li>'+x+'</li>').join("");
     body.innerHTML=examHTML(s)+'<div class="kicker">파트 '+num(s.part)+' · 암기 vs 이해</div><h2>'+esc(String(s.title).replace(/[\s★]+$/,""))+' — 무엇을 외우고 무엇을 이해하나</h2>'+
-      '<div class="mu"><div class="mu-mem"><div class="mu-h">암기할 것 <span class="hint">외워서 바로 나와야</span></div><ul>'+li(s.mem)+'</ul></div>'+
-      '<div class="mu-und"><div class="mu-h">이해할 것 <span class="hint">왜 그런지 설명할 수 있어야</span></div><ul>'+li(s.und)+'</ul></div></div>';
+      '<div class="mu"><div class="mu-mem"><div class="mu-h">암기</div><ul>'+li(s.mem)+'</ul></div>'+
+      '<div class="mu-und"><div class="mu-h">이해</div><ul>'+li(s.und)+'</ul></div></div>';
     act.innerHTML='<button class="btn" id="ok">'+(ST.done[s.id]?"다시 확인 표시":"구분했어요")+'</button>';
     $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); render(); };
   } else if(s.type==="q"){
@@ -514,19 +518,19 @@ function render(){
     ST.answer=ST.answer||{}; ST.ink=ST.ink||{}; const my=ST.answer[s.id]||"";
     const mc=Array.isArray(s.choices)&&s.choices.length>0;
     body.classList.add("q-mode"); body.classList.toggle("rev",rev);
-    const choiceHTML=()=>'<div class="choices'+(rev?" rev":"")+'">'+s.choices.map((c,i)=>{ const sel=String(my)===String(i); const cls=(sel?" sel":"")+(rev?(c.ok?" ok":(sel?" bad":"")):"");
+    const choiceHTML=()=>'<div class="choices'+(rev?" rev":"")+'">'+s.choices.map((c,i)=>{ const sel=my!=null&&my!==""&&String(my)===ckey(c,i); const cls=(sel?" sel":"")+(rev?(c.ok?" ok":(sel?" bad":"")):"");
       return '<button class="choice'+cls+'" data-ci="'+i+'"'+(rev?" disabled":"")+'><span class="cn">'+(i+1)+'</span><span class="ct">'+c.html+'</span></button>'; }).join("")+'</div>';
     body.innerHTML=examHTML(s)+'<div class="kicker">파트 '+num(s.part)+'</div><h2><span class="q-kind">'+s.kind+'</span>'+esc(s.qn)+'</h2><div class="qbody">'+s.html+'</div>'+
       (mc ? choiceHTML() : rev
         ? '<div class="myans-show"><div class="kicker">내 답</div><div class="myans-txt">'+esc(my)+'</div></div>'
-        : '<div class="myans"><label for="myans">내 답 — 답만. 행렬은 [1 2; 3 4]처럼, 여러 개면 쉼표로</label><textarea id="myans" rows="2" placeholder="여기에 답을 쓰고 「답 확인」">'+esc(my)+'</textarea></div>')+
+        : '<div class="myans"><label for="myans">내 답</label><textarea id="myans" rows="2">'+esc(my)+'</textarea></div>')+
       (rev?'<div class="myans-note"><button class="btn xs" id="showAns">답 · 풀이 다시 보기</button></div>':'');
     if(rev){ if(ST.correct[s.id]!==true) openAns(s); /* V5A: 정답이면 풀이 판을 띄우지 않는다 (아토 2026-09-21) */ const sa=$("#showAns"); if(sa) sa.onclick=()=>openAns(s); }
     closePad(); $("#padBtn").hidden=false;
     if(mc&&!rev){
       /* V5A: 보기를 누르는 순간 제출·채점 (아토 2026-09-21 "객관식은 고르면 바로 정답으로 제출") */
-      act.innerHTML='<span class="hint">보기를 누르면 바로 채점됩니다</span>';
-      body.querySelectorAll(".choice").forEach(b=>{ b.onclick=()=>{ const ci=b.dataset.ci; if(ST.revealed[s.id]) return; const ok=!!(s.choices[+ci]&&s.choices[+ci].ok); ST.answer[s.id]=ci; ST.revealed[s.id]=true; ST.correct[s.id]=ok; ST.done[s.id]=true; save(); render(); }; });
+      act.innerHTML='';
+      body.querySelectorAll(".choice").forEach(b=>{ b.onclick=()=>{ const ci=b.dataset.ci; if(ST.revealed[s.id]) return; const c=s.choices[+ci]; const ok=!!(c&&c.ok); ST.answer[s.id]=ckey(c,+ci); ST.revealed[s.id]=true; ST.correct[s.id]=ok; ST.done[s.id]=true; save(); render(); ev("quiz",{qid:s.id,ok:ok,n:qNd(s)}); }; });
     } else if(mc&&rev){
       const c=ST.correct[s.id];
       act.innerHTML='<span class="verdict '+(c?"ok":"bad")+'">'+(c?"정답":"오답 — 풀이를 읽고 다시")+'</span><button class="btn xs" id="retry1">다시 풀기</button>';
@@ -542,8 +546,8 @@ function render(){
     } else {
       const c=ST.correct[s.id];
       act.innerHTML='<button class="btn" id="yes">맞았어요'+(c===true?" ✓":"")+'</button><button class="btn" id="no">틀렸어요 · 다시'+(c===false?" ✓":"")+'</button>';
-      $("#yes").onclick=()=>{ ST.correct[s.id]=true; ST.done[s.id]=true; save(); render(); };
-      $("#no").onclick=()=>{ ST.correct[s.id]=false; ST.done[s.id]=true; save(); render(); };
+      $("#yes").onclick=()=>{ ST.correct[s.id]=true; ST.done[s.id]=true; save(); render(); ev("quiz",{qid:s.id,ok:true,n:qNd(s)}); };
+      $("#no").onclick=()=>{ ST.correct[s.id]=false; ST.done[s.id]=true; save(); render(); ev("quiz",{qid:s.id,ok:false,n:qNd(s)}); };
     }
   } else if(s.type==="result"){
     /* V6B-RESULT: 정답·오답·안 푼 3칸 + 숫자 기준 + 틀린 문제 목록 + 주버튼 하나 (브리프 v49 r3 §3) */
@@ -627,7 +631,7 @@ function postCtx(){
       const rev=!!ST.revealed[s.id], mc=Array.isArray(s.choices)&&s.choices.length>0, my=(ST.answer||{})[s.id];
       msg.q={qn:String(s.qn||"").slice(0,80),kind:String(s.kind||"").slice(0,10),text:ctxPlain(s.html,600),
         choices:mc?s.choices.slice(0,6).map(c=>ctxPlain(c.html,120)):[],
-        my: my==null||my===""?null:(mc?(s.choices[+my]?ctxPlain(s.choices[+my].html,120):null):String(my).slice(0,200)),
+        my: my==null||my===""?null:(mc?(cpick(s,my)>=0?ctxPlain(s.choices[cpick(s,my)].html,120):null):String(my).slice(0,200)),
         revealed:rev, correct: rev&&typeof ST.correct[s.id]==="boolean"?ST.correct[s.id]:null,
         answer: rev&&mc?(s.choices.map((c,i)=>c.ok?i+1:0).filter(Boolean).join(",")||null):null};
     } else if(s.type==="concept"||s.type==="mu"){ msg.q={qn:String(s.title||"").slice(0,80),kind:s.type==="mu"?"암기·이해":"개념",text:ctxPlain(s.type==="mu"?[].concat(s.mem||[],s.und||[]).join(" · "):s.html,600),choices:[],my:null,revealed:true,correct:null,answer:null}; }

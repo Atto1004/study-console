@@ -58,6 +58,14 @@ header .back{font-size:14px;color:var(--sub)}header h1{font-size:20px;font-weigh
 .q.ok{border-color:var(--known)}.q.bad{border-color:var(--unknown)}.q .why{font-size:12px;color:var(--sub);margin-top:6px;display:none}.q.done .why{display:block}
 .btn{display:block;width:100%;border:0;border-radius:12px;background:var(--acc);color:#fff;font-size:16px;font-weight:700;padding:12px;margin-top:12px;cursor:pointer;font-family:inherit}.btn:disabled{opacity:.5}
 .btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+/* 스앵님 판정(2026-09-29) */
+.judge{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--acc-soft);margin:0 0 10px}
+.judge img{flex:none;width:44px;height:44px;border-radius:50%;object-fit:cover;object-position:50% 14%;background:#1b2a21}
+.judge .jb{flex:1;min-width:0}.judge .jn{font-size:12px;font-weight:700;color:var(--acc);margin-bottom:2px}
+.judge ul{list-style:none;margin:0;padding:0}.judge li{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:14px;flex-wrap:wrap}
+.judge li .s{flex:none;font-size:11px;font-weight:700;color:#fff;border-radius:999px;padding:2px 8px}.judge li .w{color:var(--sub);font-size:12px}
+.judge li a{margin-left:auto;flex:none;font-size:13px;font-weight:700;border:1px solid var(--line);border-radius:8px;padding:0 12px;min-height:34px;display:inline-flex;align-items:center;background:var(--card);color:var(--ink)}
+.why2{font-size:14px;color:var(--ink)}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;z-index:20;pointer-events:none}.toast.on{opacity:1}
 .src{font-size:12px;color:var(--sub);margin-top:8px}
 details.prog{margin-bottom:10px}details.prog summary{cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;justify-content:space-between}details.prog summary::after{content:"▾";color:var(--sub)}details.prog[open] summary::after{content:"▴"}
@@ -98,12 +106,13 @@ details.prog ul{margin:6px 0 0;padding-left:18px;font-size:14px}details.prog li{
   <div id="list"></div>
  </div>
  <div class="card" id="mapCard" style="display:none">
-  <h2>개념 마인드맵 <small>선 = 선수지식(먼저 알아야 하는 것) → 나중 개념</small></h2>
+  <h2>개념 마인드맵</h2>
+  <div class="judge" id="judge" hidden></div>
   <div class="mapbar">
    <span class="mapseg" id="mapScope"><button data-v="all" class="on">과목 전체</button><button data-v="sel">선택한 주차</button></span>
    <span class="meta" id="mapMeta"></span>
   </div>
-  <div class="legend"><span><i class="dot" style="background:var(--known)"></i>안다</span><span><i class="dot" style="background:var(--shaky)"></i>흔들림</span><span><i class="dot" style="background:var(--unknown)"></i>모름</span><span><i class="dot" style="background:var(--unrated)"></i>미평가</span><span>옆으로 스크롤 · 「선택한 주차」를 누르면 그 주차 개념만 점선으로</span></div>
+  <div class="legend"><span><i class="dot" style="background:var(--known)"></i>안다</span><span><i class="dot" style="background:var(--shaky)"></i>흔들림</span><span><i class="dot" style="background:var(--unknown)"></i>모름</span><span><i class="dot" style="background:var(--unrated)"></i>미평가</span></div>
   <div id="mapWrap"><svg id="mapSvg"></svg></div>
  </div>
  <div class="card" id="treeCard" style="display:none">
@@ -116,6 +125,49 @@ details.prog ul{margin:6px 0 0;padding-left:18px;font-size:14px}details.prog li{
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="sheet"></div>
 <div class="toast" id="toast"></div>
+<script>/* TJ-START */
+/* 김주영 스앵님 판정 (대표님 2026-09-29 「개념 마인드맵은 스앵님이 학습을 통해 내가 뭘 알고 뭘 모르는지 알아서 파악」) — 원본은 이 파일 하나.
+   빌더가 교실·수업 노트·학습 덱·암기노트 페이지에 그대로 넣고(__JUDGE__), learn.html·앱(V57)은 같은 글을 붙여 쓴다(docs/tools/sync_judge.py).
+   기록 = localStorage atto.evidence [{t, k, n:[노드], ok, v, lid, sid, qid, clean}] (최대 4000건)
+     k: quiz(ok) 확인 문제 · read(clean) 챕터·섹션 끝(다시 설명·질문 없이 끝났으면 clean) · again 다시 설명 · ask 질문 · memo(ok) 암기노트 외움 · self(v) 카드 자가평가
+   판정 = 노드마다 atto.mastery[id] = {quiz:{correct,total,ts}, self, ts, score, state, auto} — learn.html · 앱 V47 · server.py 의 점수식이 그대로 읽는다.
+     quiz = 최근 6번 · self(설명할 수 있나 1~5) = 읽음 4 · 다시 설명·질문 2번 이상이면 3 · 외움 +1 · 카드 자가평가가 더 최근이면 그 값
+     → 문제 없이 읽기만 하면 최대 「흔들림」, 「안다」는 문제로만. 점수식 = (0.5·정답률 + 0.2·self/5)/0.7, 문제 없으면 self/5·0.6, 60일 감쇠(최저 0.4) */
+(function(g){
+  var EK="atto.evidence", MK="atto.mastery", CAP=4000;
+  function rd(k,d){ try{ var v=JSON.parse(localStorage.getItem(k)||"null"); return v==null?d:v; }catch(e){ return d; } }
+  function decay(ts){ if(!ts) return 1; var d=Math.max(0,(Date.now()/1000-ts)/86400); return Math.max(.4,1-d/60); }
+  function score(e){ var q=e.quiz||{}, tot=+q.total||0, cor=+q.correct||0, sv=e.self==null?null:Math.max(1,Math.min(5,+e.self));
+    if(tot<=0&&sv==null) return {score:0,state:"unrated"};
+    var raw=tot>0?(0.5*(cor/tot)+0.2*((sv||0)/5))/0.7:(sv/5)*0.6, s=Math.min(1,raw)*decay(Math.max(+e.ts||0,+q.ts||0)), st;
+    if(tot<=0) st=(sv>=4&&s>=.4)?"shaky":"unknown"; else st=s>=.7?"known":s>=.4?"shaky":"unknown";
+    return {score:Math.round(s*1000)/1000,state:st}; }
+  function why(evs){ var qz=evs.filter(function(e){return e.k==="quiz";}).slice(-6), r={q:qz.length,c:qz.filter(function(e){return e.ok;}).length,
+      read:evs.filter(function(e){return e.k==="read";}).length, clean:evs.filter(function(e){return e.k==="read"&&e.clean;}).length,
+      conf:evs.filter(function(e){return (e.k==="again"||e.k==="ask")&&Date.now()-e.t<21*864e5;}).length,
+      memo:null, self:null, last:0};
+    evs.forEach(function(e){ if(e.k==="memo") r.memo=!!e.ok; if(e.k==="self") r.self={v:+e.v,t:e.t}; if(e.t>r.last) r.last=e.t; });
+    return r; }
+  function judgeOne(id,L,M){ var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); if(!evs.length) return;
+    var r=why(evs), e=Object.assign({},M[id]||{}), qz=evs.filter(function(x){return x.k==="quiz";}).slice(-6);
+    var self=null; if(r.read||r.conf||r.memo!=null){ self=r.read?4:3; if(r.conf>=2) self=3; if(r.memo) self=Math.min(5,self+1); }
+    var autoLast=0; evs.forEach(function(x){ if(x.k!=="self"&&x.t>autoLast) autoLast=x.t; });
+    if(r.self&&r.self.t>=autoLast) self=r.self.v;
+    e.quiz=qz.length?{correct:r.c,total:qz.length,ts:Math.round(qz[qz.length-1].t/1000)}:undefined; if(!e.quiz) delete e.quiz;
+    e.self=self; if(self==null) delete e.self;
+    e.ts=Math.round(r.last/1000); e.auto={by:"tutor",q:r.q,c:r.c,read:r.read,clean:r.clean,conf:r.conf,memo:r.memo};
+    var s=score(e); e.score=s.score; e.state=s.state; M[id]=e; }
+  function judge(ids){ var L=rd(EK,[]), M=rd(MK,{}); if(!Array.isArray(L)) L=[]; (ids||[]).forEach(function(id){ judgeOne(id,L,M); });
+    try{ localStorage.setItem(MK,JSON.stringify(M)); }catch(e){} return M; }
+  function all(){ var L=rd(EK,[]), o={}; if(Array.isArray(L)) L.forEach(function(e){ (e&&e.n||[]).forEach(function(i){ o[i]=1; }); }); return judge(Object.keys(o)); }
+  function rec(ev){ if(!ev||!Array.isArray(ev.n)||!ev.n.length) return; var L=rd(EK,[]); if(!Array.isArray(L)) L=[];
+    ev.t=Date.now(); L.push(ev); if(L.length>CAP) L=L.slice(L.length-CAP);
+    try{ localStorage.setItem(EK,JSON.stringify(L)); }catch(e){ try{ L=L.slice(-Math.floor(CAP/2)); localStorage.setItem(EK,JSON.stringify(L)); }catch(x){} }
+    judge(ev.n); }
+  function reasons(id){ var L=rd(EK,[]); if(!Array.isArray(L)) return null; var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); return evs.length?why(evs):null; }
+  g.TJ={rec:rec,judge:judge,all:all,score:score,reasons:reasons};
+})(typeof window!=="undefined"?window:this);
+/* TJ-END */</script>
 <script>
 /* 데이터 소스: knowledge/graph.json · map.json · cards/<id>.json · (atom 안이면) /api/mastery, 밖(GitHub Pages)이면 localStorage */
 var G={}, MAP={}, NODES={}, M={}, SUBJ="", VIEW="w", SEL=null, SERVER=false, PROG=null;
@@ -144,8 +196,10 @@ function analyze(ids){var cl=closure(ids),gaps=[],next=[],need=0,cnt={known:0,sh
   return {closure:cl,gaps:gaps,next:next,need:Math.round(need*10)/10,cnt:cnt}}
 function fmtH(h){return h>=1?(Math.round(h*10)/10)+"h":Math.round(h*60)+"분"}
 /* ── 저장소 ── */
-function loadM(){if(SERVER)return fetch("/api/mastery").then(function(r){return r.json()}).then(function(d){M=d.mastery||{}}).catch(function(){M={}});
-  try{M=JSON.parse(localStorage.getItem("atto.mastery")||"{}")}catch(e){M={}}return Promise.resolve()}
+/* 스앵님 판정: 이 기기 기록(atto.evidence) 전체를 다시 판정한 atto.mastery 를 읽는다. atom 안이면 서버 값 위에 더 최근 자동 판정을 얹는다 */
+function loadM(){try{if(window.TJ)TJ.all()}catch(e){}var LOC={};try{LOC=JSON.parse(localStorage.getItem("atto.mastery")||"{}")||{}}catch(e){LOC={}}
+  if(SERVER)return fetch("/api/mastery").then(function(r){return r.json()}).then(function(d){M=d.mastery||{};Object.keys(LOC).forEach(function(id){var l=LOC[id];if(l&&l.auto&&(!M[id]||(+l.ts||0)>(+M[id].ts||0)))M[id]=l})}).catch(function(){M=LOC});
+  M=LOC;return Promise.resolve()}
 function saveM(upd){var now=Date.now()/1000;Object.keys(upd).forEach(function(id){var e=Object.assign({},M[id]||{},upd[id]);if(e.quiz&&!e.quiz.ts)e.quiz.ts=now;e.ts=now;var r=score(e);e.score=r.score;e.state=r.state;M[id]=e});
   if(SERVER)return fetch("/api/mastery",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({updates:upd})}).then(function(r){return r.json()}).then(function(d){Object.assign(M,d.updated||{})});
   localStorage.setItem("atto.mastery",JSON.stringify(M));return Promise.resolve()}
@@ -170,7 +224,7 @@ function renderTree(){var c=$("#treeCard");if(!SEL){c.style.display="none";retur
   if(SEL.type==="w"){var w=(d.weeks||{})[SEL.key]||{};ids=w.nodes||[];title=SEL.key+"주차 · "+w.title}else{var p=(d.problems||[])[SEL.key]||{};ids=p.nodes||[];title=p.ref+(p.desc?" — "+p.desc:"")}
   var a=analyze(ids),gap={},nxt={},tg={};a.gaps.forEach(function(n){gap[n]=1});a.next.forEach(function(n){nxt[n]=1});ids.forEach(function(n){tg[n]=1});
   c.style.display="";$("#treeTitle").textContent=title;
-  $("#treeMeta").innerHTML='<span>필요 시간 <b>'+fmtH(a.need)+'</b></span><span>노드 <b>'+a.closure.length+'</b></span>'+(a.gaps.length?'<span style="color:var(--unknown)">뿌리 결손 <b>'+a.gaps.length+'</b> — 여기부터 시작</span>':a.next.length?'<span>결손 없음 · 다음 평가 <b>'+a.next.length+'</b></span>':"");
+  $("#treeMeta").innerHTML='<span>필요 시간 <b>'+fmtH(a.need)+'</b></span><span>노드 <b>'+a.closure.length+'</b></span>'+(a.gaps.length?'<span style="color:var(--unknown)">뿌리 결손 <b>'+a.gaps.length+'</b></span>':a.next.length?'<span>결손 없음 · 다음 평가 <b>'+a.next.length+'</b></span>':"");
   var h="";LEVELS.forEach(function(L,i){var ns=a.closure.filter(function(n){return NODES[n].level===L}).sort(function(x,y){return (NODES[x].name).localeCompare(NODES[y].name,"ko")});if(!ns.length)return;
     if(h)h+='<div class="arrow">↓</div>';h+='<div class="lvl">'+L+' · '+ns.length+'</div><div class="nodes">'+ns.map(function(n){var s=st(n);return '<div class="node'+(gap[n]?" gap":nxt[n]?" next":"")+(tg[n]?" target":"")+'" data-id="'+n+'" data-state="'+s+'" style="--c:var(--'+s+')">'+esc(NODES[n].name)+'<span class="h">'+fmtH(+NODES[n].hours||0)+(s==="unrated"?"":" · "+Math.round(score(M[n]).score*100)+"%")+'</span></div>'}).join("")+'</div>'});
   $("#tree").innerHTML=h;[].forEach.call(document.querySelectorAll("#tree .node"),function(el){el.onclick=function(){openCard(el.dataset.id)}})}
@@ -226,7 +280,13 @@ function renderMap(){
   [].forEach.call(svg.querySelectorAll(".nd"),function(g){g.onclick=function(){openCard(g.getAttribute("data-id"))}});
 }
 function clip(t,n){return t.length>n?t.slice(0,Math.max(1,n-1))+"…":t}
-function render(){renderChips();renderProg();renderSummary();renderList();renderTree();renderMap()}
+function render(){renderChips();renderProg();renderSummary();renderList();renderTree();renderMap();renderJudge()}
+/* 김주영 스앵님 판정: 학습 기록으로 판정된 노드 중 모름·흔들림, 점수 낮은 순 3개 — 근거와 그 개념을 배운 교실 */
+var LINKS={};
+function whyText(a){if(!a)return"";var w=[];if(a.q)w.push("문제 "+a.c+"/"+a.q);if(a.conf)w.push("다시 설명·질문 "+a.conf);if(a.read&&!a.q)w.push("읽기만");if(a.memo)w.push("외움");return w.join(" · ")}
+function renderJudge(){var el=$("#judge");if(!el)return;var rows=subjectNodes(SUBJ).map(function(id){return {id:id,e:M[id]}}).filter(function(x){return x.e&&x.e.auto&&(x.e.state==="unknown"||x.e.state==="shaky")}).sort(function(a,b){return (+a.e.score||0)-(+b.e.score||0)}).slice(0,3);
+  if(!rows.length){el.hidden=true;el.innerHTML="";return}el.hidden=false;
+  el.innerHTML='<img src="notes/classroom/assets/tutor/sharp.png" alt="" onerror="this.style.display=\'none\'"><div class="jb"><div class="jn">김주영 스앵님 판정</div><ul>'+rows.map(function(r){var s2=r.e.state,w=whyText(r.e.auto),ln=LINKS[r.id];return '<li><span class="s" style="background:var(--'+s2+')">'+({shaky:"흔들림",unknown:"모름"})[s2]+'</span><span>'+esc(NODES[r.id].name)+'</span>'+(w?'<span class="w">'+esc(w)+'</span>':"")+(ln?'<a href="'+esc(ln)+'">교실</a>':"")+'</li>'}).join("")+'</ul></div>'}
 /* ── 카드 시트: 쉬운 설명 + 자가평가 + 퀴즈 → 저장 ── */
 var CARDS={};
 function getCard(id){if(CARDS[id]!==undefined)return Promise.resolve(CARDS[id]);return fetch("knowledge/cards/"+id+".json").then(function(r){return r.ok?r.json():null}).catch(function(){return null}).then(function(c){CARDS[id]=c;return c})}
@@ -236,24 +296,27 @@ function openCard(id){var n=NODES[id];if(!n)return;getCard(id).then(function(c){
     if(c){h+='<div class="sec easy"><h4>쉽게 말하면</h4><p>'+esc(c.easy)+'</p></div><div class="sec"><h4>핵심</h4><p>'+esc(c.core)+'</p></div>';
       if(c.example)h+='<div class="sec"><h4>예제 — '+esc(c.example.q)+'</h4><ol>'+(c.example.steps||[]).map(function(x){return '<li>'+esc(x)+'</li>'}).join("")+'</ol></div>';
       if(c.pitfall)h+='<div class="sec"><h4>흔한 실수</h4><p>'+esc(c.pitfall)+'</p></div>'}
-    else h+='<div class="sec"><h4>카드</h4><p style="color:var(--sub)">카드 준비 중 — 지금은 자가평가만 저장됩니다.</p></div>';
-    h+='<div class="sec"><h4>자가평가 — 남에게 설명할 수 있나?</h4><div class="self"><span style="font-size:12px;color:var(--sub)">1 전혀</span><input type="range" min="1" max="5" value="'+sv+'" id="selfR"><span style="font-size:12px;color:var(--sub)">5 확실</span><b id="selfV">'+sv+' / 5</b></div></div>';
+    else h+='<div class="sec"><h4>카드</h4><p style="color:var(--sub)">카드 준비 중</p></div>';
+    {var rs=window.TJ?TJ.reasons(id):null;h+='<div class="sec"><h4>스앵님 판정</h4><p class="why2">'+(rs?esc(whyText({q:rs.q,c:rs.c,conf:rs.conf,read:rs.read,memo:rs.memo})||"읽은 기록"):"기록 없음")+'</p></div>'}
     if(c&&c.quiz&&c.quiz.length)h+='<div class="sec"><h4>퀴즈 '+c.quiz.length+'문항</h4>'+c.quiz.map(function(q,i){return '<div class="q" data-i="'+i+'"><div class="qq">'+(i+1)+'. '+esc(q.q)+'</div>'+q.options.map(function(o,j){return '<label><input type="radio" name="q'+i+'" value="'+j+'"><span>'+esc(o)+'</span></label>'}).join("")+'<div class="why"></div></div>'}).join("")+'</div>';
-    h+='<button class="btn" id="saveBtn">'+(c&&c.quiz&&c.quiz.length?"채점하고 저장":"자가평가 저장")+'</button><button class="btn ghost" id="closeBtn">닫기</button>'+(n.src?'<div class="src">근거: '+esc(n.src)+'</div>':"");
+    h+=(c&&c.quiz&&c.quiz.length?'<button class="btn" id="saveBtn">채점</button>':'')+'<button class="btn ghost" id="closeBtn">닫기</button>'+(n.src?'<div class="src">근거: '+esc(n.src)+'</div>':"");
     var sh=$("#sheet");sh.innerHTML=h;sh.classList.add("on");$("#sheetBg").classList.add("on");
-    $("#selfR").oninput=function(){$("#selfV").textContent=this.value+" / 5"};$("#closeBtn").onclick=closeCard;
+    $("#closeBtn").onclick=closeCard;
     [].forEach.call(sh.querySelectorAll(".pre .node"),function(el){el.onclick=function(){openCard(el.dataset.id)}});
-    $("#saveBtn").onclick=function(){var upd={},u={self:+$("#selfR").value,seen:true};
+    var sb=$("#saveBtn");if(sb)sb.onclick=function(){var upd={},u={seen:true};
       if(c&&c.quiz&&c.quiz.length){var cor=0,miss=0;c.quiz.forEach(function(q,i){var el=sh.querySelector('.q[data-i="'+i+'"]'),r=sh.querySelector('input[name="q'+i+'"]:checked');if(!r){miss++;return}var ok=+r.value===q.answer;if(ok)cor++;el.classList.add("done",ok?"ok":"bad");el.querySelector(".why").textContent=(ok?"정답. ":"오답 — 답: "+q.options[q.answer]+". ")+(q.why||"")});
         if(miss){toast(miss+"문항이 비어 있어요");return}u.quiz={correct:cor,total:c.quiz.length}}
-      upd[id]=u;this.disabled=true;var btn=this;saveM(upd).then(function(){var r=score(M[id]);toast((u.quiz?"퀴즈 "+u.quiz.correct+"/"+u.quiz.total+" · ":"")+({known:"안다",shaky:"흔들림",unknown:"모름"})[r.state]+" "+Math.round(r.score*100)+"%");renderSummary();renderList();renderTree();btn.disabled=false;btn.textContent="저장됨 — 다시 저장";}).catch(function(){toast("저장 실패");btn.disabled=false})}})}
+      /* 카드 퀴즈도 스앵님 판정 기록 — 문항마다 quiz 한 건 */
+      if(u.quiz&&window.TJ){c.quiz.forEach(function(q,i){var r=sh.querySelector('input[name="q'+i+'"]:checked');if(r)TJ.rec({k:"quiz",ok:+r.value===q.answer,n:[id],lid:"card",qid:id+"#"+i})});try{var J=JSON.parse(localStorage.getItem("atto.mastery")||"{}");if(J[id])u=Object.assign({},J[id],{seen:true})}catch(e){}}
+      upd[id]=u;this.disabled=true;var btn=this;saveM(upd).then(function(){var r=score(M[id]);renderJudge();toast((u.quiz?"퀴즈 "+u.quiz.correct+"/"+u.quiz.total+" · ":"")+({known:"안다",shaky:"흔들림",unknown:"모름"})[r.state]+" "+Math.round(r.score*100)+"%");renderSummary();renderList();renderTree();btn.disabled=false;btn.textContent="저장됨 — 다시 저장";}).catch(function(){toast("저장 실패");btn.disabled=false})}})}
 function closeCard(){$("#sheet").classList.remove("on");$("#sheetBg").classList.remove("on")}
 $("#sheetBg").onclick=closeCard;$("#tabW").onclick=function(){VIEW="w";$("#tabW").classList.add("on");$("#tabP").classList.remove("on");renderList()};$("#tabP").onclick=function(){VIEW="p";$("#tabP").classList.add("on");$("#tabW").classList.remove("on");renderList()};
 /* ── 시작 ── */
 (function(){var q=new URLSearchParams(location.search);
   var probe=location.pathname.indexOf("/study/")===0?fetch("/api/health").then(function(r){return r.json()}).then(function(d){SERVER=!!d.authed}).catch(function(){SERVER=false}):Promise.resolve();
-  Promise.all([fetch("knowledge/graph.json").then(function(r){return r.json()}),fetch("knowledge/map.json").then(function(r){return r.ok?r.json():{}}).catch(function(){return {}}),fetch("knowledge/progress.json").then(function(r){return r.ok?r.json():null}).catch(function(){return null}),probe]).then(function(a){
-    G=a[0];MAP=a[1]||{};PROG=a[2];(G.nodes||[]).forEach(function(n){NODES[n.id]=n});$("#mode").textContent=SERVER?"atom 저장":"이 기기에만 저장";
+  Promise.all([fetch("knowledge/graph.json").then(function(r){return r.json()}),fetch("knowledge/map.json").then(function(r){return r.ok?r.json():{}}).catch(function(){return {}}),fetch("knowledge/progress.json").then(function(r){return r.ok?r.json():null}).catch(function(){return null}),probe,
+    fetch("knowledge/lesson_nodes.json").then(function(r){return r.ok?r.json():null}).catch(function(){return null}).then(function(j){if(!j||!j.lessons)return;Object.keys(j.lessons).forEach(function(lid){var r=j.lessons[lid],m=/^(\w+)-(\d{4}-\d{2}-\d{2})$/.exec(lid);if(!m)return;Object.keys(r.sec||{}).forEach(function(sid,k){(r.sec[sid]||[]).forEach(function(n){if(!LINKS[n])LINKS[n]="notes/classroom/"+m[1]+"/"+m[2]+".html#ch="+(k+1)})})})})]).then(function(a){
+    G=a[0];MAP=a[1]||{};PROG=a[2];(G.nodes||[]).forEach(function(n){NODES[n.id]=n});$("#mode").textContent="";
     var subs=(G.subjects||[]).filter(function(s){return s!=="공통"});SUBJ=q.get("subject")&&subs.indexOf(q.get("subject"))>=0?q.get("subject"):subs[0]||"";
     return loadM()}).then(function(){render();var qq=new URLSearchParams(location.search);
     if(qq.get("map")){setTimeout(function(){var c=$("#mapCard");if(c&&c.style.display!=="none")c.scrollIntoView({behavior:"smooth",block:"start"})},250)}

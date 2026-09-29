@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>미분적분학2 · 암기노트</title>
+<!-- 암기노트 템플릿 v1 (대표님 2026-09-29 「암기해야 하는 것 · 이해해야 하는 것 구분 · 암기노트 따로」). build_memo.py 가 자리를 채운다.
+     항목 = 수업 노트 원문의 공식 상자 + 「외울 것」 상자를 나눈 것. 가리기 = 답만 흐리게(누르면 보임). ✓ = 외움 → localStorage mc-memo-<약칭> · 스앵님 판정 기록(atto.evidence memo). 화면에 설명 문장 금지(지침 §24). -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<style>
+:root{--ink:#1F2A44;--ink-2:#55627A;--ink-3:#6B7689;--line:rgba(31,42,68,.14);--paper:rgba(255,255,255,.78);--am:#B45309;--am-soft:rgba(217,119,6,.08);--ok:#15803D;
+  --f:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+*{box-sizing:border-box}
+html{background:linear-gradient(160deg,#F4EFE6 0%,#F2F5F0 50%,#EDF2EE 100%) fixed}
+body{margin:0;font-family:var(--f);font-size:17px;line-height:1.7;color:var(--ink);word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased}
+#top{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.78);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-bottom:1px solid rgba(31,42,68,.08)}
+#top .in{max-width:820px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#top .ttl{font-weight:800;font-size:17px;display:flex;align-items:center;gap:8px}
+#top .ttl i{font-style:normal;font-size:12px;font-weight:800;color:#fff;background:var(--am);border-radius:99px;padding:4px 10px;line-height:1}
+#top .sp{flex:1}
+#cnt{font-size:14px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.tb{font:inherit;font-size:14px;font-weight:700;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:12px;min-height:44px;padding:0 14px;cursor:pointer}
+.tb[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+#bar{height:4px;background:rgba(31,42,68,.08)}#bar i{display:block;height:100%;width:0;background:var(--am);transition:width .3s}
+main{max-width:820px;margin:0 auto;padding:14px 18px 90px}
+#dates{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none}#dates::-webkit-scrollbar{display:none}
+#dates a{flex:0 0 auto;text-decoration:none;color:var(--ink);font-size:14px;font-weight:700;border:1.5px solid var(--line);background:rgba(255,255,255,.7);border-radius:99px;padding:0 14px;min-height:40px;display:inline-flex;align-items:center;font-variant-numeric:tabular-nums}
+#dates a.all{border-color:rgba(21,128,61,.4);color:var(--ok)}
+.ls{margin:14px 0 22px;scroll-margin-top:84px}
+.ls>h2{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;font-size:20px;line-height:1.35;margin:0 0 8px;letter-spacing:-.01em}
+.ls>h2 .dt{font-size:13.5px;font-weight:700;color:var(--am);white-space:nowrap}
+.ls>h2 .go{margin-left:auto;font-size:13.5px;font-weight:700;color:var(--ink);text-decoration:none;border:1.5px solid var(--line);border-radius:10px;padding:0 12px;min-height:36px;display:inline-flex;align-items:center;background:#fff}
+.ch{margin:10px 0 14px;padding:12px 14px 6px;border-radius:16px;background:var(--paper);border:1px solid rgba(255,255,255,.9);box-shadow:0 6px 20px rgba(20,40,60,.06)}
+.ch h3{margin:0 0 8px;font-size:15.5px;color:var(--ink-2)}
+.it{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.ch h3+.it{border-top:0}
+.it .c{flex:1;min-width:0}
+.it .k{font-weight:800}.it .sep{color:var(--ink-3);margin:0 2px}
+.it.f .c{padding:2px 0 2px 12px;border-left:4px solid #D97706;background:var(--am-soft);border-radius:0 10px 10px 0}
+.it .ck{flex:0 0 44px;height:44px;border-radius:50%;border:2px solid var(--line);background:#fff;color:transparent;font-size:18px;font-weight:900;cursor:pointer;display:grid;place-items:center}
+.it .ck::before{content:"";width:16px;height:9px;border-left:3px solid #C3C9D2;border-bottom:3px solid #C3C9D2;transform:translateY(-2px) rotate(-45deg)}
+.it.done .ck{background:var(--ok);border-color:var(--ok)}.it.done .ck::before{border-color:#fff}
+.it.done .c{opacity:.62}
+body.hide .it:not(.show) .ans{filter:blur(7px);-webkit-user-select:none;user-select:none;cursor:pointer}
+body.hide .it:not(.show) .c{cursor:pointer}
+body.left .it.done{display:none}body.left .ch.alldone,body.left .ls.alldone{display:none}
+.katex-display{margin:6px 0;overflow-x:auto;overflow-y:hidden}
+.katex{white-space:nowrap}
+#empty{display:none;text-align:center;color:var(--ink-3);padding:40px 0}
+body.left.none #empty{display:block}
+@media(prefers-color-scheme:dark){
+  :root{--ink:#F1F6F2;--ink-2:#B7C2BB;--ink-3:#95A29B;--line:rgba(255,255,255,.14);--paper:rgba(18,26,24,.7);--am-soft:rgba(217,119,6,.14)}
+  html{background:linear-gradient(160deg,#0B1020 0%,#0E1A16 50%,#0B1412 100%) fixed}
+  #top{background:rgba(18,26,24,.8);border-bottom-color:rgba(255,255,255,.08)}
+  .tb,.ls>h2 .go,#dates a,.it .ck{background:rgba(255,255,255,.06)}
+  .tb[aria-pressed="true"]{background:#F1F6F2;color:#0B1412;border-color:#F1F6F2}
+  .ch{border-color:rgba(255,255,255,.08);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+}
+.acts{display:flex;gap:8px}
+@media(max-width:640px){body{font-size:16.5px}#top .in{padding:8px 12px;row-gap:8px}.acts{width:100%}.acts .tb{flex:1}main{padding:10px 12px 80px}.ls>h2{font-size:18px}.ch{padding:10px 12px 4px}}
+</style>
+</head>
+<body>
+<div id="top"><div class="in"><span class="ttl">미분적분학2 <i>암기</i></span><span class="sp"></span><span id="cnt"></span><span class="acts"><button type="button" class="tb" id="bHide" aria-pressed="false">가리기</button><button type="button" class="tb" id="bLeft" aria-pressed="false">못 외운 것</button></span></div><div id="bar"><i id="barI"></i></div></div>
+<main><nav id="dates"></nav><div id="list"></div><div id="empty">전부 외움</div></main>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script>/* 김주영 스앵님 판정 (대표님 2026-09-29 「개념 마인드맵은 스앵님이 학습을 통해 내가 뭘 알고 뭘 모르는지 알아서 파악」) — 원본은 이 파일 하나.
+   빌더가 교실·수업 노트·학습 덱·암기노트 페이지에 그대로 넣고(__JUDGE__), learn.html·앱(V57)은 같은 글을 붙여 쓴다(docs/tools/sync_judge.py).
+   기록 = localStorage atto.evidence [{t, k, n:[노드], ok, v, lid, sid, qid, clean}] (최대 4000건)
+     k: quiz(ok) 확인 문제 · read(clean) 챕터·섹션 끝(다시 설명·질문 없이 끝났으면 clean) · again 다시 설명 · ask 질문 · memo(ok) 암기노트 외움 · self(v) 카드 자가평가
+   판정 = 노드마다 atto.mastery[id] = {quiz:{correct,total,ts}, self, ts, score, state, auto} — learn.html · 앱 V47 · server.py 의 점수식이 그대로 읽는다.
+     quiz = 최근 6번 · self(설명할 수 있나 1~5) = 읽음 4 · 다시 설명·질문 2번 이상이면 3 · 외움 +1 · 카드 자가평가가 더 최근이면 그 값
+     → 문제 없이 읽기만 하면 최대 「흔들림」, 「안다」는 문제로만. 점수식 = (0.5·정답률 + 0.2·self/5)/0.7, 문제 없으면 self/5·0.6, 60일 감쇠(최저 0.4) */
+(function(g){
+  var EK="atto.evidence", MK="atto.mastery", CAP=4000;
+  function rd(k,d){ try{ var v=JSON.parse(localStorage.getItem(k)||"null"); return v==null?d:v; }catch(e){ return d; } }
+  function decay(ts){ if(!ts) return 1; var d=Math.max(0,(Date.now()/1000-ts)/86400); return Math.max(.4,1-d/60); }
+  function score(e){ var q=e.quiz||{}, tot=+q.total||0, cor=+q.correct||0, sv=e.self==null?null:Math.max(1,Math.min(5,+e.self));
+    if(tot<=0&&sv==null) return {score:0,state:"unrated"};
+    var raw=tot>0?(0.5*(cor/tot)+0.2*((sv||0)/5))/0.7:(sv/5)*0.6, s=Math.min(1,raw)*decay(Math.max(+e.ts||0,+q.ts||0)), st;
+    if(tot<=0) st=(sv>=4&&s>=.4)?"shaky":"unknown"; else st=s>=.7?"known":s>=.4?"shaky":"unknown";
+    return {score:Math.round(s*1000)/1000,state:st}; }
+  function why(evs){ var qz=evs.filter(function(e){return e.k==="quiz";}).slice(-6), r={q:qz.length,c:qz.filter(function(e){return e.ok;}).length,
+      read:evs.filter(function(e){return e.k==="read";}).length, clean:evs.filter(function(e){return e.k==="read"&&e.clean;}).length,
+      conf:evs.filter(function(e){return (e.k==="again"||e.k==="ask")&&Date.now()-e.t<21*864e5;}).length,
+      memo:null, self:null, last:0};
+    evs.forEach(function(e){ if(e.k==="memo") r.memo=!!e.ok; if(e.k==="self") r.self={v:+e.v,t:e.t}; if(e.t>r.last) r.last=e.t; });
+    return r; }
+  function judgeOne(id,L,M){ var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); if(!evs.length) return;
+    var r=why(evs), e=Object.assign({},M[id]||{}), qz=evs.filter(function(x){return x.k==="quiz";}).slice(-6);
+    var self=null; if(r.read||r.conf||r.memo!=null){ self=r.read?4:3; if(r.conf>=2) self=3; if(r.memo) self=Math.min(5,self+1); }
+    var autoLast=0; evs.forEach(function(x){ if(x.k!=="self"&&x.t>autoLast) autoLast=x.t; });
+    if(r.self&&r.self.t>=autoLast) self=r.self.v;
+    e.quiz=qz.length?{correct:r.c,total:qz.length,ts:Math.round(qz[qz.length-1].t/1000)}:undefined; if(!e.quiz) delete e.quiz;
+    e.self=self; if(self==null) delete e.self;
+    e.ts=Math.round(r.last/1000); e.auto={by:"tutor",q:r.q,c:r.c,read:r.read,clean:r.clean,conf:r.conf,memo:r.memo};
+    var s=score(e); e.score=s.score; e.state=s.state; M[id]=e; }
+  function judge(ids){ var L=rd(EK,[]), M=rd(MK,{}); if(!Array.isArray(L)) L=[]; (ids||[]).forEach(function(id){ judgeOne(id,L,M); });
+    try{ localStorage.setItem(MK,JSON.stringify(M)); }catch(e){} return M; }
+  function all(){ var L=rd(EK,[]), o={}; if(Array.isArray(L)) L.forEach(function(e){ (e&&e.n||[]).forEach(function(i){ o[i]=1; }); }); return judge(Object.keys(o)); }
+  function rec(ev){ if(!ev||!Array.isArray(ev.n)||!ev.n.length) return; var L=rd(EK,[]); if(!Array.isArray(L)) L=[];
+    ev.t=Date.now(); L.push(ev); if(L.length>CAP) L=L.slice(L.length-CAP);
+    try{ localStorage.setItem(EK,JSON.stringify(L)); }catch(e){ try{ L=L.slice(-Math.floor(CAP/2)); localStorage.setItem(EK,JSON.stringify(L)); }catch(x){} }
+    judge(ev.n); }
+  function reasons(id){ var L=rd(EK,[]); if(!Array.isArray(L)) return null; var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); return evs.length?why(evs):null; }
+  g.TJ={rec:rec,judge:judge,all:all,score:score,reasons:reasons};
+})(typeof window!=="undefined"?window:this);
+</script>
+<script>/* 여러 식을 이은 식 줄 나누기(대표님 2026-09-29 「수식 한 줄로, 배치구조 신경」) — 원본은 이 파일 하나(수업 노트·암기노트 템플릿에 빌더가 넣는다, __SPLITTEX__).
+   \[ A,\qquad B \] 처럼 서로 다른 식을 \qquad 또는 「,\quad」로 이어 붙인 줄은 식마다 한 줄(\[A\]\[B\])로 — 한 식 안은 가르지 않는다.
+   괄호 { } 와 \begin…\end 안의 구분자는 건드리지 않고, 연결 기호만 남은 조각(\Rightarrow·\to·\Leftrightarrow·\therefore)은 다음 식 앞에 붙인다. */
+function splitTex(t){
+  const parts=[]; let d=0, env=0, cur="", i=0;
+  while(i<t.length){
+    if(t.startsWith("\\begin{",i)) env++;
+    else if(t.startsWith("\\end{",i)) env=Math.max(0,env-1);
+    const c=t[i];
+    if(c==="\\"&&(t[i+1]==="{"||t[i+1]==="}")){ cur+=t.slice(i,i+2); i+=2; continue; }
+    if(c==="{") d++; else if(c==="}") d=Math.max(0,d-1);
+    if(!d&&!env){
+      let m=0;
+      if(t.startsWith("\\qquad",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) m=6;
+      else if(t.startsWith(",\\quad",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) m=6;
+      if(m){ parts.push(cur); cur=""; i+=m; continue; }
+    }
+    cur+=c; i++;
+  }
+  parts.push(cur);
+  const out=[]; let carry="";
+  parts.map(p=>p.trim().replace(/^,\s*/,"").replace(/,\s*$/,"")).forEach(p=>{
+    if(!p) return;
+    if(/^(\\(Rightarrow|Leftarrow|Leftrightarrow|to|therefore|because|implies|iff)\s*)+$/.test(p)){ carry+=p+" "; return; }
+    out.push(carry+p); carry="";
+  });
+  if(carry&&out.length) out[out.length-1]+=" "+carry.trim();
+  return out.length?out:[t];
+}
+/* 좁은 화면(폰)에서만: 글자 덩어리(\text{…})를 화살표(\to·\Rightarrow)로 이은 「흐름」 줄은 화살표 단위로 줄을 나눈다 — 수식이 아니라 단계 나열이라 나눠도 식이 갈리지 않는다 */
+function splitFlow(t){
+  const segs=[]; let d=0, cur="", i=0;
+  while(i<t.length){ const c=t[i];
+    if(c==="\\"&&(t[i+1]==="{"||t[i+1]==="}")){ cur+=t.slice(i,i+2); i+=2; continue; }
+    if(c==="{") d++; else if(c==="}") d=Math.max(0,d-1);
+    if(!d){ const m=/^\\ ?\\(to|Rightarrow)(?![a-zA-Z])\\ ?/.exec(t.slice(i))||/^\s*\\(to|Rightarrow)(?![a-zA-Z])\s*/.exec(t.slice(i)); if(m&&cur.trim()){ segs.push(cur); cur="\\"+m[1]+"\\ "; i+=m[0].length; continue; } }
+    cur+=c; i++; }
+  segs.push(cur);
+  const ok=segs.length>=3&&segs.every(s=>/^(\\(to|Rightarrow)\\ )?\s*\\text\{/.test(s.trim()));
+  return ok?segs.map(s=>s.trim()):[t];
+}
+function splitDisplays(html,narrow){
+  return String(html).replace(/\\\[([\s\S]*?)\\\]/g,(m,tex)=>{ let ps=splitTex(tex); if(narrow) ps=[].concat(...ps.map(splitFlow)); return ps.length>1?ps.map(p=>"\\["+p+"\\]").join(""):m; });
+}
+</script>
+<script>
+const D={"slug": "calc2", "course": "미분적분학2", "lessons": [{"date": "2026-09-01", "label": "9/1(화) · 1주차", "title": "행렬 — 연립방정식을 푸는 도구, 그리고 다섯 가지 기본 행렬", "chs": [{"sid": "s1", "title": "왜 행렬인가 — 연립일차방정식의 계수만 뽑는다", "n": ["lin.matrix", "lin.linear_system"], "items": [{"t": "m", "k": "행렬", "s": "=", "a": "수의 직사각형 배열(연립방정식의 계수를 배열하면 계수행렬)", "id": "2026-09-01-s1-1"}, {"t": "m", "k": "", "s": "", "a": "손계산은 3차까지", "id": "2026-09-01-s1-2"}, {"t": "m", "k": "학습지", "s": "=", "a": "유일한 교재(시험 출처)", "id": "2026-09-01-s1-3"}]}, {"sid": "s2", "title": "정의 — m×n 행렬과 성분 aᵢⱼ", "n": ["lin.matrix"], "items": [{"t": "f", "a": "\\[A=(a_{ij})=\\begin{bmatrix}a_{11}&amp;a_{12}&amp;\\cdots&amp;a_{1n}\\\\a_{21}&amp;a_{22}&amp;\\cdots&amp;a_{2n}\\\\\\vdots&amp;&amp;&amp;\\vdots\\\\a_{m1}&amp;a_{m2}&amp;\\cdots&amp;a_{mn}\\end{bmatrix}\\qquad(\\text{행 }m\\text{개}\\times\\text{열 }n\\text{개})\\]", "id": "2026-09-01-s2-1"}, {"t": "m", "k": "\\(m\\times n\\)", "s": "=", "a": "행 m · 열 n", "id": "2026-09-01-s2-2"}, {"t": "m", "k": "", "s": "", "a": "\\(a_{ij}\\): i 행 j 열", "id": "2026-09-01-s2-3"}, {"t": "m", "k": "대문자", "s": "=", "a": "행렬, 소문자 = 성분", "id": "2026-09-01-s2-4"}]}, {"sid": "s3", "title": "다섯 가지 기본 행렬 (정의02)", "n": ["lin.matrix"], "items": [{"t": "m", "k": "", "s": "", "a": "정사각", "id": "2026-09-01-s3-1"}, {"t": "m", "k": "", "s": "", "a": "단위 \\(I\\)", "id": "2026-09-01-s3-2"}, {"t": "m", "k": "", "s": "", "a": "영 \\(O\\)", "id": "2026-09-01-s3-3"}, {"t": "m", "k": "", "s": "", "a": "전치 \\(A^T\\)", "id": "2026-09-01-s3-4"}, {"t": "m", "k": "", "s": "", "a": "대칭 \\(A^T=A\\)", "id": "2026-09-01-s3-5"}, {"t": "m", "k": "", "s": "", "a": "\\(AI=A,\\ AO=O\\)", "id": "2026-09-01-s3-6"}]}, {"sid": "s4", "title": "예제 — 다음 중 대칭행렬은? (Ex01)", "n": ["lin.matrix"], "items": [{"t": "m", "k": "대칭 판정", "s": "=", "a": "정사각? → \\(a_{ij}=a_{ji}\\)?", "id": "2026-09-01-s4-1"}]}], "classroom": "../classroom/calc2/2026-09-01.html"}, {"date": "2026-09-03", "label": "9/3(목) · 1주차", "title": "행렬의 연산과 행렬식 — \"시험 문제는 행렬식부터 나온다\"", "chs": [{"sid": "s1", "title": "기본 연산 — 되는 것과 안 되는 것", "n": ["lin.matrix_ops"], "items": [{"t": "f", "a": "\\[A=B\\ \\Leftrightarrow\\ a_{ij}=b_{ij}\\ (\\text{모든 }i,j)\\qquad A\\pm B=(a_{ij}\\pm b_{ij})\\ (\\text{같은 꼴일 때만})\\qquad kA=(k\\,a_{ij})\\]", "id": "2026-09-03-s1-1"}, {"t": "m", "k": "상등·합·실수배", "s": "=", "a": "성분끼리 · 같은 꼴만 · 나눗셈 없음", "id": "2026-09-03-s1-2"}, {"t": "m", "k": "", "s": "", "a": "시험에는 안 나옴(기본)", "id": "2026-09-03-s1-3"}]}, {"sid": "s2", "title": "곱셈 — 앞의 열 수 = 뒤의 행 수 · 거듭제곱", "n": ["lin.matrix_ops"], "items": [{"t": "f", "a": "\\[A_{m\\times n}B_{n\\times r}=C_{m\\times r},\\qquad c_{ij}=\\sum_{k=1}^{n}a_{ik}b_{kj}=a_{i1}b_{1j}+a_{i2}b_{2j}+\\cdots+a_{in}b_{nj}\\]", "id": "2026-09-03-s2-1"}, {"t": "m", "k": "", "s": "", "a": "\\((m\\times n)(n\\times r)=m\\times r\\)", "id": "2026-09-03-s2-2"}, {"t": "m", "k": "\\(c_{ij}\\)", "s": "=", "a": "i 행 · j 열", "id": "2026-09-03-s2-3"}, {"t": "m", "k": "", "s": "", "a": "\\(AB\\ne BA\\) · × 금지", "id": "2026-09-03-s2-4"}, {"t": "m", "k": "", "s": "", "a": "\\(A^2=O\\)여도 \\(A\\ne O\\) 가능", "id": "2026-09-03-s2-5"}]}, {"sid": "s3", "title": "행렬식(determinant) — 오늘의 키 포인트 ★", "n": ["lin.det2", "lin.det3"], "items": [{"t": "m", "k": "", "s": "", "a": "\\(\\det\\begin{bmatrix}a&b\\\\c&d\\end{bmatrix}=ad-bc\\) · 행렬식 = 값", "id": "2026-09-03-s3-1"}, {"t": "m", "k": "", "s": "", "a": "세로줄·det 표기 필수(감점)", "id": "2026-09-03-s3-2"}, {"t": "m", "k": "", "s": "", "a": "시험은 여기서부터", "id": "2026-09-03-s3-3"}]}, {"sid": "s4", "title": "3차 행렬식 — 사루스(Sarrus) 법칙", "n": ["lin.det3", "lin.det2"], "items": [{"t": "f", "a": "\\[\\det A=\\underbrace{a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32}}_{\\searrow\\ 3\\text{개}}-\\underbrace{\\big(a_{13}a_{22}a_{31}+a_{12}a_{21}a_{33}+a_{11}a_{23}a_{32}\\big)}_{\\swarrow\\ 3\\text{개}}\\]", "id": "2026-09-03-s4-1"}, {"t": "m", "k": "사루스", "s": "=", "a": "↘ 3개 합 − ↙ 3개 합 · 1·2열 복사", "id": "2026-09-03-s4-2"}, {"t": "m", "k": "", "s": "", "a": "곱마다 작게 적고 합산", "id": "2026-09-03-s4-3"}, {"t": "m", "k": "", "s": "", "a": "4차 이상 없음", "id": "2026-09-03-s4-4"}]}, {"sid": "s5", "title": "예제 3·4 — det = 0인 x · 3차 행렬식 계산", "n": ["lin.det2", "lin.det3", "lin.det_props"], "items": [{"t": "m", "k": "\\(\\det=0\\)", "s": "→", "a": "방정식 → 인수분해", "id": "2026-09-03-s5-1"}, {"t": "m", "k": "", "s": "", "a": "예제 4 \\(\\det B=-60\\)", "id": "2026-09-03-s5-2"}, {"t": "m", "k": "", "s": "", "a": "곱 6개 따로 적기", "id": "2026-09-03-s5-3"}]}], "classroom": "../classroom/calc2/2026-09-03.html"}, {"date": "2026-09-08", "label": "9/8(화) · 2주차", "title": "행렬 파트의 본체 — 여인수 전개, 역행렬, 크래머의 법칙", "chs": [{"sid": "s1", "title": "소행렬식과 여인수 — 3차를 2차로 쪼갠다 ★", "n": ["lin.cofactor", "lin.det2"], "items": [{"t": "f", "a": "\\[M_{ij}=a_{ij}\\text{의 행·열을 뺀 }(n-1)\\text{차 행렬식},\\quad A_{ij}=(-1)^{i+j}M_{ij},\\quad \\det A=a_{11}A_{11}+a_{12}A_{12}+a_{13}A_{13}=a_{11}M_{11}-a_{12}M_{12}+a_{13}M_{13}\\]", "id": "2026-09-08-s1-1"}, {"t": "m", "k": "", "s": "", "a": "\\(A_{ij}=(-1)^{i+j}M_{ij}\\) · 부호판", "id": "2026-09-08-s1-2"}, {"t": "m", "k": "", "s": "", "a": "기준 행·열 선언, 값은 동일", "id": "2026-09-08-s1-3"}, {"t": "m", "k": "", "s": "", "a": "0 많은 줄 선택", "id": "2026-09-08-s1-4"}]}, {"sid": "s2", "title": "역행렬 — 2×2는 공식, 3×3은 수반행렬 ★", "n": ["lin.inverse", "lin.det2"], "items": [{"t": "f", "a": "\\[AX=B\\ \\Rightarrow\\ X=A^{-1}B\\qquad(AA^{-1}=A^{-1}A=I,\\ \\text{양변 왼쪽에 }A^{-1})\\]", "id": "2026-09-08-s2-1"}, {"t": "m", "k": "", "s": "", "a": "2×2: \\(\\frac1{ad-bc}\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}\\)", "id": "2026-09-08-s2-2"}, {"t": "m", "k": "", "s": "", "a": "3×3: \\(A^{-1}=\\mathrm{adj}(A)/\\det A\\), adj = 여인수 행렬의 전치", "id": "2026-09-08-s2-3"}, {"t": "m", "k": "", "s": "", "a": "정사각행렬은 \\(\\det=0\\)일 때(그때만) 역행렬 없음", "id": "2026-09-08-s2-4"}]}, {"sid": "s3", "title": "역행렬로 연립방정식 풀기 — Ex9", "n": ["lin.inverse", "lin.linear_system", "lin.det2"], "items": [{"t": "f", "a": "\\[\\begin{cases}x+2y=1\\\\3x+y=1\\end{cases}\\ \\Rightarrow\\ A=\\begin{bmatrix}1&amp;2\\\\3&amp;1\\end{bmatrix},\\ B=\\begin{bmatrix}1\\\\1\\end{bmatrix},\\ \\det A=-5,\\ A^{-1}=-\\tfrac15\\begin{bmatrix}1&amp;-2\\\\-3&amp;1\\end{bmatrix},\\ X=A^{-1}B=\\begin{bmatrix}1/5\\\\2/5\\end{bmatrix}\\]", "id": "2026-09-08-s3-1"}, {"t": "m", "k": "", "s": "", "a": "\\(AX=B\\Rightarrow X=A^{-1}B\\)", "id": "2026-09-08-s3-2"}, {"t": "m", "k": "선언", "s": "→", "a": "역행렬 → 왼쪽 곱 → 대입 검산", "id": "2026-09-08-s3-3"}, {"t": "m", "k": "", "s": "", "a": "Ex9 \\((1/5,\\,2/5)\\)", "id": "2026-09-08-s3-4"}]}, {"sid": "s4", "title": "크래머의 법칙 — 역행렬 없이 행렬식만으로 ★", "n": ["lin.cramer", "lin.inverse", "lin.det2"], "items": [{"t": "f", "a": "\\[\\det A\\ne0:\\quad x_j=\\frac{\\det(A_j)}{\\det(A)},\\qquad A_j=A\\text{의 }j\\text{열을 }B\\text{로 바꾼 행렬}\\]", "id": "2026-09-08-s4-1"}, {"t": "m", "k": "", "s": "", "a": "\\(x_j=\\det A_j/\\det A\\)", "id": "2026-09-08-s4-2"}, {"t": "m", "k": "", "s": "", "a": "\\(\\det A\\ne0\\) 조건", "id": "2026-09-08-s4-3"}, {"t": "m", "k": "행렬식 4개(3차) 계산", "s": "→", "a": "사루스 또는 여인수", "id": "2026-09-08-s4-4"}, {"t": "m", "k": "", "s": "", "a": "Ex10 \\((20/9,-1/3,22/9)\\)", "id": "2026-09-08-s4-5"}]}, {"sid": "s5", "title": "시험 대비 — 이 회차가 행렬 파트의 대비 유형", "n": ["lin.inverse", "lin.cramer", "lin.cofactor"], "items": [{"t": "m", "k": "", "s": "", "a": "유형 5 · 표기 감점 3 · 검산 권장", "id": "2026-09-08-s5-1"}]}], "classroom": "../classroom/calc2/2026-09-08.html"}, {"date": "2026-09-10", "label": "9/10(목) · 2주차", "title": "12.1 3차원 좌표계 — 좌표계 둘, 곡선에서 곡면으로, 점 찍는 법", "chs": [{"sid": "s1", "title": "3D 공간의 좌표계 3종 — 쓰는 것은 둘", "n": ["vec.coords3d"], "items": [{"t": "m", "k": "", "s": "", "a": "직교 \\((x,y,z)\\) ✓", "id": "2026-09-10-s1-1"}, {"t": "m", "k": "", "s": "", "a": "원주 \\((r,\\theta,z)\\) ✓ · 구면 ✗", "id": "2026-09-10-s1-2"}, {"t": "m", "k": "원주", "s": "=", "a": "극좌표 + \\(z\\)", "id": "2026-09-10-s1-3"}]}, {"sid": "s2", "title": "원주좌표 = 극좌표 + 높이 z (판서 우측 그림)", "n": ["vec.coords3d"], "items": [{"t": "f", "a": "\\[x=r\\cos\\theta,\\quad y=r\\sin\\theta,\\quad z=z\\qquad(r\\ge0,\\ \\theta\\text{는 }x\\text{축에서 반시계})\\]", "id": "2026-09-10-s2-1"}, {"t": "m", "k": "", "s": "", "a": "\\(x=r\\cos\\theta\\), \\(y=r\\sin\\theta\\)", "id": "2026-09-10-s2-2"}, {"t": "m", "k": "", "s": "", "a": "\\(r^2=x^2+y^2\\)", "id": "2026-09-10-s2-3"}, {"t": "m", "k": "", "s": "", "a": "문제는 주로 원주좌표로", "id": "2026-09-10-s2-4"}]}, {"sid": "s3", "title": "R² 곡선 vs R³ 곡면 ★", "n": ["vec.coords3d"], "items": [{"t": "m", "k": "변수 2개", "s": "→", "a": "곡선, 3개 → 곡면(보통)", "id": "2026-09-10-s3-1"}, {"t": "m", "k": "", "s": "", "a": "식에 없는 변수는 \"모든 값\"(9/15 예제 1·2의 열쇠)", "id": "2026-09-10-s3-2"}]}, {"sid": "s4", "title": "3차원에 점 찍는 절차 — 모든 그림의 기본 동작", "n": ["vec.coords3d"], "items": [{"t": "f", "a": "\\[P(x_1,y_1,z_1):\\ \\text{① }xy\\text{ 평면에 }(x_1,y_1,0)\\text{을 찍는다(점선 직사각형)}\\ \\to\\ \\text{② }z_1\\text{만큼 수직으로 올린다(음수면 아래로)}\\]", "id": "2026-09-10-s4-1"}, {"t": "m", "k": "점 찍기", "s": "=", "a": "투영 → 올리기", "id": "2026-09-10-s4-2"}]}], "classroom": "../classroom/calc2/2026-09-10.html"}, {"date": "2026-09-15", "label": "9/15(화) · 3주차", "title": "3차원을 그리는 법 — 곡면·거리·구면, 그리고 벡터의 시작", "chs": [{"sid": "s1", "title": "R³ 곡면 그리기 — \"xy 평면에 먼저 그리고 z만큼 올려라\" ★", "n": ["vec.coords3d"], "items": [{"t": "m", "k": "없는 변수", "s": "=", "a": "모든 값", "id": "2026-09-15-s1-1"}, {"t": "m", "k": "", "s": "", "a": "원의 식에서 \\(=\\)은 원둘레, \\(\\le\\)는 원판(내부 포함)", "id": "2026-09-15-s1-2"}, {"t": "m", "k": "", "s": "", "a": "12.1은 시험 X, 그림의 바탕", "id": "2026-09-15-s1-3"}]}, {"sid": "s2", "title": "두 점 사이의 거리 — z 항 하나 추가", "n": ["vec.distance_sphere"], "items": [{"t": "f", "a": "\\[R^2:\\ |AB|=\\sqrt{(x_2-x_1)^2+(y_2-y_1)^2}\\qquad R^3:\\ |PQ|=\\sqrt{(x_2-x_1)^2+(y_2-y_1)^2+(z_2-z_1)^2}\\]", "id": "2026-09-15-s2-1"}, {"t": "m", "k": "거리", "s": "=", "a": "성분 차의 제곱합의 제곱근", "id": "2026-09-15-s2-2"}, {"t": "m", "k": "", "s": "", "a": "근호 정리(√9 → 3)", "id": "2026-09-15-s2-3"}, {"t": "m", "k": "Ex03", "s": "=", "a": "3", "id": "2026-09-15-s2-4"}]}, {"sid": "s3", "title": "구면의 방정식 — 완전제곱으로 중심·반지름, 그리고 그림 ★", "n": ["vec.distance_sphere"], "items": [{"t": "f", "a": "\\[(x-h)^2+(y-k)^2+(z-l)^2=r^2\\quad(\\text{중심 }C(h,k,l),\\ \\text{반지름 }r)\\qquad \\text{Ex04: }(x+2)^2+(y-3)^2+(z+1)^2=8\\ \\Rightarrow\\ C(-2,3,-1),\\ r=2\\sqrt2\\]", "id": "2026-09-15-s3-1"}, {"t": "m", "k": "완전제곱", "s": "→", "a": "중심·반지름 · 근호 정리", "id": "2026-09-15-s3-2"}, {"t": "m", "k": "", "s": "", "a": "<b>그림 + \"중심 C, 반지름 r인 구면\"<\/b> 문장까지", "id": "2026-09-15-s3-3"}, {"t": "m", "k": "구의 부등식", "s": "=", "a": "껍질 등 영역", "id": "2026-09-15-s3-4"}]}, {"sid": "s4", "title": "12.2 벡터 — 크기 + 방향, 시작점과 끝점", "n": ["vec.position_ops", "vec.unit", "vec.cross"], "items": [{"t": "m", "k": "벡터", "s": "=", "a": "크기 + 방향", "id": "2026-09-15-s4-1"}, {"t": "m", "k": "", "s": "", "a": "\\(\\overrightarrow{AB}\\): A 시작, B 끝, 순서 금지 · 화살표 필수", "id": "2026-09-15-s4-2"}]}, {"sid": "s5", "title": "성분과 위치벡터 — 성분은 곧 점의 좌표", "n": ["vec.position_ops", "vec.basis_unit", "vec.cross"], "items": [{"t": "f", "a": "\\[R^2:\\ \\vec a=\\langle a_1,a_2\\rangle=\\overrightarrow{OP},\\ P(a_1,a_2)\\qquad R^3:\\ \\vec a=\\langle a_1,a_2,a_3\\rangle=\\overrightarrow{OQ},\\ Q(a_1,a_2,a_3)\\]", "id": "2026-09-15-s5-1"}, {"t": "m", "k": "성분 \\(\\langle a_1,a_2,a_3\\rangle\\)", "s": "=", "a": "원점 기준 좌표 = 위치벡터", "id": "2026-09-15-s5-2"}]}], "classroom": "../classroom/calc2/2026-09-15.html"}, {"date": "2026-09-17", "label": "9/17(목) · 3주차", "title": "벡터 계산 — 두 점 벡터, 크기, 표준기저벡터 i j k, 단위벡터", "chs": [{"sid": "s1", "title": "두 점으로 정한 벡터 — 끝점 − 시작점 ★", "n": ["vec.position_ops", "vec.cross"], "items": [{"t": "f", "a": "\\[\\overrightarrow{AB}=\\overrightarrow{OB}-\\overrightarrow{OA}=\\langle x_2-x_1,\\ y_2-y_1,\\ z_2-z_1\\rangle\\qquad \\text{Ex01 }A(2,-3,4),\\ B(-2,1,1):\\ \\overrightarrow{AB}=\\langle-4,4,-3\\rangle\\]", "id": "2026-09-17-s1-1"}, {"t": "m", "k": "", "s": "", "a": "\\(\\overrightarrow{AB}=\\overrightarrow{OB}-\\overrightarrow{OA}\\) · 끝 − 시작", "id": "2026-09-17-s1-2"}, {"t": "m", "k": "", "s": "", "a": "Ex01 \\(\\langle-4,4,-3\\rangle\\)", "id": "2026-09-17-s1-3"}, {"t": "m", "k": "유향선분(有向)", "s": "=", "a": "방향 있는 선분", "id": "2026-09-17-s1-4"}]}, {"sid": "s2", "title": "크기와 기본 연산 — 덧셈·뺄셈·실수배", "n": ["vec.position_ops"], "items": [{"t": "f", "a": "\\[|\\vec a|=\\sqrt{a_1^2+a_2^2+a_3^2}\\qquad \\vec a=\\vec b\\Leftrightarrow a_i=b_i,\\quad \\vec a\\pm\\vec b=\\langle a_1\\pm b_1,a_2\\pm b_2,a_3\\pm b_3\\rangle,\\quad k\\vec a=\\langle ka_1,ka_2,ka_3\\rangle\\]", "id": "2026-09-17-s2-1"}, {"t": "m", "k": "", "s": "", "a": "\\(|\\vec a|=\\sqrt{\\sum a_i^2}\\)", "id": "2026-09-17-s2-2"}, {"t": "m", "k": "", "s": "", "a": "상등·합차·실수배는 성분끼리", "id": "2026-09-17-s2-3"}, {"t": "m", "k": "", "s": "", "a": "곱은 내적·외적으로 따로 · 나눗셈 없음", "id": "2026-09-17-s2-4"}, {"t": "m", "k": "", "s": "", "a": "클리닉 질문 항목", "id": "2026-09-17-s2-5"}]}, {"sid": "s3", "title": "★④ 표준기저벡터 i, j, k — 시험은 여기부터", "n": ["vec.basis_unit"], "items": [{"t": "m", "k": "", "s": "", "a": "\\(\\vec a=a_1\\vec i+a_2\\vec j+a_3\\vec k\\)", "id": "2026-09-17-s3-1"}, {"t": "m", "k": "", "s": "", "a": "성분 ↔ 기저 자유롭게", "id": "2026-09-17-s3-2"}, {"t": "m", "k": "", "s": "", "a": "문제 표기대로 답", "id": "2026-09-17-s3-3"}, {"t": "m", "k": "", "s": "", "a": "Ex03 \\(14\\vec i+4\\vec j+15\\vec k\\)", "id": "2026-09-17-s3-4"}]}, {"sid": "s4", "title": "★⑤ 단위벡터 — 방향은 같고 크기만 1로", "n": ["vec.basis_unit", "vec.unit", "vec.position_ops"], "items": [{"t": "f", "a": "\\[|\\vec i|=|\\vec j|=|\\vec k|=1,\\qquad \\vec u=\\frac{1}{|\\vec a|}\\vec a\\ (\\vec a\\ne\\vec0,\\ \\text{a 와 같은 방향의 단위벡터})\\qquad \\text{Ex04: }\\vec a=2\\vec i-\\vec j-2\\vec k,\\ |\\vec a|=3,\\ \\vec u=\\tfrac23\\vec i-\\tfrac13\\vec j-\\tfrac23\\vec k\\]", "id": "2026-09-17-s4-1"}, {"t": "m", "k": "", "s": "", "a": "\\(\\vec u=\\vec a/|\\vec a|\\)", "id": "2026-09-17-s4-2"}, {"t": "m", "k": "", "s": "", "a": "표기: 단위벡터라 밝히거나 \\((1/|a|)a\\)", "id": "2026-09-17-s4-3"}, {"t": "m", "k": "", "s": "", "a": "Ex02 \\(7\\sqrt2\\)", "id": "2026-09-17-s4-4"}, {"t": "m", "k": "", "s": "", "a": "Ex04 \\(\\frac23\\vec i-\\frac13\\vec j-\\frac23\\vec k\\)", "id": "2026-09-17-s4-5"}, {"t": "m", "k": "", "s": "", "a": "sol. i) ii) 단계 번호 형식", "id": "2026-09-17-s4-6"}]}, {"sid": "s5", "title": "12.3 내적 도입 — 정의(성분 합)와 정리 1(코사인) ★", "n": ["vec.dot_calc2"], "items": [{"t": "f", "a": "\\[\\textbf{Def 01}\\ \\vec a\\cdot\\vec b=a_1b_1+a_2b_2+a_3b_3\\ (\\text{실수})\\qquad \\textbf{Thm 01}\\ \\vec a\\cdot\\vec b=|\\vec a||\\vec b|\\cos\\theta\\ \\Rightarrow\\ \\cos\\theta=\\frac{\\vec a\\cdot\\vec b}{|\\vec a||\\vec b|}\\ \\Rightarrow\\ \\theta\\]", "id": "2026-09-17-s5-1"}, {"t": "m", "k": "", "s": "", "a": "\\(\\vec a\\cdot\\vec b=\\sum a_ib_i\\) · 스칼라", "id": "2026-09-17-s5-2"}, {"t": "m", "k": "", "s": "", "a": "점 진하게, × 금지", "id": "2026-09-17-s5-3"}, {"t": "m", "k": "", "s": "", "a": "\\(\\cos\\theta=\\vec a\\cdot\\vec b/|\\vec a||\\vec b|\\)", "id": "2026-09-17-s5-4"}]}], "classroom": "../classroom/calc2/2026-09-17.html"}, {"date": "2026-09-22", "label": "9/22(화) · 4주차", "title": "12.3 방향각·방향코사인 → 12.4 외적 — \"두 벡터에 수직인 벡터\"", "chs": [{"sid": "s1", "title": "Thm 01 증명 — 코사인 제2법칙에서 a·b = |a||b|cos θ (지각 구간 보충)", "n": ["vec.dot_calc2"], "items": [{"t": "f", "a": "\\[|\\vec a-\\vec b|^2=|\\vec a|^2+|\\vec b|^2-2|\\vec a||\\vec b|\\cos\\theta\\quad\\text{와}\\quad |\\vec a-\\vec b|^2=(\\vec a-\\vec b)\\cdot(\\vec a-\\vec b)=|\\vec a|^2-2\\,\\vec a\\cdot\\vec b+|\\vec b|^2\\ \\Rightarrow\\ \\vec a\\cdot\\vec b=|\\vec a||\\vec b|\\cos\\theta\\]", "id": "2026-09-22-s1-1"}, {"t": "m", "k": "", "s": "", "a": "\\(\\vec a\\cdot\\vec b=|\\vec a||\\vec b|\\cos\\theta\\)", "id": "2026-09-22-s1-2"}, {"t": "m", "k": "", "s": "", "a": "\\(\\cos\\theta=\\vec a\\cdot\\vec b/(|\\vec a||\\vec b|)\\)", "id": "2026-09-22-s1-3"}, {"t": "m", "k": "증명", "s": "=", "a": "코사인법칙 + 분배 전개", "id": "2026-09-22-s1-4"}]}, {"sid": "s2", "title": "방향각과 방향코사인 (판서 ①②) ★", "n": ["vec.unit", "vec.dot_calc2"], "items": [{"t": "f", "a": "\\[\\cos\\alpha=\\frac{\\vec a\\cdot\\vec i}{|\\vec a||\\vec i|}=\\frac{a_1}{|\\vec a|},\\quad \\cos\\beta=\\frac{a_2}{|\\vec a|},\\quad \\cos\\gamma=\\frac{a_3}{|\\vec a|}\\qquad \\text{ㄱ }\\cos^2\\alpha+\\cos^2\\beta+\\cos^2\\gamma=1\\qquad \\text{ㄴ }\\vec u=\\frac{\\vec a}{|\\vec a|}=(\\cos\\alpha,\\cos\\beta,\\cos\\gamma)\\]", "id": "2026-09-22-s2-1"}, {"t": "m", "k": "", "s": "", "a": "\\(\\cos\\alpha=a_1/|\\vec a|\\) 등", "id": "2026-09-22-s2-2"}, {"t": "m", "k": "ㄱ 제곱합", "s": "=", "a": "1", "id": "2026-09-22-s2-3"}, {"t": "m", "k": "ㄴ 단위벡터", "s": "=", "a": "(cos α, cos β, cos γ)", "id": "2026-09-22-s2-4"}]}, {"sid": "s3", "title": "Ex04 — a = (3, 4, 5)의 방향각 (판서 ②③)", "n": ["vec.unit"], "items": [{"t": "f", "a": "\\[|\\vec a|=\\sqrt{50}=5\\sqrt2,\\quad \\cos\\alpha=\\frac{3}{5\\sqrt2}=\\frac{3\\sqrt2}{10},\\ \\cos\\beta=\\frac{4}{5\\sqrt2}=\\frac{2\\sqrt2}{5},\\ \\cos\\gamma=\\frac{5}{5\\sqrt2}=\\frac{\\sqrt2}{2}\\ \\Rightarrow\\ \\alpha=\\cos^{-1}\\tfrac{3\\sqrt2}{10},\\ \\beta=\\cos^{-1}\\tfrac{2\\sqrt2}{5},\\ \\gamma=\\tfrac\\pi4\\]", "id": "2026-09-22-s3-1"}, {"t": "m", "k": "수순: 크기", "s": "→", "a": "성분/크기 → 유리화 → \\(\\cos^{-1}\\) · 검산 ㄱ", "id": "2026-09-22-s3-2"}, {"t": "m", "k": "", "s": "", "a": "Ex04 \\(\\gamma=\\pi/4\\)", "id": "2026-09-22-s3-3"}]}, {"sid": "s4", "title": "12.4 외적(Cross Product) — 정의는 2×2 행렬식 셋 (판서 ④) ★", "n": ["vec.cross"], "items": [{"t": "f", "a": "\\[\\vec a\\times\\vec b=\\langle a_2b_3-a_3b_2,\\ a_3b_1-a_1b_3,\\ a_1b_2-a_2b_1\\rangle=\\Big(\\begin{vmatrix}a_2&amp;a_3\\\\b_2&amp;b_3\\end{vmatrix},\\ \\begin{vmatrix}a_3&amp;a_1\\\\b_3&amp;b_1\\end{vmatrix},\\ \\begin{vmatrix}a_1&amp;a_2\\\\b_1&amp;b_2\\end{vmatrix}\\Big)\\]", "id": "2026-09-22-s4-1"}, {"t": "m", "k": "세 성분", "s": "=", "a": "2×2 행렬식 셋, 순환 (2,3)(3,1)(1,2) · 결과는 벡터", "id": "2026-09-22-s4-2"}, {"t": "m", "k": "", "s": "", "a": "검산 \\(\\vec a\\cdot(\\vec a\\times\\vec b)=0\\)", "id": "2026-09-22-s4-3"}]}, {"sid": "s5", "title": "[유도] 왜 그 성분인가 — 두 벡터에 수직인 벡터 (판서 ⑤⑥)", "n": ["vec.cross"], "items": [{"t": "f", "a": "\\[\\vec a\\perp\\vec c,\\ \\vec b\\perp\\vec c\\ \\Leftrightarrow\\ \\begin{cases}a_1c_1+a_2c_2+a_3c_3=0&amp;\\cdots\\text{ㄱ}\\\\b_1c_1+b_2c_2+b_3c_3=0&amp;\\cdots\\text{ㄴ}\\end{cases}\\ \\xrightarrow{\\text{ㄱ}\\times b_3-\\text{ㄴ}\\times a_3}\\ \\underbrace{(a_1b_3-a_3b_1)}_{p}c_1+\\underbrace{(a_2b_3-a_3b_2)}_{q}c_2=0\\]", "id": "2026-09-22-s5-1"}, {"t": "m", "k": "외적", "s": "=", "a": "두 벡터에 수직", "id": "2026-09-22-s5-2"}, {"t": "m", "k": "유도", "s": "=", "a": "내적 0 두 식에서 \\(c_3\\) 소거", "id": "2026-09-22-s5-3"}, {"t": "m", "k": "판서 오타 ×b₂", "s": "→", "a": "×b₃", "id": "2026-09-22-s5-4"}]}], "classroom": "../classroom/calc2/2026-09-22.html"}]}, KEY="mc-memo-"+D.slug;
+const $=s=>document.querySelector(s), $$=(s,el)=>Array.from((el||document).querySelectorAll(s));
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let ST={}; try{ ST=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ ST={}; }
+let UI={hide:false,left:false}; try{ UI=Object.assign(UI,JSON.parse(localStorage.getItem(KEY+"-ui")||"{}")); }catch(e){}
+const CH={}; D.lessons.forEach(l=>l.chs.forEach(c=>{ CH[l.date+"|"+c.sid]=c; }));
+function ev(k,x){ try{ if(window.TJ){ const o=Object.assign({k:k},x||{}); if(o.n&&o.n.length) TJ.rec(o); } }catch(e){} }
+function itemHTML(it){ return '<div class="it '+(it.t==="f"?"f":"m")+(ST[it.id]?" done":"")+'" data-id="'+esc(it.id)+'"><div class="c">'+(it.k?'<span class="k">'+it.k+'</span><span class="sep">'+esc(it.s)+'</span> ':'')+'<span class="ans">'+splitDisplays(it.a,innerWidth<700)+'</span></div><button type="button" class="ck" aria-label="외움" aria-pressed="'+(ST[it.id]?"true":"false")+'"></button></div>'; }
+function render(){
+  $("#dates").innerHTML=D.lessons.map(l=>'<a href="#d'+l.date+'">'+esc(l.label.split(" · ")[0])+'</a>').join("");
+  $("#list").innerHTML=D.lessons.map(l=>'<section class="ls" id="d'+l.date+'" data-date="'+l.date+'"><h2><span class="dt">'+esc(l.label)+'</span>'+esc(l.title)+'<a class="go" href="'+esc(l.classroom)+'">교실</a></h2>'+
+    l.chs.map(c=>'<div class="ch" data-k="'+l.date+"|"+esc(c.sid)+'"><h3>'+esc(c.title)+'</h3>'+c.items.map(itemHTML).join("")+'</div>').join("")+'</section>').join("");
+  try{ renderMathInElement($("#list"),{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){}
+  fit(); bind(); stat(); }
+/* 식은 한 줄 — 넘치면 글자를 줄여서(14px 까지), 그래도 넘치면 식 안에서 밀어 본다 */
+function fit(){ $$(".katex-display").forEach(k=>{ k.style.fontSize=""; const cw=k.clientWidth, sw=k.scrollWidth; if(!(cw>0&&sw>cw+1)) return; const kx=k.querySelector(".katex"), fz=parseFloat(getComputedStyle(kx||k).fontSize)||20, lo=Math.min(1,Math.max(.6,14/fz)); k.style.fontSize=Math.max(lo,Math.floor(cw/sw*100)/100)+"em"; });
+  $$(".katex").forEach(k=>{ if(k.closest(".katex-display")) return; k.style.fontSize=""; const box=k.closest(".c"); if(!box) return; const cw=box.clientWidth, w=k.getBoundingClientRect().width; if(cw>0&&w>cw-2){ const fs=parseFloat(getComputedStyle(k).fontSize)||17; k.style.fontSize=Math.max(14,Math.floor(fs*(cw-6)/w))+"px"; } }); }
+function stat(){ const all=$$(".it"), dn=all.filter(x=>x.classList.contains("done")).length; $("#cnt").textContent="외움 "+dn+"/"+all.length; $("#barI").style.width=(all.length?Math.round(dn/all.length*100):0)+"%";
+  $$(".ch").forEach(c=>c.classList.toggle("alldone",$$(".it",c).every(x=>x.classList.contains("done"))));
+  $$(".ls").forEach(l=>l.classList.toggle("alldone",$$(".ch",l).every(c=>c.classList.contains("alldone"))));
+  document.body.classList.toggle("none",all.length>0&&dn===all.length); }
+function bind(){ $$(".it").forEach(el=>{ const id=el.dataset.id, ch=el.closest(".ch"), c=CH[ch.dataset.k]||{}, date=ch.dataset.k.split("|")[0];
+  el.querySelector(".c").onclick=()=>{ if(document.body.classList.contains("hide")) el.classList.toggle("show"); };
+  el.querySelector(".ck").onclick=()=>{ const on=!ST[id]; if(on) ST[id]=1; else delete ST[id]; try{ localStorage.setItem(KEY,JSON.stringify(ST)); }catch(e){}
+    el.classList.toggle("done",on); el.querySelector(".ck").setAttribute("aria-pressed",on?"true":"false"); stat();
+    ev("memo",{ok:on,n:c.n||[],lid:D.slug+"-"+date,sid:c.sid}); }; }); }
+function ui(){ document.body.classList.toggle("hide",UI.hide); document.body.classList.toggle("left",UI.left); $("#bHide").setAttribute("aria-pressed",UI.hide?"true":"false"); $("#bLeft").setAttribute("aria-pressed",UI.left?"true":"false");
+  $$(".it.show").forEach(x=>x.classList.remove("show")); try{ localStorage.setItem(KEY+"-ui",JSON.stringify(UI)); }catch(e){} }
+$("#bHide").onclick=()=>{ UI.hide=!UI.hide; ui(); }; $("#bLeft").onclick=()=>{ UI.left=!UI.left; ui(); };
+window.addEventListener("resize",fit,{passive:true});
+function boot(){ render(); ui(); const h=location.hash; if(h&&/^#d\d{4}-\d{2}-\d{2}$/.test(h)){ const el=document.querySelector(h); if(el) setTimeout(()=>el.scrollIntoView(),60); }
+  try{ document.fonts.ready.then(fit); }catch(e){} }
+(function wait(){ if(window.renderMathInElement) boot(); else setTimeout(wait,40); })();
+</script>
+</body>
+</html>

@@ -42,12 +42,18 @@ section.s p{margin:0 0 10px}
 section.s.read::after{content:"읽음";position:absolute;right:16px;top:14px;font-size:12px;color:var(--accent);font-weight:700;border:1px solid rgba(21,128,61,.35);border-radius:999px;padding:1px 9px;background:rgba(21,128,61,.06)}
 /* 상자들 */
 .why,.say,.analogy,.formula,.pitfall,.memo{margin:12px 0;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:var(--paper-2);font-size:17px}
-.why{border-left:5px solid var(--blue)}.why::before{content:"왜 그런가";display:block;font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:4px}
-.say{border-left:5px solid var(--pink);background:rgba(255,77,141,.06)}.say::before{content:"교수님 말";display:block;font-size:12.5px;font-weight:700;color:var(--pink);margin-bottom:4px}
-.analogy{border-left:5px solid var(--yel);background:rgba(245,159,0,.07)}.analogy::before{content:"비유";display:block;font-size:12.5px;font-weight:700;color:#B26A00;margin-bottom:4px}
-.formula{border-left:5px solid var(--green);background:rgba(47,158,68,.06)}.formula::before{content:"외울 것";display:block;font-size:12.5px;font-weight:700;color:var(--green);margin-bottom:4px}
-.pitfall{border-left:5px solid var(--red);background:rgba(224,49,49,.05)}.pitfall::before{content:"함정";display:block;font-size:12.5px;font-weight:700;color:var(--red);margin-bottom:4px}
+/* 암기·이해 구분(대표님 2026-09-29): 상자 머리말 = 알약. 암기(주황) = 공식·외울 것, 이해(파랑) = 왜·비유 */
+.why::before,.analogy::before,.formula::before,.pitfall::before,.say::before,.memo.am::before{display:table;font-size:12px;font-weight:800;line-height:1;padding:5px 10px;border-radius:999px;margin:0 0 8px;color:#fff;letter-spacing:.02em}
+.why{border-left:5px solid var(--blue)}.why::before{content:"이해 · 왜";background:#1D4ED8}
+.say{border-left:5px solid var(--pink);background:rgba(255,77,141,.06)}.say::before{content:"교수님 말";background:#A61E4D}
+.analogy{border-left:5px solid var(--yel);background:rgba(245,159,0,.07)}.analogy{border-left-color:var(--blue)}.analogy::before{content:"이해 · 비유";background:#1D4ED8}
+.formula{border-left:5px solid var(--green);background:rgba(47,158,68,.06)}.formula{border-left-color:#D97706;background:rgba(217,119,6,.06)}.formula::before{content:"암기 · 공식";background:#B45309}
+.pitfall{border-left:5px solid var(--red);background:rgba(224,49,49,.05)}.pitfall::before{content:"함정";background:#C92A2A}
 .memo{border-left:5px solid var(--ink-3)}
+.memo.am{border-left-color:#D97706;background:rgba(217,119,6,.06)}.memo.am::before{content:"암기";background:#B45309}
+/* 인라인 식은 줄에서 끊지 않는다(대표님 2026-09-29 「수식 한 줄로」) — 넘치면 fitInline 이 줄인다 */
+.katex{white-space:nowrap}
+#top a.memo-l{color:var(--ink);font-weight:700;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:rgba(255,255,255,.6);min-height:32px;display:inline-flex;align-items:center}
 .katex-display{margin:10px 0;overflow-x:auto;overflow-y:hidden}
 /* 그림 */
 figure.fig{margin:14px auto;text-align:center;max-width:560px}
@@ -100,7 +106,7 @@ details.ex .body p{margin:8px 0}
   section.s,.q,#result,header.h .lead{border-color:rgba(255,255,255,.1);box-shadow:0 12px 34px rgba(0,0,0,.35)}
   .choice{background:rgba(255,255,255,.06)}.q .ans{background:rgba(255,255,255,.06)}.q .myans{background:rgba(255,255,255,.06)}
   .btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}.btn.a{color:#052E16}
-  .say{background:rgba(255,77,141,.10)}.analogy{background:rgba(245,159,0,.10)}.formula{background:rgba(47,158,68,.10)}.pitfall{background:rgba(224,49,49,.10)}
+  .say{background:rgba(255,77,141,.10)}.analogy{background:rgba(59,130,246,.10)}.formula{background:rgba(217,119,6,.12)}.memo.am{background:rgba(217,119,6,.12)}.pitfall{background:rgba(224,49,49,.10)}#top a.memo-l{background:rgba(255,255,255,.08)}
   figure.fig svg{filter:invert(1) hue-rotate(180deg) saturate(1.2)}
 }
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#top{background:#FFFFFF}section.s,.q,#result{background:#FFFFFF}}
@@ -110,7 +116,7 @@ details.ex .body p{margin:8px 0}
 </style>
 </head>
 <body>
-<div id="top"><div class="in"><b id="tCourse">공업수학1</b><span id="tSess">9/23(수) · 4주차 · 약 18분</span><span class="sp"></span><span id="tRead">읽음 0/0</span><span class="pct" id="tPct">0%</span></div><div id="bar"><i id="barI"></i></div></div>
+<div id="top"><div class="in"><b id="tCourse">공업수학1</b><span id="tSess">9/23(수) · 4주차 · 약 18분</span><span class="sp"></span><span id="tRead">읽음 0/0</span><span class="pct" id="tPct">0%</span><a class="memo-l" href="../../memo/em1.html#d2026-09-23">암기노트</a></div><div id="bar"><i id="barI"></i></div></div>
 <main>
 <header class="h"><div class="kicker">공업수학1 · 9/23(수) · 4주차 · 약 18분</div><h1>2.5 오일러-코시 — 지수 대신 거듭제곱, 그리고 2.6 론스키안</h1><div class="meta"><span>판서 17장 (09:27~10:04)</span><span>녹음 없음</span><span>교재 Kreyszig 2.5·2.6</span><span>4주차 · 수 · 과제 2.5 #3·5·7·13</span></div><div class="lead">2.2가 "\(e^{\lambda x}\)를 넣어 2차방정식"이었다면, 2.5는 계수가 \(x^2, x, 1\)인 방정식에 <b>\(x^m\)</b>을 넣어 2차방정식(보조방정식)을 얻는다. 근의 세 경우도 2.2와 짝을 이룬다 — 중근이면 \(\ln x\)가 붙고, 복소근이면 \(\cos(q\ln x)\). 뒤 15분은 <b>론스키안</b>: 1차독립 판정을 행렬식 하나로. 녹음이 없어 판서 17장으로 정리했고, 첫 사진(09:27) 이전의 (1) 실근 경우는 교재로 보충했다.</div></header>
 <section class="s" data-id="s1">
@@ -120,7 +126,7 @@ details.ex .body p{margin:8px 0}
 <div class="why">\(x^m\)을 미분할 때마다 \(x\)의 차수가 하나씩 내려가는데, 계수 \(x^2, x, 1\)이 그것을 정확히 되돌려 모든 항이 \(x^m\)으로 맞춰진다 → \(x^m\)이 빠지고 \(m\)의 2차방정식만 남는다. 2.2의 \(e^{\lambda x}\)와 같은 원리(미분해도 꼴이 유지되는 함수). (1) 서로 다른 실근 \(m_1,m_2\)면 \(y=c_1x^{m_1}+c_2x^{m_2}\) — 이 부분은 사진 이전이라 교재 그대로.</div>
 <div class="pitfall">\(a-1\)을 잊지 말 것: \(m(m-1)+am+b\)에서 \(-m\)이 나온다. 표준형으로 나누면 \(p=a/x\), \(q=b/x^2\)(판서에는 \(b/x\)로 적혔으나 \(x^2\)으로 나누었으니 \(b/x^2\)이 맞다).</div>
 <div class="analogy">2.2가 "시간 \(t\)로 자라는" 지수 세계라면 2.5는 "배율 \(x\)로 자라는" 거듭제곱 세계. \(x=e^t\)로 치환하면 실제로 2.2로 돌아간다 — 그래서 결과가 짝을 이룬다.</div>
-<div class="memo"><b>외울 것</b> \(x^2y''+axy'+by=0\) → \(m^2+(a-1)m+b=0\) · (1) \(c_1x^{m_1}+c_2x^{m_2}\) · \(x&gt;0\)에서 생각</div>
+<div class="memo am">\(x^2y''+axy'+by=0\) → \(m^2+(a-1)m+b=0\) · (1) \(c_1x^{m_1}+c_2x^{m_2}\) · \(x&gt;0\)에서 생각</div>
 </section>
 
 <section class="s" data-id="s2">
@@ -130,7 +136,7 @@ details.ex .body p{margin:8px 0}
 <div class="formula">\[\int\frac{u''}{u'}=\int-\frac1x\ \Rightarrow\ \ln u'=-\ln x\ \Rightarrow\ u'=\frac1x\ \Rightarrow\ u=\ln x\qquad\therefore\ y=(c_1+c_2\ln x)\,x^{(1-a)/2}\]</div>
 <div class="why">괄호 계산이 판서의 핵심: \(2xy_1'+ay_1=2x\cdot\tfrac{1-a}{2}x^{(-a-1)/2}+ax^{(1-a)/2}=(1-a)x^{(1-a)/2}+ax^{(1-a)/2}=x^{(1-a)/2}=y_1\). 그래서 식이 \((u''x^2+u'x)y_1=0\)으로 줄고 \(u'=1/x\). 2.2에서 \(u''=0\Rightarrow u=x\)였던 자리가 여기서는 \(u=\ln x\).</div>
 <div class="analogy">2.2의 쌍둥이에게 \(x\)라는 명찰을 붙였다면, 거듭제곱 세계의 쌍둥이 명찰은 \(\ln x\). \(x=e^t\)로 보면 \(\ln x=t\) — 같은 명찰이다.</div>
-<div class="memo"><b>외울 것</b> 중근 \(m=\tfrac{1-a}2\) · \(y=(c_1+c_2\ln x)x^m\) · 유도 = 차수축소, \(2xy_1'+ay_1=y_1\)</div>
+<div class="memo am">중근 \(m=\tfrac{1-a}2\) · \(y=(c_1+c_2\ln x)x^m\) · 유도 = 차수축소, \(2xy_1'+ay_1=y_1\)</div>
 </section>
 
 <section class="s" data-id="s3">
@@ -140,7 +146,7 @@ details.ex .body p{margin:8px 0}
 <figure class="fig" data-fig="osc"><svg class="fig-svg" viewbox="0 0 560 200" width="560" height="200" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><line x1="40" y1="100" x2="540" y2="100" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><line x1="40" y1="100" x2="40" y2="100" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><text x="536" y="118" font-size="13" fill="#1F2A44" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">x</text><text x="34" y="104" font-size="13" fill="#1F2A44" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">y</text><line x1="40" y1="100" x2="40" y2="20" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><path d="M55.0 156.0 L56.2 152.0 L57.4 147.2 L58.6 141.9 L59.8 136.3 L61.0 130.5 L62.2 124.6 L63.3 118.7 L64.5 112.9 L65.7 107.3 L66.9 101.9 L68.1 96.7 L69.3 91.7 L70.5 87.0 L71.7 82.6 L72.9 78.4 L74.1 74.5 L75.3 70.8 L76.5 67.4 L77.7 64.2 L78.8 61.3 L80.0 58.6 L81.2 56.1 L82.4 53.8 L83.6 51.8 L84.8 49.9 L86.0 48.3 L87.2 46.8 L88.4 45.5 L89.6 44.3 L90.8 43.3 L92.0 42.5 L93.2 41.7 L94.4 41.2 L95.5 40.7 L96.7 40.4 L97.9 40.1 L99.1 40.0 L100.3 40.0 L101.5 40.1 L102.7 40.2 L103.9 40.5 L105.1 40.8 L106.3 41.2 L107.5 41.6 L108.7 42.2 L109.9 42.8 L111.0 43.4 L112.2 44.1 L113.4 44.8 L114.6 45.6 L115.8 46.5 L117.0 47.3 L118.2 48.2 L119.4 49.2 L120.6 50.1 L121.8 51.1 L123.0 52.2 L124.2 53.2 L125.4 54.3 L126.5 55.4 L127.7 56.5 L128.9 57.6 L130.1 58.8 L131.3 60.0 L132.5 61.1 L133.7 62.3 L134.9 63.5 L136.1 64.7 L137.3 65.9 L138.5 67.1 L139.7 68.3 L140.9 69.6 L142.1 70.8 L143.2 72.0 L144.4 73.2 L145.6 74.5 L146.8 75.7 L148.0 76.9 L149.2 78.1 L150.4 79.4 L151.6 80.6 L152.8 81.8 L154.0 83.0 L155.2 84.2 L156.4 85.4 L157.6 86.6 L158.7 87.8 L159.9 88.9 L161.1 90.1 L162.3 91.3 L163.5 92.4 L164.7 93.6 L165.9 94.7 L167.1 95.8 L168.3 96.9 L169.5 98.1 L170.7 99.2 L171.9 100.2 L173.1 101.3 L174.2 102.4 L175.4 103.5 L176.6 104.5 L177.8 105.5 L179.0 106.6 L180.2 107.6 L181.4 108.6 L182.6 109.6 L183.8 110.6 L185.0 111.6 L186.2 112.5 L187.4 113.5 L188.6 114.4 L189.8 115.3 L190.9 116.3 L192.1 117.2 L193.3 118.1 L194.5 118.9 L195.7 119.8 L196.9 120.7 L198.1 121.5 L199.3 122.4 L200.5 123.2 L201.7 124.0 L202.9 124.8 L204.1 125.6 L205.3 126.4 L206.4 127.2 L207.6 127.9 L208.8 128.7 L210.0 129.4 L211.2 130.1 L212.4 130.9 L213.6 131.6 L214.8 132.3 L216.0 132.9 L217.2 133.6 L218.4 134.3 L219.6 134.9 L220.8 135.6 L222.0 136.2 L223.1 136.8 L224.3 137.4 L225.5 138.0 L226.7 138.6 L227.9 139.2 L229.1 139.8 L230.3 140.4 L231.5 140.9 L232.7 141.4 L233.9 142.0 L235.1 142.5 L236.3 143.0 L237.5 143.5 L238.6 144.0 L239.8 144.5 L241.0 145.0 L242.2 145.4 L243.4 145.9 L244.6 146.3 L245.8 146.8 L247.0 147.2 L248.2 147.6 L249.4 148.1 L250.6 148.5 L251.8 148.9 L253.0 149.2 L254.1 149.6 L255.3 150.0 L256.5 150.4 L257.7 150.7 L258.9 151.1 L260.1 151.4 L261.3 151.7 L262.5 152.1 L263.7 152.4 L264.9 152.7 L266.1 153.0 L267.3 153.3 L268.5 153.6 L269.6 153.8 L270.8 154.1 L272.0 154.4 L273.2 154.6 L274.4 154.9 L275.6 155.1 L276.8 155.4 L278.0 155.6 L279.2 155.8 L280.4 156.0 L281.6 156.2 L282.8 156.4 L284.0 156.6 L285.2 156.8 L286.3 157.0 L287.5 157.2 L288.7 157.4 L289.9 157.5 L291.1 157.7 L292.3 157.8 L293.5 158.0 L294.7 158.1 L295.9 158.3 L297.1 158.4 L298.3 158.5 L299.5 158.6 L300.7 158.8 L301.8 158.9 L303.0 159.0 L304.2 159.1 L305.4 159.2 L306.6 159.2 L307.8 159.3 L309.0 159.4 L310.2 159.5 L311.4 159.5 L312.6 159.6 L313.8 159.7 L315.0 159.7 L316.2 159.8 L317.3 159.8 L318.5 159.8 L319.7 159.9 L320.9 159.9 L322.1 159.9 L323.3 160.0 L324.5 160.0 L325.7 160.0 L326.9 160.0 L328.1 160.0 L329.3 160.0 L330.5 160.0 L331.7 160.0 L332.9 160.0 L334.0 160.0 L335.2 159.9 L336.4 159.9 L337.6 159.9 L338.8 159.9 L340.0 159.8 L341.2 159.8 L342.4 159.7 L343.6 159.7 L344.8 159.6 L346.0 159.6 L347.2 159.5 L348.4 159.5 L349.5 159.4 L350.7 159.3 L351.9 159.3 L353.1 159.2 L354.3 159.1 L355.5 159.1 L356.7 159.0 L357.9 158.9 L359.1 158.8 L360.3 158.7 L361.5 158.6 L362.7 158.5 L363.9 158.4 L365.1 158.3 L366.2 158.2 L367.4 158.1 L368.6 158.0 L369.8 157.9 L371.0 157.8 L372.2 157.6 L373.4 157.5 L374.6 157.4 L375.8 157.3 L377.0 157.1 L378.2 157.0 L379.4 156.9 L380.6 156.7 L381.7 156.6 L382.9 156.5 L384.1 156.3 L385.3 156.2 L386.5 156.0 L387.7 155.9 L388.9 155.7 L390.1 155.6 L391.3 155.4 L392.5 155.3 L393.7 155.1 L394.9 155.0 L396.1 154.8 L397.2 154.6 L398.4 154.5 L399.6 154.3 L400.8 154.1 L402.0 153.9 L403.2 153.8 L404.4 153.6 L405.6 153.4 L406.8 153.2 L408.0 153.1 L409.2 152.9 L410.4 152.7 L411.6 152.5 L412.8 152.3 L413.9 152.1 L415.1 151.9 L416.3 151.7 L417.5 151.6 L418.7 151.4 L419.9 151.2 L421.1 151.0 L422.3 150.8 L423.5 150.6 L424.7 150.4 L425.9 150.2 L427.1 150.0 L428.3 149.8 L429.4 149.5 L430.6 149.3 L431.8 149.1 L433.0 148.9 L434.2 148.7 L435.4 148.5 L436.6 148.3 L437.8 148.1 L439.0 147.9 L440.2 147.6 L441.4 147.4 L442.6 147.2 L443.8 147.0 L444.9 146.8 L446.1 146.5 L447.3 146.3 L448.5 146.1 L449.7 145.9 L450.9 145.6 L452.1 145.4 L453.3 145.2 L454.5 145.0 L455.7 144.7 L456.9 144.5 L458.1 144.3 L459.3 144.0 L460.4 143.8 L461.6 143.6 L462.8 143.3 L464.0 143.1 L465.2 142.9 L466.4 142.6 L467.6 142.4 L468.8 142.2 L470.0 141.9 L471.2 141.7 L472.4 141.4 L473.6 141.2 L474.8 141.0 L476.0 140.7 L477.1 140.5 L478.3 140.2 L479.5 140.0 L480.7 139.8 L481.9 139.5 L483.1 139.3 L484.3 139.0 L485.5 138.8 L486.7 138.5 L487.9 138.3 L489.1 138.0 L490.3 137.8 L491.5 137.5 L492.6 137.3 L493.8 137.1 L495.0 136.8 L496.2 136.6 L497.4 136.3 L498.6 136.1 L499.8 135.8 L501.0 135.6 L502.2 135.3 L503.4 135.1 L504.6 134.8 L505.8 134.6 L507.0 134.3 L508.1 134.1 L509.3 133.8 L510.5 133.5 L511.7 133.3 L512.9 133.0 L514.1 132.8 L515.3 132.5 L516.5 132.3 L517.7 132.0 L518.9 131.8 L520.1 131.5 L521.3 131.3 L522.5 131.0 L523.7 130.8 L524.8 130.5 L526.0 130.3 L527.2 130.0 L528.4 129.7 L529.6 129.5 L530.8 129.2 L532.0 129.0" fill="none" stroke="#2F9E44" stroke-width="2.4"></path></g><g data-step="2"><text x="300" y="34" font-size="12.5" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">y = cos(2 ln x)   — 진동하지만 x 가 커질수록 느려진다 (ln x)</text></g><g data-step="3"><text x="300" y="186" font-size="12" fill="#8A97A6" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">x^p 배가 곱해지면 진폭이 x^p 로 커지거나 줄어든다</text></g></svg><figcaption>(3) 복소근 m = p ± iq 의 해 xᵖ cos(q ln x), xᵖ sin(q ln x). 2.2 의 cos qx 에서 x 가 ln x 로 바뀐 꼴.</figcaption></figure>
 <div class="why">\(x^{iq}\)를 \(e^{iq\ln x}\)로 바꾸는 한 줄이 전부(교수님이 판서에 별표). 그다음은 오일러 공식과 선형성의 원리(합·차로 실수 해 만들기) — 9/18 Case III와 완전히 같은 논리, \(x\)만 \(\ln x\)로. 그래프는 진동하되 \(x\)가 커질수록 느려진다.</div>
 <div class="analogy">진동수가 일정한 시계(2.2)와, 갈수록 느려지는 시계(2.5). 눈금이 \(\ln x\)라서 오른쪽으로 갈수록 한 주기가 길어진다.</div>
-<div class="memo"><b>외울 것</b> \(x^{iq}=e^{iq\ln x}\) ☆ · \(y=x^p[c_1\cos(q\ln x)+c_2\sin(q\ln x)]\) · 2.2 Case III에서 \(x\to\ln x\)</div>
+<div class="memo am">\(x^{iq}=e^{iq\ln x}\) ☆ · \(y=x^p[c_1\cos(q\ln x)+c_2\sin(q\ln x)]\) · 2.2 Case III에서 \(x\to\ln x\)</div>
 </section>
 
 <section class="s" data-id="s4">
@@ -152,27 +158,114 @@ details.ex .body p{margin:8px 0}
 <p><b>(3)</b> \(x^2y''+7xy'+13y=0\) → \(m^2+6m+13=0\) → \(m=-3\pm2i\) → <b>\(y=x^{-3}[c_1\cos(2\ln x)+c_2\sin(2\ln x)]\)</b>.</p></div></details>
 <div class="why">계산은 2차방정식 하나. 실수는 \(a-1\)에서 나온다: (1)은 \(a=-3\)이라 \(a-1=-4\), (3)은 \(a=7\)이라 \(a-1=6\). 검산: 중근 공식 \(m=(1-a)/2=(1+3)/2=2\) ✓.</div>
 <div class="analogy">2.2 예제와 "같은 문제, 다른 옷". 옷(계수의 꼴)만 보고 어느 세계인지 알아채면 나머지는 기계적.</div>
-<div class="memo"><b>외울 것</b> (1) 중근 2 (2) 2, 3 (3) \(-3\pm2i\) · <b>4주차 과제 2.5 #3·5·7·13</b>(판서 ⑩, 마감은 과목 규칙대로 다음 주 수요일 수업 전 ❓)</div>
+<div class="memo am">(1) 중근 2 (2) 2, 3 (3) \(-3\pm2i\) · <b>4주차 과제 2.5 #3·5·7·13</b>(판서 ⑩, 마감은 과목 규칙대로 다음 주 수요일 수업 전 ❓)</div>
 </section>
 
 <section class="s" data-id="s5">
 <div class="no">5 / 5</div><h2>5. 2.6 론스키안 — 1차독립을 행렬식으로 ☆ (판서 ⑪~⑮)</h2>
-<figure class="fig" data-fig="W"><svg class="fig-svg" viewbox="0 0 560 170" width="560" height="170" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><text x="120" y="40" font-size="15" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">W(y₁, y₂) =</text><line x1="196" y1="22" x2="196" y2="62" stroke="#1F2A44" stroke-width="2"></line><line x1="300" y1="22" x2="300" y2="62" stroke="#1F2A44" stroke-width="2"></line><text x="222" y="36" font-size="14" fill="#1F2A44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">y₁</text><text x="274" y="36" font-size="14" fill="#1F2A44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">y₂</text><text x="222" y="58" font-size="14" fill="#1F2A44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">y₁′</text><text x="274" y="58" font-size="14" fill="#1F2A44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">y₂′</text></g><g data-step="2"><text x="400" y="42" font-size="14" fill="#1F2A44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">= y₁y₂′ − y₂y₁′</text></g><g data-step="3"><rect x="40" y="90" width="230" height="44" rx="9" fill="rgba(255,255,255,.75)" stroke="#2F9E44" stroke-width="1.6"></rect><text x="155.0" y="117.0" font-size="13.5" fill="#2F9E44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">W ≠ 0  →  1차독립 (기저)  ☆</text><rect x="300" y="90" width="230" height="44" rx="9" fill="rgba(255,255,255,.75)" stroke="#E03131" stroke-width="1.6"></rect><text x="415.0" y="117.0" font-size="13.5" fill="#E03131" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">W = 0  →  1차종속</text></g><g data-step="4"><text x="280" y="156" font-size="12.5" fill="#8A97A6" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">eg1) cos ωx, sin ωx: W = ω ≠ 0      eg2) eˣ, xeˣ: W = e^(2x) ≠ 0</text></g></svg><figcaption>2.6 론스키안(Wronskian). 비례 판정을 행렬식 하나로 — 판서 별표 자리.</figcaption></figure>
-<div class="formula">\[W(y_1,y_2)=\begin{vmatrix}y_1&amp;y_2\\y_1'&amp;y_2'\end{vmatrix}=y_1y_2'-y_2y_1'\qquad W\ne0\ \Rightarrow\ \text{1차독립(기저)},\quad W=0\ \Rightarrow\ \text{1차종속}\]</div>
+<figure class="fig" data-fig="W"><svg class="fig-svg" viewbox="0 0 560 170" width="560" height="170" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><text x="120" y="40" font-size="15" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">W(y₁, y₂) =</text><line x1="196" y1="22" x2="196" y2="62" stroke="#1F2A44" stroke-width="2"></line><line x1="300" y1="22" x2="300" y2="62" stroke="#1F2A44" stroke-width="2"></line><text x="222" y="36" font-size="14" fill="#1F2A44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">y₁</text><text x="274" y="36" font-size="14" fill="#1F2A44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">y₂</text><text x="222" y="58" font-size="14" fill="#1F2A44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">y₁′</text><text x="274" y="58" font-size="14" fill="#1F2A44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">y₂′</text></g><g data-step="2"><text x="400" y="42" font-size="14" fill="#1F2A44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">= y₁y₂′ − y₂y₁′</text></g><g data-step="3"><rect x="40" y="90" width="230" height="44" rx="9" fill="rgba(255,255,255,.75)" stroke="#2F9E44" stroke-width="1.6"></rect><text x="155.0" y="117.0" font-size="13.5" fill="#2F9E44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">W ≠ 0  →  1차독립 (기저)  ☆</text><rect x="300" y="90" width="230" height="44" rx="9" fill="rgba(255,255,255,.75)" stroke="#E03131" stroke-width="1.6"></rect><text x="415.0" y="117.0" font-size="13.5" fill="#E03131" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">W = 0  →  1차종속</text></g><g data-step="4"><text x="280" y="156" font-size="12.5" fill="#8A97A6" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">eg1) cos ωx, sin ωx: W = ω ≠ 0 (ω ≠ 0)      eg2) eˣ, xeˣ: W = e^(2x) ≠ 0</text></g></svg><figcaption>2.6 론스키안(Wronskian). 비례 판정을 행렬식 하나로 — 판서 별표 자리.</figcaption></figure>
+<div class="formula">\[W(y_1,y_2)=\begin{vmatrix}y_1&amp;y_2\\y_1'&amp;y_2'\end{vmatrix}=y_1y_2'-y_2y_1'\qquad W\ne0\ \Rightarrow\ \text{1차독립(기저)},\quad W=0\ \Rightarrow\ \text{1차종속}\] 같은 표준형 \(y''+p(x)y'+q(x)y=0\)의 두 해이고 \(p,q\)가 구간 \(I\)에서 연속일 때, \(I\) 안 한 점의 \(W\)로 판정한다 — 아무 두 함수에나 쓰면 안 된다(\(x\)와 \(x^2\)는 독립인데 \(W(0)=0\)).</div>
 <div class="why">9/16의 판별 "비례하면 종속": \(k_1y_1+k_2y_2=0\)에서 \(y_2/y_1=-k_1/k_2\)(상수)면 \(y_2=cy_1\), \(y_2'=cy_1'\) → \(W=y_1cy_1'-cy_1y_1'=0\). 거꾸로 \(W\ne0\)이면 비례할 수 없다 → 독립. 미분 한 번과 곱셈 둘로 끝나니 비를 직접 살피는 것보다 기계적이다. 일반해 \(y=c_1y_1+c_2y_2\)는 \(y_1,y_2\)가 기저일 때만 "모든 해"(판서 동그라미 강조).</div>
-<details class="ex"><summary>eg1) \(y''+\omega^2y=0\), \(y_1=\cos\omega x\), \(y_2=\sin\omega x\) / eg2) \(y''-2y'+y=0\)</summary><div class="body"><p>eg1) \(W=\begin{vmatrix}\cos\omega x&amp;\sin\omega x\\-\omega\sin\omega x&amp;\omega\cos\omega x\end{vmatrix}=\omega(\cos^2+\sin^2)=\omega\ne0\) → 독립. eg2) \((\lambda-1)^2=0\) → \(y_1=e^x\), \(y_2=xe^x\): \(W=\begin{vmatrix}e^x&amp;xe^x\\e^x&amp;(x+1)e^x\end{vmatrix}=e^{2x}(x+1-x)=e^{2x}\ne0\) → 독립. (판서는 계수 \(c_1,c_2\)를 붙였다가 동그라미로 뺐다 — \(W\)는 기저 자체로 계산.)</p></div></details>
+<details class="ex"><summary>eg1) \(y''+\omega^2y=0\), \(y_1=\cos\omega x\), \(y_2=\sin\omega x\) / eg2) \(y''-2y'+y=0\)</summary><div class="body"><p>eg1) \(W=\begin{vmatrix}\cos\omega x&amp;\sin\omega x\\-\omega\sin\omega x&amp;\omega\cos\omega x\end{vmatrix}=\omega(\cos^2+\sin^2)=\omega\ne0\)(\(\omega\ne0\)) → 독립(\(\omega=0\)이면 두 함수가 \(1,0\)이라 기저가 아니다). eg2) \((\lambda-1)^2=0\) → \(y_1=e^x\), \(y_2=xe^x\): \(W=\begin{vmatrix}e^x&amp;xe^x\\e^x&amp;(x+1)e^x\end{vmatrix}=e^{2x}(x+1-x)=e^{2x}\ne0\) → 독립. (판서는 계수 \(c_1,c_2\)를 붙였다가 동그라미로 뺐다 — \(W\)는 기저 자체로 계산.)</p></div></details>
 <div class="analogy">두 벡터가 평행이면 평행사변형 넓이가 0(정역학 외적) — 론스키안은 두 함수 버전의 "넓이". 0이면 같은 방향(종속).</div>
-<div class="memo"><b>외울 것</b> \(W=y_1y_2'-y_2y_1'\) · \(W\ne0\) ⇔ 독립 ☆ · eg1 \(W=\omega\) · eg2 \(W=e^{2x}\) · 정리 1~4(존재·유일성)는 슬라이드 대조 때</div>
+<div class="memo am">\(W=y_1y_2'-y_2y_1'\) · (같은 방정식의 두 해) \(W\ne0\) ⇔ 독립 ☆ · eg1 \(W=\omega\) · eg2 \(W=e^{2x}\) · 정리 1~4(존재·유일성)는 슬라이드 대조 때</div>
 </section>
 
 
-<section id="quiz"><h2>확인 문제</h2><div class="hint">보기를 누르면 바로 채점됩니다. 답을 쓰는 문제는 「답 보기」 뒤에 맞음/틀림을 스스로 표시합니다.</div><div id="qlist"></div><div id="result"></div></section>
+<section id="quiz"><h2>확인 문제</h2><div id="qlist"></div><div id="result"></div></section>
 <div id="done"></div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script>/* 김주영 스앵님 판정 (대표님 2026-09-29 「개념 마인드맵은 스앵님이 학습을 통해 내가 뭘 알고 뭘 모르는지 알아서 파악」) — 원본은 이 파일 하나.
+   빌더가 교실·수업 노트·학습 덱·암기노트 페이지에 그대로 넣고(__JUDGE__), learn.html·앱(V57)은 같은 글을 붙여 쓴다(docs/tools/sync_judge.py).
+   기록 = localStorage atto.evidence [{t, k, n:[노드], ok, v, lid, sid, qid, clean}] (최대 4000건)
+     k: quiz(ok) 확인 문제 · read(clean) 챕터·섹션 끝(다시 설명·질문 없이 끝났으면 clean) · again 다시 설명 · ask 질문 · memo(ok) 암기노트 외움 · self(v) 카드 자가평가
+   판정 = 노드마다 atto.mastery[id] = {quiz:{correct,total,ts}, self, ts, score, state, auto} — learn.html · 앱 V47 · server.py 의 점수식이 그대로 읽는다.
+     quiz = 최근 6번 · self(설명할 수 있나 1~5) = 읽음 4 · 다시 설명·질문 2번 이상이면 3 · 외움 +1 · 카드 자가평가가 더 최근이면 그 값
+     → 문제 없이 읽기만 하면 최대 「흔들림」, 「안다」는 문제로만. 점수식 = (0.5·정답률 + 0.2·self/5)/0.7, 문제 없으면 self/5·0.6, 60일 감쇠(최저 0.4) */
+(function(g){
+  var EK="atto.evidence", MK="atto.mastery", CAP=4000;
+  function rd(k,d){ try{ var v=JSON.parse(localStorage.getItem(k)||"null"); return v==null?d:v; }catch(e){ return d; } }
+  function decay(ts){ if(!ts) return 1; var d=Math.max(0,(Date.now()/1000-ts)/86400); return Math.max(.4,1-d/60); }
+  function score(e){ var q=e.quiz||{}, tot=+q.total||0, cor=+q.correct||0, sv=e.self==null?null:Math.max(1,Math.min(5,+e.self));
+    if(tot<=0&&sv==null) return {score:0,state:"unrated"};
+    var raw=tot>0?(0.5*(cor/tot)+0.2*((sv||0)/5))/0.7:(sv/5)*0.6, s=Math.min(1,raw)*decay(Math.max(+e.ts||0,+q.ts||0)), st;
+    if(tot<=0) st=(sv>=4&&s>=.4)?"shaky":"unknown"; else st=s>=.7?"known":s>=.4?"shaky":"unknown";
+    return {score:Math.round(s*1000)/1000,state:st}; }
+  function why(evs){ var qz=evs.filter(function(e){return e.k==="quiz";}).slice(-6), r={q:qz.length,c:qz.filter(function(e){return e.ok;}).length,
+      read:evs.filter(function(e){return e.k==="read";}).length, clean:evs.filter(function(e){return e.k==="read"&&e.clean;}).length,
+      conf:evs.filter(function(e){return (e.k==="again"||e.k==="ask")&&Date.now()-e.t<21*864e5;}).length,
+      memo:null, self:null, last:0};
+    evs.forEach(function(e){ if(e.k==="memo") r.memo=!!e.ok; if(e.k==="self") r.self={v:+e.v,t:e.t}; if(e.t>r.last) r.last=e.t; });
+    return r; }
+  function judgeOne(id,L,M){ var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); if(!evs.length) return;
+    var r=why(evs), e=Object.assign({},M[id]||{}), qz=evs.filter(function(x){return x.k==="quiz";}).slice(-6);
+    var self=null; if(r.read||r.conf||r.memo!=null){ self=r.read?4:3; if(r.conf>=2) self=3; if(r.memo) self=Math.min(5,self+1); }
+    var autoLast=0; evs.forEach(function(x){ if(x.k!=="self"&&x.t>autoLast) autoLast=x.t; });
+    if(r.self&&r.self.t>=autoLast) self=r.self.v;
+    e.quiz=qz.length?{correct:r.c,total:qz.length,ts:Math.round(qz[qz.length-1].t/1000)}:undefined; if(!e.quiz) delete e.quiz;
+    e.self=self; if(self==null) delete e.self;
+    e.ts=Math.round(r.last/1000); e.auto={by:"tutor",q:r.q,c:r.c,read:r.read,clean:r.clean,conf:r.conf,memo:r.memo};
+    var s=score(e); e.score=s.score; e.state=s.state; M[id]=e; }
+  function judge(ids){ var L=rd(EK,[]), M=rd(MK,{}); if(!Array.isArray(L)) L=[]; (ids||[]).forEach(function(id){ judgeOne(id,L,M); });
+    try{ localStorage.setItem(MK,JSON.stringify(M)); }catch(e){} return M; }
+  function all(){ var L=rd(EK,[]), o={}; if(Array.isArray(L)) L.forEach(function(e){ (e&&e.n||[]).forEach(function(i){ o[i]=1; }); }); return judge(Object.keys(o)); }
+  function rec(ev){ if(!ev||!Array.isArray(ev.n)||!ev.n.length) return; var L=rd(EK,[]); if(!Array.isArray(L)) L=[];
+    ev.t=Date.now(); L.push(ev); if(L.length>CAP) L=L.slice(L.length-CAP);
+    try{ localStorage.setItem(EK,JSON.stringify(L)); }catch(e){ try{ L=L.slice(-Math.floor(CAP/2)); localStorage.setItem(EK,JSON.stringify(L)); }catch(x){} }
+    judge(ev.n); }
+  function reasons(id){ var L=rd(EK,[]); if(!Array.isArray(L)) return null; var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); return evs.length?why(evs):null; }
+  g.TJ={rec:rec,judge:judge,all:all,score:score,reasons:reasons};
+})(typeof window!=="undefined"?window:this);
+</script>
+<script>/* 여러 식을 이은 식 줄 나누기(대표님 2026-09-29 「수식 한 줄로, 배치구조 신경」) — 원본은 이 파일 하나(수업 노트·암기노트 템플릿에 빌더가 넣는다, __SPLITTEX__).
+   \[ A,\qquad B \] 처럼 서로 다른 식을 \qquad 또는 「,\quad」로 이어 붙인 줄은 식마다 한 줄(\[A\]\[B\])로 — 한 식 안은 가르지 않는다.
+   괄호 { } 와 \begin…\end 안의 구분자는 건드리지 않고, 연결 기호만 남은 조각(\Rightarrow·\to·\Leftrightarrow·\therefore)은 다음 식 앞에 붙인다. */
+function splitTex(t){
+  const parts=[]; let d=0, env=0, cur="", i=0;
+  while(i<t.length){
+    if(t.startsWith("\\begin{",i)) env++;
+    else if(t.startsWith("\\end{",i)) env=Math.max(0,env-1);
+    const c=t[i];
+    if(c==="\\"&&(t[i+1]==="{"||t[i+1]==="}")){ cur+=t.slice(i,i+2); i+=2; continue; }
+    if(c==="{") d++; else if(c==="}") d=Math.max(0,d-1);
+    if(!d&&!env){
+      let m=0;
+      if(t.startsWith("\\qquad",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) m=6;
+      else if(t.startsWith(",\\quad",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) m=6;
+      if(m){ parts.push(cur); cur=""; i+=m; continue; }
+    }
+    cur+=c; i++;
+  }
+  parts.push(cur);
+  const out=[]; let carry="";
+  parts.map(p=>p.trim().replace(/^,\s*/,"").replace(/,\s*$/,"")).forEach(p=>{
+    if(!p) return;
+    if(/^(\\(Rightarrow|Leftarrow|Leftrightarrow|to|therefore|because|implies|iff)\s*)+$/.test(p)){ carry+=p+" "; return; }
+    out.push(carry+p); carry="";
+  });
+  if(carry&&out.length) out[out.length-1]+=" "+carry.trim();
+  return out.length?out:[t];
+}
+/* 좁은 화면(폰)에서만: 글자 덩어리(\text{…})를 화살표(\to·\Rightarrow)로 이은 「흐름」 줄은 화살표 단위로 줄을 나눈다 — 수식이 아니라 단계 나열이라 나눠도 식이 갈리지 않는다 */
+function splitFlow(t){
+  const segs=[]; let d=0, cur="", i=0;
+  while(i<t.length){ const c=t[i];
+    if(c==="\\"&&(t[i+1]==="{"||t[i+1]==="}")){ cur+=t.slice(i,i+2); i+=2; continue; }
+    if(c==="{") d++; else if(c==="}") d=Math.max(0,d-1);
+    if(!d){ const m=/^\\ ?\\(to|Rightarrow)(?![a-zA-Z])\\ ?/.exec(t.slice(i))||/^\s*\\(to|Rightarrow)(?![a-zA-Z])\s*/.exec(t.slice(i)); if(m&&cur.trim()){ segs.push(cur); cur="\\"+m[1]+"\\ "; i+=m[0].length; continue; } }
+    cur+=c; i++; }
+  segs.push(cur);
+  const ok=segs.length>=3&&segs.every(s=>/^(\\(to|Rightarrow)\\ )?\s*\\text\{/.test(s.trim()));
+  return ok?segs.map(s=>s.trim()):[t];
+}
+function splitDisplays(html,narrow){
+  return String(html).replace(/\\\[([\s\S]*?)\\\]/g,(m,tex)=>{ let ps=splitTex(tex); if(narrow) ps=[].concat(...ps.map(splitFlow)); return ps.length>1?ps.map(p=>"\\["+p+"\\]").join(""):m; });
+}
+</script>
 <script>
-const LESSON_ID="em1-2026-09-23", QUIZ=[{"id": "q1", "qn": "확인 1 · 보조방정식", "html": "\\(x^2y''+axy'+by=0\\)에 \\(y=x^m\\)을 넣으면 나오는 식은?", "choices": [{"html": "\\(m^2+(a-1)m+b=0\\)", "ok": true}, {"html": "\\(m^2+am+b=0\\)", "ok": false}, {"html": "\\(m^2+(a+1)m+b=0\\)", "ok": false}, {"html": "\\(am^2+bm+1=0\\)", "ok": false}], "ans": "\\(m(m-1)+am+b\\). 2번은 2.2의 특성방정식과 혼동."}, {"id": "q2", "qn": "확인 2 · 예제 (2)", "html": "\\(x^2y''-4xy'+6y=0\\)의 일반해는?", "choices": [{"html": "\\(y=c_1x^2+c_2x^3\\)", "ok": true}, {"html": "\\(y=c_1e^{2x}+c_2e^{3x}\\)", "ok": false}, {"html": "\\(y=(c_1+c_2\\ln x)x^2\\)", "ok": false}, {"html": "\\(y=c_1x^{-2}+c_2x^{-3}\\)", "ok": false}], "ans": "\\(m^2-5m+6=(m-2)(m-3)\\)."}, {"id": "q3", "qn": "확인 3 · 중근", "html": "\\(x^2y''-3xy'+4y=0\\)의 일반해는?", "choices": [{"html": "\\(y=(c_1+c_2\\ln x)x^2\\)", "ok": true}, {"html": "\\(y=(c_1+c_2x)x^2\\)", "ok": false}, {"html": "\\(y=(c_1+c_2x)e^{2x}\\)", "ok": false}, {"html": "\\(y=c_1x^2+c_2x^{-2}\\)", "ok": false}], "ans": "\\((m-2)^2=0\\) → 거듭제곱 세계의 중근은 \\(\\ln x\\)가 붙는다(2번은 2.2식 착각)."}, {"id": "q4", "qn": "확인 4 · 복소근", "html": "\\(x^2y''+7xy'+13y=0\\)의 일반해는?", "choices": [{"html": "\\(y=x^{-3}[c_1\\cos(2\\ln x)+c_2\\sin(2\\ln x)]\\)", "ok": true}, {"html": "\\(y=e^{-3x}[c_1\\cos2x+c_2\\sin2x]\\)", "ok": false}, {"html": "\\(y=x^{3}[c_1\\cos(2\\ln x)+c_2\\sin(2\\ln x)]\\)", "ok": false}, {"html": "\\(y=x^{-3}[c_1\\cos2x+c_2\\sin2x]\\)", "ok": false}], "ans": "\\(m^2+6m+13=0\\) → \\(m=-3\\pm2i\\): \\(p=-3\\), \\(q=2\\), 인수는 \\(\\ln x\\)."}, {"id": "q5", "qn": "확인 5 · 론스키안", "html": "\\(y_1=\\cos\\omega x\\), \\(y_2=\\sin\\omega x\\)의 론스키안은?", "choices": [{"html": "\\(W=\\omega\\) (≠ 0 → 1차독립)", "ok": true}, {"html": "\\(W=0\\) (1차종속)", "ok": false}, {"html": "\\(W=\\cos^2\\omega x-\\sin^2\\omega x\\)", "ok": false}, {"html": "\\(W=1\\)", "ok": false}], "ans": "\\(\\omega\\cos^2\\omega x+\\omega\\sin^2\\omega x=\\omega\\)."}, {"id": "q6", "qn": "확인 6 · eg2", "html": "\\(y''-2y'+y=0\\)의 기저를 구하고 론스키안으로 1차독립임을 보여라.", "choices": null, "ans": "\\((\\lambda-1)^2=0\\) → \\(y_1=e^x\\), \\(y_2=xe^x\\). \\(W=e^x(x+1)e^x-xe^x\\cdot e^x=e^{2x}\\ne0\\) → 독립 → 일반해 \\((c_1+c_2x)e^x\\)."}], N_SEC=document.querySelectorAll("section.s[data-id]").length;
+const LESSON_ID="em1-2026-09-23", QUIZ=[{"id": "q1", "qn": "확인 1 · 보조방정식", "html": "\\(x^2y''+axy'+by=0\\)에 \\(y=x^m\\)을 넣으면 나오는 식은?", "choices": [{"html": "\\(m^2+am+b=0\\)", "ok": false, "k": 1}, {"html": "\\(m^2+(a+1)m+b=0\\)", "ok": false, "k": 2}, {"html": "\\(am^2+bm+1=0\\)", "ok": false, "k": 3}, {"html": "\\(m^2+(a-1)m+b=0\\)", "ok": true, "k": 0}], "ans": "\\(m(m-1)+am+b\\). 1번은 2.2의 특성방정식과 혼동."}, {"id": "q2", "qn": "확인 2 · 예제 (2)", "html": "\\(x^2y''-4xy'+6y=0\\)의 일반해는?", "choices": [{"html": "\\(y=c_1x^2+c_2x^3\\)", "ok": true, "k": 0}, {"html": "\\(y=c_1e^{2x}+c_2e^{3x}\\)", "ok": false, "k": 1}, {"html": "\\(y=c_1x^{-2}+c_2x^{-3}\\)", "ok": false, "k": 3}, {"html": "\\(y=(c_1+c_2\\ln x)x^2\\)", "ok": false, "k": 2}], "ans": "\\(m^2-5m+6=(m-2)(m-3)\\)."}, {"id": "q3", "qn": "확인 3 · 중근", "html": "\\(x^2y''-3xy'+4y=0\\)의 일반해는?", "choices": [{"html": "\\(y=c_1x^2+c_2x^{-2}\\)", "ok": false, "k": 3}, {"html": "\\(y=(c_1+c_2\\ln x)x^2\\)", "ok": true, "k": 0}, {"html": "\\(y=(c_1+c_2x)e^{2x}\\)", "ok": false, "k": 2}, {"html": "\\(y=(c_1+c_2x)x^2\\)", "ok": false, "k": 1}], "ans": "\\((m-2)^2=0\\) → 거듭제곱 세계의 중근은 \\(\\ln x\\)가 붙는다(4번은 2.2식 착각)."}, {"id": "q4", "qn": "확인 4 · 복소근", "html": "\\(x^2y''+7xy'+13y=0\\)의 일반해는?", "choices": [{"html": "\\(y=x^{-3}[c_1\\cos2x+c_2\\sin2x]\\)", "ok": false, "k": 3}, {"html": "\\(y=e^{-3x}[c_1\\cos2x+c_2\\sin2x]\\)", "ok": false, "k": 1}, {"html": "\\(y=x^{-3}[c_1\\cos(2\\ln x)+c_2\\sin(2\\ln x)]\\)", "ok": true, "k": 0}, {"html": "\\(y=x^{3}[c_1\\cos(2\\ln x)+c_2\\sin(2\\ln x)]\\)", "ok": false, "k": 2}], "ans": "\\(m^2+6m+13=0\\) → \\(m=-3\\pm2i\\): \\(p=-3\\), \\(q=2\\), 인수는 \\(\\ln x\\)."}, {"id": "q5", "qn": "확인 5 · 론스키안", "html": "\\(y_1=\\cos\\omega x\\), \\(y_2=\\sin\\omega x\\)의 론스키안은?", "choices": [{"html": "\\(W=1\\)", "ok": false, "k": 3}, {"html": "\\(W=0\\) (1차종속)", "ok": false, "k": 1}, {"html": "\\(W=\\cos^2\\omega x-\\sin^2\\omega x\\)", "ok": false, "k": 2}, {"html": "\\(W=\\omega\\) (≠ 0 → 1차독립)", "ok": true, "k": 0}], "ans": "\\(\\omega\\cos^2\\omega x+\\omega\\sin^2\\omega x=\\omega\\)(\\(\\omega\\ne0\\)일 때 독립)."}, {"id": "q6", "qn": "확인 6 · eg2", "html": "\\(y''-2y'+y=0\\)의 기저를 구하고 론스키안으로 1차독립임을 보여라.", "choices": null, "ans": "\\((\\lambda-1)^2=0\\) → \\(y_1=e^x\\), \\(y_2=xe^x\\). \\(W=e^x(x+1)e^x-xe^x\\cdot e^x=e^{2x}\\ne0\\) → 독립 → 일반해 \\((c_1+c_2x)e^x\\)."}], NDS={"sec": {"s1": ["ode.euler_cauchy"], "s2": ["ode.euler_cauchy", "ode.reduction_order"], "s3": ["ode.euler_cauchy"], "s4": ["ode.euler_cauchy", "ode.const_coeff"], "s5": ["ode.wronskian", "ode.basis"]}, "q": {"q1": ["ode.euler_cauchy"], "q2": ["ode.euler_cauchy"], "q3": ["ode.euler_cauchy"], "q4": ["ode.euler_cauchy"], "q5": ["ode.wronskian"], "q6": ["ode.wronskian"]}}, N_SEC=document.querySelectorAll("section.s[data-id]").length;
 const KEY="mc-lesson-"+LESSON_ID;
 let ST={read:{},done:{},correct:{},answer:{},ts:0};
 try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}
@@ -181,7 +274,14 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 function save(){ ST.ts=Date.now(); try{ localStorage.setItem(KEY,JSON.stringify(ST)); const qs=QUIZ.length, qd=QUIZ.filter(q=>ST.done[q.id]).length, rd=Object.keys(ST.read).length;
   const li={deck:LESSON_ID,title:document.title,href:location.href.split("#")[0],idx:Math.max(0,rd-1),n:N_SEC,sid:curSec||"",part:null,partTitle:document.title.slice(0,60),where:(rd>=N_SEC?"확인 문제":"읽는 중 · "+(curTitle||"")),qDone:qd,qN:qs,ts:Date.now()};
   const j=JSON.stringify(li); localStorage.setItem("mc-slides-last",j); localStorage.setItem("mc-slides-last-"+LESSON_ID,j); }catch(e){} }
-function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} }
+/* 스앵님 판정 기록(대표님 2026-09-29) — 섹션 읽음 · 문제 채점 → 개념 노드(knowledge/lesson_nodes.json) */
+function ev(k,x){ try{ if(!window.TJ) return; const o=Object.assign({k:k,lid:LESSON_ID},x||{}); if(o.n&&o.n.length) TJ.rec(o); }catch(e){} }
+/* 객관식 보기는 빌드 때 섞인다(quizmix) — 고른 보기를 원문 순서 k 로 저장 */
+const ck=(c,i)=>String(c&&c.k!=null?c.k:i);
+/* 인라인 식이 줄보다 길면 글자를 줄여 한 줄에(14px 까지) */
+function fitInline(root){ $$(".katex",root).forEach(k=>{ if(k.closest(".katex-display")) return; k.style.fontSize=""; const box=k.parentElement&&k.parentElement.closest("p,li,div,summary,button,td"); if(!box) return; const cw=box.clientWidth, w=k.getBoundingClientRect().width; if(!(cw>0&&w>cw-2)) return; const fs=parseFloat(getComputedStyle(k).fontSize)||17; k.style.fontSize=Math.max(14,Math.floor(fs*(cw-6)/w))+"px"; }); }
+window.addEventListener("resize",()=>fitInline(document.querySelector("main")),{passive:true});
+function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} fitInline(el); }
 /* ---- 읽음: 섹션이 화면의 절반 이상 1.2초 보이면 읽음 ---- */
 let curSec=null, curTitle="";
 function renderTop(){ const rd=Object.keys(ST.read).filter(k=>ST.read[k]).length, qd=QUIZ.filter(q=>ST.done[q.id]).length, tot=N_SEC+QUIZ.length;
@@ -189,30 +289,30 @@ function renderTop(){ const rd=Object.keys(ST.read).filter(k=>ST.read[k]).length
   $$("section.s[data-id]").forEach(s=>s.classList.toggle("read",!!ST.read[s.dataset.id]));
   /* 따라감 기준은 앱(V52)과 같다: 섹션 전부 + 문제 90% 풀고 60% 정답 */
   const okN=QUIZ.filter(q=>ST.correct[q.id]===true).length, need=Math.ceil(QUIZ.length*.6);
-  $("#done").textContent= rd>=N_SEC&&qd>=QUIZ.length&&QUIZ.length? (okN>=need? "이 회차 끝 — 정답 "+okN+"/"+QUIZ.length+". 앱의 「수업 따라가기」에서 따라감으로 표시됩니다." : "다 풀었지만 정답 "+okN+"/"+QUIZ.length+" — 틀린 문제를 다시 풀어 "+need+"개 이상 맞히면 따라감으로 표시됩니다.") : ""; }
+  $("#done").textContent= rd>=N_SEC&&qd>=QUIZ.length&&QUIZ.length? (okN>=need? "완료 · 정답 "+okN+"/"+QUIZ.length : "정답 "+okN+"/"+QUIZ.length+" · "+need+"개 이상이면 완료") : ""; }
 const timers={};
 const io=new IntersectionObserver(es=>{ es.forEach(e=>{ const id=e.target.dataset.id; if(e.isIntersecting){ curSec=id; curTitle=(e.target.querySelector("h2")||{}).textContent||""; postCtx(e.target);
-    if(!ST.read[id]&&!timers[id]) timers[id]=setTimeout(()=>{ ST.read[id]=true; save(); renderTop(); },1200); } else { if(timers[id]){ clearTimeout(timers[id]); delete timers[id]; } } }); },{threshold:.5});
+    if(!ST.read[id]&&!timers[id]) timers[id]=setTimeout(()=>{ ST.read[id]=true; save(); renderTop(); ev("read",{sid:id,n:(NDS.sec||{})[id]||[],clean:true}); },1200); } else { if(timers[id]){ clearTimeout(timers[id]); delete timers[id]; } } }); },{threshold:.5});
 $$("section.s[data-id]").forEach(s=>io.observe(s));
 /* 짧은 섹션(화면보다 작아 50%가 금방 차는) 은 그대로, 긴 섹션은 끝까지 스크롤하면 읽음 */
-window.addEventListener("scroll",()=>{ $$("section.s[data-id]").forEach(s=>{ if(ST.read[s.dataset.id]) return; const r=s.getBoundingClientRect(); if(r.bottom<window.innerHeight*.6&&r.bottom>-2000){ ST.read[s.dataset.id]=true; save(); renderTop(); } }); },{passive:true});
+window.addEventListener("scroll",()=>{ $$("section.s[data-id]").forEach(s=>{ if(ST.read[s.dataset.id]) return; const r=s.getBoundingClientRect(); if(r.bottom<window.innerHeight*.6&&r.bottom>-2000){ ST.read[s.dataset.id]=true; save(); renderTop(); ev("read",{sid:s.dataset.id,n:(NDS.sec||{})[s.dataset.id]||[],clean:true}); } }); },{passive:true});
 /* ---- 판서 사진: atom 안에서만 (없으면 숨김) ---- */
 $$("figure.board img").forEach(img=>{ img.addEventListener("error",()=>{ img.closest("figure").hidden=true; }); });
 /* ---- 문제 카드 ---- */
 function qHTML(q,i){ const mc=Array.isArray(q.choices)&&q.choices.length, rev=!!ST.done[q.id], my=ST.answer[q.id];
   let inner='<div class="qn">'+esc(q.qn||("문제 "+(i+1)))+'</div><div class="qb">'+q.html+'</div>';
-  if(mc){ inner+='<ol class="choices">'+q.choices.map((c,ci)=>{ const sel=String(my)===String(ci); const cls=rev?(c.ok?" ok":(sel?" bad":"")):""; return '<li><button class="choice'+cls+'" data-ci="'+ci+'"'+(rev?" disabled":"")+'><span class="cn">'+(ci+1)+'</span><span>'+c.html+'</span></button></li>'; }).join("")+'</ol>'; }
+  if(mc){ inner+='<ol class="choices">'+q.choices.map((c,ci)=>{ const sel=my!=null&&String(my)===ck(c,ci); const cls=rev?(c.ok?" ok":(sel?" bad":"")):""; return '<li><button class="choice'+cls+'" data-ci="'+ci+'"'+(rev?" disabled":"")+'><span class="cn">'+(ci+1)+'</span><span>'+c.html+'</span></button></li>'; }).join("")+'</ol>'; }
   else { inner+= rev? '<div class="memo"><b>내 답</b> '+esc(my||"")+'</div>' : '<textarea class="myans" placeholder="답만 간단히">'+esc(my||"")+'</textarea><div class="row"><button class="btn a" data-reveal>답 보기</button></div>'; }
   if(rev){ const c=ST.correct[q.id]; inner+='<span class="verdict '+(c===true?"ok":c===false?"bad":"")+'">'+(c===true?"정답":c===false?"오답":"채점 전")+'</span>';
     if(!mc&&c==null) inner+='<div class="row"><button class="btn" data-grade="1">맞았어요</button><button class="btn" data-grade="0">틀렸어요</button></div>';
     inner+='<div class="row"><button class="btn xs" data-retry>다시 풀기</button></div>'; }
-  inner+='<div class="ans"><b>답 · 풀이</b><div>'+(q.ans||"")+'</div></div>';
+  inner+='<div class="ans"><b>답 · 풀이</b><div>'+splitDisplays(q.ans||"",innerWidth<700)+'</div></div>';
   return '<div class="q'+(rev?" rev":"")+'" data-q="'+q.id+'">'+inner+'</div>'; }
 function bindQ(){ const box=$("#qlist"); box.innerHTML=QUIZ.map(qHTML).join(""); typeset(box);
   $$("#qlist .q").forEach(el=>{ const q=QUIZ.find(x=>x.id===el.dataset.q);
-    $$(".choice",el).forEach(b=>{ b.onclick=()=>{ if(ST.done[q.id]) return; const ci=+b.dataset.ci; ST.answer[q.id]=ci; ST.done[q.id]=true; ST.correct[q.id]=!!(q.choices[ci]&&q.choices[ci].ok); save(); bindQ(); renderTop(); }; });
+    $$(".choice",el).forEach(b=>{ b.onclick=()=>{ if(ST.done[q.id]) return; const ci=+b.dataset.ci, c=q.choices[ci]; ST.answer[q.id]=(c&&c.k!=null)?c.k:ci; ST.done[q.id]=true; ST.correct[q.id]=!!(c&&c.ok); save(); bindQ(); renderTop(); ev("quiz",{qid:q.id,ok:ST.correct[q.id],n:(NDS.q||{})[q.id]||[]}); }; });
     const rv=el.querySelector("[data-reveal]"); if(rv) rv.onclick=()=>{ const ta=el.querySelector(".myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); bindQ(); renderTop(); };
-    $$("[data-grade]",el).forEach(b=>{ b.onclick=()=>{ ST.correct[q.id]=b.dataset.grade==="1"; save(); bindQ(); renderTop(); }; });
+    $$("[data-grade]",el).forEach(b=>{ b.onclick=()=>{ ST.correct[q.id]=b.dataset.grade==="1"; save(); bindQ(); renderTop(); ev("quiz",{qid:q.id,ok:ST.correct[q.id],n:(NDS.q||{})[q.id]||[]}); }; });
     const rt=el.querySelector("[data-retry]"); if(rt) rt.onclick=()=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; save(); bindQ(); renderTop(); };
   });
   const done=QUIZ.filter(q=>ST.done[q.id]).length, ok=QUIZ.filter(q=>ST.correct[q.id]===true).length, wrong=QUIZ.filter(q=>ST.correct[q.id]===false);
@@ -226,7 +326,10 @@ function postCtx(sec){ try{ if(!CTX_GEN||window.parent===window) return; const s
   window.parent.postMessage({type:"mc-slide",v:1,gen:CTX_GEN,deck:LESSON_ID,title:document.title.slice(0,80),sid:s.dataset.id,stype:"concept",part:null,partTitle:document.title.slice(0,60),label:"읽는 중 · "+t.slice(0,60),q:{qn:t.slice(0,80),kind:"개념",text:txt,choices:[],my:null,revealed:true,correct:null,answer:null}},location.origin); }catch(e){} }
 window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; postCtx(); } });
 /* ---- 시작 ---- */
-function boot(){ typeset(document.querySelector("main")); bindQ(); renderTop(); save();
+/* 넘치는 식 줄은 글자를 줄여 한 줄에(14px 까지) — 그래도 넘치면 식 칸 안에서 민다 */
+function fitDisplay(root){ $$(".katex-display",root).forEach(k=>{ k.style.fontSize=""; const cw=k.clientWidth, sw=k.scrollWidth; if(!(cw>0&&sw>cw+1)) return; const kx=k.querySelector(".katex"), fz=parseFloat(getComputedStyle(kx||k).fontSize)||20, lo=Math.min(1,Math.max(.6,14/fz)); k.style.fontSize=Math.max(lo,Math.floor(cw/sw*100)/100)+"em"; }); }
+window.addEventListener("resize",()=>fitDisplay(document.querySelector("main")),{passive:true});
+function boot(){ $$("section.s").forEach(s=>{ const h=s.innerHTML, n=splitDisplays(h,innerWidth<700); if(n!==h) s.innerHTML=n; }); typeset(document.querySelector("main")); fitDisplay(document.querySelector("main")); try{ document.fonts.ready.then(()=>fitDisplay(document.querySelector("main"))); }catch(e){} bindQ(); renderTop(); save();
   const m=/^#s=([\w-]+)$/.exec(location.hash||""); if(m){ const el=document.querySelector('section.s[data-id="'+m[1]+'"]'); if(el) el.scrollIntoView(); }
   else if(location.hash==="#resume"){ const ids=$$("section.s[data-id]").map(s=>s.dataset.id); const next=ids.find(id=>!ST.read[id]); if(next){ const el=document.querySelector('section.s[data-id="'+next+'"]'); if(el) el.scrollIntoView(); } else if(QUIZ.length){ $("#quiz").scrollIntoView(); } } }
 (function wait(){ if(window.renderMathInElement) boot(); else setTimeout(wait,40); })();

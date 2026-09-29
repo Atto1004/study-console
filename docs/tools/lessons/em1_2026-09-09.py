@@ -28,7 +28,7 @@ fig_cases = canvas(560, 210,
         text(280, 200, "둘 중 적분이 쉬운 쪽을 고른다", 12, GRAY, "middle")),
     step(4, arrow(475, 146, 475, 166, GREEN, "", 1.8), fbox(380, 168, 170, 34, "u(x, y) = c  → 검증", RED, size=12.5)),
     step(5, arrow(90, 88, 90, 150, RED, "아니오", 1.8, 26, 0), fbox(30, 152, 120, 44, "적분인자 F", RED, sub="§4~5 로", size=12.5)),
-    cap="판별 → 해 → 검증. 교수님의 Step 형식이 곧 채점 형식(과제 제출용 규칙과 같다).", name="cases")
+    cap="판별 → 퍼텐셜 계산 → 해 작성 → 검산 순서로 정리한다.", name="cases")
 
 fig_if = canvas(560, 170,
     step(1, fbox(20, 40, 170, 60, "−y dx + x dy = 0", INK, sub="M_y = −1 ≠ N_x = 1  ✗", size=13)),
@@ -63,7 +63,7 @@ fig_ex5 = canvas(560, 150,
         fbox(442, 20, 104, 50, "× e^(−y)", GREEN, sub="재검증 ✓", size=13)),
     step(4, arrow(494, 72, 494, 92, GREEN, "", 1.8), fbox(300, 94, 246, 46, "u = eˣ + xy + e^(−y) = c", RED, sub="y(0) = −1 → c = 1 + e", size=13.5),
         text(150, 122, "판별 → R → R* → 곱하기 → 일반해 → 특수해", 12.5, GRAY, "middle")),
-    cap="Ex.5 의 여섯 단계. 정리 1 이 실패한 것을 확인하는 줄도 답안에 쓴다.", name="ex5")
+    cap="Ex.5 의 여섯 단계. 이 예제는 정리 2 를 적용해 풀 수 있다.", name="ex5")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공업수학1 · 9/9 완전상미분방정식 · 적분인자</title></head><body>
 <header>
@@ -85,11 +85,11 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 <section class="s" data-id="s2">
 <h2>2. 판별 M_y = N_x 와 해법 Case 1·2 ★</h2>
 {fig_cases}
-<div class="formula">\\[\\text{{판별: }}\\frac{{\\partial M}}{{\\partial y}}=\\frac{{\\partial N}}{{\\partial x}}\\quad(\\because u_{{xy}}=u_{{yx}})\\qquad \\text{{Case 1: }}u=\\int M\\,dx+k(y),\\ \\frac{{\\partial u}}{{\\partial y}}=N\\Rightarrow k\\qquad \\text{{Case 2: }}u=\\int N\\,dy+l(x),\\ \\frac{{\\partial u}}{{\\partial x}}=M\\Rightarrow l\\]</div>
+<div class="formula">\\[\\text{{판별(M, N 의 1계 편도함수가 연속인 단일연결 영역): }}\\frac{{\\partial M}}{{\\partial y}}=\\frac{{\\partial N}}{{\\partial x}}\\quad(\\because u_{{xy}}=u_{{yx}})\\qquad \\text{{Case 1: }}u=\\int M\\,dx+k(y),\\ \\frac{{\\partial u}}{{\\partial y}}=N\\Rightarrow k\\qquad \\text{{Case 2: }}u=\\int N\\,dy+l(x),\\ \\frac{{\\partial u}}{{\\partial x}}=M\\Rightarrow l\\]</div>
 <div class="why">\\(M=u_x\\)를 \\(x\\)로 적분하면 \\(u\\)가 나오지만 "\\(y\\)만의 함수" \\(k(y)\\)가 적분상수 자리에 남는다(\\(x\\)로 미분하면 사라지므로). 그 \\(k\\)를 두 번째 조건 \\(u_y=N\\)으로 정한다. \\(y\\)로 먼저 적분해도(Case 2) 같은 \\(u\\).</div>
 <details class="ex"><summary>Ex.1 \\(\\cos(x+y)\\,dx+(3y^2+2y+\\cos(x+y))\\,dy=0\\)</summary><div class="body"><p><b>Step 1 판별</b>: \\(M_y=-\\sin(x+y)=N_x\\) ✓ 완전. <b>Step 2</b>: \\(u=\\int\\cos(x+y)\\,dx+k(y)=\\sin(x+y)+k(y)\\) → \\(u_y=\\cos(x+y)+k'=N\\) → \\(k'=3y^2+2y\\) → \\(k=y^3+y^2\\). ∴ <b>\\(u=\\sin(x+y)+y^3+y^2=c\\)</b>. <b>Step 3 검증</b>: \\(u\\)를 \\(x\\)로 미분(\\(y=y(x)\\))하면 원식.</p></div></details>
 <div class="analogy">퍼즐의 가로 줄(\\(x\\) 적분)을 먼저 맞추면 세로 정보(\\(y\\)만의 조각 \\(k\\))가 비어 있다 — 세로 조건 \\(u_y=N\\)으로 그 조각을 채운다.</div>
-<div class="memo"><b>외울 것</b> \\(M_y=N_x\\) → Case 1 \\(u=\\int Mdx+k(y)\\) → \\(u_y=N\\) → \\(k\\) → \\(u=c\\) → 검증 · Step 형식 = 채점 형식</div>
+<div class="memo"><b>외울 것</b> \\(M_y=N_x\\) → Case 1 \\(u=\\int Mdx+k(y)\\) → \\(u_y=N\\) → \\(k\\) → \\(u=c\\) → 검산 · 판별 → 퍼텐셜 → 해 → 검산 순서</div>
 </section>
 
 <section class="s" data-id="s3">
@@ -107,7 +107,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 {fig_if}
 <div class="why">완전이 아닌 식도 적당한 \\(F(x,y)\\)를 곱하면 완전이 될 수 있다(Reduction to Exact Form). Ex.3: \\(-y\\,dx+x\\,dy=0\\)은 \\(M_y=-1\\ne N_x=1\\)이지만 \\(1/x^2\\)을 곱하면 \\(-(y/x^2)dx+(1/x)dy=0\\), \\(M_y=-1/x^2=N_x\\) ✓ → \\(u=y/x=c\\). 문제는 "그 \\(F\\)를 어떻게 찾나".</div>
 <div class="analogy">양변에 공통분모를 곱해 분수 방정식을 정리하듯, 알맞은 "곱셈 하나"가 식을 풀 수 있는 모양으로 바꾼다. 무엇을 곱할지 아는 것이 기술.</div>
-<div class="memo"><b>외울 것</b> 적분인자 = 곱해서 완전으로 만드는 함수 · \\(-y\\,dx+x\\,dy\\)에는 \\(1/x^2\\) (또는 \\(1/y^2\\), \\(1/(x^2+y^2)\\))</div>
+<div class="memo"><b>외울 것</b> 적분인자 = 곱해서 완전으로 만드는 함수 · \\(-y\\,dx+x\\,dy\\)에는 \\(1/x^2\\) (\\(x\\ne0\\) 인 영역) · 또는 \\(1/y^2\\)(\\(y\\ne0\\)) · \\(1/(x^2+y^2)\\)는 원점을 피하는 단일연결 영역으로 제한</div>
 </section>
 
 <section class="s" data-id="s5">
@@ -133,11 +133,11 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 <p><b>Step 4</b> \\(y(0)=-1\\): \\(1+0+e=c\\) → <b>\\(e^x+xy+e^{{-y}}=1+e\\approx3.72\\)</b>.</p></div></details>
 {fig_ex5}
 <div class="why">정리 1이 실패하면 좌절하지 말고 정리 2로 — 이 문제는 그것을 시험하려고 만든 문제다. \\(R^*=-1\\)처럼 <b>상수</b>가 나오면 그 자체가 "y만의 함수"라 적용 가능.</div>
-<div class="analogy">자물쇠 하나에 열쇠 두 개를 순서대로 — 첫 열쇠가 안 맞는 것을 확인하는 것(정리 1 불가 판정)도 답안의 일부다.</div>
+<div class="analogy">자물쇠 하나에 열쇠 두 개를 순서대로 대 보는 것 — 이 예제는 두 번째 열쇠(정리 2)로 열린다.</div>
 <div class="memo"><b>외울 것</b> Ex.5 수순 6단계 · 과제 1.4 #4·11·12도 이 틀 · \\(R^*\\)이 상수면 바로 \\(F^*=e^{{R^*y}}\\)</div>
 </section>
 
-<div class="q" data-qid="q1"><div class="qn">확인 1 · 판별</div><div class="qb">\\(M\\,dx+N\\,dy=0\\)이 완전미분방정식일 필요충분조건은?</div><ol class="choices"><li data-ok="1">\\(\\partial M/\\partial y=\\partial N/\\partial x\\)</li><li>\\(\\partial M/\\partial x=\\partial N/\\partial y\\)</li><li>\\(M=N\\)</li><li>\\(M_x+N_y=0\\)</li></ol><div class="ans">\\(M=u_x\\), \\(N=u_y\\)이고 \\(u_{{xy}}=u_{{yx}}\\)이므로.</div></div>
+<div class="q" data-qid="q1"><div class="qn">확인 1 · 판별</div><div class="qb">\\(M\\,dx+N\\,dy=0\\)이 완전미분방정식일 필요충분조건은?</div><ol class="choices"><li data-ok="1">\\(\\partial M/\\partial y=\\partial N/\\partial x\\)</li><li>\\(\\partial M/\\partial x=\\partial N/\\partial y\\)</li><li>\\(M=N\\)</li><li>\\(M_x+N_y=0\\)</li></ol><div class="ans">\\(M=u_x\\), \\(N=u_y\\)이고 \\(u_{{xy}}=u_{{yx}}\\)이므로(\\(M,N\\)의 1계 편도함수가 연속인 단일연결 영역에서).</div></div>
 <div class="q" data-qid="q2"><div class="qn">확인 2 · Ex.1</div><div class="qb">\\(\\cos(x+y)dx+(3y^2+2y+\\cos(x+y))dy=0\\)의 해는?</div><ol class="choices"><li data-ok="1">\\(\\sin(x+y)+y^3+y^2=c\\)</li><li>\\(\\cos(x+y)+y^3+y^2=c\\)</li><li>\\(\\sin(x+y)+3y^2+2y=c\\)</li><li>\\(\\sin(x+y)=c\\)</li></ol><div class="ans">\\(u=\\int M dx+k(y)\\), \\(k'=3y^2+2y\\). 3번은 \\(k'\\)를 적분하지 않은 것.</div></div>
 <div class="q" data-qid="q3"><div class="qn">확인 3 · 예제 (1)</div><div class="qb">\\((x^3+y^3)dx+3xy^2dy=0\\)의 해는?</div><ol class="choices"><li data-ok="1">\\(\\dfrac{{x^4}}4+xy^3=c\\)</li><li>\\(x^4+y^4=c\\)</li><li>\\(\\dfrac{{x^4}}4+\\dfrac{{y^4}}4=c\\)</li><li>\\(x^3y^3=c\\)</li></ol><div class="ans">\\(u_x=x^3+y^3\\), \\(u_y=3xy^2\\)로 검산.</div></div>
 <div class="q" data-qid="q4"><div class="qn">확인 4 · 정리 1</div><div class="qb">\\(P\\,dx+Q\\,dy=0\\)에서 \\(x\\)만의 적분인자를 주는 식은?</div><ol class="choices"><li data-ok="1">\\(R=\\dfrac1Q\\Big(\\dfrac{{\\partial P}}{{\\partial y}}-\\dfrac{{\\partial Q}}{{\\partial x}}\\Big)\\), \\(F=e^{{\\int R\\,dx}}\\)</li><li>\\(R=\\dfrac1P\\Big(\\dfrac{{\\partial P}}{{\\partial y}}-\\dfrac{{\\partial Q}}{{\\partial x}}\\Big)\\)</li><li>\\(R=\\dfrac1Q\\Big(\\dfrac{{\\partial Q}}{{\\partial x}}-\\dfrac{{\\partial P}}{{\\partial y}}\\Big)\\)</li><li>\\(R=P_y-Q_x\\)</li></ol><div class="ans">분모는 곱해지지 않는 쪽 \\(Q\\). 9/11 정정 "p가 아니라 q". 3번은 부호가 반대(정리 2의 괄호).</div></div>

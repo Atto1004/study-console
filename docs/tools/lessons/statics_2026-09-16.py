@@ -46,7 +46,7 @@ fig_pulley = canvas(560, 230,
         block(94, 160, 60, 44, "m", INK), text(200, 176, "사람이 당김", 11.5, GRAY, "start")),
     step(2, arrow(124, 158, 124, 120, GREEN, "T₁", 2.6, -14, 0),
         arrow(176, 150, 176, 112, GREEN, "T₂", 2.6, 16, 0),
-        text(150, 222, "도르래: 방향만 바꾼다, T₁ = T₂ (케이블 질량 0)", 12.5, INK, "middle", True)),
+        text(150, 222, "이상적인 도르래: 방향만 바꾼다, T₁ = T₂", 12.5, INK, "middle", True)),
     # 스프링
     step(3, line(340, 60, 340, 200, INK, 2), path("M340 80 l 20 8 l -40 8 l 40 8 l -40 8 l 40 8 l -40 8 l 20 8", INK, 2), line(340, 136, 340, 150, INK, 2),
         line(340, 60, 500, 60, GRAY, 1, "4 3"), line(340, 150, 500, 150, GRAY, 1, "4 3"), text(470, 108, "L₀ (자연 길이)", 12, GRAY, "middle"),
@@ -104,27 +104,27 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>정
 <section class="s" data-id="s4">
 <h2>4. 장력 · 도르래 · 스프링</h2>
 {fig_pulley}
-<div class="why"><b>장력</b>: 로프·케이블이 물체에 <b>묶여서 당겨질 때</b> 가하는 접촉력. 크기 \\(T\\), 작용선은 <b>케이블과 일직선</b>(colinear), 반대쪽(크레인)에는 \\(-\\mathbf T\\). <b>도르래</b>는 홈 파인 바퀴로 케이블의 <b>방향을 바꾸는</b> 장치 — 장력은 유지된다: \\(T_1=T_2\\). <b>스프링</b>은 늘어나거나 압축되면 원래 길이로 돌아가려는 힘을 낸다: 자연 길이 \\(L_0\\), 현재 길이 \\(L\\), 선형이면 \\(|\\mathbf F|=k|L-L_0|\\), \\(k\\) [N/m]. \\(L&gt;L_0\\)면 물체를 당기고, \\(L&lt;L_0\\)면 민다. 이 과목은 선형 스프링만.</div>
-<div class="say">교수님이 학생에게 되물음: "<b>왜 같다고 가정하나?</b>"(\\(T_1=T_2\\)) → <b>케이블 질량을 0</b>으로 가정. \\(F=ma\\)에서 \\(m=0\\)이니 합력 0 → 장력이 케이블 전체에서 일정. "실제로는 질량이 있어 마찰·중력이 생기니 다르다. 중요한 건 아니지만 적어 둔다."</div>
+<div class="why"><b>장력</b>: 로프·케이블이 물체에 <b>묶여서 당겨질 때</b> 가하는 접촉력. 크기 \\(T\\), 작용선은 <b>케이블과 일직선</b>(colinear), 반대쪽(크레인)에는 \\(-\\mathbf T\\). <b>도르래</b>는 홈 파인 바퀴로 케이블의 <b>방향을 바꾸는</b> 장치 — 질량 없는 케이블과 마찰·회전관성을 무시한 <b>이상적인 도르래</b>면 장력이 유지된다: \\(T_1=T_2\\). <b>스프링</b>은 늘어나거나 압축되면 원래 길이로 돌아가려는 힘을 낸다: 자연 길이 \\(L_0\\), 현재 길이 \\(L\\), 선형이면 \\(|\\mathbf F|=k|L-L_0|\\)(\\(F\\)의 단위 N, \\(k\\)의 단위 N/m). \\(L&gt;L_0\\)면 물체를 당기고, \\(L&lt;L_0\\)면 민다. 이 과목은 선형 스프링만.</div>
+<div class="say">교수님이 학생에게 되물음: "<b>왜 같다고 가정하나?</b>"(\\(T_1=T_2\\)) → <b>케이블 질량을 0</b>으로 가정하고 도르래의 마찰·회전관성도 무시(이상적인 도르래) → 장력이 케이블 전체에서 일정. "실제로는 질량이 있어 마찰·중력이 생기니 다르다. 중요한 건 아니지만 적어 둔다."</div>
 <div class="analogy">도르래는 힘의 "방향 전환기" — 아래로 당겨서 위로 들어 올린다, 크기는 그대로. 스프링은 "원래 길이로 돌아가려는 고집"이고, 그 고집의 세기가 \\(k\\).</div>
-<div class="memo"><b>외울 것</b> 장력 작용선 = 케이블 방향 · 도르래 \\(T_1=T_2\\)(케이블 질량 0) · 스프링 \\(F=k|L-L_0|\\), [N/m] · 늘림 → 당김, 압축 → 밈</div>
+<div class="memo"><b>외울 것</b> 장력 작용선 = 케이블 방향 · 이상적인 도르래 \\(T_1=T_2\\) · 스프링 \\(F=k|L-L_0|\\)(F 는 N, k 는 N/m) · 늘림 → 당김, 압축 → 밈</div>
 </section>
 
 <section class="s" data-id="s5">
-<h2>5. 평형 ⇔ ΣF = 0 · 자유물체도 3단계 ★★</h2>
+<h2>5. 입자의 평형 ⇔ ΣF = 0 · 자유물체도 3단계 ★★</h2>
 <div class="why"><b>평형</b>의 정의: 물체의 <b>각 부분이 같은 일정 속도</b>를 가짐 — 정지 또는 등속 → 가속도 0. 그러면 \\(\\sum\\mathbf F=m\\mathbf a=0\\): <b>평형이면 물체에 작용하는 모든 외력의 벡터 합 = 0</b>. 그래서 먼저 <b>물체에 작용하는 모든 외력을 빠짐없이 찾아</b> 표시하고 합을 0으로 놓는다 — 그 "찾아 표시하기"가 자유물체도.</div>
 {fig_fbd}
-<div class="formula">\\[\\text{{평형}}\\ \\Leftrightarrow\\ \\sum\\mathbf F_{{\\text{{외력}}}}=0\\] <b>자유물체도 3단계</b>: ① 분리할 물체를 정한다 → ② 주변에서 떼어내 그 물체만 그린다 → ③ 모든 외력을 표시한다</div>
+<div class="formula">\\[\\text{{입자의 평형}}\\ \\Leftrightarrow\\ \\sum\\mathbf F_{{\\text{{외력}}}}=0\\] <b>자유물체도 3단계</b>: ① 분리할 물체를 정한다 → ② 주변에서 떼어내 그 물체만 그린다 → ③ 모든 외력을 표시한다</div>
 <div class="say">"교재에 있지만, 예제를 직접 풀어 봐야 제일 빨리 이해된다. <b>다음 시간에 예제로 자유물체도 그리는 법</b>."</div>
 <details class="ex"><summary>연습 — 질량 10 kg 상자를 케이블로 매달아 도르래를 거쳐 사람이 잡고 정지</summary><div class="body"><p>① 물체 = 상자 ② 상자만 그린다 ③ 외력: 케이블 장력 \\(T\\)(위), 무게 \\(mg\\)(아래). \\(\\sum F_y=T-mg=0\\) → \\(T=10\\times9.81=98.1\\) N. 도르래 반대편 사람 쪽 케이블도 98.1 N(방향만 다름, \\(T_1=T_2\\)).</p></div></details>
-<div class="analogy">자유물체도는 "그 사람만 방에 남기고 나머지는 다 내보낸 뒤, 나간 사람들이 그에게 주던 힘만 화살표로 남기는 것". 화살표를 하나라도 빠뜨리면 평형식이 틀린다 — 그래서 3단계 중 ③이 점수를 가른다.</div>
-<div class="memo"><b>외울 것</b> 평형 = 가속도 0 = 정지 또는 등속 · \\(\\sum\\mathbf F=0\\) · FBD ① 물체 정하기 ② 떼어내 그리기 ③ 모든 외력 · 과제 1~2문제가 시험에 그대로(OT)</div>
+<div class="analogy">자유물체도는 "그 사람만 방에 남기고 나머지는 다 내보낸 뒤, 나간 사람들이 그에게 주던 힘만 화살표로 남기는 것". 화살표를 하나라도 빠뜨리면 평형식이 틀린다 — ③에서 외력을 빠뜨리면 평형식이 잘못된다.</div>
+<div class="memo"><b>외울 것</b> 평형 = 가속도 0 = 정지 또는 등속 · 입자는 \\(\\sum\\mathbf F=0\\)(강체는 \\(\\sum\\mathbf M=0\\)도) · FBD ① 물체 정하기 ② 떼어내 그리기 ③ 모든 외력 · 과제 1~2문제가 시험에 그대로(OT)</div>
 </section>
 
 <div class="q" data-qid="q1"><div class="qn">확인 1 · 삼중적의 결과</div><div class="qb">\\(\\mathbf U\\cdot(\\mathbf V\\times\\mathbf W)\\)의 결과는?</div><ol class="choices"><li data-ok="1">스칼라 — 마지막 연산이 내적이므로</li><li>벡터 — 외적이 들어 있으므로</li><li>3×3 행렬</li><li>각도</li></ol><div class="ans">외적(벡터)을 먼저 하고 내적(스칼라)으로 끝난다. 절댓값 = 평행육면체 부피.</div></div>
 <div class="q" data-qid="q2"><div class="qn">확인 2 · 행렬식 계산</div><div class="qb">\\(\\mathbf U=(1,0,0)\\), \\(\\mathbf V=(0,2,0)\\), \\(\\mathbf W=(0,0,3)\\)일 때 \\(\\mathbf U\\cdot(\\mathbf V\\times\\mathbf W)\\)는?</div><ol class="choices"><li data-ok="1">6</li><li>0</li><li>\\((1,2,3)\\)</li><li>5</li></ol><div class="ans">대각 행렬식 = \\(1\\cdot2\\cdot3=6\\) = 직육면체 부피. \\(\\mathbf W=(1,1,0)\\)이면 공면이라 0.</div></div>
 <div class="q" data-qid="q3"><div class="qn">확인 3 · 접촉력</div><div class="qb">면과 면이 닿을 때 접촉력의 두 성분은?</div><ol class="choices"><li data-ok="1">면에 수직한 수직력 \\(\\mathbf N\\) + 면에 평행한 마찰력 \\(\\mathbf f\\)</li><li>면에 평행한 수직력 + 면에 수직한 마찰력</li><li>수직력 \\(\\mathbf N\\)뿐이다</li><li>마찰력은 항상 무게와 같다</li></ol><div class="ans">\\(\\mathbf F=\\mathbf N+\\mathbf f\\). 곡면이면 접평면 기준.</div></div>
-<div class="q" data-qid="q4"><div class="qn">확인 4 · 도르래</div><div class="qb">도르래 양쪽 케이블의 장력이 같다(\\(T_1=T_2\\))고 가정하는 근거는?</div><ol class="choices"><li data-ok="1">케이블 질량을 0으로 두면 \\(F=ma\\)에서 합력이 0이라 장력이 케이블 전체에서 일정</li><li>도르래가 회전하지 않기 때문</li><li>케이블이 늘어나기 때문</li><li>도르래의 마찰이 크기 때문</li></ol><div class="ans">교수님이 되물은 질문. 실제로는 질량·마찰이 있어 조금 다르다.</div></div>
+<div class="q" data-qid="q4"><div class="qn">확인 4 · 도르래</div><div class="qb">도르래 양쪽 케이블의 장력이 같다(\\(T_1=T_2\\))고 가정하는 근거는?</div><ol class="choices"><li data-ok="1">질량 없는 케이블과 마찰·회전관성을 무시한 이상적인 도르래라서 장력이 케이블 전체에서 일정</li><li>도르래가 회전하지 않기 때문</li><li>케이블이 늘어나기 때문</li><li>도르래의 마찰이 크기 때문</li></ol><div class="ans">교수님이 되물은 질문. 실제로는 질량·마찰이 있어 조금 다르다.</div></div>
 <div class="q" data-qid="q5"><div class="qn">확인 5 · 평형 방정식</div><div class="qb">물체가 평형일 때 성립하는 것은?</div><ol class="choices"><li data-ok="1">물체에 작용하는 모든 <b>외력</b>의 벡터 합 = 0</li><li>\\(\\sum\\mathbf F=m\\mathbf a\\), \\(\\mathbf a\\ne0\\)</li><li>내력의 합만 0이면 된다</li><li>무게와 장력은 항상 같다</li></ol><div class="ans">평형 = 가속도 0. 내력은 3법칙으로 저절로 상쇄되니 외력만 센다.</div></div>
 <div class="q" data-qid="q6"><div class="qn">확인 6 · 자유물체도</div><div class="qb">질량 10 kg 상자를 케이블로 매달아 정지시켰다. 자유물체도 3단계를 쓰고 장력을 구하라.</div><div class="ans">① 물체 = 상자 ② 상자만 그림 ③ 외력: \\(T\\)(위), \\(mg\\)(아래). \\(T-mg=0\\) → \\(T=98.1\\) N. 도르래 너머 사람 쪽도 98.1 N.</div></div>
 </body></html>'''

@@ -10,6 +10,8 @@
 import io, os, re, sys, json, shutil, datetime
 from xml.sax.saxutils import escape
 from lxml import html as LH
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from quizmix import Mixer, renum
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SM = os.path.join(os.path.dirname(ROOT), "study-materials")
@@ -20,7 +22,11 @@ src, slug, date = sys.argv[1], sys.argv[2], sys.argv[3]
 minutes = int(sys.argv[sys.argv.index("--minutes") + 1]) if "--minutes" in sys.argv else 18
 course = COURSE[slug]
 lesson_id = f"{slug}-{date}"
-doc = LH.fromstring(io.open(src, encoding="utf-8").read())
+_raw = io.open(src, encoding="utf-8", newline="").read()
+# 제어문자 검사 — 생성기 문자열에 \rangle·\vec 를 역슬래시 하나로 쓰면 \r·\v 가 되어 식이 깨진다(2026-09-29 미적2, 오타 3차가 잡음)
+_bad = {name: _raw.count(ch) for name, ch in (("BEL", "\x07"), ("BS", "\x08"), ("VT", "\x0b"), ("FF", "\x0c"), ("CR", "\r")) if _raw.replace("\r\n", "\n").count(ch)}
+if _bad: raise SystemExit(f"원문에 제어문자 {_bad} — 생성기의 TeX 역슬래시를 \\\\ 로(예: \\\\rangle, \\\\vec): {src}")
+doc = LH.fromstring(_raw)
 
 def inner(el):
     # el.text 는 풀린 글자(&lt; → <)라서 다시 이스케이프한다 — 안 하면 < 가 브라우저에서 태그로 읽혀 글이 사라진다(교실 빌더에서 발견, 2026-09-26)
@@ -56,26 +62,41 @@ for i, sec in enumerate(sections, 1):
             else:
                 print("WARN 판서 사진 없음:", p); img.getparent().getparent().set("hidden", "hidden")
             del img.attrib["data-photo"]
+    # 암기·이해 구분(대표님 2026-09-29): 「외울 것」 정리 상자 → .memo.am (알약 「암기」가 머리말을 대신하므로 <b>외울 것</b> 은 뺀다)
+    for mb in sec.xpath('.//div[contains(concat(" ",normalize-space(@class)," ")," memo ")]'):
+        b = mb.xpath("./b[1]")
+        if b and not (mb.text or "").strip() and b[0].text_content().strip() == "외울 것":
+            mb.set("class", (mb.get("class") or "") + " am")
+            tail = (b[0].tail or "").lstrip(" :：·—-"); mb.text = tail; mb.remove(b[0])
 body_html = "".join(LH.tostring(s, encoding="unicode") for s in sections)
 
 # 문제
-quiz = []
+quiz = []; mixer = Mixer(lesson_id)
 for k, q in enumerate(doc.xpath('//div[contains(concat(" ",normalize-space(@class)," ")," q ")]'), 1):
     qid = q.get("data-qid") or f"q{k}"
     qn = (q.xpath('./div[@class="qn"]/text()') or [f"문제 {k}"])[0].strip()
     qb = q.xpath('./div[@class="qb"]'); qhtml = inner(qb[0]) if qb else ""
     ch = q.xpath('./ol[contains(@class,"choices")]')
-    choices = None
+    choices = None; newpos = None
     if ch:
         choices = [{"html": inner(li), "ok": li.get("data-ok") == "1"} for li in ch[0].xpath("./li")]
         assert sum(1 for c in choices if c["ok"]) == 1, "정답은 정확히 하나: " + qn
+        choices, newpos = mixer.mix(choices, qid)   # 보기 섞기 — 원문은 정답이 늘 1번(대표님 2026-09-29), 교실 빌더와 같은 순서
     ans = q.xpath('./div[@class="ans"]'); ans_html = inner(ans[0]) if ans else ""
+    if newpos: ans_html = renum(ans_html, newpos)
     quiz.append({"id": qid, "qn": qn, "html": qhtml, "choices": choices, "ans": ans_html})
 
 tpl = io.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "lesson_tpl.html"), encoding="utf-8").read()
+# 스앵님 판정: 노드 연결(knowledge/lesson_nodes.json) + 판정 스크립트(tutor_judge.js) — 교실 빌더와 같은 원본
+_ln = os.path.join(ROOT, "knowledge", "lesson_nodes.json")
+_rec = (json.load(io.open(_ln, encoding="utf-8")).get("lessons") or {}).get(lesson_id) if os.path.exists(_ln) else None
+nodes_js = json.dumps({"sec": (_rec or {}).get("sec") or {}, "q": (_rec or {}).get("q") or {}}, ensure_ascii=False)
+judge = io.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tutor_judge.js"), encoding="utf-8").read().replace("</", "<\\/")
+tpl = tpl.replace("__JUDGE__", judge)
+tpl = tpl.replace("__SPLITTEX__", io.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "split_tex.js"), encoding="utf-8").read().replace("</", "<\/"))   # 이은 식 → 식마다 한 줄
 page = (tpl.replace("__TITLE__", title).replace("__COURSE__", course).replace("__SESS__", sess).replace("__KICKER__", f"{course} · {sess}")
            .replace("__META__", meta_html).replace("__LEAD__", lead_html).replace("__BODY__", body_html)
-           .replace("__QUIZ__", json.dumps(quiz, ensure_ascii=False)).replace("__ID__", lesson_id))
+           .replace("__QUIZ__", json.dumps(quiz, ensure_ascii=False)).replace("__NODES__", nodes_js).replace("__MEMO__", f"../../memo/{slug}.html#d{date}").replace("__ID__", lesson_id))
 out_dir = os.path.join(ROOT, "notes", "lessons", slug); os.makedirs(out_dir, exist_ok=True)
 out = os.path.join(out_dir, f"{date}.html")
 io.open(out, "w", encoding="utf-8", newline="\n").write(page)

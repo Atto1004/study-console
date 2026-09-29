@@ -112,10 +112,10 @@
   window.addEventListener("storage",function(e){ if(e&&/^mc-slides-/.test(e.key||"")&&ui.view==="study"){ try{ V49.render(); }catch(x){} } });
   /* ---- 시험 범위 덱을 과목 화면 노트 목록에도 (V41 방식) ---- */
   V49.NOTES=[
-    {course:"미분적분학2",file:"notes/calc2-vectors-slides.html",title:"미분적분학2 · 중간고사 대비 벡터 (12.1 좌표 · 12.2 벡터 · 12.3 내적 · 12.4 외적) — 5파트 · 문제 25",week:4,date:"2026-09-24",sub:"개념 → 암기 vs 이해 → 기초(객관식) → 응용 · 「문제만」 모드 #quiz"},
-    {course:"공업수학1",file:"notes/em1-mid-slides.html",title:"공업수학1 · 중간고사 대비 (1장 1계 ODE · 2.1~2.3 · 2.5 오일러-코시) — 6파트 · 문제 36",week:4,date:"2026-09-24",sub:"개념 → 암기 vs 이해 → 기초(객관식) → 응용 · 「문제만」 모드 #quiz"},
-    {course:"일반물리학2",file:"notes/phys2-mid-slides.html",title:"일반물리학2 · 중간고사 대비 (21 전하 · 22 전기장 · 23 가우스 · 24 전위 · 25 전기용량) — 5파트 · 문제 34",week:4,date:"2026-09-24",sub:"개념 → 암기 vs 이해 → 기초(객관식) → 응용 · 「문제만」 모드 #quiz"},
-    {course:"정역학",file:"notes/statics-mid-slides.html",title:"정역학 · 중간고사 대비 (Ch.2 벡터 · Ch.3 힘과 평형) — 5파트 · 문제 31",week:4,date:"2026-09-24",sub:"개념 → 암기 vs 이해 → 기초(객관식) → 응용 · 「문제만」 모드 #quiz"}
+    {course:"미분적분학2",file:"notes/calc2-vectors-slides.html",title:"미분적분학2 · 중간고사 대비 벡터 (12.1 좌표 · 12.2 벡터 · 12.3 내적 · 12.4 외적) — 5파트 · 문제 25",week:4,date:"2026-09-24",sub:""},
+    {course:"공업수학1",file:"notes/em1-mid-slides.html",title:"공업수학1 · 중간고사 대비 (1장 1계 ODE · 2.1~2.3 · 2.5 오일러-코시) — 6파트 · 문제 36",week:4,date:"2026-09-24",sub:""},
+    {course:"일반물리학2",file:"notes/phys2-mid-slides.html",title:"일반물리학2 · 중간고사 대비 (21 전하 · 22 전기장 · 23 가우스 · 24 전위 · 25 전기용량) — 5파트 · 문제 34",week:4,date:"2026-09-24",sub:""},
+    {course:"정역학",file:"notes/statics-mid-slides.html",title:"정역학 · 중간고사 대비 (Ch.2 벡터 · Ch.3 힘과 평형) — 5파트 · 문제 31",week:4,date:"2026-09-24",sub:""}
   ];
   if(Array.isArray(window.NOTES)) V49.NOTES.forEach(function(n){ if(!NOTES.some(function(x){ return x.file===n.file; })) NOTES.push({course:n.course,type:"학습",title:n.title,file:n.file,week:n.week,date:n.date,sub:n.sub}); });
   /* ---- boot 패치: 일반물리학2 중간 범위(교수 발언) ---- */

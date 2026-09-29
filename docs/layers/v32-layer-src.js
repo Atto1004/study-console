@@ -436,7 +436,7 @@ var V32={LIB:null,LIBERR:false,LIBMAP:{},cur:null,attCache:{},gridTok:0};
     var v=$("#v-study"); if(!v||$("#v32StudyEntry",v)) return;
     var vh=$(".vh",v); if(!vh) return;
     var card=document.createElement("div"); card.id="v32StudyEntry"; card.className="v32-entry";
-    card.innerHTML='<button class="btn sm" data-go="lib">📚 라이브러리</button><button class="btn sm" data-go="grid">🗓 주차표</button><span class="smut">자료 4종 업로드 여부 · 녹음·강의자료·필기·판서</span>';
+    card.innerHTML='<button class="btn sm" data-go="lib">📚 라이브러리</button><button class="btn sm" data-go="grid">🗓 주차표</button>';
     vh.insertAdjacentElement("afterend",card);
     $$("[data-go]",card).forEach(function(b){ b.onclick=function(){ if(b.dataset.go==="lib") go("lib"); else { ui.calMode="grid"; go("cal"); } }; });
   };

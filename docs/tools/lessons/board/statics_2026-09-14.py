@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """교실 판서 + 김주영 스앵님 대사 — 정역학 9/14 내적 마무리 · 정사영 · 외적 · 행렬식 (원문: docs/tools/lessons/statics_2026-09-14.py)"""
-VERSION = "2026-09-28b"
+VERSION = "2026-09-29a"
 BOARD = {
  "s1": [
   {"b": ["# 내적의 성질과 단위벡터 표", r"= \mathbf U\cdot\mathbf V=\mathbf V\cdot\mathbf U,\quad a(\mathbf U\cdot\mathbf V)=(a\mathbf U)\cdot\mathbf V=\mathbf U\cdot(a\mathbf V)", r"= \mathbf U\cdot(\mathbf V+\mathbf W)=\mathbf U\cdot\mathbf V+\mathbf U\cdot\mathbf W"],
@@ -17,8 +17,8 @@ BOARD = {
  "s2": [
   {"b": ["# 성분으로 내적 → 두 벡터 사이의 각 ★", r"= \mathbf U\cdot\mathbf V=U_xV_x+U_yV_y+U_zV_z"],
    "s": "별 하나. i 성분끼리 곱하고, j 성분끼리 곱하고, k 성분끼리 곱해서 더하면 됩니다."},
-  {"b": [r"= \cos\theta=\frac{U_xV_x+U_yV_y+U_zV_z}{|\mathbf U||\mathbf V|}", r"= \theta=\cos^{-1}\!\left(\frac{\mathbf U\cdot\mathbf V}{|\mathbf U||\mathbf V|}\right)", "→ 공간에서 두 벡터·두 직선 사이의 각을 구하는 공식"],
-   "s": "정의식과 성분식이 같은 값이니 붙이면 코사인 세타가 나와요. 각도기를 못 대는 3차원 공간의 두 선, 케이블 두 가닥이나 축과 힘 사이의 각을 좌표만으로 구하는 도구예요."},
+  {"b": [r"= \cos\theta=\frac{U_xV_x+U_yV_y+U_zV_z}{|\mathbf U||\mathbf V|}", r"= \theta=\cos^{-1}\!\left(\frac{\mathbf U\cdot\mathbf V}{|\mathbf U||\mathbf V|}\right)", "→ 영벡터가 아닌 두 벡터 사이의 각", "! 방향 없는 두 직선의 작은 각은 cos θ = |U·V| / (|U||V|)"],
+   "s": "정의식과 성분식이 같은 값이니 붙이면 코사인 세타가 나와요. 각도기를 못 대는 3차원 공간에서 두 벡터 사이의 각을 좌표만으로 구하는 도구예요. 영벡터가 아니어야 하고, 방향이 없는 두 직선의 작은 각을 구할 때는 내적에 절댓값을 씌워요."},
   {"b": ["• 연습 : U = (1, 2, 2), V = (2, 0, 1)"], "fig": "comp", "fs": 1,
    "s": "연습이에요. U 가 1 2 2, V 가 2 0 1."},
   {"b": ["• 같은 축 성분끼리 곱한다 : 2, 0, 2"], "fig": "comp", "fs": 2,
@@ -37,16 +37,16 @@ BOARD = {
    "s": "직선 L 과 그 방향의 단위벡터 e. 크기 1이에요."},
   {"b": ["• 벡터 U, 사이각 θ"], "fig": "proj", "fs": 2,
    "s": "벡터 U 를 놓고 L 과의 사이각을 세타."},
-  {"b": [r"= |\mathbf U_p|=|\mathbf U|\cos\theta,\qquad \mathbf e\cdot\mathbf U=|\mathbf U|\cos\theta", r"= \mathbf U_p=(\mathbf U\cdot\mathbf e)\,\mathbf e", "→ 내적이 크기, e 가 방향 — 「이게 크기, 이게 방향」"], "fig": "proj", "fs": 3,
-   "s": "평행 성분의 크기는 U 의 크기 곱하기 코사인 세타. 그런데 e 와 U 의 내적이 딱 그 값이에요. e 의 크기가 1이니까. 내적은 스칼라니까 크기가 나오고, 방향은 단위벡터 e 로. 이게 크기, 이게 방향. 필기본에서 빨간 박스를 친 시험 공식이에요."},
+  {"b": [r"= |\mathbf U_p|=|\mathbf U\cdot\mathbf e|=|\mathbf U||\cos\theta|,\qquad \mathbf e\cdot\mathbf U=|\mathbf U|\cos\theta", r"= \mathbf U_p=(\mathbf U\cdot\mathbf e)\,\mathbf e", "→ 내적 = 부호 있는 성분(절댓값이 크기), e 가 방향"], "fig": "proj", "fs": 3,
+   "s": "e 와 U 의 내적은 U 의 크기 곱하기 코사인 세타예요. e 의 크기가 1이니까. 이 내적은 부호 있는 스칼라 성분이고, 그 절댓값이 평행 성분의 크기예요. 방향은 단위벡터 e 로. 그래서 평행 성분은 내적 곱하기 e. 필기본에서 빨간 박스를 친 시험 공식이에요."},
   {"b": [r"= \mathbf U_n=\mathbf U-\mathbf U_p", "• 평행 성분을 구했으면 원래 벡터에서 빼면 수직 성분"], "fig": "proj", "fs": 4,
    "s": "수직 성분은 평행 성분을 구했으면 원래 벡터에서 빼면 돼요. 2학년 올라가서 배울 재료역학, 동역학 다 똑같다고 하셨어요."},
   {"b": ["! (U·e) 는 부호 있는 길이 — L 의 + 방향이면 +, 반대면 − · e 는 반드시 단위벡터", "• 연습 : U = 4i + 3j, L 방향 i + j"],
    "s": "함정 둘. U 점 e 는 부호 있는 길이라 L 의 플러스 방향이면 플러스, 반대면 마이너스. 그리고 e 는 반드시 단위벡터여야 해요. 연습 하나 볼게요. U 가 4i 더하기 3j, 직선 방향이 i 더하기 j."},
   {"b": [r"= \mathbf e=\frac{\mathbf i+\mathbf j}{\sqrt2},\qquad \mathbf U\cdot\mathbf e=\frac{7}{\sqrt2}\approx4.95", r"= \mathbf U_p=3.5\mathbf i+3.5\mathbf j,\qquad \mathbf U_n=0.5\mathbf i-0.5\mathbf j", "☆ 검산 : U_n · e = 0 ✓ 수직"],
    "s": "e 는 i 더하기 j 나누기 루트 2. U 점 e 는 7 나누기 루트 2. U p 는 3.5, 3.5. U n 은 0.5, 마이너스 0.5. 검산은 U n 과 e 의 내적이 0인지."},
-  {"b": ["☆ 비유 : L 방향 햇빛 — 막대 그림자가 평행 성분", "■ 외울 것 : U_p = (U·e) e · U_n = U − U_p · e 는 단위벡터 · 검산 U_n·e = 0"],
-   "s": "햇빛이 직선 L 방향으로 비칠 때 막대의 그림자 길이가 U 의 크기 곱하기 코사인 세타. 그림자가 평행 성분, 막대에서 그림자를 뺀 나머지가 수직 성분이에요."},
+  {"b": ["☆ 비유 : 막대 끝에서 L 에 수선 — 그 발까지가 평행 성분", "■ 외울 것 : U_p = (U·e) e · U_n = U − U_p · e 는 단위벡터 · 검산 U_n·e = 0"],
+   "s": "막대 끝에서 직선 L 에 수선을 내리면, 수선의 발까지가 평행 성분이에요. 막대에서 평행 성분을 뺀 나머지가 수직 성분이고요."},
  ],
  "s4": [
   {"b": ["# 외적 — 정의 · 오른손 법칙 · 넓이", "☆ 왜 배우나 : 모멘트 M = r × F 를 계산할 때 (4장)"],

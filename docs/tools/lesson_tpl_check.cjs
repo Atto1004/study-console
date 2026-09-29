@@ -34,12 +34,13 @@ setTimeout(()=>{const w=p1.window,d=w.document;
   const rd={}; sids.forEach(s=>rd[s]=true); const dn={},co={}; qs.forEach((q,i)=>{dn[q]=true;co[q]=i<Math.ceil(qs.length*.6);});
   const p2=page(w2=>w2.localStorage.setItem(K,JSON.stringify({read:rd,done:dn,correct:co,answer:{}})));
   setTimeout(()=>{const d2=p2.window.document, t=d2.querySelector("#done").textContent, l2=JSON.parse(p2.window.localStorage.getItem("mc-slides-last"));
-    ok(new RegExp("정답 "+Math.ceil(qs.length*.6)+"/"+qs.length).test(t)&&/따라감으로 표시됩니다/.test(t)&&!/다시 풀어/.test(t),"완료 문구(60% 정답): "+t);
+    /* 2026-09-29 화면 부가 설명 제거(지침 §24) — 완료 문구는 「완료 · 정답 n/m」, 미달은 「정답 n/m · k개 이상이면 완료」 */
+    ok(new RegExp("정답 "+Math.ceil(qs.length*.6)+"/"+qs.length).test(t)&&/^완료 · /.test(t)&&!/개 이상이면/.test(t),"완료 문구(60% 정답): "+t);
     ok(l2.idx===sids.length-1&&l2.n===sids.length,"전부 읽음 → idx n-1 ("+l2.idx+"/"+l2.n+")");
     const co3={}; qs.forEach((q,i)=>{co3[q]=i<Math.ceil(qs.length*.6)-1;});
     const p3=page(w3=>w3.localStorage.setItem(K,JSON.stringify({read:rd,done:dn,correct:co3,answer:{}})));
     setTimeout(()=>{const t3=p3.window.document.querySelector("#done").textContent;
-      ok(/다시 풀어 \d+개 이상/.test(t3),"미달 문구: "+t3);
+      ok(/\d+개 이상이면 완료/.test(t3)&&!/^완료/.test(t3),"미달 문구: "+t3);
       console.log(errs.length?"jsdom errors: "+errs.slice(0,3).join(" | "):"jsdom errors 0"); console.log(fail?"FAIL "+fail:"ALL OK"); process.exit(fail?1:0); },250);
   },250);
 },300);

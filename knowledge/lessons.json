@@ -440,7 +440,7 @@
     "id": "calc2-2026-09-01",
     "file": "notes/lessons/calc2/2026-09-01.html",
     "title": "행렬 — 연립방정식을 푸는 도구, 그리고 다섯 가지 기본 행렬",
-    "minutes": 15,
+    "minutes": 18,
     "sids": [
      "s1",
      "s2",
@@ -459,13 +459,13 @@
     "week": 1,
     "classroom": "notes/classroom/calc2/2026-09-01.html",
     "chapters": 5,
-    "steps": 27
+    "steps": 25
    },
    "2026-09-03": {
     "id": "calc2-2026-09-03",
     "file": "notes/lessons/calc2/2026-09-03.html",
     "title": "행렬의 연산과 행렬식 — \"시험 문제는 행렬식부터 나온다\"",
-    "minutes": 20,
+    "minutes": 18,
     "sids": [
      "s1",
      "s2",
@@ -484,13 +484,13 @@
     "week": 1,
     "classroom": "notes/classroom/calc2/2026-09-03.html",
     "chapters": 5,
-    "steps": 31
+    "steps": 26
    },
    "2026-09-08": {
     "id": "calc2-2026-09-08",
     "file": "notes/lessons/calc2/2026-09-08.html",
     "title": "행렬 파트의 본체 — 여인수 전개, 역행렬, 크래머의 법칙",
-    "minutes": 22,
+    "minutes": 18,
     "sids": [
      "s1",
      "s2",
@@ -515,7 +515,7 @@
     "id": "calc2-2026-09-15",
     "file": "notes/lessons/calc2/2026-09-15.html",
     "title": "3차원을 그리는 법 — 곡면·거리·구면, 그리고 벡터의 시작",
-    "minutes": 20,
+    "minutes": 18,
     "sids": [
      "s1",
      "s2",
@@ -534,13 +534,13 @@
     "week": 3,
     "classroom": "notes/classroom/calc2/2026-09-15.html",
     "chapters": 5,
-    "steps": 30
+    "steps": 25
    },
    "2026-09-17": {
     "id": "calc2-2026-09-17",
     "file": "notes/lessons/calc2/2026-09-17.html",
     "title": "벡터 계산 — 두 점 벡터, 크기, 표준기저벡터 i j k, 단위벡터",
-    "minutes": 22,
+    "minutes": 18,
     "sids": [
      "s1",
      "s2",
@@ -559,13 +559,13 @@
     "week": 3,
     "classroom": "notes/classroom/calc2/2026-09-17.html",
     "chapters": 5,
-    "steps": 32
+    "steps": 26
    },
    "2026-09-22": {
     "id": "calc2-2026-09-22",
     "file": "notes/lessons/calc2/2026-09-22.html",
     "title": "12.3 방향각·방향코사인 → 12.4 외적 — \"두 벡터에 수직인 벡터\"",
-    "minutes": 20,
+    "minutes": 18,
     "sids": [
      "s1",
      "s2",
@@ -584,13 +584,13 @@
     "week": 4,
     "classroom": "notes/classroom/calc2/2026-09-22.html",
     "chapters": 5,
-    "steps": 28
+    "steps": 26
    },
    "2026-09-10": {
     "id": "calc2-2026-09-10",
     "file": "notes/lessons/calc2/2026-09-10.html",
     "title": "12.1 3차원 좌표계 — 좌표계 둘, 곡선에서 곡면으로, 점 찍는 법",
-    "minutes": 12,
+    "minutes": 18,
     "sids": [
      "s1",
      "s2",
@@ -608,9 +608,9 @@
     "week": 2,
     "classroom": "notes/classroom/calc2/2026-09-10.html",
     "chapters": 4,
-    "steps": 21
+    "steps": 17
    }
   }
  },
- "generated": "2026-09-28T16:01:33"
+ "generated": "2026-09-29T10:46:27"
 }

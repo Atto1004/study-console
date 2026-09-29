@@ -66,10 +66,10 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 
 <section class="s" data-id="s1">
 <h2>1. 해의 종류와 초기값 문제(IVP) ★</h2>
-<p>미분방정식의 해는 적분상수 \\(c\\)를 품은 <b>일반해</b>(가족)다. 조건을 넣어 \\(c\\)를 정하면 <b>특수해</b>. 가족에 속하지 않는 별난 해(<b>특이해</b>)도 있지만 교수님은 "공학적 의미가 없어 거의 안 다룬다"고 했다.</p>
+<p>미분방정식의 해는 적분상수 \\(c\\)를 품은 <b>일반해</b>(가족)다. 조건을 넣어 \\(c\\)를 정하면 <b>특수해</b>. 가족에 속하지 않는 별난 해(<b>특이해</b>)도 있지만 교수님은 "공학적 의미가 없어 거의 안 다룬다"고 했다 — 이번 수업에서 자세히 다루지 않는다는 뜻으로 한정한다.</p>
 {fig_ivp}
 <div class="formula">\\[y'=3y,\\ y(0)=5.7:\\quad \\frac{{dy}}{{y}}=3\\,dx\\ \\to\\ \\ln y=3x+c\\ \\to\\ y=e^{{c}}e^{{3x}}=c\\,e^{{3x}}\\ \\to\\ c=5.7\\ \\Rightarrow\\ y=5.7e^{{3x}}\\]</div>
-<div class="say">"초기조건 = 독립변수가 0일 때의 값. 공학에서는 <b>경계조건</b>이라는 말을 많이 쓴다." · "n계면 적분상수 n개 → 조건도 n개." · 풀기 전에 늘 "이거 <b>선형이야 비선형이야?</b>" (뒷자리 학생 지목)</div>
+<div class="say">"초기조건 = 독립변수가 0일 때의 값. 공학에서는 <b>경계조건</b>이라는 말을 많이 쓴다."(정확히는 한 점 \\(x_0\\)에서 주는 함수값·필요한 도함숫값 — \\(x_0=0\\)일 필요 없고, 구간 양 끝에서 주면 경계조건) · "n계면 적분상수 n개 → 조건도 n개." · 풀기 전에 늘 "이거 <b>선형이야 비선형이야?</b>" (뒷자리 학생 지목)</div>
 <div class="why">\\(e^{{3x+c}}=e^c e^{{3x}}\\)에서 \\(e^c\\)는 양의 상수일 뿐이니 새 상수 \\(c\\)로 다시 쓴다. 초기값 문제는 언제나 <b>일반해 → 조건 대입 → 특수해</b> 두 단계. 슬라이드 메모 "#일반해와 특수해를 구해라".</div>
 <div class="analogy">일반해는 한 가족의 단체사진, 초기조건은 "안경 쓴 사람"이라는 힌트 — 그 힌트로 한 명(특수해)이 지목된다. 힌트가 두 개 필요한 가족(2계)도 있다.</div>
 <div class="memo"><b>외울 것</b> 일반해(상수 c) → 초기조건 → 특수해 · n계 = 상수 n개 = 조건 n개 · 특이해는 거의 안 다룸</div>
@@ -92,7 +92,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 <details class="ex"><summary>예제 세 문제(p.23, 메모 "#부분분수로 적분") — 일반해</summary><div class="body">
 <p>(1) \\(xe^{{-y}}\\sin x\\,dx-y\\,dy=0\\) → \\(ye^{{y}}dy=x\\sin x\\,dx\\) → 양변 <b>부분적분</b>: \\((y-1)e^y=-x\\cos x+\\sin x+c\\).</p>
 <p>(2) \\(x^2y'=y^2+1\\) → \\(\\dfrac{{dy}}{{y^2+1}}=\\dfrac{{dx}}{{x^2}}\\) → \\(\\tan^{{-1}}y=-\\dfrac1x+c\\).</p>
-<p>(3) \\(y'=y^2-1\\) → \\(\\dfrac{{dy}}{{y^2-1}}=dx\\), <b>부분분수</b> \\(\\dfrac{{1}}{{y^2-1}}=\\dfrac12\\Big(\\dfrac{{1}}{{y-1}}-\\dfrac{{1}}{{y+1}}\\Big)\\) → \\(\\dfrac12\\ln\\Big|\\dfrac{{y-1}}{{y+1}}\\Big|=x+c\\).</p></div></details>
+<p>(3) \\(y'=y^2-1\\) → \\(\\dfrac{{dy}}{{y^2-1}}=dx\\), <b>부분분수</b> \\(\\dfrac{{1}}{{y^2-1}}=\\dfrac12\\Big(\\dfrac{{1}}{{y-1}}-\\dfrac{{1}}{{y+1}}\\Big)\\) → \\(\\dfrac12\\ln\\Big|\\dfrac{{y-1}}{{y+1}}\\Big|=x+c\\). 나눗셈으로 빠지는 상수해 \\(y=\\pm1\\)도 해.</p></div></details>
 <div class="why">분리형의 어려움은 미분방정식이 아니라 <b>적분</b>이다. 같은 도구 셋(역탄젠트 공식·부분분수·부분적분)이 반복되니 이 셋은 손에 익혀 둔다. \\(\\ln\\)이 나오면 절댓값, 적분상수는 한쪽에 하나만.</div>
 <div class="analogy">섞인 동전을 종류별로 갈라 놓고(분리) 각 더미를 따로 세는 것(적분). 갈라지지 않는 동전(\\(x\\)와 \\(y\\)가 곱·합으로 얽힌 식)은 다음 절의 치환으로 갈라야 한다.</div>
 <div class="memo"><b>외울 것</b> \\(g(y)dy=f(x)dx\\) → 양변 적분 → \\(c\\) 한쪽 · \\(\\int\\frac{{du}}{{u^2+a^2}}=\\frac1a\\tan^{{-1}}\\frac ua\\) · 부분분수 · 부분적분 · 과제 1.3 #6·7·8·16·17</div>
@@ -102,21 +102,21 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 <h2>4. 모델화 Ex.7 — 토리첼리의 법칙(탱크 비우기)</h2>
 {fig_tank}
 <div class="formula">\\[\\text{{유출 속도 }}v=0.600\\sqrt{{2gh}}\\ \\Rightarrow\\ B\\,\\frac{{dh}}{{dt}}=-0.600\\,A\\sqrt{{2gh}}\\ \\Rightarrow\\ \\frac{{dh}}{{\\sqrt h}}=-0.000664\\,dt\\ \\Rightarrow\\ 2\\sqrt h=-0.000664\\,t+c\\]</div>
-<div class="why">탱크 단면 \\(B\\)에서 높이 \\(h\\)가 \\(dh\\) 내려간 부피 = 구멍 \\(A\\)로 빠져나간 부피. \\(h\\)는 왼쪽, \\(t\\)는 오른쪽 — 변수분리형. \\(h(0)=225\\) cm → \\(c=30\\) → \\(h(t)=(15-0.000332t)^2\\), \\(h=0\\)은 \\(t=45{{,}}181\\) s ≈ <b>12.6시간</b>. 판서 사진이 흐려 세부는 교재(Kreyszig 1.3 Ex.7) 수치로 채웠다.</div>
-<div class="analogy">욕조 마개를 뽑으면 처음엔 콸콸, 끝날수록 졸졸 — 수압(\\(\\sqrt h\\))이 줄기 때문. 그래서 비는 시간이 "처음 속도로 나누기"보다 훨씬 길다.</div>
+<div class="why">탱크 단면 \\(B\\)에서 높이 \\(h\\)가 \\(dh\\) 내려간 부피 = 구멍 \\(A\\)로 빠져나간 부피. \\(h\\)는 왼쪽, \\(t\\)는 오른쪽 — 변수분리형. \\(h(0)=225\\) cm → \\(c=30\\) → \\(h(t)=(15-0.000332t)^2\\), \\(h=0\\)은 \\(t=45{{,}}181\\) s ≈ <b>12.6시간</b>(이 식은 탱크가 빌 때까지만). 판서 사진이 흐려 세부는 교재(Kreyszig 1.3 Ex.7) 수치로 채웠다.</div>
+<div class="analogy">욕조 마개를 뽑으면 처음엔 콸콸, 끝날수록 졸졸 — 수압은 \\(h\\)에 비례하고, 그래서 유출 속도(\\(\\sqrt h\\)에 비례)가 줄기 때문. 그래서 비는 시간이 "처음 속도로 나누기"보다 훨씬 길다.</div>
 <div class="memo"><b>외울 것</b> 모델 설정의 핵심은 <b>부피 보존</b>(줄어든 부피 = 빠져나간 부피) · \\(v=0.6\\sqrt{{2gh}}\\) · 결과 \\(h=(\\sqrt{{h_0}}-\\alpha t)^2\\)</div>
 </section>
 
 <section class="s" data-id="s5">
 <h2>5. 확장 — 동차형: y = ux 치환으로 분리형 만들기 ★</h2>
 <p>그대로는 분리가 안 되는 식이라도 \\(y'=f(y/x)\\) 꼴(우변이 \\(y/x\\)의 함수 = <b>동차</b>)이면 \\(u=y/x\\), \\(y=ux\\), \\(y'=u'x+u\\)로 치환한다.</p>
-<div class="formula">\\[u'x+u=f(u)\\ \\Rightarrow\\ \\frac{{du}}{{f(u)-u}}=\\frac{{dx}}{{x}}\\qquad(\\text{{변수분리형이 된다}})\\]</div>
-<details class="ex"><summary>p.26 동차함수 판정 — \\(f(tx,ty)=t^nf(x,y)\\)이면 \\(n\\)차 동차</summary><div class="body"><p>(1) \\(x-\\sqrt{{xy}}+3y\\): 1차 동차 ✓ (2) \\(x^4-x^2y^2+8y^4\\): 4차 동차 ✓ (3) \\(x^2+y^2+4\\): 상수 4 때문에 ✗ (4) \\(y/x+1\\): 0차 동차 ✓. (슬라이드에 답 없음 — 아톰 판정)</p></div></details>
+<div class="formula">\\[u'x+u=f(u)\\ \\Rightarrow\\ \\frac{{du}}{{f(u)-u}}=\\frac{{dx}}{{x}}\\qquad(\\text{{변수분리형이 된다}})\\] \\(f(u)-u=0\\)인 상수 \\(u\\)는 나누기 전에 따로 확인한다.</div>
+<details class="ex"><summary>p.26 동차함수 판정 — \\(f(tx,ty)=t^nf(x,y)\\)이면 \\(n\\)차 동차</summary><div class="body"><p>(1) \\(x-\\sqrt{{xy}}+3y\\): 1차 동차 ✓(\\(t>0\\)) (2) \\(x^4-x^2y^2+8y^4\\): 4차 동차 ✓ (3) \\(x^2+y^2+4\\): 상수 4 때문에 ✗ (4) \\(y/x+1\\): 0차 동차 ✓. (슬라이드에 답 없음 — 아톰 판정)</p></div></details>
 {fig_circles}
 <details class="ex"><summary>Ex.8 \\(2xyy'=y^2-x^2\\) — 회차의 마지막 문제</summary><div class="body"><p>\\(y'=\\dfrac12\\Big(\\dfrac yx-\\dfrac xy\\Big)\\) → \\(y=ux\\): \\(u'x+u=\\dfrac12\\Big(u-\\dfrac1u\\Big)\\) → \\(u'x=-\\dfrac{{u^2+1}}{{2u}}\\) → \\(\\dfrac{{2u\\,du}}{{u^2+1}}=-\\dfrac{{dx}}{{x}}\\) → \\(\\ln(u^2+1)=-\\ln|x|+c^*\\) → \\(u^2+1=\\dfrac cx\\) → \\(\\Big(\\dfrac yx\\Big)^2+1=\\dfrac cx\\) → <b>\\(x^2+y^2=cx\\)</b>, 즉 \\((x-c/2)^2+y^2=(c/2)^2\\).</p></div></details>
 <div class="why">치환 뒤 \\(u\\)와 \\(x\\)가 갈라지는 이유: 동차 식은 크기(\\(x\\))와 비율(\\(y/x\\))로 분해되기 때문. 마지막에 반드시 \\(u=y/x\\)로 <b>되돌린다</b> — 되돌리지 않으면 답이 아니다(9/16 베르누이에서도 같은 말).</div>
 <div class="analogy">지도를 확대·축소해도 같은 모양이면(동차) "비율"만 보면 된다 — \\(y/x\\) 하나로 문제가 1차원이 되는 셈.</div>
-<div class="memo"><b>외울 것</b> \\(y'=f(y/x)\\) → \\(y=ux\\), \\(y'=u'x+u\\) → \\(\\frac{{du}}{{f(u)-u}}=\\frac{{dx}}x\\) → 되돌리기 · 동차 판정 \\(f(tx,ty)=t^nf\\)</div>
+<div class="memo"><b>외울 것</b> \\(y'=f(y/x)\\) → \\(y=ux\\), \\(y'=u'x+u\\) → \\(\\frac{{du}}{{f(u)-u}}=\\frac{{dx}}x\\) → 되돌리기(\\(f(u)=u\\)인 상수 \\(u\\)는 따로) · 동차 판정 \\(f(tx,ty)=t^nf\\)</div>
 </section>
 
 <div class="q" data-qid="q1"><div class="qn">확인 1 · 초기값 문제</div><div class="qb">\\(y'=3y\\), \\(y(0)=5.7\\)의 특수해는?</div><ol class="choices"><li data-ok="1">\\(y=5.7e^{{3x}}\\)</li><li>\\(y=3e^{{5.7x}}\\)</li><li>\\(y=5.7+3x\\)</li><li>\\(y=e^{{3x}}+5.7\\)</li></ol><div class="ans">일반해 \\(ce^{{3x}}\\), \\(y(0)=c=5.7\\).</div></div>

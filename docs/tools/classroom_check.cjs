@@ -19,7 +19,11 @@ const until = async (fn, ms) => { const t0 = Date.now(); while (Date.now() - t0 
 const escH = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 function boardLine(line) { const t = String(line).trim(); let kind = "li", body = t;
   for (const [pre, k] of [["#", "h"], ["=", "f"], ["!", "pit"], ["☆", "star"], ["→", "res"], ["■", "memo"], ["•", "li"]]) { if (t.startsWith(pre)) { kind = k; body = t.slice(pre.length).trim(); break; } }
-  const h = kind === "f" ? "\\[" + escH(body) + "\\]" : escH(body).replace(/__(.+?)__/g, '<span class="ul">$1</span>'); return { k: kind, h }; }
+  /* 암기·이해 알약(2026-09-29): ■·☆ 뒤 「외울 것 :」 등 → tg, 알약과 같은 말인 머리말은 뺀다(비유·할 일은 남김) — build_classroom.TAG 와 같다 */
+  let tg = null; if (kind === "memo" || kind === "star") { const m = /^(외울 것|암기|이해|비유|시험|연습|할 일)\s*[:：]\s*/.exec(body);
+    if (m) { const T = { "외울 것": ["am", 1], "암기": ["am", 1], "이해": ["ih", 1], "비유": ["ih", 0], "시험": ["ex", 1], "연습": ["pr", 1], "할 일": ["pr", 0] }[m[1]]; tg = T[0]; if (T[1]) body = body.slice(m[0].length); } }
+  const h = kind === "f" ? "\\[" + escH(body) + "\\]" : escH(body).replace(/__(.+?)__/g, '<span class="ul">$1</span>'); return tg ? { k: kind, h, tg } : { k: kind, h }; }
+const TGN = { am: "암기", ih: "이해", ex: "시험", pr: "연습" };
 let fail = 0, total = { steps: 0, quiz: 0, v2: 0 };
 function loadBoard(slug, date) {
   const p = path.join(__dirname, "lessons", "board", `${slug}_${date}.py`); if (!fs.existsSync(p)) return null;
@@ -47,7 +51,7 @@ async function check(file) {
         const want = c.steps.slice(0, si + 1).flatMap(s => s.b.map((_, j) => s.id + "#" + j)); const got = [...doc.querySelectorAll("#bc .bl")].map(l => l.getAttribute("data-step") + "#" + l.getAttribute("data-ln"));
         if (want.join(",") !== got.join(",")) problems.push(`CH${ci + 1} 단계 ${si + 1} 판서 줄 누적이 다름: ${got.length}/${want.length}`);
         /* 화면의 줄 내용이 자료 b[].h 그대로인지(오타 R1: 개수만 세면 내용이 틀려도 통과) */
-        { const wantH = c.steps.slice(0, si + 1).flatMap(s => s.b.map(l => l.h)); const gotH = [...doc.querySelectorAll("#bc .bl")].map(l => (l.querySelector(".bt") || l).innerHTML); const k = gotH.findIndex((h, i) => h !== wantH[i]); if (k >= 0) problems.push(`CH${ci + 1} 단계 ${si + 1} 판서 줄 ${k + 1} 내용이 자료와 다름: ${gotH[k].slice(0, 40)} ≠ ${String(wantH[k]).slice(0, 40)}`); }
+        { const wantH = c.steps.slice(0, si + 1).flatMap(s => s.b.map(l => (l.tg && TGN[l.tg] ? '<span class="tg tg-' + l.tg + '">' + TGN[l.tg] + "</span>" : "") + l.h)); const gotH = [...doc.querySelectorAll("#bc .bl")].map(l => (l.querySelector(".bt") || l).innerHTML); const k = gotH.findIndex((h, i) => h !== wantH[i]); if (k >= 0) problems.push(`CH${ci + 1} 단계 ${si + 1} 판서 줄 ${k + 1} 내용이 자료와 다름: ${gotH[k].slice(0, 40)} ≠ ${String(wantH[k]).slice(0, 40)}`); }
         if (![...doc.querySelectorAll("#bc .bl")].every(l => l.classList.contains("now"))) problems.push(`CH${ci + 1} 단계 ${si + 1} 즉시 표시인데 줄이 가려짐`);
         const figs = doc.querySelectorAll("#bc .bd-fig"); if (figs.length !== (st.fig ? 1 : 0)) problems.push(`CH${ci + 1} 단계 ${si + 1} 그림 수 ${figs.length} (기대 ${st.fig ? 1 : 0})`);
         if (st.fig) { const gs = [...doc.querySelectorAll("#bc .bd-fig [data-step]")]; if (!gs.length) problems.push(`CH${ci + 1} 단계 ${si + 1} 그림에 data-step 없음`);

@@ -67,7 +67,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미
 <tr><td>\\(x^2+y^2=1\\)</td><td>원둘레</td><td>모든 값</td><td>속 빈 원기둥면</td></tr>
 <tr><td>\\(x^2+y^2\\le1,\\ 2\\le z\\le4\\)</td><td>원판(내부 포함)</td><td>2~4</td><td>속 찬 원기둥 조각</td></tr></table>
 <div class="analogy">쿠키 틀: 반죽 위에 틀(xy 평면의 그림)을 먼저 찍고, 그 모양대로 위로 뽑아 올리는 높이가 \\(z\\)의 범위. 높이 제한이 없으면 한없이 긴 기둥.</div>
-<div class="memo"><b>외울 것</b> 없는 변수 = 모든 값 · \\(=\\)은 둘레, \\(\\le\\)는 내부 포함 · 12.1은 시험 X, 그림의 바탕</div>
+<div class="memo"><b>외울 것</b> 없는 변수 = 모든 값 · 원의 식에서 \\(=\\)은 원둘레, \\(\\le\\)는 원판(내부 포함) · 12.1은 시험 X, 그림의 바탕</div>
 </section>
 
 <section class="s" data-id="s2">
@@ -84,12 +84,12 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미
 <h2>3. 구면의 방정식 — 완전제곱으로 중심·반지름, 그리고 그림 ★</h2>
 {fig_sph}
 <div class="formula">\\[(x-h)^2+(y-k)^2+(z-l)^2=r^2\\quad(\\text{{중심 }}C(h,k,l),\\ \\text{{반지름 }}r)\\qquad \\text{{Ex04: }}(x+2)^2+(y-3)^2+(z+1)^2=8\\ \\Rightarrow\\ C(-2,3,-1),\\ r=2\\sqrt2\\]</div>
-<div class="why">\\(x^2+y^2+z^2+4x-6y+2z+6=0\\): 미지수 3개, 최고차 2차 → 구면. \\(x\\)끼리·\\(y\\)끼리·\\(z\\)끼리 묶고 <b>1차 계수 절반의 제곱</b>을 더하고 빼면 \\(-6+4+9+1=8\\). \\(r=\\sqrt8=2\\sqrt2\\) — "√8 쓰면 감점, 4×2니까 2√2". \\(x^2+y^2+z^2\\)이 보이면 구면을 암시.</div>
-<details class="ex" open><summary>완전제곱 절차(예제 4) — sol. i) 묶기 ii) 더하고 빼기 iii) 중심·반지름 iv) 그림</summary><div class="body"><p>i) \\((x^2+4x)+(y^2-6y)+(z^2+2z)=-6\\) ii) 양변에 \\(+4,+9,+1\\): \\((x+2)^2+(y-3)^2+(z+1)^2=8\\) iii) 완전제곱 안이 0이 되는 값이 중심 \\(C(-2,3,-1)\\), \\(r^2=8\\to r=2\\sqrt2\\) iv) 바닥에 \\((-2,3)\\)을 찍고 \\(z=-1\\)로 내린 점을 중심으로 반지름 \\(2.83\\)의 공 — "중심이 \\(C\\)이고 반지름이 \\(2\\sqrt2\\)인 구면"이라고 문장으로 쓴다.</p></div></details>
+<div class="why">\\(x^2+y^2+z^2+4x-6y+2z+6=0\\): 완전제곱하면 \\((x+2)^2+(y-3)^2+(z+1)^2=8\\)이므로 구면이다(미지수 셋·2차라는 것만으로는 판정할 수 없다 — \\(x^2+y^2-z^2=1\\)은 구면이 아니다). \\(x\\)끼리·\\(y\\)끼리·\\(z\\)끼리 묶고 <b>1차 계수 절반의 제곱</b>을 더하고 빼면 \\(-6+4+9+1=8\\). \\(r=\\sqrt8=2\\sqrt2\\) — "√8 쓰면 감점, 4×2니까 2√2". \\(x^2+y^2+z^2\\)이 보이면 구면을 암시(확정은 완전제곱 뒤 우변이 양수일 때).</div>
+<details class="ex" open><summary>완전제곱 절차(예제 4) — sol. i) 묶기 ii) 더하고 빼기 iii) 중심·반지름 iv) 그림</summary><div class="body"><p>i) \\((x^2+4x)+(y^2-6y)+(z^2+2z)=-6\\) ii) 양변에 \\(+4,+9,+1\\): \\((x+2)^2+(y-3)^2+(z+1)^2=8\\) iii) 완전제곱 안이 0이 되는 값이 중심 \\(C(-2,3,-1)\\), \\(r^2=8\\to r=2\\sqrt2\\) iv) 바닥에 \\((-2,3)\\)을 찍고 \\(z=-1\\)로 내린 점을 중심으로 반지름 \\(2\\sqrt2\\approx2.83\\)의 공 — "중심이 \\(C\\)이고 반지름이 \\(2\\sqrt2\\)인 구면"이라고 문장으로 쓴다.</p></div></details>
 <div class="say">"값만 구하면 중고등학교. 대학은 이게 뭐냐를 알려줘야 돼." · 교재 비판: "교재는 답만 적었다. <b>채점 기준은 제가 가르친 기준.</b> 교재만 보면 점수 낮게 나온다." → 답안에 <b>그림 + 기하학적 의미 문장</b>.</div>
 <details class="ex"><summary>추가 예제 \\(1\\le x^2+y^2+z^2\\le4,\\ z\\le0\\)</summary><div class="body"><p>중심 \\((0,0,0)\\)(3차원에선 극점이라고도), 반지름 1 이상 2 이하 → 큰 공(축구공) 안에 작은 공(핸드볼공)이 든 <b>구 껍질 사이 영역</b>. \\(z\\le0\\) → \\(z=0\\)에서 잘라 <b>아래 반쪽</b>. "달걀을 반으로 잘라 노른자를 빼낸 흰자" 모양. 특수한 꼴만 손으로 그리고 나머지는 컴퓨터가 그린다.</p></div></details>
 <div class="analogy">중심을 찍는 법은 점 찍기와 같다 — \\(x=-2,\\ y=3\\)을 바닥에 찍고 \\(z=-1\\)만큼 내려간 점, 거기서 반지름 \\(2\\sqrt2\\approx2.83\\)의 공.</div>
-<div class="memo"><b>외울 것</b> 완전제곱 → 중심·반지름 · 근호 정리 · <b>그림 + "중심 C, 반지름 r인 구면"</b> 문장까지 · 부등식 = 영역</div>
+<div class="memo"><b>외울 것</b> 완전제곱 → 중심·반지름 · 근호 정리 · <b>그림 + "중심 C, 반지름 r인 구면"</b> 문장까지 · 구의 부등식 = 껍질 등 영역</div>
 </section>
 
 <section class="s" data-id="s4">
@@ -112,7 +112,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미
 
 <div class="q" data-qid="q1"><div class="qn">확인 1 · 곡면</div><div class="qb">R³에서 \\(z=3\\)은 어떤 도형인가?</div><ol class="choices"><li data-ok="1">높이 3에 있는 수평 평면(\\(xy\\) 평면 전체를 올린 것)</li><li>\\(z\\)축 위의 점 하나</li><li>\\(z=3\\)인 직선</li><li>반지름 3인 구면</li></ol><div class="ans">\\(x,y\\)가 없다 = 모든 영역. 문제가 잘못된 게 아니다.</div></div>
 <div class="q" data-qid="q2"><div class="qn">확인 2 · 부등식 영역</div><div class="qb">\\(x^2+y^2\\le1,\\ 2\\le z\\le4\\)는?</div><ol class="choices"><li data-ok="1">원판을 \\(z=2\\)에서 4까지 올린 속이 찬 원기둥 조각</li><li>속 빈 원기둥면</li><li>높이 3에 있는 원</li><li>반지름 1인 구</li></ol><div class="ans">\\(\\le\\)는 원 + 내부, \\(z\\) 범위가 있으니 조각.</div></div>
-<div class="q" data-qid="q3"><div class="qn">확인 3 · 거리</div><div class="qb">\\(P(2,-1,7)\\), \\(Q(1,-3,5)\\)의 거리는?</div><ol class="choices"><li data-ok="1">3</li><li>\\(\\sqrt9\\)</li><li>\\(\\sqrt{{13}}\\)</li><li>9</li></ol><div class="ans">\\(\\sqrt{{1+4+4}}=3\\). "√9 쓰면 감점" — 정리해서 3.</div></div>
+<div class="q" data-qid="q3"><div class="qn">확인 3 · 거리</div><div class="qb">\\(P(2,-1,7)\\), \\(Q(1,-3,5)\\)의 거리를 근호를 간단히 정리한 답은?</div><ol class="choices"><li data-ok="1">3</li><li>\\(\\sqrt9\\)</li><li>\\(\\sqrt{{13}}\\)</li><li>9</li></ol><div class="ans">\\(\\sqrt{{1+4+4}}=3\\). 값은 같지만 이 문항은 정리된 답안 형식을 묻는다 — "√9 쓰면 감점", 정리해서 3.</div></div>
 <div class="q" data-qid="q4"><div class="qn">확인 4 · 구면</div><div class="qb">\\(x^2+y^2+z^2+4x-6y+2z+6=0\\)의 중심과 반지름은?</div><ol class="choices"><li data-ok="1">\\(C(-2,3,-1)\\), \\(r=2\\sqrt2\\)</li><li>\\(C(2,-3,1)\\), \\(r=\\sqrt8\\)</li><li>\\(C(-2,3,-1)\\), \\(r=8\\)</li><li>\\(C(4,-6,2)\\), \\(r=\\sqrt6\\)</li></ol><div class="ans">완전제곱: \\((x+2)^2+(y-3)^2+(z+1)^2=8\\). \\(\\sqrt8=2\\sqrt2\\)로 정리. 답안에는 그림과 "중심 C, 반지름 r인 구면" 문장까지.</div></div>
 <div class="q" data-qid="q5"><div class="qn">확인 5 · 벡터</div><div class="qb">벡터 \\(\\overrightarrow{{AB}}\\)에 대한 설명으로 옳은 것은?</div><ol class="choices"><li data-ok="1">A가 시작점, B가 끝점이며 크기와 방향을 가진다</li><li>B가 시작점, A가 끝점이다</li><li>크기만 있고 방향은 없다</li><li>\\(\\overrightarrow{{AB}}=\\overrightarrow{{BA}}\\)</li></ol><div class="ans">순서를 바꾸면 방향이 반대. 손으로는 화살표 필수.</div></div>
 <div class="q" data-qid="q6"><div class="qn">확인 6 · 영역 설명</div><div class="qb">\\(1\\le x^2+y^2+z^2\\le4,\\ z\\le0\\)이 나타내는 영역을 말로 설명하라.</div><div class="ans">중심 원점, 반지름 1과 2인 두 구면 사이의 껍질 영역 중 \\(z\\le0\\)인 아래 반쪽 — "달걀을 반으로 잘라 노른자를 빼낸 흰자" 모양. 답에는 그림과 이 문장을 같이.</div></div>

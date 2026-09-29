@@ -11,6 +11,8 @@
 import io, os, re, sys, json, datetime
 from xml.sax.saxutils import escape
 from lxml import html as LH
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from quizmix import Mixer, renum
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -55,14 +57,24 @@ def chalkify(fig_html, fid):
     s = re.sub(r'(<svg\b[^>]*)(>)', lambda m: m.group(1) + f' id="fig-{fid}"' + m.group(2), s, count=1)
     return s
 
+# 암기·이해 구분(대표님 2026-09-29 「무조건 암기해야 하는 것, 이해해야 하는 것 구분」): ■·☆ 줄의 머리말 → 알약 tg. 알약과 같은 말인 머리말은 글에서 뺀다(비유·할 일은 남김)
+TAG = {"외울 것": ("am", True), "암기": ("am", True), "이해": ("ih", True), "비유": ("ih", False), "시험": ("ex", True), "연습": ("pr", True), "할 일": ("pr", False)}
+
 def board_line(line):
-    """판서 줄 → {"k": 종류, "h": HTML}. 접두: # 소제목 · = 식(KaTeX display) · ! 함정 · ☆ 시험/비유 · → 결론 · ■ 외울 것 · • 기본. __글__ 은 밑줄."""
+    """판서 줄 → {"k": 종류, "h": HTML, "tg": 알약}. 접두: # 소제목 · = 식(KaTeX display) · ! 함정 · ☆ 시험/비유 · → 결론 · ■ 외울 것 · • 기본. __글__ 은 밑줄.
+    ■·☆ 뒤 「외울 것 :」「비유 :」「시험 :」「연습 :」 → tg am(암기)·ih(이해)·ex(시험)·pr(연습)"""
     t = str(line).strip(); kind, body = "li", t
     for pre, k in (("#", "h"), ("=", "f"), ("!", "pit"), ("☆", "star"), ("→", "res"), ("■", "memo"), ("•", "li")):
         if t.startswith(pre): kind, body = k, t[len(pre):].strip(); break
+    tg = None
+    if kind in ("memo", "star"):
+        m = re.match(r"(외울 것|암기|이해|비유|시험|연습|할 일)\s*[:：]\s*", body)
+        if m:
+            tg, cut = TAG[m.group(1)]
+            if cut: body = body[m.end():]
     if kind == "f": h = "\\[" + escape(body) + "\\]"   # 식도 이스케이프 — r<R 의 <R 이 태그로 읽혀 식이 통째로 사라졌다(2026-09-27 검사기 R1 이 잡음). KaTeX 는 textContent 를 읽으므로 &lt; 로 두어도 된다
     else: h = re.sub(r"__(.+?)__", r'<span class="ul">\1</span>', escape(body))
-    return {"k": kind, "h": h}
+    return {"k": kind, "h": h, "tg": tg} if tg else {"k": kind, "h": h}
 
 def build_v2(doc, chapters, v2, slug, date):
     """챕터 = 원문 섹션(순서·id 그대로), 단계 = BOARD[섹션][n] (id = 섹션id-n 고정), 그림 = 그 섹션의 figure[data-fig] 를 분필로.
@@ -163,21 +175,28 @@ def build(src, slug, date, minutes=18):
         figs_html = "".join(f["svg"] for c in chapters for f in c["figs"].values())
         io.open(os.path.join(FIGCHK_DIR, f"classroom_{slug}_{date}.html"), "w", encoding="utf-8", newline="\n").write(
             '<!doctype html><meta charset="utf-8"><body style="background:#fff">' + figs_html)
-    quiz = []
+    quiz = []; mixer = Mixer(lesson_id)
     for k, q in enumerate(doc.xpath('//div[contains(concat(" ",normalize-space(@class)," ")," q ")]'), 1):
         qid = q.get("data-qid") or f"q{k}"
         qn = (q.xpath('./div[@class="qn"]/text()') or [f"문제 {k}"])[0].strip()
         qb = q.xpath('./div[@class="qb"]'); qhtml = inner(qb[0]) if qb else ""
-        ch = q.xpath('./ol[contains(@class,"choices")]'); choices = None
+        ch = q.xpath('./ol[contains(@class,"choices")]'); choices = None; newpos = None
         if ch:
             choices = [{"html": inner(li), "ok": li.get("data-ok") == "1"} for li in ch[0].xpath("./li")]
             assert sum(1 for c in choices if c["ok"]) == 1, "정답은 정확히 하나: " + qn
+            choices, newpos = mixer.mix(choices, qid)   # 보기 섞기(quizmix — 수업 노트 빌더와 같은 순서). 보기의 k = 원문 순서 → 화면은 k 로 저장
         ans = q.xpath('./div[@class="ans"]'); ans_html = inner(ans[0]) if ans else ""
+        if newpos: ans_html = renum(ans_html, newpos)
         quiz.append({"id": qid, "qn": qn, "html": qhtml, "choices": choices, "ans": ans_html})
+    # 스앵님 판정용 노드 연결(knowledge/lesson_nodes.json — build_lesson_nodes.py 가 만든다). 없으면 빈 연결(기록만 안 남는다)
+    ln_path = os.path.join(ROOT, "knowledge", "lesson_nodes.json")
+    lnodes = (json.load(io.open(ln_path, encoding="utf-8")).get("lessons") or {}).get(lesson_id) if os.path.exists(ln_path) else None
     data = {"id": lesson_id, "slug": slug, "course": course, "date": date, "sess": sess, "title": title, "lead": lead_html, "minutes": minutes, "chapters": chapters, "quiz": quiz,
-            "v": 2 if v2 else 1, "ver": v2["VERSION"] if v2 else ""}
+            "v": 2 if v2 else 1, "ver": v2["VERSION"] if v2 else "", "nodes": {"sec": (lnodes or {}).get("sec") or {}, "q": (lnodes or {}).get("q") or {}}}
     js = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
     tpl = io.open(os.path.join(HERE, "classroom_tpl.html"), encoding="utf-8").read()
+    judge = io.open(os.path.join(HERE, "tutor_judge.js"), encoding="utf-8").read().replace("</", "<\\/")
+    tpl = tpl.replace("__JUDGE__", judge)
     # 김주영 스앵님 캐릭터: 원본 docs/tools/tutor.svg 하나 → 교실 페이지에 인라인 + notes/classroom/assets/tutor.svg (앱이 fetch)
     # 폴더 이름에 _ 를 쓰면 GitHub Pages(Jekyll)가 올리지 않는다(2026-09-27 _assets 404) — assets 로.
     tutor = io.open(os.path.join(HERE, "tutor.svg"), encoding="utf-8").read()

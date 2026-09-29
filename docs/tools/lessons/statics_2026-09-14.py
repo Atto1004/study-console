@@ -20,7 +20,7 @@ fig_proj = canvas(560, 230,
     step(2, arrow(120, 170, 380, 50, BLUE, "", 3), text(240, 96, "U", 16, BLUE, "middle", True),
         arc(120, 170, 46, -25, 0, GRAY, 1.5, "θ", 58)),
     step(3, line(380, 50, 380, 170, GRAY, 1.2, "5 4"),
-        arrow(120, 156, 380, 156, RED, "", 2.6), text(250, 146, "U_p = (U·e) e", 13, RED, "middle"), text(300, 196, "|U_p| = |U| cos θ", 13, RED, "middle")),
+        arrow(120, 156, 380, 156, RED, "", 2.6), text(250, 146, "U_p = (U·e) e", 13, RED, "middle"), text(300, 196, "|U_p| = |U| |cos θ|", 13, RED, "middle")),
     step(4, arrow(394, 170, 394, 50, PINK, "", 2.6), text(408, 112, "U_n = U − U_p", 13, PINK, "start")),
     cap="정사영: 벡터 \\(\\mathbf U\\)를 직선 L에 <b>평행한 성분</b> \\(\\mathbf U_p\\)와 <b>수직한 성분</b> \\(\\mathbf U_n\\)으로. 크기는 내적으로, 방향은 단위벡터 \\(\\mathbf e\\)로.", name="proj")
 
@@ -85,7 +85,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>정
 <div class="formula">\\[\\mathbf U\\cdot\\mathbf V=U_xV_x+U_yV_y+U_zV_z\\qquad\\Rightarrow\\qquad \\cos\\theta=\\frac{{U_xV_x+U_yV_y+U_zV_z}}{{|\\mathbf U||\\mathbf V|}},\\quad \\theta=\\cos^{{-1}}\\!\\left(\\frac{{\\mathbf U\\cdot\\mathbf V}}{{|\\mathbf U||\\mathbf V|}}\\right)\\]</div>
 <div class="say">"<b>i 성분끼리 곱하고, j 성분끼리 곱하고, k 성분끼리 곱해서</b> 더하면 됩니다." · "이 공식은 <b>공간에서 두 벡터 또는 두 직선 사이의 각</b>을 구할 때 쓴다."</div>
 {fig_comp}
-<div class="why">정의식 \\(|\\mathbf U||\\mathbf V|\\cos\\theta\\)와 성분식이 같은 값이므로 둘을 붙이면 \\(\\cos\\theta\\)가 나온다. 각도기를 못 대는 3차원 공간의 두 선(케이블 두 가닥, 축과 힘)의 각을 좌표만으로 구하는 도구.</div>
+<div class="why">정의식 \\(|\\mathbf U||\\mathbf V|\\cos\\theta\\)와 성분식이 같은 값이므로 둘을 붙이면 \\(\\cos\\theta\\)가 나온다. 각도기를 못 대는 3차원 공간에서 영벡터가 아닌 두 벡터 사이의 각을 좌표만으로 구하는 도구. 방향이 없는 두 직선의 작은 각은 \\(\\cos\\theta=|\\mathbf U\\cdot\\mathbf V|/(|\\mathbf U||\\mathbf V|)\\).</div>
 <details class="ex"><summary>연습 — \\(\\mathbf U=(1,2,2)\\), \\(\\mathbf V=(2,0,1)\\)의 사이각</summary><div class="body"><p>\\(\\mathbf U\\cdot\\mathbf V=1\\cdot2+2\\cdot0+2\\cdot1=4\\), \\(|\\mathbf U|=\\sqrt{{1+4+4}}=3\\), \\(|\\mathbf V|=\\sqrt{{4+0+1}}=\\sqrt5\\approx2.236\\).</p><p>\\(\\cos\\theta=\\dfrac{{4}}{{3\\times2.236}}=0.596\\) → \\(\\theta\\approx53.4^\\circ\\).</p></div></details>
 <div class="analogy">두 사람이 각자 "동·북·위로 몇 걸음" 갔는지만 알려 주면, 만나지 않아도 두 사람의 진행 방향 사이 각을 계산할 수 있다.</div>
 <div class="memo"><b>외울 것</b> \\(\\mathbf U\\cdot\\mathbf V=U_xV_x+U_yV_y+U_zV_z\\) · \\(\\theta=\\cos^{{-1}}\\big(\\mathbf U\\cdot\\mathbf V/|\\mathbf U||\\mathbf V|\\big)\\)</div>
@@ -95,11 +95,11 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>정
 <h2>3. 직선에 평행·수직한 성분 — 정사영 ★★</h2>
 <p>덧셈 때 \\(x\\)·\\(y\\)로 나눴듯, 공학 문제에서는 <b>어떤 직선 L에 평행한 성분과 수직한 성분</b>으로 나누면 계산이 쉽다. 벡터 \\(\\mathbf U\\)와 직선 L이 있으면 항상 \\(\\mathbf U=\\mathbf U_p+\\mathbf U_n\\).</p>
 {fig_proj}
-<div class="formula">\\[|\\mathbf U_p|=|\\mathbf U|\\cos\\theta,\\qquad \\mathbf e\\cdot\\mathbf U=|\\mathbf e||\\mathbf U|\\cos\\theta=|\\mathbf U|\\cos\\theta\\ (\\text{{L 방향 스칼라 성분}})\\] \\[\\boxed{{\\ \\mathbf U_p=(\\mathbf U\\cdot\\mathbf e)\\,\\mathbf e\\ }}\\qquad \\mathbf U_n=\\mathbf U-\\mathbf U_p\\]</div>
-<div class="say">"내적은 스칼라니까" 크기가 나오고, 방향은 단위벡터 \\(\\mathbf e\\)로 — "<b>이게 크기, 이게 방향</b>." · 수직 성분은 "평행 성분을 구했으면 원래 벡터에서 빼면" 된다. · "2학년 올라가서 배울 <b>재료역학·동역학 다 똑같다</b>."</div>
+<div class="formula">\\[|\\mathbf U_p|=|\\mathbf U\\cdot\\mathbf e|=|\\mathbf U||\\cos\\theta|,\\qquad \\mathbf e\\cdot\\mathbf U=|\\mathbf e||\\mathbf U|\\cos\\theta=|\\mathbf U|\\cos\\theta\\ (\\text{{L 방향 스칼라 성분}})\\] \\[\\boxed{{\\ \\mathbf U_p=(\\mathbf U\\cdot\\mathbf e)\\,\\mathbf e\\ }}\\qquad \\mathbf U_n=\\mathbf U-\\mathbf U_p\\]</div>
+<div class="say">"내적은 스칼라니까" 크기가 나오고, 방향은 단위벡터 \\(\\mathbf e\\)로 — "<b>이게 크기, 이게 방향</b>."(정확히는 내적 \\(\\mathbf U\\cdot\\mathbf e\\)가 부호 있는 성분이고, 그 절댓값이 크기)(정확히는 내적 \\(\\mathbf U\\cdot\\mathbf e\\)가 부호 있는 성분이고, 그 절댓값이 크기) · 수직 성분은 "평행 성분을 구했으면 원래 벡터에서 빼면" 된다. · "2학년 올라가서 배울 <b>재료역학·동역학 다 똑같다</b>."</div>
 <div class="why">\\((\\mathbf U\\cdot\\mathbf e)\\)는 부호 있는 길이(L의 + 방향이면 +, 반대면 −), 여기에 \\(\\mathbf e\\)를 곱하면 방향이 붙어 벡터가 된다. 완전히 수직이면 \\(\\mathbf U_p=0\\), 평행이면 \\(\\mathbf U_n=0\\). 필기본에서 <b>빨간 박스</b>를 친 시험 공식.</div>
 <details class="ex"><summary>연습 — \\(\\mathbf U=4\\mathbf i+3\\mathbf j\\)를 직선 L(방향 \\(\\mathbf i+\\mathbf j\\))에 대해 분해</summary><div class="body"><p>① \\(\\mathbf e=(\\mathbf i+\\mathbf j)/\\sqrt2\\) ② \\(\\mathbf U\\cdot\\mathbf e=(4+3)/\\sqrt2=7/\\sqrt2\\approx4.95\\) ③ \\(\\mathbf U_p=(7/\\sqrt2)\\,(\\mathbf i+\\mathbf j)/\\sqrt2=3.5\\mathbf i+3.5\\mathbf j\\) ④ \\(\\mathbf U_n=\\mathbf U-\\mathbf U_p=0.5\\mathbf i-0.5\\mathbf j\\). 검산: \\(\\mathbf U_n\\cdot\\mathbf e=(0.5-0.5)/\\sqrt2=0\\) ✓ 수직.</p></div></details>
-<div class="analogy">햇빛이 직선 L 방향으로 비칠 때 막대 \\(\\mathbf U\\)의 그림자 길이가 \\(|\\mathbf U|\\cos\\theta\\). 그림자가 평행 성분, 막대에서 그림자를 뺀 나머지가 수직 성분.</div>
+<div class="analogy">벡터 \\(\\mathbf U\\)의 끝점에서 직선 L에 수선을 내리면, 그 발까지의 정사영이 평행 성분(부호 있는 길이 \\(\\mathbf U\\cdot\\mathbf e\\)). 원래 벡터에서 평행 성분을 뺀 나머지가 수직 성분.</div>
 <div class="memo"><b>외울 것</b> \\(\\mathbf U_p=(\\mathbf U\\cdot\\mathbf e)\\mathbf e\\) · \\(\\mathbf U_n=\\mathbf U-\\mathbf U_p\\) · \\(\\mathbf e\\)는 반드시 단위벡터 · 검산 \\(\\mathbf U_n\\cdot\\mathbf e=0\\)</div>
 </section>
 

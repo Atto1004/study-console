@@ -84,7 +84,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 <div class="why">유도(슬라이드 p.3): \\((py-r)dx+dy=0\\)은 완전이 아니지만 정리 1의 \\(R=\\frac1Q(P_y-Q_x)=p\\) → 적분인자 \\(F=e^{{\\int p\\,dx}}=e^h\\). 곱하면 \\((e^hy)'=e^hr\\) → 적분해 \\(e^h\\)로 나눈 것이 공식. 1.4가 1.5의 바탕이라는 뜻.</div>
 <div class="say">"<b>이거 하고 이거는 기억을 하라.</b> 이게 기억을 못하는데 이제 못 푸는 거야." · "수학의 <b>일정 부분은 외워야 돼요.</b> 형태를 — 완전미방이냐 동차냐 선형이냐 비제차 선형이냐 — 잘 보고서 나가야 된다." · "유도 과정은 알면 좋지만 필수는 아니다."</div>
 <div class="analogy">자판기 공식: 동전 \\(p\\)와 \\(r\\)만 넣으면 \\(y\\)가 나온다. 자판기 내부(유도)는 한 번 들여다보면 되지만, 버튼 위치(공식)는 외워야 한다.</div>
-<div class="memo"><b>외울 것</b> \\(h=\\int p\\,dx\\) · \\(y=e^{{-h}}[\\int e^hr\\,dx+c]\\) · 특수 함수 적분(\\(\\int\\tan x=\\ln|\\sec x|\\))은 시험에서 준다</div>
+<div class="memo"><b>외울 것</b> \\(h=\\int p\\,dx\\) · \\(y=e^{{-h}}[\\int e^hr\\,dx+c]\\) · 탄젠트 적분 공식(\\(\\int\\tan x=\\ln|\\sec x|\\))은 중간·기말에 나오면 제공한다고 했다</div>
 </section>
 
 <section class="s" data-id="s3">
@@ -98,11 +98,11 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 
 <section class="s" data-id="s4">
 <h2>4. 예제 — 별표 예제 1과 연습 3제 ★</h2>
-<details class="ex" open><summary>★ 교재 예제 1 \\(y'+y\\tan x=\\sin2x\\), \\(y(0)=1\\) — 판서에 별표</summary><div class="body"><p>\\(p=\\tan x\\), \\(r=\\sin2x=2\\sin x\\cos x\\). \\(h=\\int\\tan x\\,dx=-\\ln\\cos x=\\ln|\\sec x|\\), \\(e^h=\\sec x\\), \\(e^{{-h}}=\\cos x\\).</p><p>\\(y=\\cos x\\Big[\\int\\sec x\\cdot2\\sin x\\cos x\\,dx+c\\Big]=\\cos x\\Big[2\\int\\sin x\\,dx+c\\Big]=\\cos x(-2\\cos x+c)=c\\cos x-2\\cos^2x\\).</p><p>\\(y(0)=c-2=1\\) → \\(c=3\\) → <b>\\(y=3\\cos x-2\\cos^2x\\)</b>.</p></div></details>
+<details class="ex" open><summary>★ 교재 예제 1 \\(y'+y\\tan x=\\sin2x\\), \\(y(0)=1\\)(\\(-\\pi/2<x<\\pi/2\\)) — 판서에 별표</summary><div class="body"><p>\\(p=\\tan x\\), \\(r=\\sin2x=2\\sin x\\cos x\\). \\(h=\\int\\tan x\\,dx=-\\ln\\cos x=\\ln|\\sec x|\\), \\(e^h=\\sec x\\), \\(e^{{-h}}=\\cos x\\).</p><p>\\(y=\\cos x\\Big[\\int\\sec x\\cdot2\\sin x\\cos x\\,dx+c\\Big]=\\cos x\\Big[2\\int\\sin x\\,dx+c\\Big]=\\cos x(-2\\cos x+c)=c\\cos x-2\\cos^2x\\).</p><p>\\(y(0)=c-2=1\\) → \\(c=3\\) → <b>\\(y=3\\cos x-2\\cos^2x\\)</b>.</p></div></details>
 <div class="say">"탄젠트 적분이 \\(\\ln\\sec x\\)라는 거, <b>외울 필요는 없어요.</b> 중간·기말에 나오면 <b>내가 공식을 알려줄 거예요.</b>"</div>
 {fig_recip}
 <details class="ex"><summary>연습 3제 (p.5)</summary><div class="body">
-<p><b>1</b> \\(x\\,dy/dx+2y=3\\) → 표준형 \\(y'+\\frac2xy=\\frac3x\\), \\(h=2\\ln x\\), \\(e^h=x^2\\): \\(y=x^{{-2}}[\\int x^2\\cdot\\frac3x\\,dx+c]=x^{{-2}}[\\frac32x^2+c]\\) → <b>\\(y=\\frac32+\\frac c{{x^2}}\\)</b>.</p>
+<p><b>1</b> \\(x\\,dy/dx+2y=3\\) → 표준형 \\(y'+\\frac2xy=\\frac3x\\), \\(h=2\\ln|x|\\), \\(e^h=x^2\\)(\\(x\\ne0\\)): \\(y=x^{{-2}}[\\int x^2\\cdot\\frac3x\\,dx+c]=x^{{-2}}[\\frac32x^2+c]\\) → <b>\\(y=\\frac32+\\frac c{{x^2}}\\)</b>.</p>
 <p><b>2</b> \\(y'=\\frac1{{x+y^2}}\\) → 역수: \\(\\frac{{dx}}{{dy}}=x+y^2\\) → \\(x'-x=y^2\\) (\\(y\\)에 대한 선형). \\(p(y)=-1\\), \\(r(y)=y^2\\), \\(h=-y\\): \\(x=e^{{y}}[\\int e^{{-y}}y^2\\,dy+c]=e^y[-e^{{-y}}(y^2+2y+2)+c]\\) → <b>\\(x=-y^2-2y-2+ce^{{y}}\\)</b>.</p>
 <p><b>3</b> \\((1+e^x)y'+e^xy=0\\) → \\(y'+\\frac{{e^x}}{{1+e^x}}y=0\\), \\(h=\\ln(1+e^x)\\), \\(r=0\\) → <b>\\(y=\\frac{{c}}{{1+e^x}}\\)</b>.</p></div></details>
 <div class="why">2번이 핵심 기술: \\(y\\)에 대해 풀면 비선형이지만 <b>\\(x\\)를 \\(y\\)의 함수로 보면</b> 선형. 독립변수를 바꿔 보는 눈 — "이것만 봐서는 비선형인데 이렇게 바꿔버리면 선형이 된다".</div>
@@ -125,13 +125,13 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>공
 <h2>6. 베르누이 방정식 예고 — 비선형이지만 치환으로 선형</h2>
 {fig_bern}
 <div class="formula">\\[y'+p(x)y=g(x)y^a\\ \\xrightarrow{{u=y^{{1-a}}}}\\ u'+(1-a)p(x)\\,u=(1-a)g(x)\\qquad \\text{{예 로지스틱 }}y'=Ay-By^2:\\ u=y^{{-1}},\\ u'+Au=B\\]</div>
-<div class="why">\\(a=0,1\\)이면 그냥 선형. 그 외는 비선형이라 일반 해법이 없지만, \\(u=y^{{1-a}}\\)로 놓고 미분(\\(u'=(1-a)y^{{-a}}y'\\))해 대입하면 \\(u\\)에 대한 비제차 선형 — 위 공식으로 풀고 마지막에 \\(u\\)를 \\(y\\)로 되돌린다. 9/16 연습 3제.</div>
+<div class="why">\\(a=0,1\\)이면 그냥 선형. 그 외는 비선형이라 일반 해법이 없지만, \\(u=y^{{1-a}}\\)로 놓고 미분(\\(u'=(1-a)y^{{-a}}y'\\))해 대입하면 \\(u\\)에 대한 비제차 선형 — 위 공식으로 풀고 마지막에 \\(u\\)를 \\(y\\)로 되돌린다(치환이 정의되는 영역에서 — 로지스틱의 \\(y=0\\) 같은 해는 따로 확인). 9/16 연습 3제.</div>
 <div class="analogy">직접 못 여는 문(비선형)을 옆방(\\(u\\)-세계)으로 돌아가서 열고 다시 돌아온다. 돌아오는 것(되돌리기)까지가 한 세트.</div>
 <div class="memo"><b>외울 것</b> 베르누이 \\(u=y^{{1-a}}\\) → 선형 → 되돌리기 · 로지스틱 \\(u=1/y\\) · "1계가 어렵지, 2계로 가면 오히려 쉬워진다"</div>
 </section>
 
 <div class="q" data-qid="q1"><div class="qn">확인 1 · 해 공식</div><div class="qb">\\(y'+p(x)y=r(x)\\)의 일반해로 옳은 것은? (\\(h=\\int p\\,dx\\))</div><ol class="choices"><li data-ok="1">\\(y=e^{{-h}}\\big[\\int e^{{h}}r\\,dx+c\\big]\\)</li><li>\\(y=e^{{h}}\\big[\\int e^{{-h}}r\\,dx+c\\big]\\)</li><li>\\(y=e^{{-h}}\\int r\\,dx+c\\)</li><li>\\(y=\\int e^{{h}}r\\,dx+c\\)</li></ol><div class="ans">적분인자 \\(e^h\\)를 곱해 \\((e^hy)'=e^hr\\). 부호를 바꾸면 틀린다.</div></div>
-<div class="q" data-qid="q2"><div class="qn">확인 2 · 연습 1</div><div class="qb">\\(x\\,y'+2y=3\\)의 일반해는?</div><ol class="choices"><li data-ok="1">\\(y=\\dfrac32+\\dfrac{{c}}{{x^2}}\\)</li><li>\\(y=\\dfrac32+cx^2\\)</li><li>\\(y=3+\\dfrac cx\\)</li><li>\\(y=ce^{{-2x}}+\\dfrac32\\)</li></ol><div class="ans">표준형 \\(y'+\\frac2xy=\\frac3x\\), \\(h=2\\ln x\\), \\(e^h=x^2\\).</div></div>
+<div class="q" data-qid="q2"><div class="qn">확인 2 · 연습 1</div><div class="qb">\\(x\\,y'+2y=3\\)의 일반해는?</div><ol class="choices"><li data-ok="1">\\(y=\\dfrac32+\\dfrac{{c}}{{x^2}}\\)</li><li>\\(y=\\dfrac32+cx^2\\)</li><li>\\(y=3+\\dfrac cx\\)</li><li>\\(y=ce^{{-2x}}+\\dfrac32\\)</li></ol><div class="ans">표준형 \\(y'+\\frac2xy=\\frac3x\\), \\(h=2\\ln|x|\\), \\(e^h=x^2\\)(\\(x\\ne0\\)).</div></div>
 <div class="q" data-qid="q3"><div class="qn">확인 3 · 예제 1</div><div class="qb">\\(y'+y\\tan x=\\sin2x\\), \\(y(0)=1\\)의 해는?</div><ol class="choices"><li data-ok="1">\\(y=3\\cos x-2\\cos^2x\\)</li><li>\\(y=\\cos x-2\\cos^2x\\)</li><li>\\(y=3\\cos x+2\\cos^2x\\)</li><li>\\(y=3\\sin x-2\\sin^2x\\)</li></ol><div class="ans">\\(y=c\\cos x-2\\cos^2x\\), \\(y(0)=c-2=1\\).</div></div>
 <div class="q" data-qid="q4"><div class="qn">확인 4 · 역수 기술</div><div class="qb">\\(y'=\\dfrac{{1}}{{x+y^2}}\\)를 푸는 첫 단계로 옳은 것은?</div><ol class="choices"><li data-ok="1">역수를 취해 \\(dx/dy=x+y^2\\), 즉 \\(x'-x=y^2\\) — \\(y\\)에 대한 선형</li><li>\\(y=ux\\) 치환(동차형)</li><li>변수분리 \\(dy=dx/(x+y^2)\\)</li><li>완전미분방정식 판별 후 적분인자</li></ol><div class="ans">\\(x\\)를 \\(y\\)의 함수로 보면 선형. 결과 \\(x=-y^2-2y-2+ce^y\\).</div></div>
 <div class="q" data-qid="q5"><div class="qn">확인 5 · RL 회로</div><div class="qb">\\(Li'+Ri=E\\), \\(i(0)=0\\)의 해는?</div><ol class="choices"><li data-ok="1">\\(i=\\dfrac ER\\big(1-e^{{-Rt/L}}\\big)\\)</li><li>\\(i=\\dfrac ER e^{{-Rt/L}}\\)</li><li>\\(i=\\dfrac EL t\\)</li><li>\\(i=\\dfrac ER\\big(1-e^{{-Lt/R}}\\big)\\)</li></ol><div class="ans">\\(p=R/L\\), \\(r=E/L\\), \\(h=Rt/L\\). 정상값 \\(E/R\\), 지수는 \\(R/L\\)(4번은 뒤집힘).</div></div>

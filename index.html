@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-28.90";
+var BUILD="2026-09-29.91";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -3758,7 +3758,7 @@ function renderShelf(){
   var nm=(S.profile.name||"").trim();
   $("#shelfTitle").textContent = nm ? nm+"님의 수강과목" : "수강과목";
   $("#shelfSub").textContent=cs.filter(function(c){return !c.hidden;}).length+"과목 · "+curCredits()+"학점"+
-    (hid?" · 숨김 "+hid:"")+(nm?"":" · 설정에서 이름을 넣으세요");
+    (hid?" · 숨김 "+hid:"");
   /* 증원 대기 안내 */
   var pc=pendingCourses();
   $("#pendBar").innerHTML= pc.length
@@ -4838,6 +4838,15 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-29.91",d:"09-29",items:[
+    "객관식 정답이 늘 1번이던 오류 고침 — 교실·수업 노트·학습 덱(중간고사 대비 4개 포함) 모두 빌드 때 보기를 섞고, 한 회차 안에서 정답 칸이 1~4번에 고르게 간다. 해설의 몇 번은 새 번호로 자동으로 바뀌고, 이미 푼 기록도 그대로 맞는다",
+    "암기·이해 구분 — 판서 줄 앞에 알약(암기 · 이해 · 시험 · 연습), 수업 노트 상자 머리도 암기 · 공식 / 암기 / 이해 · 왜 / 이해 · 비유로. 과목별 암기노트 새로(공식 + 외울 것 항목, 가리기 · 못 외운 것 · 외움 체크) — 교실 첫 화면·목차, 수업 노트 머리, 과목 화면에서 연다",
+    "개념 마인드맵은 스앵님이 판정 — 교실·수업 노트·덱·암기노트에서 푼 문제, 다시 설명, 질문, 챕터 끝, 외움 체크를 모아 개념마다 안다 · 흔들림 · 모름을 정한다(자가평가 슬라이더 없앰). 지식맵 위에 약한 개념 3개와 근거, 그 개념을 배운 교실로 가는 버튼",
+    "스앵님이 움직인다 — 말하는 동안 설명하는 손 · 손가락 강조 · 지시봉 · 생각 · 엄지 · 허리에 손 동작과 표정이 대사에 맞춰 바뀌고, 말이 끝나면 지시봉 · 노트 · 팔짱 자세로. 표정 이름 글자는 없앰",
+    "수식은 한 줄 — 문장 속 식은 중간에서 줄이 끊기지 않고(길면 글자를 줄임), 식 줄도 글자를 줄여 한 줄에. 여러 식을 한 줄에 이어 붙인 곳은 식마다 한 줄로 나눠 가로 스크롤을 없앰",
+    "화면의 부가 설명 글 정리 — 학습 탭 요약줄·지식맵 안내·설정/성적/할 일 안내·과목 화면 안내·교실 조작 안내·덱 시작 장 설명 등을 없애고 필요한 것만 남김",
+    "미분적분학2 7회차 교실 v2(판서 + 스앵님 대사 + 그림 단계) — 오타 내용 검수 반영. 정역학·공업수학1 판서도 사후 검수 지적(조건 누락·과한 일반화) 고침"
+  ]},
   {v:"2026-09-28.90",d:"09-28",items:[
     "교실 v4 = 인강 전자칠판(대표님 9/28 레퍼런스): 초록 칠판 + 흰 활자 판서, 민트 테두리 식 상자에 (식 챕터-번호), 그림 캡션 【그림 챕터-번호】, 칠판 오른쪽에 전신으로 서서 지시봉으로 판서를 가리키는 스앵님, 대사는 아래 자막(표정 얼굴), 조작은 칠판 아래 줄",
     "오타 디자인 검수 반영: 글자 대비 전부 4.5 이상(칠판 가장 밝은 곳·노이즈 최대 기준 실측), 지난 단계 글자 흐림 제거, 미채점 결과엔 배지 없이 채점 완료 n/m, 스크롤은 이번 단계 기준 + 위 판서 버튼(머리글 안)",
@@ -5150,7 +5159,7 @@ function renderPatch(){
   var box=$("#patchBox"); if(!box) return;
   $("#patchHs").textContent="현재 빌드 "+BUILD;
   box.innerHTML=PATCHNOTES.map(function(p,i){
-    return '<details'+(i===0?" open":"")+' style="padding:6px 0;border-top:'+(i?'1px solid var(--line)':'0')+'"><summary style="cursor:pointer;font-size:13.5px"><b class="mono">'+esc(p.v)+'</b> <span class="hint">'+esc(p.d)+'</span></summary>'+
+    return '<details style="padding:6px 0;border-top:'+(i?'1px solid var(--line)':'0')+'"><summary style="cursor:pointer;font-size:13.5px"><b class="mono">'+esc(p.v)+'</b> <span class="hint">'+esc(p.d)+'</span></summary>'+
       '<ul style="margin:6px 0 2px 18px;padding:0;font-size:13px;line-height:1.55;word-break:keep-all">'+p.items.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></details>';
   }).join("");
 }
@@ -5220,7 +5229,7 @@ function renderFuture(){
         '<td><button class="iconbtn" data-fdel="'+r.id+'" aria-label="학기 삭제">✕</button></td></tr>'; }).join("")+
     '</tbody></table></div>'+
     '<div class="hint" style="padding:10px 14px">'+(gap>0?'<span style="color:var(--crit)">계획 합계가 잔여 학점보다 '+gap+'학점 부족</span>':gap<0?'계획 합계가 잔여보다 '+(-gap)+'학점 많음 (여유 '+(-gap)+')':'계획 합계 = 잔여 학점 ✓')+
-    ' · 전공 계획 '+(majorCur+majorPlanned)+'/36 (전공핵심 30 포함 여부는 과목별 확인) · 영어전용 2 · 산학협력 6 · PBL 4 · 교양선택 10 · 8학기 이상 · 졸업논문/시험/작품. 계절학기는 학기당 최대 6학점 기준으로 잡았습니다.</div>';
+    ' · 전공 계획 '+(majorCur+majorPlanned)+'/36 · 영어전용 2 · 산학협력 6 · PBL 4 · 교양선택 10 · 8학기 이상 · 졸업논문/시험/작품</div>';
   box.innerHTML=html;
   var find=function(id){ return rows.filter(function(x){return x.id===id;})[0]; };
   $$("[data-fc]",box).forEach(function(inp){ inp.onchange=function(){ var r=find(inp.dataset.fc); if(r){ r.credits=+inp.value||0; persist(); renderFuture(); } }; });
@@ -5494,7 +5503,7 @@ function renderToday(){
   var hol=holidayOn(date);
   $("#dayLine").innerHTML=
     (hol?'<div class="tl-daysum" style="color:var(--warn);border-bottom:1px solid var(--line)">'+
-      '<span>⚠ <b>'+esc(hol.name)+'</b> — 공휴일 휴강. 이 날 수업은 계산에서 빠집니다.</span></div>':"")+
+      '<span>⚠ <b>'+esc(hol.name)+'</b> · 휴강</span></div>':"")+
     '<div class="tl-daysum">'+
       '<span>수업 <b>'+classesOn(date).length+'</b>교시</span>'+
       '<span>학습 계획 <b>'+(planMin/60).toFixed(1)+'</b>h</span>'+
@@ -5503,7 +5512,7 @@ function renderToday(){
       (planMin>cap?'<span class="chip warn">목표 초과</span>':"")+
       (!isToday&&classesOn(date).length?'<span class="chip acc">미리 지정 — 결석 예정·휴강을 앞당겨 정할 수 있어요</span>':"")+
       gcalAllDay(date).map(function(ev){ return '<span class="chip mut" title="구글 캘린더 종일 일정">▣ '+esc(ev.title||"")+'</span>'; }).join("")+
-      ((S.profile.awHook||"").trim()? (gcalCache[date]&&gcalCache[date].err?'<span class="chip warn" title="웹훅 GET 실패 — Apps Script 새 버전 배포 필요">캘린더 연결 안 됨</span>':"") : '<span class="hint">설정에 얼라이브위크 웹훅을 넣으면 구글 캘린더 일정이 빈 시간에 표시됩니다</span>')+
+      ((S.profile.awHook||"").trim()? (gcalCache[date]&&gcalCache[date].err?'<span class="chip warn" title="웹훅 GET 실패 — Apps Script 새 버전 배포 필요">캘린더 연결 안 됨</span>':"") : '')+
     '</div>'+
     '<div class="tl">'+(rows.length?rows.join(""):'<div class="empty"><span class="big">◌</span>이 날은 비어 있습니다.</div>')+'</div>';
 
@@ -5550,7 +5559,7 @@ function renderToday(){
     var risk=courses().filter(function(c){return attStats(c).risk>=0.75;});
     var dueQ=buildReviewQueue();
     if(risk.length) lines.push("<b>출결 위험</b> — "+risk.map(function(c){return c.name;}).join(", "));
-    if(dueQ.length) lines.push("<b>복습 대기 "+dueQ.length+"건</b> — 지금 복습 예정인 회차입니다. 등급을 매기면 다음 복습일이 잡힙니다.");
+    if(dueQ.length) lines.push("<b>복습 대기 "+dueQ.length+"건</b>");
     var weak=courses().filter(function(c){return !noStudyType(c)&&coverage(c).mastery<45&&sessions(c.id).length;});
     if(weak.length) lines.push("<b>이해도 45% 미만</b> — "+weak.map(function(c){return c.name;}).join(", "));
     if(!lines.length) lines.push("특이사항 없음. 오늘 수업 기록부터 하라.");
@@ -5802,7 +5811,7 @@ function renderGrade(){
         ? '<b style="color:var(--ok)">이 조합이면 가능합니다.</b> 재수강 '+plan.length+'과목 + 이번 학기 평균 '+req2.need.toFixed(2)+'.'
         : '<b style="color:var(--crit)">남은 학기만으로는 불가능합니다</b> (필요 평점 '+req.need.toFixed(2)+'). 재수강을 담아 보세요.';
     } else if(req){
-      msg = '재수강 없이도 이번 학기 '+req.need.toFixed(2)+'이면 목표에 닿습니다. 여유를 만들려면 아래를 담으세요.';
+      msg = '재수강 없이도 이번 학기 '+req.need.toFixed(2)+'이면 목표에 닿습니다.';
     } else msg = '이번 학기 과목을 넣으면 역산이 됩니다.';
     $("#retakeBox").innerHTML=
       '<div style="padding:12px 14px;border-bottom:1px solid var(--line);font-size:13px;line-height:1.6;color:var(--ink-2)">'+msg+'</div>'+
@@ -7735,7 +7744,7 @@ var V25={};
   function ensureBoard(){ var v=$("#v-study"); if(!v) return null; var b=$("#examBoard"); if(!b){ b=document.createElement("div"); b.id="examBoard"; var first=v.querySelector(".card"); v.insertBefore(b,first); } return b; }
   V25.renderExamBoard=function(){
     var b=ensureBoard(); if(!b) return; var p=V25.plan();
-    if(!p){ var nx=nextExam(); b.innerHTML=nx?'<div class="hint" style="margin:-4px 0 8px">다음 시험 '+esc(course(nx.courseId)?course(nx.courseId).name:"")+' '+fmtDate(nx.date)+' (D-'+diffDays(today(),nx.date)+') · 시험 모드는 D-14부터 켜집니다</div>':""; return; }
+    if(!p){ var nx=nextExam(); b.innerHTML=nx?'<div class="hint" style="margin:-4px 0 8px">다음 시험 '+esc(course(nx.courseId)?course(nx.courseId).name:"")+' '+fmtDate(nx.date)+' (D-'+diffDays(today(),nx.date)+')</div>':""; return; }
     var strat=p.items.map(function(it){return esc(it.c.name)+' '+h1(it.need)+'h';}).join(' → ');
     var rows=p.items.map(function(it){
       var chips=it.weeks.map(function(u){ return '<button class="chip exu '+(u.studied?"ok":u.has?"half":"mut")+'" data-stu="'+it.c.id+'|'+u.w+'" title="'+(u.studied?"공부함":u.has?"정리만 있음":"정리 없음")+'">'+u.w+'주차'+(u.studied?" ✓":u.has?" ▤":"")+'</button>'; }).join("");
@@ -7812,7 +7821,7 @@ var V25={};
     return list.map(function(a){ var dd=ddayOf(a.due); var st=a.submitted?'<span class="chip ok">제출</span>':(dd!=null&&dd<0)?'<span class="chip crit">지남 '+(-dd)+'일</span>':'<span class="chip warn">미제출'+(dd!=null?' · '+(dd===0?"오늘":"D-"+dd):'')+'</span>';
       return '<div class="lrow"><div class="gr"><div class="t"><span class="cchip">'+esc(a.course||"")+'</span> '+esc(a.name)+'</div><div class="s">'+(a.due?'마감 '+esc(a.due):'기한 없음')+(a.points?' · '+a.points+'점':'')+(a.kind==="quiz"?' · 퀴즈':a.kind==="discussion"?' · 토론':'')+'</div></div>'+st+(a.url?'<a class="btn xs" href="'+esc(a.url)+'" target="_blank" rel="noopener">열기</a>':'')+'</div>'; }).join("");
   }
-  function lmsEmpty(st){ return st?'':'<div class="hint">atom 홈의 「LMS 과제 · 공지」 카드에서 액세스 토큰을 한 번 넣으면 여기에 과제·공지·모듈이 자동으로 들어옵니다.</div>'; }
+  function lmsEmpty(st){ return st?'':'<div class="hint">LMS 미연결</div>'; }
   V25.renderLmsTodo=function(){
     var v=$("#v-todo"); if(!v) return; var c=$("#lmsTodoCard"); if(!c){ c=document.createElement("div"); c.className="card"; c.id="lmsTodoCard"; c.innerHTML='<div class="card-h"><h3>LMS 과제</h3><span class="hs" id="lmsTodoHs">CANVAS</span><div class="ha"><span class="kbdhint" id="lmsTodoMeta"></span></div></div><div class="card-b tight" id="lmsTodoBox"></div>'; v.appendChild(c); }
     V25.lms(function(st){ if(!st){ $("#lmsTodoBox").innerHTML=lmsEmpty(null)||'<div class="hint">LMS 미연결</div>'; return; }
@@ -8439,7 +8448,7 @@ var V32={LIB:null,LIBERR:false,LIBMAP:{},cur:null,attCache:{},gridTok:0};
     var v=$("#v-study"); if(!v||$("#v32StudyEntry",v)) return;
     var vh=$(".vh",v); if(!vh) return;
     var card=document.createElement("div"); card.id="v32StudyEntry"; card.className="v32-entry";
-    card.innerHTML='<button class="btn sm" data-go="lib">📚 라이브러리</button><button class="btn sm" data-go="grid">🗓 주차표</button><span class="smut">자료 4종 업로드 여부 · 녹음·강의자료·필기·판서</span>';
+    card.innerHTML='<button class="btn sm" data-go="lib">📚 라이브러리</button><button class="btn sm" data-go="grid">🗓 주차표</button>';
     vh.insertAdjacentElement("afterend",card);
     $$("[data-go]",card).forEach(function(b){ b.onclick=function(){ if(b.dataset.go==="lib") go("lib"); else { ui.calMode="grid"; go("cal"); } }; });
   };
@@ -8883,7 +8892,7 @@ var V33={};
 
   /* 책장 빈 문구 */
   var _renderShelf=renderShelf;
-  renderShelf=function(){ _renderShelf(); var e=$("#shelf .shelf-empty"); if(e) e.innerHTML="아직 책이 없습니다.<br>설정에서 시간표를 불러오면 과목이 책으로 꽂힙니다."; };
+  renderShelf=function(){ _renderShelf(); var e=$("#shelf .shelf-empty"); if(e) e.innerHTML="아직 책이 없습니다."; };
 })();
 /* ============================================================
    V35 LAYER (데이터 시드) — 미분적분학2 1~3주차 주차 정리 시드 (아토 2026-09-17 "미적분 1·2·3주차 정리해줘")
@@ -8983,10 +8992,10 @@ var V33={};
   boot=function(){ _boot(); var ch=false; try{ var t0=term(); ch=!t0.patchV35a; V35.patch(); }catch(e){ if(window.console) console.warn("V35 패치 오류", e); } if(ch){ try{ render(); }catch(e){} } };   /* 이 레이어는 start() 호출문보다 앞에 삽입되므로 래퍼가 먼저 등록된다 */
   /* NOTES 목록에 벡터 정리노트 추가(정리 노트 카드·과목 자료) */
   if(Array.isArray(window.NOTES)&&!NOTES.some(function(n){return n.file==="notes/calc2-matrix-slides.html";})){
-    NOTES.push({course:"미분적분학2",type:"학습",title:"행렬 단원 학습 슬라이드 — 가로 화면, 58페이지 (개념 → 기초 → 응용)",file:"notes/calc2-matrix-slides.html",week:2,date:"2026-09-17",sub:"한 페이지 완료 → 다음 화살표 · 정답률 저장 · 아이패드 가로"});
+    NOTES.push({course:"미분적분학2",type:"학습",title:"행렬 단원 학습 슬라이드 · 58장",file:"notes/calc2-matrix-slides.html",week:2,date:"2026-09-17",sub:""});
   }
   if(Array.isArray(window.NOTES)&&!NOTES.some(function(n){return n.file==="notes/calc2-matrix-w1-2.html";})){
-    NOTES.push({course:"미분적분학2",type:"정리",title:"행렬 단원 통합 학습 (1~2주차) — 개념 → 기초 → 응용",file:"notes/calc2-matrix-w1-2.html",week:2,date:"2026-09-17",sub:"일차별 진도 목차 · 핵심 개념 6파트 · 기초 19 + 응용 18문제 · 교수 강조 표시"});
+    NOTES.push({course:"미분적분학2",type:"정리",title:"행렬 단원 통합 학습 (1~2주차)",file:"notes/calc2-matrix-w1-2.html",week:2,date:"2026-09-17",sub:"일차별 진도 목차 · 핵심 개념 6파트 · 기초 19 + 응용 18문제 · 교수 강조 표시"});
   }
   if(Array.isArray(window.NOTES)&&!NOTES.some(function(n){return n.file==="notes/calc2-vectors-0917.html";})){
     NOTES.push({course:"미분적분학2",type:"정리",title:"벡터 정리노트 12.1~12.3 도입 — 클리닉·중간 대비",file:"notes/calc2-vectors-0917.html",week:3,date:"2026-09-17",sub:"공식 4 · 연습 10문제 · 시험은 표준기저벡터부터"});
@@ -10457,10 +10466,10 @@ var V33={};
   window.addEventListener("storage",function(e){ if(e&&/^mc-slides-/.test(e.key||"")&&ui.view==="study"){ try{ V49.render(); }catch(x){} } });
   /* ---- 시험 범위 덱을 과목 화면 노트 목록에도 (V41 방식) ---- */
   V49.NOTES=[
-    {course:"미분적분학2",file:"notes/calc2-vectors-slides.html",title:"미분적분학2 · 중간고사 대비 벡터 (12.1 좌표 · 12.2 벡터 · 12.3 내적 · 12.4 외적) — 5파트 · 문제 25",week:4,date:"2026-09-24",sub:"개념 → 암기 vs 이해 → 기초(객관식) → 응용 · 「문제만」 모드 #quiz"},
-    {course:"공업수학1",file:"notes/em1-mid-slides.html",title:"공업수학1 · 중간고사 대비 (1장 1계 ODE · 2.1~2.3 · 2.5 오일러-코시) — 6파트 · 문제 36",week:4,date:"2026-09-24",sub:"개념 → 암기 vs 이해 → 기초(객관식) → 응용 · 「문제만」 모드 #quiz"},
-    {course:"일반물리학2",file:"notes/phys2-mid-slides.html",title:"일반물리학2 · 중간고사 대비 (21 전하 · 22 전기장 · 23 가우스 · 24 전위 · 25 전기용량) — 5파트 · 문제 34",week:4,date:"2026-09-24",sub:"개념 → 암기 vs 이해 → 기초(객관식) → 응용 · 「문제만」 모드 #quiz"},
-    {course:"정역학",file:"notes/statics-mid-slides.html",title:"정역학 · 중간고사 대비 (Ch.2 벡터 · Ch.3 힘과 평형) — 5파트 · 문제 31",week:4,date:"2026-09-24",sub:"개념 → 암기 vs 이해 → 기초(객관식) → 응용 · 「문제만」 모드 #quiz"}
+    {course:"미분적분학2",file:"notes/calc2-vectors-slides.html",title:"미분적분학2 · 중간고사 대비 벡터 (12.1 좌표 · 12.2 벡터 · 12.3 내적 · 12.4 외적) — 5파트 · 문제 25",week:4,date:"2026-09-24",sub:""},
+    {course:"공업수학1",file:"notes/em1-mid-slides.html",title:"공업수학1 · 중간고사 대비 (1장 1계 ODE · 2.1~2.3 · 2.5 오일러-코시) — 6파트 · 문제 36",week:4,date:"2026-09-24",sub:""},
+    {course:"일반물리학2",file:"notes/phys2-mid-slides.html",title:"일반물리학2 · 중간고사 대비 (21 전하 · 22 전기장 · 23 가우스 · 24 전위 · 25 전기용량) — 5파트 · 문제 34",week:4,date:"2026-09-24",sub:""},
+    {course:"정역학",file:"notes/statics-mid-slides.html",title:"정역학 · 중간고사 대비 (Ch.2 벡터 · Ch.3 힘과 평형) — 5파트 · 문제 31",week:4,date:"2026-09-24",sub:""}
   ];
   if(Array.isArray(window.NOTES)) V49.NOTES.forEach(function(n){ if(!NOTES.some(function(x){ return x.file===n.file; })) NOTES.push({course:n.course,type:"학습",title:n.title,file:n.file,week:n.week,date:n.date,sub:n.sub}); });
   /* ---- boot 패치: 일반물리학2 중간 범위(교수 발언) ---- */
@@ -10619,7 +10628,7 @@ var V33={};
     var items=V50.items(), todo=items.reduce(function(a,it){ return a+it.todo.length; },0), tdN=items.reduce(function(a,it){ return a+it.todayL.length; },0), wait=items.reduce(function(a,it){ return a+it.wait; },0);
     if(hs) hs.textContent=(todo?"밀림 "+todo:"")+(tdN?(todo?" · ":"")+"오늘 "+tdN:"");
     var top=(V50.err?'<div class="v49-err">회차 목록(knowledge/sessions.json)을 못 읽었습니다: '+esc(V50.err)+' — 앱 기록만으로 표시합니다.</div>':'')+
-      '<div class="v50-top">'+(todo?'<b>밀린 회차 '+todo+'개</b> — 가장 오래된 것부터 「따라가기」':'<b>밀린 회차 없음</b>')+(tdN?' · <b>오늘 수업 '+tdN+'회차</b>':'')+(wait?' · 정리 대기 '+wait+'회차(자료가 오면 아톰이 정리)':'')+'</div>';
+      '<div class="v50-top">'+(todo?'<b>밀린 회차 '+todo+'개</b>':'<b>밀린 회차 없음</b>')+(tdN?' · <b>오늘 수업 '+tdN+'회차</b>':'')+(wait?' · 정리 대기 '+wait+'회차':'')+'</div>';
     body.innerHTML=top+(items.length?items.map(V50.rowHTML).join(""):'<div class="v44-mut" style="padding:12px">과목이 없습니다.</div>');
     V50.bind(body);
   };
@@ -11390,6 +11399,38 @@ var V33={};
   ].join("\n");
   var st=document.createElement("style"); st.id="v56css"; st.textContent=css; document.head.appendChild(st);
   try{ if($("#v-study")&&$("#v-study").classList.contains("on")) V56.apply(); }catch(e){}   /* 화면 표시 클래스는 .view.on */
+})();
+/* ============================================================
+   V57 LAYER — 심플 화면 · 암기노트 입구 · 스앵님 판정 이어받기 (BUILD 2026-09-29.91)
+   대표님 2026-09-29: 「부가적인 설명을 붙인 텍스트들은 전부 화면상에 안 보이게, 화면에는 필요한 것만 심플하게」(지침 학습시스템 §24)
+     ① 설명만 하는 글(조작 안내·흐름 설명·설정 안내)은 숨긴다 — 검사 docs/tools/helper_text_audit.cjs 로 찾은 자리. 상태·수치가 섞인 글은 원문에서 설명 조각만 뺐다(기본 코드·V25·V34·V35·V49)
+     ② 과목 화면 히어로에 「암기노트」(notes/memo/<약칭>.html — build_memo.py)
+     ③ atom 안(서버 이해도)에서도 이 기기의 스앵님 판정(atto.mastery 의 auto — 교실·수업 노트·덱·암기노트 기록)이 더 최근이면 그것을 쓴다(V47)
+   끄기: ?simple=off (①만)
+   ============================================================ */
+(function(){
+  var V57=window.V57={};
+  V57.MEMO={"일반물리학2":"phys2","정역학":"statics","공업수학1":"em1","미분적분학2":"calc2"};
+  /* ① 설명만 하는 글 숨김 */
+  if(!/[?&]simple=off\b/.test(location.search)){
+    var st=document.createElement("style"); st.id="v57css";
+    st.textContent=[
+      "#studySub,#kmapEntry .hint,#v50Card>.card-h .ha,#weeklyBox>.hint,#v-grade>.vh .sub,#v-set>.vh .sub,#retakeBox>.hint,#termBox>.hint,#v54Card .hint,#rulesBox>.hint,#fontBox>.hint,#dataBox>.hint,#v55Path>.card-h .ha,.v55-unit.none .v55-ut{display:none!important}"
+    ].join("\n");
+    document.head.appendChild(st);
+  }
+  /* ② 암기노트 버튼 */
+  V57.memoBtn=function(){
+    var v=$("#v-course"), c=course(ui.course), hero=$("#v55Hero",v||document); if(!v||!c||!hero) return;
+    var slug=V57.MEMO[c.name], act=$(".v55-act",hero); if(!slug||!act||$("#v57Memo",act)) return;
+    var b=document.createElement("button"); b.type="button"; b.className="btn"; b.id="v57Memo"; b.textContent="암기노트";
+    b.onclick=function(){ openNote("notes/memo/"+slug+".html",c.name+" 암기노트"); };
+    var sp=$(".v55-actsp",act); act.insertBefore(b,sp||null);
+  };
+  if(window.V55&&V55.render&&!V55._v57){ var _r=V55.render; V55.render=function(){ var x=_r.apply(this,arguments); try{ V57.memoBtn(); }catch(e){} return x; }; V55._v57=1; }
+  /* ③ 스앵님 판정 이어받기 */
+  if(window.V47&&V47.load&&!V47._v57){ var _ld=V47.load; V47.load=function(){ var p=_ld.apply(this,arguments);
+    return p.then(function(ok){ try{ if(V47.MAST){ var L=JSON.parse(localStorage.getItem("atto.mastery")||"{}")||{}; Object.keys(L).forEach(function(id){ var l=L[id], m=V47.MAST[id]; if(l&&l.auto&&(!m||(+l.ts||0)>(+m.ts||0))) V47.MAST[id]=l; }); } }catch(e){} return ok; }); }; V47._v57=1; }
 })();
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start);
 else start();

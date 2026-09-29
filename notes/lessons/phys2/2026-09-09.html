@@ -42,12 +42,18 @@ section.s p{margin:0 0 10px}
 section.s.read::after{content:"읽음";position:absolute;right:16px;top:14px;font-size:12px;color:var(--accent);font-weight:700;border:1px solid rgba(21,128,61,.35);border-radius:999px;padding:1px 9px;background:rgba(21,128,61,.06)}
 /* 상자들 */
 .why,.say,.analogy,.formula,.pitfall,.memo{margin:12px 0;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:var(--paper-2);font-size:17px}
-.why{border-left:5px solid var(--blue)}.why::before{content:"왜 그런가";display:block;font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:4px}
-.say{border-left:5px solid var(--pink);background:rgba(255,77,141,.06)}.say::before{content:"교수님 말";display:block;font-size:12.5px;font-weight:700;color:var(--pink);margin-bottom:4px}
-.analogy{border-left:5px solid var(--yel);background:rgba(245,159,0,.07)}.analogy::before{content:"비유";display:block;font-size:12.5px;font-weight:700;color:#B26A00;margin-bottom:4px}
-.formula{border-left:5px solid var(--green);background:rgba(47,158,68,.06)}.formula::before{content:"외울 것";display:block;font-size:12.5px;font-weight:700;color:var(--green);margin-bottom:4px}
-.pitfall{border-left:5px solid var(--red);background:rgba(224,49,49,.05)}.pitfall::before{content:"함정";display:block;font-size:12.5px;font-weight:700;color:var(--red);margin-bottom:4px}
+/* 암기·이해 구분(대표님 2026-09-29): 상자 머리말 = 알약. 암기(주황) = 공식·외울 것, 이해(파랑) = 왜·비유 */
+.why::before,.analogy::before,.formula::before,.pitfall::before,.say::before,.memo.am::before{display:table;font-size:12px;font-weight:800;line-height:1;padding:5px 10px;border-radius:999px;margin:0 0 8px;color:#fff;letter-spacing:.02em}
+.why{border-left:5px solid var(--blue)}.why::before{content:"이해 · 왜";background:#1D4ED8}
+.say{border-left:5px solid var(--pink);background:rgba(255,77,141,.06)}.say::before{content:"교수님 말";background:#A61E4D}
+.analogy{border-left:5px solid var(--yel);background:rgba(245,159,0,.07)}.analogy{border-left-color:var(--blue)}.analogy::before{content:"이해 · 비유";background:#1D4ED8}
+.formula{border-left:5px solid var(--green);background:rgba(47,158,68,.06)}.formula{border-left-color:#D97706;background:rgba(217,119,6,.06)}.formula::before{content:"암기 · 공식";background:#B45309}
+.pitfall{border-left:5px solid var(--red);background:rgba(224,49,49,.05)}.pitfall::before{content:"함정";background:#C92A2A}
 .memo{border-left:5px solid var(--ink-3)}
+.memo.am{border-left-color:#D97706;background:rgba(217,119,6,.06)}.memo.am::before{content:"암기";background:#B45309}
+/* 인라인 식은 줄에서 끊지 않는다(대표님 2026-09-29 「수식 한 줄로」) — 넘치면 fitInline 이 줄인다 */
+.katex{white-space:nowrap}
+#top a.memo-l{color:var(--ink);font-weight:700;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:rgba(255,255,255,.6);min-height:32px;display:inline-flex;align-items:center}
 .katex-display{margin:10px 0;overflow-x:auto;overflow-y:hidden}
 /* 그림 */
 figure.fig{margin:14px auto;text-align:center;max-width:560px}
@@ -100,7 +106,7 @@ details.ex .body p{margin:8px 0}
   section.s,.q,#result,header.h .lead{border-color:rgba(255,255,255,.1);box-shadow:0 12px 34px rgba(0,0,0,.35)}
   .choice{background:rgba(255,255,255,.06)}.q .ans{background:rgba(255,255,255,.06)}.q .myans{background:rgba(255,255,255,.06)}
   .btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}.btn.a{color:#052E16}
-  .say{background:rgba(255,77,141,.10)}.analogy{background:rgba(245,159,0,.10)}.formula{background:rgba(47,158,68,.10)}.pitfall{background:rgba(224,49,49,.10)}
+  .say{background:rgba(255,77,141,.10)}.analogy{background:rgba(59,130,246,.10)}.formula{background:rgba(217,119,6,.12)}.memo.am{background:rgba(217,119,6,.12)}.pitfall{background:rgba(224,49,49,.10)}#top a.memo-l{background:rgba(255,255,255,.08)}
   figure.fig svg{filter:invert(1) hue-rotate(180deg) saturate(1.2)}
 }
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#top{background:#FFFFFF}section.s,.q,#result{background:#FFFFFF}}
@@ -110,7 +116,7 @@ details.ex .body p{margin:8px 0}
 </style>
 </head>
 <body>
-<div id="top"><div class="in"><b id="tCourse">일반물리학2</b><span id="tSess">9/9(수) · 2주차 · 약 18분</span><span class="sp"></span><span id="tRead">읽음 0/0</span><span class="pct" id="tPct">0%</span></div><div id="bar"><i id="barI"></i></div></div>
+<div id="top"><div class="in"><b id="tCourse">일반물리학2</b><span id="tSess">9/9(수) · 2주차 · 약 18분</span><span class="sp"></span><span id="tRead">읽음 0/0</span><span class="pct" id="tPct">0%</span><a class="memo-l" href="../../memo/phys2.html#d2026-09-09">암기노트</a></div><div id="bar"><i id="barI"></i></div></div>
 <main>
 <header class="h"><div class="kicker">일반물리학2 · 9/9(수) · 2주차 · 약 18분</div><h1>22장 전기장 계산 ①~④ — 점전하 · 점전하군 · 쌍극자 · 직선 도선</h1><div class="meta"><span>결석 회차(인정)</span><span>강의노트 p.6~7</span><span>다음 9/11에 복습됨</span></div><div class="lead">이 회차는 결석이라 강의노트 p.6~7과 9/11 수업의 복습 대목으로 재구성했다. 내용은 단순하다: <b>점전하 공식 하나</b>를 알고, 전하가 여러 개면 <b>벡터로 더하고</b>, 연속이면 <b>조각으로 잘라 적분</b>한다.</div></header>
 <section class="s" data-id="s1">
@@ -122,7 +128,7 @@ details.ex .body p{margin:8px 0}
 <div class="say">"E⃗ = (1/4πε₀)(q/r³) r⃗ — 시험 문제 내면 반드시 써야 된다." (9/11 복습 때)</div>
 <div class="pitfall">\(q\)의 부호를 식에 그대로 넣는다. \(q&lt;0\)이면 \(\vec E\)가 \(\vec r\)과 반대 → 전하 쪽으로 향한다. 크기만 구하고 방향을 따로 붙이는 습관보다 벡터식 하나로 끝내는 게 안전하다.</div>
 <div class="analogy">체중계에 1 kg 추를 올려 "이 자리의 저울이 얼마나 세게 누르나"를 재듯, 어느 점에 +1 C을 놓아 보고 받는 힘을 읽은 것이 전기장. 추(시험전하)가 커지면 눈금은 커지지만 저울(전기장) 자체는 그대로다 — 그래서 \(q'\)로 나눈다.</div>
-<div class="memo"><b>외울 것</b> \(\vec E=\dfrac{1}{4\pi\varepsilon_0}\dfrac{q}{r^3}\vec r\) — 벡터 \(\vec r\)로 쓰기 · \(q\)의 부호 그대로 · 단위 N/C · \(\hat r=\vec r/r\)</div>
+<div class="memo am">\(\vec E=\dfrac{1}{4\pi\varepsilon_0}\dfrac{q}{r^3}\vec r\) — 벡터 \(\vec r\)로 쓰기 · \(q\)의 부호 그대로 · 단위 N/C · \(\hat r=\vec r/r\)</div>
 </section>
 
 <section class="s" data-id="s2">
@@ -148,7 +154,7 @@ details.ex .body p{margin:8px 0}
 <div class="why">두 항이 거의 같아서 빼면 작은 값만 남고, 그 작은 값이 \(d\)에 비례한다. 점전하는 \(1/z^2\)인데 쌍극자는 \(1/z^3\) — 멀리서 보면 +와 −가 상쇄되어 <b>더 빨리 사라진다</b>.</div>
 <div class="analogy">멀리서 보면 서로 반대인 두 목소리가 거의 지워져 작게 들린다. 가까이 가야 "누가 더 가까운지" 차이가 드러난다.</div>
 <p>쌍극자가 균일한 전기장 안에서 받는 토크와 에너지는 뒤에 나온다(강의노트 p.8).</p>
-<div class="memo"><b>외울 것</b> \(\vec p=q\vec d\)(방향은 −에서 +로) · 축 위 멀리서 \(E=\dfrac{1}{2\pi\varepsilon_0}\dfrac{p}{z^3}\) · 균일한 장 안에서 토크 \(\vec\tau=\vec p\times\vec E\), 위치 에너지 \(U=-\vec p\cdot\vec E\)(강의노트 p.8 — 장과 나란할 때 에너지 최소)</div>
+<div class="memo am">\(\vec p=q\vec d\)(방향은 −에서 +로) · 축 위 멀리서 \(E=\dfrac{1}{2\pi\varepsilon_0}\dfrac{p}{z^3}\) · 균일한 장 안에서 토크 \(\vec\tau=\vec p\times\vec E\), 위치 에너지 \(U=-\vec p\cdot\vec E\)(강의노트 p.8 — 장과 나란할 때 에너지 최소)</div>
 </section>
 
 <section class="s" data-id="s4">
@@ -165,13 +171,100 @@ details.ex .body p{margin:8px 0}
 </section>
 
 
-<section id="quiz"><h2>확인 문제</h2><div class="hint">보기를 누르면 바로 채점됩니다. 답을 쓰는 문제는 「답 보기」 뒤에 맞음/틀림을 스스로 표시합니다.</div><div id="qlist"></div><div id="result"></div></section>
+<section id="quiz"><h2>확인 문제</h2><div id="qlist"></div><div id="result"></div></section>
 <div id="done"></div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script>/* 김주영 스앵님 판정 (대표님 2026-09-29 「개념 마인드맵은 스앵님이 학습을 통해 내가 뭘 알고 뭘 모르는지 알아서 파악」) — 원본은 이 파일 하나.
+   빌더가 교실·수업 노트·학습 덱·암기노트 페이지에 그대로 넣고(__JUDGE__), learn.html·앱(V57)은 같은 글을 붙여 쓴다(docs/tools/sync_judge.py).
+   기록 = localStorage atto.evidence [{t, k, n:[노드], ok, v, lid, sid, qid, clean}] (최대 4000건)
+     k: quiz(ok) 확인 문제 · read(clean) 챕터·섹션 끝(다시 설명·질문 없이 끝났으면 clean) · again 다시 설명 · ask 질문 · memo(ok) 암기노트 외움 · self(v) 카드 자가평가
+   판정 = 노드마다 atto.mastery[id] = {quiz:{correct,total,ts}, self, ts, score, state, auto} — learn.html · 앱 V47 · server.py 의 점수식이 그대로 읽는다.
+     quiz = 최근 6번 · self(설명할 수 있나 1~5) = 읽음 4 · 다시 설명·질문 2번 이상이면 3 · 외움 +1 · 카드 자가평가가 더 최근이면 그 값
+     → 문제 없이 읽기만 하면 최대 「흔들림」, 「안다」는 문제로만. 점수식 = (0.5·정답률 + 0.2·self/5)/0.7, 문제 없으면 self/5·0.6, 60일 감쇠(최저 0.4) */
+(function(g){
+  var EK="atto.evidence", MK="atto.mastery", CAP=4000;
+  function rd(k,d){ try{ var v=JSON.parse(localStorage.getItem(k)||"null"); return v==null?d:v; }catch(e){ return d; } }
+  function decay(ts){ if(!ts) return 1; var d=Math.max(0,(Date.now()/1000-ts)/86400); return Math.max(.4,1-d/60); }
+  function score(e){ var q=e.quiz||{}, tot=+q.total||0, cor=+q.correct||0, sv=e.self==null?null:Math.max(1,Math.min(5,+e.self));
+    if(tot<=0&&sv==null) return {score:0,state:"unrated"};
+    var raw=tot>0?(0.5*(cor/tot)+0.2*((sv||0)/5))/0.7:(sv/5)*0.6, s=Math.min(1,raw)*decay(Math.max(+e.ts||0,+q.ts||0)), st;
+    if(tot<=0) st=(sv>=4&&s>=.4)?"shaky":"unknown"; else st=s>=.7?"known":s>=.4?"shaky":"unknown";
+    return {score:Math.round(s*1000)/1000,state:st}; }
+  function why(evs){ var qz=evs.filter(function(e){return e.k==="quiz";}).slice(-6), r={q:qz.length,c:qz.filter(function(e){return e.ok;}).length,
+      read:evs.filter(function(e){return e.k==="read";}).length, clean:evs.filter(function(e){return e.k==="read"&&e.clean;}).length,
+      conf:evs.filter(function(e){return (e.k==="again"||e.k==="ask")&&Date.now()-e.t<21*864e5;}).length,
+      memo:null, self:null, last:0};
+    evs.forEach(function(e){ if(e.k==="memo") r.memo=!!e.ok; if(e.k==="self") r.self={v:+e.v,t:e.t}; if(e.t>r.last) r.last=e.t; });
+    return r; }
+  function judgeOne(id,L,M){ var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); if(!evs.length) return;
+    var r=why(evs), e=Object.assign({},M[id]||{}), qz=evs.filter(function(x){return x.k==="quiz";}).slice(-6);
+    var self=null; if(r.read||r.conf||r.memo!=null){ self=r.read?4:3; if(r.conf>=2) self=3; if(r.memo) self=Math.min(5,self+1); }
+    var autoLast=0; evs.forEach(function(x){ if(x.k!=="self"&&x.t>autoLast) autoLast=x.t; });
+    if(r.self&&r.self.t>=autoLast) self=r.self.v;
+    e.quiz=qz.length?{correct:r.c,total:qz.length,ts:Math.round(qz[qz.length-1].t/1000)}:undefined; if(!e.quiz) delete e.quiz;
+    e.self=self; if(self==null) delete e.self;
+    e.ts=Math.round(r.last/1000); e.auto={by:"tutor",q:r.q,c:r.c,read:r.read,clean:r.clean,conf:r.conf,memo:r.memo};
+    var s=score(e); e.score=s.score; e.state=s.state; M[id]=e; }
+  function judge(ids){ var L=rd(EK,[]), M=rd(MK,{}); if(!Array.isArray(L)) L=[]; (ids||[]).forEach(function(id){ judgeOne(id,L,M); });
+    try{ localStorage.setItem(MK,JSON.stringify(M)); }catch(e){} return M; }
+  function all(){ var L=rd(EK,[]), o={}; if(Array.isArray(L)) L.forEach(function(e){ (e&&e.n||[]).forEach(function(i){ o[i]=1; }); }); return judge(Object.keys(o)); }
+  function rec(ev){ if(!ev||!Array.isArray(ev.n)||!ev.n.length) return; var L=rd(EK,[]); if(!Array.isArray(L)) L=[];
+    ev.t=Date.now(); L.push(ev); if(L.length>CAP) L=L.slice(L.length-CAP);
+    try{ localStorage.setItem(EK,JSON.stringify(L)); }catch(e){ try{ L=L.slice(-Math.floor(CAP/2)); localStorage.setItem(EK,JSON.stringify(L)); }catch(x){} }
+    judge(ev.n); }
+  function reasons(id){ var L=rd(EK,[]); if(!Array.isArray(L)) return null; var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); return evs.length?why(evs):null; }
+  g.TJ={rec:rec,judge:judge,all:all,score:score,reasons:reasons};
+})(typeof window!=="undefined"?window:this);
+</script>
+<script>/* 여러 식을 이은 식 줄 나누기(대표님 2026-09-29 「수식 한 줄로, 배치구조 신경」) — 원본은 이 파일 하나(수업 노트·암기노트 템플릿에 빌더가 넣는다, __SPLITTEX__).
+   \[ A,\qquad B \] 처럼 서로 다른 식을 \qquad 또는 「,\quad」로 이어 붙인 줄은 식마다 한 줄(\[A\]\[B\])로 — 한 식 안은 가르지 않는다.
+   괄호 { } 와 \begin…\end 안의 구분자는 건드리지 않고, 연결 기호만 남은 조각(\Rightarrow·\to·\Leftrightarrow·\therefore)은 다음 식 앞에 붙인다. */
+function splitTex(t){
+  const parts=[]; let d=0, env=0, cur="", i=0;
+  while(i<t.length){
+    if(t.startsWith("\\begin{",i)) env++;
+    else if(t.startsWith("\\end{",i)) env=Math.max(0,env-1);
+    const c=t[i];
+    if(c==="\\"&&(t[i+1]==="{"||t[i+1]==="}")){ cur+=t.slice(i,i+2); i+=2; continue; }
+    if(c==="{") d++; else if(c==="}") d=Math.max(0,d-1);
+    if(!d&&!env){
+      let m=0;
+      if(t.startsWith("\\qquad",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) m=6;
+      else if(t.startsWith(",\\quad",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) m=6;
+      if(m){ parts.push(cur); cur=""; i+=m; continue; }
+    }
+    cur+=c; i++;
+  }
+  parts.push(cur);
+  const out=[]; let carry="";
+  parts.map(p=>p.trim().replace(/^,\s*/,"").replace(/,\s*$/,"")).forEach(p=>{
+    if(!p) return;
+    if(/^(\\(Rightarrow|Leftarrow|Leftrightarrow|to|therefore|because|implies|iff)\s*)+$/.test(p)){ carry+=p+" "; return; }
+    out.push(carry+p); carry="";
+  });
+  if(carry&&out.length) out[out.length-1]+=" "+carry.trim();
+  return out.length?out:[t];
+}
+/* 좁은 화면(폰)에서만: 글자 덩어리(\text{…})를 화살표(\to·\Rightarrow)로 이은 「흐름」 줄은 화살표 단위로 줄을 나눈다 — 수식이 아니라 단계 나열이라 나눠도 식이 갈리지 않는다 */
+function splitFlow(t){
+  const segs=[]; let d=0, cur="", i=0;
+  while(i<t.length){ const c=t[i];
+    if(c==="\\"&&(t[i+1]==="{"||t[i+1]==="}")){ cur+=t.slice(i,i+2); i+=2; continue; }
+    if(c==="{") d++; else if(c==="}") d=Math.max(0,d-1);
+    if(!d){ const m=/^\\ ?\\(to|Rightarrow)(?![a-zA-Z])\\ ?/.exec(t.slice(i))||/^\s*\\(to|Rightarrow)(?![a-zA-Z])\s*/.exec(t.slice(i)); if(m&&cur.trim()){ segs.push(cur); cur="\\"+m[1]+"\\ "; i+=m[0].length; continue; } }
+    cur+=c; i++; }
+  segs.push(cur);
+  const ok=segs.length>=3&&segs.every(s=>/^(\\(to|Rightarrow)\\ )?\s*\\text\{/.test(s.trim()));
+  return ok?segs.map(s=>s.trim()):[t];
+}
+function splitDisplays(html,narrow){
+  return String(html).replace(/\\\[([\s\S]*?)\\\]/g,(m,tex)=>{ let ps=splitTex(tex); if(narrow) ps=[].concat(...ps.map(splitFlow)); return ps.length>1?ps.map(p=>"\\["+p+"\\]").join(""):m; });
+}
+</script>
 <script>
-const LESSON_ID="phys2-2026-09-09", QUIZ=[{"id": "q1", "qn": "확인 1 · 점전하 벡터식", "html": "점전하 \\(q\\)에서 위치벡터 \\(\\vec r\\)만큼 떨어진 점의 전기장으로 옳은 것은?", "choices": [{"html": "\\(\\vec E=\\dfrac{1}{4\\pi\\varepsilon_0}\\dfrac{q}{r^3}\\vec r\\)", "ok": true}, {"html": "\\(\\vec E=\\dfrac{1}{4\\pi\\varepsilon_0}\\dfrac{q}{r^2}\\vec r\\)", "ok": false}, {"html": "\\(\\vec E=\\dfrac{1}{4\\pi\\varepsilon_0}\\dfrac{q}{r}\\hat r\\)", "ok": false}, {"html": "\\(\\vec E=\\dfrac{q}{\\varepsilon_0 r^2}\\hat r\\)", "ok": false}], "ans": "\\(\\hat r=\\vec r/r\\)이므로 \\(\\frac{q}{r^2}\\hat r=\\frac{q}{r^3}\\vec r\\). \\(\\frac{q}{r^2}\\vec r\\)은 차원이 틀리다."}, {"id": "q2", "qn": "확인 2 · 중첩", "html": "전하 세 개가 만드는 전기장을 구할 때 옳은 방법은?", "choices": [{"html": "각 전하의 장을 성분으로 나눠 <b>벡터로</b> 더한다", "ok": true}, {"html": "각 전하의 장의 크기를 더한다", "ok": false}, {"html": "가장 가까운 전하의 장만 쓴다", "ok": false}, {"html": "세 전하를 합친 알짜 전하 하나로 바꿔 계산한다", "ok": false}], "ans": "중첩 원리 = 벡터 합. 알짜 전하 하나로 바꾸는 것은 멀리서 볼 때만 근사로 가능."}, {"id": "q3", "qn": "확인 3 · 필수문제 1", "html": "\\(q_1=20\\) C(원점), \\(q_2=-3\\) C(4,0), \\(q_3=-4\\) C(0,3) [m]. \\(q_1\\)이 받는 알짜 힘은? (\\(k=1/4\\pi\\varepsilon_0\\))", "choices": [{"html": "\\(k\\left(\\tfrac{15}{4}\\hat i+\\tfrac{80}{9}\\hat j\\right)\\)", "ok": true}, {"html": "\\(k\\left(-\\tfrac{15}{4}\\hat i-\\tfrac{80}{9}\\hat j\\right)\\)", "ok": false}, {"html": "\\(k\\left(\\tfrac{15}{4}+\\tfrac{80}{9}\\right)\\)", "ok": false}, {"html": "\\(k\\left(\\tfrac{60}{16}\\hat i+\\tfrac{80}{3}\\hat j\\right)\\)", "ok": false}], "ans": "둘 다 인력이라 \\(q_1\\)은 \\(q_2\\)(+x)·\\(q_3\\)(+y) 쪽으로 당겨진다. 크기 \\(k\\cdot60/16\\), \\(k\\cdot80/9\\). 벡터로 답한다(3번처럼 크기 합은 오답)."}, {"id": "q4", "qn": "확인 4 · 쌍극자", "html": "전기 쌍극자의 축에서 멀리(\\(z\\gg d\\)) 떨어진 점의 전기장 크기는 \\(z\\)에 대해?", "choices": [{"html": "\\(1/z^3\\)에 비례", "ok": true}, {"html": "\\(1/z^2\\)에 비례", "ok": false}, {"html": "\\(1/z\\)에 비례", "ok": false}, {"html": "\\(z\\)와 무관", "ok": false}], "ans": "두 점전하의 장이 거의 상쇄되고 거리 차이만 남아 \\(2qd/z^3\\). 점전하(\\(1/z^2\\))보다 빨리 준다."}, {"id": "q5", "qn": "확인 5 · 직선 도선의 극한", "html": "직선 도선 결과 \\(E=\\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{a(a+L)}\\)에서 \\(a\\gg L\\)이면?", "choices": [{"html": "\\(\\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{a^2}\\) — 점전하와 같아진다", "ok": true}, {"html": "\\(\\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{aL}\\)", "ok": false}, {"html": "0", "ok": false}, {"html": "\\(\\frac{\\lambda}{2\\pi\\varepsilon_0 a}\\)", "ok": false}], "ans": "\\(a+L\\approx a\\). 멀리서 본 도선은 점전하 — 유도 결과의 검산."}, {"id": "q6", "qn": "확인 6 · 적분 설정", "html": "직선 도선(길이 \\(L\\), 선밀도 \\(\\lambda\\)) 연장선에서 끝으로부터 \\(a\\) 떨어진 점의 전기장을 구할 때, 미소 조각 \\(dq\\)와 적분 구간을 쓰라.", "choices": null, "ans": "\\(dq=\\lambda\\,dx\\), \\(dE=\\frac{1}{4\\pi\\varepsilon_0}\\frac{\\lambda dx}{x^2}\\), 구간 \\(x=a\\)~\\(a+L\\). 결과 \\(\\frac{\\lambda}{4\\pi\\varepsilon_0}\\big(\\frac1a-\\frac{1}{a+L}\\big)=\\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{a(a+L)}\\)."}], N_SEC=document.querySelectorAll("section.s[data-id]").length;
+const LESSON_ID="phys2-2026-09-09", QUIZ=[{"id": "q1", "qn": "확인 1 · 점전하 벡터식", "html": "점전하 \\(q\\)에서 위치벡터 \\(\\vec r\\)만큼 떨어진 점의 전기장으로 옳은 것은?", "choices": [{"html": "\\(\\vec E=\\dfrac{1}{4\\pi\\varepsilon_0}\\dfrac{q}{r^3}\\vec r\\)", "ok": true, "k": 0}, {"html": "\\(\\vec E=\\dfrac{q}{\\varepsilon_0 r^2}\\hat r\\)", "ok": false, "k": 3}, {"html": "\\(\\vec E=\\dfrac{1}{4\\pi\\varepsilon_0}\\dfrac{q}{r}\\hat r\\)", "ok": false, "k": 2}, {"html": "\\(\\vec E=\\dfrac{1}{4\\pi\\varepsilon_0}\\dfrac{q}{r^2}\\vec r\\)", "ok": false, "k": 1}], "ans": "\\(\\hat r=\\vec r/r\\)이므로 \\(\\frac{q}{r^2}\\hat r=\\frac{q}{r^3}\\vec r\\). \\(\\frac{q}{r^2}\\vec r\\)은 차원이 틀리다."}, {"id": "q2", "qn": "확인 2 · 중첩", "html": "전하 세 개가 만드는 전기장을 구할 때 옳은 방법은?", "choices": [{"html": "세 전하를 합친 알짜 전하 하나로 바꿔 계산한다", "ok": false, "k": 3}, {"html": "각 전하의 장을 성분으로 나눠 <b>벡터로</b> 더한다", "ok": true, "k": 0}, {"html": "각 전하의 장의 크기를 더한다", "ok": false, "k": 1}, {"html": "가장 가까운 전하의 장만 쓴다", "ok": false, "k": 2}], "ans": "중첩 원리 = 벡터 합. 알짜 전하 하나로 바꾸는 것은 멀리서 볼 때만 근사로 가능."}, {"id": "q3", "qn": "확인 3 · 필수문제 1", "html": "\\(q_1=20\\) C(원점), \\(q_2=-3\\) C(4,0), \\(q_3=-4\\) C(0,3) [m]. \\(q_1\\)이 받는 알짜 힘은? (\\(k=1/4\\pi\\varepsilon_0\\))", "choices": [{"html": "\\(k\\left(\\tfrac{60}{16}\\hat i+\\tfrac{80}{3}\\hat j\\right)\\)", "ok": false, "k": 3}, {"html": "\\(k\\left(\\tfrac{15}{4}+\\tfrac{80}{9}\\right)\\)", "ok": false, "k": 2}, {"html": "\\(k\\left(\\tfrac{15}{4}\\hat i+\\tfrac{80}{9}\\hat j\\right)\\)", "ok": true, "k": 0}, {"html": "\\(k\\left(-\\tfrac{15}{4}\\hat i-\\tfrac{80}{9}\\hat j\\right)\\)", "ok": false, "k": 1}], "ans": "둘 다 인력이라 \\(q_1\\)은 \\(q_2\\)(+x)·\\(q_3\\)(+y) 쪽으로 당겨진다. 크기 \\(k\\cdot60/16\\), \\(k\\cdot80/9\\). 벡터로 답한다(2번처럼 크기 합은 오답)."}, {"id": "q4", "qn": "확인 4 · 쌍극자", "html": "전기 쌍극자의 축에서 멀리(\\(z\\gg d\\)) 떨어진 점의 전기장 크기는 \\(z\\)에 대해?", "choices": [{"html": "\\(1/z\\)에 비례", "ok": false, "k": 2}, {"html": "\\(z\\)와 무관", "ok": false, "k": 3}, {"html": "\\(1/z^2\\)에 비례", "ok": false, "k": 1}, {"html": "\\(1/z^3\\)에 비례", "ok": true, "k": 0}], "ans": "두 점전하의 장이 거의 상쇄되고 거리 차이만 남아 \\(2qd/z^3\\). 점전하(\\(1/z^2\\))보다 빨리 준다."}, {"id": "q5", "qn": "확인 5 · 직선 도선의 극한", "html": "직선 도선 결과 \\(E=\\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{a(a+L)}\\)에서 \\(a\\gg L\\)이면?", "choices": [{"html": "\\(\\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{aL}\\)", "ok": false, "k": 1}, {"html": "0", "ok": false, "k": 2}, {"html": "\\(\\frac{\\lambda}{2\\pi\\varepsilon_0 a}\\)", "ok": false, "k": 3}, {"html": "\\(\\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{a^2}\\) — 점전하와 같아진다", "ok": true, "k": 0}], "ans": "\\(a+L\\approx a\\). 멀리서 본 도선은 점전하 — 유도 결과의 검산."}, {"id": "q6", "qn": "확인 6 · 적분 설정", "html": "직선 도선(길이 \\(L\\), 선밀도 \\(\\lambda\\)) 연장선에서 끝으로부터 \\(a\\) 떨어진 점의 전기장을 구할 때, 미소 조각 \\(dq\\)와 적분 구간을 쓰라.", "choices": null, "ans": "\\(dq=\\lambda\\,dx\\), \\(dE=\\frac{1}{4\\pi\\varepsilon_0}\\frac{\\lambda dx}{x^2}\\), 구간 \\(x=a\\)~\\(a+L\\). 결과 \\(\\frac{\\lambda}{4\\pi\\varepsilon_0}\\big(\\frac1a-\\frac{1}{a+L}\\big)=\\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{a(a+L)}\\)."}], NDS={"sec": {"s1": ["em.field", "em.superposition", "em.continuous"], "s2": ["em.superposition", "em.potential", "em.field"], "s3": ["em.dipole"], "s4": ["em.continuous"]}, "q": {"q1": ["em.field"], "q2": ["em.superposition"], "q3": ["em.superposition"], "q4": ["em.dipole"], "q5": ["em.continuous"], "q6": ["em.continuous"]}}, N_SEC=document.querySelectorAll("section.s[data-id]").length;
 const KEY="mc-lesson-"+LESSON_ID;
 let ST={read:{},done:{},correct:{},answer:{},ts:0};
 try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}
@@ -180,7 +273,14 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 function save(){ ST.ts=Date.now(); try{ localStorage.setItem(KEY,JSON.stringify(ST)); const qs=QUIZ.length, qd=QUIZ.filter(q=>ST.done[q.id]).length, rd=Object.keys(ST.read).length;
   const li={deck:LESSON_ID,title:document.title,href:location.href.split("#")[0],idx:Math.max(0,rd-1),n:N_SEC,sid:curSec||"",part:null,partTitle:document.title.slice(0,60),where:(rd>=N_SEC?"확인 문제":"읽는 중 · "+(curTitle||"")),qDone:qd,qN:qs,ts:Date.now()};
   const j=JSON.stringify(li); localStorage.setItem("mc-slides-last",j); localStorage.setItem("mc-slides-last-"+LESSON_ID,j); }catch(e){} }
-function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} }
+/* 스앵님 판정 기록(대표님 2026-09-29) — 섹션 읽음 · 문제 채점 → 개념 노드(knowledge/lesson_nodes.json) */
+function ev(k,x){ try{ if(!window.TJ) return; const o=Object.assign({k:k,lid:LESSON_ID},x||{}); if(o.n&&o.n.length) TJ.rec(o); }catch(e){} }
+/* 객관식 보기는 빌드 때 섞인다(quizmix) — 고른 보기를 원문 순서 k 로 저장 */
+const ck=(c,i)=>String(c&&c.k!=null?c.k:i);
+/* 인라인 식이 줄보다 길면 글자를 줄여 한 줄에(14px 까지) */
+function fitInline(root){ $$(".katex",root).forEach(k=>{ if(k.closest(".katex-display")) return; k.style.fontSize=""; const box=k.parentElement&&k.parentElement.closest("p,li,div,summary,button,td"); if(!box) return; const cw=box.clientWidth, w=k.getBoundingClientRect().width; if(!(cw>0&&w>cw-2)) return; const fs=parseFloat(getComputedStyle(k).fontSize)||17; k.style.fontSize=Math.max(14,Math.floor(fs*(cw-6)/w))+"px"; }); }
+window.addEventListener("resize",()=>fitInline(document.querySelector("main")),{passive:true});
+function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} fitInline(el); }
 /* ---- 읽음: 섹션이 화면의 절반 이상 1.2초 보이면 읽음 ---- */
 let curSec=null, curTitle="";
 function renderTop(){ const rd=Object.keys(ST.read).filter(k=>ST.read[k]).length, qd=QUIZ.filter(q=>ST.done[q.id]).length, tot=N_SEC+QUIZ.length;
@@ -188,30 +288,30 @@ function renderTop(){ const rd=Object.keys(ST.read).filter(k=>ST.read[k]).length
   $$("section.s[data-id]").forEach(s=>s.classList.toggle("read",!!ST.read[s.dataset.id]));
   /* 따라감 기준은 앱(V52)과 같다: 섹션 전부 + 문제 90% 풀고 60% 정답 */
   const okN=QUIZ.filter(q=>ST.correct[q.id]===true).length, need=Math.ceil(QUIZ.length*.6);
-  $("#done").textContent= rd>=N_SEC&&qd>=QUIZ.length&&QUIZ.length? (okN>=need? "이 회차 끝 — 정답 "+okN+"/"+QUIZ.length+". 앱의 「수업 따라가기」에서 따라감으로 표시됩니다." : "다 풀었지만 정답 "+okN+"/"+QUIZ.length+" — 틀린 문제를 다시 풀어 "+need+"개 이상 맞히면 따라감으로 표시됩니다.") : ""; }
+  $("#done").textContent= rd>=N_SEC&&qd>=QUIZ.length&&QUIZ.length? (okN>=need? "완료 · 정답 "+okN+"/"+QUIZ.length : "정답 "+okN+"/"+QUIZ.length+" · "+need+"개 이상이면 완료") : ""; }
 const timers={};
 const io=new IntersectionObserver(es=>{ es.forEach(e=>{ const id=e.target.dataset.id; if(e.isIntersecting){ curSec=id; curTitle=(e.target.querySelector("h2")||{}).textContent||""; postCtx(e.target);
-    if(!ST.read[id]&&!timers[id]) timers[id]=setTimeout(()=>{ ST.read[id]=true; save(); renderTop(); },1200); } else { if(timers[id]){ clearTimeout(timers[id]); delete timers[id]; } } }); },{threshold:.5});
+    if(!ST.read[id]&&!timers[id]) timers[id]=setTimeout(()=>{ ST.read[id]=true; save(); renderTop(); ev("read",{sid:id,n:(NDS.sec||{})[id]||[],clean:true}); },1200); } else { if(timers[id]){ clearTimeout(timers[id]); delete timers[id]; } } }); },{threshold:.5});
 $$("section.s[data-id]").forEach(s=>io.observe(s));
 /* 짧은 섹션(화면보다 작아 50%가 금방 차는) 은 그대로, 긴 섹션은 끝까지 스크롤하면 읽음 */
-window.addEventListener("scroll",()=>{ $$("section.s[data-id]").forEach(s=>{ if(ST.read[s.dataset.id]) return; const r=s.getBoundingClientRect(); if(r.bottom<window.innerHeight*.6&&r.bottom>-2000){ ST.read[s.dataset.id]=true; save(); renderTop(); } }); },{passive:true});
+window.addEventListener("scroll",()=>{ $$("section.s[data-id]").forEach(s=>{ if(ST.read[s.dataset.id]) return; const r=s.getBoundingClientRect(); if(r.bottom<window.innerHeight*.6&&r.bottom>-2000){ ST.read[s.dataset.id]=true; save(); renderTop(); ev("read",{sid:s.dataset.id,n:(NDS.sec||{})[s.dataset.id]||[],clean:true}); } }); },{passive:true});
 /* ---- 판서 사진: atom 안에서만 (없으면 숨김) ---- */
 $$("figure.board img").forEach(img=>{ img.addEventListener("error",()=>{ img.closest("figure").hidden=true; }); });
 /* ---- 문제 카드 ---- */
 function qHTML(q,i){ const mc=Array.isArray(q.choices)&&q.choices.length, rev=!!ST.done[q.id], my=ST.answer[q.id];
   let inner='<div class="qn">'+esc(q.qn||("문제 "+(i+1)))+'</div><div class="qb">'+q.html+'</div>';
-  if(mc){ inner+='<ol class="choices">'+q.choices.map((c,ci)=>{ const sel=String(my)===String(ci); const cls=rev?(c.ok?" ok":(sel?" bad":"")):""; return '<li><button class="choice'+cls+'" data-ci="'+ci+'"'+(rev?" disabled":"")+'><span class="cn">'+(ci+1)+'</span><span>'+c.html+'</span></button></li>'; }).join("")+'</ol>'; }
+  if(mc){ inner+='<ol class="choices">'+q.choices.map((c,ci)=>{ const sel=my!=null&&String(my)===ck(c,ci); const cls=rev?(c.ok?" ok":(sel?" bad":"")):""; return '<li><button class="choice'+cls+'" data-ci="'+ci+'"'+(rev?" disabled":"")+'><span class="cn">'+(ci+1)+'</span><span>'+c.html+'</span></button></li>'; }).join("")+'</ol>'; }
   else { inner+= rev? '<div class="memo"><b>내 답</b> '+esc(my||"")+'</div>' : '<textarea class="myans" placeholder="답만 간단히">'+esc(my||"")+'</textarea><div class="row"><button class="btn a" data-reveal>답 보기</button></div>'; }
   if(rev){ const c=ST.correct[q.id]; inner+='<span class="verdict '+(c===true?"ok":c===false?"bad":"")+'">'+(c===true?"정답":c===false?"오답":"채점 전")+'</span>';
     if(!mc&&c==null) inner+='<div class="row"><button class="btn" data-grade="1">맞았어요</button><button class="btn" data-grade="0">틀렸어요</button></div>';
     inner+='<div class="row"><button class="btn xs" data-retry>다시 풀기</button></div>'; }
-  inner+='<div class="ans"><b>답 · 풀이</b><div>'+(q.ans||"")+'</div></div>';
+  inner+='<div class="ans"><b>답 · 풀이</b><div>'+splitDisplays(q.ans||"",innerWidth<700)+'</div></div>';
   return '<div class="q'+(rev?" rev":"")+'" data-q="'+q.id+'">'+inner+'</div>'; }
 function bindQ(){ const box=$("#qlist"); box.innerHTML=QUIZ.map(qHTML).join(""); typeset(box);
   $$("#qlist .q").forEach(el=>{ const q=QUIZ.find(x=>x.id===el.dataset.q);
-    $$(".choice",el).forEach(b=>{ b.onclick=()=>{ if(ST.done[q.id]) return; const ci=+b.dataset.ci; ST.answer[q.id]=ci; ST.done[q.id]=true; ST.correct[q.id]=!!(q.choices[ci]&&q.choices[ci].ok); save(); bindQ(); renderTop(); }; });
+    $$(".choice",el).forEach(b=>{ b.onclick=()=>{ if(ST.done[q.id]) return; const ci=+b.dataset.ci, c=q.choices[ci]; ST.answer[q.id]=(c&&c.k!=null)?c.k:ci; ST.done[q.id]=true; ST.correct[q.id]=!!(c&&c.ok); save(); bindQ(); renderTop(); ev("quiz",{qid:q.id,ok:ST.correct[q.id],n:(NDS.q||{})[q.id]||[]}); }; });
     const rv=el.querySelector("[data-reveal]"); if(rv) rv.onclick=()=>{ const ta=el.querySelector(".myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); bindQ(); renderTop(); };
-    $$("[data-grade]",el).forEach(b=>{ b.onclick=()=>{ ST.correct[q.id]=b.dataset.grade==="1"; save(); bindQ(); renderTop(); }; });
+    $$("[data-grade]",el).forEach(b=>{ b.onclick=()=>{ ST.correct[q.id]=b.dataset.grade==="1"; save(); bindQ(); renderTop(); ev("quiz",{qid:q.id,ok:ST.correct[q.id],n:(NDS.q||{})[q.id]||[]}); }; });
     const rt=el.querySelector("[data-retry]"); if(rt) rt.onclick=()=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; save(); bindQ(); renderTop(); };
   });
   const done=QUIZ.filter(q=>ST.done[q.id]).length, ok=QUIZ.filter(q=>ST.correct[q.id]===true).length, wrong=QUIZ.filter(q=>ST.correct[q.id]===false);
@@ -225,7 +325,10 @@ function postCtx(sec){ try{ if(!CTX_GEN||window.parent===window) return; const s
   window.parent.postMessage({type:"mc-slide",v:1,gen:CTX_GEN,deck:LESSON_ID,title:document.title.slice(0,80),sid:s.dataset.id,stype:"concept",part:null,partTitle:document.title.slice(0,60),label:"읽는 중 · "+t.slice(0,60),q:{qn:t.slice(0,80),kind:"개념",text:txt,choices:[],my:null,revealed:true,correct:null,answer:null}},location.origin); }catch(e){} }
 window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; postCtx(); } });
 /* ---- 시작 ---- */
-function boot(){ typeset(document.querySelector("main")); bindQ(); renderTop(); save();
+/* 넘치는 식 줄은 글자를 줄여 한 줄에(14px 까지) — 그래도 넘치면 식 칸 안에서 민다 */
+function fitDisplay(root){ $$(".katex-display",root).forEach(k=>{ k.style.fontSize=""; const cw=k.clientWidth, sw=k.scrollWidth; if(!(cw>0&&sw>cw+1)) return; const kx=k.querySelector(".katex"), fz=parseFloat(getComputedStyle(kx||k).fontSize)||20, lo=Math.min(1,Math.max(.6,14/fz)); k.style.fontSize=Math.max(lo,Math.floor(cw/sw*100)/100)+"em"; }); }
+window.addEventListener("resize",()=>fitDisplay(document.querySelector("main")),{passive:true});
+function boot(){ $$("section.s").forEach(s=>{ const h=s.innerHTML, n=splitDisplays(h,innerWidth<700); if(n!==h) s.innerHTML=n; }); typeset(document.querySelector("main")); fitDisplay(document.querySelector("main")); try{ document.fonts.ready.then(()=>fitDisplay(document.querySelector("main"))); }catch(e){} bindQ(); renderTop(); save();
   const m=/^#s=([\w-]+)$/.exec(location.hash||""); if(m){ const el=document.querySelector('section.s[data-id="'+m[1]+'"]'); if(el) el.scrollIntoView(); }
   else if(location.hash==="#resume"){ const ids=$$("section.s[data-id]").map(s=>s.dataset.id); const next=ids.find(id=>!ST.read[id]); if(next){ const el=document.querySelector('section.s[data-id="'+next+'"]'); if(el) el.scrollIntoView(); } else if(QUIZ.length){ $("#quiz").scrollIntoView(); } } }
 (function wait(){ if(window.renderMathInElement) boot(); else setTimeout(wait,40); })();

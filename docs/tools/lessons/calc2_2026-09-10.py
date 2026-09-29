@@ -36,7 +36,7 @@ fig_cs = canvas(560, 210,
     step(2, line(280, 40, 280, 180, GRAY, 1, "3 3"),
         axes3d(360, 150, 70), path("M330 108 C 380 40, 470 50, 500 98 C 470 128, 380 138, 330 108 Z", RED, 2.2, "rgba(224,49,49,.10)"),
         text(430, 190, "★② R³ : 곡면 (x, y, z)", 12.5, INK, "middle", True)),
-    cap="변수 개수가 도형의 차원을 정한다. 이 과목의 대상은 곡면(판서 ② 앞의 별표는 교수님 분필).", name="cs")
+    cap="변수 개수만으로 도형을 판정할 수는 없다(x²+y²+z²=0 은 점). 이 절은 평면의 곡선과 공간의 곡면을 비교한다(판서 ② 앞의 별표는 교수님 분필).", name="cs")
 
 fig_step = canvas(560, 120,
     step(1, fbox(14, 24, 160, 54, "① 바닥에 찍기", BLUE, sub="xy 평면에 (x₁, y₁, 0)", size=13.5)),
@@ -67,7 +67,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미
 <h2>2. 원주좌표 = 극좌표 + 높이 z (판서 우측 그림)</h2>
 {fig_polar}
 <div class="formula">\\[x=r\\cos\\theta,\\quad y=r\\sin\\theta,\\quad z=z\\qquad(r\\ge0,\\ \\theta\\text{{는 }}x\\text{{축에서 반시계}})\\]</div>
-<div class="why">판서 우측의 2D 그림은 3D 그림에서 \\(xy\\) 평면만 떼어 놓은 것. 같은 점을 \\((x,y)\\)로도 \\((r,\\theta)\\)로도 쓴다 — 그래서 \\(x^2+y^2=1\\)은 \\(r=1\\)(9/15 원기둥). 축 끝에 \\(\\theta\\)의 기준각 4개(0·π/2·π·3π/2)를 적어 둔 것은 방향 감각을 잃지 말라는 뜻. 판서의 "동경벡터"는 \\(O\\)에서 \\(xy\\) 위 투영점까지의 화살표 — 높이와 무관.</div>
+<div class="why">판서 우측의 2D 그림은 3D 그림에서 \\(xy\\) 평면만 떼어 놓은 것. 같은 점을 \\((x,y)\\)로도 \\((r,\\theta)\\)로도 쓴다 — 그래서 \\(x^2+y^2=1\\)은 \\(r=1\\)(9/15 원기둥). 축 끝에 \\(\\theta\\)의 기준각 4개(0·π/2·π·3π/2)를 적어 둔 것은 방향 감각을 잃지 말라는 뜻. 판서의 "동경벡터"는 \\(O\\)에서 \\(xy\\) 위 투영점까지의 화살표(그 길이가 \\(r\\)) — 높이와 무관.</div>
 <div class="analogy">시계: 시침이 가리키는 방향(\\(\\theta\\))과 시침 길이(\\(r\\))로 시계판 위 점이 정해진다. 시계를 몇 층에 걸었느냐가 \\(z\\).</div>
 <div class="memo"><b>외울 것</b> \\(x=r\\cos\\theta\\), \\(y=r\\sin\\theta\\) · \\(r^2=x^2+y^2\\) · 문제는 주로 원주좌표로</div>
 </section>
@@ -76,9 +76,9 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미
 <h2>3. R² 곡선 vs R³ 곡면 ★</h2>
 {fig_cs}
 <div class="say">(9/15) "지난번에 R²는 곡선, R³에서는 곡선이 아니라 <b>곡면</b>. xy 면적 위에 z 높이가 있으니 부피로 생각. 면적의 의미를 가진 곡선 = 곡면."</div>
-<div class="why">변수가 2개(\\(x,y\\))면 평면 위의 곡선, 3개(\\(x,y,z\\))면 공간 속의 <b>면</b>. 같은 식이라도 어느 공간에서 보느냐로 도형이 달라진다 — 9/15 예제 2: \\(x^2+y^2=1\\)이 R²에선 원, R³에선 원기둥면. 판서 ② 앞의 별표는 "이 과목의 대상은 곡면"이라는 강조(시험 표시 아님).</div>
+<div class="why">변수가 2개(\\(x,y\\))인 식은 보통 평면 위의 곡선, 3개(\\(x,y,z\\))인 식은 보통 공간 속의 <b>면</b>(예외: \\(x^2+y^2+z^2=0\\)은 점 하나 — 변수 개수만으로 도형을 판정할 수는 없다). 같은 식이라도 어느 공간에서 보느냐로 도형이 달라진다 — 9/15 예제 2: \\(x^2+y^2=1\\)이 R²에선 원, R³에선 원기둥면. 판서 ② 앞의 별표는 "이 과목의 대상은 곡면"이라는 강조(시험 표시 아님).</div>
 <div class="analogy">지도 위의 등고선(R² 곡선)과 실제 산(R³ 곡면). 같은 정보라도 "높이"라는 변수가 하나 더 붙으면 면이 된다.</div>
-<div class="memo"><b>외울 것</b> 변수 2개 → 곡선, 3개 → 곡면 · 식에 없는 변수는 "모든 값"(9/15 예제 1·2의 열쇠)</div>
+<div class="memo"><b>외울 것</b> 변수 2개 → 곡선, 3개 → 곡면(보통) · 식에 없는 변수는 "모든 값"(9/15 예제 1·2의 열쇠)</div>
 </section>
 
 <section class="s" data-id="s4">
@@ -91,12 +91,12 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미
 <div class="memo"><b>외울 것</b> 점 찍기 = 투영 → 올리기 · 연습: \\(P(2,-1,7)\\) 같은 점 3개 직접 찍어 보기 → 9/15 예제로</div>
 </section>
 
-<div class="q" data-qid="q1"><div class="qn">확인 1 · 좌표계</div><div class="qb">이 강의에서 실제로 쓰는 3차원 좌표계는?</div><ol class="choices"><li data-ok="1">직교좌표 \\((x,y,z)\\)와 원주좌표 \\((r,\\theta,z)\\)</li><li>직교좌표와 구면좌표</li><li>원주좌표와 구면좌표</li><li>구면좌표만</li></ol><div class="ans">판서 ✓✓✗. 구면좌표는 "차원이 다른 얘기"라 뺐다.</div></div>
+<div class="q" data-qid="q1"><div class="qn">확인 1 · 좌표계</div><div class="qb">이 강의에서 실제로 쓰는 3차원 좌표계는?</div><ol class="choices"><li data-ok="1">직교좌표 \\((x,y,z)\\)와 원주좌표 \\((r,\\theta,z)\\)</li><li>직교좌표와 구면좌표</li><li>원주좌표와 구면좌표</li><li>구면좌표만</li></ol><div class="ans">판서 ✓✓✗. 구면좌표도 3차원 좌표계지만 이 강의에서는 제외한다.</div></div>
 <div class="q" data-qid="q2"><div class="qn">확인 2 · 원주좌표</div><div class="qb">원주좌표 \\(P(r,\\theta,z)\\)에서 \\(r\\)과 \\(\\theta\\)는?</div><ol class="choices"><li data-ok="1">\\(xy\\) 평면 위 투영점의 극좌표 — 원점에서의 거리와 \\(x\\)축에서 잰 각</li><li>원점에서 \\(P\\)까지의 3차원 거리와 \\(z\\)축에서 잰 각</li><li>\\(z\\)축 위의 위치와 회전 횟수</li><li>\\(x\\)좌표와 \\(y\\)좌표</li></ol><div class="ans">높이 \\(z\\)와 무관하게 바닥에서만 잰다(동경·편각). 2번은 구면좌표 쪽.</div></div>
 <div class="q" data-qid="q3"><div class="qn">확인 3 · 곡선과 곡면</div><div class="qb">\\(x^2+y^2=1\\)을 R³에서 보면?</div><ol class="choices"><li data-ok="1">\\(z\\) 방향으로 끝없이 뻗은 원기둥면</li><li>반지름 1인 원(평면 도형)</li><li>반지름 1인 구면</li><li>원판</li></ol><div class="ans">식에 \\(z\\)가 없다 = 모든 \\(z\\). R²에서는 원, R³에서는 원기둥면.</div></div>
-<div class="q" data-qid="q4"><div class="qn">확인 4 · 점 찍기</div><div class="qb">3차원에 \\(P(x_1,y_1,z_1)\\)을 찍는 순서는?</div><ol class="choices"><li data-ok="1">\\(xy\\) 평면에 \\((x_1,y_1,0)\\)을 먼저 찍고 \\(z_1\\)만큼 올린다</li><li>\\(z\\)축에 \\(z_1\\)을 먼저 찍고 \\(x_1,y_1\\)만큼 옮긴다</li><li>원점에서 직선으로 한 번에 긋는다</li><li>순서는 상관없다</li></ol><div class="ans">"z = 0 기준으로 xy 평면에 projection 후 올려라" — 모든 3D 그림의 기본 동작.</div></div>
-<div class="q" data-qid="q5"><div class="qn">확인 5 · 변수와 차원</div><div class="qb">R³에서 변수 세 개(\\(x,y,z\\))를 가진 식이 나타내는 도형은 일반적으로?</div><ol class="choices"><li data-ok="1">곡면</li><li>곡선</li><li>점</li><li>부피(입체)</li></ol><div class="ans">"R³에서는 곡선이 아니라 곡면" — 이 과목의 대상.</div></div>
-<div class="q" data-qid="q6"><div class="qn">확인 6 · 변환</div><div class="qb">원주좌표 \\((r,\\theta,z)\\)를 직교좌표로 바꾸는 식을 쓰라.</div><div class="ans">\\(x=r\\cos\\theta\\), \\(y=r\\sin\\theta\\), \\(z=z\\). 거꾸로 \\(r^2=x^2+y^2\\), \\(\\tan\\theta=y/x\\).</div></div>
+<div class="q" data-qid="q4"><div class="qn">확인 4 · 점 찍기</div><div class="qb">3차원에 \\(P(x_1,y_1,z_1)\\)을 찍을 때 수업에서 권장한 순서는?</div><ol class="choices"><li data-ok="1">\\(xy\\) 평면에 \\((x_1,y_1,0)\\)을 먼저 찍고 \\(z_1\\)만큼 올린다</li><li>\\(z\\)축에 \\(z_1\\)을 먼저 찍고 \\(x_1,y_1\\)만큼 옮긴다</li><li>원점에서 직선으로 한 번에 긋는다</li><li>원점에서 \(z\) 방향으로 먼저 긋는다</li></ol><div class="ans">"z = 0 기준으로 xy 평면에 projection 후 올려라" — 모든 3D 그림의 기본 동작(다른 순서로 찍어도 같은 점이지만, 그림 채점은 이 습관으로 본다).</div></div>
+<div class="q" data-qid="q5"><div class="qn">확인 5 · 변수와 차원</div><div class="qb">변수 세 개(\(x,y,z\))를 가진 식이라는 사실만으로 그 도형이 곡면이라고 단정할 수 있는가?</div><ol class="choices"><li data-ok="1">없다 — \(x^2+y^2+z^2=0\)은 점 하나다</li><li>있다 — 변수가 셋이면 늘 곡면</li><li>있다 — 변수가 셋이면 늘 곡선</li><li>있다 — 변수가 셋이면 늘 입체</li></ol><div class="ans">R³의 식은 <b>보통</b> 곡면이지만, 변수 개수만으로 도형을 판정할 수는 없다(\(x^2+y^2+z^2=0\)은 점, \(x^2+y^2+z^2\le1\)은 입체).</div></div>
+<div class="q" data-qid="q6"><div class="qn">확인 6 · 변환</div><div class="qb">원주좌표 \\((r,\\theta,z)\\)를 직교좌표로 바꾸는 식을 쓰라.</div><div class="ans">\\(x=r\\cos\\theta\\), \\(y=r\\sin\\theta\\), \\(z=z\\). 거꾸로 \\(r^2=x^2+y^2\\), \\(\\tan\\theta=y/x\\)(\\(x\\ne0\\) 일 때 — 사분면을 확인하고, \\(r=0\\)이면 \\(\\theta\\)는 하나로 정해지지 않는다).</div></div>
 </body></html>'''
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 io.open(OUT, "w", encoding="utf-8", newline="\n").write(html)

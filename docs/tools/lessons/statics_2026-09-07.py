@@ -46,8 +46,8 @@ fig_add = canvas(560, 225,
 fig_unitv = canvas(560, 150,
     step(1, arrow(60, 100, 300, 40, BLUE, "", 3), text(180, 56, "u = |u| e", 15, BLUE, "middle", True)),
     step(2, arrow(60, 100, 120, 85, GREEN, "", 3.4), text(96, 122, "e (크기 1)", 13, GREEN, "middle")),
-    step(3, text(420, 58, "e = u / |u|", 16, INK, "middle", True), text(420, 82, "방향만 남긴다", 13, GRAY, "middle"), text(420, 102, "크기가 1이라 곱해도 크기가 안 바뀐다", 12, GRAY, "middle")),
-    cap="단위벡터: 크기 1, 방향만 지정. 어떤 벡터든 「크기 × 방향」으로 쪼갠다 — 3장에서 케이블 힘을 성분으로 쓸 때의 핵심.", name="unitv")
+    step(3, text(420, 58, "e = u / |u|", 16, INK, "middle", True), text(420, 82, "방향만 남긴다", 13, GRAY, "middle"), text(420, 102, "양수배는 같은 방향, 음수배는 반대 방향", 12, GRAY, "middle")),
+    cap="단위벡터: 크기 1, 방향만 지정. 영벡터가 아닌 벡터는 「크기 × 방향」으로 쪼갠다 — 3장에서 케이블 힘을 성분으로 쓸 때의 핵심.", name="unitv")
 
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>정역학 · 9/7 역학의 정의 · 뉴턴 법칙 · 벡터 시작</title></head><body>
 <header>
@@ -73,7 +73,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>정
 <p>주로 <b>SI 단위</b>를 쓴다(US customary 는 참고만). 힘의 단위 뉴턴은 정의부터 기억한다.</p>
 {fig_unit}
 <div class="formula">\\[1\\ \\mathrm{{N}}=1\\ \\mathrm{{kg\\cdot m/s^2}},\\qquad \\mathrm{{kN}}=10^3\\ \\mathrm N,\\quad \\mathrm{{MN}}=10^6\\ \\mathrm N,\\qquad 2\\pi\\ \\mathrm{{rad}}=360^\\circ\\]</div>
-<div class="why">뉴턴 2법칙 \\(F=ma\\)에서 나온 단위다. 그래서 힘 문제의 답이 kg·m/s² 로 떨어지면 맞게 계산한 것 — 단위 검산에 쓴다.</div>
+<div class="why">뉴턴 2법칙 \\(F=ma\\)에서 나온 단위다. 그래서 힘 문제의 답이 kg·m/s² 로 떨어지면 힘의 차원은 맞은 것 — 단위 검산에 쓴다(수치·부호·계산은 따로 검산).</div>
 <div class="analogy">사과 하나(약 100 g)를 손에 올렸을 때 느끼는 무게가 대략 1 N. "kN" 이 나오면 사과 천 개, 자동차 한 대 무게가 10 kN 남짓.</div>
 <div class="memo"><b>외울 것</b> \\(1\\ \\mathrm N=1\\ \\mathrm{{kg\\,m/s^2}}\\) · 속도 = 위치의 변화율, 가속도 = 속도의 변화율 · 각도는 rad</div>
 </section>
@@ -82,7 +82,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>정
 <h2>3. 뉴턴의 법칙 — 정역학은 항상 ΣF = 0</h2>
 <table><tr><th></th><th>내용</th><th>정역학에서의 뜻</th></tr>
 <tr><td><b>1법칙</b></td><td>\\(\\sum\\mathbf F=0\\)이면 속도가 일정</td><td>정지해 있으면 계속 정지. <b>정역학은 항상 \\(\\sum\\mathbf F=0\\)</b></td></tr>
-<tr><td><b>2법칙</b></td><td>\\(\\sum\\mathbf F=d\\mathbf p/dt\\) (선운동량의 변화율)</td><td>합력이 0이라 안 쓴다 — 동역학 개념</td></tr>
+<tr><td><b>2법칙</b></td><td>\\(\\sum\\mathbf F=d\\mathbf p/dt\\) (선운동량의 변화율)</td><td>정역학은 여기에 가속도 0 을 넣어 쓴다(ΣF = 0)</td></tr>
 <tr><td><b>3법칙</b></td><td>\\(\\mathbf F_{{A\\to B}}=-\\mathbf F_{{B\\to A}}\\), 크기 같고 방향 반대</td><td>자유물체도(3장)의 근거</td></tr></table>
 <div class="say">"we study statics right so <b>always the summation of forces will be zero</b>"</div>
 <h3>왜 「입자(particle)」라고 하는가 — 교수님이 질문으로 짚은 포인트</h3>
@@ -117,8 +117,8 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>정
 <section class="s" data-id="s6">
 <h2>6. 단위벡터 — 크기 1, 방향만 남긴다 ★</h2>
 {fig_unitv}
-<div class="formula">\\[\\mathbf e=\\frac{{\\mathbf u}}{{|\\mathbf u|}},\\quad |\\mathbf e|=1,\\qquad \\mathbf u=|\\mathbf u|\\,\\mathbf e\\ (\\text{{크기}}\\times\\text{{방향}})\\]</div>
-<div class="why">쓰는 이유는 하나 — <b>방향만 지정</b>하려고. 크기가 1이라 어떤 수를 곱해도 방향은 그대로고 크기만 그 수가 된다. "케이블이 A에서 B 방향으로 500 N을 당긴다"를 식으로 쓰려면 \\(500\\,\\mathbf e_{{AB}}\\)가 필요하다.</div>
+<div class="formula">\\[\\mathbf e=\\frac{{\\mathbf u}}{{|\\mathbf u|}}\\ (\\mathbf u\\ne\\mathbf 0),\\quad |\\mathbf e|=1,\\qquad \\mathbf u=|\\mathbf u|\\,\\mathbf e\\ (\\text{{크기}}\\times\\text{{방향}})\\]</div>
+<div class="why">쓰는 이유는 하나 — <b>방향만 지정</b>하려고. 크기가 1이라 양수를 곱하면 방향은 그대로고 크기만 그 수가 된다(음수배는 반대 방향, 크기는 절댓값). "케이블이 A에서 B 방향으로 500 N을 당긴다"를 식으로 쓰려면 \\(500\\,\\mathbf e_{{AB}}\\)가 필요하다.</div>
 <div class="say">"안 쓸 것 같지만 생각보다 많이 쓰이고 <b>고체역학 가서도 많이 쓰기 때문에</b> 한 번씩 (봐 두세요)"</div>
 <div class="analogy">나침반 바늘은 길이가 아니라 방향만 알려 준다. 단위벡터는 그 바늘 — "얼마나 세게"(크기)는 따로 곱한다.</div>
 <div class="memo"><b>외울 것</b> \\(\\mathbf e=\\mathbf u/|\\mathbf u|\\) · \\(\\mathbf u=|\\mathbf u|\\mathbf e\\) · 다음 시간: 성분 \\(\\mathbf i,\\mathbf j,\\mathbf k\\)와 방향여현</div>
@@ -126,11 +126,11 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>정
 </section>
 
 <div class="q" data-qid="q1"><div class="qn">확인 1 · 정역학의 정의</div><div class="qb">정역학(Statics)이 다루는 것은?</div><ol class="choices"><li data-ok="1">평형(정지) 상태에 있는 물체와 그에 작용하는 힘</li><li>운동하는 물체의 가속도</li><li>기계(machine)의 설계</li><li>물체의 온도 변화</li></ol><div class="ans">Statics = study of objects in "equilibrium". 운동은 Dynamics.</div></div>
-<div class="q" data-qid="q2"><div class="qn">확인 2 · 뉴턴 법칙</div><div class="qb">정역학에서 <b>항상</b> 성립하는 식은?</div><ol class="choices"><li data-ok="1">\\(\\sum\\mathbf F=0\\)</li><li>\\(\\sum\\mathbf F=d\\mathbf p/dt\\ne0\\)</li><li>\\(\\sum\\mathbf F=m\\mathbf a,\\ \\mathbf a\\ne0\\)</li><li>\\(\\mathbf F_{{A\\to B}}=\\mathbf F_{{B\\to A}}\\)</li></ol><div class="ans">정지(평형)이므로 합력 0. 3법칙은 부호가 반대(\\(-\\)). 2법칙은 동역학.</div></div>
+<div class="q" data-qid="q2"><div class="qn">확인 2 · 뉴턴 법칙</div><div class="qb">정역학에서 <b>항상</b> 성립하는 식은?</div><ol class="choices"><li data-ok="1">\\(\\sum\\mathbf F=0\\)</li><li>\\(\\sum\\mathbf F=d\\mathbf p/dt\\ne0\\)</li><li>\\(\\sum\\mathbf F=m\\mathbf a,\\ \\mathbf a\\ne0\\)</li><li>\\(\\mathbf F_{{A\\to B}}=\\mathbf F_{{B\\to A}}\\)</li></ol><div class="ans">정지(평형)이므로 합력 0. 3법칙은 부호가 반대(\\(-\\)). 2법칙은 정역학에도 가속도 0 으로 적용한다(그래서 합력 0).</div></div>
 <div class="q" data-qid="q3"><div class="qn">확인 3 · 단위</div><div class="qb">1 N의 정의는?</div><ol class="choices"><li data-ok="1">1 kg 물체에 \\(1\\ \\mathrm{{m/s^2}}\\)의 가속도를 만드는 힘</li><li>1 kg 물체의 무게</li><li>1 g 물체에 \\(1\\ \\mathrm{{m/s^2}}\\)의 가속도를 만드는 힘</li><li>1 m를 1 s에 가는 속도</li></ol><div class="ans">\\(1\\ \\mathrm N=1\\ \\mathrm{{kg\\,m/s^2}}\\). 1 kg의 무게는 9.81 N.</div></div>
 <div class="q" data-qid="q4"><div class="qn">확인 4 · 왜 입자인가</div><div class="qb">1장에서 물체를 「입자」로 보는 이유는?</div><ol class="choices"><li data-ok="1">크기가 있으면 힘의 작용선 위치에 따라 회전(모멘트)이 생기는데, 이를 일단 배제하려고</li><li>모든 물체는 실제로 크기가 없기 때문</li><li>입자는 힘을 받지 않기 때문</li><li>질량을 무시하기 위해</li></ol><div class="ans">"부피가 있으면 힘의 작용선이 달라져 회전 — 모멘트가 생기기 때문". 모멘트는 4장.</div></div>
 <div class="q" data-qid="q5"><div class="qn">확인 5 · 위치벡터</div><div class="qb">\\(\\mathbf r_{{AB}}\\)는?</div><ol class="choices"><li data-ok="1">점 A에서 점 B로 향하는 벡터</li><li>점 B에서 점 A로 향하는 벡터</li><li>A와 B 사이의 거리(스칼라)</li><li>A와 B의 중점</li></ol><div class="ans">앞 첨자 = 시작, 뒤 첨자 = 끝. \\(\\mathbf r_{{BA}}=-\\mathbf r_{{AB}}\\).</div></div>
-<div class="q" data-qid="q6"><div class="qn">확인 6 · 단위벡터</div><div class="qb">단위벡터 \\(\\mathbf e\\)의 정의와, 벡터 \\(\\mathbf u\\)를 단위벡터로 나타내는 식, 그리고 단위벡터를 쓰는 이유를 한 줄로 쓰라.</div><div class="ans">\\(\\mathbf e=\\mathbf u/|\\mathbf u|\\), 크기 1. \\(\\mathbf u=|\\mathbf u|\\,\\mathbf e\\)(크기 × 방향). 이유: <b>방향만</b> 지정하기 위해 — 크기가 1이라 곱해도 크기가 안 바뀐다.</div></div>
+<div class="q" data-qid="q6"><div class="qn">확인 6 · 단위벡터</div><div class="qb">단위벡터 \\(\\mathbf e\\)의 정의와, 벡터 \\(\\mathbf u\\)를 단위벡터로 나타내는 식, 그리고 단위벡터를 쓰는 이유를 한 줄로 쓰라.</div><div class="ans">\\(\\mathbf e=\\mathbf u/|\\mathbf u|\\), 크기 1. \\(\\mathbf u=|\\mathbf u|\\,\\mathbf e\\)(크기 × 방향). 이유: <b>방향만</b> 지정하기 위해 — 크기가 1이라 양수배는 같은 방향·그 크기, 음수배는 반대 방향(영벡터는 제외).</div></div>
 </body></html>'''
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 io.open(OUT, "w", encoding="utf-8", newline="\n").write(html)

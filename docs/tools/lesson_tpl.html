@@ -42,12 +42,18 @@ section.s p{margin:0 0 10px}
 section.s.read::after{content:"읽음";position:absolute;right:16px;top:14px;font-size:12px;color:var(--accent);font-weight:700;border:1px solid rgba(21,128,61,.35);border-radius:999px;padding:1px 9px;background:rgba(21,128,61,.06)}
 /* 상자들 */
 .why,.say,.analogy,.formula,.pitfall,.memo{margin:12px 0;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:var(--paper-2);font-size:17px}
-.why{border-left:5px solid var(--blue)}.why::before{content:"왜 그런가";display:block;font-size:12.5px;font-weight:700;color:var(--blue);margin-bottom:4px}
-.say{border-left:5px solid var(--pink);background:rgba(255,77,141,.06)}.say::before{content:"교수님 말";display:block;font-size:12.5px;font-weight:700;color:var(--pink);margin-bottom:4px}
-.analogy{border-left:5px solid var(--yel);background:rgba(245,159,0,.07)}.analogy::before{content:"비유";display:block;font-size:12.5px;font-weight:700;color:#B26A00;margin-bottom:4px}
-.formula{border-left:5px solid var(--green);background:rgba(47,158,68,.06)}.formula::before{content:"외울 것";display:block;font-size:12.5px;font-weight:700;color:var(--green);margin-bottom:4px}
-.pitfall{border-left:5px solid var(--red);background:rgba(224,49,49,.05)}.pitfall::before{content:"함정";display:block;font-size:12.5px;font-weight:700;color:var(--red);margin-bottom:4px}
+/* 암기·이해 구분(대표님 2026-09-29): 상자 머리말 = 알약. 암기(주황) = 공식·외울 것, 이해(파랑) = 왜·비유 */
+.why::before,.analogy::before,.formula::before,.pitfall::before,.say::before,.memo.am::before{display:table;font-size:12px;font-weight:800;line-height:1;padding:5px 10px;border-radius:999px;margin:0 0 8px;color:#fff;letter-spacing:.02em}
+.why{border-left:5px solid var(--blue)}.why::before{content:"이해 · 왜";background:#1D4ED8}
+.say{border-left:5px solid var(--pink);background:rgba(255,77,141,.06)}.say::before{content:"교수님 말";background:#A61E4D}
+.analogy{border-left:5px solid var(--yel);background:rgba(245,159,0,.07)}.analogy{border-left-color:var(--blue)}.analogy::before{content:"이해 · 비유";background:#1D4ED8}
+.formula{border-left:5px solid var(--green);background:rgba(47,158,68,.06)}.formula{border-left-color:#D97706;background:rgba(217,119,6,.06)}.formula::before{content:"암기 · 공식";background:#B45309}
+.pitfall{border-left:5px solid var(--red);background:rgba(224,49,49,.05)}.pitfall::before{content:"함정";background:#C92A2A}
 .memo{border-left:5px solid var(--ink-3)}
+.memo.am{border-left-color:#D97706;background:rgba(217,119,6,.06)}.memo.am::before{content:"암기";background:#B45309}
+/* 인라인 식은 줄에서 끊지 않는다(대표님 2026-09-29 「수식 한 줄로」) — 넘치면 fitInline 이 줄인다 */
+.katex{white-space:nowrap}
+#top a.memo-l{color:var(--ink);font-weight:700;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:rgba(255,255,255,.6);min-height:32px;display:inline-flex;align-items:center}
 .katex-display{margin:10px 0;overflow-x:auto;overflow-y:hidden}
 /* 그림 */
 figure.fig{margin:14px auto;text-align:center;max-width:560px}
@@ -100,7 +106,7 @@ details.ex .body p{margin:8px 0}
   section.s,.q,#result,header.h .lead{border-color:rgba(255,255,255,.1);box-shadow:0 12px 34px rgba(0,0,0,.35)}
   .choice{background:rgba(255,255,255,.06)}.q .ans{background:rgba(255,255,255,.06)}.q .myans{background:rgba(255,255,255,.06)}
   .btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}.btn.a{color:#052E16}
-  .say{background:rgba(255,77,141,.10)}.analogy{background:rgba(245,159,0,.10)}.formula{background:rgba(47,158,68,.10)}.pitfall{background:rgba(224,49,49,.10)}
+  .say{background:rgba(255,77,141,.10)}.analogy{background:rgba(59,130,246,.10)}.formula{background:rgba(217,119,6,.12)}.memo.am{background:rgba(217,119,6,.12)}.pitfall{background:rgba(224,49,49,.10)}#top a.memo-l{background:rgba(255,255,255,.08)}
   figure.fig svg{filter:invert(1) hue-rotate(180deg) saturate(1.2)}
 }
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#top{background:#FFFFFF}section.s,.q,#result{background:#FFFFFF}}
@@ -110,17 +116,19 @@ details.ex .body p{margin:8px 0}
 </style>
 </head>
 <body>
-<div id="top"><div class="in"><b id="tCourse">__COURSE__</b><span id="tSess">__SESS__</span><span class="sp"></span><span id="tRead">읽음 0/0</span><span class="pct" id="tPct">0%</span></div><div id="bar"><i id="barI"></i></div></div>
+<div id="top"><div class="in"><b id="tCourse">__COURSE__</b><span id="tSess">__SESS__</span><span class="sp"></span><span id="tRead">읽음 0/0</span><span class="pct" id="tPct">0%</span><a class="memo-l" href="__MEMO__">암기노트</a></div><div id="bar"><i id="barI"></i></div></div>
 <main>
 <header class="h"><div class="kicker">__KICKER__</div><h1>__TITLE__</h1><div class="meta">__META__</div>__LEAD__</header>
 __BODY__
-<section id="quiz"><h2>확인 문제</h2><div class="hint">보기를 누르면 바로 채점됩니다. 답을 쓰는 문제는 「답 보기」 뒤에 맞음/틀림을 스스로 표시합니다.</div><div id="qlist"></div><div id="result"></div></section>
+<section id="quiz"><h2>확인 문제</h2><div id="qlist"></div><div id="result"></div></section>
 <div id="done"></div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script>__JUDGE__</script>
+<script>__SPLITTEX__</script>
 <script>
-const LESSON_ID="__ID__", QUIZ=__QUIZ__, N_SEC=document.querySelectorAll("section.s[data-id]").length;
+const LESSON_ID="__ID__", QUIZ=__QUIZ__, NDS=__NODES__, N_SEC=document.querySelectorAll("section.s[data-id]").length;
 const KEY="mc-lesson-"+LESSON_ID;
 let ST={read:{},done:{},correct:{},answer:{},ts:0};
 try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}
@@ -129,7 +137,14 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 function save(){ ST.ts=Date.now(); try{ localStorage.setItem(KEY,JSON.stringify(ST)); const qs=QUIZ.length, qd=QUIZ.filter(q=>ST.done[q.id]).length, rd=Object.keys(ST.read).length;
   const li={deck:LESSON_ID,title:document.title,href:location.href.split("#")[0],idx:Math.max(0,rd-1),n:N_SEC,sid:curSec||"",part:null,partTitle:document.title.slice(0,60),where:(rd>=N_SEC?"확인 문제":"읽는 중 · "+(curTitle||"")),qDone:qd,qN:qs,ts:Date.now()};
   const j=JSON.stringify(li); localStorage.setItem("mc-slides-last",j); localStorage.setItem("mc-slides-last-"+LESSON_ID,j); }catch(e){} }
-function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} }
+/* 스앵님 판정 기록(대표님 2026-09-29) — 섹션 읽음 · 문제 채점 → 개념 노드(knowledge/lesson_nodes.json) */
+function ev(k,x){ try{ if(!window.TJ) return; const o=Object.assign({k:k,lid:LESSON_ID},x||{}); if(o.n&&o.n.length) TJ.rec(o); }catch(e){} }
+/* 객관식 보기는 빌드 때 섞인다(quizmix) — 고른 보기를 원문 순서 k 로 저장 */
+const ck=(c,i)=>String(c&&c.k!=null?c.k:i);
+/* 인라인 식이 줄보다 길면 글자를 줄여 한 줄에(14px 까지) */
+function fitInline(root){ $$(".katex",root).forEach(k=>{ if(k.closest(".katex-display")) return; k.style.fontSize=""; const box=k.parentElement&&k.parentElement.closest("p,li,div,summary,button,td"); if(!box) return; const cw=box.clientWidth, w=k.getBoundingClientRect().width; if(!(cw>0&&w>cw-2)) return; const fs=parseFloat(getComputedStyle(k).fontSize)||17; k.style.fontSize=Math.max(14,Math.floor(fs*(cw-6)/w))+"px"; }); }
+window.addEventListener("resize",()=>fitInline(document.querySelector("main")),{passive:true});
+function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} fitInline(el); }
 /* ---- 읽음: 섹션이 화면의 절반 이상 1.2초 보이면 읽음 ---- */
 let curSec=null, curTitle="";
 function renderTop(){ const rd=Object.keys(ST.read).filter(k=>ST.read[k]).length, qd=QUIZ.filter(q=>ST.done[q.id]).length, tot=N_SEC+QUIZ.length;
@@ -137,30 +152,30 @@ function renderTop(){ const rd=Object.keys(ST.read).filter(k=>ST.read[k]).length
   $$("section.s[data-id]").forEach(s=>s.classList.toggle("read",!!ST.read[s.dataset.id]));
   /* 따라감 기준은 앱(V52)과 같다: 섹션 전부 + 문제 90% 풀고 60% 정답 */
   const okN=QUIZ.filter(q=>ST.correct[q.id]===true).length, need=Math.ceil(QUIZ.length*.6);
-  $("#done").textContent= rd>=N_SEC&&qd>=QUIZ.length&&QUIZ.length? (okN>=need? "이 회차 끝 — 정답 "+okN+"/"+QUIZ.length+". 앱의 「수업 따라가기」에서 따라감으로 표시됩니다." : "다 풀었지만 정답 "+okN+"/"+QUIZ.length+" — 틀린 문제를 다시 풀어 "+need+"개 이상 맞히면 따라감으로 표시됩니다.") : ""; }
+  $("#done").textContent= rd>=N_SEC&&qd>=QUIZ.length&&QUIZ.length? (okN>=need? "완료 · 정답 "+okN+"/"+QUIZ.length : "정답 "+okN+"/"+QUIZ.length+" · "+need+"개 이상이면 완료") : ""; }
 const timers={};
 const io=new IntersectionObserver(es=>{ es.forEach(e=>{ const id=e.target.dataset.id; if(e.isIntersecting){ curSec=id; curTitle=(e.target.querySelector("h2")||{}).textContent||""; postCtx(e.target);
-    if(!ST.read[id]&&!timers[id]) timers[id]=setTimeout(()=>{ ST.read[id]=true; save(); renderTop(); },1200); } else { if(timers[id]){ clearTimeout(timers[id]); delete timers[id]; } } }); },{threshold:.5});
+    if(!ST.read[id]&&!timers[id]) timers[id]=setTimeout(()=>{ ST.read[id]=true; save(); renderTop(); ev("read",{sid:id,n:(NDS.sec||{})[id]||[],clean:true}); },1200); } else { if(timers[id]){ clearTimeout(timers[id]); delete timers[id]; } } }); },{threshold:.5});
 $$("section.s[data-id]").forEach(s=>io.observe(s));
 /* 짧은 섹션(화면보다 작아 50%가 금방 차는) 은 그대로, 긴 섹션은 끝까지 스크롤하면 읽음 */
-window.addEventListener("scroll",()=>{ $$("section.s[data-id]").forEach(s=>{ if(ST.read[s.dataset.id]) return; const r=s.getBoundingClientRect(); if(r.bottom<window.innerHeight*.6&&r.bottom>-2000){ ST.read[s.dataset.id]=true; save(); renderTop(); } }); },{passive:true});
+window.addEventListener("scroll",()=>{ $$("section.s[data-id]").forEach(s=>{ if(ST.read[s.dataset.id]) return; const r=s.getBoundingClientRect(); if(r.bottom<window.innerHeight*.6&&r.bottom>-2000){ ST.read[s.dataset.id]=true; save(); renderTop(); ev("read",{sid:s.dataset.id,n:(NDS.sec||{})[s.dataset.id]||[],clean:true}); } }); },{passive:true});
 /* ---- 판서 사진: atom 안에서만 (없으면 숨김) ---- */
 $$("figure.board img").forEach(img=>{ img.addEventListener("error",()=>{ img.closest("figure").hidden=true; }); });
 /* ---- 문제 카드 ---- */
 function qHTML(q,i){ const mc=Array.isArray(q.choices)&&q.choices.length, rev=!!ST.done[q.id], my=ST.answer[q.id];
   let inner='<div class="qn">'+esc(q.qn||("문제 "+(i+1)))+'</div><div class="qb">'+q.html+'</div>';
-  if(mc){ inner+='<ol class="choices">'+q.choices.map((c,ci)=>{ const sel=String(my)===String(ci); const cls=rev?(c.ok?" ok":(sel?" bad":"")):""; return '<li><button class="choice'+cls+'" data-ci="'+ci+'"'+(rev?" disabled":"")+'><span class="cn">'+(ci+1)+'</span><span>'+c.html+'</span></button></li>'; }).join("")+'</ol>'; }
+  if(mc){ inner+='<ol class="choices">'+q.choices.map((c,ci)=>{ const sel=my!=null&&String(my)===ck(c,ci); const cls=rev?(c.ok?" ok":(sel?" bad":"")):""; return '<li><button class="choice'+cls+'" data-ci="'+ci+'"'+(rev?" disabled":"")+'><span class="cn">'+(ci+1)+'</span><span>'+c.html+'</span></button></li>'; }).join("")+'</ol>'; }
   else { inner+= rev? '<div class="memo"><b>내 답</b> '+esc(my||"")+'</div>' : '<textarea class="myans" placeholder="답만 간단히">'+esc(my||"")+'</textarea><div class="row"><button class="btn a" data-reveal>답 보기</button></div>'; }
   if(rev){ const c=ST.correct[q.id]; inner+='<span class="verdict '+(c===true?"ok":c===false?"bad":"")+'">'+(c===true?"정답":c===false?"오답":"채점 전")+'</span>';
     if(!mc&&c==null) inner+='<div class="row"><button class="btn" data-grade="1">맞았어요</button><button class="btn" data-grade="0">틀렸어요</button></div>';
     inner+='<div class="row"><button class="btn xs" data-retry>다시 풀기</button></div>'; }
-  inner+='<div class="ans"><b>답 · 풀이</b><div>'+(q.ans||"")+'</div></div>';
+  inner+='<div class="ans"><b>답 · 풀이</b><div>'+splitDisplays(q.ans||"",innerWidth<700)+'</div></div>';
   return '<div class="q'+(rev?" rev":"")+'" data-q="'+q.id+'">'+inner+'</div>'; }
 function bindQ(){ const box=$("#qlist"); box.innerHTML=QUIZ.map(qHTML).join(""); typeset(box);
   $$("#qlist .q").forEach(el=>{ const q=QUIZ.find(x=>x.id===el.dataset.q);
-    $$(".choice",el).forEach(b=>{ b.onclick=()=>{ if(ST.done[q.id]) return; const ci=+b.dataset.ci; ST.answer[q.id]=ci; ST.done[q.id]=true; ST.correct[q.id]=!!(q.choices[ci]&&q.choices[ci].ok); save(); bindQ(); renderTop(); }; });
+    $$(".choice",el).forEach(b=>{ b.onclick=()=>{ if(ST.done[q.id]) return; const ci=+b.dataset.ci, c=q.choices[ci]; ST.answer[q.id]=(c&&c.k!=null)?c.k:ci; ST.done[q.id]=true; ST.correct[q.id]=!!(c&&c.ok); save(); bindQ(); renderTop(); ev("quiz",{qid:q.id,ok:ST.correct[q.id],n:(NDS.q||{})[q.id]||[]}); }; });
     const rv=el.querySelector("[data-reveal]"); if(rv) rv.onclick=()=>{ const ta=el.querySelector(".myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); bindQ(); renderTop(); };
-    $$("[data-grade]",el).forEach(b=>{ b.onclick=()=>{ ST.correct[q.id]=b.dataset.grade==="1"; save(); bindQ(); renderTop(); }; });
+    $$("[data-grade]",el).forEach(b=>{ b.onclick=()=>{ ST.correct[q.id]=b.dataset.grade==="1"; save(); bindQ(); renderTop(); ev("quiz",{qid:q.id,ok:ST.correct[q.id],n:(NDS.q||{})[q.id]||[]}); }; });
     const rt=el.querySelector("[data-retry]"); if(rt) rt.onclick=()=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; save(); bindQ(); renderTop(); };
   });
   const done=QUIZ.filter(q=>ST.done[q.id]).length, ok=QUIZ.filter(q=>ST.correct[q.id]===true).length, wrong=QUIZ.filter(q=>ST.correct[q.id]===false);
@@ -174,7 +189,10 @@ function postCtx(sec){ try{ if(!CTX_GEN||window.parent===window) return; const s
   window.parent.postMessage({type:"mc-slide",v:1,gen:CTX_GEN,deck:LESSON_ID,title:document.title.slice(0,80),sid:s.dataset.id,stype:"concept",part:null,partTitle:document.title.slice(0,60),label:"읽는 중 · "+t.slice(0,60),q:{qn:t.slice(0,80),kind:"개념",text:txt,choices:[],my:null,revealed:true,correct:null,answer:null}},location.origin); }catch(e){} }
 window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; postCtx(); } });
 /* ---- 시작 ---- */
-function boot(){ typeset(document.querySelector("main")); bindQ(); renderTop(); save();
+/* 넘치는 식 줄은 글자를 줄여 한 줄에(14px 까지) — 그래도 넘치면 식 칸 안에서 민다 */
+function fitDisplay(root){ $$(".katex-display",root).forEach(k=>{ k.style.fontSize=""; const cw=k.clientWidth, sw=k.scrollWidth; if(!(cw>0&&sw>cw+1)) return; const kx=k.querySelector(".katex"), fz=parseFloat(getComputedStyle(kx||k).fontSize)||20, lo=Math.min(1,Math.max(.6,14/fz)); k.style.fontSize=Math.max(lo,Math.floor(cw/sw*100)/100)+"em"; }); }
+window.addEventListener("resize",()=>fitDisplay(document.querySelector("main")),{passive:true});
+function boot(){ $$("section.s").forEach(s=>{ const h=s.innerHTML, n=splitDisplays(h,innerWidth<700); if(n!==h) s.innerHTML=n; }); typeset(document.querySelector("main")); fitDisplay(document.querySelector("main")); try{ document.fonts.ready.then(()=>fitDisplay(document.querySelector("main"))); }catch(e){} bindQ(); renderTop(); save();
   const m=/^#s=([\w-]+)$/.exec(location.hash||""); if(m){ const el=document.querySelector('section.s[data-id="'+m[1]+'"]'); if(el) el.scrollIntoView(); }
   else if(location.hash==="#resume"){ const ids=$$("section.s[data-id]").map(s=>s.dataset.id); const next=ids.find(id=>!ST.read[id]); if(next){ const el=document.querySelector('section.s[data-id="'+next+'"]'); if(el) el.scrollIntoView(); } else if(QUIZ.length){ $("#quiz").scrollIntoView(); } } }
 (function wait(){ if(window.renderMathInElement) boot(); else setTimeout(wait,40); })();

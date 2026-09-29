@@ -129,7 +129,7 @@
     var items=V50.items(), todo=items.reduce(function(a,it){ return a+it.todo.length; },0), tdN=items.reduce(function(a,it){ return a+it.todayL.length; },0), wait=items.reduce(function(a,it){ return a+it.wait; },0);
     if(hs) hs.textContent=(todo?"밀림 "+todo:"")+(tdN?(todo?" · ":"")+"오늘 "+tdN:"");
     var top=(V50.err?'<div class="v49-err">회차 목록(knowledge/sessions.json)을 못 읽었습니다: '+esc(V50.err)+' — 앱 기록만으로 표시합니다.</div>':'')+
-      '<div class="v50-top">'+(todo?'<b>밀린 회차 '+todo+'개</b> — 가장 오래된 것부터 「따라가기」':'<b>밀린 회차 없음</b>')+(tdN?' · <b>오늘 수업 '+tdN+'회차</b>':'')+(wait?' · 정리 대기 '+wait+'회차(자료가 오면 아톰이 정리)':'')+'</div>';
+      '<div class="v50-top">'+(todo?'<b>밀린 회차 '+todo+'개</b>':'<b>밀린 회차 없음</b>')+(tdN?' · <b>오늘 수업 '+tdN+'회차</b>':'')+(wait?' · 정리 대기 '+wait+'회차':'')+'</div>';
     body.innerHTML=top+(items.length?items.map(V50.rowHTML).join(""):'<div class="v44-mut" style="padding:12px">과목이 없습니다.</div>');
     V50.bind(body);
   };

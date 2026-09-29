@@ -37,7 +37,7 @@ fig_cross = canvas(560, 230,
     step(1, path("M50 195 L 270 195 L 330 135 L 110 135 Z", GRAY, 1.5, "rgba(138,151,166,.12)", "4 3"),
         arrow(110, 178, 250, 178, BLUE, "", 3), text(180, 214, "a⃗", 15, BLUE, "middle", True), arrow(110, 178, 190, 142, RED, "", 3), text(150, 150, "b⃗", 15, RED, "middle", True)),
     step(2, arrow(110, 178, 110, 40, GREEN, "", 3.4), text(124, 46, "c⃗ = a⃗ × b⃗  ⊥ a⃗, ⊥ b⃗", 14, GREEN, "start", True)),
-    step(3, text(440, 60, "[Def 01] 외적 (cross / outer product)", 13, INK, "middle", True),
+    step(3, text(440, 60, "[Def 01] 외적 (cross product)", 13, INK, "middle", True),
         text(440, 88, "a⃗ × b⃗ = (a₂b₃ − a₃b₂,  a₃b₁ − a₁b₃,  a₁b₂ − a₂b₁)", 10.5, INK, "middle"),
         mat(340, 104, [["a_2", "a_3"], ["b_2", "b_3"]], 30, 24, bars=True), mat(410, 104, [["a_3", "a_1"], ["b_3", "b_1"]], 30, 24, bars=True), mat(480, 104, [["a_1", "a_2"], ["b_1", "b_2"]], 30, 24, bars=True)),
     step(4, text(440, 176, "결과는 벡터 — 내적(스칼라)과 다르다", 11.5, RED, "middle"), text(440, 196, "자기 번호 뺀 두 번호 = 순환 (2,3)(3,1)(1,2)", 11, GRAY, "middle")),
@@ -63,7 +63,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미
 <h2>1. Thm 01 증명 — 코사인 제2법칙에서 a·b = |a||b|cos θ (지각 구간 보충)</h2>
 {fig_cos}
 <div class="formula">\\[|\\vec a-\\vec b|^2=|\\vec a|^2+|\\vec b|^2-2|\\vec a||\\vec b|\\cos\\theta\\quad\\text{{와}}\\quad |\\vec a-\\vec b|^2=(\\vec a-\\vec b)\\cdot(\\vec a-\\vec b)=|\\vec a|^2-2\\,\\vec a\\cdot\\vec b+|\\vec b|^2\\ \\Rightarrow\\ \\vec a\\cdot\\vec b=|\\vec a||\\vec b|\\cos\\theta\\]</div>
-<div class="why">9/17 마지막에 세운 삼각형 OAB(\\(\\overrightarrow{{BA}}=\\vec a-\\vec b\\)). 한 각 \\(\\theta\\)와 세 변을 아는 삼각형 = <b>코사인 제2법칙</b>. 같은 변 \\(|\\vec a-\\vec b|^2\\)을 내적의 분배법칙으로도 전개하면 \\(|\\vec a|^2,|\\vec b|^2\\)이 지워지고 \\(\\vec a\\cdot\\vec b\\)만 남는다. 이 부분은 판서에 없어(9:45 이전) 교재 증명 — 녹음이 오면 교수님 순서로 고친다.</div>
+<div class="why">9/17 마지막에 세운 삼각형 OAB(\\(\\overrightarrow{{BA}}=\\vec a-\\vec b\\)). (\\(\\vec a,\\vec b\\ne\\vec0\\)) 한 각 \\(\\theta\\)와 세 변을 아는 삼각형 = <b>코사인 제2법칙</b>. 같은 변 \\(|\\vec a-\\vec b|^2\\)을 내적의 분배법칙으로도 전개하면 \\(|\\vec a|^2,|\\vec b|^2\\)이 지워지고 \\(\\vec a\\cdot\\vec b\\)만 남는다. 이 부분은 판서에 없어(9:45 이전) 교재 증명 — 녹음이 오면 교수님 순서로 고친다.</div>
 <div class="analogy">같은 물건을 두 저울(기하: 코사인법칙, 대수: 성분 전개)로 재서 눈금을 맞추면 미지의 항(내적)이 정해진다.</div>
 <div class="memo"><b>외울 것</b> \\(\\vec a\\cdot\\vec b=|\\vec a||\\vec b|\\cos\\theta\\) · \\(\\cos\\theta=\\vec a\\cdot\\vec b/(|\\vec a||\\vec b|)\\) · 증명 = 코사인법칙 + 분배 전개</div>
 </section>
@@ -72,8 +72,8 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미
 <h2>2. 방향각과 방향코사인 (판서 ①②) ★</h2>
 {fig_dir}
 <div class="formula">\\[\\cos\\alpha=\\frac{{\\vec a\\cdot\\vec i}}{{|\\vec a||\\vec i|}}=\\frac{{a_1}}{{|\\vec a|}},\\quad \\cos\\beta=\\frac{{a_2}}{{|\\vec a|}},\\quad \\cos\\gamma=\\frac{{a_3}}{{|\\vec a|}}\\qquad \\text{{ㄱ }}\\cos^2\\alpha+\\cos^2\\beta+\\cos^2\\gamma=1\\qquad \\text{{ㄴ }}\\vec u=\\frac{{\\vec a}}{{|\\vec a|}}=(\\cos\\alpha,\\cos\\beta,\\cos\\gamma)\\]</div>
-<div class="why">방향각 = 벡터가 \\(x,y,z\\)축과 이루는 각. 사이각 공식에 \\(\\vec b=\\vec i,\\vec j,\\vec k\\)를 넣으면 분모의 \\(|\\vec i|=1\\)이 지워져(판서에서 1로 그어 지움) <b>성분/크기</b>만 남는다. ㄴ: \\(\\vec a\\)와 같은 방향의 단위벡터(9/17 ★⑤)의 성분이 곧 방향코사인, ㄱ: 그 단위벡터의 크기가 1이라는 뜻. 정역학 9/9 방향여현 \\(\\cos^2\\theta_x+\\cos^2\\theta_y+\\cos^2\\theta_z=1\\)과 같은 식.</div>
-<div class="analogy">손전등을 세 방향에서 비춘 그림자 길이 ÷ 막대 길이 = 방향코사인. 세 그림자의 제곱합이 막대 길이의 제곱이라 코사인 제곱합이 1.</div>
+<div class="why">방향각 = 영벡터가 아닌 벡터가 양의 \\(x,y,z\\)축과 이루는 각(0~π). 사이각 공식에 \\(\\vec b=\\vec i,\\vec j,\\vec k\\)를 넣으면 분모의 \\(|\\vec i|=1\\)이 지워져(판서에서 1로 그어 지움) <b>성분/크기</b>만 남는다. ㄴ: \\(\\vec a\\)와 같은 방향의 단위벡터(9/17 ★⑤)의 성분이 곧 방향코사인, ㄱ: 그 단위벡터의 크기가 1이라는 뜻. 정역학 9/9 방향여현 \\(\\cos^2\\theta_x+\\cos^2\\theta_y+\\cos^2\\theta_z=1\\)과 같은 식.</div>
+<div class="analogy">막대를 각 양의 축 방향으로 정사영한 부호 있는 길이 ÷ 막대 길이 = 방향코사인(반대 방향이면 음수). 세 정사영의 제곱합이 막대 길이의 제곱이라 코사인 제곱합이 1.</div>
 <div class="memo"><b>외울 것</b> \\(\\cos\\alpha=a_1/|\\vec a|\\) 등 · ㄱ 제곱합 = 1 · ㄴ 단위벡터 = (cos α, cos β, cos γ)</div>
 </section>
 
@@ -91,7 +91,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미
 <h2>4. 12.4 외적(Cross Product) — 정의는 2×2 행렬식 셋 (판서 ④) ★</h2>
 {fig_cross}
 <div class="formula">\\[\\vec a\\times\\vec b=\\langle a_2b_3-a_3b_2,\\ a_3b_1-a_1b_3,\\ a_1b_2-a_2b_1\\rangle=\\Big(\\begin{{vmatrix}}a_2&a_3\\\\b_2&b_3\\end{{vmatrix}},\\ \\begin{{vmatrix}}a_3&a_1\\\\b_3&b_1\\end{{vmatrix}},\\ \\begin{{vmatrix}}a_1&a_2\\\\b_1&b_2\\end{{vmatrix}}\\Big)\\]</div>
-<div class="why">내적은 스칼라, <b>외적은 벡터</b>. 성분마다 자기 번호를 뺀 나머지 두 번호가 <b>순환 순서</b>(2→3, 3→1, 1→2)로 2×2 행렬식(↘ 곱 − ↗ 곱)에 들어간다. 9/3의 \\(ad-bc\\)가 여기서 다시 쓰인다. 정역학 9/14는 같은 것을 3×3 행렬식 \\(\\begin{{vmatrix}}\\mathbf i&\\mathbf j&\\mathbf k\\\\a_1&a_2&a_3\\\\b_1&b_2&b_3\\end{{vmatrix}}\\)로 썼다 — 둘째 성분의 부호(\\(-(a_1b_3-a_3b_1)=a_3b_1-a_1b_3\\))가 같은 것임을 확인해 둘 것.</div>
+<div class="why">내적은 스칼라, <b>외적은 벡터</b>(두 벡터가 평행하거나 영벡터가 끼면 외적은 영벡터). 성분마다 자기 번호를 뺀 나머지 두 번호가 <b>순환 순서</b>(2→3, 3→1, 1→2)로 2×2 행렬식(↘ 곱 − ↗ 곱)에 들어간다. 9/3의 \\(ad-bc\\)가 여기서 다시 쓰인다. 정역학 9/14는 같은 것을 3×3 행렬식 \\(\\begin{{vmatrix}}\\mathbf i&\\mathbf j&\\mathbf k\\\\a_1&a_2&a_3\\\\b_1&b_2&b_3\\end{{vmatrix}}\\)로 썼다 — 둘째 성분의 부호(\\(-(a_1b_3-a_3b_1)=a_3b_1-a_1b_3\\))가 같은 것임을 확인해 둘 것.</div>
 <details class="ex"><summary>연습 — \\(\\vec a=(1,2,3)\\), \\(\\vec b=(4,5,6)\\)</summary><div class="body"><p>\\((2\\cdot6-3\\cdot5,\\ 3\\cdot4-1\\cdot6,\\ 1\\cdot5-2\\cdot4)=(-3,\\ 6,\\ -3)\\). 검산 \\(\\vec a\\cdot(\\vec a\\times\\vec b)=-3+12-9=0\\) ✓ — 외적은 두 벡터에 수직(§5).</p></div></details>
 <div class="analogy">나사를 \\(\\vec a\\)에서 \\(\\vec b\\)로 돌릴 때 나사가 나아가는 방향(정역학 9/14) — 이번 시간은 그 방향의 벡터를 성분으로 쓰는 법.</div>
 <div class="memo"><b>외울 것</b> 세 성분 = 2×2 행렬식 셋, 순환 (2,3)(3,1)(1,2) · 결과는 벡터 · 검산 \\(\\vec a\\cdot(\\vec a\\times\\vec b)=0\\)</div>
@@ -101,17 +101,17 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미
 <h2>5. [유도] 왜 그 성분인가 — 두 벡터에 수직인 벡터 (판서 ⑤⑥)</h2>
 {fig_der}
 <div class="formula">\\[\\vec a\\perp\\vec c,\\ \\vec b\\perp\\vec c\\ \\Leftrightarrow\\ \\begin{{cases}}a_1c_1+a_2c_2+a_3c_3=0&\\cdots\\text{{ㄱ}}\\\\b_1c_1+b_2c_2+b_3c_3=0&\\cdots\\text{{ㄴ}}\\end{{cases}}\\ \\xrightarrow{{\\text{{ㄱ}}\\times b_3-\\text{{ㄴ}}\\times a_3}}\\ \\underbrace{{(a_1b_3-a_3b_1)}}_{{p}}c_1+\\underbrace{{(a_2b_3-a_3b_2)}}_{{q}}c_2=0\\]</div>
-<div class="why">미지수 \\(c_1,c_2,c_3\\) 셋에 식이 둘 — 해가 한 방향으로 무수히 많다(수직인 벡터는 길이만 다르게 무한). \\(c_3\\)을 소거하면 \\(pc_1+qc_2=0\\); 한 해로 \\(c_1=q,\\ c_2=-p=a_3b_1-a_1b_3\\)을 택하고 되돌려 넣으면 \\(c_3=a_1b_2-a_2b_1\\) — 정확히 Def 01. 즉 <b>외적의 정의는 "둘 다에 수직"에서 나온 것</b>. 칠판의 「ㄱ×b₂」는 \\(c_3\\)을 지우려면 <b>×b₃</b>가 맞다(옆 주황 주석과 같다).</div>
+<div class="why">미지수 \\(c_1,c_2,c_3\\) 셋에 식이 둘 — 영벡터가 아닌 두 벡터가 평행하지 않을 때, 두 수직 조건의 해는 원점을 지나는 한 직선이다(수직인 벡터는 길이만 다르게 무한. 평행하면 해가 평면이 된다 — 예: \\(\\vec a=(1,0,0),\\ \\vec b=(2,0,0)\\)이면 \\(\\vec c=(0,s,t)\\)). \\(c_3\\)을 소거하면 \\(pc_1+qc_2=0\\); 한 해로 \\(c_1=q,\\ c_2=-p=a_3b_1-a_1b_3\\)을 택하고 \\(c_3=a_1b_2-a_2b_1\\)로 택하면 두 내적이 모두 0임을 직접 확인할 수 있다(\\(a_3\\ne0\\)이면 ㄱ에서 \\(c_3\\)이 이 값으로 정해진다) — Def 01과 같은 성분. <b>(평행하지 않을 때) 수직 조건은 방향(한 직선)만 정하고</b>, 외적의 크기와 부호는 넓이와 오른손 법칙으로 정한다. 칠판의 「ㄱ×b₂」는 \\(c_3\\)을 지우려면 <b>×b₃</b>가 맞다(옆 주황 주석과 같다).</div>
 <div class="say">판서 ⑤: \\(c_1,c_2,c_3\\) 밑줄(노랑) = unknown. 교수님이 판서 앞에 서 있어 \\(c_3\\) 유도 과정은 사진에 없음(결론만). 다음(9/24): 외적의 성질 — \\(\\vec a\\times\\vec b\\perp\\vec a,\\vec b\\) · \\(|\\vec a\\times\\vec b|=|\\vec a||\\vec b|\\sin\\theta\\) · 평행사변형 넓이 · \\(\\vec b\\times\\vec a=-\\vec a\\times\\vec b\\)(예상).</div>
-<div class="analogy">두 벽(\\(\\vec a,\\vec b\\))에 동시에 수직인 기둥의 방향은 하나뿐(길이는 자유). 연립 두 식이 그 기둥의 방향을 정하고, "길이"를 정해 준 것이 Def 01의 성분.</div>
+<div class="analogy">평행하지 않은 두 벡터에 동시에 수직인 방향은 한 직선뿐 — 그 직선 위에서 오른손 법칙 쪽, 평행사변형 넓이만큼의 길이를 고른 것이 외적.</div>
 <div class="memo"><b>외울 것</b> 외적 = 두 벡터에 수직 · 유도 = 내적 0 두 식에서 \\(c_3\\) 소거 · 판서 오타 ×b₂ → ×b₃ · 할 일: 임의 \\(\\vec a,\\vec b\\)로 계산 후 \\(\\vec a\\cdot(\\vec a\\times\\vec b)=0\\) 확인</div>
 </section>
 
-<div class="q" data-qid="q1"><div class="qn">확인 1 · 방향코사인</div><div class="qb">\\(\\vec a=(a_1,a_2,a_3)\\)의 방향각 \\(\\alpha\\)(x축과의 각)에 대해 \\(\\cos\\alpha\\)는?</div><ol class="choices"><li data-ok="1">\\(a_1/|\\vec a|\\)</li><li>\\(a_1\\)</li><li>\\(|\\vec a|/a_1\\)</li><li>\\(a_1/|\\vec a|^2\\)</li></ol><div class="ans">\\(\\cos\\alpha=\\vec a\\cdot\\vec i/(|\\vec a||\\vec i|)\\), \\(|\\vec i|=1\\). 필기의 \\(|a|^2\\)처럼 보이는 곳은 오독 — 제곱 아님.</div></div>
+<div class="q" data-qid="q1"><div class="qn">확인 1 · 방향코사인</div><div class="qb">\\(\\vec a=(a_1,a_2,a_3)\\)(\\(\\vec a\\ne\\vec0\\))의 방향각 \\(\\alpha\\)(양의 \\(x\\)축과의 각)에 대해 \\(\\cos\\alpha\\)는?</div><ol class="choices"><li data-ok="1">\\(a_1/|\\vec a|\\)</li><li>\\(a_1\\)</li><li>\\(|\\vec a|/a_1\\)</li><li>\\(a_1/|\\vec a|^2\\)</li></ol><div class="ans">\\(\\cos\\alpha=\\vec a\\cdot\\vec i/(|\\vec a||\\vec i|)\\), \\(|\\vec i|=1\\). 필기의 \\(|a|^2\\)처럼 보이는 곳은 오독 — 제곱 아님.</div></div>
 <div class="q" data-qid="q2"><div class="qn">확인 2 · Ex04</div><div class="qb">\\(\\vec a=(3,4,5)\\)의 방향각 \\(\\gamma\\)(z축과의 각)는?</div><ol class="choices"><li data-ok="1">\\(\\pi/4\\)</li><li>\\(\\cos^{{-1}}(3\\sqrt2/10)\\)</li><li>\\(\\pi/3\\)</li><li>\\(\\cos^{{-1}}(1/\\sqrt{{50}})\\)</li></ol><div class="ans">\\(\\cos\\gamma=5/(5\\sqrt2)=\\sqrt2/2\\) → 특수각 \\(\\pi/4\\). 2번은 \\(\\alpha\\).</div></div>
 <div class="q" data-qid="q3"><div class="qn">확인 3 · 성질 ㄱ</div><div class="qb">방향코사인 사이에 항상 성립하는 식은?</div><ol class="choices"><li data-ok="1">\\(\\cos^2\\alpha+\\cos^2\\beta+\\cos^2\\gamma=1\\)</li><li>\\(\\cos\\alpha+\\cos\\beta+\\cos\\gamma=1\\)</li><li>\\(\\alpha+\\beta+\\gamma=\\pi\\)</li><li>\\(\\cos\\alpha\\cos\\beta\\cos\\gamma=1\\)</li></ol><div class="ans">단위벡터 \\((\\cos\\alpha,\\cos\\beta,\\cos\\gamma)\\)의 크기가 1.</div></div>
 <div class="q" data-qid="q4"><div class="qn">확인 4 · 외적 정의</div><div class="qb">\\(\\vec a\\times\\vec b\\)의 첫째 성분은?</div><ol class="choices"><li data-ok="1">\\(a_2b_3-a_3b_2\\)</li><li>\\(a_1b_1\\)</li><li>\\(a_3b_2-a_2b_3\\)</li><li>\\(a_1b_2-a_2b_1\\)</li></ol><div class="ans">자기 번호(1)를 뺀 (2,3) 순환 행렬식. 3번은 부호 반대(\\(\\vec b\\times\\vec a\\)), 4번은 셋째 성분.</div></div>
-<div class="q" data-qid="q5"><div class="qn">확인 5 · 유도의 뜻</div><div class="qb">외적 \\(\\vec c=\\vec a\\times\\vec b\\)를 유도할 때 출발한 조건은?</div><ol class="choices"><li data-ok="1">\\(\\vec c\\)가 \\(\\vec a\\)와 \\(\\vec b\\) 둘 다에 수직 — \\(\\vec a\\cdot\\vec c=0,\\ \\vec b\\cdot\\vec c=0\\)</li><li>\\(\\vec c\\)가 \\(\\vec a\\)와 평행</li><li>\\(|\\vec c|=|\\vec a||\\vec b|\\)</li><li>\\(\\vec c=\\vec a+\\vec b\\)</li></ol><div class="ans">두 내적 0 식에서 \\(c_3\\)을 소거해 성분을 정했다.</div></div>
+<div class="q" data-qid="q5"><div class="qn">확인 5 · 유도의 뜻</div><div class="qb">외적 \\(\\vec c=\\vec a\\times\\vec b\\)를 유도할 때 출발한 조건은?</div><ol class="choices"><li data-ok="1">\\(\\vec c\\)가 \\(\\vec a\\)와 \\(\\vec b\\) 둘 다에 수직 — \\(\\vec a\\cdot\\vec c=0,\\ \\vec b\\cdot\\vec c=0\\)</li><li>\\(\\vec c\\)가 \\(\\vec a\\)와 평행</li><li>\\(|\\vec c|=|\\vec a||\\vec b|\\)</li><li>\\(\\vec c=\\vec a+\\vec b\\)</li></ol><div class="ans">두 내적이 0이라는 조건을 만족하는 성분을 택해 확인했다. 수직 조건만으로 외적 전체(크기·오른손 방향)가 결정되지는 않는다.</div></div>
 <div class="q" data-qid="q6"><div class="qn">확인 6 · 계산과 검산</div><div class="qb">\\(\\vec a=(1,2,3)\\), \\(\\vec b=(4,5,6)\\)의 \\(\\vec a\\times\\vec b\\)를 구하고 \\(\\vec a\\cdot(\\vec a\\times\\vec b)=0\\)임을 확인하라.</div><div class="ans">\\((2\\cdot6-3\\cdot5,\\ 3\\cdot4-1\\cdot6,\\ 1\\cdot5-2\\cdot4)=(-3,6,-3)\\). \\(\\vec a\\cdot(-3,6,-3)=-3+12-9=0\\) ✓ (정역학 9/14 연습과 같은 답).</div></div>
 </body></html>'''
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
