@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-29.92";
+var BUILD="2026-09-30.93";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,12 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-30.93",d:"09-30",items:[
+    "일반물리학2 중간고사 대비 2 — 26장 전류와 저항 · 27장 회로(RC 회로까지) 덱: 수업 전이라 교수님 강의노트 Part-06·07의 순서·표기에 교재 개념을 채움. 6파트 · 문제 44(객관식 30) · 회로도 15장",
+    "문제는 강의노트 필수·기초문제와 교재 보기 유형을 숫자만 바꿔 새로 만들고 전부 검산, 오타 내용 검수 3차 GREEN",
+    "지식맵에 26·27장 개념 6개(전류 · 저항 · 전력 · 기전력과 고리 · 다중 고리 · RC 회로) — 새 덱 문제가 스앵님 판정에 기록됨",
+    "학습 덱이 그림을 싣도록 개념 장 나누기가 그림 높이를 셈(기존 덱 9개는 그대로)"
+  ]},
   {v:"2026-09-29.92",d:"09-29",items:[
     "오타 검수 반영 — 수업 노트 내용 4곳 고침(공업수학1 9/11 구간 표기가 깨져 풀이가 접힌 것 · 정역학 9/14 정사영 문제 해설 · 공업수학1 9/23 론스키안 문제 조건 · 9/18 중근 유도식)",
     "스앵님 판정 정밀화 — 문제 정답과 읽기·외움 근거를 따로 감쇠(오늘 외움 체크 하나로 옛 정답이 새것처럼 되지 않게), 기록이 넘쳐도 개념마다 최근 문제 6건은 지킴, 저장이 막혀도 이 화면 안에서는 이어 감, 지식맵 카드를 다시 채점해도 정답 수가 불어나지 않음",
@@ -10476,6 +10482,7 @@ var V33={};
     {course:"미분적분학2",file:"notes/calc2-vectors-slides.html",title:"미분적분학2 · 중간고사 대비 벡터 (12.1 좌표 · 12.2 벡터 · 12.3 내적 · 12.4 외적) — 5파트 · 문제 25",week:4,date:"2026-09-24",sub:""},
     {course:"공업수학1",file:"notes/em1-mid-slides.html",title:"공업수학1 · 중간고사 대비 (1장 1계 ODE · 2.1~2.3 · 2.5 오일러-코시) — 6파트 · 문제 36",week:4,date:"2026-09-24",sub:""},
     {course:"일반물리학2",file:"notes/phys2-mid-slides.html",title:"일반물리학2 · 중간고사 대비 (21 전하 · 22 전기장 · 23 가우스 · 24 전위 · 25 전기용량) — 5파트 · 문제 34",week:4,date:"2026-09-24",sub:""},
+    {course:"일반물리학2",file:"notes/phys2-mid2-slides.html",title:"일반물리학2 · 중간고사 대비 26 전류와 저항 · 27 회로 (교재 선행) — 6파트 · 문제 44",week:5,date:"2026-09-30",sub:""},
     {course:"정역학",file:"notes/statics-mid-slides.html",title:"정역학 · 중간고사 대비 (Ch.2 벡터 · Ch.3 힘과 평형) — 5파트 · 문제 31",week:4,date:"2026-09-24",sub:""}
   ];
   if(Array.isArray(window.NOTES)) V49.NOTES.forEach(function(n){ if(!NOTES.some(function(x){ return x.file===n.file; })) NOTES.push({course:n.course,type:"학습",title:n.title,file:n.file,week:n.week,date:n.date,sub:n.sub}); });

@@ -197,3 +197,166 @@ def diamond(cx, cy, w, h, label, color=None, size=12.5):
     c = color or INK
     s = path(f"M{cx} {cy - h/2} L{cx + w/2} {cy} L{cx} {cy + h/2} L{cx - w/2} {cy} Z", c, 1.6, "rgba(255,255,255,.75)")
     return s + text(cx, cy + 5, label, size, c, "middle", True)
+
+# ---- 회로도 (2026-09-30, 일물2 26·27장) ----
+# 부품은 가로·세로 선분 (x1,y1)→(x2,y2) 위에만 놓는다. 그 구간 전체가 부품 자리이고 몸체는 가운데에 그린다(양옆은 전선).
+# 라벨 자리 lpos: t 위 · b 아래 · l 왼쪽 · r 오른쪽. 전류 화살표는 빨강, 고리 방향은 초록.
+def _axis(x1, y1, x2, y2):
+    if y1 == y2 and x1 != x2: return "h", (1 if x2 > x1 else -1)
+    if x1 == x2 and y1 != y2: return "v", (1 if y2 > y1 else -1)
+    raise ValueError("회로 부품은 가로·세로 선분에만 놓는다")
+
+def _lab(mx, my, pos, gap, label, size, c):
+    if not label: return ""
+    if pos == "t": return text(mx, my - gap, label, size, c, "middle")
+    if pos == "b": return text(mx, my + gap + size * .8, label, size, c, "middle")
+    if pos == "r": return text(mx + gap, my + size * .35, label, size, c, "start")
+    return text(mx - gap, my + size * .35, label, size, c, "end")
+
+def wire(*pts, color=None, w=2):
+    """전선 — 꺾은선 (x,y) 점들"""
+    return polyline(list(pts), color or INK, w)
+
+def junction(x, y, label="", color=None, lpos="tr", size=13):
+    """접합점(검은 점) + 이름. lpos 는 tr·tl·br·bl"""
+    c = color or INK
+    s = f'<circle cx="{x}" cy="{y}" r="3.6" fill="{c}"/>'
+    if label:
+        dx = 7 if "r" in lpos else -7; dy = -7 if "t" in lpos else 17
+        s += text(x + dx, y + dy, label, size, c, "start" if dx > 0 else "end", True)
+    return s
+
+def terminal(x, y, label="", color=None, lpos="r", size=13):
+    """열린 단자(속이 빈 원) — 아무것도 연결되지 않은 끝"""
+    c = color or INK
+    return f'<circle cx="{x}" cy="{y}" r="4" fill="#fff" stroke="{c}" stroke-width="2"/>' + _lab(x, y, lpos, 11, label, size, c)
+
+def resistor(x1, y1, x2, y2, label="", color=None, lpos=None, body=40, n=6, amp=7, size=13):
+    """지그재그 저항. 라벨 기본 자리: 가로면 위, 세로면 오른쪽"""
+    c = color or INK
+    ax, sg = _axis(x1, y1, x2, y2)
+    L = abs(x2 - x1) + abs(y2 - y1); b = min(body, L * .7); lead = (L - b) / 2
+    pts = [(x1, y1)]
+    for k in range(n + 1):
+        t = lead + b * k / n; off = 0 if k in (0, n) else (amp if k % 2 else -amp)
+        pts.append((x1 + sg * t, y1 + off) if ax == "h" else (x1 + off, y1 + sg * t))
+    pts.append((x2, y2))
+    mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+    return polyline(pts, c, 2) + _lab(mx, my, lpos or ("t" if ax == "h" else "r"), amp + 7, label, size, c)
+
+def battery(x1, y1, x2, y2, label="", plus=2, color=None, lpos=None, size=13, sign=True):
+    """전지: 긴 가는 판 = +극, 짧은 굵은 판 = −극. plus=1 이면 (x1,y1) 쪽 판이 +극, 2 면 (x2,y2) 쪽.
+    「+」 표시는 라벨 반대편에 둔다(겹침 방지)"""
+    c = color or INK
+    ax, sg = _axis(x1, y1, x2, y2)
+    mx, my = (x1 + x2) / 2, (y1 + y2) / 2; g = 5
+    if ax == "h":
+        pa, pb = mx - sg * g, mx + sg * g
+        lp, sp = (pa, pb) if plus == 1 else (pb, pa)
+        pos = lpos or "b"
+        s = line(x1, y1, pa, my, c) + line(pb, my, x2, y2, c)
+        s += line(lp, my - 14, lp, my + 14, c, 2) + line(sp, my - 7, sp, my + 7, c, 4.5)
+        if sign: s += text(lp + (-10 if lp < sp else 10), (my - 17) if pos != "t" else (my + 27), "+", 13, c, "middle", True)
+        return s + _lab(mx, my, pos, 17, label, size, c)
+    pa, pb = my - sg * g, my + sg * g
+    lp, sp = (pa, pb) if plus == 1 else (pb, pa)
+    pos = lpos or "l"
+    s = line(x1, y1, mx, pa, c) + line(mx, pb, x2, y2, c)
+    s += line(mx - 14, lp, mx + 14, lp, c, 2) + line(mx - 7, sp, mx + 7, sp, c, 4.5)
+    if sign: s += text(mx + (21 if pos != "r" else -21), lp + (-4 if lp < sp else 14), "+", 13, c, "middle", True)
+    return s + _lab(mx, my, pos, 20, label, size, c)
+
+def capacitor(x1, y1, x2, y2, label="", color=None, lpos=None, size=13):
+    """축전기: 같은 길이 두 판"""
+    c = color or INK
+    ax, sg = _axis(x1, y1, x2, y2)
+    mx, my = (x1 + x2) / 2, (y1 + y2) / 2; g = 5
+    if ax == "h":
+        pa, pb = mx - sg * g, mx + sg * g
+        s = line(x1, y1, pa, my, c) + line(pb, my, x2, y2, c) + line(pa, my - 13, pa, my + 13, c, 3) + line(pb, my - 13, pb, my + 13, c, 3)
+        return s + _lab(mx, my, lpos or "t", 19, label, size, c)
+    pa, pb = my - sg * g, my + sg * g
+    s = line(x1, y1, mx, pa, c) + line(mx, pb, x2, y2, c) + line(mx - 13, pa, mx + 13, pa, c, 3) + line(mx - 13, pb, mx + 13, pb, c, 3)
+    return s + _lab(mx, my, lpos or "r", 19, label, size, c)
+
+def switch(x1, y1, x2, y2, closed=False, label="S", color=None, lpos=None, size=13):
+    """스위치: 두 접점(빈 원) + 칼날. 열림이면 칼날이 30° 들린다(가로는 위로, 세로는 오른쪽으로)"""
+    c = color or INK
+    ax, sg = _axis(x1, y1, x2, y2)
+    mx, my = (x1 + x2) / 2, (y1 + y2) / 2; h = 14
+    if ax == "h":
+        pa, pb = mx - sg * h, mx + sg * h
+        s = line(x1, y1, pa, my, c) + line(pb, my, x2, y2, c)
+        tip = (pb, my) if closed else (round(pa + sg * 2 * h * .87, 1), round(my - 2 * h * .5, 1))
+        s += line(pa, my, tip[0], tip[1], c, 2.2)
+        s += f'<circle cx="{pa}" cy="{my}" r="3.2" fill="#fff" stroke="{c}" stroke-width="2"/><circle cx="{pb}" cy="{my}" r="3.2" fill="#fff" stroke="{c}" stroke-width="2"/>'
+        return s + _lab(mx, my, lpos or "t", 24, label, size, c)
+    pa, pb = my - sg * h, my + sg * h
+    s = line(x1, y1, mx, pa, c) + line(mx, pb, x2, y2, c)
+    tip = (mx, pb) if closed else (round(mx + 2 * h * .5, 1), round(pa + sg * 2 * h * .87, 1))
+    s += line(mx, pa, tip[0], tip[1], c, 2.2)
+    s += f'<circle cx="{mx}" cy="{pa}" r="3.2" fill="#fff" stroke="{c}" stroke-width="2"/><circle cx="{mx}" cy="{pb}" r="3.2" fill="#fff" stroke="{c}" stroke-width="2"/>'
+    return s + _lab(mx, my, lpos or "l", 12, label, size, c)
+
+def bulb(x1, y1, x2, y2, label="", color=None, lpos=None, r=12, size=13):
+    """전구: 원 + ×. 전선은 원 테두리에서 끊는다"""
+    c = color or INK
+    ax, sg = _axis(x1, y1, x2, y2)
+    mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+    if ax == "h": s = line(x1, y1, mx - sg * r, my, c) + line(mx + sg * r, my, x2, y2, c)
+    else: s = line(x1, y1, mx, my - sg * r, c) + line(mx, my + sg * r, x2, y2, c)
+    k = r * .7
+    s += f'<circle cx="{mx}" cy="{my}" r="{r}" fill="#FFF9DB" stroke="{c}" stroke-width="2"/>'
+    s += line(mx - k, my - k, mx + k, my + k, c, 1.6) + line(mx - k, my + k, mx + k, my - k, c, 1.6)
+    return s + _lab(mx, my, lpos or ("t" if ax == "h" else "r"), r + 6, label, size, c)
+
+def meter(x1, y1, x2, y2, letter="A", color=None, r=13):
+    """전류계(A)·전압계(V): 원 안 글자. 전선은 원 테두리에서 끊어 글자 위로 선이 지나가지 않게"""
+    c = color or INK
+    ax, sg = _axis(x1, y1, x2, y2)
+    mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+    if ax == "h": s = line(x1, y1, mx - sg * r, my, c) + line(mx + sg * r, my, x2, y2, c)
+    else: s = line(x1, y1, mx, my - sg * r, c) + line(mx, my + sg * r, x2, y2, c)
+    return s + f'<circle cx="{mx}" cy="{my}" r="{r}" fill="#fff" stroke="{c}" stroke-width="2"/>' + f'<text x="{mx}" y="{my + 5}" text-anchor="middle" font-size="14" font-weight="700" fill="{c}">{letter}</text>'
+
+def current(x1, y1, x2, y2, label="i", color=None, lpos=None, size=13, gap=9):
+    """전류 화살표(빨강) — 전선 위에 겹쳐 그린다. 라벨은 선 옆"""
+    c = color or RED
+    ax, sg = _axis(x1, y1, x2, y2)
+    mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+    return (f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{c}" stroke-width="2.6" marker-end="url(#ah)"/>'
+            + _lab(mx, my, lpos or ("t" if ax == "h" else "r"), gap, label, size, c))
+
+def inductor(x1, y1, x2, y2, label="", color=None, lpos=None, n=4, r=6, size=13):
+    """코일(유도기): 반원 n개. 가로는 위로, 세로는 오른쪽으로 볼록"""
+    c = color or INK
+    ax, sg = _axis(x1, y1, x2, y2)
+    L = abs(x2 - x1) + abs(y2 - y1); b = 2 * r * n; lead = (L - b) / 2
+    mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+    sweep = 1 if sg > 0 else 0
+    if ax == "h":
+        x0 = x1 + sg * lead
+        d = f"M{x1} {y1} L{x0} {y1}" + "".join(f" A {r} {r} 0 0 {sweep} {x0 + sg * 2 * r * (k + 1)} {y1}" for k in range(n)) + f" L{x2} {y2}"
+        return path(d, c, 2) + _lab(mx, my, lpos or "t", r + 8, label, size, c)
+    y0 = y1 + sg * lead
+    d = f"M{x1} {y1} L{x1} {y0}" + "".join(f" A {r} {r} 0 0 {sweep} {x1} {y0 + sg * 2 * r * (k + 1)}" for k in range(n)) + f" L{x2} {y2}"
+    return path(d, c, 2) + _lab(mx, my, lpos or "r", r + 8, label, size, c)
+
+def ac_source(x1, y1, x2, y2, label="", color=None, lpos=None, r=14, size=13):
+    """교류 전원: 원 + 사인 곡선(글자 없음). 전선은 원 테두리에서 끊는다"""
+    c = color or INK
+    ax, sg = _axis(x1, y1, x2, y2)
+    mx, my = (x1 + x2) / 2, (y1 + y2) / 2
+    if ax == "h": s = line(x1, y1, mx - sg * r, my, c) + line(mx + sg * r, my, x2, y2, c)
+    else: s = line(x1, y1, mx, my - sg * r, c) + line(mx, my + sg * r, x2, y2, c)
+    s += f'<circle cx="{mx}" cy="{my}" r="{r}" fill="#fff" stroke="{c}" stroke-width="2"/>'
+    s += path(f"M{mx - 8} {my} C{mx - 5} {my - 9} {mx - 1} {my - 9} {mx} {my} C{mx + 1} {my + 9} {mx + 5} {my + 9} {mx + 8} {my}", c, 1.8)
+    return s + _lab(mx, my, lpos or ("t" if ax == "h" else "l"), r + 6, label, size, c)
+
+def loop_dir(cx, cy, r=18, cw=True, color=None):
+    """고리(순환) 방향 표시 — 원호 300° + 화살촉. cw=True 시계 방향"""
+    c = color or GREEN
+    k, h = round(r * .866, 1), round(r * .5, 1)
+    if cw: d = f"M{cx - k} {cy - h} A {r} {r} 0 1 1 {cx - k} {cy + h}"
+    else: d = f"M{cx + k} {cy - h} A {r} {r} 0 1 0 {cx + k} {cy + h}"
+    return f'<path d="{d}" fill="none" stroke="{c}" stroke-width="2" marker-end="url(#ah)"/>'

@@ -112,6 +112,7 @@ for pi, sec in enumerate(parts, 1):
         w += 40 * h.count("\\begin{pmatrix}") + 40 * h.count("\\begin{vmatrix}")   # 행렬(세로로 큼)
         w += 12 * h.count("<tr")
         w += 26 * h.count("<li") + 22 * h.count("<br") + 30 * h.count(chr(10))   # 줄 수(목록·줄바꿈·코드 줄)
+        w += sum(int(x) for x in _re.findall(r'<svg[^>]*?\sheight="(\d+)"', h))   # 그림(figs.canvas): 세로 픽셀만큼 (2026-09-30, 기존 덱엔 svg 없음)
         return w
     _chunks = []
     for h in concept_html:

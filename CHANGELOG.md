@@ -2,6 +2,19 @@
 
 설정 화면의 「패치 노트」 카드에는 최근 항목만 보이고, 전체 기록은 이 파일에 쌓는다. 빌드 번호는 설정 하단(상단 학기 태그에 마우스를 올려도 보임)에서 확인한다. 배포 후 GitHub Pages 반영까지 최대 10분, iPad에서는 ↻ 버튼으로 새로 고친다.
 
+## 2026-09-30
+
+### .93 — 일반물리학2 26·27장 교재 선행 덱(대표님 9/30 「교재에 있는 개념으로 시험범위 먼저」)
+- **덱 `phys2-mid2`**(`notes/phys2-mid2-slides.html`, 105장 · 6파트 · 문제 44 · 객관식 30): 26장 ① 전류·전류밀도 ② 저항·비저항·옴 ③ 전력·줄 열 / 27장 ① 기전력·전압법칙·단일 고리 ② 다중 고리·병렬·계기 ③ RC 회로. 수업 전이라 교수님 강의노트 63p Part-06·07(p.22~27)의 순서·표기(i·J·v_d·ρ·σ·τ·ε, 전류법칙 KIL·전압법칙 KVL)에 교재 요약(26.1~26.5·27.1~27.4) 개념을 채웠다. 표지 `no` = 「교재 선행」(날짜 없음 → 수업 따라가기와 안 이어짐, 수업이 나가면 회차 정리로 따로 들어온다).
+- 원본: 생성기 `docs/tools/exam_gap/phys2_ahead.py` → `study-materials/일반물리학2/_정리노트/2026-09-30_일반물리학2_중간대비_26-27장_교재선행.html` → `build_slides.py`. 문제는 강의노트 필수·기초문제·교재 보기 유형을 숫자만 바꿔 새로 만들었다(공개 저장소). 검산 `phys2_ahead_check.py`(74건).
+- **회로도 15장** — `figs.py` 에 회로 부품(`resistor`·`battery`·`capacitor`·`switch`·`bulb`·`meter`·`current`·`loop_dir`·`junction`·`terminal`·`inductor`·`ac_source`) 추가. `fig_check.cjs` 0건 · 그림 수 대조(생성기 15 = 검사 15 = 덱 SLIDES 15).
+- `build_slides.py` 개념 장 나누기 무게에 그림 높이(`<svg … height>`)를 더함 — 기존 덱 9개 `rebuild_decks.py` 비교 「내용 동일」 9/9.
+- 지식 노드 `em.current`·`em.resistance`·`em.power`·`em.emf_loop`·`em.kirchhoff`·`em.rc`(`add_nodes_phys2_ahead.py`, `check_graph.py --all` 0건) + `build_lesson_nodes.py` DECK_OVR — 순서 덱 → 색인 → 노드 → 덱 재빌드(오타 계획 RED 8).
+- 앱 노트 목록 `V49.NOTES` 는 `docs/tools/exam_gap/register_v49.py` 가 `decks.json` 에서 다시 쓰고 V49 블록만 제자리 교체(스크래치 `v49_layer.js` 는 옛 버전이라 쓰지 않음).
+- 오타: 계획 1차 RED 4(기존 덱에 붙이면 진행 표시 어긋남 → 별도 덱 · 그림 검사 누락 · 노드 순서 · 범위) → 2차 GREEN / 내용 1차 RED(부호 정의·초기조건·노베이스 설명 31건) → 2차 RED 1 → 3차 **GREEN** (`docs/otta/_exam-gap-plan-otta-1·2.md`, `_phys2-ahead-content-otta-1~3.md`).
+- 검사: 배치(1024×768) 105장 실패 0 · 자기완결 0 · 구문 0 · 레이어 이상 0.
+- 알려진 한계: 폰(390px)에서는 그림이 줄어 라벨이 작다(아이패드 기준 완성, 확대 보기는 후속).
+
 ## 2026-09-29
 
 ### .92 — 오타 사후 검수 반영(.91 내용 4차 RED 4 · 설계 1차 RED 5 + 화면 2)

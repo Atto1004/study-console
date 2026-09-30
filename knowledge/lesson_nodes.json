@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-29T15:10:03",
+ "generated": "2026-09-30T12:19:10",
  "lessons": {
   "phys2-2026-09-04": {
    "course": "일반물리학2",
@@ -1796,6 +1796,163 @@
     ],
     "p5-a6": [
      "em.dielectric"
+    ]
+   }
+  },
+  "phys2-mid2": {
+   "course": "일반물리학2",
+   "parts": {
+    "1": [
+     "em.current"
+    ],
+    "2": [
+     "em.resistance"
+    ],
+    "3": [
+     "em.power"
+    ],
+    "4": [
+     "em.emf_loop"
+    ],
+    "5": [
+     "em.kirchhoff"
+    ],
+    "6": [
+     "em.rc"
+    ]
+   },
+   "q": {
+    "p1-b1": [
+     "em.current"
+    ],
+    "p1-b2": [
+     "em.current"
+    ],
+    "p1-b3": [
+     "em.current"
+    ],
+    "p1-b4": [
+     "em.current"
+    ],
+    "p1-b5": [
+     "em.current"
+    ],
+    "p1-a6": [
+     "em.current"
+    ],
+    "p1-a7": [
+     "em.current"
+    ],
+    "p2-b1": [
+     "em.resistance"
+    ],
+    "p2-b2": [
+     "em.resistance"
+    ],
+    "p2-b3": [
+     "em.resistance"
+    ],
+    "p2-b4": [
+     "em.resistance"
+    ],
+    "p2-b5": [
+     "em.resistance"
+    ],
+    "p2-a6": [
+     "em.resistance"
+    ],
+    "p2-a7": [
+     "em.resistance"
+    ],
+    "p3-b1": [
+     "em.power"
+    ],
+    "p3-b2": [
+     "em.power"
+    ],
+    "p3-b3": [
+     "em.power"
+    ],
+    "p3-b4": [
+     "em.power"
+    ],
+    "p3-a5": [
+     "em.power"
+    ],
+    "p3-a6": [
+     "em.power"
+    ],
+    "p4-b1": [
+     "em.emf_loop"
+    ],
+    "p4-b2": [
+     "em.emf_loop"
+    ],
+    "p4-b3": [
+     "em.emf_loop"
+    ],
+    "p4-b4": [
+     "em.emf_loop"
+    ],
+    "p4-b5": [
+     "em.emf_loop"
+    ],
+    "p4-a6": [
+     "em.emf_loop"
+    ],
+    "p4-a7": [
+     "em.emf_loop"
+    ],
+    "p5-b1": [
+     "em.kirchhoff"
+    ],
+    "p5-b2": [
+     "em.kirchhoff"
+    ],
+    "p5-b3": [
+     "em.kirchhoff"
+    ],
+    "p5-b4": [
+     "em.kirchhoff"
+    ],
+    "p5-b5": [
+     "em.kirchhoff"
+    ],
+    "p5-a6": [
+     "em.kirchhoff"
+    ],
+    "p5-a7": [
+     "em.kirchhoff"
+    ],
+    "p5-a8": [
+     "em.kirchhoff"
+    ],
+    "p6-b1": [
+     "em.rc"
+    ],
+    "p6-b2": [
+     "em.rc"
+    ],
+    "p6-b3": [
+     "em.rc"
+    ],
+    "p6-b4": [
+     "em.rc"
+    ],
+    "p6-b5": [
+     "em.rc"
+    ],
+    "p6-b6": [
+     "em.rc"
+    ],
+    "p6-a7": [
+     "em.rc"
+    ],
+    "p6-a8": [
+     "em.rc"
+    ],
+    "p6-a9": [
+     "em.rc"
     ]
    }
   },

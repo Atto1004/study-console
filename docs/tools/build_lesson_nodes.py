@@ -77,10 +77,12 @@ DECK_OVR = {
  "calc2-vectors": {"parts": {"5": ["vec.cross"]}},
  "calc2-matrix": {"parts": {"3": ["lin.det2", "lin.det3"], "6": ["lin.linear_system", "lin.inverse", "lin.cramer"]}},
  "phys2-mid": {"parts": {"1": ["em.charge", "em.coulomb", "em.field"], "2": ["em.superposition", "em.continuous", "em.dipole"], "4": ["em.potential_energy", "em.potential", "em.potential_dist"], "5": ["em.capacitance", "em.dielectric"]}},
+ "phys2-mid2": {"parts": {"1": ["em.current"], "2": ["em.resistance"], "3": ["em.power"], "4": ["em.emf_loop"], "5": ["em.kirchhoff"], "6": ["em.rc"]}},
  "phys2-w1-3": {"parts": {"1": ["em.charge", "em.field", "em.coulomb"], "2": ["em.superposition", "em.dipole", "em.continuous"], "3": ["em.continuous", "em.gauss"], "4": ["em.gauss", "em.gauss_apps"], "5": ["em.potential_energy", "em.potential", "em.potential_dist"]}},
  "statics-mid": {"parts": {"1": ["mech.force_vector", "mech.force_3d"], "3": ["mech.cross_apps", "mech.triple_product"], "4": ["mech.equilibrium_particle"], "5": ["mech.equilibrium_particle"]}},
  "statics-w1-3": {"parts": {"1": ["mech.statics_intro", "mech.force_vector"], "2": ["mech.force_vector", "mech.force_3d", "mech.dot_apps"], "3": ["mech.dot_apps", "mech.projection", "mech.cross_apps"]}},
  "em1-mid": {"parts": {"1": ["ode.concept", "ode.ivp", "ode.separable", "ode.homogeneous"], "3": ["ode.linear1", "ode.bernoulli"], "5": ["ode.const_coeff", "ode.diff_operator"], "6": ["ode.euler_cauchy"]}},
+ "em1-mid2": {"parts": {"1": ["ode.free_oscillation"], "2": ["ode.undetermined_coeff"], "3": ["ode.forced_oscillation", "ode.rlc"], "4": ["ode.variation_params"], "5": ["ode.higher_homog"], "6": ["ode.higher_nonhomog"]}},
  "em1-w1-3": {"parts": {"3": ["ode.bernoulli", "ode.superposition", "ode.basis"]}},
 }
 
