@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-09-30.94";
+var BUILD="2026-09-30.95";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,11 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-09-30.95",d:"09-30",items:[
+    "정역학 중간고사 대비 2 — Ch.4 점·직선 모멘트·우력·등가계·렌치(9/21·9/23·9/28 수업, 교수님 필기·영상 순서) + Ch.5 강체 평형(2D 지지·반력 · 부정정·2력·3력 부재 · 3D, 수업 전 교재 선행). 6파트 · 문제 29(객관식 20) · 그림 10장",
+    "파트 1~3은 수업 날짜와 이어져 수업 따라가기에서 열림, 모든 답은 외적·평형 방정식으로 다시 풀어 검산",
+    "지식맵에 정역학 개념 5개(직선 모멘트 · 우력·등가계 · 2D 강체 평형 · 부정정·2력 부재 · 3D 강체 평형)"
+  ]},
   {v:"2026-09-30.94",d:"09-30",items:[
     "공업수학1 중간고사 대비 2 — 2.4 자유진동 · 2.7 미정계수법 · 2.8 강제진동·공진 · 2.9 RLC · 2.10 매개변수변환 · 3.1~3.3 고계 선형 덱: 9/23 수업(2.6) 뒤를 교수님 슬라이드 순서·표기(Step 1 → 2 → 3, 표 2.1)대로 채움. 6파트 · 문제 35(객관식 22) · 그림 4장",
     "모든 풀이를 원식에 직접 대입해 검산(초기조건 포함)",
@@ -10489,7 +10494,8 @@ var V33={};
     {course:"공업수학1",file:"notes/em1-mid2-slides.html",title:"공업수학1 · 중간고사 대비 2 (2.4 자유진동 · 2.7~2.10 비제차 · 3장 고계) — 교재 선행 — 6파트 · 문제 35",week:5,date:"2026-09-30",sub:""},
     {course:"일반물리학2",file:"notes/phys2-mid-slides.html",title:"일반물리학2 · 중간고사 대비 (21 전하 · 22 전기장 · 23 가우스 · 24 전위 · 25 전기용량) — 5파트 · 문제 34",week:4,date:"2026-09-24",sub:""},
     {course:"일반물리학2",file:"notes/phys2-mid2-slides.html",title:"일반물리학2 · 중간고사 대비 26 전류와 저항 · 27 회로 (교재 선행) — 6파트 · 문제 44",week:5,date:"2026-09-30",sub:""},
-    {course:"정역학",file:"notes/statics-mid-slides.html",title:"정역학 · 중간고사 대비 (Ch.2 벡터 · Ch.3 힘과 평형) — 5파트 · 문제 31",week:4,date:"2026-09-24",sub:""}
+    {course:"정역학",file:"notes/statics-mid-slides.html",title:"정역학 · 중간고사 대비 (Ch.2 벡터 · Ch.3 힘과 평형) — 5파트 · 문제 31",week:4,date:"2026-09-24",sub:""},
+    {course:"정역학",file:"notes/statics-mid2-slides.html",title:"정역학 · 중간고사 대비 2 (Ch.4 모멘트·우력·등가계 · Ch.5 강체 평형 교재 선행) — 6파트 · 문제 29",week:4,date:"2026-09-30",sub:""}
   ];
   if(Array.isArray(window.NOTES)) V49.NOTES.forEach(function(n){ if(!NOTES.some(function(x){ return x.file===n.file; })) NOTES.push({course:n.course,type:"학습",title:n.title,file:n.file,week:n.week,date:n.date,sub:n.sub}); });
   /* ---- boot 패치: 일반물리학2 중간 범위(교수 발언) ---- */

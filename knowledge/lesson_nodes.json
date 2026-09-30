@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-30T12:24:43",
+ "generated": "2026-09-30T12:39:09",
  "lessons": {
   "phys2-2026-09-04": {
    "course": "일반물리학2",
@@ -500,6 +500,7 @@
      "mech.equilibrium_particle"
     ],
     "q5": [
+     "mech.rigid_3d",
      "mech.equilibrium_particle"
     ],
     "q6": [
@@ -2237,6 +2238,119 @@
     ],
     "p5-a6": [
      "mech.equilibrium_particle"
+    ]
+   }
+  },
+  "statics-mid2": {
+   "course": "정역학",
+   "parts": {
+    "1": [
+     "mech.moment",
+     "mech.equilibrium_particle"
+    ],
+    "2": [
+     "mech.moment_line"
+    ],
+    "3": [
+     "mech.couple"
+    ],
+    "4": [
+     "mech.rigid_2d"
+    ],
+    "5": [
+     "mech.indeterminate"
+    ],
+    "6": [
+     "mech.rigid_3d"
+    ]
+   },
+   "q": {
+    "p1-b1": [
+     "mech.moment"
+    ],
+    "p1-b2": [
+     "mech.moment"
+    ],
+    "p1-b3": [
+     "mech.moment"
+    ],
+    "p1-b4": [
+     "mech.moment"
+    ],
+    "p1-a5": [
+     "mech.moment"
+    ],
+    "p1-a6": [
+     "mech.equilibrium_particle"
+    ],
+    "p2-b1": [
+     "mech.moment_line"
+    ],
+    "p2-b2": [
+     "mech.moment_line"
+    ],
+    "p2-b3": [
+     "mech.moment_line"
+    ],
+    "p2-a4": [
+     "mech.moment_line"
+    ],
+    "p3-b1": [
+     "mech.couple"
+    ],
+    "p3-b2": [
+     "mech.couple"
+    ],
+    "p3-b3": [
+     "mech.couple"
+    ],
+    "p3-a4": [
+     "mech.couple"
+    ],
+    "p3-a5": [
+     "mech.couple"
+    ],
+    "p4-b1": [
+     "mech.rigid_2d"
+    ],
+    "p4-b2": [
+     "mech.rigid_2d"
+    ],
+    "p4-b3": [
+     "mech.rigid_2d"
+    ],
+    "p4-b4": [
+     "mech.rigid_2d"
+    ],
+    "p4-a5": [
+     "mech.rigid_2d"
+    ],
+    "p4-a6": [
+     "mech.rigid_2d"
+    ],
+    "p5-b1": [
+     "mech.indeterminate"
+    ],
+    "p5-b2": [
+     "mech.indeterminate"
+    ],
+    "p5-b3": [
+     "mech.indeterminate"
+    ],
+    "p5-a4": [
+     "mech.indeterminate"
+    ],
+    "p6-b1": [
+     "mech.rigid_3d"
+    ],
+    "p6-b2": [
+     "mech.rigid_3d"
+    ],
+    "p6-b3": [
+     "mech.rigid_3d"
+    ],
+    "p6-a4": [
+     "mech.rigid_3d"
     ]
    }
   },

@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-30T12:24:42",
+ "generated": "2026-09-30T12:39:21",
  "decks": [
   {
    "id": "calc2-matrix",
@@ -1573,6 +1573,184 @@
    "qN": 31,
    "qMC": 21,
    "slides": 63,
+   "kind": "exam",
+   "quiz": true
+  },
+  {
+   "id": "statics-mid2",
+   "file": "notes/statics-mid2-slides.html",
+   "title": "정역학 · 중간고사 대비 2 (Ch.4 모멘트·우력·등가계 · Ch.5 강체 평형 교재 선행)",
+   "course": "정역학",
+   "weeks": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "scope": "Ch.4 점·직선 모멘트·우력·등가계(9/21·9/23·9/28 수업) · Ch.5 강체 평형 2D·부정정·2력·3D(교재 선행)",
+   "parts": 6,
+   "partList": [
+    {
+     "n": 1,
+     "title": "Ch.3 마무리 · Ch.4 ① 점에 대한 모멘트 — M = DF, M = r × F",
+     "no": "파트 1 · 9/21",
+     "dates": [
+      "2026-09-21"
+     ],
+     "sids": [
+      "p1-concept",
+      "p1-concept-2",
+      "p1-concept-3",
+      "p1-concept-4",
+      "p1-concept-5",
+      "p1-mu",
+      "p1-b1",
+      "p1-b2",
+      "p1-b3",
+      "p1-b4",
+      "p1-a5",
+      "p1-a6"
+     ],
+     "qids": [
+      "p1-b1",
+      "p1-b2",
+      "p1-b3",
+      "p1-b4",
+      "p1-a5",
+      "p1-a6"
+     ]
+    },
+    {
+     "n": 2,
+     "title": "Ch.4 ② 바리뇽 정리 · 직선에 대한 모멘트 — M_L = [e·(r × F)]e",
+     "no": "파트 2 · 9/23",
+     "dates": [
+      "2026-09-23"
+     ],
+     "sids": [
+      "p2-concept",
+      "p2-concept-2",
+      "p2-concept-3",
+      "p2-concept-4",
+      "p2-mu",
+      "p2-b1",
+      "p2-b2",
+      "p2-b3",
+      "p2-a4"
+     ],
+     "qids": [
+      "p2-b1",
+      "p2-b2",
+      "p2-b3",
+      "p2-a4"
+     ]
+    },
+    {
+     "n": 3,
+     "title": "Ch.4 ③ 우력 · 등가계 · 힘 옮기기 · 렌치",
+     "no": "파트 3 · 9/28",
+     "dates": [
+      "2026-09-28"
+     ],
+     "sids": [
+      "p3-concept",
+      "p3-concept-2",
+      "p3-concept-3",
+      "p3-concept-4",
+      "p3-concept-5",
+      "p3-mu",
+      "p3-b1",
+      "p3-b2",
+      "p3-b3",
+      "p3-a4",
+      "p3-a5"
+     ],
+     "qids": [
+      "p3-b1",
+      "p3-b2",
+      "p3-b3",
+      "p3-a4",
+      "p3-a5"
+     ]
+    },
+    {
+     "n": 4,
+     "title": "Ch.5 ① 2D 강체의 평형 — 지지와 반력 · 평형 방정식 3개",
+     "no": "파트 4 · 교재 선행",
+     "dates": [],
+     "sids": [
+      "p4-concept",
+      "p4-concept-2",
+      "p4-concept-3",
+      "p4-concept-4",
+      "p4-concept-5",
+      "p4-concept-6",
+      "p4-concept-7",
+      "p4-mu",
+      "p4-b1",
+      "p4-b2",
+      "p4-b3",
+      "p4-b4",
+      "p4-a5",
+      "p4-a6"
+     ],
+     "qids": [
+      "p4-b1",
+      "p4-b2",
+      "p4-b3",
+      "p4-b4",
+      "p4-a5",
+      "p4-a6"
+     ]
+    },
+    {
+     "n": 5,
+     "title": "Ch.5 ② 부정정 · 부적절한 지지 · 2력 부재와 3력 부재",
+     "no": "파트 5 · 교재 선행",
+     "dates": [],
+     "sids": [
+      "p5-concept",
+      "p5-concept-2",
+      "p5-concept-3",
+      "p5-concept-4",
+      "p5-mu",
+      "p5-b1",
+      "p5-b2",
+      "p5-b3",
+      "p5-a4"
+     ],
+     "qids": [
+      "p5-b1",
+      "p5-b2",
+      "p5-b3",
+      "p5-a4"
+     ]
+    },
+    {
+     "n": 6,
+     "title": "Ch.5 ③ 3D 강체의 평형 — 지지 5종 · 평형 방정식 6개",
+     "no": "파트 6 · 교재 선행",
+     "dates": [],
+     "sids": [
+      "p6-concept",
+      "p6-concept-2",
+      "p6-mu",
+      "p6-b1",
+      "p6-b2",
+      "p6-b3",
+      "p6-a4"
+     ],
+     "qids": [
+      "p6-b1",
+      "p6-b2",
+      "p6-b3",
+      "p6-a4"
+     ]
+    }
+   ],
+   "qN": 29,
+   "qMC": 20,
+   "slides": 77,
    "kind": "exam",
    "quiz": true
   },
