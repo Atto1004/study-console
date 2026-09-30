@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-30T12:19:10",
+ "generated": "2026-09-30T12:24:43",
  "lessons": {
   "phys2-2026-09-04": {
    "course": "일반물리학2",
@@ -674,7 +674,8 @@
     "ode.solution",
     "ode.integrating_factor",
     "ode.linear1",
-    "ode.bernoulli"
+    "ode.bernoulli",
+    "ode.rlc"
    ],
    "sec": {
     "s1": [
@@ -692,9 +693,9 @@
      "ode.linear1"
     ],
     "s5": [
+     "ode.rlc",
      "ode.linear1",
-     "ode.solution",
-     "ode.linearity"
+     "ode.solution"
     ],
     "s6": [
      "ode.bernoulli"
@@ -715,7 +716,7 @@
      "ode.linear1"
     ],
     "q5": [
-     "ode.linear1"
+     "ode.rlc"
     ],
     "q6": [
      "ode.bernoulli"
@@ -1634,6 +1635,138 @@
     ],
     "p6-a6": [
      "ode.euler_cauchy"
+    ]
+   }
+  },
+  "em1-mid2": {
+   "course": "공업수학1",
+   "parts": {
+    "1": [
+     "ode.free_oscillation"
+    ],
+    "2": [
+     "ode.undetermined_coeff"
+    ],
+    "3": [
+     "ode.forced_oscillation",
+     "ode.rlc"
+    ],
+    "4": [
+     "ode.variation_params"
+    ],
+    "5": [
+     "ode.higher_homog"
+    ],
+    "6": [
+     "ode.higher_nonhomog"
+    ]
+   },
+   "q": {
+    "p1-b1": [
+     "ode.free_oscillation"
+    ],
+    "p1-b2": [
+     "ode.free_oscillation"
+    ],
+    "p1-b3": [
+     "ode.free_oscillation"
+    ],
+    "p1-b4": [
+     "ode.free_oscillation"
+    ],
+    "p1-a5": [
+     "ode.free_oscillation"
+    ],
+    "p1-a6": [
+     "ode.free_oscillation"
+    ],
+    "p2-b1": [
+     "ode.undetermined_coeff"
+    ],
+    "p2-b2": [
+     "ode.undetermined_coeff"
+    ],
+    "p2-b3": [
+     "ode.undetermined_coeff"
+    ],
+    "p2-b4": [
+     "ode.undetermined_coeff"
+    ],
+    "p2-a5": [
+     "ode.undetermined_coeff"
+    ],
+    "p2-a6": [
+     "ode.undetermined_coeff"
+    ],
+    "p2-a7": [
+     "ode.undetermined_coeff"
+    ],
+    "p3-b1": [
+     "ode.forced_oscillation"
+    ],
+    "p3-b2": [
+     "ode.forced_oscillation"
+    ],
+    "p3-b3": [
+     "ode.forced_oscillation"
+    ],
+    "p3-b4": [
+     "ode.rlc"
+    ],
+    "p3-a5": [
+     "ode.forced_oscillation"
+    ],
+    "p3-a6": [
+     "ode.rlc",
+     "ode.forced_oscillation"
+    ],
+    "p4-b1": [
+     "ode.variation_params"
+    ],
+    "p4-b2": [
+     "ode.variation_params"
+    ],
+    "p4-b3": [
+     "ode.variation_params"
+    ],
+    "p4-a4": [
+     "ode.variation_params"
+    ],
+    "p4-a5": [
+     "ode.variation_params"
+    ],
+    "p5-b1": [
+     "ode.higher_homog"
+    ],
+    "p5-b2": [
+     "ode.higher_homog"
+    ],
+    "p5-b3": [
+     "ode.higher_homog"
+    ],
+    "p5-b4": [
+     "ode.higher_homog"
+    ],
+    "p5-a5": [
+     "ode.higher_homog"
+    ],
+    "p5-a6": [
+     "ode.higher_homog"
+    ],
+    "p6-b1": [
+     "ode.higher_nonhomog"
+    ],
+    "p6-b2": [
+     "ode.higher_nonhomog"
+    ],
+    "p6-b3": [
+     "ode.higher_nonhomog"
+    ],
+    "p6-a4": [
+     "ode.higher_nonhomog"
+    ],
+    "p6-a5": [
+     "ode.higher_nonhomog"
     ]
    }
   },

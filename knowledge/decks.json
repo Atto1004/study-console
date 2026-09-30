@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-30T12:19:10",
+ "generated": "2026-09-30T12:24:42",
  "decks": [
   {
    "id": "calc2-matrix",
@@ -554,6 +554,193 @@
    "qN": 36,
    "qMC": 24,
    "slides": 81,
+   "kind": "exam",
+   "quiz": true
+  },
+  {
+   "id": "em1-mid2",
+   "file": "notes/em1-mid2-slides.html",
+   "title": "공업수학1 · 중간고사 대비 2 (2.4 자유진동 · 2.7~2.10 비제차 · 3장 고계) — 교재 선행",
+   "course": "공업수학1",
+   "weeks": [
+    5,
+    6,
+    7
+   ],
+   "scope": "2.4 자유진동 · 2.7 미정계수법 · 2.8 강제진동·공진 · 2.9 RLC · 2.10 매개변수변환 · 3.1~3.3 고계 선형 — 수업 전 교재 선행",
+   "parts": 6,
+   "partList": [
+    {
+     "n": 1,
+     "title": "2.4 모델화: 자유진동 — 질량-용수철 시스템",
+     "no": "파트 1 · 교재 선행",
+     "dates": [],
+     "sids": [
+      "p1-concept",
+      "p1-concept-2",
+      "p1-concept-3",
+      "p1-concept-4",
+      "p1-concept-5",
+      "p1-concept-6",
+      "p1-concept-7",
+      "p1-concept-8",
+      "p1-mu",
+      "p1-b1",
+      "p1-b2",
+      "p1-b3",
+      "p1-b4",
+      "p1-a5",
+      "p1-a6"
+     ],
+     "qids": [
+      "p1-b1",
+      "p1-b2",
+      "p1-b3",
+      "p1-b4",
+      "p1-a5",
+      "p1-a6"
+     ]
+    },
+    {
+     "n": 2,
+     "title": "2.7 비제차 상미분방정식 — 미정계수법",
+     "no": "파트 2 · 교재 선행",
+     "dates": [],
+     "sids": [
+      "p2-concept",
+      "p2-concept-2",
+      "p2-concept-3",
+      "p2-concept-4",
+      "p2-concept-5",
+      "p2-concept-6",
+      "p2-mu",
+      "p2-b1",
+      "p2-b2",
+      "p2-b3",
+      "p2-b4",
+      "p2-a5",
+      "p2-a6",
+      "p2-a7"
+     ],
+     "qids": [
+      "p2-b1",
+      "p2-b2",
+      "p2-b3",
+      "p2-b4",
+      "p2-a5",
+      "p2-a6",
+      "p2-a7"
+     ]
+    },
+    {
+     "n": 3,
+     "title": "2.8 강제진동 · 공진 · 맥놀이 + 2.9 RLC 회로",
+     "no": "파트 3 · 교재 선행",
+     "dates": [],
+     "sids": [
+      "p3-concept",
+      "p3-concept-2",
+      "p3-concept-3",
+      "p3-concept-4",
+      "p3-concept-5",
+      "p3-concept-6",
+      "p3-mu",
+      "p3-b1",
+      "p3-b2",
+      "p3-b3",
+      "p3-b4",
+      "p3-a5",
+      "p3-a6"
+     ],
+     "qids": [
+      "p3-b1",
+      "p3-b2",
+      "p3-b3",
+      "p3-b4",
+      "p3-a5",
+      "p3-a6"
+     ]
+    },
+    {
+     "n": 4,
+     "title": "2.10 매개변수변환법 — 어떤 r(x)에도 쓰는 공식",
+     "no": "파트 4 · 교재 선행",
+     "dates": [],
+     "sids": [
+      "p4-concept",
+      "p4-concept-2",
+      "p4-mu",
+      "p4-b1",
+      "p4-b2",
+      "p4-b3",
+      "p4-a4",
+      "p4-a5"
+     ],
+     "qids": [
+      "p4-b1",
+      "p4-b2",
+      "p4-b3",
+      "p4-a4",
+      "p4-a5"
+     ]
+    },
+    {
+     "n": 5,
+     "title": "3.1~3.2 고계 제차 선형 ODE — n계 이론 · 상수계수 · 고계 오일러-코시",
+     "no": "파트 5 · 교재 선행",
+     "dates": [],
+     "sids": [
+      "p5-concept",
+      "p5-concept-2",
+      "p5-concept-3",
+      "p5-concept-4",
+      "p5-concept-5",
+      "p5-mu",
+      "p5-b1",
+      "p5-b2",
+      "p5-b3",
+      "p5-b4",
+      "p5-a5",
+      "p5-a6"
+     ],
+     "qids": [
+      "p5-b1",
+      "p5-b2",
+      "p5-b3",
+      "p5-b4",
+      "p5-a5",
+      "p5-a6"
+     ]
+    },
+    {
+     "n": 6,
+     "title": "3.3 고계 비제차 선형 ODE — 미정계수법 · 매개변수변환법의 일반화",
+     "no": "파트 6 · 교재 선행",
+     "dates": [],
+     "sids": [
+      "p6-concept",
+      "p6-concept-2",
+      "p6-concept-3",
+      "p6-concept-4",
+      "p6-mu",
+      "p6-b1",
+      "p6-b2",
+      "p6-b3",
+      "p6-a4",
+      "p6-a5"
+     ],
+     "qids": [
+      "p6-b1",
+      "p6-b2",
+      "p6-b3",
+      "p6-a4",
+      "p6-a5"
+     ]
+    }
+   ],
+   "qN": 35,
+   "qMC": 22,
+   "slides": 87,
    "kind": "exam",
    "quiz": true
   },
