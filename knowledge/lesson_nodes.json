@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-30T12:49:17",
+ "generated": "2026-09-30T15:41:13",
  "lessons": {
   "phys2-2026-09-04": {
    "course": "일반물리학2",
@@ -365,13 +365,14 @@
     "mech.force_vector",
     "mech.force_3d",
     "mech.dot_apps",
-    "mech.projection"
+    "mech.projection",
+    "mech.particle_3d"
    ],
    "sec": {
     "s1": [
      "mech.force_vector",
-     "mech.force_3d",
-     "mech.dot_apps"
+     "mech.particle_3d",
+     "mech.force_3d"
     ],
     "s2": [
      "mech.dot_apps",
@@ -395,7 +396,7 @@
     ],
     "q2": [
      "mech.force_vector",
-     "mech.force_3d"
+     "mech.particle_3d"
     ],
     "q3": [
      "mech.force_3d",
@@ -419,11 +420,13 @@
    "nodes": [
     "mech.dot_apps",
     "mech.cross_apps",
-    "mech.projection"
+    "mech.projection",
+    "mech.particle_3d"
    ],
    "sec": {
     "s1": [
      "mech.dot_apps",
+     "mech.particle_3d",
      "mech.projection"
     ],
     "s2": [
@@ -2480,6 +2483,107 @@
     ],
     "p6-a4": [
      "mech.rigid_3d"
+    ]
+   }
+  },
+  "statics-mid3": {
+   "course": "정역학",
+   "parts": {
+    "1": [
+     "mech.particle_2d"
+    ],
+    "2": [
+     "mech.particle_2d",
+     "mech.force_types"
+    ],
+    "3": [
+     "mech.particle_2d"
+    ],
+    "4": [
+     "mech.particle_3d"
+    ]
+   },
+   "q": {
+    "p1-b1": [
+     "mech.particle_2d"
+    ],
+    "p1-b2": [
+     "mech.particle_2d"
+    ],
+    "p1-b3": [
+     "mech.particle_2d"
+    ],
+    "p1-b4": [
+     "mech.particle_2d"
+    ],
+    "p1-a5": [
+     "mech.particle_2d"
+    ],
+    "p1-a6": [
+     "mech.particle_2d"
+    ],
+    "p2-b1": [
+     "mech.particle_2d"
+    ],
+    "p2-b2": [
+     "mech.particle_2d"
+    ],
+    "p2-b3": [
+     "mech.particle_2d"
+    ],
+    "p2-b4": [
+     "mech.particle_2d"
+    ],
+    "p2-b5": [
+     "mech.particle_2d"
+    ],
+    "p2-a6": [
+     "mech.particle_2d"
+    ],
+    "p2-a7": [
+     "mech.particle_2d"
+    ],
+    "p2-a8": [
+     "mech.particle_2d"
+    ],
+    "p3-b1": [
+     "mech.particle_2d"
+    ],
+    "p3-b2": [
+     "mech.particle_2d"
+    ],
+    "p3-b3": [
+     "mech.particle_2d"
+    ],
+    "p3-b4": [
+     "mech.particle_2d"
+    ],
+    "p3-b5": [
+     "mech.particle_2d"
+    ],
+    "p3-a6": [
+     "mech.particle_2d"
+    ],
+    "p3-a7": [
+     "mech.particle_2d"
+    ],
+    "p4-b1": [
+     "mech.particle_3d"
+    ],
+    "p4-b2": [
+     "mech.particle_3d"
+    ],
+    "p4-b3": [
+     "mech.particle_3d"
+    ],
+    "p4-b4": [
+     "mech.particle_3d"
+    ],
+    "p4-a5": [
+     "mech.particle_3d"
+    ],
+    "p4-a6": [
+     "mech.particle_3d"
     ]
    }
   },

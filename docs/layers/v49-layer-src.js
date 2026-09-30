@@ -119,7 +119,8 @@
     {course:"일반물리학2",file:"notes/phys2-mid-slides.html",title:"일반물리학2 · 중간고사 대비 (21 전하 · 22 전기장 · 23 가우스 · 24 전위 · 25 전기용량) — 5파트 · 문제 34",week:4,date:"2026-09-24",sub:""},
     {course:"일반물리학2",file:"notes/phys2-mid2-slides.html",title:"일반물리학2 · 중간고사 대비 26 전류와 저항 · 27 회로 (교재 선행) — 6파트 · 문제 44",week:5,date:"2026-09-30",sub:""},
     {course:"정역학",file:"notes/statics-mid-slides.html",title:"정역학 · 중간고사 대비 (Ch.2 벡터 · Ch.3 힘과 평형) — 5파트 · 문제 31",week:4,date:"2026-09-24",sub:""},
-    {course:"정역학",file:"notes/statics-mid2-slides.html",title:"정역학 · 중간고사 대비 2 (Ch.4 모멘트·우력·등가계 · Ch.5 강체 평형 교재 선행) — 6파트 · 문제 29",week:4,date:"2026-09-30",sub:""}
+    {course:"정역학",file:"notes/statics-mid2-slides.html",title:"정역학 · 중간고사 대비 2 (Ch.4 모멘트·우력·등가계 · Ch.5 강체 평형 교재 선행) — 6파트 · 문제 29",week:4,date:"2026-09-30",sub:""},
+    {course:"정역학",file:"notes/statics-mid3-slides.html",title:"정역학 · 중간고사 대비 3 (Ch.3 입자 평형 2D·3D · 과제 유형) — 4파트 · 문제 27",week:3,date:"2026-09-30",sub:""}
   ];
   if(Array.isArray(window.NOTES)) V49.NOTES.forEach(function(n){ if(!NOTES.some(function(x){ return x.file===n.file; })) NOTES.push({course:n.course,type:"학습",title:n.title,file:n.file,week:n.week,date:n.date,sub:n.sub}); });
   /* ---- boot 패치: 일반물리학2 중간 범위(교수 발언) ---- */

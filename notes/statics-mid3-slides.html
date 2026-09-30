@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>정역학 · 중간고사 대비 3 (Ch.3 입자 평형 2D·3D · 과제 유형)</title>
+<!-- 학습게임 지침(학습게임_미적분2.md) v4 템플릿 · 오타 디자인 검토(2026-09-17, RED 14건) 반영
+     폰트 2종: 본문 손글씨(Nanum Pen Script, display=block) + 수식·숫자 정자(KaTeX). 5색 고정. 16:10. 상단 진행점·챕터명·n/N, 하단 [힌트] [확인/다음]. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  /* 5색 고정 (지침 §2) */
+  --memory:#FFE45C; --caution:#E03131; --concept:#1971C2; --exam:#FF4D8D; --example:#2F9E44;
+  /* 무채색 — 종이·글자·선 (의미색 아님) */
+  --paper:#FFFFFF; --ink:#111111; --muted:#5F5F5F; --line:#D8D8D8; --soft:#F5F5F5; --bg:#EDEDED;
+  /* 폰트 2종 (지침 §1) */
+  --font-hand:'Nanum Pen Script','NanumPen',sans-serif;
+  --font-num:'KaTeX_Main','Times New Roman',serif;
+  /* 글자 크기 3단계 (지침 §1) */
+  --fs-title:31px; --fs-body:22px; --fs-note:17px;
+}
+*{box-sizing:border-box}
+:where(h1,h2,h3,h4,p,ul,ol,li,dl,dt,dd,pre,blockquote,figure,figcaption,table,th,td,button,input,textarea,label){margin:0;padding:0;text-indent:0;word-break:keep-all;overflow-wrap:break-word}
+html,body{height:100%;width:100%;margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-hand);font-size:var(--fs-body);line-height:1.45;word-break:keep-all;overflow-wrap:break-word;overflow:hidden}
+body{display:grid;place-items:center;padding:12px}
+.katex{font-size:1em}
+#stage{position:relative;width:min(calc(100vw - 24px),calc((100dvh - 24px) * 1.6));aspect-ratio:16/10;background:var(--paper);border:1px solid var(--line);display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden}
+/* 상단: 진행점 · 챕터명 · n/N */
+#top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,auto) auto;align-items:center;gap:16px;padding:10px 22px;border-bottom:1px solid var(--line);font-size:var(--fs-note)}
+#progress{display:flex;align-items:center;gap:6px;min-width:0;flex-wrap:wrap}
+.dot{flex:0 0 12px;width:12px;height:12px;border:2px solid var(--ink);border-radius:50%;background:var(--paper)}
+.dot.done{background:var(--ink)}
+.dot.exam{border-color:var(--exam);background:var(--exam)}
+.dot.cur{outline:2px solid var(--ink);outline-offset:2px}
+#chapter{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#pos{font-family:var(--font-num);white-space:nowrap}
+/* 작업 영역 */
+#body{min-height:0;overflow:hidden;padding:18px 24px 12px;font-size:var(--fs-body);line-height:1.45}
+#body[data-ready="false"]{visibility:hidden}
+#body.scrollable{overflow:auto}   /* 시작 위치 장만 — 학습 내용이 아니라 목록이라 스크롤 허용 */
+#body h1,#body h2{font-size:var(--fs-title);line-height:1.2;margin-bottom:8px}
+#body h3{font-size:var(--fs-body)}
+.num{font-family:var(--font-num)}
+#fontWarn{position:absolute;left:22px;right:22px;top:58px;border:2px solid var(--caution);background:var(--paper);padding:6px 12px;font-size:var(--fs-note);z-index:12}
+#fontWarn[hidden]{display:none}
+#body .kicker{font-size:var(--fs-note);color:var(--muted)}
+#body p,#body li{margin:0}
+#body p+p{margin-top:6px}
+#body ul,#body ol{padding-left:22px}
+#body :is(.why,.concept,.one,.say,.extra),.ans,.myans-show,.mu>div{margin:8px 0 0;padding:10px 14px}
+#body .why,#body .concept{border:2px solid var(--concept)}
+#body .say{border-left:4px solid var(--concept);background:var(--soft)}
+#body .say b{color:var(--concept)}
+#body .one{border-left:4px solid var(--ink);background:var(--soft)}
+#body .term{color:var(--concept);border-bottom:1px dashed var(--concept)}
+#body .hl{background:var(--memory);padding:0 4px}
+#body .red{color:var(--caution)}
+#body .star{color:var(--exam)}
+#body .tw{overflow:hidden;margin:8px 0 0;border:1px solid var(--line)}
+#body table{border-collapse:collapse;width:100%;font-size:var(--fs-body)}
+#body th,#body td{padding:3px 10px;text-align:left;vertical-align:top;border-top:1px solid var(--line)}
+#body thead th{border-top:0;font-size:var(--fs-note);color:var(--muted)}
+#body pre{white-space:pre-wrap;font-family:var(--font-num);font-size:var(--fs-note);line-height:1.35}
+#body code{font-family:var(--font-num)}
+/* 시험 언급 — 최우선 (지침 §3) */
+.exam-callout{border:4px solid var(--exam);padding:10px 14px;margin:0 0 10px;background:var(--paper)}
+.exam-label{font-size:var(--fs-note);color:var(--exam)}
+.exam-label b{color:var(--ink)}
+.exam-quote{font-size:var(--fs-body)}
+/* 표지·결과 */
+.cover .big{font-size:var(--fs-title);line-height:1.2;margin:6px 0 10px}
+.cover .sub{font-size:var(--fs-body)}
+.score{display:flex;gap:14px;margin:10px 0}
+.score .c{border:2px solid var(--ink);padding:10px 16px}
+.score .c b{display:block;font-family:var(--font-num);font-size:var(--fs-title)}
+/* 암기 vs 이해 */
+.mu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.mu>div{min-width:0}
+.mu-mem{background:var(--memory);border:2px solid var(--memory)}
+.mu-und{border:2px solid var(--concept)}
+.mu-h{margin-bottom:4px}.mu-h .hint{font-size:var(--fs-note);color:var(--muted);margin-left:6px}
+.mu li{margin:2px 0}
+/* 문제 */
+.q-kind{display:inline-block;font-size:var(--fs-note);border:1px solid var(--ink);padding:0 8px;margin-right:8px;vertical-align:middle}
+#body.q-mode{display:flex;flex-direction:column}
+#body.q-mode>*{flex:0 0 auto}
+.pad{flex:1 1 auto!important;min-height:100px;display:flex;flex-direction:column;margin-top:8px;border:1px solid var(--line);overflow:hidden;background:var(--paper)}
+.pad-bar{display:flex;align-items:center;gap:6px;padding:4px 10px;border-bottom:1px solid var(--line);font-size:var(--fs-note);background:var(--soft);flex-wrap:wrap}
+.pad-bar .hint{color:var(--muted);margin-right:auto}
+.pad-bar button{font:inherit;font-size:var(--fs-note);min-height:36px;padding:2px 12px;border:1px solid var(--ink);background:var(--paper);color:var(--ink);cursor:pointer}
+.pad-bar button.on{background:var(--ink);color:var(--paper)}
+.pad canvas{flex:1 1 auto;min-height:0;width:100%;display:block;touch-action:none;cursor:crosshair;background-image:linear-gradient(to right,var(--line) 1px,transparent 1px),linear-gradient(to bottom,var(--line) 1px,transparent 1px);background-size:24px 24px}
+/* V4-PADPANEL 필기 판 — 「+ 필기」로 여닫음, 문제 아래쪽을 덮는다 */
+#padPanel{position:absolute;left:24px;right:24px;top:38%;bottom:72px;background:var(--paper);border:2px solid var(--ink);display:none;flex-direction:column;z-index:16}
+#padPanel.on{display:flex}
+#padPanel .pad{flex:1 1 auto;margin:0;border:0;min-height:0}
+#padBtn.on{background:var(--ink);color:var(--paper)}
+/* V4-ANSLB 답·풀이 판 — 작업 영역 전체 */
+#anslb{position:absolute;left:0;right:0;top:0;bottom:0;background:var(--paper);display:none;flex-direction:column;z-index:18;padding:14px 24px;overflow:hidden}
+#anslb.on{display:flex}
+#anslb .ans{flex:1 1 auto;min-height:0;overflow:hidden;margin-top:8px}
+#anslb .ans-top{display:flex;align-items:center;gap:10px}
+#anslb .ans-top .kicker{margin-right:auto}
+.myans{margin-top:8px}.myans label{display:block;font-size:var(--fs-note);color:var(--muted)}
+.myans textarea{width:100%;font-family:var(--font-num);font-size:var(--fs-body);line-height:1.35;padding:6px 12px;border:2px solid var(--ink);background:var(--paper);resize:none;outline:none}
+.myans textarea:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.myans-show{border:2px dashed var(--ink)}
+.myans-txt{font-family:var(--font-num);white-space:pre-wrap}
+.ans{border:2px solid var(--example)}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+.choice{display:flex;align-items:center;gap:10px;min-width:0;text-align:left;font:inherit;font-size:var(--fs-body);padding:6px 12px;border:2px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;min-height:48px}
+.choice .cn{flex:0 0 28px;height:28px;border:1px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-num);font-size:var(--fs-note)}
+.choice .ct{min-width:0}
+.choice.sel{border-color:var(--ink);border-width:3px}
+.choice.ok{border-color:var(--example)}.choice.ok .cn{background:var(--example);border-color:var(--example);color:var(--paper)}
+.choice.bad{border-color:var(--caution)}.choice.bad .cn{background:var(--caution);border-color:var(--caution);color:var(--paper)}
+.choice[disabled]{cursor:default}
+.verdict{padding:6px 14px;border:2px solid var(--ink)}.verdict.ok{border-color:var(--example)}.verdict.bad{border-color:var(--caution);color:var(--caution)}
+/* 시작 위치 */
+.jump-h{font-size:var(--fs-note);color:var(--muted);margin-bottom:6px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.jump-part{display:flex;gap:10px;align-items:flex-start;margin:2px 0}
+.jump-pt{flex:0 0 220px;font-size:var(--fs-note);padding-top:6px}
+.jump-items{display:flex;flex-wrap:wrap;gap:4px}
+.jp{font:inherit;font-size:var(--fs-note);min-height:36px;padding:2px 10px;border:1px solid var(--ink);background:var(--paper);color:var(--ink);cursor:pointer}
+.jp.done{background:var(--ink);color:var(--paper)}.jp.skip{color:var(--muted);text-decoration:line-through;border-color:var(--line)}.jp.cur{border:3px solid var(--ink)}
+/* 하단: [이전] [힌트] · 출처 · 동작 · [확인/다음] */
+#foot{display:flex;align-items:center;gap:12px;padding:10px 22px;border-top:1px solid var(--line)}
+.btn{font:inherit;font-size:var(--fs-body);min-height:48px;padding:4px 18px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.xs{font-size:var(--fs-note);min-height:36px;padding:2px 12px}
+.btn[disabled]{opacity:.35;cursor:default}
+.btn:focus-visible,.choice:focus-visible,.jp:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+#act{display:flex;gap:8px;align-items:center;margin-left:auto}#act .hint{font-size:var(--fs-note);color:var(--muted)}
+#next{margin-left:8px}
+#next.undone{background:var(--paper);color:var(--ink);border-style:dashed}
+#doneTag{font-size:var(--fs-note);color:var(--muted)}
+/* 출처 썸네일 · 확대 */
+#srcs{display:flex;gap:6px}
+.src-th{position:relative;width:48px;height:48px;padding:0;border:2px solid var(--ink);overflow:hidden;background:var(--paper);cursor:pointer;flex:0 0 auto}
+.src-th img{width:100%;height:100%;object-fit:cover;object-position:left top;display:block}
+.src-th .src-n{position:absolute;right:0;bottom:0;font-family:var(--font-num);font-size:var(--fs-note);background:var(--ink);color:var(--paper);padding:0 4px}
+#srclb{position:absolute;inset:0;background:var(--paper);display:none;flex-direction:column;z-index:20;padding:12px 18px}
+#srclb.on{display:flex}
+.src-top{display:flex;align-items:center;gap:10px;font-size:var(--fs-note);padding-bottom:8px}.src-top b{color:var(--ink)}.src-top .src-pos{margin-left:auto;font-family:var(--font-num)}
+.src-x{font:inherit;font-size:var(--fs-body);min-width:48px;min-height:44px;border:2px solid var(--ink);background:var(--paper);cursor:pointer}
+.src-body{flex:1;min-height:0;overflow:auto;border:1px solid var(--line);touch-action:pan-x pan-y pinch-zoom}
+.src-body img{width:100%;height:auto;display:block;cursor:zoom-in}
+.src-body img.zoom{width:190%;max-width:none;cursor:zoom-out}
+.src-foot{display:flex;align-items:center;gap:10px;padding-top:8px}.src-foot .hint{margin:0 auto;font-size:var(--fs-note);color:var(--muted)}
+/* 힌트 상자 */
+#hintBox{position:absolute;left:22px;right:22px;bottom:76px;background:var(--paper);border:2px solid var(--ink);padding:10px 14px;z-index:15}
+#hintBox[hidden]{display:none}
+/* 검사 모드 표시 */
+#chk{position:absolute;left:0;right:0;top:0;bottom:0;background:var(--paper);overflow:auto;padding:20px;z-index:30;font-size:var(--fs-note);display:none}
+
+/* ===== V6 UI — 조작부 재설계 (아토 2026-09-21). 본문(손글씨·5색)은 그대로, 조작부만 정자·평면 ===== */
+:root{--ui:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;--accent:#4F9A35;--accent-soft:#EAF4E6;--bad:#D23B3B;--bad-soft:#FBEAEA;--line:#E3E8E5;--soft:#F4F6F5;--bg:#EEF1EF;--muted:#6B7570;--ink-3:#8A9490}
+body{background:var(--bg)}
+#stage{border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+/* 상단: 분절 진행 막대 + 정자 라벨 */
+#top{padding:12px 20px;gap:14px;font-family:var(--ui);font-size:13px;color:var(--muted);border-bottom:1px solid var(--line);background:#fff}
+#progress{gap:3px;flex-wrap:nowrap;overflow:hidden}
+.dot{flex:1 1 0;width:auto;min-width:6px;max-width:28px;height:6px;border:0;border-radius:3px;background:var(--line)}
+.dot.done{background:var(--accent)}.dot.cur{background:#B7DBA8;outline:0;box-shadow:inset 0 0 0 1px var(--accent)}.dot.exam{background:#FFC2D8}.dot.exam.done{background:var(--exam)}
+#chapter{font-family:var(--ui);font-size:13px;font-weight:600;color:#1F2A24}
+#pos{font-family:var(--ui);font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted)}
+/* 본문 상자: 두꺼운 파란 테두리 → 좌측 바 */
+#body .why,#body .concept{border:0;border-left:3px solid var(--concept);background:#F5F8FD;border-radius:0 10px 10px 0}
+#body .one{border-radius:0 10px 10px 0}#body .say{border-radius:0 10px 10px 0}
+#body .tw{border-radius:10px}
+.mu-mem{border:0;border-left:3px solid #E5C400;background:#FFF9D6;border-radius:0 10px 10px 0}.mu-und{border:0;border-left:3px solid var(--concept);background:#F5F8FD;border-radius:0 10px 10px 0}
+.q-kind{font-family:var(--ui);font-size:12px;font-weight:600;border:0;border-radius:999px;padding:2px 10px;background:var(--accent-soft);color:var(--accent);vertical-align:middle}
+#body .kicker{font-family:var(--ui);font-size:12px;letter-spacing:0;color:var(--ink-3)}
+/* 보기 카드 */
+.choices{gap:10px;margin-top:12px}
+.choice{font-family:var(--font-hand);border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px 14px;min-height:56px;transition:border-color .12s,background .12s}
+.choice:hover{border-color:#B9C4BE;background:var(--soft)}
+.choice .cn{flex:0 0 28px;width:28px;height:28px;border:0;border-radius:50%;background:var(--soft);color:#1F2A24;font-family:var(--ui);font-size:13px;font-weight:600}
+.choice.sel{border:2px solid var(--accent);padding:11px 13px}.choice.sel .cn{background:var(--accent);color:#fff}
+.choice.ok{border:2px solid var(--accent);background:var(--accent-soft);padding:11px 13px}.choice.ok .cn{background:var(--accent);color:#fff}
+.choice.bad{border:2px solid var(--bad);background:var(--bad-soft);padding:11px 13px}.choice.bad .cn{background:var(--bad);color:#fff}
+.choice[disabled]:not(.ok):not(.bad){opacity:.55}
+.choice:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* 주관식 */
+.myans label{font-family:var(--ui);font-size:12px;color:var(--muted)}
+.myans textarea{border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-family:var(--ui);font-size:16px;background:#fff}
+.myans textarea:focus-visible{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+.myans-show{border:1px dashed #B9C4BE;border-radius:12px;background:var(--soft)}
+.myans-txt{font-family:var(--ui);font-size:16px}
+.myans-note{margin-top:8px}
+/* 판정·안내 */
+.verdict{font-family:var(--ui);font-size:13px;font-weight:600;border:0;border-radius:999px;padding:6px 12px;background:var(--soft);color:#1F2A24}
+.verdict.ok{background:var(--accent-soft);color:var(--accent)}.verdict.bad{background:var(--bad-soft);color:var(--bad)}
+#act .hint{font-family:var(--ui);font-size:12px;color:var(--ink-3)}
+#doneTag{font-family:var(--ui);font-size:12px;color:var(--ink-3)}
+/* 하단 바 · 버튼 */
+#foot{padding:10px 16px;gap:8px;border-top:1px solid var(--line);background:#fff}
+.btn{font-family:var(--ui);font-size:14px;font-weight:600;min-height:40px;padding:6px 16px;border:1px solid var(--line);border-radius:10px;background:#fff;color:#1F2A24;box-shadow:none}
+.btn:hover{background:var(--soft)}
+.btn.xs{font-size:13px;min-height:36px;padding:4px 12px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(.95)}
+#next{min-width:96px}
+#next.undone{background:#fff;color:var(--accent);border:1px solid var(--accent);border-style:solid}
+.btn[disabled]{opacity:.35}
+.btn:focus-visible,.choice:focus-visible,.jp:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#padBtn.on{background:#1F2A24;border-color:#1F2A24;color:#fff}
+/* 출처 썸네일 */
+#srcs{gap:6px}
+.src-th{width:40px;height:40px;border:1px solid var(--line);border-radius:8px}
+.src-th .src-n{font-family:var(--ui);font-size:11px;padding:0 5px;border-radius:6px 0 6px 0}
+.src-x{font-family:var(--ui);font-size:14px;border:1px solid var(--line);border-radius:10px;min-height:40px}
+.src-top{font-family:var(--ui);font-size:13px}.src-body{border-radius:12px}
+.src-foot .hint{font-family:var(--ui);font-size:12px}
+/* 힌트 · 필기 · 풀이 판 · 글꼴 경고 */
+#hintBox{border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.08);bottom:70px}
+#padPanel{border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.08);bottom:70px}
+.pad-bar{font-family:var(--ui);font-size:12px;padding:6px 10px;background:var(--soft);border-radius:14px 14px 0 0}
+.pad-bar button{font-family:var(--ui);font-size:12px;font-weight:600;min-height:32px;padding:2px 10px;border:1px solid var(--line);border-radius:8px}
+.pad-bar button.on{background:#1F2A24;border-color:#1F2A24;color:#fff}
+#anslb{padding:16px 24px}
+#anslb .ans{border:0;border-left:3px solid var(--example);background:#F3F9F2;border-radius:0 10px 10px 0}
+.ans{border:0;border-left:3px solid var(--example);background:#F3F9F2;border-radius:0 10px 10px 0}
+#anslb .ans-top .kicker{font-family:var(--ui);font-size:12px}
+#fontWarn{border:1px solid var(--bad);border-radius:10px;font-family:var(--ui);font-size:12px}
+.score .c.ok b{color:var(--accent)}.score .c.bad b{color:var(--bad)}.rs-rule{font-family:var(--ui);font-size:13px;color:var(--muted);margin-top:4px}.rs-pass{color:var(--accent)}.rs-fail{color:var(--bad)}
+.rs-list{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}.rs-list .kicker{flex:0 0 100%}
+.rs-q{font:inherit;font-size:var(--fs-note);display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:6px 12px;cursor:pointer}.rs-q:hover{background:var(--soft)}
+/* 시작 위치 목록 · 결과 */
+.jp{font-family:var(--ui);font-size:13px;border:1px solid var(--line);border-radius:8px;min-height:34px}
+.jp.done{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-soft)}.jp.cur{border:2px solid var(--accent)}
+.score{gap:12px}.score .c{border:1px solid var(--line);border-radius:12px;background:var(--soft);padding:12px 18px;min-width:120px}
+.score .c b{font-family:var(--ui);font-weight:700;font-size:28px;line-height:1.1}
+.cover .kicker{font-family:var(--ui);font-size:12px;color:var(--ink-3)}
+
+/* ===== V6C 여백 제거 (아토 2026-09-21) ===== */
+:root{--fs-title:clamp(26px,3.6vh,36px);--fs-body:clamp(18px,2.7vh,26px);--fs-note:clamp(13px,1.9vh,18px)}
+body{padding:0;display:block}
+#stage{width:100vw;height:100dvh;max-width:none;aspect-ratio:auto;border:0;border-radius:0;box-shadow:none;margin:0}
+@media(min-width:1480px){#stage{width:1400px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line)}}
+#top{padding:10px clamp(16px,3vw,40px)}
+#foot{padding:10px clamp(16px,3vw,40px)}
+#body{padding:clamp(14px,3vh,28px) clamp(20px,4vw,56px) clamp(10px,2vh,20px)}
+#body:not(.q-mode):not(.scrollable){display:flex;flex-direction:column;justify-content:center}
+#body:not(.q-mode):not(.scrollable)>*{flex:0 0 auto}
+#body:not(.q-mode):not(.scrollable){--cs:1;font-size:calc(var(--fs-body)*var(--cs))}
+#body:not(.q-mode):not(.scrollable) h1,#body:not(.q-mode):not(.scrollable) h2{font-size:calc(var(--fs-title)*var(--cs))}
+#body:not(.q-mode):not(.scrollable) :is(.why,.concept,.one,.say,.extra,.mu>div){padding:calc(12px*var(--cs)) calc(16px*var(--cs))}
+@media(min-height:680px) and (min-width:900px){#body:not(.q-mode):not(.scrollable){--cs:1.12}}
+@media(min-height:760px) and (min-width:1100px){#body:not(.q-mode):not(.scrollable){--cs:1.22}}
+@media(min-width:1300px){#body{padding-left:max(56px,calc((100% - 1180px)/2));padding-right:max(56px,calc((100% - 1180px)/2))}}
+#body.q-mode{--qs:1}
+@media(min-height:680px) and (min-width:900px){#body.q-mode{--qs:1.15}}
+@media(min-height:760px) and (min-width:1000px){#body.q-mode{--qs:1.3}}
+@media(min-height:900px) and (min-width:1100px){#body.q-mode{--qs:1.45}}
+#body.q-mode h2{font-size:calc(var(--fs-title)*var(--qs))}
+#body.q-mode .qbody{font-size:calc(var(--fs-body)*1.1*var(--qs));margin-top:8px}
+#body.q-mode{justify-content:safe center}
+#body.q-mode .choices{flex:0 1 auto;min-height:0;grid-auto-rows:minmax(72px,auto);margin-top:calc(18px*var(--qs));gap:calc(14px*var(--qs))}
+#body.q-mode .choice{min-height:calc(72px*var(--qs));padding:calc(16px*var(--qs)) calc(20px*var(--qs));font-size:calc(var(--fs-body)*1.12*var(--qs))}
+#body.q-mode .choice .cn{flex:0 0 32px;width:32px;height:32px;font-size:14px}
+#body.q-mode .myans textarea{font-size:calc(18px*var(--qs))}
+#body.q-mode .myans{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+#body.q-mode .myans textarea{flex:1 1 auto;min-height:88px}
+.cover .big{font-size:calc(var(--fs-title)*1.25)}
+.cover .sub{max-width:60ch}
+@media(max-width:700px){.choices{grid-template-columns:minmax(0,1fr)}#body{padding:14px 16px 10px;overflow:auto}#body.q-mode{justify-content:flex-start}#top,#foot{padding-left:12px;padding-right:12px}#srcs{display:none}#foot{gap:6px}.btn{white-space:nowrap;padding:6px 12px}#act .hint{display:none}#chapter{display:none}}
+
+/* ===== V6D 본문 서체: Gowun Dodum (아토 2026-09-21 "손글씨 대신 더 이쁜 대안") ===== */
+:root{--font-hand:'Gowun Dodum',Pretendard,-apple-system,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;--fs-title:clamp(24px,3.2vh,32px);--fs-body:clamp(17px,2.4vh,23px);--fs-note:clamp(13px,1.8vh,16px)}
+html,body{line-height:1.55}
+#body h1,#body h2{font-weight:700;letter-spacing:-.01em}
+#body .why,#body .concept,#body .one,#body .say{line-height:1.6}
+
+/* ===== V6F 글래스 (대표님 2026-09-24) — 치수 불변, 색·투명·모서리만 ===== */
+:root{--gl:rgba(255,255,255,.60);--gl-2:rgba(255,255,255,.42);--gl-3:rgba(255,255,255,.82);--gl-line:rgba(255,255,255,.80);--gl-hi:inset 0 1px 0 rgba(255,255,255,.85);--gl-blur:blur(18px) saturate(140%);--line:rgba(17,17,17,.14);--soft:rgba(255,255,255,.40)}
+html{background:linear-gradient(160deg,#E9F0F5 0%,#F2F5F0 48%,#EDF2EE 100%) fixed}
+body{background:transparent;position:relative}
+body::before,body::after{content:"";position:fixed;z-index:0;border-radius:50%;pointer-events:none;filter:blur(60px)}
+body::before{width:52vw;height:52vw;max-width:640px;max-height:640px;left:-14vw;top:-18vh;background:radial-gradient(circle at 40% 40%,rgba(74,222,128,.32),transparent 68%)}
+body::after{width:60vw;height:60vw;max-width:760px;max-height:760px;right:-20vw;bottom:-24vh;background:radial-gradient(circle at 50% 50%,rgba(96,165,250,.30),transparent 66%)}
+#stage{position:relative;z-index:1;background:var(--gl-2);-webkit-backdrop-filter:var(--gl-blur);backdrop-filter:var(--gl-blur);border-color:var(--gl-line)}
+#top{background:var(--gl-2);border-bottom:1px solid var(--gl-line)}
+#foot{background:var(--gl-2);border-top:1px solid var(--gl-line)}
+.dot{background:rgba(255,255,255,.7)}
+.btn{background:var(--gl);border-color:rgba(17,17,17,.55);border-radius:12px;box-shadow:var(--gl-hi)}
+.btn.primary{background:#15803D;border-color:#15803D;color:#fff;box-shadow:0 4px 12px rgba(21,128,61,.28),inset 0 1px 0 rgba(255,255,255,.25)}
+.choice{background:var(--gl);border-color:rgba(255,255,255,.85);border-radius:14px;box-shadow:0 2px 10px rgba(20,40,60,.06),var(--gl-hi)}
+.choice.sel{border-color:var(--ink)}
+.choice .cn{background:rgba(255,255,255,.7)}
+#body .why,#body .concept{background:var(--gl-2);border-color:rgba(25,113,194,.38);border-radius:14px}
+#body .say,#body .one{background:var(--gl-2);border-radius:0 12px 12px 0}
+#body .tw{border-radius:10px;background:var(--gl-2)}
+.exam-callout{background:rgba(255,77,141,.08);border-radius:14px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.mu>div{border-radius:14px}
+.score .c{border-radius:14px;background:var(--gl-2)}
+.q-kind{border-radius:8px;background:var(--gl-2)}
+.verdict{border-radius:12px;background:var(--gl)}
+.jp{border-radius:10px;background:var(--gl)}
+.myans textarea{border-radius:12px;background:var(--gl)}
+#anslb,#padPanel{background:var(--gl-3);-webkit-backdrop-filter:blur(24px) saturate(150%);backdrop-filter:blur(24px) saturate(150%)}
+#padPanel{border-radius:16px;border-color:rgba(17,17,17,.45)}
+.pad{border-radius:10px;background:rgba(255,255,255,.85)}
+#hintBox{border-radius:14px}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#stage{background:#FAFBFA}.choice,.btn,#top,#foot,#body .why,#body .concept,#anslb,#padPanel,.pad,.myans textarea,.verdict,.jp{background:#FFFFFF}.exam-callout{background:#FFF0F5}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <header id="top"><div id="progress" aria-label="학습 진행"></div><span id="chapter"></span><span id="pos"></span></header>
+  <main id="body" data-ready="false"></main>
+  <footer id="foot">
+    <button class="btn xs" id="prev" aria-label="이전">← 이전</button>
+    <button class="btn xs" id="hintBtn">힌트</button>
+    <button class="btn xs" id="padBtn" aria-label="필기 영역 열기">+ 필기</button>
+    <div id="srcs"></div>
+    <div id="act"></div>
+    <span id="doneTag"></span>
+    <button class="btn primary" id="next" aria-label="다음">다음 →</button>
+  </footer>
+  <div id="hintBox" hidden></div>
+  <div id="padPanel"><div class="pad"><div class="pad-bar"><span>풀이 메모장</span><button data-tool="pen" class="on">펜</button><button data-tool="eraser">지우개</button><button data-act="undo">되돌리기</button><button data-act="clear">지우기</button><button data-act="finger">손가락도</button><button data-act="close">닫기</button></div><canvas id="pad"></canvas></div></div>
+  <div id="chk"></div>
+</div>
+<script>/* 김주영 스앵님 판정 (대표님 2026-09-29 「개념 마인드맵은 스앵님이 학습을 통해 내가 뭘 알고 뭘 모르는지 알아서 파악」) — 원본은 이 파일 하나.
+   빌더가 교실·수업 노트·학습 덱·암기노트 페이지에 그대로 넣고(__JUDGE__), learn.html 은 patch_learn_judge.py 가 TJ-START~TJ-END 사이를 이 파일로 갈아 끼운다.
+   기록 = localStorage atto.evidence [{t, k, n:[노드], ok, v, lid, sid, qid, a, clean}] (최대 4000건 — 넘치면 읽기·질문 기록부터 버리고 노드마다 최근 문제 6건은 남긴다)
+     k: quiz(ok) 확인 문제 · read(clean) 챕터·섹션 끝(다시 설명·질문 없이 끝났으면 clean) · again 다시 설명 · ask 질문 · memo(ok) 암기노트 외움 · self(v) 카드 자가평가
+     a: 같은 시도 표시(카드 「다시 저장」) — 같은 a·qid 는 새 기록으로 바꿔 넣는다(정답 수가 늘지 않는다)
+   판정 = 노드마다 atto.mastery[id] = {quiz:{correct,total,ts}, self, sts, ts, score, state, auto} — learn.html 은 TJ.score 로 같은 식을 쓴다.
+     quiz = 최근 6번 · self(설명할 수 있나 1~5) = 읽음 4 · 다시 설명·질문 2번 이상이면 3 · 외움 +1 · 카드 자가평가가 더 최근이면 그 값
+     → 문제 없이 읽기만 하면 최대 「흔들림」, 「안다」는 문제로만. 점수식 = (0.5·정답률·감쇠(quiz.ts) + 0.2·self/5·감쇠(sts))/0.7, 문제 없으면 self/5·0.6·감쇠(sts)
+     감쇠 = 60일에 걸쳐 1 → 0.4 (최저 0.4). 정답 근거와 읽기·암기 근거를 따로 감쇠한다 — 오늘 암기 체크 하나로 90일 전 정답이 새것처럼 되지 않게(오타 .91 설계 검수 ⑦)
+   저장이 막히면(용량·사생활 모드) 이 페이지 안에서는 메모리 사본으로 이어 가고 rec 은 false 를 돌려준다. */
+(function(g){
+  var EK="atto.evidence", MK="atto.mastery", CAP=4000, KEEPQ=6, MEM={}, DIRTY={};
+  function rd(k,d){ if(DIRTY[k]) return MEM[k]; try{ var v=JSON.parse(localStorage.getItem(k)||"null"); return v==null?d:v; }catch(e){ return DIRTY[k]?MEM[k]:d; } }
+  function wr(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); DIRTY[k]=false; return true; }catch(e){ MEM[k]=v; DIRTY[k]=true; return false; } }
+  function decay(ts){ if(!ts) return 1; var d=Math.max(0,(Date.now()/1000-ts)/86400); return Math.max(.4,1-d/60); }
+  function score(e){ if(!e||typeof e!=="object") return {score:0,state:"unrated"};
+    var q=e.quiz||{}, tot=+q.total||0, cor=+q.correct||0, sv=e.self==null?null:Math.max(1,Math.min(5,+e.self));
+    if(tot<=0&&sv==null) return {score:0,state:"unrated"};
+    var dq=decay(+q.ts||+e.ts||0), ds=decay(+e.sts||+e.ts||0);
+    var raw=tot>0?(0.5*(cor/tot)*dq+0.2*((sv||0)/5)*ds)/0.7:(sv/5)*0.6*ds, s=Math.min(1,raw), st;
+    if(tot<=0) st=(sv>=4&&s>=.4)?"shaky":"unknown"; else st=s>=.7?"known":s>=.4?"shaky":"unknown";
+    return {score:Math.round(s*1000)/1000,state:st}; }
+  function why(evs){ var qz=evs.filter(function(e){return e.k==="quiz";}).slice(-KEEPQ), r={q:qz.length,c:qz.filter(function(e){return e.ok;}).length,
+      read:evs.filter(function(e){return e.k==="read";}).length, clean:evs.filter(function(e){return e.k==="read"&&e.clean;}).length,
+      conf:evs.filter(function(e){return (e.k==="again"||e.k==="ask")&&Date.now()-e.t<21*864e5;}).length,
+      memo:null, self:null, last:0, selfLast:0};
+    evs.forEach(function(e){ if(e.k==="memo") r.memo=!!e.ok; if(e.k==="self") r.self={v:+e.v,t:e.t}; if(e.t>r.last) r.last=e.t; if(e.k!=="quiz"&&e.t>r.selfLast) r.selfLast=e.t; });
+    return r; }
+  function judgeOne(id,L,M){ var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); if(!evs.length) return;
+    var r=why(evs), e=Object.assign({},M[id]||{}), qz=evs.filter(function(x){return x.k==="quiz";}).slice(-KEEPQ);
+    var self=null; if(r.read||r.conf||r.memo!=null){ self=r.read?4:3; if(r.conf>=2) self=3; if(r.memo) self=Math.min(5,self+1); }
+    var autoLast=0; evs.forEach(function(x){ if(x.k!=="self"&&x.t>autoLast) autoLast=x.t; });
+    if(r.self&&r.self.t>=autoLast) self=r.self.v;
+    e.quiz=qz.length?{correct:r.c,total:qz.length,ts:Math.round(qz[qz.length-1].t/1000)}:undefined; if(!e.quiz) delete e.quiz;
+    e.self=self; if(self==null){ delete e.self; delete e.sts; } else e.sts=Math.round(r.selfLast/1000);
+    e.ts=Math.round(r.last/1000); e.auto={by:"tutor",q:r.q,c:r.c,read:r.read,clean:r.clean,conf:r.conf,memo:r.memo};
+    var s=score(e); e.score=s.score; e.state=s.state; M[id]=e; }
+  function judge(ids){ var L=rd(EK,[]), M=rd(MK,{}); if(!Array.isArray(L)) L=[]; if(!M||typeof M!=="object") M={}; (ids||[]).forEach(function(id){ judgeOne(id,L,M); });
+    wr(MK,M); return M; }
+  function all(){ var L=rd(EK,[]), o={}; if(Array.isArray(L)) L.forEach(function(e){ (e&&e.n||[]).forEach(function(i){ o[i]=1; }); }); return judge(Object.keys(o)); }
+  /* 상한 넘침: 노드마다 최근 문제 KEEPQ 건은 지키고, 나머지(읽기·질문·오래된 문제)에서 오래된 것부터 버린다 — 다른 노드 활동으로 정답 기록이 사라지지 않게 */
+  function trim(L,cap){ cap=cap||CAP; if(L.length<=cap) return L; var seen={}, keep=[], rest=[], i;
+    for(i=L.length-1;i>=0;i--){ var e=L[i], k=false; if(e&&e.k==="quiz") (e.n||[]).forEach(function(id){ seen[id]=(seen[id]||0)+1; if(seen[id]<=KEEPQ) k=true; }); (k?keep:rest).push(e); }
+    keep.reverse(); rest.reverse(); rest=rest.slice(Math.max(0,rest.length-Math.max(0,cap-keep.length)));
+    return keep.concat(rest).sort(function(a,b){ return (a.t||0)-(b.t||0); }); }
+  function rec(ev){ if(!ev||!Array.isArray(ev.n)||!ev.n.length) return false; var L=rd(EK,[]); if(!Array.isArray(L)) L=[];
+    ev.t=Date.now();
+    if(ev.a!=null&&ev.qid!=null){ for(var i=L.length-1;i>=0;i--){ var x=L[i]; if(x&&x.k===ev.k&&x.qid===ev.qid&&x.a===ev.a){ L.splice(i,1); break; } } }
+    L.push(ev); L=trim(L);
+    /* 저장 실패 → 절반 상한으로 다시(이때도 노드마다 최근 정답은 지킨다, 오타 설계 2차) · 그래도 실패면 메모리 사본은 자르지 않은 전체로 */
+    var ok=wr(EK,L); if(!ok){ var half=trim(L,Math.floor(CAP/2)); if(wr(EK,half)){ L=half; ok=true; } else { MEM[EK]=L; DIRTY[EK]=true; } }
+    judge(ev.n); return ok; }
+  function reasons(id){ var L=rd(EK,[]); if(!Array.isArray(L)) return null; var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); return evs.length?why(evs):null; }
+  g.TJ={rec:rec,judge:judge,all:all,score:score,reasons:reasons,trim:trim};
+})(typeof window!=="undefined"?window:this);
+</script>
+<script>
+const DECK_ID="statics-mid3";
+const NDS={"q": {"p1-b1": ["mech.particle_2d"], "p1-b2": ["mech.particle_2d"], "p1-b3": ["mech.particle_2d"], "p1-b4": ["mech.particle_2d"], "p1-a5": ["mech.particle_2d"], "p1-a6": ["mech.particle_2d"], "p2-b1": ["mech.particle_2d"], "p2-b2": ["mech.particle_2d"], "p2-b3": ["mech.particle_2d"], "p2-b4": ["mech.particle_2d"], "p2-b5": ["mech.particle_2d"], "p2-a6": ["mech.particle_2d"], "p2-a7": ["mech.particle_2d"], "p2-a8": ["mech.particle_2d"], "p3-b1": ["mech.particle_2d"], "p3-b2": ["mech.particle_2d"], "p3-b3": ["mech.particle_2d"], "p3-b4": ["mech.particle_2d"], "p3-b5": ["mech.particle_2d"], "p3-a6": ["mech.particle_2d"], "p3-a7": ["mech.particle_2d"], "p4-b1": ["mech.particle_3d"], "p4-b2": ["mech.particle_3d"], "p4-b3": ["mech.particle_3d"], "p4-b4": ["mech.particle_3d"], "p4-a5": ["mech.particle_3d"], "p4-a6": ["mech.particle_3d"]}, "parts": {"1": ["mech.particle_2d"], "2": ["mech.particle_2d", "mech.force_types"], "3": ["mech.particle_2d"], "4": ["mech.particle_3d"]}}, qNd=s=>((NDS.q||{})[s.id]||(NDS.parts||{})[String(s.part)]||[]), pNd=s=>((NDS.parts||{})[String(s.part)]||[]);
+function ev(k,x){ try{ if(!window.TJ) return; const o=Object.assign({k:k,lid:DECK_ID},x||{}); if(o.n&&o.n.length) TJ.rec(o); }catch(e){} }
+const SLIDES=[{"id": "start", "type": "start"}, {"id": "jump", "type": "jump", "part": 0}, {"id": "p1-cover", "type": "cover", "part": 1, "no": "파트 1 · 9/21", "title": "2D 입자 평형 ① 두 줄에 매단 물체 — 매듭 점 · 성분 · 연립 ★★", "star": true}, {"id": "p1-concept", "type": "concept", "part": 1, "title": "매듭 점 하나를 떼어 내고 ΣFx = 0, ΣFy = 0 (1/6)", "html": "<div class=\"why\">Ch.3 과제 6문제가 전부 이 모양이다: 줄·스프링·면에 붙잡힌 물체(또는 줄이 모인 매듭)에서 \\(\\sum\\vec F=0\\). 수업에서 배운 평형 방정식을 삼각비와 연립방정식으로 푸는 연습이다.</div>\n  <div class=\"concept\"><p><b>입자(particle)</b>: 크기를 무시하고 한 점으로 보는 물체. 모든 힘이 한 점에 모이므로 평형 조건은 \\(\\sum\\vec F=0\\) 하나다(9/21 판서). 줄 여러 개가 묶인 매듭(knot)도 입자로 본다.</p></div>", "exam": [{"level": "강조", "when": "9/2 OT 슬라이드 p.8", "quote": "과제 1~2문제가 시험에 그대로 출제 — 틀리면 부분점수 없음"}]}, {"id": "p1-concept-2", "type": "concept", "part": 1, "title": "매듭 점 하나를 떼어 내고 ΣFx = 0, ΣFy = 0 (2/6)", "html": "<div class=\"concept\"><p><b>풀이 순서</b> ① 떼어 낼 점 고르기 — 모르는 장력이 모두 걸린 점(보통 매듭) ② 자유물체도(FBD): 그 점에 작용하는 외력만 — 무게 \\(mg\\)는 아래, 장력은 줄을 따라 그 점에서 <b>멀어지는</b> 쪽(줄은 당기기만 한다) ③ 좌표축: 힘이 대부분 수평·수직이면 축도 수평·수직(9/21 판서) ④ 힘마다 성분 → \\(\\sum F_x=0,\\ \\sum F_y=0\\) 두 식 → 모르는 값 두 개까지 풀린다.</p></div>", "exam": []}, {"id": "p1-concept-3", "type": "concept", "part": 1, "title": "매듭 점 하나를 떼어 내고 ΣFx = 0, ΣFy = 0 (3/6)", "html": "<div class=\"concept\"><figure class=\"fig\" data-fig=\"knot\"><svg class=\"fig-svg\" style=\"max-width:100%;height:auto\" viewbox=\"0 0 540 230\" width=\"540\" height=\"230\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"></path></marker></defs><line x1=\"20\" y1=\"40\" x2=\"250\" y2=\"40\" stroke=\"#1F2A44\" stroke-width=\"1.8\"></line><line x1=\"20\" y1=\"40\" x2=\"14\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"28\" y1=\"40\" x2=\"22\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"36\" y1=\"40\" x2=\"30\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"44\" y1=\"40\" x2=\"38\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"52\" y1=\"40\" x2=\"46\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"60\" y1=\"40\" x2=\"54\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"68\" y1=\"40\" x2=\"62\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"76\" y1=\"40\" x2=\"70\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"84\" y1=\"40\" x2=\"78\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"92\" y1=\"40\" x2=\"86\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"100\" y1=\"40\" x2=\"94\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"108\" y1=\"40\" x2=\"102\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"116\" y1=\"40\" x2=\"110\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"124\" y1=\"40\" x2=\"118\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"132\" y1=\"40\" x2=\"126\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"140\" y1=\"40\" x2=\"134\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"148\" y1=\"40\" x2=\"142\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"156\" y1=\"40\" x2=\"150\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"164\" y1=\"40\" x2=\"158\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"172\" y1=\"40\" x2=\"166\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"180\" y1=\"40\" x2=\"174\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"188\" y1=\"40\" x2=\"182\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"196\" y1=\"40\" x2=\"190\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"204\" y1=\"40\" x2=\"198\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"212\" y1=\"40\" x2=\"206\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"220\" y1=\"40\" x2=\"214\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"228\" y1=\"40\" x2=\"222\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"236\" y1=\"40\" x2=\"230\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"244\" y1=\"40\" x2=\"238\" y2=\"33\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"100\" y1=\"110\" x2=\"41.26\" y2=\"40\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><line x1=\"100\" y1=\"110\" x2=\"221.24\" y2=\"40\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><line x1=\"100\" y1=\"110\" x2=\"100\" y2=\"146\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><rect x=\"82\" y=\"146\" width=\"36\" height=\"28\" rx=\"6\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"></rect><text x=\"100.0\" y=\"165.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">m</text><line x1=\"55\" y1=\"110\" x2=\"175\" y2=\"110\" stroke=\"#8A97A6\" stroke-width=\"1.2\" stroke-dasharray=\"5 4\"></line><path d=\"M74.0 110.0 A 26 26 0 0 1 83.3 90.1\" fill=\"none\" stroke=\"#8A97A6\" stroke-width=\"1.3\"></path><text x=\"63.7\" y=\"97.1\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">α</text><path d=\"M129.4 93.0 A 34 34 0 0 1 134.0 110.0\" fill=\"none\" stroke=\"#8A97A6\" stroke-width=\"1.3\"></path><text x=\"146.4\" y=\"101.6\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">β</text><circle cx=\"100\" cy=\"110\" r=\"4\" fill=\"#1F2A44\"></circle><text x=\"30\" y=\"58\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A</text><text x=\"230\" y=\"58\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">C</text><text x=\"88\" y=\"128\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">B</text><text x=\"400\" y=\"24\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">매듭 B의 자유물체도</text><line x1=\"340\" y1=\"125\" x2=\"470\" y2=\"125\" stroke=\"#8A97A6\" stroke-width=\"1.2\" stroke-dasharray=\"5 4\"></line><line x1=\"400\" y1=\"125\" x2=\"348.6\" y2=\"63.7\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah)\"></line><line x1=\"400\" y1=\"125\" x2=\"469.3\" y2=\"85.0\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah)\"></line><line x1=\"400\" y1=\"125\" x2=\"400\" y2=\"200\" stroke=\"#E03131\" stroke-width=\"2.4\" marker-end=\"url(#ah)\"></line><text x=\"340\" y=\"60\" font-size=\"14\" fill=\"#2F9E44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">T<tspan baseline-shift=\"sub\" font-size=\"72%\">BA</tspan></text><text x=\"476\" y=\"82\" font-size=\"14\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">T<tspan baseline-shift=\"sub\" font-size=\"72%\">BC</tspan></text><text x=\"408\" y=\"198\" font-size=\"14\" fill=\"#E03131\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">W</text><path d=\"M376.0 125.0 A 24 24 0 0 1 384.6 106.6\" fill=\"none\" stroke=\"#8A97A6\" stroke-width=\"1.3\"></path><text x=\"367.4\" y=\"113.8\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">α</text><path d=\"M426.0 110.0 A 30 30 0 0 1 430.0 125.0\" fill=\"none\" stroke=\"#8A97A6\" stroke-width=\"1.3\"></path><text x=\"444.4\" y=\"117.1\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">β</text><circle cx=\"400\" cy=\"125\" r=\"4\" fill=\"#1F2A44\"></circle><line x1=\"480\" y1=\"200\" x2=\"514\" y2=\"200\" stroke=\"#1F2A44\" stroke-width=\"1.4\" marker-end=\"url(#ah)\"></line><line x1=\"480\" y1=\"200\" x2=\"480\" y2=\"166\" stroke=\"#1F2A44\" stroke-width=\"1.4\" marker-end=\"url(#ah)\"></line><text x=\"518\" y=\"204\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">x</text><text x=\"486\" y=\"168\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">y</text></svg><figcaption style=\"font-size:.86em;opacity:.85;margin-top:4px\">매듭 B를 떼어 낸 자유물체도: 두 줄의 장력은 줄을 따라 B에서 멀어지는 쪽, 무게는 아래. \\(\\alpha\\)·\\(\\beta\\)는 수평에서 잰 각.</figcaption></figure></div>", "exam": []}, {"id": "p1-concept-4", "type": "concept", "part": 1, "title": "매듭 점 하나를 떼어 내고 ΣFx = 0, ΣFy = 0 (4/6)", "html": "<div class=\"concept\"><p><b>[중학 수학 연결] 삼각비</b>: 크기 \\(T\\)인 힘이 수평과 각 \\(\\alpha\\)를 이루면 수평 성분 \\(T\\cos\\alpha\\), 수직 성분 \\(T\\sin\\alpha\\). 직각삼각형에서 빗변 × cos = 각에 붙은 변, 빗변 × sin = 각의 맞은편 변이기 때문이다. 각을 <b>연직선</b>에서 쟀다면 sin과 cos이 서로 바뀐다 — 각을 어디서 쟀는지 먼저 본다. 부호는 방향으로: 왼쪽·아래는 −.</p></div><div class=\"concept\"><p><b>식 세우기(그림의 매듭 B)</b>: \\(\\sum F_x=-T_{BA}\\cos\\alpha+T_{BC}\\cos\\beta=0\\), \\(\\sum F_y=T_{BA}\\sin\\alpha+T_{BC}\\sin\\beta-W=0\\).</p></div><div class=\"concept\"><p><b>[중학 수학 연결] 연립방정식</b>: 첫 식에서 \\(T_{BC}=T_{BA}\\cos\\alpha/\\cos\\beta\\) → 둘째 식에 대입하면 \\(T_{BA}\\)가 나오고, 다시 첫 식으로 \\(T_{BC}\\). 정리하면 \\(T_{BA}=\\dfrac{W\\cos\\beta}{\\sin(\\alpha+\\beta)}\\), \\(T_{BC}=\\dfrac{W\\cos\\alpha}{\\sin(\\alpha+\\beta)}\\) — 외울 필요는 없고 검산용.</p></div>", "exam": []}, {"id": "p1-concept-5", "type": "concept", "part": 1, "title": "매듭 점 하나를 떼어 내고 ΣFx = 0, ΣFy = 0 (5/6)", "html": "<div class=\"concept\"><p><b>길이로 주어지면</b>: 각 대신 변의 길이를 주는 문제가 많다(과제 3.26). 세 변이 \\(a^2+b^2=c^2\\)를 만족하면 [중학 수학 연결] 피타고라스 정리의 역으로 두 줄이 만나는 각이 직각 → cos·sin이 변의 비로 바로 나온다(3-4-5면 0.6·0.8). 직각이 아니면 코사인 법칙(파트 3).</p></div><div class=\"concept\"><p><b>감각</b>: 무게 \\(W\\)를 두 줄이 수평과 같은 각 \\(\\theta\\)로 대칭으로 매달면 \\(2T\\sin\\theta=W\\) → \\(T=\\dfrac{W}{2\\sin\\theta}\\). 줄이 수평에 가까울수록(\\(\\theta\\)가 작을수록) 장력이 커진다 — 빨랫줄을 완전히 수평으로 팽팽하게 만들 수 없는 이유.</p></div>", "exam": []}, {"id": "p1-concept-6", "type": "concept", "part": 1, "title": "매듭 점 하나를 떼어 내고 ΣFx = 0, ΣFy = 0 (6/6)", "html": "<div class=\"one\">한 줄: 매듭을 떼어 FBD(장력은 줄을 따라 바깥쪽) → 성분(각을 어디서 쟀는지 확인) → \\(\\sum F_x=0,\\ \\sum F_y=0\\) 연립 → 식에 다시 넣어 검산.</div>\n  ", "exam": []}, {"id": "p1-mu", "type": "mu", "part": 1, "title": "2D 입자 평형 ① 두 줄에 매단 물체 — 매듭 점 · 성분 · 연립 ★★", "mem": ["평형(equilibrium): \\(\\sum F_x=0,\\ \\sum F_y=0\\)", "장력(tension)은 줄 방향, 떼어 낸 점에서 멀어지는 쪽", "수평에서 잰 각: \\((T\\cos\\alpha,\\ T\\sin\\alpha)\\)", "3-4-5 삼각형: cos·sin = 0.6·0.8", "자유물체도 = free-body diagram(FBD)"], "und": ["매듭을 떼어 내는 이유 — 모르는 장력이 한 점에 모인다", "각이 작을수록 장력이 커지는 이유", "연직선에서 잰 각이면 sin·cos이 바뀌는 이유"]}, {"id": "p1-b1", "type": "q", "part": 1, "kind": "기초", "qn": "기초 1-1 · 장력의 성분", "html": "<p>장력 \\(T=200\\) N인 줄이 매듭을 오른쪽 위로, 수평과 30°를 이루며 당긴다. 이 힘의 \\((x,\\ y)\\) 성분은?</p>", "ans": "수평에서 잰 각이므로 \\(x\\) 성분 \\(200\\cos30°=173.2\\) N, \\(y\\) 성분 \\(200\\sin30°=100\\) N. 2번은 sin·cos을 바꾼 것, 1번은 곱하지 않고 나눈 것. 검산: \\(\\sqrt{173.2^2+100^2}=200\\) ✓.", "choices": [{"html": "(230.9, 400) N", "ok": false, "k": 2}, {"html": "(100, 173.2) N", "ok": false, "k": 1}, {"html": "(200, 200) N", "ok": false, "k": 3}, {"html": "(173.2, 100) N", "ok": true, "k": 0}], "exam": []}, {"id": "p1-b2", "type": "q", "part": 1, "kind": "기초", "qn": "기초 1-2 · 줄의 각과 장력", "html": "<p>무게 \\(W\\)인 물체를 두 줄이 좌우 대칭으로, 각각 수평과 각 \\(\\theta\\)를 이루며 매단다. \\(\\theta\\)를 점점 작게 하면(줄을 수평에 가깝게) 장력은?</p>", "ans": "연직 방향 평형 \\(2T\\sin\\theta=W\\) → \\(T=\\dfrac{W}{2\\sin\\theta}\\). \\(\\theta\\)가 작아지면 \\(\\sin\\theta\\)가 작아져 \\(T\\)가 커진다. 예: \\(\\theta=30°\\)면 \\(T=W\\), \\(\\theta=10°\\)면 \\(T\\approx2.88W\\). \\(W/2\\)는 두 줄이 연직(\\(\\theta=90°\\))일 때뿐.", "choices": [{"html": "\\(W/2\\)로 일정하다", "ok": false, "k": 3}, {"html": "작아진다", "ok": false, "k": 1}, {"html": "커진다", "ok": true, "k": 0}, {"html": "변하지 않는다", "ok": false, "k": 2}], "exam": []}, {"id": "p1-b3", "type": "q", "part": 1, "kind": "기초", "qn": "기초 1-3 · 장력의 방향", "html": "<p>매듭을 떼어 내 자유물체도를 그릴 때, 매듭에 묶인 줄이 매듭에 주는 힘의 방향은?</p>", "ans": "줄은 당기기만 하고 밀 수 없다(9/16 판서: 장력의 작용선은 케이블과 일직선). 그래서 떼어 낸 점에서 줄이 뻗은 쪽으로 화살표를 그린다. 계산에서 장력이 음수로 나오면 자유물체도나 좌표를 다시 본다.", "choices": [{"html": "줄을 따라 매듭에서 멀어지는 쪽", "ok": true, "k": 0}, {"html": "줄을 따라 매듭 쪽으로 미는 방향", "ok": false, "k": 1}, {"html": "줄에 수직인 방향", "ok": false, "k": 3}, {"html": "줄 방향과 상관없이 연직 위쪽", "ok": false, "k": 2}], "exam": []}, {"id": "p1-b4", "type": "q", "part": 1, "kind": "기초", "qn": "기초 1-4 · 3-4-5 방향", "html": "<p>매듭에서 줄이 오른쪽으로 4, 위로 3의 비율로 뻗어 있고 장력의 크기는 50 N이다. 줄이 매듭에 주는 힘의 \\((x,\\ y)\\) 성분은?</p>", "ans": "방향의 길이 \\(\\sqrt{4^2+3^2}=5\\) → 단위벡터 \\((4/5,\\ 3/5)=(0.8,\\ 0.6)\\). 힘 \\(=50\\times(0.8,\\ 0.6)=(40,\\ 30)\\) N. 1번은 5로 나누지 않은 것.", "choices": [{"html": "(200, 150) N", "ok": false, "k": 2}, {"html": "(40, 30) N", "ok": true, "k": 0}, {"html": "(4, 3) N", "ok": false, "k": 3}, {"html": "(30, 40) N", "ok": false, "k": 1}], "exam": []}, {"id": "p1-a5", "type": "q", "part": 1, "kind": "응용", "qn": "응용 1-1 · 각이 다른 두 줄", "html": "<p>질량 50 kg인 물체가 매듭 B에 매달려 있다. B에서 줄 BA는 왼쪽 위로 수평과 50°, 줄 BC는 오른쪽 위로 수평과 30°를 이루며 천장에 묶여 있다. 두 줄의 장력 \\(T_{BA}\\), \\(T_{BC}\\)를 구하라(\\(g=9.81\\ \\mathrm{m/s^2}\\)).</p>", "ans": "① 무게 \\(W=50\\times9.81=490.5\\) N. ② B의 자유물체도: \\(T_{BA}\\)는 왼쪽 위 50°, \\(T_{BC}\\)는 오른쪽 위 30°, \\(W\\)는 아래. ③ \\(\\sum F_x=-T_{BA}\\cos50°+T_{BC}\\cos30°=0\\) → \\(T_{BC}=T_{BA}\\dfrac{\\cos50°}{\\cos30°}=0.7422\\,T_{BA}\\). ④ \\(\\sum F_y=T_{BA}\\sin50°+T_{BC}\\sin30°-490.5=0\\) → \\(T_{BA}(0.7660+0.7422\\times0.5)=1.1372\\,T_{BA}=490.5\\) → \\(T_{BA}\\approx431.3\\) N. ⑤ \\(T_{BC}=0.7422\\times431.3\\approx320.2\\) N. 검산: \\(x\\) 성분 \\(-431.3\\times0.6428+320.2\\times0.8660=-277.2+277.3\\approx0\\) ✓, 공식 \\(T_{BA}=W\\cos30°/\\sin80°=431.3\\) ✓.", "choices": null, "exam": []}, {"id": "p1-a6", "type": "q", "part": 1, "kind": "응용", "qn": "응용 1-2 · 길이로 주어진 두 줄", "html": "<p>그림처럼 천장의 두 점 A, C(사이 1.3 m)에 줄 AB(0.5 m)와 줄 BC(1.2 m)를 묶고, 매듭 B에 질량 20 kg인 물체를 매달았다. 두 줄의 장력을 구하라(\\(g=9.81\\ \\mathrm{m/s^2}\\)).</p><figure class=\"fig\" data-fig=\"q-rt\"><svg class=\"fig-svg\" style=\"max-width:100%;height:auto\" viewbox=\"0 0 380 182\" width=\"380\" height=\"182\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"></path></marker></defs><line x1=\"60\" y1=\"20\" x2=\"320\" y2=\"20\" stroke=\"#8A97A6\" stroke-width=\"1.2\"></line><line x1=\"60\" y1=\"16\" x2=\"60\" y2=\"24\" stroke=\"#8A97A6\" stroke-width=\"1.2\"></line><line x1=\"320\" y1=\"16\" x2=\"320\" y2=\"24\" stroke=\"#8A97A6\" stroke-width=\"1.2\"></line><text x=\"190.0\" y=\"14\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">1.3 m</text><line x1=\"50\" y1=\"42\" x2=\"330\" y2=\"42\" stroke=\"#1F2A44\" stroke-width=\"1.8\"></line><line x1=\"50\" y1=\"42\" x2=\"44\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"58\" y1=\"42\" x2=\"52\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"66\" y1=\"42\" x2=\"60\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"74\" y1=\"42\" x2=\"68\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"82\" y1=\"42\" x2=\"76\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"90\" y1=\"42\" x2=\"84\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"98\" y1=\"42\" x2=\"92\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"106\" y1=\"42\" x2=\"100\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"114\" y1=\"42\" x2=\"108\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"122\" y1=\"42\" x2=\"116\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"130\" y1=\"42\" x2=\"124\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"138\" y1=\"42\" x2=\"132\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"146\" y1=\"42\" x2=\"140\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"154\" y1=\"42\" x2=\"148\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"162\" y1=\"42\" x2=\"156\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"170\" y1=\"42\" x2=\"164\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"178\" y1=\"42\" x2=\"172\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"186\" y1=\"42\" x2=\"180\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"194\" y1=\"42\" x2=\"188\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"202\" y1=\"42\" x2=\"196\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"210\" y1=\"42\" x2=\"204\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"218\" y1=\"42\" x2=\"212\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"226\" y1=\"42\" x2=\"220\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"234\" y1=\"42\" x2=\"228\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"242\" y1=\"42\" x2=\"236\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"250\" y1=\"42\" x2=\"244\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"258\" y1=\"42\" x2=\"252\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"266\" y1=\"42\" x2=\"260\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"274\" y1=\"42\" x2=\"268\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"282\" y1=\"42\" x2=\"276\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"290\" y1=\"42\" x2=\"284\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"298\" y1=\"42\" x2=\"292\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"306\" y1=\"42\" x2=\"300\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"314\" y1=\"42\" x2=\"308\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"322\" y1=\"42\" x2=\"316\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"330\" y1=\"42\" x2=\"324\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"60\" y1=\"42\" x2=\"98.5\" y2=\"134.3\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><line x1=\"98.5\" y1=\"134.3\" x2=\"320\" y2=\"42\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><path d=\"M94.7 125.1 L103.9 121.2 L107.7 130.5\" fill=\"none\" stroke=\"#8A97A6\" stroke-width=\"1.2\"></path><line x1=\"98.5\" y1=\"134.3\" x2=\"98.5\" y2=\"150\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><rect x=\"80\" y=\"150\" width=\"37\" height=\"24\" rx=\"6\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"></rect><text x=\"124\" y=\"168\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">20 kg</text><circle cx=\"98.5\" cy=\"134.3\" r=\"4\" fill=\"#1F2A44\"></circle><text x=\"52\" y=\"59\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A</text><text x=\"328\" y=\"59\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">C</text><text x=\"88\" y=\"139\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">B</text><text x=\"70\" y=\"97\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"end\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">0.5 m</text><text x=\"230\" y=\"109\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">1.2 m</text></svg></figure>", "ans": "① 변 확인: \\(0.5^2+1.2^2=0.25+1.44=1.69=1.3^2\\) → B에서 두 줄이 직각(피타고라스 정리의 역). ② 각: 줄 AB가 수평과 이루는 각의 cos \\(=0.5/1.3=5/13\\)(약 67.4°), 줄 BC는 cos \\(=1.2/1.3=12/13\\)(약 22.6°). ③ B에서 A 쪽 단위벡터 \\((-\\tfrac{5}{13},\\ \\tfrac{12}{13})\\), C 쪽 \\((\\tfrac{12}{13},\\ \\tfrac{5}{13})\\). ④ \\(W=20\\times9.81=196.2\\) N. \\(\\sum F_x=-\\tfrac{5}{13}T_{AB}+\\tfrac{12}{13}T_{BC}=0\\) → \\(T_{AB}=2.4\\,T_{BC}\\). \\(\\sum F_y=\\tfrac{12}{13}T_{AB}+\\tfrac{5}{13}T_{BC}-196.2=0\\) → \\(\\tfrac{12\\times2.4+5}{13}T_{BC}=2.6\\,T_{BC}=196.2\\) → \\(T_{BC}\\approx75.5\\) N, \\(T_{AB}=2.4\\times75.46\\approx181.1\\) N. 검산(축을 두 줄 방향으로 잡으면 식 하나에 미지수 하나): \\(T_{AB}=W\\times\\tfrac{12}{13}=181.1\\) ✓, \\(T_{BC}=W\\times\\tfrac{5}{13}=75.5\\) ✓.", "choices": null, "exam": []}, {"id": "p1-result", "type": "result", "part": 1, "title": "2D 입자 평형 ① 두 줄에 매단 물체 — 매듭 점 · 성분 · 연립 ★★"}, {"id": "p2-cover", "type": "cover", "part": 2, "no": "파트 2 · 9/16", "title": "2D 입자 평형 ② 경사면과 도르래 — 축을 면에 맞춘다 · 장력은 줄을 따라 같다 ★★", "star": true}, {"id": "p2-concept", "type": "concept", "part": 2, "title": "매끄러운 면은 수직력 하나 · 도르래는 방향만 바꾼다 (1/6)", "html": "<div class=\"why\">과제 3.11(매끄러운 경사면의 상자)과 도르래 문제의 핵심은 두 가지다: 면이 주는 힘의 방향, 그리고 도르래를 지나도 장력이 같다는 것. 둘 다 9/16 판서 내용이다.</div>\n  ", "exam": [{"level": "범위", "when": "9/16 영상 ②06:38", "quote": "\"여기서부터 중간고사 범위. 3, 4, 5장\""}]}, {"id": "p2-concept-2", "type": "concept", "part": 2, "title": "매끄러운 면은 수직력 하나 · 도르래는 방향만 바꾼다 (2/6)", "html": "<div class=\"concept\"><p><b>면의 접촉력(9/16 판서)</b>: 면이 물체에 주는 힘 = 면에 수직인 수직력 \\(\\vec N\\)(normal force) + 면에 평행한 마찰력 \\(\\vec f\\)(friction). <b>매끄러운(smooth) 면</b> = 마찰 없음 → 수직력 하나뿐. 방향은 면에서 물체 쪽(면은 밀기만 한다).</p></div><div class=\"concept\"><p><b>경사면 요령</b>: 축을 경사면 방향(\\(x\\))과 경사면에 수직(\\(y\\))으로 잡는다. 수직력은 \\(y\\)축에, 경사면과 평행한 줄의 장력은 \\(x\\)축에 놓여 나눌 필요가 없고, 무게만 나누면 된다.</p></div>", "exam": []}, {"id": "p2-concept-3", "type": "concept", "part": 2, "title": "매끄러운 면은 수직력 하나 · 도르래는 방향만 바꾼다 (3/6)", "html": "<div class=\"concept\"><figure class=\"fig\" data-fig=\"incline\"><svg class=\"fig-svg\" style=\"max-width:100%;height:auto\" viewbox=\"0 0 540 240\" width=\"540\" height=\"240\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"></path></marker></defs><path d=\"M25 205 L245 205 L245 78 Z\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"></path><path d=\"M59.6 185.0 A 40 40 0 0 1 65.0 205.0\" fill=\"none\" stroke=\"#8A97A6\" stroke-width=\"1.3\"></path><text x=\"77.2\" y=\"195.0\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">θ</text><path d=\"M138.2 105.0 L153.2 131.0 L113.3 154.0 L98.3 128.0 Z\" fill=\"#DDE3EA\" stroke=\"#1F2A44\" stroke-width=\"2\"></path><text x=\"125.8\" y=\"134.5\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">m</text><line x1=\"202.5\" y1=\"102.5\" x2=\"192.5\" y2=\"85.2\" stroke=\"#1F2A44\" stroke-width=\"3\"></line><line x1=\"145.7\" y1=\"118.0\" x2=\"195.0\" y2=\"89.5\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><text x=\"150\" y=\"190\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">매끄러운 면</text><text x=\"420\" y=\"22\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">상자의 자유물체도</text><line x1=\"351.7\" y1=\"143.0\" x2=\"485.9\" y2=\"65.5\" stroke=\"#8A97A6\" stroke-width=\"1.2\" marker-end=\"url(#ah)\" stroke-dasharray=\"4 3\"></line><text x=\"489.9\" y=\"62.5\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">x</text><line x1=\"425.0\" y1=\"170.0\" x2=\"347.5\" y2=\"35.7\" stroke=\"#8A97A6\" stroke-width=\"1.2\" marker-end=\"url(#ah)\" stroke-dasharray=\"4 3\"></line><text x=\"340.5\" y=\"34.7\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"end\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">y</text><line x1=\"395\" y1=\"118\" x2=\"360.0\" y2=\"57.4\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah)\"></line><text x=\"376\" y=\"72\" font-size=\"14\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">N</text><line x1=\"395\" y1=\"118\" x2=\"464.3\" y2=\"78.0\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah)\"></line><text x=\"470\" y=\"96\" font-size=\"14\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">T</text><line x1=\"395\" y1=\"118\" x2=\"395\" y2=\"203\" stroke=\"#E03131\" stroke-width=\"2.4\" marker-end=\"url(#ah)\"></line><text x=\"403\" y=\"203\" font-size=\"14\" fill=\"#E03131\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">mg</text><line x1=\"395\" y1=\"118\" x2=\"358.2\" y2=\"139.2\" stroke=\"#8A97A6\" stroke-width=\"1.6\" marker-end=\"url(#ah)\" stroke-dasharray=\"5 3\"></line><text x=\"352\" y=\"158\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"end\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">mg sinθ</text><line x1=\"395\" y1=\"118\" x2=\"431.8\" y2=\"181.8\" stroke=\"#8A97A6\" stroke-width=\"1.6\" marker-end=\"url(#ah)\" stroke-dasharray=\"5 3\"></line><text x=\"438\" y=\"190\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">mg cosθ</text><path d=\"M408.0 140.5 A 26 26 0 0 1 395.0 144.0\" fill=\"none\" stroke=\"#8A97A6\" stroke-width=\"1.3\"></path><text x=\"404.8\" y=\"158.7\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">θ</text><circle cx=\"395\" cy=\"118\" r=\"4\" fill=\"#1F2A44\"></circle></svg><figcaption style=\"font-size:.86em;opacity:.85;margin-top:4px\">매끄러운 경사면(경사각 \\(\\theta\\))의 상자와 자유물체도: 축을 경사면 방향 \\(x\\)·수직 방향 \\(y\\)로 잡으면 \\(N\\)과 \\(T\\)는 축 위에 있고, 무게만 \\(mg\\sin\\theta\\)(경사면 아래쪽)와 \\(mg\\cos\\theta\\)(면 쪽)로 나눈다. 무게와 면의 수직선 사이 각이 \\(\\theta\\).</figcaption></figure></div>", "exam": []}, {"id": "p2-concept-4", "type": "concept", "part": 2, "title": "매끄러운 면은 수직력 하나 · 도르래는 방향만 바꾼다 (4/6)", "html": "<div class=\"concept\"><p><b>무게의 성분</b>: 경사각 \\(\\theta\\)이면 경사면을 따라 아래로 \\(mg\\sin\\theta\\), 면을 누르는 쪽으로 \\(mg\\cos\\theta\\). 이유: 무게(연직)와 면의 수직선 사이 각이 경사각과 같은 \\(\\theta\\)다 — 수평선과 경사면을 각각 90° 돌린 것이 연직선과 수직선이라 사이각이 그대로다. 확인: \\(\\theta=0\\)(평평한 바닥)이면 경사면 방향 성분 \\(mg\\sin0=0\\), \\(\\theta=90°\\)(벽)이면 \\(mg\\) 전부.</p></div><div class=\"concept\"><p><b>평형식(그림)</b>: \\(\\sum F_x=T-mg\\sin\\theta=0\\), \\(\\sum F_y=N-mg\\cos\\theta=0\\). 줄이나 미는 힘이 축과 비스듬하면 그 힘도 두 성분으로 나눈다.</p></div><div class=\"concept\"><p><b>도르래(pulley, 9/16 판서)</b>: 줄의 방향만 바꾸고 장력은 그대로 \\(T_1=T_2\\) — 줄의 질량이 0이라 줄 한 토막의 양끝 장력이 같다. 도르래 축의 마찰도 무시한다.</p></div>", "exam": []}, {"id": "p2-concept-5", "type": "concept", "part": 2, "title": "매끄러운 면은 수직력 하나 · 도르래는 방향만 바꾼다 (5/6)", "html": "<div class=\"concept\"><figure class=\"fig\" data-fig=\"pulley\"><svg class=\"fig-svg\" style=\"max-width:100%;height:auto\" viewbox=\"0 0 540 240\" width=\"540\" height=\"240\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"></path></marker></defs><text x=\"130\" y=\"16\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">고정 도르래</text><line x1=\"60\" y1=\"30\" x2=\"200\" y2=\"30\" stroke=\"#1F2A44\" stroke-width=\"1.8\"></line><line x1=\"60\" y1=\"30\" x2=\"54\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"68\" y1=\"30\" x2=\"62\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"76\" y1=\"30\" x2=\"70\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"84\" y1=\"30\" x2=\"78\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"92\" y1=\"30\" x2=\"86\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"100\" y1=\"30\" x2=\"94\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"108\" y1=\"30\" x2=\"102\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"116\" y1=\"30\" x2=\"110\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"124\" y1=\"30\" x2=\"118\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"132\" y1=\"30\" x2=\"126\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"140\" y1=\"30\" x2=\"134\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"148\" y1=\"30\" x2=\"142\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"156\" y1=\"30\" x2=\"150\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"164\" y1=\"30\" x2=\"158\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"172\" y1=\"30\" x2=\"166\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"180\" y1=\"30\" x2=\"174\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"188\" y1=\"30\" x2=\"182\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"196\" y1=\"30\" x2=\"190\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"130\" y1=\"30\" x2=\"130\" y2=\"46\" stroke=\"#1F2A44\" stroke-width=\"1.6\"></line><circle cx=\"130\" cy=\"70\" r=\"24\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"1.6\"></circle><circle cx=\"130\" cy=\"70\" r=\"3\" fill=\"#1F2A44\"></circle><path d=\"M106 70 A24 24 0 0 1 154 70\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"2\"></path><line x1=\"106\" y1=\"70\" x2=\"106\" y2=\"175\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><line x1=\"154\" y1=\"70\" x2=\"154\" y2=\"150\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><rect x=\"88\" y=\"175\" width=\"36\" height=\"28\" rx=\"6\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"></rect><text x=\"106.0\" y=\"194.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">W</text><line x1=\"154\" y1=\"150\" x2=\"154\" y2=\"196\" stroke=\"#E03131\" stroke-width=\"2.4\" marker-end=\"url(#ah)\"></line><text x=\"96\" y=\"140\" font-size=\"14\" fill=\"#2F9E44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">T<tspan baseline-shift=\"sub\" font-size=\"72%\">1</tspan></text><text x=\"162\" y=\"190\" font-size=\"14\" fill=\"#E03131\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">T<tspan baseline-shift=\"sub\" font-size=\"72%\">2</tspan></text><text x=\"130\" y=\"228\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">T<tspan baseline-shift=\"sub\" font-size=\"72%\">1</tspan> = T<tspan baseline-shift=\"sub\" font-size=\"72%\">2</tspan></text><text x=\"375\" y=\"16\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">움직도르래</text><line x1=\"300\" y1=\"30\" x2=\"450\" y2=\"30\" stroke=\"#1F2A44\" stroke-width=\"1.8\"></line><line x1=\"300\" y1=\"30\" x2=\"294\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"308\" y1=\"30\" x2=\"302\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"316\" y1=\"30\" x2=\"310\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"324\" y1=\"30\" x2=\"318\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"332\" y1=\"30\" x2=\"326\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"340\" y1=\"30\" x2=\"334\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"348\" y1=\"30\" x2=\"342\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"356\" y1=\"30\" x2=\"350\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"364\" y1=\"30\" x2=\"358\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"372\" y1=\"30\" x2=\"366\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"380\" y1=\"30\" x2=\"374\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"388\" y1=\"30\" x2=\"382\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"396\" y1=\"30\" x2=\"390\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"404\" y1=\"30\" x2=\"398\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"412\" y1=\"30\" x2=\"406\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"420\" y1=\"30\" x2=\"414\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"428\" y1=\"30\" x2=\"422\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"436\" y1=\"30\" x2=\"430\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"444\" y1=\"30\" x2=\"438\" y2=\"23\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"396\" y1=\"30\" x2=\"396\" y2=\"60\" stroke=\"#1F2A44\" stroke-width=\"1.6\"></line><circle cx=\"396\" cy=\"60\" r=\"22\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"1.6\"></circle><circle cx=\"396\" cy=\"60\" r=\"3\" fill=\"#1F2A44\"></circle><circle cx=\"352\" cy=\"150\" r=\"22\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"1.6\"></circle><circle cx=\"352\" cy=\"150\" r=\"3\" fill=\"#1F2A44\"></circle><line x1=\"330\" y1=\"30\" x2=\"330\" y2=\"150\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><path d=\"M330 150 A22 22 0 0 0 374 150\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"2\"></path><line x1=\"374\" y1=\"150\" x2=\"374\" y2=\"60\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><path d=\"M374 60 A22 22 0 0 1 418 60\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"2\"></path><line x1=\"418\" y1=\"60\" x2=\"418\" y2=\"150\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><line x1=\"418\" y1=\"150\" x2=\"418\" y2=\"196\" stroke=\"#E03131\" stroke-width=\"2.4\" marker-end=\"url(#ah)\"></line><line x1=\"352\" y1=\"150\" x2=\"352\" y2=\"182\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><rect x=\"332\" y=\"182\" width=\"40\" height=\"24\" rx=\"6\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"></rect><text x=\"352.0\" y=\"199.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">W</text><text x=\"322\" y=\"100\" font-size=\"14\" fill=\"#2F9E44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">T</text><text x=\"382\" y=\"110\" font-size=\"14\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">T</text><text x=\"426\" y=\"190\" font-size=\"14\" fill=\"#E03131\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">T</text><text x=\"352\" y=\"230\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">2T = W</text></svg><figcaption style=\"font-size:.86em;opacity:.85;margin-top:4px\">도르래는 줄의 방향만 바꾸고 장력은 그대로(\\(T_1=T_2\\)). 오른쪽: 물체에 달린 움직도르래를 줄 두 가닥이 받치면 \\(2T=W\\).</figcaption></figure></div>", "exam": []}, {"id": "p2-concept-6", "type": "concept", "part": 2, "title": "매끄러운 면은 수직력 하나 · 도르래는 방향만 바꾼다 (6/6)", "html": "<div class=\"concept\"><p><b>움직도르래</b>: 물체에 달린 도르래를 줄 두 가닥이 받치면, 도르래+물체를 떼어 낸 자유물체도에 위로 \\(T\\) 두 개 → \\(2T=W\\). 가닥이 \\(n\\)개면 \\(T=W/n\\). <b>도르래 축이 받는 힘</b>: 도르래만 떼어 내면 줄 두 가닥의 장력이 모두 도르래에서 멀어지는 쪽 → 축(지지대)이 그 합력의 반대 힘을 준다.</p></div><div class=\"one\">한 줄: 매끄러운 면 → 수직력 \\(N\\) 하나(면에 수직) · 경사면은 축을 면에 맞추고 무게만 \\(mg\\sin\\theta\\)·\\(mg\\cos\\theta\\)로 · 도르래는 \\(T_1=T_2\\) · 가닥 \\(n\\)개면 \\(T=W/n\\).</div>\n  ", "exam": []}, {"id": "p2-mu", "type": "mu", "part": 2, "title": "2D 입자 평형 ② 경사면과 도르래 — 축을 면에 맞춘다 · 장력은 줄을 따라 같다 ★★", "mem": ["매끄러운(smooth) = 마찰 없음 → \\(N\\)만", "경사면: 면 방향 \\(mg\\sin\\theta\\), 수직 \\(mg\\cos\\theta\\)", "도르래(pulley): \\(T_1=T_2\\)", "움직도르래 두 가닥: \\(2T=W\\)", "수직력 = normal force"], "und": ["무게와 면의 수직선 사이 각이 경사각과 같은 이유", "도르래를 지나도 장력이 같은 이유(줄 질량 0)", "축을 면에 맞추면 계산이 줄어드는 이유"]}, {"id": "p2-b1", "type": "q", "part": 2, "kind": "기초", "qn": "기초 2-1 · 매끄러운 면의 힘", "html": "<p>매끄러운(마찰 없는) 면이 그 면에 놓인 물체에 주는 힘의 방향은?</p>", "ans": "접촉력 = 수직력(면에 수직) + 마찰력(면에 평행). 매끄러우면 마찰력 0 → 수직력만 남고, 면은 물체를 밀기만 하므로 면에서 물체 쪽. 경사면이면 연직이 아니라 경사면에 수직이다.", "choices": [{"html": "면에 평행", "ok": false, "k": 1}, {"html": "면에 수직, 면에서 물체 쪽", "ok": true, "k": 0}, {"html": "항상 연직 위쪽", "ok": false, "k": 2}, {"html": "물체가 미끄러지려는 방향의 반대", "ok": false, "k": 3}], "exam": []}, {"id": "p2-b2", "type": "q", "part": 2, "kind": "기초", "qn": "기초 2-2 · 무게의 경사면 방향 성분", "html": "<p>경사각 \\(\\theta\\)인 경사면에 질량 \\(m\\)인 물체가 놓여 있다. 무게 중 경사면을 따라 아래로 향하는 성분의 크기는?</p>", "ans": "무게와 경사면의 수직선 사이 각이 \\(\\theta\\) → 면에 수직인 성분 \\(mg\\cos\\theta\\), 면 방향 성분 \\(mg\\sin\\theta\\). 확인: \\(\\theta=0\\)(평평)이면 면 방향 성분이 0이어야 하는데 \\(\\sin0=0\\) ✓.", "choices": [{"html": "\\(mg\\sin\\theta\\)", "ok": true, "k": 0}, {"html": "\\(mg\\cos\\theta\\)", "ok": false, "k": 1}, {"html": "\\(mg\\tan\\theta\\)", "ok": false, "k": 2}, {"html": "\\(mg\\)", "ok": false, "k": 3}], "exam": []}, {"id": "p2-b3", "type": "q", "part": 2, "kind": "기초", "qn": "기초 2-3 · 경사면 상자의 자유물체도", "html": "<p>매끄러운 경사면에 놓인 상자가 경사면과 평행한 줄에 붙잡혀 정지해 있다. 상자의 자유물체도에 그려야 하는 힘을 모두 고르면?</p>", "ans": "매끄러운 면 → 마찰력 없음. 「미끄러지려는 힘」은 따로 있는 힘이 아니라 무게의 경사면 방향 성분 \\(mg\\sin\\theta\\)이다 — 무게를 그렸으면 다시 그리지 않는다.", "choices": [{"html": "무게, 장력", "ok": false, "k": 2}, {"html": "무게, 수직력, 장력, 마찰력", "ok": false, "k": 1}, {"html": "무게, 수직력, 장력", "ok": true, "k": 0}, {"html": "무게, 수직력, 장력, 경사면을 따라 미끄러지려는 힘", "ok": false, "k": 3}], "exam": []}, {"id": "p2-b4", "type": "q", "part": 2, "kind": "기초", "qn": "기초 2-4 · 움직도르래", "html": "<p>무게 \\(W\\)인 물체가 달린 움직도르래를 줄 두 가닥이 연직으로 받치고 있다(줄·도르래의 무게와 마찰 무시). 줄의 장력은?</p>", "ans": "도르래+물체를 떼어 내면 위로 \\(T\\) 두 개(같은 줄이라 장력이 같다), 아래로 \\(W\\) → \\(2T-W=0\\) → \\(T=W/2\\).", "choices": [{"html": "\\(2W\\)", "ok": false, "k": 2}, {"html": "\\(W\\)", "ok": false, "k": 1}, {"html": "\\(W/4\\)", "ok": false, "k": 3}, {"html": "\\(W/2\\)", "ok": true, "k": 0}], "exam": []}, {"id": "p2-b5", "type": "q", "part": 2, "kind": "기초", "qn": "기초 2-5 · 도르래 축이 받는 힘", "html": "<p>천장에 매달린 고정 도르래에 줄이 걸려 있고, 줄의 두 가닥이 모두 연직 아래로 내려가며 장력은 각각 100 N이다. 천장의 지지대가 도르래를 받치는 힘은? (도르래 무게 무시)</p>", "ans": "도르래만 떼어 내면 두 가닥이 도르래를 각각 100 N씩 아래로 당긴다 → 지지대는 \\(2\\times100=200\\) N을 위로.", "choices": [{"html": "0", "ok": false, "k": 2}, {"html": "200 N, 연직 위로", "ok": true, "k": 0}, {"html": "100 N, 연직 위로", "ok": false, "k": 1}, {"html": "200 N, 연직 아래로", "ok": false, "k": 3}], "exam": []}, {"id": "p2-a6", "type": "q", "part": 2, "kind": "응용", "qn": "응용 2-1 · 매끄러운 경사면의 상자", "html": "<p>수평과 40°를 이루는 매끄러운 경사면에 질량 80 kg인 상자가 놓여 있고, 경사면과 평행하게 위쪽으로 당기는 줄이 상자를 붙잡고 있다. (a) 상자의 자유물체도에 들어갈 힘을 쓰라. (b) 줄의 장력과 경사면의 수직력을 구하라(\\(g=9.81\\ \\mathrm{m/s^2}\\)).</p>", "ans": "(a) 무게 \\(mg=784.8\\) N(연직 아래) · 수직력 \\(N\\)(경사면에 수직, 면에서 상자 쪽) · 장력 \\(T\\)(경사면을 따라 위쪽). 마찰 없음. (b) 축: 경사면 방향 \\(x\\)(위쪽 +), 수직 방향 \\(y\\). \\(\\sum F_x=T-784.8\\sin40°=0\\) → \\(T=784.8\\times0.6428\\approx504.5\\) N. \\(\\sum F_y=N-784.8\\cos40°=0\\) → \\(N=784.8\\times0.7660\\approx601.2\\) N. 검산: \\(\\sqrt{504.5^2+601.2^2}\\approx784.8=mg\\) ✓(두 힘의 합력이 무게와 균형).", "choices": null, "exam": []}, {"id": "p2-a7", "type": "q", "part": 2, "kind": "응용", "qn": "응용 2-2 · 수평으로 미는 힘", "html": "<p>수평과 30°를 이루는 매끄러운 경사면에 질량 20 kg인 상자가 놓여 있다. 수평 방향의 힘 \\(F\\)로 상자를 경사면 쪽으로 밀어 정지시켰다. \\(F\\)와 수직력 \\(N\\)을 구하라(\\(g=9.81\\ \\mathrm{m/s^2}\\)).</p>", "ans": "① \\(mg=196.2\\) N. ② 축: 경사면 방향 \\(x\\)(위쪽 +), 면에 수직 \\(y\\)(면 바깥 +). 수평 힘 \\(F\\)는 경사면과 30° → 경사면 위쪽 성분 \\(F\\cos30°\\), 면을 누르는 쪽 성분 \\(F\\sin30°\\). ③ \\(\\sum F_x=F\\cos30°-196.2\\sin30°=0\\) → \\(F=196.2\\tan30°\\approx113.3\\) N. ④ \\(\\sum F_y=N-196.2\\cos30°-F\\sin30°=0\\) → \\(N=169.91+56.64\\approx226.6\\) N. 검산(수평·연직 축): 연직 \\(N\\cos30°=196.2\\) → \\(N=226.6\\) ✓, 수평 \\(F=N\\sin30°=113.3\\) ✓ — 축을 다르게 잡아도 답은 같다.", "choices": null, "exam": []}, {"id": "p2-a8", "type": "q", "part": 2, "kind": "응용", "qn": "응용 2-3 · 움직도르래와 고정 도르래", "html": "<p>그림처럼 줄의 한 끝은 천장에 묶여 있고, 줄은 질량 60 kg 물체가 달린 움직도르래 아래를 감아 올라가 천장의 고정 도르래를 지나 사람의 손으로 내려온다. 모든 줄 가닥은 연직이고, 줄·도르래의 무게와 마찰은 무시한다. (a) 사람이 당기는 힘 (b) 고정 도르래의 지지대가 도르래를 받치는 힘을 구하라(\\(g=9.81\\ \\mathrm{m/s^2}\\)).</p><figure class=\"fig\" data-fig=\"q-pulley\"><svg class=\"fig-svg\" style=\"max-width:100%;height:auto\" viewbox=\"0 0 260 200\" width=\"260\" height=\"200\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"></path></marker></defs><line x1=\"10\" y1=\"22\" x2=\"160\" y2=\"22\" stroke=\"#1F2A44\" stroke-width=\"1.8\"></line><line x1=\"10\" y1=\"22\" x2=\"4\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"18\" y1=\"22\" x2=\"12\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"26\" y1=\"22\" x2=\"20\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"34\" y1=\"22\" x2=\"28\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"42\" y1=\"22\" x2=\"36\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"50\" y1=\"22\" x2=\"44\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"58\" y1=\"22\" x2=\"52\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"66\" y1=\"22\" x2=\"60\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"74\" y1=\"22\" x2=\"68\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"82\" y1=\"22\" x2=\"76\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"90\" y1=\"22\" x2=\"84\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"98\" y1=\"22\" x2=\"92\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"106\" y1=\"22\" x2=\"100\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"114\" y1=\"22\" x2=\"108\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"122\" y1=\"22\" x2=\"116\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"130\" y1=\"22\" x2=\"124\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"138\" y1=\"22\" x2=\"132\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"146\" y1=\"22\" x2=\"140\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"154\" y1=\"22\" x2=\"148\" y2=\"15\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"106\" y1=\"22\" x2=\"106\" y2=\"50\" stroke=\"#1F2A44\" stroke-width=\"1.6\"></line><circle cx=\"106\" cy=\"50\" r=\"22\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"1.6\"></circle><circle cx=\"106\" cy=\"50\" r=\"3\" fill=\"#1F2A44\"></circle><circle cx=\"62\" cy=\"132\" r=\"22\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"1.6\"></circle><circle cx=\"62\" cy=\"132\" r=\"3\" fill=\"#1F2A44\"></circle><line x1=\"40\" y1=\"22\" x2=\"40\" y2=\"132\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><path d=\"M40 132 A22 22 0 0 0 84 132\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"2\"></path><line x1=\"84\" y1=\"132\" x2=\"84\" y2=\"50\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><path d=\"M84 50 A22 22 0 0 1 128 50\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"2\"></path><line x1=\"128\" y1=\"50\" x2=\"128\" y2=\"132\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><line x1=\"128\" y1=\"132\" x2=\"128\" y2=\"170\" stroke=\"#E03131\" stroke-width=\"2.4\" marker-end=\"url(#ah)\"></line><line x1=\"62\" y1=\"132\" x2=\"62\" y2=\"164\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><rect x=\"42\" y=\"164\" width=\"40\" height=\"24\" rx=\"6\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"></rect><text x=\"88\" y=\"182\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">60 kg</text><text x=\"136\" y=\"172\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">사람</text></svg></figure>", "ans": "(a) 움직도르래+물체를 떼어 낸다: 위로 장력 \\(T\\) 두 가닥, 아래로 \\(W=60\\times9.81=588.6\\) N → \\(2T=588.6\\) → \\(T=294.3\\) N. 줄 하나라 어디서나 장력이 같으므로 사람이 당기는 힘도 294.3 N. (b) 고정 도르래만 떼어 낸다: 움직도르래 쪽 가닥과 손 쪽 가닥이 모두 아래로 \\(T\\) → 지지대는 \\(2T=588.6\\) N을 위로. 검산(전체를 한 덩어리로): 천장 고정점 \\(T\\) + 지지대 \\(2T\\) − 손 \\(T\\) − \\(W\\) \\(=294.3+588.6-294.3-588.6=0\\) ✓.", "choices": null, "exam": []}, {"id": "p2-result", "type": "result", "part": 2, "title": "2D 입자 평형 ② 경사면과 도르래 — 축을 면에 맞춘다 · 장력은 줄을 따라 같다 ★★"}, {"id": "p3-cover", "type": "cover", "part": 3, "no": "파트 3 · 9/16", "title": "2D 입자 평형 ③ 스프링 · 두 점을 잇는 방향의 힘 — 길이로 각을 구한다 ★★", "star": true}, {"id": "p3-concept", "type": "concept", "part": 3, "title": "스프링 힘 F = k|L − L₀| · 세 변이면 코사인 법칙 · 방향 = (끝점 − 시작점) ÷ 길이 (1/4)", "html": "<div class=\"why\">과제 3.51(줄과 스프링으로 매단 물체의 스프링 상수)과 3.47(링크 두 개와 실린더가 한 점에 거는 힘)이 이 유형이다. 둘 다 각이 주어지지 않고 길이·좌표만 주어진다 — 방향을 스스로 만들어야 한다.</div>\n  <div class=\"concept\"><p><b>스프링(9/16 판서)</b>: 힘이 없을 때 길이 = 자연 길이 \\(L_0\\)(unstretched length), 지금 길이 \\(L\\). 힘의 크기 \\(F=k\\lvert L-L_0\\rvert\\), \\(k\\) = 스프링 상수(spring constant, 단위 N/m). 늘어났으면(\\(L\\gt L_0\\)) 당기고, 줄었으면(\\(L\\lt L_0\\)) 민다 — 원래 길이로 돌아가려는 쪽.</p></div>", "exam": []}, {"id": "p3-concept-2", "type": "concept", "part": 3, "title": "스프링 힘 F = k|L − L₀| · 세 변이면 코사인 법칙 · 방향 = (끝점 − 시작점) ÷ 길이 (2/4)", "html": "<div class=\"concept\"><p><b>스프링이 줄 대신 매달 때</b>: 스프링도 두 끝을 잇는 방향으로 힘을 준다. 평형식으로 스프링 힘 \\(F\\)를 먼저 구하고 → \\(k=F/\\lvert L-L_0\\rvert\\), 또는 늘어난 경우 \\(L_0=L-F/k\\).</p></div><div class=\"concept\"><p><b>[고등 수학 연결] 코사인 법칙</b>: 세 변 \\(a,b,c\\)인 삼각형에서 변 \\(a\\)의 맞은편 각 \\(A\\)는 \\(a^2=b^2+c^2-2bc\\cos A\\) → \\(\\cos A=\\dfrac{b^2+c^2-a^2}{2bc}\\). 세 변만 알면 세 각을 모두 구한다. 확인: 세 각의 합 = 180°. 직각이면 \\(\\cos90°=0\\)이라 피타고라스 정리가 된다.</p></div><div class=\"concept\"><p><b>[중학 수학 연결] 엇각</b>: 천장(수평)의 점 A에서 잰 삼각형의 각은, 아래 매듭에서 줄이 수평과 이루는 각과 같다 — 평행한 두 수평선을 줄이 가로지르며 만드는 엇각이다.</p></div>", "exam": []}, {"id": "p3-concept-3", "type": "concept", "part": 3, "title": "스프링 힘 F = k|L − L₀| · 세 변이면 코사인 법칙 · 방향 = (끝점 − 시작점) ÷ 길이 (3/4)", "html": "<div class=\"concept\"><p><b>[2주차 연결] 두 점을 잇는 방향</b>: 점 P에서 점 Q 쪽 단위벡터 \\(\\vec e_{PQ}=\\dfrac{\\overrightarrow{PQ}}{\\lvert\\overrightarrow{PQ}\\rvert}\\), \\(\\overrightarrow{PQ}\\) = 끝점 Q − 시작점 P. 크기를 모르는 힘은 \\(F\\,\\vec e\\)로 두고 \\(F\\)를 미지수로 푼다.</p></div><div class=\"concept\"><p><b>음수가 나오면</b>: 링크(양 끝이 핀인 막대)는 당길 수도 밀 수도 있다. 방향을 가정하고 풀어 \\(F\\)가 음수면 가정의 반대 방향이다 — 틀린 게 아니다(과제 3.47). 반면 줄의 장력이 음수면 자유물체도를 잘못 그린 것(줄은 밀 수 없다).</p></div><div class=\"concept\"><p><b>세 힘이 한 점에서 만나면</b>: 물체에 크기가 있어도 모든 힘의 작용선이 한 점을 지나면 그 점에 대한 모멘트가 저절로 0이라, 입자처럼 \\(\\sum\\vec F=0\\)만 쓰면 된다(과제 3.47의 실린더 — 세 힘이 모두 C를 지난다).</p></div>", "exam": []}, {"id": "p3-concept-4", "type": "concept", "part": 3, "title": "스프링 힘 F = k|L − L₀| · 세 변이면 코사인 법칙 · 방향 = (끝점 − 시작점) ÷ 길이 (4/4)", "html": "<div class=\"one\">한 줄: 스프링 \\(F=k\\lvert L-L_0\\rvert\\)(늘면 당김·줄면 밂) · 세 변 → 코사인 법칙으로 각 · 두 점 방향 \\(\\vec e\\) = (끝점 − 시작점) ÷ 길이 · 링크 힘이 음수면 반대 방향.</div>\n  ", "exam": []}, {"id": "p3-mu", "type": "mu", "part": 3, "title": "2D 입자 평형 ③ 스프링 · 두 점을 잇는 방향의 힘 — 길이로 각을 구한다 ★★", "mem": ["\\(F=k\\lvert L-L_0\\rvert\\), \\(k\\) [N/m] — spring constant", "자연 길이 = unstretched length", "\\(\\cos A=\\dfrac{b^2+c^2-a^2}{2bc}\\)", "\\(\\vec e_{PQ}\\) = (Q − P) ÷ 길이"], "und": ["늘어난 스프링은 당기고 줄어든 스프링은 미는 이유", "링크 힘은 음수가 나와도 되고 줄 장력은 안 되는 이유", "세 힘이 한 점을 지나면 입자처럼 풀 수 있는 이유"]}, {"id": "p3-b1", "type": "q", "part": 3, "kind": "기초", "qn": "기초 3-1 · 줄어든 스프링", "html": "<p>스프링 상수 800 N/m, 자연 길이 0.30 m인 스프링이 지금 0.24 m로 줄어 있다. 스프링이 끝에 붙은 물체에 주는 힘은?</p>", "ans": "\\(F=k\\lvert L-L_0\\rvert=800\\times\\lvert0.24-0.30\\rvert=800\\times0.06=48\\) N. 줄어 있으니(\\(L\\lt L_0\\)) 원래 길이로 늘어나려고 <b>민다</b>. 1번은 \\(k\\times L\\), 4번은 \\(k\\times L_0\\)로 계산한 것.", "choices": [{"html": "192 N, 물체를 민다", "ok": false, "k": 2}, {"html": "48 N, 물체를 당긴다", "ok": false, "k": 1}, {"html": "48 N, 물체를 민다", "ok": true, "k": 0}, {"html": "240 N, 물체를 당긴다", "ok": false, "k": 3}], "exam": []}, {"id": "p3-b2", "type": "q", "part": 3, "kind": "기초", "qn": "기초 3-2 · 코사인 법칙", "html": "<p>세 변의 길이가 5, 7, 8인 삼각형에서 길이 7인 변의 맞은편 각은?</p>", "ans": "\\(\\cos A=\\dfrac{5^2+8^2-7^2}{2\\times5\\times8}=\\dfrac{25+64-49}{80}=\\dfrac{40}{80}=0.5\\) → \\(A=60°\\). 맞은편 변(7)의 제곱을 <b>빼는</b> 자리에 둔다.", "choices": [{"html": "60°", "ok": true, "k": 0}, {"html": "45°", "ok": false, "k": 2}, {"html": "90°", "ok": false, "k": 3}, {"html": "30°", "ok": false, "k": 1}], "exam": []}, {"id": "p3-b3", "type": "q", "part": 3, "kind": "기초", "qn": "기초 3-3 · 두 점을 잇는 단위벡터", "html": "<p>점 P(1, 2) m에서 점 Q(4, 6) m 쪽을 가리키는 단위벡터는?</p>", "ans": "\\(\\overrightarrow{PQ}=(4-1,\\ 6-2)=(3,\\ 4)\\), 길이 \\(\\sqrt{9+16}=5\\) → \\((3/5,\\ 4/5)=(0.6,\\ 0.8)\\). 2번은 Q에서 P 쪽(끝점·시작점을 바꾼 것), 3번은 길이로 나누지 않은 것.", "choices": [{"html": "(0.8, 0.6)", "ok": false, "k": 3}, {"html": "(−0.6, −0.8)", "ok": false, "k": 1}, {"html": "(3, 4)", "ok": false, "k": 2}, {"html": "(0.6, 0.8)", "ok": true, "k": 0}], "exam": []}, {"id": "p3-b4", "type": "q", "part": 3, "kind": "기초", "qn": "기초 3-4 · 음수로 나온 링크 힘", "html": "<p>링크 AC가 점 C에 주는 힘을 \\(F_{AC}\\,\\vec e_{AC}\\)(\\(\\vec e_{AC}\\)는 A에서 C 쪽 단위벡터)로 두고 평형식을 풀었더니 \\(F_{AC}=-5\\) kN이 나왔다. 옳은 해석은?</p>", "ans": "링크는 밀 수도 당길 수도 있다. 가정한 방향(A→C)의 반대라는 뜻 → 크기 5 kN, 방향은 C→A(C를 A 쪽으로 당긴다). 힘의 크기는 음수가 될 수 없다.", "choices": [{"html": "크기가 −5 kN인 힘이다", "ok": false, "k": 2}, {"html": "계산이 틀렸으니 다시 풀어야 한다", "ok": false, "k": 1}, {"html": "크기 5 kN, C에서 A 쪽으로 작용한다", "ok": true, "k": 0}, {"html": "링크 AC에는 힘이 없다", "ok": false, "k": 3}], "exam": []}, {"id": "p3-b5", "type": "q", "part": 3, "kind": "기초", "qn": "기초 3-5 · 자연 길이 구하기", "html": "<p>무게 150 N인 물체를 스프링(스프링 상수 3000 N/m) 하나로 연직으로 매달았더니 스프링 길이가 0.35 m가 되어 정지했다. 스프링의 자연 길이는?</p>", "ans": "평형: 스프링 힘 = 무게 = 150 N. 늘어난 길이 \\(=F/k=150/3000=0.05\\) m. 매달려 늘어났으므로 \\(L_0=L-0.05=0.35-0.05=0.30\\) m. 3번은 더한 것, 1번은 늘어난 길이만.", "choices": [{"html": "0.05 m", "ok": false, "k": 3}, {"html": "0.35 m", "ok": false, "k": 2}, {"html": "0.40 m", "ok": false, "k": 1}, {"html": "0.30 m", "ok": true, "k": 0}], "exam": []}, {"id": "p3-a6", "type": "q", "part": 3, "kind": "응용", "qn": "응용 3-1 · 줄과 스프링으로 매단 물체", "html": "<p>그림처럼 천장의 두 점 A, C(사이 0.8 m)에 줄 AB(0.6 m)와 스프링 CB를 걸고 매듭 B에 질량 30 kg인 물체를 매달았더니 스프링 길이가 0.5 m가 되어 정지했다. 스프링의 자연 길이가 0.4 m일 때 스프링 상수 \\(k\\)를 구하라(\\(g=9.81\\ \\mathrm{m/s^2}\\)).</p><figure class=\"fig\" data-fig=\"q-spring\"><svg class=\"fig-svg\" style=\"max-width:100%;height:auto\" viewbox=\"0 0 380 196\" width=\"380\" height=\"196\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"></path></marker></defs><line x1=\"50\" y1=\"18\" x2=\"274\" y2=\"18\" stroke=\"#8A97A6\" stroke-width=\"1.2\"></line><line x1=\"50\" y1=\"14\" x2=\"50\" y2=\"22\" stroke=\"#8A97A6\" stroke-width=\"1.2\"></line><line x1=\"274\" y1=\"14\" x2=\"274\" y2=\"22\" stroke=\"#8A97A6\" stroke-width=\"1.2\"></line><text x=\"162.0\" y=\"12\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">0.8 m</text><line x1=\"40\" y1=\"42\" x2=\"284\" y2=\"42\" stroke=\"#1F2A44\" stroke-width=\"1.8\"></line><line x1=\"40\" y1=\"42\" x2=\"34\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"48\" y1=\"42\" x2=\"42\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"56\" y1=\"42\" x2=\"50\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"64\" y1=\"42\" x2=\"58\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"72\" y1=\"42\" x2=\"66\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"80\" y1=\"42\" x2=\"74\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"88\" y1=\"42\" x2=\"82\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"96\" y1=\"42\" x2=\"90\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"104\" y1=\"42\" x2=\"98\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"112\" y1=\"42\" x2=\"106\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"120\" y1=\"42\" x2=\"114\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"128\" y1=\"42\" x2=\"122\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"136\" y1=\"42\" x2=\"130\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"144\" y1=\"42\" x2=\"138\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"152\" y1=\"42\" x2=\"146\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"160\" y1=\"42\" x2=\"154\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"168\" y1=\"42\" x2=\"162\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"176\" y1=\"42\" x2=\"170\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"184\" y1=\"42\" x2=\"178\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"192\" y1=\"42\" x2=\"186\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"200\" y1=\"42\" x2=\"194\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"208\" y1=\"42\" x2=\"202\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"216\" y1=\"42\" x2=\"210\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"224\" y1=\"42\" x2=\"218\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"232\" y1=\"42\" x2=\"226\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"240\" y1=\"42\" x2=\"234\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"248\" y1=\"42\" x2=\"242\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"256\" y1=\"42\" x2=\"250\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"264\" y1=\"42\" x2=\"258\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"272\" y1=\"42\" x2=\"266\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"280\" y1=\"42\" x2=\"274\" y2=\"35\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"50\" y1=\"42\" x2=\"181.25\" y2=\"146.87\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><path d=\"M274.0 42.0 L264.7 52.5 L256.1 53.2 L261.0 65.8 L247.9 62.5 L252.7 75.1 L239.6 71.8 L244.5 84.4 L231.4 81.1 L236.2 93.7 L223.1 90.5 L228.0 103.1 L214.9 99.8 L219.8 112.4 L206.6 109.1 L211.5 121.7 L198.4 118.4 L203.3 131.0 L190.2 127.7 L190.5 136.4 L181.2 146.9\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"></path><line x1=\"181.25\" y1=\"146.87\" x2=\"181.25\" y2=\"160\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><rect x=\"162\" y=\"160\" width=\"38\" height=\"24\" rx=\"6\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"></rect><text x=\"206\" y=\"178\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">30 kg</text><circle cx=\"181.25\" cy=\"146.87\" r=\"4\" fill=\"#1F2A44\"></circle><text x=\"42\" y=\"58\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A</text><text x=\"282\" y=\"58\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">C</text><text x=\"166\" y=\"156\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">B</text><text x=\"100\" y=\"112\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"end\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">0.6 m</text><text x=\"246\" y=\"112\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">스프링 0.5 m</text><text x=\"246\" y=\"128\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">(자연 길이 0.4 m)</text></svg></figure>", "ans": "① 각(코사인 법칙): A에서 \\(\\cos\\alpha=\\dfrac{0.6^2+0.8^2-0.5^2}{2(0.6)(0.8)}=\\dfrac{0.75}{0.96}=0.78125\\) → \\(\\alpha\\approx38.6°\\). C에서 \\(\\cos\\gamma=\\dfrac{0.5^2+0.8^2-0.6^2}{2(0.5)(0.8)}=\\dfrac{0.53}{0.8}=0.6625\\) → \\(\\gamma\\approx48.5°\\). 엇각이라 B에서 줄 BA는 수평과 \\(\\alpha\\), 스프링 BC는 수평과 \\(\\gamma\\). ② B의 자유물체도: 줄 장력 \\(T\\)는 B→A(왼쪽 위), 스프링 힘 \\(F\\)는 B→C(오른쪽 위) — 늘어나 있으니 당긴다. 무게 \\(W=30\\times9.81=294.3\\) N. ③ \\(\\sum F_x=-T\\cos\\alpha+F\\cos\\gamma=0\\) → \\(T=\\dfrac{0.6625}{0.78125}F=0.848F\\). ④ \\(\\sum F_y=T\\sin\\alpha+F\\sin\\gamma-294.3=0\\), \\(\\sin\\alpha=0.6242\\), \\(\\sin\\gamma=0.7491\\) → \\((0.848\\times0.6242+0.7491)F=1.2784F=294.3\\) → \\(F\\approx230.2\\) N, \\(T\\approx195.2\\) N. ⑤ \\(k=\\dfrac{F}{L-L_0}=\\dfrac{230.2}{0.5-0.4}\\approx2302\\) N/m \\(\\approx2.30\\) kN/m.", "choices": null, "exam": []}, {"id": "p3-a7", "type": "q", "part": 3, "kind": "응용", "qn": "응용 3-2 · 한 점에 모인 세 힘", "html": "<p>그림처럼 점 C(0, 0.6) m에 세 힘이 작용해 평형이다: ① 실린더가 주는 크기 6 kN의 힘(점 B(0.8, 0) m에서 C 쪽 방향) ② 링크 AC가 주는 힘(직선 A–C와 평행, A(0, 0)) ③ 링크 CD가 주는 힘(직선 C–D와 평행, D(1.2, 1.1) m). ②와 ③의 크기와 방향을 구하라.</p><figure class=\"fig\" data-fig=\"q-link\"><svg class=\"fig-svg\" style=\"max-width:100%;height:auto\" viewbox=\"0 0 390 236\" width=\"390\" height=\"236\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"></path></marker></defs><path d=\"M100 200 L86 224 L114 224 Z\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"></path><line x1=\"78\" y1=\"224\" x2=\"122\" y2=\"224\" stroke=\"#1F2A44\" stroke-width=\"1.8\"></line><line x1=\"78\" y1=\"224\" x2=\"72\" y2=\"231\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"86\" y1=\"224\" x2=\"80\" y2=\"231\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"94\" y1=\"224\" x2=\"88\" y2=\"231\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"102\" y1=\"224\" x2=\"96\" y2=\"231\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"110\" y1=\"224\" x2=\"104\" y2=\"231\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"118\" y1=\"224\" x2=\"112\" y2=\"231\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><circle cx=\"100\" cy=\"200\" r=\"4\" fill=\"#fff\" stroke=\"#1F2A44\" stroke-width=\"2\"></circle><path d=\"M212 200 L198 224 L226 224 Z\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"></path><line x1=\"190\" y1=\"224\" x2=\"234\" y2=\"224\" stroke=\"#1F2A44\" stroke-width=\"1.8\"></line><line x1=\"190\" y1=\"224\" x2=\"184\" y2=\"231\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"198\" y1=\"224\" x2=\"192\" y2=\"231\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"206\" y1=\"224\" x2=\"200\" y2=\"231\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"214\" y1=\"224\" x2=\"208\" y2=\"231\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"222\" y1=\"224\" x2=\"216\" y2=\"231\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"230\" y1=\"224\" x2=\"224\" y2=\"231\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><circle cx=\"212\" cy=\"200\" r=\"4\" fill=\"#fff\" stroke=\"#1F2A44\" stroke-width=\"2\"></circle><path d=\"M268 46 L256 24 L280 24 Z\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"></path><line x1=\"248\" y1=\"24\" x2=\"288\" y2=\"24\" stroke=\"#1F2A44\" stroke-width=\"1.8\"></line><line x1=\"248\" y1=\"24\" x2=\"242\" y2=\"17\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"256\" y1=\"24\" x2=\"250\" y2=\"17\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"264\" y1=\"24\" x2=\"258\" y2=\"17\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"272\" y1=\"24\" x2=\"266\" y2=\"17\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"280\" y1=\"24\" x2=\"274\" y2=\"17\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"288\" y1=\"24\" x2=\"282\" y2=\"17\" stroke=\"#8A97A6\" stroke-width=\"1.1\"></line><line x1=\"100\" y1=\"200\" x2=\"100\" y2=\"116\" stroke=\"#1F2A44\" stroke-width=\"6\"></line><line x1=\"100\" y1=\"116\" x2=\"268\" y2=\"46\" stroke=\"#1F2A44\" stroke-width=\"6\"></line><line x1=\"212\" y1=\"200\" x2=\"152\" y2=\"155\" stroke=\"#AAB4C0\" stroke-width=\"14\"></line><line x1=\"152\" y1=\"155\" x2=\"100\" y2=\"116\" stroke=\"#1F2A44\" stroke-width=\"5\"></line><circle cx=\"100\" cy=\"200\" r=\"5\" fill=\"#fff\" stroke=\"#1F2A44\" stroke-width=\"2\"></circle><circle cx=\"212\" cy=\"200\" r=\"5\" fill=\"#fff\" stroke=\"#1F2A44\" stroke-width=\"2\"></circle><circle cx=\"100\" cy=\"116\" r=\"5\" fill=\"#fff\" stroke=\"#1F2A44\" stroke-width=\"2\"></circle><circle cx=\"268\" cy=\"46\" r=\"5\" fill=\"#fff\" stroke=\"#1F2A44\" stroke-width=\"2\"></circle><line x1=\"100\" y1=\"116\" x2=\"64\" y2=\"89\" stroke=\"#E03131\" stroke-width=\"2.6\" marker-end=\"url(#ah)\"></line><text x=\"58\" y=\"84\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">6 kN</text><text x=\"88\" y=\"197\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A</text><text x=\"224\" y=\"197\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">B</text><text x=\"90\" y=\"136\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">C</text><text x=\"278\" y=\"52\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">D</text><text x=\"178\" y=\"158\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">실린더</text><line x1=\"330\" y1=\"215\" x2=\"364\" y2=\"215\" stroke=\"#1F2A44\" stroke-width=\"1.4\" marker-end=\"url(#ah)\"></line><line x1=\"330\" y1=\"215\" x2=\"330\" y2=\"181\" stroke=\"#1F2A44\" stroke-width=\"1.4\" marker-end=\"url(#ah)\"></line><text x=\"368\" y=\"219\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">x</text><text x=\"336\" y=\"183\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">y</text></svg></figure>", "ans": "① 실린더 힘: \\(\\overrightarrow{BC}=(0-0.8,\\ 0.6-0)=(-0.8,\\ 0.6)\\), 길이 1.0 → \\(\\vec F_B=6(-0.8,\\ 0.6)=(-4.8,\\ 3.6)\\) kN. ② 단위벡터: \\(\\vec e_{AC}=(0,\\ 0.6)/0.6=(0,\\ 1)\\), \\(\\overrightarrow{CD}=(1.2,\\ 0.5)\\), 길이 \\(\\sqrt{1.44+0.25}=1.3\\) → \\(\\vec e_{CD}=(0.9231,\\ 0.3846)\\). ③ 모르는 힘을 \\(F_{AC}\\vec e_{AC}\\), \\(F_{CD}\\vec e_{CD}\\)로 두면 \\(\\sum F_x=-4.8+0.9231F_{CD}=0\\) → \\(F_{CD}=5.2\\) kN. \\(\\sum F_y=3.6+F_{AC}+0.3846\\times5.2=0\\) → \\(F_{AC}=-5.6\\) kN. ④ 해석: 링크 CD는 5.2 kN으로 C를 D 쪽으로 당기고, 링크 AC는 음수라 가정(A→C)의 반대 — 5.6 kN으로 C를 A 쪽(아래)으로 당긴다. 검산: \\(x\\) \\(-4.8+4.8=0\\) ✓, \\(y\\) \\(3.6-5.6+2.0=0\\) ✓.", "choices": null, "exam": []}, {"id": "p3-result", "type": "result", "part": 3, "title": "2D 입자 평형 ③ 스프링 · 두 점을 잇는 방향의 힘 — 길이로 각을 구한다 ★★"}, {"id": "p4-cover", "type": "cover", "part": 4, "no": "파트 4 · 9/21", "title": "3D 입자 평형 — 좌표 → 위치벡터 → 단위벡터 → 세 식 ★★", "star": true}, {"id": "p4-concept", "type": "concept", "part": 4, "title": "줄마다 T e 로 쓰고 x·y·z 성분별로 합 = 0 (1/4)", "html": "<div class=\"why\">과제 3.63·3.69(세 줄로 매단 물체)가 이 유형이다. 2D와 방법은 같고, 각 대신 좌표로 방향을 만든다는 것만 다르다. 식이 세 개라 모르는 장력 세 개까지 풀린다.</div>\n  <div class=\"concept\"><p><b>3D 평형(9/21 판서)</b>: \\(\\sum\\vec F=(\\sum F_x)\\vec i+(\\sum F_y)\\vec j+(\\sum F_z)\\vec k=0\\) → \\(\\sum F_x=0,\\ \\sum F_y=0,\\ \\sum F_z=0\\) 세 식.</p></div><div class=\"concept\"><p><b>줄의 힘 만들기 5단계</b> ① 좌표 읽기: 매듭 A, 줄 끝 B·C·D ② 위치벡터 \\(\\vec r_{AB}\\) = 끝점 B − 시작점 A(매듭에서 줄 끝 쪽 — 장력이 매듭을 그쪽으로 당기니까) ③ 길이 \\(\\lvert\\vec r_{AB}\\rvert=\\sqrt{r_x^2+r_y^2+r_z^2}\\) ④ 단위벡터 \\(\\vec e_{AB}=\\vec r_{AB}/\\lvert\\vec r_{AB}\\rvert\\) ⑤ 장력 벡터 \\(T_{AB}\\,\\vec e_{AB}\\).</p></div>", "exam": []}, {"id": "p4-concept-2", "type": "concept", "part": 4, "title": "줄마다 T e 로 쓰고 x·y·z 성분별로 합 = 0 (2/4)", "html": "<div class=\"concept\"><figure class=\"fig\" data-fig=\"cables3d\"><svg class=\"fig-svg\" style=\"max-width:100%;height:auto\" viewbox=\"0 0 500 250\" width=\"500\" height=\"250\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"></path></marker></defs><path d=\"M163.0 11.5 L471.0 11.5 L372.0 80.8 L64.0 80.8 Z\" fill=\"#EEF1F5\" stroke=\"none\"></path><line x1=\"240.0\" y1=\"160.0\" x2=\"383.0\" y2=\"42.3\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><circle cx=\"383.0\" cy=\"42.3\" r=\"4\" fill=\"#1F2A44\"></circle><line x1=\"240.0\" y1=\"160.0\" x2=\"119.0\" y2=\"73.1\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><circle cx=\"119.0\" cy=\"73.1\" r=\"4\" fill=\"#1F2A44\"></circle><line x1=\"240.0\" y1=\"160.0\" x2=\"218.0\" y2=\"19.2\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><circle cx=\"218.0\" cy=\"19.2\" r=\"4\" fill=\"#1F2A44\"></circle><line x1=\"240.0\" y1=\"160.0\" x2=\"240.0\" y2=\"178.0\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><rect x=\"222.0\" y=\"178.0\" width=\"36\" height=\"26\" rx=\"6\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"></rect><text x=\"240.0\" y=\"196.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">m</text><line x1=\"240.0\" y1=\"160.0\" x2=\"275.5\" y2=\"130.8\" stroke=\"#E03131\" stroke-width=\"3\" marker-end=\"url(#ah)\"></line><text x=\"284.6\" y=\"146.8\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">T<tspan baseline-shift=\"sub\" font-size=\"72%\">AB</tspan> e<tspan baseline-shift=\"sub\" font-size=\"72%\">AB</tspan></text><text x=\"322\" y=\"116\" font-size=\"13\" fill=\"#1971C2\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">r<tspan baseline-shift=\"sub\" font-size=\"72%\">AB</tspan> = B − A</text><circle cx=\"240.0\" cy=\"160.0\" r=\"4\" fill=\"#1F2A44\"></circle><text x=\"228.0\" y=\"164.0\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A</text><text x=\"390.0\" y=\"40.3\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">B</text><text x=\"110.0\" y=\"70.1\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">C</text><text x=\"210.0\" y=\"18.2\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">D</text><text x=\"300\" y=\"26\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">천장 (y = 0)</text><line x1=\"60\" y1=\"222\" x2=\"96\" y2=\"222\" stroke=\"#1F2A44\" stroke-width=\"1.4\" marker-end=\"url(#ah)\"></line><line x1=\"60\" y1=\"222\" x2=\"60\" y2=\"186\" stroke=\"#1F2A44\" stroke-width=\"1.4\" marker-end=\"url(#ah)\"></line><line x1=\"60\" y1=\"222\" x2=\"40\" y2=\"236\" stroke=\"#1F2A44\" stroke-width=\"1.4\" marker-end=\"url(#ah)\"></line><text x=\"100\" y=\"226\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">x</text><text x=\"66\" y=\"190\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">y</text><text x=\"34\" y=\"242\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"end\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">z</text></svg><figcaption style=\"font-size:.86em;opacity:.85;margin-top:4px\">매듭 A에서 줄 끝 B로 가는 위치벡터 \\(\\vec r_{AB}\\)(끝점 − 시작점)를 길이로 나눈 단위벡터 \\(\\vec e_{AB}\\)에 장력을 곱한 \\(T_{AB}\\vec e_{AB}\\)가 줄의 힘. \\(y\\)축이 연직 위.</figcaption></figure></div>", "exam": []}, {"id": "p4-concept-3", "type": "concept", "part": 4, "title": "줄마다 T e 로 쓰고 x·y·z 성분별로 합 = 0 (3/4)", "html": "<div class=\"concept\"><p><b>무게</b>: 연직 아래. 과제 3.63·3.69처럼 \\(y\\)축이 연직 위인 그림이면 \\(\\vec W=-mg\\,\\vec j\\), \\(z\\)축이 위면 \\(-mg\\,\\vec k\\) — 축 방향을 그림에서 먼저 확인한다.</p></div><div class=\"concept\"><p><b>세 식</b>: \\(T_{AB}\\vec e_{AB}+T_{AC}\\vec e_{AC}+T_{AD}\\vec e_{AD}+\\vec W=0\\)을 성분별로 — \\(x\\)성분끼리, \\(y\\)성분끼리, \\(z\\)성분끼리 더해 0.</p></div><div class=\"concept\"><p><b>푸는 요령</b>: 성분에 0이 있어 미지수가 두 개뿐인 식부터 푼다 → 한 장력을 다른 장력으로 나타내 → 나머지 식에 대입([중학 수학 연결] 대입법). 미지수 셋인 연립방정식도 이렇게 하나씩 줄이면 된다.</p></div><div class=\"concept\"><p><b>검산</b>: 구한 장력을 세 식에 다시 넣어 모두 0인지. 장력이 음수면 좌표를 잘못 읽었거나 (시작점 − 끝점)으로 뒤집은 것이다 — 줄은 밀 수 없다.</p></div>", "exam": []}, {"id": "p4-concept-4", "type": "concept", "part": 4, "title": "줄마다 T e 로 쓰고 x·y·z 성분별로 합 = 0 (4/4)", "html": "<div class=\"one\">한 줄: \\(\\vec r\\) = 끝점 − 매듭 → \\(\\vec e=\\vec r/\\lvert\\vec r\\rvert\\) → \\(T\\vec e\\) → \\(x\\)·\\(y\\)·\\(z\\) 합 = 0 세 식 → 0이 있는 식부터 대입 → 다시 넣어 검산.</div>\n  ", "exam": []}, {"id": "p4-mu", "type": "mu", "part": 4, "title": "3D 입자 평형 — 좌표 → 위치벡터 → 단위벡터 → 세 식 ★★", "mem": ["\\(\\sum F_x=\\sum F_y=\\sum F_z=0\\) — 미지수 최대 3개", "\\(\\vec e_{AB}=\\vec r_{AB}/\\lvert\\vec r_{AB}\\rvert\\) — unit vector", "위치벡터(position vector) = 끝점 − 시작점", "\\(y\\)가 연직 위면 \\(\\vec W=-mg\\,\\vec j\\)"], "und": ["위치벡터를 매듭에서 줄 끝 쪽으로 잡는 이유", "0 성분이 있는 식부터 풀면 빨라지는 이유", "장력이 음수면 어디가 틀렸는지"]}, {"id": "p4-b1", "type": "q", "part": 4, "kind": "기초", "qn": "기초 4-1 · 좌표로 단위벡터", "html": "<p>매듭 A(0, −2, 0) m에서 줄 끝 B(2, 0, 1) m로 뻗은 줄의 단위벡터 \\(\\vec e_{AB}\\)는?</p>", "ans": "\\(\\vec r_{AB}\\) = B − A = \\((2-0,\\ 0-(-2),\\ 1-0)=(2,\\ 2,\\ 1)\\), 길이 \\(\\sqrt{4+4+1}=3\\) → \\((\\tfrac23,\\ \\tfrac23,\\ \\tfrac13)\\). 4번은 A − B(방향 반대), 3번은 성분을 제곱하지 않고 더해(2+2+1=5) 나눈 것.", "choices": [{"html": "\\((2,\\ 2,\\ 1)\\)", "ok": false, "k": 2}, {"html": "\\((\\tfrac23,\\ \\tfrac23,\\ \\tfrac13)\\)", "ok": true, "k": 0}, {"html": "\\((\\tfrac25,\\ \\tfrac25,\\ \\tfrac15)\\)", "ok": false, "k": 3}, {"html": "\\((-\\tfrac23,\\ -\\tfrac23,\\ -\\tfrac13)\\)", "ok": false, "k": 1}], "exam": []}, {"id": "p4-b2", "type": "q", "part": 4, "kind": "기초", "qn": "기초 4-2 · 장력 벡터", "html": "<p>장력의 크기가 150 N이고 단위벡터가 \\((\\tfrac23,\\ \\tfrac23,\\ \\tfrac13)\\)인 줄이 매듭에 주는 힘은?</p>", "ans": "\\(150\\times(\\tfrac23,\\ \\tfrac23,\\ \\tfrac13)=(100,\\ 100,\\ 50)\\) N. 검산: \\(\\sqrt{100^2+100^2+50^2}=\\sqrt{22500}=150\\) ✓. 2번은 곱하지 않고 나눈 것.", "choices": [{"html": "(100, 100, 50) N", "ok": true, "k": 0}, {"html": "(225, 225, 450) N", "ok": false, "k": 2}, {"html": "(150, 150, 150) N", "ok": false, "k": 3}, {"html": "(50, 50, 100) N", "ok": false, "k": 1}], "exam": []}, {"id": "p4-b3", "type": "q", "part": 4, "kind": "기초", "qn": "기초 4-3 · 식의 개수", "html": "<p>3차원에서 한 점(입자)의 평형 방정식만으로 구할 수 있는 모르는 값은 최대 몇 개인가?</p>", "ans": "\\(\\sum F_x=0,\\ \\sum F_y=0,\\ \\sum F_z=0\\) 세 식 → 3개. 2개는 2D 입자, 6개는 Ch.5 3D 강체(힘 세 식 + 모멘트 세 식).", "choices": [{"html": "3개", "ok": true, "k": 0}, {"html": "2개", "ok": false, "k": 1}, {"html": "1개", "ok": false, "k": 3}, {"html": "6개", "ok": false, "k": 2}], "exam": []}, {"id": "p4-b4", "type": "q", "part": 4, "kind": "기초", "qn": "기초 4-4 · 무게 벡터", "html": "<p>\\(y\\)축이 연직 위쪽인 좌표계에서 질량 20 kg인 물체의 무게 벡터는? (\\(g=9.81\\ \\mathrm{m/s^2}\\))</p>", "ans": "크기 \\(mg=20\\times9.81=196.2\\) N, 방향은 연직 아래 = \\(-y\\) → \\(-196.2\\,\\vec j\\) N. 3번은 \\(z\\)가 위인 좌표계일 때의 답, 1번은 질량을 그대로 쓴 것.", "choices": [{"html": "\\(-20\\,\\vec j\\) N", "ok": false, "k": 3}, {"html": "\\(196.2\\,\\vec j\\) N", "ok": false, "k": 2}, {"html": "\\(-196.2\\,\\vec k\\) N", "ok": false, "k": 1}, {"html": "\\(-196.2\\,\\vec j\\) N", "ok": true, "k": 0}], "exam": []}, {"id": "p4-a5", "type": "q", "part": 4, "kind": "응용", "qn": "응용 4-1 · 세 줄에 매단 물체", "html": "<p>질량 100 kg인 물체가 매듭 A(0, −6, 0) m에 매달려 있고, 매듭에서 세 줄이 천장의 점 B(8, 0, 0) m, C(−3, 0, 2) m, D(−2, 0, −3) m로 뻗어 있다. \\(y\\)축이 연직 위일 때 세 줄의 장력을 구하라(\\(g=9.81\\ \\mathrm{m/s^2}\\)).</p>", "ans": "① 위치벡터(끝점 − A): \\(\\vec r_{AB}=(8,\\ 6,\\ 0)\\), 길이 10 / \\(\\vec r_{AC}=(-3,\\ 6,\\ 2)\\), 길이 \\(\\sqrt{9+36+4}=7\\) / \\(\\vec r_{AD}=(-2,\\ 6,\\ -3)\\), 길이 7. ② 단위벡터 \\(\\vec e_{AB}=(0.8,\\ 0.6,\\ 0)\\), \\(\\vec e_{AC}=(-\\tfrac37,\\ \\tfrac67,\\ \\tfrac27)\\), \\(\\vec e_{AD}=(-\\tfrac27,\\ \\tfrac67,\\ -\\tfrac37)\\). ③ 세 식(\\(W=981\\) N): \\(x\\): \\(0.8T_{AB}-\\tfrac37T_{AC}-\\tfrac27T_{AD}=0\\) / \\(y\\): \\(0.6T_{AB}+\\tfrac67T_{AC}+\\tfrac67T_{AD}=981\\) / \\(z\\): \\(\\tfrac27T_{AC}-\\tfrac37T_{AD}=0\\). ④ \\(z\\)식(미지수 둘)부터: \\(T_{AC}=1.5T_{AD}\\). \\(x\\)식에 넣으면 \\(0.8T_{AB}=\\tfrac{4.5+2}{7}T_{AD}\\) → \\(T_{AB}=1.1607T_{AD}\\). ⑤ \\(y\\)식: \\((0.6\\times1.1607+\\tfrac67\\times2.5)T_{AD}=2.8393T_{AD}=981\\) → \\(T_{AD}\\approx345.5\\) N, \\(T_{AC}\\approx518.3\\) N, \\(T_{AB}\\approx401.0\\) N. 검산 \\(x\\): \\(320.8-222.1-98.7=0\\) ✓.", "choices": null, "exam": []}, {"id": "p4-a6", "type": "q", "part": 4, "kind": "응용", "qn": "응용 4-2 · 기둥 세 개에 건 줄", "html": "<p>높이 3 m인 수직 기둥 세 개의 꼭대기 B(−1, 3, 2) m, C(2, 3, −1) m, D(−2, 3, −1) m에 줄을 걸어 매듭 A(0, 1, 0) m에 질량 40 kg인 물체를 매달았다(\\(y\\)축이 연직 위). 세 줄의 장력을 구하라(\\(g=9.81\\ \\mathrm{m/s^2}\\)).</p>", "ans": "① \\(\\vec r_{AB}=(-1,\\ 2,\\ 2)\\), \\(\\vec r_{AC}=(2,\\ 2,\\ -1)\\), \\(\\vec r_{AD}=(-2,\\ 2,\\ -1)\\) — 길이가 모두 \\(\\sqrt9=3\\). ② \\(W=40\\times9.81=392.4\\) N. 세 식에 3을 곱해 분모를 없애면 \\(x\\): \\(-T_{AB}+2T_{AC}-2T_{AD}=0\\) / \\(y\\): \\(2(T_{AB}+T_{AC}+T_{AD})=3\\times392.4\\) / \\(z\\): \\(2T_{AB}-T_{AC}-T_{AD}=0\\). ③ \\(z\\)식 → \\(T_{AC}+T_{AD}=2T_{AB}\\) → \\(y\\)식에 넣으면 \\(2(3T_{AB})=1177.2\\) → \\(T_{AB}=196.2\\) N. ④ \\(T_{AC}+T_{AD}=392.4\\), \\(x\\)식 → \\(T_{AC}-T_{AD}=T_{AB}/2=98.1\\) → \\(T_{AC}=245.25\\) N, \\(T_{AD}=147.15\\) N. 검산 \\(z\\): \\(392.4-245.25-147.15=0\\) ✓.", "choices": null, "exam": []}, {"id": "p4-result", "type": "result", "part": 4, "title": "3D 입자 평형 — 좌표 → 위치벡터 → 단위벡터 → 세 식 ★★"}, {"id": "final", "type": "final"}];
+const PARTS=[{"n": 1, "title": "2D 입자 평형 ① 두 줄에 매단 물체 — 매듭 점 · 성분 · 연립 ★★", "hint": "한 줄: 매듭을 떼어 FBD(장력은 줄을 따라 바깥쪽) → 성분(각을 어디서 쟀는지 확인) → \\(\\sum F_x=0,\\ \\sum F_y=0\\) 연립 → 식에 다시 넣어 검산."}, {"n": 2, "title": "2D 입자 평형 ② 경사면과 도르래 — 축을 면에 맞춘다 · 장력은 줄을 따라 같다 ★★", "hint": "한 줄: 매끄러운 면 → 수직력 \\(N\\) 하나(면에 수직) · 경사면은 축을 면에 맞추고 무게만 \\(mg\\sin\\theta\\)·\\(mg\\cos\\theta\\)로 · 도르래는 \\(T_1=T_2\\) · 가닥 \\(n\\)개면 \\(T=W/n\\)."}, {"n": 3, "title": "2D 입자 평형 ③ 스프링 · 두 점을 잇는 방향의 힘 — 길이로 각을 구한다 ★★", "hint": "한 줄: 스프링 \\(F=k\\lvert L-L_0\\rvert\\)(늘면 당김·줄면 밂) · 세 변 → 코사인 법칙으로 각 · 두 점 방향 \\(\\vec e\\) = (끝점 − 시작점) ÷ 길이 · 링크 힘이 음수면 반대 방향."}, {"n": 4, "title": "3D 입자 평형 — 좌표 → 위치벡터 → 단위벡터 → 세 식 ★★", "hint": "한 줄: \\(\\vec r\\) = 끝점 − 매듭 → \\(\\vec e=\\vec r/\\lvert\\vec r\\rvert\\) → \\(T\\vec e\\) → \\(x\\)·\\(y\\)·\\(z\\) 합 = 0 세 식 → 0이 있는 식부터 대입 → 다시 넣어 검산."}];
+/* V6E-QUIZ: #quiz 로 열면 문제 장만(시작·전체 결과 포함). 저장 키를 분리하고 이어서-학습 위치는 건드리지 않는다 (대표님 2026-09-24 시험 대비) */
+const QUIZ=(location.hash==="#quiz");
+if(QUIZ){ const qs=SLIDES.filter(x=>x.type==="q"); SLIDES.length=0; SLIDES.push({id:"start",type:"start"}); qs.forEach(q=>SLIDES.push(q)); SLIDES.push({id:"final",type:"final"}); }
+/* 진행 저장: 지침 §0은 브라우저 저장소 금지. 저장 방식(앱 상태 vs 저장 안 함)은 아토 결정 대기라 그때까지 localStorage 유지 (2026-09-17). */
+const KEY="mc-slides-"+DECK_ID+(QUIZ?"-quiz":"");
+let ST={idx:0,done:{},correct:{},revealed:{},answer:{},ink:{},finger:false,padBig:false,skip:{}};
+try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}
+/* V5A-RESUME: 마지막 학습 위치 — 앱의 「이어서 학습하기」 카드가 읽는다 (아토 2026-09-21). #check(빌드 검사) 중에는 쓰지 않는다 */
+const LAST_KEY="mc-slides-last";
+function lastInfo(){
+  const s=SLIDES[Math.max(0,Math.min(ST.idx,SLIDES.length-1))]; if(!s) return null;
+  const p=s.part?PARTS.find(x=>x.n===s.part):null; const qs=SLIDES.filter(x=>x.type==="q");
+  const clean=t=>String(t||"").replace(/[\s★]+$/,"");
+  const where= s.type==="q"?((s.kind||"")+" 문제 · "+(s.qn||"")).trim() : s.type==="concept"?("개념 · "+clean(s.title)) : s.type==="mu"?"암기 vs 이해" : s.type==="cover"?"파트 시작" : s.type==="result"?"파트 결과" : s.type==="final"?"전체 결과" : s.type==="jump"?"시작 위치 고르기" : "표지";
+  return {deck:DECK_ID,title:document.title,href:location.href.split("#")[0],idx:ST.idx,n:SLIDES.length,sid:s.id,part:s.part||null,partTitle:p?clean(p.title):"",where:where,qDone:qs.filter(q=>ST.done[q.id]).length,qN:qs.length,ts:Date.now()};
+}
+const save=()=>{ if(location.hash==="#check") return; /* 빌드 검사 상태는 저장하지 않는다(오타 RED 2026-09-21) */ try{ localStorage.setItem(KEY,JSON.stringify(ST)); const li=QUIZ?null:lastInfo(); if(li){ const j=JSON.stringify(li); localStorage.setItem(LAST_KEY,j); localStorage.setItem(LAST_KEY+"-"+DECK_ID,j); } }catch(e){} };
+window.addEventListener("pagehide",()=>{ try{ save(); }catch(e){} });
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const partOf=n=>PARTS.find(p=>p.n===n)||null;
+const num=v=>'<span class="num">'+esc(v)+'</span>';   /* UI 숫자는 정자(지침 §1) */
+function partScore(p){ ST.skip=ST.skip||{}; const qs=SLIDES.filter(s=>s.type==="q"&&s.part===p&&!ST.skip[s.id]); const b=qs.filter(q=>q.kind==="기초"), a=qs.filter(q=>q.kind==="응용");
+  const cnt=arr=>({n:arr.length,ok:arr.filter(q=>ST.correct[q.id]===true).length,done:arr.filter(q=>ST.done[q.id]).length});
+  return {b:cnt(b),a:cnt(a)}; }
+function partDone(p){ return SLIDES.filter(s=>s.part===p&&s.type!=="result").every(s=>ST.done[s.id]); }
+
+/* ---------- 수식: KaTeX (지침 §1). 렌더 끝나기 전엔 작업 영역을 감춘다(§0 raw LaTeX 노출 금지) ---------- */
+function typeset(el){
+  if(window.renderMathInElement){
+    try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true},{left:"$$",right:"$$",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){}
+  }
+  const cl=el.cloneNode(true); cl.querySelectorAll(".katex,.katex-display").forEach(k=>k.remove());
+  const raw=/\\\(|\\\[|\\frac|\\vec|\\begin\{|\$\$/.test(cl.textContent||"");
+  el.dataset.raw=raw?"1":"0";
+  if(raw&&el.id==="body"){ el.dataset.ready="false"; el.innerHTML='<div class="kicker">수식 오류</div><h2>이 장의 수식이 그대로 드러나 표시를 멈췄습니다</h2><p>정리노트의 수식 표기를 고쳐 다시 만들어야 합니다.</p>'; }
+  el.dataset.ready="true";
+  return !raw;
+}
+
+/* ---------- 풀이 메모장 (손글씨 캔버스 · 애플펜슬) ---------- */
+const PAD={tool:"pen",cv:null,ctx:null,id:null,cur:null,ro:null,dpr:1,W:0,H:0};
+function padStrokes(id){ ST.ink=ST.ink||{}; if(!ST.ink[id]) ST.ink[id]={strokes:[]}; return ST.ink[id].strokes; }
+function padResize(){ const cv=PAD.cv; if(!cv||!cv.isConnected) return; const r=cv.getBoundingClientRect(); if(r.width<10||r.height<10) return;
+  PAD.dpr=Math.min(3,window.devicePixelRatio||1); PAD.W=r.width; PAD.H=r.height; cv.width=Math.round(r.width*PAD.dpr); cv.height=Math.round(r.height*PAD.dpr);
+  PAD.ctx=cv.getContext("2d"); PAD.ctx.setTransform(PAD.dpr,0,0,PAD.dpr,0,0); PAD.ctx.lineCap="round"; PAD.ctx.lineJoin="round"; padRedraw(); }
+function padLine(ctx,t,x0,y0,x1,y1,p){ if(!ctx) return; const W=PAD.W; ctx.globalCompositeOperation=t==="e"?"destination-out":"source-over"; ctx.strokeStyle="#111111";
+  ctx.lineWidth=t==="e"?W*0.03:Math.max(1.2,W*0.0035*(0.6+(p||0.5)*1.2)); ctx.beginPath(); ctx.moveTo(x0*W,y0*W); ctx.lineTo(x1*W,y1*W); ctx.stroke(); }
+function padRedraw(){ const ctx=PAD.ctx; if(!ctx) return; ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,PAD.cv.width,PAD.cv.height); ctx.restore();
+  for(const st of padStrokes(PAD.id)){ const c=st.c; if(c.length<3) continue; if(c.length===3){ padLine(ctx,st.t,c[0],c[1],c[0]+0.0005,c[1],c[2]); continue; }
+    for(let i=3;i<c.length;i+=3) padLine(ctx,st.t,c[i-3],c[i-2],c[i],c[i+1],c[i+2]); } }
+function padPt(e){ const r=PAD.cv.getBoundingClientRect(); return [Math.round((e.clientX-r.left)/PAD.W*1000)/1000, Math.round((e.clientY-r.top)/PAD.W*1000)/1000, Math.round((e.pressure||0.5)*100)/100]; }
+function padAllowed(e){ return e.pointerType==="pen"||e.pointerType==="mouse"||(e.pointerType==="touch"&&ST.finger); }
+function mountPad(id){
+  const cv=$("#pad"); if(!cv) return; PAD.cv=cv; PAD.id=id; PAD.cur=null;
+  cv.onpointerdown=e=>{ if(!padAllowed(e)) return; e.preventDefault(); try{ cv.setPointerCapture(e.pointerId); }catch(x){} const pt=padPt(e); PAD.cur={t:PAD.tool==="eraser"?"e":"p",c:pt.slice()}; padLine(PAD.ctx,PAD.cur.t,pt[0],pt[1],pt[0]+0.0005,pt[1],pt[2]); };
+  cv.onpointermove=e=>{ if(!PAD.cur||!padAllowed(e)) return; e.preventDefault(); const evs=(e.getCoalescedEvents&&e.getCoalescedEvents().length)?e.getCoalescedEvents():[e];
+    for(const ev of evs){ const pt=padPt(ev), c=PAD.cur.c, n=c.length; padLine(PAD.ctx,PAD.cur.t,c[n-3],c[n-2],pt[0],pt[1],pt[2]); c.push(pt[0],pt[1],pt[2]); } };
+  const end=()=>{ if(!PAD.cur) return; padStrokes(id).push(PAD.cur); PAD.cur=null; save(); };
+  cv.onpointerup=end; cv.onpointercancel=end; cv.onpointerleave=e=>{ if(PAD.cur&&e.pointerType!=="pen") end(); };
+  cv.oncontextmenu=e=>e.preventDefault();
+  const bar=cv.previousElementSibling;
+  bar.querySelectorAll("[data-tool]").forEach(b=>{ b.onclick=()=>{ PAD.tool=b.dataset.tool; bar.querySelectorAll("[data-tool]").forEach(x=>x.classList.toggle("on",x===b)); }; });
+  bar.querySelector('[data-act="undo"]').onclick=()=>{ padStrokes(id).pop(); save(); padRedraw(); };
+  bar.querySelector('[data-act="clear"]').onclick=()=>{ if(!padStrokes(id).length||confirm("이 문제의 풀이 메모를 지울까요?")){ ST.ink[id]={strokes:[]}; save(); padRedraw(); } };
+  bar.querySelector('[data-act="finger"]').onclick=function(){ ST.finger=!ST.finger; save(); this.classList.toggle("on",ST.finger); };
+  if(window.ResizeObserver){ PAD.ro=new ResizeObserver(()=>padResize()); PAD.ro.observe(cv); }
+  setTimeout(padResize,30);
+}
+
+/* ---------- 필기 판 여닫기 (V4-PADPANEL) ---------- */
+function openPad(id){ const pp=$("#padPanel"); pp.classList.add("on"); $("#padBtn").classList.add("on"); const fb=pp.querySelector('[data-act="finger"]'); if(fb) fb.classList.toggle("on",!!ST.finger); mountPad(id); const cb=pp.querySelector('[data-act="close"]'); if(cb) cb.onclick=closePad; }
+function closePad(){ const pp=$("#padPanel"); if(pp) pp.classList.remove("on"); const b=$("#padBtn"); if(b) b.classList.remove("on"); if(PAD.ro){ PAD.ro.disconnect(); PAD.ro=null; } }
+/* ---------- 시험 언급 상자 (지침 §3) ---------- */
+function examHTML(s){
+  const list=Array.isArray(s.exam)?s.exam:[]; if(!list.length) return "";
+  return list.map(x=>'<aside class="exam-callout" aria-label="시험 언급"><div class="exam-label"><b>📌 시험 언급</b> · '+esc(x.level||"강조")+(x.when?' · '+esc(x.when):'')+'</div><blockquote class="exam-quote">"'+esc(x.quote||"")+'"</blockquote></aside>').join("");
+}
+
+/* ---------- 시작 위치 점프 ---------- */
+function startFrom(id,mode){
+  const n=SLIDES.findIndex(x=>x.id===id); if(n<0) return;
+  ST.skip=ST.skip||{}; mode=mode||"skip";
+  if(mode!=="at") SLIDES.forEach((x,i)=>{ if(i<n&&x.type!=="start"&&x.type!=="jump"&&!ST.done[x.id]){ ST.done[x.id]=true; if(mode==="skip") ST.skip[x.id]=true; } });
+  ST.idx=n; save(); render();
+}
+function unskipAll(){ ST.skip=ST.skip||{}; Object.keys(ST.skip).forEach(k=>{ delete ST.done[k]; }); ST.skip={}; save(); render(); }
+function jumpListHTML(){
+  ST.skip=ST.skip||{};
+  const rows=[]; let cur=null;
+  SLIDES.forEach((x,i)=>{
+    if(x.type==="cover"){ cur={part:x.part,title:x.title,items:[]}; rows.push(cur); return; }
+    if(!cur) return;
+    if(x.type==="concept"||x.type==="mu"||x.type==="q"){
+      const lab= x.type==="concept"?(x.title||"개념"): x.type==="mu"?"암기 vs 이해": x.qn;
+      const st= ST.skip[x.id]?"skip": ST.done[x.id]?"done": (i===ST.idx?"cur":"");
+      cur.items.push('<button class="jp '+st+'" data-jump="'+x.id+'">'+esc(lab)+'</button>');
+    }
+  });
+  const nSkip=Object.keys(ST.skip).length;
+  return '<div class="jump"><div class="jump-h">아는 부분은 건너뛰고 막히는 곳부터. 누른 장 앞은 전부 「건너뜀」이 되고 채점에서 빠진다.'+
+    (nSkip?'<button class="btn xs" id="unskip">건너뜀 '+num(nSkip)+'장 되돌리기</button>':'')+'</div>'+
+    rows.map(r=>'<div class="jump-part"><div class="jump-pt">파트 '+num(r.part)+' · '+esc(String(r.title).replace(/[\s★]+$/,""))+'</div><div class="jump-items">'+r.items.join("")+'</div></div>').join("")+'</div>';
+}
+
+/* ---------- 출처 발췌 ---------- */
+function renderSrc(s){
+  const box=$("#srcs"); const list=Array.isArray(s.src)?s.src:[];
+  box.innerHTML=list.map((x,i)=>'<button class="src-th" data-si="'+i+'" title="'+esc(x.label||"출처")+'"><img src="'+esc(x.img)+'" alt="" loading="lazy"><span class="src-n">'+(i+1)+'</span></button>').join("");
+  box.querySelectorAll(".src-th").forEach(b=>{ b.onclick=()=>openSrc(list,+b.dataset.si); });
+}
+function openSrc(list,i){
+  let lb=$("#srclb"); if(!lb){ lb=document.createElement("div"); lb.id="srclb"; $("#stage").appendChild(lb); }
+  const x=list[i];
+  lb.innerHTML='<div class="src-top"><b>출처</b><span>'+esc(x.label||"")+'</span><span class="src-pos">'+(i+1)+' / '+list.length+'</span><button class="src-x" aria-label="닫기">✕</button></div>'+
+    '<div class="src-body"><img src="'+esc(x.img)+'" alt="'+esc(x.label||"")+'"></div>'+
+    '<div class="src-foot"><button class="btn xs" id="srcPrev"'+(i<=0?" disabled":"")+'>← 이전 출처</button><span class="sp" style="flex:1"></span><button class="btn xs" id="srcNext"'+(i>=list.length-1?" disabled":"")+'>다음 출처 →</button></div>';
+  lb.classList.add("on");
+  const img=lb.querySelector(".src-body img"), bd=lb.querySelector(".src-body");
+  img.onclick=()=>{ const z=img.classList.toggle("zoom"); if(!z) bd.scrollTo(0,0); };
+  lb.querySelector(".src-x").onclick=()=>lb.classList.remove("on");
+  const p=$("#srcPrev"), n=$("#srcNext"); if(p) p.onclick=()=>openSrc(list,i-1); if(n) n.onclick=()=>openSrc(list,i+1);
+}
+
+/* ---------- 답·풀이 판 ---------- */
+/* v7: 보기는 빌드 때 섞인다(quizmix). 저장값 = 원문 순서 k → 화면 칸 찾기 */
+const ckey=(c,i)=>String(c&&c.k!=null?c.k:i), cpick=(s,my)=>(s.choices||[]).findIndex((c,i)=>my!=null&&my!==""&&ckey(c,i)===String(my));
+function openAns(s){
+  let lb=$("#anslb"); if(!lb){ lb=document.createElement("div"); lb.id="anslb"; $("#stage").appendChild(lb); }
+  const my=(ST.answer||{})[s.id]; const mc=Array.isArray(s.choices)&&s.choices.length>0;
+  const mi=mc?cpick(s,my):-1; const mine= mc ? (mi>=0?'<span class="num">'+(mi+1)+'</span>번 — '+s.choices[mi].html:'') : esc(my||"");
+  lb.innerHTML='<div class="ans-top"><span class="kicker">'+esc(s.qn)+'</span><span class="verdict '+(ST.correct[s.id]===true?"ok":ST.correct[s.id]===false?"bad":"")+'">'+(ST.correct[s.id]===true?"정답":ST.correct[s.id]===false?"오답":"내 답")+'</span><button class="src-x" id="ansX" aria-label="닫기">✕</button></div>'+
+    '<div class="myans-show"><div class="kicker">내 답</div><div class="myans-txt">'+mine+'</div></div>'+
+    '<div class="ans"><div class="kicker">답 · 풀이</div>'+s.ans+'</div>';
+  lb.classList.add("on"); $("#ansX").onclick=()=>lb.classList.remove("on"); typeset(lb);
+}
+/* ---------- 상단 진행점 (파트 안의 단계 · 시험 언급은 핑크) ---------- */
+function renderTop(s){
+  const inPart=s.part?SLIDES.filter(x=>x.part===s.part&&x.type!=="cover"&&x.type!=="result"):[];
+  $("#progress").innerHTML=inPart.map(x=>'<span class="dot'+(ST.done[x.id]?" done":"")+(Array.isArray(x.exam)&&x.exam.length?" exam":"")+(x.id===s.id?" cur":"")+'"></span>').join("");
+  const p=partOf(s.part); $("#chapter").textContent=p?("파트 "+p.n+" · "+String(p.title).replace(/[\s★]+$/,"")):"정역학 · 중간고사 대비 3 (Ch.3 입자 평형 2D·3D · 과제 유형)";
+  $("#pos").textContent=(ST.idx+1)+" / "+SLIDES.length;
+}
+
+/* ---------- 힌트: 문제 장에서는 그 파트의 한 줄 요약, 개념 장에서는 없음 ---------- */
+function hintFor(s){ const p=partOf(s.part); if(s.type==="q"&&p&&p.hint) return p.hint; return null; }
+
+function render(){
+  const i=Math.max(0,Math.min(ST.idx,SLIDES.length-1)); ST.idx=i; const s=SLIDES[i]; const body=$("#body"), act=$("#act");
+  body.dataset.ready="false"; $("#hintBox").hidden=true; { const al=$("#anslb"); if(al) al.classList.remove("on"); } /* V4-ANSLB */
+  act.innerHTML=""; ST.skip=ST.skip||{}; $("#doneTag").textContent=ST.skip[s.id]?"건너뜀":ST.done[s.id]?"완료":"";
+  body.classList.remove("q-mode","rev","scrollable"); closePad(); $("#padBtn").hidden=true;
+  renderTop(s); if(s.scroll) body.classList.add("scrollable");   /* --soft 임시 덱: 넘친 장만 스크롤 */
+  if(s.type==="start"){
+    body.innerHTML='<div class="cover"><div class="kicker">'+(QUIZ?"문제만 풀기 · 시험 대비":"학습 슬라이드")+'</div><div class="big">정역학 · 중간고사 대비 3 (Ch.3 입자 평형 2D·3D · 과제 유형)</div>'+
+            '<div class="sub">'+(QUIZ?'문제 '+num(SLIDES.filter(x=>x.type==="q").length)+'개':'파트 '+num(PARTS.length)+'개 · 문제 '+num(SLIDES.filter(x=>x.type==="q").length)+'개')+'</div></div>';
+    act.innerHTML='<button class="btn xs" id="reset">진행 기록 지우기</button>';
+    $("#reset").onclick=()=>{ if(confirm("진행 기록을 지울까요?")){ ST={idx:0,done:{},correct:{},revealed:{},answer:{},ink:{},finger:false,padBig:false,skip:{}}; save(); render(); } };
+    ST.done[s.id]=true;
+  } else if(s.type==="jump"){
+    body.classList.add("scrollable"); body.innerHTML='<div class="kicker">시작 위치</div><h2>어디서부터 할까?</h2>'+jumpListHTML();
+    body.querySelectorAll("[data-jump]").forEach(b=>{ b.onclick=()=>startFrom(b.dataset.jump); }); const u=$("#unskip"); if(u) u.onclick=unskipAll;
+    act.innerHTML='<button class="btn" id="ok">처음부터 차례로</button>'; $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); go(1); };
+    ST.done[s.id]=true;
+  } else if(s.type==="cover"){
+    body.innerHTML=examHTML(s)+'<div class="cover"><div class="kicker">'+esc(s.no)+'</div><div class="big">'+esc(String(s.title).replace(/[\s★]+$/,""))+'</div></div>';
+    act.innerHTML='<button class="btn" id="ok">시작</button>'; $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); go(1); };
+  } else if(s.type==="concept"){
+    body.innerHTML=examHTML(s)+'<div class="kicker">'+(s.part?'파트 '+num(s.part)+' · 개념':'')+'</div><h2>'+esc(s.title)+'</h2>'+s.html;
+    act.innerHTML='<button class="btn" id="ok">'+(ST.done[s.id]?"다시 읽음 표시":"이해했어요")+'</button>';
+    $("#ok").onclick=()=>{ const was=!!ST.done[s.id]; ST.done[s.id]=true; save(); render(); if(!was) ev("read",{sid:s.id,n:pNd(s),clean:true}); };
+  } else if(s.type==="mu"){
+    const li=xs=>xs.map(x=>'<li>'+x+'</li>').join("");
+    body.innerHTML=examHTML(s)+'<div class="kicker">파트 '+num(s.part)+' · 암기 vs 이해</div><h2>'+esc(String(s.title).replace(/[\s★]+$/,""))+' — 무엇을 외우고 무엇을 이해하나</h2>'+
+      '<div class="mu"><div class="mu-mem"><div class="mu-h">암기</div><ul>'+li(s.mem)+'</ul></div>'+
+      '<div class="mu-und"><div class="mu-h">이해</div><ul>'+li(s.und)+'</ul></div></div>';
+    act.innerHTML='<button class="btn" id="ok">'+(ST.done[s.id]?"다시 확인 표시":"구분했어요")+'</button>';
+    $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); render(); };
+  } else if(s.type==="q"){
+    const rev=!!ST.revealed[s.id];
+    ST.answer=ST.answer||{}; ST.ink=ST.ink||{}; const my=ST.answer[s.id]||"";
+    const mc=Array.isArray(s.choices)&&s.choices.length>0;
+    body.classList.add("q-mode"); body.classList.toggle("rev",rev);
+    const choiceHTML=()=>'<div class="choices'+(rev?" rev":"")+'">'+s.choices.map((c,i)=>{ const sel=my!=null&&my!==""&&String(my)===ckey(c,i); const cls=(sel?" sel":"")+(rev?(c.ok?" ok":(sel?" bad":"")):"");
+      return '<button class="choice'+cls+'" data-ci="'+i+'"'+(rev?" disabled":"")+'><span class="cn">'+(i+1)+'</span><span class="ct">'+c.html+'</span></button>'; }).join("")+'</div>';
+    body.innerHTML=examHTML(s)+'<div class="kicker">파트 '+num(s.part)+'</div><h2><span class="q-kind">'+s.kind+'</span>'+esc(s.qn)+'</h2><div class="qbody">'+s.html+'</div>'+
+      (mc ? choiceHTML() : rev
+        ? '<div class="myans-show"><div class="kicker">내 답</div><div class="myans-txt">'+esc(my)+'</div></div>'
+        : '<div class="myans"><label for="myans">내 답</label><textarea id="myans" rows="2">'+esc(my)+'</textarea></div>')+
+      (rev?'<div class="myans-note"><button class="btn xs" id="showAns">답 · 풀이 다시 보기</button></div>':'');
+    if(rev){ if(ST.correct[s.id]!==true) openAns(s); /* V5A: 정답이면 풀이 판을 띄우지 않는다 (아토 2026-09-21) */ const sa=$("#showAns"); if(sa) sa.onclick=()=>openAns(s); }
+    closePad(); $("#padBtn").hidden=false;
+    if(mc&&!rev){
+      /* V5A: 보기를 누르는 순간 제출·채점 (아토 2026-09-21 "객관식은 고르면 바로 정답으로 제출") */
+      act.innerHTML='';
+      body.querySelectorAll(".choice").forEach(b=>{ b.onclick=()=>{ const ci=b.dataset.ci; if(ST.revealed[s.id]) return; const c=s.choices[+ci]; const ok=!!(c&&c.ok); ST.answer[s.id]=ckey(c,+ci); ST.revealed[s.id]=true; ST.correct[s.id]=ok; ST.done[s.id]=true; save(); render(); ev("quiz",{qid:s.id,ok:ok,n:qNd(s)}); }; });
+    } else if(mc&&rev){
+      const c=ST.correct[s.id];
+      act.innerHTML='<span class="verdict '+(c?"ok":"bad")+'">'+(c?"정답":"오답 — 풀이를 읽고 다시")+'</span><button class="btn xs" id="retry1">다시 풀기</button>';
+      $("#retry1").onclick=()=>{ delete ST.revealed[s.id]; delete ST.done[s.id]; delete ST.correct[s.id]; delete ST.answer[s.id]; save(); render(); };
+    } else if(!rev){
+      act.innerHTML='<button class="btn primary" id="reveal" disabled>답 확인</button>';
+      const ta=$("#myans"), rb=$("#reveal");
+      const sync=()=>{ ST.answer[s.id]=ta.value; rb.disabled=!ta.value.trim(); };
+      ta.oninput=sync; ta.onchange=()=>{ sync(); save(); }; sync();
+      rb.onclick=()=>{ if(!ta.value.trim()){ ta.focus(); return; } ST.answer[s.id]=ta.value.trim(); ST.revealed[s.id]=true; save(); render(); };
+      ta.onkeydown=e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); rb.click(); } };
+      setTimeout(()=>{ try{ ta.focus({preventScroll:true}); }catch(e){} },50);
+    } else {
+      const c=ST.correct[s.id];
+      act.innerHTML='<button class="btn" id="yes">맞았어요'+(c===true?" ✓":"")+'</button><button class="btn" id="no">틀렸어요 · 다시'+(c===false?" ✓":"")+'</button>';
+      $("#yes").onclick=()=>{ ST.correct[s.id]=true; ST.done[s.id]=true; save(); render(); ev("quiz",{qid:s.id,ok:true,n:qNd(s)}); };
+      $("#no").onclick=()=>{ ST.correct[s.id]=false; ST.done[s.id]=true; save(); render(); ev("quiz",{qid:s.id,ok:false,n:qNd(s)}); };
+    }
+  } else if(s.type==="result"){
+    /* V6B-RESULT: 정답·오답·안 푼 3칸 + 숫자 기준 + 틀린 문제 목록 + 주버튼 하나 (브리프 v49 r3 §3) */
+    const sc=partScore(s.part);
+    const qs=SLIDES.filter(x=>x.type==="q"&&x.part===s.part&&!ST.skip[x.id]);
+    const wrong=qs.filter(q=>ST.correct[q.id]===false), left=qs.filter(q=>!ST.done[q.id]||ST.correct[q.id]==null&&!ST.revealed[q.id]);
+    const okN=qs.filter(q=>ST.correct[q.id]===true).length;
+    const passB=sc.b.n===0||sc.b.ok===sc.b.n, needA=Math.ceil(sc.a.n*2/3), passA=sc.a.n===0||sc.a.ok>=needA;
+    const rule=(sc.b.n?'기초 '+sc.b.n+'문제 전부 정답':'')+(sc.b.n&&sc.a.n?' + ':'')+(sc.a.n?'응용 '+sc.a.n+'문제 중 '+needA+'문제 이상':'');
+    body.classList.add("scrollable");
+    body.innerHTML='<div class="kicker">파트 '+num(s.part)+' 결과</div><h1>'+esc(String(s.title).replace(/[\s★]+$/,""))+'</h1>'+
+      '<div class="score"><div class="c ok"><b>'+okN+'</b>정답</div><div class="c bad"><b>'+wrong.length+'</b>오답</div><div class="c"><b>'+left.length+'</b>안 푼 문제</div></div>'+
+      '<p class="rs-rule">통과 기준: '+esc(rule||'문제 없음')+' · 지금 '+(passB&&passA?'<b class="rs-pass">통과</b>':'<b class="rs-fail">미달</b>')+' (기초 '+sc.b.ok+'/'+sc.b.n+' · 응용 '+sc.a.ok+'/'+sc.a.n+')</p>'+
+      (wrong.length?'<div class="rs-list"><div class="kicker">틀린 문제</div>'+wrong.map(q=>'<button class="rs-q" data-go="'+q.id+'"><span class="q-kind">'+esc(q.kind||"")+'</span>'+esc(q.qn||q.id)+'</button>').join("")+'</div>':'')+
+      (left.length&&!wrong.length?'<div class="rs-list"><div class="kicker">안 푼 문제</div>'+left.map(q=>'<button class="rs-q" data-go="'+q.id+'"><span class="q-kind">'+esc(q.kind||"")+'</span>'+esc(q.qn||q.id)+'</button>').join("")+'</div>':'');
+    body.querySelectorAll(".rs-q").forEach(b=>{ b.onclick=()=>startFrom(b.dataset.go,"at"); });
+    const nextPart=PARTS.find(p=>p.n===s.part+1);
+    let primary;
+    if(wrong.length) primary='<button class="btn primary" id="rsGo">틀린 문제 복습</button>';
+    else if(left.length) primary='<button class="btn primary" id="rsGo">안 푼 문제 풀기</button>';
+    else primary='<button class="btn primary" id="rsGo">'+(nextPart?'다음 파트':'전체 결과')+'</button>';
+    act.innerHTML='<button class="btn xs" id="back">이 파트 처음으로</button>'+(wrong.length&&left.length?'<button class="btn xs" id="rsLeft">안 푼 문제 '+left.length+'개</button>':'')+primary;
+    $("#back").onclick=()=>{ ST.idx=SLIDES.findIndex(x=>x.id==="p"+s.part+"-cover"); save(); render(); };
+    const rl=$("#rsLeft"); if(rl) rl.onclick=()=>startFrom(left[0].id,"at");
+    $("#rsGo").onclick=()=>{ ST.done[s.id]=true; save();
+      if(wrong.length){ wrong.forEach(q=>{ delete ST.revealed[q.id]; delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; }); save(); startFrom(wrong[0].id,"at"); }
+      else if(left.length) startFrom(left[0].id,"at");
+      else go(1); };
+  } else if(s.type==="final"){
+    const qs=SLIDES.filter(x=>x.type==="q"&&!(ST.skip||{})[x.id]); const ok=qs.filter(q=>ST.correct[q.id]===true).length, done=qs.filter(q=>ST.done[q.id]).length;
+    const wrong=SLIDES.filter(x=>x.type==="q"&&ST.correct[x.id]===false);
+    body.innerHTML='<div class="kicker">전체 결과</div><h1>정역학 · 중간고사 대비 3 (Ch.3 입자 평형 2D·3D · 과제 유형)</h1><div class="score"><div class="c"><b>'+ok+'/'+qs.length+'</b>정답 · 푼 문제 '+num(done)+'</div><div class="c"><b>'+wrong.length+'</b>틀린 문제</div></div>'+
+      '<p>'+(wrong.length?'틀린 문제: '+wrong.slice(0,6).map(w=>esc(w.qn)).join(", ")+(wrong.length>6?' 외 '+num(wrong.length-6)+'개':''):'틀린 문제가 없습니다.')+'</p>';
+    act.innerHTML='<button class="btn xs" id="retry"'+(wrong.length?"":" disabled")+'>틀린 문제만 다시</button><button class="btn xs" id="first">처음으로</button>';
+    $("#retry").onclick=()=>{ if(!wrong.length) return; wrong.forEach(q=>{ delete ST.revealed[q.id]; delete ST.done[q.id]; delete ST.correct[q.id]; }); ST.idx=SLIDES.indexOf(wrong[0]); save(); render(); };
+    $("#first").onclick=()=>{ ST.idx=0; save(); render(); };
+    ST.done[s.id]=true; save();
+  }
+  renderSrc(s);
+  const h=hintFor(s); const hb=$("#hintBtn"); hb.disabled=!h; hb.title=h?"":"이 장에는 힌트가 없습니다";
+  const nxt=$("#next"), prv=$("#prev");
+  const unlocked=i<SLIDES.length-1;
+  nxt.disabled=!unlocked; nxt.classList.toggle("undone",!ST.done[s.id]&&unlocked); prv.disabled=(i===0);
+  typeset(body);
+  body.scrollTop=0;
+}
+function go(d){ const n=ST.idx+d; if(n<0||n>=SLIDES.length) return; ST.idx=n; save(); render(); }
+$("#next").onclick=()=>go(1); $("#prev").onclick=()=>go(-1);
+$("#padBtn").onclick=()=>{ const s=SLIDES[ST.idx]; if(s.type!=="q") return; if($("#padPanel").classList.contains("on")) closePad(); else openPad(s.id); };
+$("#hintBtn").onclick=()=>{ const s=SLIDES[ST.idx], h=hintFor(s); if(!h) return; const hb=$("#hintBox"); if(!hb.hidden){ hb.hidden=true; return; } hb.innerHTML='<div class="kicker">힌트 · 파트 '+num(s.part)+' 한 줄</div><div>'+esc(h)+'</div>'; hb.hidden=false; typeset(hb); };
+document.addEventListener("keydown",e=>{ const t=e.target; if(t&&/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||(t&&t.isContentEditable)) return; if(e.key==="ArrowRight") go(1); else if(e.key==="ArrowLeft") go(-1); });
+
+/* ---------- 검사 모드 (#check): 전 장을 돌며 오버플로·raw LaTeX를 잰다. 빌드 뒤 헤드리스로 캡처해 확인한다 ---------- */
+async function runCheck(){
+  try{ await document.fonts.ready; }catch(e){}
+  const body=$("#body"); const fails=[]; const saved=JSON.stringify(ST);
+  const foot=$("#foot"), stage=$("#stage");
+  const measure=(tag)=>{ const over=SLIDES[ST.idx].type!=="jump"&&!SLIDES[ST.idx].scroll&&(body.scrollHeight>body.clientHeight||body.scrollWidth>body.clientWidth); const fo=SLIDES[ST.idx].type!=="jump"&&!SLIDES[ST.idx].scroll&&(foot.scrollWidth>foot.clientWidth||stage.scrollHeight>stage.clientHeight); const raw=body.dataset.raw==="1"; if(over||fo||raw) fails.push(SLIDES[ST.idx].id+tag+(over?" 넘침 "+body.scrollHeight+">"+body.clientHeight:"")+(fo?" 하단/무대 넘침":"")+(raw?" rawLaTeX":"")); };
+  for(let i=0;i<SLIDES.length;i++){
+    const s=SLIDES[i];
+    ST.idx=i; delete ST.revealed[s.id]; render(); await new Promise(r=>setTimeout(r,20)); measure("");
+    if(s.type==="q"){ /* 답 공개 상태 */ ST.revealed[s.id]=true; ST.answer[s.id]=Array.isArray(s.choices)&&s.choices.length?"0":"x"; ST.correct[s.id]=false; render(); await new Promise(r=>setTimeout(r,20)); measure(" [답공개]"); { const al=$("#anslb"); if(al&&al.classList.contains("on")){ const a=al.querySelector(".ans"); if(a&&(a.scrollHeight>a.clientHeight||al.scrollHeight>al.clientHeight)) fails.push(s.id+" [풀이판] 넘침 "+a.scrollHeight+">"+a.clientHeight); al.classList.remove("on"); } }
+      /* 힌트 열림 */ $("#hintBtn").click(); await new Promise(r=>setTimeout(r,20)); const hb=$("#hintBox"); if(!hb.hidden&&hb.getBoundingClientRect().top<body.getBoundingClientRect().top) fails.push(s.id+" [힌트] 상단 침범"); hb.hidden=true; }
+  }
+  try{ ST=JSON.parse(saved); }catch(e){}
+  const c=$("#chk"); c.style.display="block";
+  c.innerHTML='<h2 id="chkTitle">검사: '+SLIDES.length+'장 · 실패 '+fails.length+'</h2><pre id="chkList">'+esc(fails.join("\n"))+'</pre>';
+  window.CHECK_RESULT={n:SLIDES.length,fails};
+}
+/* V5B-CTX: 학습 질문 패널용 문맥 (아토 2026-09-21). 앱이 gen 을 주기 전엔 보내지 않는다 — 이전 창의 늦은 메시지를 앱이 gen 으로 걸러낸다 */
+let CTX_GEN=null;
+const ctxPlain=(h,n)=>{ const t=String(h||"").replace(/<[^>]+>/g," ").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/\s+/g," ").trim(); return t.length>n?t.slice(0,n)+"…(잘림)":t; };
+function postCtx(){
+  try{
+    if(location.hash==="#check"||!CTX_GEN||window.parent===window) return;
+    const s=SLIDES[Math.max(0,Math.min(ST.idx,SLIDES.length-1))]; if(!s) return;
+    const p=s.part?PARTS.find(x=>x.n===s.part):null; const li=lastInfo()||{};
+    const msg={type:"mc-slide",v:1,gen:CTX_GEN,deck:DECK_ID,title:String(document.title).slice(0,80),sid:s.id,stype:s.type,part:s.part||null,
+      partTitle:p?String(p.title).replace(/[\s★]+$/,"").slice(0,60):"",label:String(li.where||"").slice(0,80),q:null};
+    if(s.type==="q"){
+      const rev=!!ST.revealed[s.id], mc=Array.isArray(s.choices)&&s.choices.length>0, my=(ST.answer||{})[s.id];
+      msg.q={qn:String(s.qn||"").slice(0,80),kind:String(s.kind||"").slice(0,10),text:ctxPlain(s.html,600),
+        choices:mc?s.choices.slice(0,6).map(c=>ctxPlain(c.html,120)):[],
+        my: my==null||my===""?null:(mc?(cpick(s,my)>=0?ctxPlain(s.choices[cpick(s,my)].html,120):null):String(my).slice(0,200)),
+        revealed:rev, correct: rev&&typeof ST.correct[s.id]==="boolean"?ST.correct[s.id]:null,
+        answer: rev&&mc?(s.choices.map((c,i)=>c.ok?i+1:0).filter(Boolean).join(",")||null):null};
+    } else if(s.type==="concept"||s.type==="mu"){ msg.q={qn:String(s.title||"").slice(0,80),kind:s.type==="mu"?"암기·이해":"개념",text:ctxPlain(s.type==="mu"?[].concat(s.mem||[],s.und||[]).join(" · "):s.html,600),choices:[],my:null,revealed:true,correct:null,answer:null}; }
+    window.parent.postMessage(msg, location.origin);
+  }catch(e){}
+}
+window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; postCtx(); } });
+const _renderV5b=render; render=function(){ _renderV5b(); postCtx(); };
+function boot(){
+  { const m=/^#(from|done|at)=([\w-]+)(?:,pad)?$/.exec(location.hash||""); if(m){ startFrom(m[2], m[1]==="from"?"skip":m[1]); if(/,pad$/.test(location.hash)) setTimeout(()=>$("#padBtn").click(),300); return; } }
+  if(location.hash==="#check"){ runCheck(); return; }
+  if(location.hash==="#resume"){ render(); save(); return; }   /* V5A: 저장된 위치 그대로 */
+  render();
+  if(location.hash==="#src"){ setTimeout(()=>{ const b=$("#srcs .src-th"); if(b) b.click(); },400); }
+}
+function fontCheck(){ try{ const ok=document.fonts.check("22px 'Gowun Dodum'"); if(ok){ const w0=$("#fontWarn"); if(w0) w0.hidden=true; return; } setTimeout(fontCheck,3000); /* V6B: 늦게 로드되면 경고를 지운다 */ if(!ok){ let w=$("#fontWarn"); if(!w){ w=document.createElement("div"); w.id="fontWarn"; $("#stage").appendChild(w); } w.hidden=false; w.textContent="손글씨 글꼴을 불러오지 못해 대체 글꼴로 보입니다. 인터넷 연결을 확인하고 새로 고침하세요."; } }catch(e){} }
+function whenReady(){ if(window.renderMathInElement){ fontCheck(); boot(); } else setTimeout(whenReady,40); }
+document.addEventListener("DOMContentLoaded",()=>{ (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(whenReady,whenReady); });
+</script>
+</body>
+</html>

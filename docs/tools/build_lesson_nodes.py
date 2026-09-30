@@ -82,6 +82,7 @@ DECK_OVR = {
  "phys2-w1-3": {"parts": {"1": ["em.charge", "em.field", "em.coulomb"], "2": ["em.superposition", "em.dipole", "em.continuous"], "3": ["em.continuous", "em.gauss"], "4": ["em.gauss", "em.gauss_apps"], "5": ["em.potential_energy", "em.potential", "em.potential_dist"]}},
  "statics-mid": {"parts": {"1": ["mech.force_vector", "mech.force_3d"], "3": ["mech.cross_apps", "mech.triple_product"], "4": ["mech.equilibrium_particle"], "5": ["mech.equilibrium_particle"]}},
  "statics-mid2": {"parts": {"1": ["mech.moment", "mech.equilibrium_particle"], "2": ["mech.moment_line"], "3": ["mech.couple"], "4": ["mech.rigid_2d"], "5": ["mech.indeterminate"], "6": ["mech.rigid_3d"]}},
+ "statics-mid3": {"parts": {"1": ["mech.particle_2d"], "2": ["mech.particle_2d", "mech.force_types"], "3": ["mech.particle_2d"], "4": ["mech.particle_3d"]}},
  "statics-w1-3": {"parts": {"1": ["mech.statics_intro", "mech.force_vector"], "2": ["mech.force_vector", "mech.force_3d", "mech.dot_apps"], "3": ["mech.dot_apps", "mech.projection", "mech.cross_apps"]}},
  "em1-mid": {"parts": {"1": ["ode.concept", "ode.ivp", "ode.separable", "ode.homogeneous"], "3": ["ode.linear1", "ode.bernoulli"], "5": ["ode.const_coeff", "ode.diff_operator"], "6": ["ode.euler_cauchy"]}},
  "em1-mid2": {"parts": {"1": ["ode.free_oscillation"], "2": ["ode.undetermined_coeff"], "3": ["ode.forced_oscillation", "ode.rlc"], "4": ["ode.variation_params"], "5": ["ode.higher_homog"], "6": ["ode.higher_nonhomog"]}},
