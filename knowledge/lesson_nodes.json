@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-30T12:39:09",
+ "generated": "2026-09-30T12:49:17",
  "lessons": {
   "phys2-2026-09-04": {
    "course": "일반물리학2",
@@ -923,7 +923,8 @@
      "lin.matrix"
     ],
     "q2": [
-     "lin.matrix"
+     "lin.matrix",
+     "vec.vector_calc"
     ],
     "q3": [
      "lin.matrix"
@@ -1051,7 +1052,8 @@
    "course": "미분적분학2",
    "date": "2026-09-10",
    "nodes": [
-    "vec.coords3d"
+    "vec.coords3d",
+    "vec.quadric"
    ],
    "sec": {
     "s1": [
@@ -1061,7 +1063,8 @@
      "vec.coords3d"
     ],
     "s3": [
-     "vec.coords3d"
+     "vec.coords3d",
+     "vec.quadric"
     ],
     "s4": [
      "vec.coords3d"
@@ -1122,14 +1125,15 @@
    },
    "q": {
     "q1": [
-     "vec.coords3d"
+     "vec.coords3d",
+     "vec.quadric"
     ],
     "q2": [
      "vec.coords3d"
     ],
     "q3": [
      "vec.distance_sphere",
-     "vec.position_ops"
+     "vec.plane_eq"
     ],
     "q4": [
      "vec.distance_sphere"
@@ -1395,6 +1399,131 @@
     ],
     "p6-a6": [
      "lin.cramer"
+    ]
+   }
+  },
+  "calc2-mid2": {
+   "course": "미분적분학2",
+   "parts": {
+    "1": [
+     "vec.cross",
+     "lin.cofactor"
+    ],
+    "2": [
+     "vec.line_eq"
+    ],
+    "3": [
+     "vec.plane_eq"
+    ],
+    "4": [
+     "vec.quadric"
+    ],
+    "5": [
+     "vec.vector_func"
+    ],
+    "6": [
+     "vec.vector_calc"
+    ]
+   },
+   "q": {
+    "p1-b1": [
+     "vec.cross"
+    ],
+    "p1-b2": [
+     "vec.cross"
+    ],
+    "p1-b3": [
+     "vec.cross"
+    ],
+    "p1-b4": [
+     "vec.cross"
+    ],
+    "p1-a5": [
+     "vec.cross"
+    ],
+    "p1-a6": [
+     "vec.cross"
+    ],
+    "p2-b1": [
+     "vec.line_eq"
+    ],
+    "p2-b2": [
+     "vec.line_eq"
+    ],
+    "p2-b3": [
+     "vec.line_eq"
+    ],
+    "p2-a4": [
+     "vec.line_eq"
+    ],
+    "p2-a5": [
+     "vec.line_eq"
+    ],
+    "p3-b1": [
+     "vec.plane_eq"
+    ],
+    "p3-b2": [
+     "vec.plane_eq"
+    ],
+    "p3-b3": [
+     "vec.plane_eq"
+    ],
+    "p3-a4": [
+     "vec.plane_eq"
+    ],
+    "p3-a5": [
+     "vec.plane_eq"
+    ],
+    "p3-a6": [
+     "vec.plane_eq"
+    ],
+    "p4-b1": [
+     "vec.quadric"
+    ],
+    "p4-b2": [
+     "vec.quadric"
+    ],
+    "p4-b3": [
+     "vec.quadric"
+    ],
+    "p4-a4": [
+     "vec.quadric"
+    ],
+    "p5-b1": [
+     "vec.vector_func"
+    ],
+    "p5-b2": [
+     "vec.vector_func"
+    ],
+    "p5-b3": [
+     "vec.vector_func"
+    ],
+    "p5-a4": [
+     "vec.vector_func"
+    ],
+    "p5-a5": [
+     "vec.vector_func"
+    ],
+    "p6-b1": [
+     "vec.vector_calc"
+    ],
+    "p6-b2": [
+     "vec.vector_calc"
+    ],
+    "p6-b3": [
+     "vec.vector_calc"
+    ],
+    "p6-b4": [
+     "vec.vector_calc"
+    ],
+    "p6-a5": [
+     "vec.vector_calc"
+    ],
+    "p6-a6": [
+     "vec.vector_calc"
+    ],
+    "p6-a7": [
+     "vec.vector_calc"
     ]
    }
   },

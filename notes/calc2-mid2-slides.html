@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>미분적분학2 · 중간고사 대비 2 (12.4 외적 계산 · 12.5 직선과 평면 · 12.6 기둥면 · 13.1~13.2 벡터함수)</title>
+<!-- 학습게임 지침(학습게임_미적분2.md) v4 템플릿 · 오타 디자인 검토(2026-09-17, RED 14건) 반영
+     폰트 2종: 본문 손글씨(Nanum Pen Script, display=block) + 수식·숫자 정자(KaTeX). 5색 고정. 16:10. 상단 진행점·챕터명·n/N, 하단 [힌트] [확인/다음]. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  /* 5색 고정 (지침 §2) */
+  --memory:#FFE45C; --caution:#E03131; --concept:#1971C2; --exam:#FF4D8D; --example:#2F9E44;
+  /* 무채색 — 종이·글자·선 (의미색 아님) */
+  --paper:#FFFFFF; --ink:#111111; --muted:#5F5F5F; --line:#D8D8D8; --soft:#F5F5F5; --bg:#EDEDED;
+  /* 폰트 2종 (지침 §1) */
+  --font-hand:'Nanum Pen Script','NanumPen',sans-serif;
+  --font-num:'KaTeX_Main','Times New Roman',serif;
+  /* 글자 크기 3단계 (지침 §1) */
+  --fs-title:31px; --fs-body:22px; --fs-note:17px;
+}
+*{box-sizing:border-box}
+:where(h1,h2,h3,h4,p,ul,ol,li,dl,dt,dd,pre,blockquote,figure,figcaption,table,th,td,button,input,textarea,label){margin:0;padding:0;text-indent:0;word-break:keep-all;overflow-wrap:break-word}
+html,body{height:100%;width:100%;margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-hand);font-size:var(--fs-body);line-height:1.45;word-break:keep-all;overflow-wrap:break-word;overflow:hidden}
+body{display:grid;place-items:center;padding:12px}
+.katex{font-size:1em}
+#stage{position:relative;width:min(calc(100vw - 24px),calc((100dvh - 24px) * 1.6));aspect-ratio:16/10;background:var(--paper);border:1px solid var(--line);display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden}
+/* 상단: 진행점 · 챕터명 · n/N */
+#top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,auto) auto;align-items:center;gap:16px;padding:10px 22px;border-bottom:1px solid var(--line);font-size:var(--fs-note)}
+#progress{display:flex;align-items:center;gap:6px;min-width:0;flex-wrap:wrap}
+.dot{flex:0 0 12px;width:12px;height:12px;border:2px solid var(--ink);border-radius:50%;background:var(--paper)}
+.dot.done{background:var(--ink)}
+.dot.exam{border-color:var(--exam);background:var(--exam)}
+.dot.cur{outline:2px solid var(--ink);outline-offset:2px}
+#chapter{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#pos{font-family:var(--font-num);white-space:nowrap}
+/* 작업 영역 */
+#body{min-height:0;overflow:hidden;padding:18px 24px 12px;font-size:var(--fs-body);line-height:1.45}
+#body[data-ready="false"]{visibility:hidden}
+#body.scrollable{overflow:auto}   /* 시작 위치 장만 — 학습 내용이 아니라 목록이라 스크롤 허용 */
+#body h1,#body h2{font-size:var(--fs-title);line-height:1.2;margin-bottom:8px}
+#body h3{font-size:var(--fs-body)}
+.num{font-family:var(--font-num)}
+#fontWarn{position:absolute;left:22px;right:22px;top:58px;border:2px solid var(--caution);background:var(--paper);padding:6px 12px;font-size:var(--fs-note);z-index:12}
+#fontWarn[hidden]{display:none}
+#body .kicker{font-size:var(--fs-note);color:var(--muted)}
+#body p,#body li{margin:0}
+#body p+p{margin-top:6px}
+#body ul,#body ol{padding-left:22px}
+#body :is(.why,.concept,.one,.say,.extra),.ans,.myans-show,.mu>div{margin:8px 0 0;padding:10px 14px}
+#body .why,#body .concept{border:2px solid var(--concept)}
+#body .say{border-left:4px solid var(--concept);background:var(--soft)}
+#body .say b{color:var(--concept)}
+#body .one{border-left:4px solid var(--ink);background:var(--soft)}
+#body .term{color:var(--concept);border-bottom:1px dashed var(--concept)}
+#body .hl{background:var(--memory);padding:0 4px}
+#body .red{color:var(--caution)}
+#body .star{color:var(--exam)}
+#body .tw{overflow:hidden;margin:8px 0 0;border:1px solid var(--line)}
+#body table{border-collapse:collapse;width:100%;font-size:var(--fs-body)}
+#body th,#body td{padding:3px 10px;text-align:left;vertical-align:top;border-top:1px solid var(--line)}
+#body thead th{border-top:0;font-size:var(--fs-note);color:var(--muted)}
+#body pre{white-space:pre-wrap;font-family:var(--font-num);font-size:var(--fs-note);line-height:1.35}
+#body code{font-family:var(--font-num)}
+/* 시험 언급 — 최우선 (지침 §3) */
+.exam-callout{border:4px solid var(--exam);padding:10px 14px;margin:0 0 10px;background:var(--paper)}
+.exam-label{font-size:var(--fs-note);color:var(--exam)}
+.exam-label b{color:var(--ink)}
+.exam-quote{font-size:var(--fs-body)}
+/* 표지·결과 */
+.cover .big{font-size:var(--fs-title);line-height:1.2;margin:6px 0 10px}
+.cover .sub{font-size:var(--fs-body)}
+.score{display:flex;gap:14px;margin:10px 0}
+.score .c{border:2px solid var(--ink);padding:10px 16px}
+.score .c b{display:block;font-family:var(--font-num);font-size:var(--fs-title)}
+/* 암기 vs 이해 */
+.mu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.mu>div{min-width:0}
+.mu-mem{background:var(--memory);border:2px solid var(--memory)}
+.mu-und{border:2px solid var(--concept)}
+.mu-h{margin-bottom:4px}.mu-h .hint{font-size:var(--fs-note);color:var(--muted);margin-left:6px}
+.mu li{margin:2px 0}
+/* 문제 */
+.q-kind{display:inline-block;font-size:var(--fs-note);border:1px solid var(--ink);padding:0 8px;margin-right:8px;vertical-align:middle}
+#body.q-mode{display:flex;flex-direction:column}
+#body.q-mode>*{flex:0 0 auto}
+.pad{flex:1 1 auto!important;min-height:100px;display:flex;flex-direction:column;margin-top:8px;border:1px solid var(--line);overflow:hidden;background:var(--paper)}
+.pad-bar{display:flex;align-items:center;gap:6px;padding:4px 10px;border-bottom:1px solid var(--line);font-size:var(--fs-note);background:var(--soft);flex-wrap:wrap}
+.pad-bar .hint{color:var(--muted);margin-right:auto}
+.pad-bar button{font:inherit;font-size:var(--fs-note);min-height:36px;padding:2px 12px;border:1px solid var(--ink);background:var(--paper);color:var(--ink);cursor:pointer}
+.pad-bar button.on{background:var(--ink);color:var(--paper)}
+.pad canvas{flex:1 1 auto;min-height:0;width:100%;display:block;touch-action:none;cursor:crosshair;background-image:linear-gradient(to right,var(--line) 1px,transparent 1px),linear-gradient(to bottom,var(--line) 1px,transparent 1px);background-size:24px 24px}
+/* V4-PADPANEL 필기 판 — 「+ 필기」로 여닫음, 문제 아래쪽을 덮는다 */
+#padPanel{position:absolute;left:24px;right:24px;top:38%;bottom:72px;background:var(--paper);border:2px solid var(--ink);display:none;flex-direction:column;z-index:16}
+#padPanel.on{display:flex}
+#padPanel .pad{flex:1 1 auto;margin:0;border:0;min-height:0}
+#padBtn.on{background:var(--ink);color:var(--paper)}
+/* V4-ANSLB 답·풀이 판 — 작업 영역 전체 */
+#anslb{position:absolute;left:0;right:0;top:0;bottom:0;background:var(--paper);display:none;flex-direction:column;z-index:18;padding:14px 24px;overflow:hidden}
+#anslb.on{display:flex}
+#anslb .ans{flex:1 1 auto;min-height:0;overflow:hidden;margin-top:8px}
+#anslb .ans-top{display:flex;align-items:center;gap:10px}
+#anslb .ans-top .kicker{margin-right:auto}
+.myans{margin-top:8px}.myans label{display:block;font-size:var(--fs-note);color:var(--muted)}
+.myans textarea{width:100%;font-family:var(--font-num);font-size:var(--fs-body);line-height:1.35;padding:6px 12px;border:2px solid var(--ink);background:var(--paper);resize:none;outline:none}
+.myans textarea:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.myans-show{border:2px dashed var(--ink)}
+.myans-txt{font-family:var(--font-num);white-space:pre-wrap}
+.ans{border:2px solid var(--example)}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+.choice{display:flex;align-items:center;gap:10px;min-width:0;text-align:left;font:inherit;font-size:var(--fs-body);padding:6px 12px;border:2px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;min-height:48px}
+.choice .cn{flex:0 0 28px;height:28px;border:1px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-num);font-size:var(--fs-note)}
+.choice .ct{min-width:0}
+.choice.sel{border-color:var(--ink);border-width:3px}
+.choice.ok{border-color:var(--example)}.choice.ok .cn{background:var(--example);border-color:var(--example);color:var(--paper)}
+.choice.bad{border-color:var(--caution)}.choice.bad .cn{background:var(--caution);border-color:var(--caution);color:var(--paper)}
+.choice[disabled]{cursor:default}
+.verdict{padding:6px 14px;border:2px solid var(--ink)}.verdict.ok{border-color:var(--example)}.verdict.bad{border-color:var(--caution);color:var(--caution)}
+/* 시작 위치 */
+.jump-h{font-size:var(--fs-note);color:var(--muted);margin-bottom:6px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.jump-part{display:flex;gap:10px;align-items:flex-start;margin:2px 0}
+.jump-pt{flex:0 0 220px;font-size:var(--fs-note);padding-top:6px}
+.jump-items{display:flex;flex-wrap:wrap;gap:4px}
+.jp{font:inherit;font-size:var(--fs-note);min-height:36px;padding:2px 10px;border:1px solid var(--ink);background:var(--paper);color:var(--ink);cursor:pointer}
+.jp.done{background:var(--ink);color:var(--paper)}.jp.skip{color:var(--muted);text-decoration:line-through;border-color:var(--line)}.jp.cur{border:3px solid var(--ink)}
+/* 하단: [이전] [힌트] · 출처 · 동작 · [확인/다음] */
+#foot{display:flex;align-items:center;gap:12px;padding:10px 22px;border-top:1px solid var(--line)}
+.btn{font:inherit;font-size:var(--fs-body);min-height:48px;padding:4px 18px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.xs{font-size:var(--fs-note);min-height:36px;padding:2px 12px}
+.btn[disabled]{opacity:.35;cursor:default}
+.btn:focus-visible,.choice:focus-visible,.jp:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+#act{display:flex;gap:8px;align-items:center;margin-left:auto}#act .hint{font-size:var(--fs-note);color:var(--muted)}
+#next{margin-left:8px}
+#next.undone{background:var(--paper);color:var(--ink);border-style:dashed}
+#doneTag{font-size:var(--fs-note);color:var(--muted)}
+/* 출처 썸네일 · 확대 */
+#srcs{display:flex;gap:6px}
+.src-th{position:relative;width:48px;height:48px;padding:0;border:2px solid var(--ink);overflow:hidden;background:var(--paper);cursor:pointer;flex:0 0 auto}
+.src-th img{width:100%;height:100%;object-fit:cover;object-position:left top;display:block}
+.src-th .src-n{position:absolute;right:0;bottom:0;font-family:var(--font-num);font-size:var(--fs-note);background:var(--ink);color:var(--paper);padding:0 4px}
+#srclb{position:absolute;inset:0;background:var(--paper);display:none;flex-direction:column;z-index:20;padding:12px 18px}
+#srclb.on{display:flex}
+.src-top{display:flex;align-items:center;gap:10px;font-size:var(--fs-note);padding-bottom:8px}.src-top b{color:var(--ink)}.src-top .src-pos{margin-left:auto;font-family:var(--font-num)}
+.src-x{font:inherit;font-size:var(--fs-body);min-width:48px;min-height:44px;border:2px solid var(--ink);background:var(--paper);cursor:pointer}
+.src-body{flex:1;min-height:0;overflow:auto;border:1px solid var(--line);touch-action:pan-x pan-y pinch-zoom}
+.src-body img{width:100%;height:auto;display:block;cursor:zoom-in}
+.src-body img.zoom{width:190%;max-width:none;cursor:zoom-out}
+.src-foot{display:flex;align-items:center;gap:10px;padding-top:8px}.src-foot .hint{margin:0 auto;font-size:var(--fs-note);color:var(--muted)}
+/* 힌트 상자 */
+#hintBox{position:absolute;left:22px;right:22px;bottom:76px;background:var(--paper);border:2px solid var(--ink);padding:10px 14px;z-index:15}
+#hintBox[hidden]{display:none}
+/* 검사 모드 표시 */
+#chk{position:absolute;left:0;right:0;top:0;bottom:0;background:var(--paper);overflow:auto;padding:20px;z-index:30;font-size:var(--fs-note);display:none}
+
+/* ===== V6 UI — 조작부 재설계 (아토 2026-09-21). 본문(손글씨·5색)은 그대로, 조작부만 정자·평면 ===== */
+:root{--ui:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;--accent:#4F9A35;--accent-soft:#EAF4E6;--bad:#D23B3B;--bad-soft:#FBEAEA;--line:#E3E8E5;--soft:#F4F6F5;--bg:#EEF1EF;--muted:#6B7570;--ink-3:#8A9490}
+body{background:var(--bg)}
+#stage{border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+/* 상단: 분절 진행 막대 + 정자 라벨 */
+#top{padding:12px 20px;gap:14px;font-family:var(--ui);font-size:13px;color:var(--muted);border-bottom:1px solid var(--line);background:#fff}
+#progress{gap:3px;flex-wrap:nowrap;overflow:hidden}
+.dot{flex:1 1 0;width:auto;min-width:6px;max-width:28px;height:6px;border:0;border-radius:3px;background:var(--line)}
+.dot.done{background:var(--accent)}.dot.cur{background:#B7DBA8;outline:0;box-shadow:inset 0 0 0 1px var(--accent)}.dot.exam{background:#FFC2D8}.dot.exam.done{background:var(--exam)}
+#chapter{font-family:var(--ui);font-size:13px;font-weight:600;color:#1F2A24}
+#pos{font-family:var(--ui);font-variant-numeric:tabular-nums;font-size:13px;color:var(--muted)}
+/* 본문 상자: 두꺼운 파란 테두리 → 좌측 바 */
+#body .why,#body .concept{border:0;border-left:3px solid var(--concept);background:#F5F8FD;border-radius:0 10px 10px 0}
+#body .one{border-radius:0 10px 10px 0}#body .say{border-radius:0 10px 10px 0}
+#body .tw{border-radius:10px}
+.mu-mem{border:0;border-left:3px solid #E5C400;background:#FFF9D6;border-radius:0 10px 10px 0}.mu-und{border:0;border-left:3px solid var(--concept);background:#F5F8FD;border-radius:0 10px 10px 0}
+.q-kind{font-family:var(--ui);font-size:12px;font-weight:600;border:0;border-radius:999px;padding:2px 10px;background:var(--accent-soft);color:var(--accent);vertical-align:middle}
+#body .kicker{font-family:var(--ui);font-size:12px;letter-spacing:0;color:var(--ink-3)}
+/* 보기 카드 */
+.choices{gap:10px;margin-top:12px}
+.choice{font-family:var(--font-hand);border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px 14px;min-height:56px;transition:border-color .12s,background .12s}
+.choice:hover{border-color:#B9C4BE;background:var(--soft)}
+.choice .cn{flex:0 0 28px;width:28px;height:28px;border:0;border-radius:50%;background:var(--soft);color:#1F2A24;font-family:var(--ui);font-size:13px;font-weight:600}
+.choice.sel{border:2px solid var(--accent);padding:11px 13px}.choice.sel .cn{background:var(--accent);color:#fff}
+.choice.ok{border:2px solid var(--accent);background:var(--accent-soft);padding:11px 13px}.choice.ok .cn{background:var(--accent);color:#fff}
+.choice.bad{border:2px solid var(--bad);background:var(--bad-soft);padding:11px 13px}.choice.bad .cn{background:var(--bad);color:#fff}
+.choice[disabled]:not(.ok):not(.bad){opacity:.55}
+.choice:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* 주관식 */
+.myans label{font-family:var(--ui);font-size:12px;color:var(--muted)}
+.myans textarea{border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-family:var(--ui);font-size:16px;background:#fff}
+.myans textarea:focus-visible{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+.myans-show{border:1px dashed #B9C4BE;border-radius:12px;background:var(--soft)}
+.myans-txt{font-family:var(--ui);font-size:16px}
+.myans-note{margin-top:8px}
+/* 판정·안내 */
+.verdict{font-family:var(--ui);font-size:13px;font-weight:600;border:0;border-radius:999px;padding:6px 12px;background:var(--soft);color:#1F2A24}
+.verdict.ok{background:var(--accent-soft);color:var(--accent)}.verdict.bad{background:var(--bad-soft);color:var(--bad)}
+#act .hint{font-family:var(--ui);font-size:12px;color:var(--ink-3)}
+#doneTag{font-family:var(--ui);font-size:12px;color:var(--ink-3)}
+/* 하단 바 · 버튼 */
+#foot{padding:10px 16px;gap:8px;border-top:1px solid var(--line);background:#fff}
+.btn{font-family:var(--ui);font-size:14px;font-weight:600;min-height:40px;padding:6px 16px;border:1px solid var(--line);border-radius:10px;background:#fff;color:#1F2A24;box-shadow:none}
+.btn:hover{background:var(--soft)}
+.btn.xs{font-size:13px;min-height:36px;padding:4px 12px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{filter:brightness(.95)}
+#next{min-width:96px}
+#next.undone{background:#fff;color:var(--accent);border:1px solid var(--accent);border-style:solid}
+.btn[disabled]{opacity:.35}
+.btn:focus-visible,.choice:focus-visible,.jp:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#padBtn.on{background:#1F2A24;border-color:#1F2A24;color:#fff}
+/* 출처 썸네일 */
+#srcs{gap:6px}
+.src-th{width:40px;height:40px;border:1px solid var(--line);border-radius:8px}
+.src-th .src-n{font-family:var(--ui);font-size:11px;padding:0 5px;border-radius:6px 0 6px 0}
+.src-x{font-family:var(--ui);font-size:14px;border:1px solid var(--line);border-radius:10px;min-height:40px}
+.src-top{font-family:var(--ui);font-size:13px}.src-body{border-radius:12px}
+.src-foot .hint{font-family:var(--ui);font-size:12px}
+/* 힌트 · 필기 · 풀이 판 · 글꼴 경고 */
+#hintBox{border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.08);bottom:70px}
+#padPanel{border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.08);bottom:70px}
+.pad-bar{font-family:var(--ui);font-size:12px;padding:6px 10px;background:var(--soft);border-radius:14px 14px 0 0}
+.pad-bar button{font-family:var(--ui);font-size:12px;font-weight:600;min-height:32px;padding:2px 10px;border:1px solid var(--line);border-radius:8px}
+.pad-bar button.on{background:#1F2A24;border-color:#1F2A24;color:#fff}
+#anslb{padding:16px 24px}
+#anslb .ans{border:0;border-left:3px solid var(--example);background:#F3F9F2;border-radius:0 10px 10px 0}
+.ans{border:0;border-left:3px solid var(--example);background:#F3F9F2;border-radius:0 10px 10px 0}
+#anslb .ans-top .kicker{font-family:var(--ui);font-size:12px}
+#fontWarn{border:1px solid var(--bad);border-radius:10px;font-family:var(--ui);font-size:12px}
+.score .c.ok b{color:var(--accent)}.score .c.bad b{color:var(--bad)}.rs-rule{font-family:var(--ui);font-size:13px;color:var(--muted);margin-top:4px}.rs-pass{color:var(--accent)}.rs-fail{color:var(--bad)}
+.rs-list{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}.rs-list .kicker{flex:0 0 100%}
+.rs-q{font:inherit;font-size:var(--fs-note);display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:6px 12px;cursor:pointer}.rs-q:hover{background:var(--soft)}
+/* 시작 위치 목록 · 결과 */
+.jp{font-family:var(--ui);font-size:13px;border:1px solid var(--line);border-radius:8px;min-height:34px}
+.jp.done{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-soft)}.jp.cur{border:2px solid var(--accent)}
+.score{gap:12px}.score .c{border:1px solid var(--line);border-radius:12px;background:var(--soft);padding:12px 18px;min-width:120px}
+.score .c b{font-family:var(--ui);font-weight:700;font-size:28px;line-height:1.1}
+.cover .kicker{font-family:var(--ui);font-size:12px;color:var(--ink-3)}
+
+/* ===== V6C 여백 제거 (아토 2026-09-21) ===== */
+:root{--fs-title:clamp(26px,3.6vh,36px);--fs-body:clamp(18px,2.7vh,26px);--fs-note:clamp(13px,1.9vh,18px)}
+body{padding:0;display:block}
+#stage{width:100vw;height:100dvh;max-width:none;aspect-ratio:auto;border:0;border-radius:0;box-shadow:none;margin:0}
+@media(min-width:1480px){#stage{width:1400px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line)}}
+#top{padding:10px clamp(16px,3vw,40px)}
+#foot{padding:10px clamp(16px,3vw,40px)}
+#body{padding:clamp(14px,3vh,28px) clamp(20px,4vw,56px) clamp(10px,2vh,20px)}
+#body:not(.q-mode):not(.scrollable){display:flex;flex-direction:column;justify-content:center}
+#body:not(.q-mode):not(.scrollable)>*{flex:0 0 auto}
+#body:not(.q-mode):not(.scrollable){--cs:1;font-size:calc(var(--fs-body)*var(--cs))}
+#body:not(.q-mode):not(.scrollable) h1,#body:not(.q-mode):not(.scrollable) h2{font-size:calc(var(--fs-title)*var(--cs))}
+#body:not(.q-mode):not(.scrollable) :is(.why,.concept,.one,.say,.extra,.mu>div){padding:calc(12px*var(--cs)) calc(16px*var(--cs))}
+@media(min-height:680px) and (min-width:900px){#body:not(.q-mode):not(.scrollable){--cs:1.12}}
+@media(min-height:760px) and (min-width:1100px){#body:not(.q-mode):not(.scrollable){--cs:1.22}}
+@media(min-width:1300px){#body{padding-left:max(56px,calc((100% - 1180px)/2));padding-right:max(56px,calc((100% - 1180px)/2))}}
+#body.q-mode{--qs:1}
+@media(min-height:680px) and (min-width:900px){#body.q-mode{--qs:1.15}}
+@media(min-height:760px) and (min-width:1000px){#body.q-mode{--qs:1.3}}
+@media(min-height:900px) and (min-width:1100px){#body.q-mode{--qs:1.45}}
+#body.q-mode h2{font-size:calc(var(--fs-title)*var(--qs))}
+#body.q-mode .qbody{font-size:calc(var(--fs-body)*1.1*var(--qs));margin-top:8px}
+#body.q-mode{justify-content:safe center}
+#body.q-mode .choices{flex:0 1 auto;min-height:0;grid-auto-rows:minmax(72px,auto);margin-top:calc(18px*var(--qs));gap:calc(14px*var(--qs))}
+#body.q-mode .choice{min-height:calc(72px*var(--qs));padding:calc(16px*var(--qs)) calc(20px*var(--qs));font-size:calc(var(--fs-body)*1.12*var(--qs))}
+#body.q-mode .choice .cn{flex:0 0 32px;width:32px;height:32px;font-size:14px}
+#body.q-mode .myans textarea{font-size:calc(18px*var(--qs))}
+#body.q-mode .myans{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+#body.q-mode .myans textarea{flex:1 1 auto;min-height:88px}
+.cover .big{font-size:calc(var(--fs-title)*1.25)}
+.cover .sub{max-width:60ch}
+@media(max-width:700px){.choices{grid-template-columns:minmax(0,1fr)}#body{padding:14px 16px 10px;overflow:auto}#body.q-mode{justify-content:flex-start}#top,#foot{padding-left:12px;padding-right:12px}#srcs{display:none}#foot{gap:6px}.btn{white-space:nowrap;padding:6px 12px}#act .hint{display:none}#chapter{display:none}}
+
+/* ===== V6D 본문 서체: Gowun Dodum (아토 2026-09-21 "손글씨 대신 더 이쁜 대안") ===== */
+:root{--font-hand:'Gowun Dodum',Pretendard,-apple-system,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;--fs-title:clamp(24px,3.2vh,32px);--fs-body:clamp(17px,2.4vh,23px);--fs-note:clamp(13px,1.8vh,16px)}
+html,body{line-height:1.55}
+#body h1,#body h2{font-weight:700;letter-spacing:-.01em}
+#body .why,#body .concept,#body .one,#body .say{line-height:1.6}
+
+/* ===== V6F 글래스 (대표님 2026-09-24) — 치수 불변, 색·투명·모서리만 ===== */
+:root{--gl:rgba(255,255,255,.60);--gl-2:rgba(255,255,255,.42);--gl-3:rgba(255,255,255,.82);--gl-line:rgba(255,255,255,.80);--gl-hi:inset 0 1px 0 rgba(255,255,255,.85);--gl-blur:blur(18px) saturate(140%);--line:rgba(17,17,17,.14);--soft:rgba(255,255,255,.40)}
+html{background:linear-gradient(160deg,#E9F0F5 0%,#F2F5F0 48%,#EDF2EE 100%) fixed}
+body{background:transparent;position:relative}
+body::before,body::after{content:"";position:fixed;z-index:0;border-radius:50%;pointer-events:none;filter:blur(60px)}
+body::before{width:52vw;height:52vw;max-width:640px;max-height:640px;left:-14vw;top:-18vh;background:radial-gradient(circle at 40% 40%,rgba(74,222,128,.32),transparent 68%)}
+body::after{width:60vw;height:60vw;max-width:760px;max-height:760px;right:-20vw;bottom:-24vh;background:radial-gradient(circle at 50% 50%,rgba(96,165,250,.30),transparent 66%)}
+#stage{position:relative;z-index:1;background:var(--gl-2);-webkit-backdrop-filter:var(--gl-blur);backdrop-filter:var(--gl-blur);border-color:var(--gl-line)}
+#top{background:var(--gl-2);border-bottom:1px solid var(--gl-line)}
+#foot{background:var(--gl-2);border-top:1px solid var(--gl-line)}
+.dot{background:rgba(255,255,255,.7)}
+.btn{background:var(--gl);border-color:rgba(17,17,17,.55);border-radius:12px;box-shadow:var(--gl-hi)}
+.btn.primary{background:#15803D;border-color:#15803D;color:#fff;box-shadow:0 4px 12px rgba(21,128,61,.28),inset 0 1px 0 rgba(255,255,255,.25)}
+.choice{background:var(--gl);border-color:rgba(255,255,255,.85);border-radius:14px;box-shadow:0 2px 10px rgba(20,40,60,.06),var(--gl-hi)}
+.choice.sel{border-color:var(--ink)}
+.choice .cn{background:rgba(255,255,255,.7)}
+#body .why,#body .concept{background:var(--gl-2);border-color:rgba(25,113,194,.38);border-radius:14px}
+#body .say,#body .one{background:var(--gl-2);border-radius:0 12px 12px 0}
+#body .tw{border-radius:10px;background:var(--gl-2)}
+.exam-callout{background:rgba(255,77,141,.08);border-radius:14px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.mu>div{border-radius:14px}
+.score .c{border-radius:14px;background:var(--gl-2)}
+.q-kind{border-radius:8px;background:var(--gl-2)}
+.verdict{border-radius:12px;background:var(--gl)}
+.jp{border-radius:10px;background:var(--gl)}
+.myans textarea{border-radius:12px;background:var(--gl)}
+#anslb,#padPanel{background:var(--gl-3);-webkit-backdrop-filter:blur(24px) saturate(150%);backdrop-filter:blur(24px) saturate(150%)}
+#padPanel{border-radius:16px;border-color:rgba(17,17,17,.45)}
+.pad{border-radius:10px;background:rgba(255,255,255,.85)}
+#hintBox{border-radius:14px}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#stage{background:#FAFBFA}.choice,.btn,#top,#foot,#body .why,#body .concept,#anslb,#padPanel,.pad,.myans textarea,.verdict,.jp{background:#FFFFFF}.exam-callout{background:#FFF0F5}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <header id="top"><div id="progress" aria-label="학습 진행"></div><span id="chapter"></span><span id="pos"></span></header>
+  <main id="body" data-ready="false"></main>
+  <footer id="foot">
+    <button class="btn xs" id="prev" aria-label="이전">← 이전</button>
+    <button class="btn xs" id="hintBtn">힌트</button>
+    <button class="btn xs" id="padBtn" aria-label="필기 영역 열기">+ 필기</button>
+    <div id="srcs"></div>
+    <div id="act"></div>
+    <span id="doneTag"></span>
+    <button class="btn primary" id="next" aria-label="다음">다음 →</button>
+  </footer>
+  <div id="hintBox" hidden></div>
+  <div id="padPanel"><div class="pad"><div class="pad-bar"><span>풀이 메모장</span><button data-tool="pen" class="on">펜</button><button data-tool="eraser">지우개</button><button data-act="undo">되돌리기</button><button data-act="clear">지우기</button><button data-act="finger">손가락도</button><button data-act="close">닫기</button></div><canvas id="pad"></canvas></div></div>
+  <div id="chk"></div>
+</div>
+<script>/* 김주영 스앵님 판정 (대표님 2026-09-29 「개념 마인드맵은 스앵님이 학습을 통해 내가 뭘 알고 뭘 모르는지 알아서 파악」) — 원본은 이 파일 하나.
+   빌더가 교실·수업 노트·학습 덱·암기노트 페이지에 그대로 넣고(__JUDGE__), learn.html 은 patch_learn_judge.py 가 TJ-START~TJ-END 사이를 이 파일로 갈아 끼운다.
+   기록 = localStorage atto.evidence [{t, k, n:[노드], ok, v, lid, sid, qid, a, clean}] (최대 4000건 — 넘치면 읽기·질문 기록부터 버리고 노드마다 최근 문제 6건은 남긴다)
+     k: quiz(ok) 확인 문제 · read(clean) 챕터·섹션 끝(다시 설명·질문 없이 끝났으면 clean) · again 다시 설명 · ask 질문 · memo(ok) 암기노트 외움 · self(v) 카드 자가평가
+     a: 같은 시도 표시(카드 「다시 저장」) — 같은 a·qid 는 새 기록으로 바꿔 넣는다(정답 수가 늘지 않는다)
+   판정 = 노드마다 atto.mastery[id] = {quiz:{correct,total,ts}, self, sts, ts, score, state, auto} — learn.html 은 TJ.score 로 같은 식을 쓴다.
+     quiz = 최근 6번 · self(설명할 수 있나 1~5) = 읽음 4 · 다시 설명·질문 2번 이상이면 3 · 외움 +1 · 카드 자가평가가 더 최근이면 그 값
+     → 문제 없이 읽기만 하면 최대 「흔들림」, 「안다」는 문제로만. 점수식 = (0.5·정답률·감쇠(quiz.ts) + 0.2·self/5·감쇠(sts))/0.7, 문제 없으면 self/5·0.6·감쇠(sts)
+     감쇠 = 60일에 걸쳐 1 → 0.4 (최저 0.4). 정답 근거와 읽기·암기 근거를 따로 감쇠한다 — 오늘 암기 체크 하나로 90일 전 정답이 새것처럼 되지 않게(오타 .91 설계 검수 ⑦)
+   저장이 막히면(용량·사생활 모드) 이 페이지 안에서는 메모리 사본으로 이어 가고 rec 은 false 를 돌려준다. */
+(function(g){
+  var EK="atto.evidence", MK="atto.mastery", CAP=4000, KEEPQ=6, MEM={}, DIRTY={};
+  function rd(k,d){ if(DIRTY[k]) return MEM[k]; try{ var v=JSON.parse(localStorage.getItem(k)||"null"); return v==null?d:v; }catch(e){ return DIRTY[k]?MEM[k]:d; } }
+  function wr(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); DIRTY[k]=false; return true; }catch(e){ MEM[k]=v; DIRTY[k]=true; return false; } }
+  function decay(ts){ if(!ts) return 1; var d=Math.max(0,(Date.now()/1000-ts)/86400); return Math.max(.4,1-d/60); }
+  function score(e){ if(!e||typeof e!=="object") return {score:0,state:"unrated"};
+    var q=e.quiz||{}, tot=+q.total||0, cor=+q.correct||0, sv=e.self==null?null:Math.max(1,Math.min(5,+e.self));
+    if(tot<=0&&sv==null) return {score:0,state:"unrated"};
+    var dq=decay(+q.ts||+e.ts||0), ds=decay(+e.sts||+e.ts||0);
+    var raw=tot>0?(0.5*(cor/tot)*dq+0.2*((sv||0)/5)*ds)/0.7:(sv/5)*0.6*ds, s=Math.min(1,raw), st;
+    if(tot<=0) st=(sv>=4&&s>=.4)?"shaky":"unknown"; else st=s>=.7?"known":s>=.4?"shaky":"unknown";
+    return {score:Math.round(s*1000)/1000,state:st}; }
+  function why(evs){ var qz=evs.filter(function(e){return e.k==="quiz";}).slice(-KEEPQ), r={q:qz.length,c:qz.filter(function(e){return e.ok;}).length,
+      read:evs.filter(function(e){return e.k==="read";}).length, clean:evs.filter(function(e){return e.k==="read"&&e.clean;}).length,
+      conf:evs.filter(function(e){return (e.k==="again"||e.k==="ask")&&Date.now()-e.t<21*864e5;}).length,
+      memo:null, self:null, last:0, selfLast:0};
+    evs.forEach(function(e){ if(e.k==="memo") r.memo=!!e.ok; if(e.k==="self") r.self={v:+e.v,t:e.t}; if(e.t>r.last) r.last=e.t; if(e.k!=="quiz"&&e.t>r.selfLast) r.selfLast=e.t; });
+    return r; }
+  function judgeOne(id,L,M){ var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); if(!evs.length) return;
+    var r=why(evs), e=Object.assign({},M[id]||{}), qz=evs.filter(function(x){return x.k==="quiz";}).slice(-KEEPQ);
+    var self=null; if(r.read||r.conf||r.memo!=null){ self=r.read?4:3; if(r.conf>=2) self=3; if(r.memo) self=Math.min(5,self+1); }
+    var autoLast=0; evs.forEach(function(x){ if(x.k!=="self"&&x.t>autoLast) autoLast=x.t; });
+    if(r.self&&r.self.t>=autoLast) self=r.self.v;
+    e.quiz=qz.length?{correct:r.c,total:qz.length,ts:Math.round(qz[qz.length-1].t/1000)}:undefined; if(!e.quiz) delete e.quiz;
+    e.self=self; if(self==null){ delete e.self; delete e.sts; } else e.sts=Math.round(r.selfLast/1000);
+    e.ts=Math.round(r.last/1000); e.auto={by:"tutor",q:r.q,c:r.c,read:r.read,clean:r.clean,conf:r.conf,memo:r.memo};
+    var s=score(e); e.score=s.score; e.state=s.state; M[id]=e; }
+  function judge(ids){ var L=rd(EK,[]), M=rd(MK,{}); if(!Array.isArray(L)) L=[]; if(!M||typeof M!=="object") M={}; (ids||[]).forEach(function(id){ judgeOne(id,L,M); });
+    wr(MK,M); return M; }
+  function all(){ var L=rd(EK,[]), o={}; if(Array.isArray(L)) L.forEach(function(e){ (e&&e.n||[]).forEach(function(i){ o[i]=1; }); }); return judge(Object.keys(o)); }
+  /* 상한 넘침: 노드마다 최근 문제 KEEPQ 건은 지키고, 나머지(읽기·질문·오래된 문제)에서 오래된 것부터 버린다 — 다른 노드 활동으로 정답 기록이 사라지지 않게 */
+  function trim(L,cap){ cap=cap||CAP; if(L.length<=cap) return L; var seen={}, keep=[], rest=[], i;
+    for(i=L.length-1;i>=0;i--){ var e=L[i], k=false; if(e&&e.k==="quiz") (e.n||[]).forEach(function(id){ seen[id]=(seen[id]||0)+1; if(seen[id]<=KEEPQ) k=true; }); (k?keep:rest).push(e); }
+    keep.reverse(); rest.reverse(); rest=rest.slice(Math.max(0,rest.length-Math.max(0,cap-keep.length)));
+    return keep.concat(rest).sort(function(a,b){ return (a.t||0)-(b.t||0); }); }
+  function rec(ev){ if(!ev||!Array.isArray(ev.n)||!ev.n.length) return false; var L=rd(EK,[]); if(!Array.isArray(L)) L=[];
+    ev.t=Date.now();
+    if(ev.a!=null&&ev.qid!=null){ for(var i=L.length-1;i>=0;i--){ var x=L[i]; if(x&&x.k===ev.k&&x.qid===ev.qid&&x.a===ev.a){ L.splice(i,1); break; } } }
+    L.push(ev); L=trim(L);
+    /* 저장 실패 → 절반 상한으로 다시(이때도 노드마다 최근 정답은 지킨다, 오타 설계 2차) · 그래도 실패면 메모리 사본은 자르지 않은 전체로 */
+    var ok=wr(EK,L); if(!ok){ var half=trim(L,Math.floor(CAP/2)); if(wr(EK,half)){ L=half; ok=true; } else { MEM[EK]=L; DIRTY[EK]=true; } }
+    judge(ev.n); return ok; }
+  function reasons(id){ var L=rd(EK,[]); if(!Array.isArray(L)) return null; var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); return evs.length?why(evs):null; }
+  g.TJ={rec:rec,judge:judge,all:all,score:score,reasons:reasons,trim:trim};
+})(typeof window!=="undefined"?window:this);
+</script>
+<script>
+const DECK_ID="calc2-mid2";
+const NDS={"q": {"p1-b1": ["vec.cross"], "p1-b2": ["vec.cross"], "p1-b3": ["vec.cross"], "p1-b4": ["vec.cross"], "p1-a5": ["vec.cross"], "p1-a6": ["vec.cross"], "p2-b1": ["vec.line_eq"], "p2-b2": ["vec.line_eq"], "p2-b3": ["vec.line_eq"], "p2-a4": ["vec.line_eq"], "p2-a5": ["vec.line_eq"], "p3-b1": ["vec.plane_eq"], "p3-b2": ["vec.plane_eq"], "p3-b3": ["vec.plane_eq"], "p3-a4": ["vec.plane_eq"], "p3-a5": ["vec.plane_eq"], "p3-a6": ["vec.plane_eq"], "p4-b1": ["vec.quadric"], "p4-b2": ["vec.quadric"], "p4-b3": ["vec.quadric"], "p4-a4": ["vec.quadric"], "p5-b1": ["vec.vector_func"], "p5-b2": ["vec.vector_func"], "p5-b3": ["vec.vector_func"], "p5-a4": ["vec.vector_func"], "p5-a5": ["vec.vector_func"], "p6-b1": ["vec.vector_calc"], "p6-b2": ["vec.vector_calc"], "p6-b3": ["vec.vector_calc"], "p6-b4": ["vec.vector_calc"], "p6-a5": ["vec.vector_calc"], "p6-a6": ["vec.vector_calc"], "p6-a7": ["vec.vector_calc"]}, "parts": {"1": ["vec.cross", "lin.cofactor"], "2": ["vec.line_eq"], "3": ["vec.plane_eq"], "4": ["vec.quadric"], "5": ["vec.vector_func"], "6": ["vec.vector_calc"]}}, qNd=s=>((NDS.q||{})[s.id]||(NDS.parts||{})[String(s.part)]||[]), pNd=s=>((NDS.parts||{})[String(s.part)]||[]);
+function ev(k,x){ try{ if(!window.TJ) return; const o=Object.assign({k:k,lid:DECK_ID},x||{}); if(o.n&&o.n.length) TJ.rec(o); }catch(e){} }
+const SLIDES=[{"id": "start", "type": "start"}, {"id": "jump", "type": "jump", "part": 0}, {"id": "p1-cover", "type": "cover", "part": 1, "no": "파트 1 · 9/29", "title": "12.4 외적 계산 — 3×3 행렬식 1행 여인수 전개 · 넓이", "star": false}, {"id": "p1-concept", "type": "concept", "part": 1, "title": "a × b = |i j k ; a₁ a₂ a₃ ; b₁ b₂ b₃| — 1행 기준 + − + 로 전개 (1/4)", "html": "<div class=\"why\">9/22에 외적을 성분식 [Def 01]로 정의했다. 외우기 어려운 그 식을 1학기 행렬식 [Def 02]로 바꿔 쓰면 규칙 하나로 계산된다. 결과는 두 벡터에 동시에 수직인 벡터다.</div>\n  ", "exam": [{"level": "강조", "when": "9/29 19:54·23:11", "quote": "「사라스 적용할 필요 없어요. 무조건 여인수 전개」 · j 성분 「마이너스가 있으니까 조심」"}, {"level": "범위", "when": "9/29 29:19", "quote": "외적의 의미(두 벡터에 동시에 수직) 「뒤에 시험하고 연관된 내용이 나온다」 · 스칼라 삼중곱은 이번 학기 패스"}]}, {"id": "p1-concept-2", "type": "concept", "part": 1, "title": "a × b = |i j k ; a₁ a₂ a₃ ; b₁ b₂ b₃| — 1행 기준 + − + 로 전개 (2/4)", "html": "<div class=\"concept\"><p><b>[Def 01] 성분식</b>: \\(\\vec a\\times\\vec b=(a_2b_3-a_3b_2,\\ a_3b_1-a_1b_3,\\ a_1b_2-a_2b_1)\\) — 각 성분이 2×2 행렬식이다. 가운데(\\(y\\)) 성분의 순서 3·1이 헷갈린다.</p></div><div class=\"concept\"><p><b>[Def 02] 3×3 행렬식 1행 여인수 전개</b>: 1행의 원소마다, 그 원소의 행과 열을 지운 2×2 행렬식(소행렬식)을 곱하고 부호 + − +를 붙인다. \\[\\begin{vmatrix}a_1&amp;a_2&amp;a_3\\\\b_1&amp;b_2&amp;b_3\\\\c_1&amp;c_2&amp;c_3\\end{vmatrix}=a_1\\begin{vmatrix}b_2&amp;b_3\\\\c_2&amp;c_3\\end{vmatrix}-a_2\\begin{vmatrix}b_1&amp;b_3\\\\c_1&amp;c_3\\end{vmatrix}+a_3\\begin{vmatrix}b_1&amp;b_2\\\\c_1&amp;c_2\\end{vmatrix}\\]</p></div>", "exam": []}, {"id": "p1-concept-3", "type": "concept", "part": 1, "title": "a × b = |i j k ; a₁ a₂ a₃ ; b₁ b₂ b₃| — 1행 기준 + − + 로 전개 (3/4)", "html": "<div class=\"concept\"><p><b>둘을 잇기(교수님 판서)</b>: \\(\\vec a=a_1\\vec i+a_2\\vec j+a_3\\vec k\\)로 쓰면 [Def 01]의 가운데 항 \\(\\begin{vmatrix}a_3&amp;a_1\\\\b_3&amp;b_1\\end{vmatrix}\\)은 두 열을 바꾸면 부호가 바뀌어 \\(-\\begin{vmatrix}a_1&amp;a_3\\\\b_1&amp;b_3\\end{vmatrix}\\) → + − + 모양이 된다. 그래서 \\[\\vec a\\times\\vec b=\\begin{vmatrix}\\vec i&amp;\\vec j&amp;\\vec k\\\\a_1&amp;a_2&amp;a_3\\\\b_1&amp;b_2&amp;b_3\\end{vmatrix}\\]</p></div><div class=\"concept\"><p><b>[1학기 복습] 2×2 행렬식</b>: \\(\\begin{vmatrix}p&amp;q\\\\r&amp;s\\end{vmatrix}=ps-qr\\). 행렬식 성질: 두 행(또는 두 열)을 바꾸면 −1배.</p></div>", "exam": []}, {"id": "p1-concept-4", "type": "concept", "part": 1, "title": "a × b = |i j k ; a₁ a₂ a₃ ; b₁ b₂ b₃| — 1행 기준 + − + 로 전개 (4/4)", "html": "<div class=\"concept\"><p><b>교수님 Ex01 흐름</b>: \\(\\vec a=(1,3,4)\\), \\(\\vec b=(2,7,-5)\\) → \\(\\vec i\\) 항 \\(3\\cdot(-5)-4\\cdot7=-43\\), \\(\\vec j\\) 항 \\(-(1\\cdot(-5)-4\\cdot2)=+13\\), \\(\\vec k\\) 항 \\(1\\cdot7-3\\cdot2=1\\) → \\((-43,13,1)\\). 검산: \\(\\vec a\\cdot(\\vec a\\times\\vec b)=-43+39+4=0\\) — 수직.</p></div><div class=\"concept\"><p><b>[교재 보충] 성질과 크기</b>: \\(\\vec b\\times\\vec a=-\\vec a\\times\\vec b\\), \\(\\vec a\\times\\vec a=\\vec0\\), \\(\\vec i\\times\\vec j=\\vec k\\), \\(\\vec j\\times\\vec k=\\vec i\\), \\(\\vec k\\times\\vec i=\\vec j\\). 크기 \\(|\\vec a\\times\\vec b|=|\\vec a||\\vec b|\\sin\\theta\\) = 두 벡터가 만드는 평행사변형의 넓이(삼각형은 그 절반). 방향은 오른손 법칙.</p></div><div class=\"one\">한 줄: \\(\\vec a\\times\\vec b=|\\,\\vec i\\ \\vec j\\ \\vec k;\\ \\vec a;\\ \\vec b\\,|\\)를 1행 + − +로 전개(사라스 금지) · 결과는 \\(\\vec a,\\vec b\\)에 수직 · \\(|\\vec a\\times\\vec b|\\) = 평행사변형 넓이.</div>\n  ", "exam": []}, {"id": "p1-mu", "type": "mu", "part": 1, "title": "12.4 외적 계산 — 3×3 행렬식 1행 여인수 전개 · 넓이", "mem": ["1행 여인수 전개 + − +, \\(\\vec j\\) 항 앞 −", "\\(\\vec a\\times\\vec b=|\\vec i\\ \\vec j\\ \\vec k;\\vec a;\\vec b|\\)", "\\(\\vec b\\times\\vec a=-\\vec a\\times\\vec b\\), \\(\\vec i\\times\\vec j=\\vec k\\)", "\\(|\\vec a\\times\\vec b|=|\\vec a||\\vec b|\\sin\\theta\\) = 평행사변형 넓이"], "und": ["[Def 01]이 [Def 02] 모양이 되는 이유(열 교환 → −1배)", "외적이 두 벡터에 수직인지 내적으로 확인하는 법"]}, {"id": "p1-b1", "type": "q", "part": 1, "kind": "기초", "qn": "기초 1-1 · 외적 계산", "html": "<p>\\(\\vec a=(2,1,0)\\), \\(\\vec b=(1,3,2)\\)일 때 \\(\\vec a\\times\\vec b\\)는?</p>", "ans": "\\(\\begin{vmatrix}\\vec i&\\vec j&\\vec k\\\\2&1&0\\\\1&3&2\\end{vmatrix}=(1\\cdot2-0\\cdot3)\\vec i-(2\\cdot2-0\\cdot1)\\vec j+(2\\cdot3-1\\cdot1)\\vec k=2\\vec i-4\\vec j+5\\vec k\\). \\(\\vec j\\) 항의 −를 빼먹으면 \\((2,4,5)\\).", "choices": [{"html": "\\((-2,4,-5)\\)", "ok": false, "k": 2}, {"html": "\\((2,-4,-5)\\)", "ok": false, "k": 3}, {"html": "\\((2,-4,5)\\)", "ok": true, "k": 0}, {"html": "\\((2,4,5)\\)", "ok": false, "k": 1}], "exam": []}, {"id": "p1-b2", "type": "q", "part": 1, "kind": "기초", "qn": "기초 1-2 · j 성분 부호", "html": "<p>\\(\\vec a=(1,2,3)\\), \\(\\vec b=(4,5,6)\\)일 때 \\(\\vec a\\times\\vec b\\)는?</p>", "ans": "\\(\\vec i\\): \\(2\\cdot6-3\\cdot5=-3\\), \\(\\vec j\\): \\(-(1\\cdot6-3\\cdot4)=-(-6)=6\\), \\(\\vec k\\): \\(1\\cdot5-2\\cdot4=-3\\). 검산 \\(\\vec a\\cdot(-3,6,-3)=-3+12-9=0\\) ✓.", "choices": [{"html": "\\((3,-6,3)\\)", "ok": false, "k": 2}, {"html": "\\((0,0,0)\\)", "ok": false, "k": 3}, {"html": "\\((-3,-6,-3)\\)", "ok": false, "k": 1}, {"html": "\\((-3,6,-3)\\)", "ok": true, "k": 0}], "exam": []}, {"id": "p1-b3", "type": "q", "part": 1, "kind": "기초", "qn": "기초 1-3 · 성질", "html": "<p>옳은 것은?</p>", "ans": "\\(\\vec i\\times\\vec j=\\vec k\\)이고 순서를 바꾸면 부호가 바뀐다. \\(\\vec a\\times\\vec a=\\vec0\\)(사이각 0), 외적은 교환법칙이 안 된다.", "choices": [{"html": "\\(\\vec j\\times\\vec i=-\\vec k\\)", "ok": true, "k": 0}, {"html": "\\(\\vec a\\times\\vec a=|\\vec a|^2\\)", "ok": false, "k": 2}, {"html": "\\(\\vec a\\times\\vec b=\\vec b\\times\\vec a\\)", "ok": false, "k": 3}, {"html": "\\(\\vec j\\times\\vec i=\\vec k\\)", "ok": false, "k": 1}], "exam": []}, {"id": "p1-b4", "type": "q", "part": 1, "kind": "기초", "qn": "기초 1-4 · 평행사변형 넓이", "html": "<p>\\(\\vec a=(3,0,0)\\), \\(\\vec b=(1,2,0)\\)이 만드는 평행사변형의 넓이는?</p>", "ans": "\\(\\vec a\\times\\vec b=(0\\cdot0-0\\cdot2)\\vec i-(3\\cdot0-0\\cdot1)\\vec j+(3\\cdot2-0\\cdot1)\\vec k=(0,0,6)\\) → 넓이 6. 3은 삼각형 넓이.", "choices": [{"html": "\\(\\sqrt{45}\\)", "ok": false, "k": 2}, {"html": "6", "ok": true, "k": 0}, {"html": "12", "ok": false, "k": 3}, {"html": "3", "ok": false, "k": 1}], "exam": []}, {"id": "p1-a5", "type": "q", "part": 1, "kind": "응용", "qn": "응용 1-1 · 두 벡터에 수직인 단위벡터", "html": "<p>\\(\\vec a=(1,-1,2)\\), \\(\\vec b=(3,0,1)\\)에 동시에 수직인 단위벡터를 모두 구하라.</p>", "ans": "① \\(\\vec a\\times\\vec b=\\begin{vmatrix}\\vec i&\\vec j&\\vec k\\\\1&-1&2\\\\3&0&1\\end{vmatrix}=(-1\\cdot1-2\\cdot0)\\vec i-(1\\cdot1-2\\cdot3)\\vec j+(1\\cdot0-(-1)\\cdot3)\\vec k=(-1,5,3)\\). ② 검산 \\(\\vec a\\cdot(-1,5,3)=-1-5+6=0\\), \\(\\vec b\\cdot(-1,5,3)=-3+0+3=0\\) ✓. ③ 크기 \\(\\sqrt{1+25+9}=\\sqrt{35}\\) → 단위벡터 \\(\\pm\\frac{1}{\\sqrt{35}}(-1,5,3)\\)(두 개).", "choices": null, "exam": []}, {"id": "p1-a6", "type": "q", "part": 1, "kind": "응용", "qn": "응용 1-2 · 세 점이 만드는 삼각형", "html": "<p>세 점 P\\((1,0,0)\\), Q\\((0,2,0)\\), R\\((0,0,3)\\)이 만드는 삼각형의 넓이를 구하라.</p>", "ans": "① \\(\\overrightarrow{PQ}=(-1,2,0)\\), \\(\\overrightarrow{PR}=(-1,0,3)\\). ② \\(\\overrightarrow{PQ}\\times\\overrightarrow{PR}=(2\\cdot3-0\\cdot0)\\vec i-((-1)\\cdot3-0\\cdot(-1))\\vec j+((-1)\\cdot0-2\\cdot(-1))\\vec k=(6,3,2)\\). ③ 크기 \\(\\sqrt{36+9+4}=7\\) = 평행사변형 넓이 → 삼각형 \\(\\frac72\\).", "choices": null, "exam": []}, {"id": "p1-result", "type": "result", "part": 1, "title": "12.4 외적 계산 — 3×3 행렬식 1행 여인수 전개 · 넓이"}, {"id": "p2-cover", "type": "cover", "part": 2, "no": "파트 2 · 9/29", "title": "12.5 ① 직선의 방정식 — 방향코사인 · 방향비 · 매개방정식 · 대칭방정식", "star": false}, {"id": "p2-concept", "type": "concept", "part": 2, "title": "P₀P = t v 한 줄에서 매개방정식과 대칭방정식이 나온다 (1/5)", "html": "<div class=\"why\">평면(\\(\\mathbb R^2\\))에서는 직선을 기울기로 썼다. 공간(\\(\\mathbb R^3\\))에서는 기울기 하나로 방향을 못 나타내서 방향벡터를 쓴다. 공식을 외우지 말고 그림(\\(\\overrightarrow{P_0P}\\parallel\\vec v\\))에서 매번 유도할 수 있어야 한다.</div>\n  ", "exam": [{"level": "강조", "when": "9/29 32:24~34:52", "quote": "「직선·평면의 방정식 = 중간고사 문제에 관련된 내용 … 잘 체크해서 집중적으로」 · 암기한 공식만으로는 「응용하는 문제는 안 먹혀」 — 그림에서 유도"}]}, {"id": "p2-concept-2", "type": "concept", "part": 2, "title": "P₀P = t v 한 줄에서 매개방정식과 대칭방정식이 나온다 (2/5)", "html": "<div class=\"concept\"><p><b>① 방향코사인</b>(교수님 판서): 원점 O와 점 \\(P_0(x_0,y_0,z_0)\\)을 지나는 직선 g의 방향은 단위벡터 \\(\\frac{1}{|\\overrightarrow{OP_0}|}\\overrightarrow{OP_0}\\). \\(x\\)축 단위벡터 \\(\\vec E_x=(1,0,0)\\)과의 내적 \\(\\vec E_x\\cdot\\overrightarrow{OP_0}=x_0=|\\overrightarrow{OP_0}|\\cos\\alpha\\) → \\[\\cos\\alpha=\\frac{x_0}{|\\overrightarrow{OP_0}|},\\ \\cos\\beta=\\frac{y_0}{|\\overrightarrow{OP_0}|},\\ \\cos\\gamma=\\frac{z_0}{|\\overrightarrow{OP_0}|}\\] 이것을 \\(l,m,n\\)으로 부른다(9/22 방향코사인과 같은 식).</p></div><div class=\"concept\"><p><b>ㄴ 부호 ±</b>: 직선은 반대로도 뻗으니 각에 \\(\\pi\\)를 더한 방향도 같은 직선이고 \\(\\cos(\\pi+\\alpha)=-\\cos\\alpha\\) → \\(l=\\pm\\frac{x_0}{|\\overrightarrow{OP_0}|}\\), \\(m\\), \\(n\\)도 ±.</p></div><div class=\"concept\"><p><b>ㄷ 방향비</b>: ±와 분모는 셋이 같으니 비는 고정 — \\(l:m:n=x_0:y_0:z_0\\)(direction ratio).</p></div>", "exam": []}, {"id": "p2-concept-3", "type": "concept", "part": 2, "title": "P₀P = t v 한 줄에서 매개방정식과 대칭방정식이 나온다 (3/5)", "html": "<div class=\"concept\"><figure class=\"fig\" data-fig=\"line\"><svg class=\"fig-svg\" style=\"max-width:100%;height:auto\" viewbox=\"0 0 500 250\" width=\"500\" height=\"250\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"></path></marker></defs><line x1=\"150\" y1=\"190\" x2=\"270\" y2=\"190\" stroke=\"#1F2A44\" stroke-width=\"1.5\" marker-end=\"url(#ah)\"></line><line x1=\"150\" y1=\"190\" x2=\"150\" y2=\"70\" stroke=\"#1F2A44\" stroke-width=\"1.5\" marker-end=\"url(#ah)\"></line><line x1=\"150\" y1=\"190\" x2=\"78.0\" y2=\"250.0\" stroke=\"#1F2A44\" stroke-width=\"1.5\" marker-end=\"url(#ah)\"></line><text x=\"276\" y=\"195\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">y</text><text x=\"146\" y=\"64\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"end\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">z</text><text x=\"72.0\" y=\"240.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"end\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">x</text><text x=\"158\" y=\"206\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">O</text><line x1=\"109.4\" y1=\"186.8\" x2=\"299.4\" y2=\"81.2\" stroke=\"#F59F00\" stroke-width=\"3\"></line><line x1=\"150\" y1=\"190\" x2=\"161.2\" y2=\"158.0\" stroke=\"#8A97A6\" stroke-width=\"1.4\" marker-end=\"url(#ah)\"></line><line x1=\"150\" y1=\"190\" x2=\"253.4\" y2=\"106.8\" stroke=\"#8A97A6\" stroke-width=\"1.4\" marker-end=\"url(#ah)\"></line><line x1=\"161.2\" y1=\"158.0\" x2=\"253.4\" y2=\"106.8\" stroke=\"#E03131\" stroke-width=\"2.4\" marker-end=\"url(#ah)\"></line><line x1=\"231.1\" y1=\"61.6\" x2=\"272.59000000000003\" y2=\"38.56\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah)\"></line><text x=\"278.59000000000003\" y=\"34.56\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">v = (A, B, C)</text><circle cx=\"161.2\" cy=\"158.0\" r=\"4\" fill=\"#1F2A44\"></circle><text x=\"151.2\" y=\"150.0\" font-size=\"12\" fill=\"#1F2A44\" text-anchor=\"end\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">P₀(x₀, y₀, z₀)</text><circle cx=\"253.4\" cy=\"106.8\" r=\"4\" fill=\"#1F2A44\"></circle><text x=\"261.4\" y=\"120.8\" font-size=\"12\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">P(x, y, z)</text><text x=\"470\" y=\"40\" font-size=\"14\" fill=\"#E03131\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">P₀P = t v</text></svg><figcaption style=\"font-size:.86em;opacity:.85;margin-top:4px\">직선 위의 점 P는 \\(\\overrightarrow{P_0P}\\parallel\\vec v\\), 즉 \\(\\overrightarrow{P_0P}=t\\vec v\\)인 실수 \\(t\\)가 있다 — 여기서 매개방정식과 대칭방정식이 나온다.</figcaption></figure></div>", "exam": []}, {"id": "p2-concept-4", "type": "concept", "part": 2, "title": "P₀P = t v 한 줄에서 매개방정식과 대칭방정식이 나온다 (4/5)", "html": "<div class=\"concept\"><p><b>② 한 점과 방향벡터</b>: \\(P_0(x_0,y_0,z_0)\\)를 지나고 방향벡터 \\(\\vec v=(A,B,C)\\)에 평행한 직선. 직선 위 점 \\(P(x,y,z)\\)이면 \\(\\overrightarrow{P_0P}=(x-x_0,\\,y-y_0,\\,z-z_0)\\parallel\\vec v\\) ⇔ \\(\\overrightarrow{P_0P}=t\\vec v\\)인 실수 \\(t\\)가 있다.</p></div><div class=\"concept\"><p><b>매개방정식</b>: 성분끼리 같다고 놓으면 \\[x=x_0+tA,\\qquad y=y_0+tB,\\qquad z=z_0+tC\\] \\(t\\)(매개변수)가 모든 실수를 돌면 직선 전체가 그려진다.</p></div><div class=\"concept\"><p><b>대칭방정식</b>: 세 식을 \\(t\\)에 대해 풀어 같다고 놓으면 \\[\\frac{x-x_0}{A}=\\frac{y-y_0}{B}=\\frac{z-z_0}{C}\\ (=t)\\] 분모 \\(A,B,C\\)가 방향비 역할. <b>[교재 보충]</b> 성분 하나가 0이면(예 \\(B=0\\)) 그 좌표는 상수: \\(\\frac{x-x_0}{A}=\\frac{z-z_0}{C},\\ y=y_0\\).</p></div>", "exam": []}, {"id": "p2-concept-5", "type": "concept", "part": 2, "title": "P₀P = t v 한 줄에서 매개방정식과 대칭방정식이 나온다 (5/5)", "html": "<div class=\"concept\"><p><b>[교재 보충] 두 점을 지나는 직선</b>: A, B를 지나면 \\(\\vec v=\\overrightarrow{AB}\\). <b>두 직선의 위치</b>: 방향벡터가 평행하면 평행(또는 일치), 아니면 연립해서 해가 있으면 한 점에서 만나고, 없으면 <b>꼬인 위치</b>(평행하지도 만나지도 않음 — 공간에서만).</p></div><div class=\"one\">한 줄: \\(l,m,n=\\pm\\frac{x_0,y_0,z_0}{|\\overrightarrow{OP_0}|}\\), 방향비 \\(x_0:y_0:z_0\\) · \\(\\overrightarrow{P_0P}=t\\vec v\\) → 매개 \\(x=x_0+tA\\) … → 대칭 \\(\\frac{x-x_0}A=\\frac{y-y_0}B=\\frac{z-z_0}C\\).</div>\n  ", "exam": []}, {"id": "p2-mu", "type": "mu", "part": 2, "title": "12.5 ① 직선의 방정식 — 방향코사인 · 방향비 · 매개방정식 · 대칭방정식", "mem": ["\\(\\cos\\alpha=x_0/|\\overrightarrow{OP_0}|\\) … (\\(l,m,n\\)), 부호 ±", "방향비 \\(l:m:n=x_0:y_0:z_0\\)", "매개방정식 · 대칭방정식", "공간의 두 직선: 평행 · 교차 · 꼬인 위치"], "und": ["\\(\\overrightarrow{P_0P}=t\\vec v\\) 그림에서 두 방정식을 유도하는 과정", "방향코사인이 ±까지만 정해지는 이유", "방향벡터 성분이 0일 때 대칭방정식을 고쳐 쓰는 이유"]}, {"id": "p2-b1", "type": "q", "part": 2, "kind": "기초", "qn": "기초 2-1 · 방향코사인", "html": "<p>원점과 \\(P_0(2,-1,2)\\)를 지나는 직선의 방향코사인 \\((l,m,n)\\)은?</p>", "ans": "\\(|\\overrightarrow{OP_0}|=\\sqrt{4+1+4}=3\\) → \\(l=\\pm\\frac23\\), \\(m=\\mp\\frac13\\), \\(n=\\pm\\frac23\\)(복부호 동순). 제곱하지 않은 거리 9로 나누면 틀린다.", "choices": [{"html": "\\((2,-1,2)\\)", "ok": false, "k": 1}, {"html": "\\(\\left(\\frac23,\\frac13,\\frac23\\right)\\)", "ok": false, "k": 3}, {"html": "\\(\\pm\\left(\\frac29,-\\frac19,\\frac29\\right)\\)", "ok": false, "k": 2}, {"html": "\\(\\pm\\left(\\frac23,-\\frac13,\\frac23\\right)\\)", "ok": true, "k": 0}], "exam": []}, {"id": "p2-b2", "type": "q", "part": 2, "kind": "기초", "qn": "기초 2-2 · 매개방정식", "html": "<p>점 \\((1,2,-1)\\)을 지나고 \\(\\vec v=(3,0,4)\\)에 평행한 직선의 매개방정식은?</p>", "ans": "\\(x=x_0+tA\\) 꼴: \\(1+3t\\), \\(2+0\\cdot t=2\\), \\(-1+4t\\). 점과 방향을 바꿔 넣으면 다른 직선.", "choices": [{"html": "\\(x=3+t,\\ y=2t,\\ z=4-t\\)", "ok": false, "k": 1}, {"html": "\\(x=1+3t,\\ y=2+t,\\ z=-1+4t\\)", "ok": false, "k": 2}, {"html": "\\(x=1+3t,\\ y=2,\\ z=-1+4t\\)", "ok": true, "k": 0}, {"html": "\\(x=3t,\\ y=0,\\ z=4t\\)", "ok": false, "k": 3}], "exam": []}, {"id": "p2-b3", "type": "q", "part": 2, "kind": "기초", "qn": "기초 2-3 · 두 점과 대칭방정식", "html": "<p>A\\((1,0,2)\\), B\\((3,4,1)\\)을 지나는 직선의 대칭방정식은?</p>", "ans": "\\(\\vec v=\\overrightarrow{AB}=(2,4,-1)\\), 점 A → \\(\\frac{x-1}{2}=\\frac{y-0}{4}=\\frac{z-2}{-1}\\). B의 좌표를 분모에 쓰면 틀린다.", "choices": [{"html": "\\(\\frac{x-1}{2}=\\frac{y}{4}=\\frac{z-2}{-1}\\)", "ok": true, "k": 0}, {"html": "\\(\\frac{x-2}{1}=\\frac{y-4}{0}=\\frac{z+1}{2}\\)", "ok": false, "k": 3}, {"html": "\\(\\frac{x-1}{3}=\\frac{y}{4}=\\frac{z-2}{1}\\)", "ok": false, "k": 1}, {"html": "\\(\\frac{x+1}{2}=\\frac{y}{4}=\\frac{z+2}{-1}\\)", "ok": false, "k": 2}], "exam": []}, {"id": "p2-a4", "type": "q", "part": 2, "kind": "응용", "qn": "응용 2-1 · xy평면과 만나는 점", "html": "<p>A\\((1,3,-2)\\), B\\((2,1,2)\\)를 지나는 직선이 \\(xy\\)평면과 만나는 점을 구하라.</p>", "ans": "① \\(\\vec v=\\overrightarrow{AB}=(1,-2,4)\\) → 매개 \\(x=1+t,\\ y=3-2t,\\ z=-2+4t\\). ② \\(xy\\)평면은 \\(z=0\\) → \\(-2+4t=0\\) → \\(t=\\frac12\\). ③ \\((1.5,\\ 2,\\ 0)\\).", "choices": null, "exam": []}, {"id": "p2-a5", "type": "q", "part": 2, "kind": "응용", "qn": "응용 2-2 · 두 직선의 위치 관계", "html": "<p>\\(L_1:\\ x=1+2t,\\ y=t,\\ z=3-t\\)과 \\(L_2:\\ x=s,\\ y=2+s,\\ z=1+2s\\)가 평행한지, 만나는지, 꼬인 위치인지 판정하라.</p>", "ans": "① 방향 \\(\\vec v_1=(2,1,-1)\\), \\(\\vec v_2=(1,1,2)\\) — 한쪽이 다른 쪽의 실수배가 아니므로 평행 아님. ② 만나는지: \\(1+2t=s\\), \\(t=2+s\\)를 풀면 \\(t=-3,\\ s=-5\\). ③ 셋째 좌표: \\(3-t=6\\), \\(1+2s=-9\\) → 다르다 → 공통점 없음. ∴ 평행하지도 만나지도 않는 <b>꼬인 위치</b>.", "choices": null, "exam": []}, {"id": "p2-result", "type": "result", "part": 2, "title": "12.5 ① 직선의 방정식 — 방향코사인 · 방향비 · 매개방정식 · 대칭방정식"}, {"id": "p3-cover", "type": "cover", "part": 3, "no": "파트 3 · 교재 선행", "title": "12.5 ② 평면의 방정식 — 법선벡터 · 두 평면 · 점과 평면 사이 거리", "star": false}, {"id": "p3-concept", "type": "concept", "part": 3, "title": "n · (r − r₀) = 0 → a(x−x₀) + b(y−y₀) + c(z−z₀) = 0 (1/4)", "html": "<div class=\"why\">직선은 방향벡터 하나로 정해졌다. 평면은 「평면에 수직인 방향」 하나(법선벡터)와 한 점으로 정해진다. 세 점이 주어지면 법선을 외적으로 만든다 — 파트 1의 외적(두 벡터에 동시에 수직)이 여기서 쓰인다.</div>\n  <div class=\"concept\"><p><b>법선벡터</b>: 평면에 수직인 벡터 \\(\\vec n=(a,b,c)\\). 평면 위의 한 점 \\(P_0(x_0,y_0,z_0)\\)과 임의의 점 \\(P(x,y,z)\\)에 대해 \\(\\overrightarrow{P_0P}=\\vec r-\\vec r_0\\)는 평면 안의 벡터라 \\(\\vec n\\)과 수직(내적 0).</p></div>", "exam": []}, {"id": "p3-concept-2", "type": "concept", "part": 3, "title": "n · (r − r₀) = 0 → a(x−x₀) + b(y−y₀) + c(z−z₀) = 0 (2/4)", "html": "<div class=\"concept\"><figure class=\"fig\" data-fig=\"plane\"><svg class=\"fig-svg\" style=\"max-width:100%;height:auto\" viewbox=\"0 0 460 196\" width=\"460\" height=\"196\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"></path></marker></defs><path d=\"M90.0 170.0 L330.0 170.0 L420.0 90.0 L180.0 90.0 Z\" fill=\"rgba(25,113,194,.07)\" stroke=\"#1F2A44\" stroke-width=\"1.8\"></path><circle cx=\"220\" cy=\"140\" r=\"4\" fill=\"#1F2A44\"></circle><text x=\"212\" y=\"158\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">P₀</text><circle cx=\"320\" cy=\"118\" r=\"4\" fill=\"#1F2A44\"></circle><text x=\"328\" y=\"134\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">P</text><line x1=\"220\" y1=\"140\" x2=\"317\" y2=\"119\" stroke=\"#E03131\" stroke-width=\"2.2\" marker-end=\"url(#ah)\"></line><text x=\"270\" y=\"146\" font-size=\"12\" fill=\"#E03131\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">r − r₀</text><line x1=\"220\" y1=\"140\" x2=\"220\" y2=\"26\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah)\"></line><text x=\"228\" y=\"36\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">n = (a, b, c)</text><path d=\"M220 128 L231 125.5 L231 137.5\" fill=\"none\" stroke=\"#2F9E44\" stroke-width=\"1.3\"></path></svg><figcaption style=\"font-size:.86em;opacity:.85;margin-top:4px\">평면: 법선벡터 \\(\\vec n\\)이 평면 위 모든 벡터 \\(\\vec r-\\vec r_0\\)와 수직 → \\(\\vec n\\cdot(\\vec r-\\vec r_0)=0\\).</figcaption></figure></div>", "exam": []}, {"id": "p3-concept-3", "type": "concept", "part": 3, "title": "n · (r − r₀) = 0 → a(x−x₀) + b(y−y₀) + c(z−z₀) = 0 (3/4)", "html": "<div class=\"concept\"><p><b>평면의 방정식</b>: \\[\\vec n\\cdot(\\vec r-\\vec r_0)=0\\iff a(x-x_0)+b(y-y_0)+c(z-z_0)=0\\] 전개하면 \\(ax+by+cz+d=0\\)(일차방정식). 거꾸로 \\(ax+by+cz+d=0\\)의 법선은 계수 \\((a,b,c)\\).</p></div><div class=\"concept\"><p><b>세 점을 지나는 평면</b>: P, Q, R이면 \\(\\vec n=\\overrightarrow{PQ}\\times\\overrightarrow{PR}\\)(두 벡터에 동시에 수직 = 평면에 수직), 점은 셋 중 아무거나.</p></div><div class=\"concept\"><p><b>두 평면</b>: 법선이 평행하면 평면도 평행. 두 평면이 이루는 각 = 법선 사이 각 \\(\\cos\\theta=\\dfrac{|\\vec n_1\\cdot\\vec n_2|}{|\\vec n_1||\\vec n_2|}\\). 평행하지 않은 두 평면의 교선은 직선이고, 방향은 \\(\\vec n_1\\times\\vec n_2\\)(두 법선 모두에 수직).</p></div><div class=\"concept\"><p><b>직선과 평면의 교점</b>: 직선의 매개방정식을 평면 식에 넣어 \\(t\\)를 구한다.</p></div>", "exam": []}, {"id": "p3-concept-4", "type": "concept", "part": 3, "title": "n · (r − r₀) = 0 → a(x−x₀) + b(y−y₀) + c(z−z₀) = 0 (4/4)", "html": "<div class=\"concept\"><p><b>점과 평면 사이 거리</b>: 점 \\((x_1,y_1,z_1)\\)에서 평면 \\(ax+by+cz+d=0\\)까지 \\[D=\\frac{|ax_1+by_1+cz_1+d|}{\\sqrt{a^2+b^2+c^2}}\\] (평면 위 한 점에서 그 점으로 가는 벡터를 법선 방향으로 정사영한 길이 — 12.3 정사영.)</p></div><div class=\"one\">한 줄: \\(a(x-x_0)+b(y-y_0)+c(z-z_0)=0\\), 법선 = 계수 · 세 점 → \\(\\vec n=\\overrightarrow{PQ}\\times\\overrightarrow{PR}\\) · 두 평면 각 = 법선 각, 교선 방향 \\(\\vec n_1\\times\\vec n_2\\) · 거리 \\(\\frac{|ax_1+by_1+cz_1+d|}{\\sqrt{a^2+b^2+c^2}}\\).</div>\n  ", "exam": []}, {"id": "p3-mu", "type": "mu", "part": 3, "title": "12.5 ② 평면의 방정식 — 법선벡터 · 두 평면 · 점과 평면 사이 거리", "mem": ["\\(\\vec n\\cdot(\\vec r-\\vec r_0)=0\\), \\(ax+by+cz+d=0\\)의 법선 \\((a,b,c)\\)", "세 점 평면의 법선 = 외적", "교선 방향 \\(\\vec n_1\\times\\vec n_2\\)", "점-평면 거리 공식"], "und": ["평면 위 벡터가 모두 법선과 수직인 이유", "두 평면의 각을 법선으로 재는 이유", "거리 공식이 정사영인 이유"]}, {"id": "p3-b1", "type": "q", "part": 3, "kind": "기초", "qn": "기초 3-1 · 평면의 방정식", "html": "<p>점 \\((1,-2,3)\\)을 지나고 법선벡터가 \\((2,1,-1)\\)인 평면은?</p>", "ans": "\\(2(x-1)+(y+2)-(z-3)=0\\) → \\(2x-2+y+2-z+3=0\\) → \\(2x+y-z+3=0\\). 검산: 점을 넣으면 \\(2-2-3+3=0\\) ✓.", "choices": [{"html": "\\(x-2y+3z=0\\)", "ok": false, "k": 2}, {"html": "\\(2x+y-z+3=0\\)", "ok": true, "k": 0}, {"html": "\\(2x+y-z=0\\)", "ok": false, "k": 3}, {"html": "\\(2x+y-z-3=0\\)", "ok": false, "k": 1}], "exam": []}, {"id": "p3-b2", "type": "q", "part": 3, "kind": "기초", "qn": "기초 3-2 · 법선벡터 읽기", "html": "<p>평면 \\(3x-y+2z=5\\)의 법선벡터는?</p>", "ans": "\\(ax+by+cz+d=0\\)의 \\(x,y,z\\) 계수 \\((3,-1,2)\\). 오른쪽 상수 5는 위치(평행 이동)만 바꾼다.", "choices": [{"html": "\\((3,-1,5)\\)", "ok": false, "k": 1}, {"html": "\\((-1,2,5)\\)", "ok": false, "k": 2}, {"html": "\\((3,1,2)\\)", "ok": false, "k": 3}, {"html": "\\((3,-1,2)\\)", "ok": true, "k": 0}], "exam": []}, {"id": "p3-b3", "type": "q", "part": 3, "kind": "기초", "qn": "기초 3-3 · 점과 평면 사이 거리", "html": "<p>점 \\((1,2,3)\\)과 평면 \\(2x-y+2z=10\\) 사이의 거리는?</p>", "ans": "\\(2x-y+2z-10=0\\)으로 옮겨 \\(D=\\frac{|2-2+6-10|}{\\sqrt{4+1+4}}=\\frac{4}{3}\\). 분모에 제곱근을 빼먹으면 \\(\\frac49\\).", "choices": [{"html": "4", "ok": false, "k": 1}, {"html": "\\(\\frac43\\)", "ok": true, "k": 0}, {"html": "\\(\\frac{4}{9}\\)", "ok": false, "k": 2}, {"html": "\\(\\frac{10}{3}\\)", "ok": false, "k": 3}], "exam": []}, {"id": "p3-a4", "type": "q", "part": 3, "kind": "응용", "qn": "응용 3-1 · 세 점을 지나는 평면", "html": "<p>P\\((1,0,0)\\), Q\\((0,2,0)\\), R\\((0,0,3)\\)을 지나는 평면의 방정식을 구하라.</p>", "ans": "① \\(\\overrightarrow{PQ}=(-1,2,0)\\), \\(\\overrightarrow{PR}=(-1,0,3)\\). ② \\(\\vec n=\\overrightarrow{PQ}\\times\\overrightarrow{PR}=(6,3,2)\\). ③ 점 P: \\(6(x-1)+3y+2z=0\\) → \\(6x+3y+2z=6\\). 검산: Q \\(6=6\\), R \\(6=6\\) ✓(양변 6으로 나누면 \\(\\frac x1+\\frac y2+\\frac z3=1\\) — 절편형).", "choices": null, "exam": []}, {"id": "p3-a5", "type": "q", "part": 3, "kind": "응용", "qn": "응용 3-2 · 두 평면의 각과 교선", "html": "<p>두 평면 \\(x+y+z=2\\)와 \\(x-y+2z=1\\)이 이루는 각의 코사인과 교선의 매개방정식을 구하라.</p>", "ans": "① \\(\\vec n_1=(1,1,1)\\), \\(\\vec n_2=(1,-1,2)\\), \\(\\vec n_1\\cdot\\vec n_2=1-1+2=2\\) → \\(\\cos\\theta=\\frac{2}{\\sqrt3\\sqrt6}=\\frac{\\sqrt2}{3}\\)(약 62°). ② 교선 방향 \\(\\vec n_1\\times\\vec n_2=(1\\cdot2-1\\cdot(-1),\\ -(1\\cdot2-1\\cdot1),\\ 1\\cdot(-1)-1\\cdot1)=(3,-1,-2)\\). ③ 교선 위 한 점: \\(z=0\\)으로 두면 \\(x+y=2,\\ x-y=1\\) → \\((1.5,0.5,0)\\). ∴ \\(x=1.5+3t,\\ y=0.5-t,\\ z=-2t\\).", "choices": null, "exam": []}, {"id": "p3-a6", "type": "q", "part": 3, "kind": "응용", "qn": "응용 3-3 · 직선과 평면의 교점", "html": "<p>직선 \\(x=1+t,\\ y=2-t,\\ z=3t\\)와 평면 \\(2x+y+z=7\\)의 교점을 구하라.</p>", "ans": "평면 식에 넣으면 \\(2(1+t)+(2-t)+3t=7\\) → \\(4+4t=7\\) → \\(t=\\frac34\\). 교점 \\(\\left(\\frac74,\\frac54,\\frac94\\right)\\). 검산 \\(\\frac{14}{4}+\\frac54+\\frac94=\\frac{28}{4}=7\\) ✓.", "choices": null, "exam": []}, {"id": "p3-result", "type": "result", "part": 3, "title": "12.5 ② 평면의 방정식 — 법선벡터 · 두 평면 · 점과 평면 사이 거리"}, {"id": "p4-cover", "type": "cover", "part": 4, "no": "파트 4 · 교재 선행", "title": "12.6 기둥면과 이차곡면 — 자취(단면)로 모양 알아보기", "star": false}, {"id": "p4-concept", "type": "concept", "part": 4, "title": "빠진 변수 방향으로 민 곡면 = 기둥면 · x·y·z 의 2차식 = 이차곡면 (1/5)", "html": "<div class=\"why\">\\(\\mathbb R^3\\)에서 방정식 하나는 곡면을 나타낸다. 곡면의 모양은 좌표평면과 평행한 평면으로 잘라 본 단면(자취)으로 알아낸다. 강의계획서에는 「기둥면」까지만 적혀 있어 이차곡면을 어디까지 다룰지는 수업을 봐야 안다.</div>\n  <div class=\"concept\"><p><b>기둥면(cylinder)</b>: 평면 곡선 하나와, 그 곡선을 지나며 한 직선에 평행한 모든 직선으로 이루어진 곡면. 방정식에 <b>변수 하나가 빠지면</b> 그 변수 축 방향의 기둥면이다.</p></div>", "exam": []}, {"id": "p4-concept-2", "type": "concept", "part": 4, "title": "빠진 변수 방향으로 민 곡면 = 기둥면 · x·y·z 의 2차식 = 이차곡면 (2/5)", "html": "<div class=\"concept\"><figure class=\"fig\" data-fig=\"cyl\"><svg class=\"fig-svg\" style=\"max-width:100%;height:auto\" viewbox=\"0 0 470 226\" width=\"470\" height=\"226\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"></path></marker></defs><ellipse cx=\"150\" cy=\"50\" rx=\"70\" ry=\"18\" fill=\"rgba(25,113,194,.08)\" stroke=\"#1F2A44\" stroke-width=\"2\"></ellipse><line x1=\"80\" y1=\"50\" x2=\"80\" y2=\"170\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><line x1=\"220\" y1=\"50\" x2=\"220\" y2=\"170\" stroke=\"#1F2A44\" stroke-width=\"2\"></line><path d=\"M80 170 A 70 18 0 0 0 220 170\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"2\"></path><path d=\"M80 170 A 70 18 0 0 1 220 170\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.2\" stroke-dasharray=\"5 4\"></path><line x1=\"110\" y1=\"61\" x2=\"110\" y2=\"183\" stroke=\"#8A97A6\" stroke-width=\"1\" stroke-dasharray=\"4 4\"></line><line x1=\"150\" y1=\"64\" x2=\"150\" y2=\"186\" stroke=\"#8A97A6\" stroke-width=\"1\" stroke-dasharray=\"4 4\"></line><line x1=\"190\" y1=\"61\" x2=\"190\" y2=\"183\" stroke=\"#8A97A6\" stroke-width=\"1\" stroke-dasharray=\"4 4\"></line><text x=\"150\" y=\"214\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">x² + y² = 1 (원기둥)</text><path d=\"M252.0 61.7 L254.6 69.5 L257.2 76.9 L259.8 84.2 L262.4 91.1 L265.0 97.8 L267.6 104.3 L270.2 110.5 L272.8 116.4 L275.4 122.0 L278.0 127.4 L280.6 132.5 L283.2 137.4 L285.8 142.0 L288.4 146.4 L291.0 150.4 L293.6 154.2 L296.2 157.8 L298.8 161.1 L301.4 164.1 L304.0 166.9 L306.6 169.4 L309.2 171.6 L311.8 173.6 L314.4 175.3 L317.0 176.7 L319.6 177.9 L322.2 178.8 L324.8 179.5 L327.4 179.9 L330.0 180.0 L332.6 179.9 L335.2 179.5 L337.8 178.8 L340.4 177.9 L343.0 176.7 L345.6 175.3 L348.2 173.6 L350.8 171.6 L353.4 169.4 L356.0 166.9 L358.6 164.1 L361.2 161.1 L363.8 157.8 L366.4 154.2 L369.0 150.4 L371.6 146.4 L374.2 142.0 L376.8 137.4 L379.4 132.5 L382.0 127.4 L384.6 122.0 L387.2 116.4 L389.8 110.5 L392.4 104.3 L395.0 97.8 L397.6 91.1 L400.2 84.2 L402.8 76.9 L405.4 69.5 L408.0 61.7\" fill=\"none\" stroke=\"#1971C2\" stroke-width=\"2.2\"></path><path d=\"M312.0 31.7 L314.6 39.5 L317.2 46.9 L319.8 54.2 L322.4 61.1 L325.0 67.8 L327.6 74.3 L330.2 80.5 L332.8 86.4 L335.4 92.0 L338.0 97.4 L340.6 102.5 L343.2 107.4 L345.8 112.0 L348.4 116.4 L351.0 120.4 L353.6 124.2 L356.2 127.8 L358.8 131.1 L361.4 134.1 L364.0 136.9 L366.6 139.4 L369.2 141.6 L371.8 143.6 L374.4 145.3 L377.0 146.7 L379.6 147.9 L382.2 148.8 L384.8 149.5 L387.4 149.9 L390.0 150.0 L392.6 149.9 L395.2 149.5 L397.8 148.8 L400.4 147.9 L403.0 146.7 L405.6 145.3 L408.2 143.6 L410.8 141.6 L413.4 139.4 L416.0 136.9 L418.6 134.1 L421.2 131.1 L423.8 127.8 L426.4 124.2 L429.0 120.4 L431.6 116.4 L434.2 112.0 L436.8 107.4 L439.4 102.5 L442.0 97.4 L444.6 92.0 L447.2 86.4 L449.8 80.5 L452.4 74.3 L455.0 67.8 L457.6 61.1 L460.2 54.2 L462.8 46.9 L465.4 39.5 L468.0 31.7\" fill=\"none\" stroke=\"#1971C2\" stroke-width=\"1.2\" stroke-dasharray=\"5 4\"></path><line x1=\"258.0\" y1=\"79.2\" x2=\"318.0\" y2=\"49.2\" stroke=\"#8A97A6\" stroke-width=\"1\" stroke-dasharray=\"4 4\"></line><line x1=\"330\" y1=\"180\" x2=\"390\" y2=\"150\" stroke=\"#8A97A6\" stroke-width=\"1\" stroke-dasharray=\"4 4\"></line><line x1=\"402.0\" y1=\"79.2\" x2=\"462.0\" y2=\"49.2\" stroke=\"#8A97A6\" stroke-width=\"1\" stroke-dasharray=\"4 4\"></line><text x=\"360\" y=\"214\" font-size=\"13\" fill=\"#1971C2\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">z = y² (포물기둥)</text></svg><figcaption style=\"font-size:.86em;opacity:.85;margin-top:4px\">기둥면: 식에 빠진 변수 방향으로 곡선을 그대로 민 곡면. \\(x^2+y^2=1\\)은 \\(z\\)가 빠져 \\(z\\)축 방향, \\(z=y^2\\)은 \\(x\\)가 빠져 \\(x\\)축 방향으로 민다.</figcaption></figure></div>", "exam": []}, {"id": "p4-concept-3", "type": "concept", "part": 4, "title": "빠진 변수 방향으로 민 곡면 = 기둥면 · x·y·z 의 2차식 = 이차곡면 (3/5)", "html": "<div class=\"concept\"><p><b>예</b>: \\(x^2+y^2=1\\)은 \\(\\mathbb R^2\\)에서는 원이지만 \\(\\mathbb R^3\\)에서는 \\(z\\)가 무엇이든 성립 → 원을 \\(z\\)축 방향으로 민 원기둥. \\(z=y^2\\)은 \\(x\\)가 빠져 포물선을 \\(x\\)축 방향으로 민 포물기둥.</p></div><div class=\"concept\"><p><b>자취(trace)</b>: \\(z=k\\)(수평) 또는 \\(x=k,\\ y=k\\)(수직) 평면으로 잘랐을 때의 곡선. 이 단면들을 모아 입체를 떠올린다.</p></div><div class=\"concept\"><p><b>이차곡면</b>: \\(x,y,z\\)의 2차방정식이 나타내는 곡면. 평행 이동·회전으로 아래 표준형 중 하나가 된다.</p></div>", "exam": []}, {"id": "p4-concept-4", "type": "concept", "part": 4, "title": "빠진 변수 방향으로 민 곡면 = 기둥면 · x·y·z 의 2차식 = 이차곡면 (4/5)", "html": "<div class=\"concept\"><table><tr><th>이름</th><th>표준형(예)</th><th>자취(단면)</th></tr>\n<tr><td>타원면</td><td>\\(\\frac{x^2}{a^2}+\\frac{y^2}{b^2}+\\frac{z^2}{c^2}=1\\)</td><td>모두 타원</td></tr>\n<tr><td>원뿔(타원뿔)</td><td>\\(\\frac{z^2}{c^2}=\\frac{x^2}{a^2}+\\frac{y^2}{b^2}\\)</td><td>수평 단면 타원, 수직 단면 두 직선·쌍곡선</td></tr>\n<tr><td>타원포물면</td><td>\\(\\frac zc=\\frac{x^2}{a^2}+\\frac{y^2}{b^2}\\)</td><td>수평 타원, 수직 포물선</td></tr>\n<tr><td>쌍곡포물면(말안장)</td><td>\\(\\frac zc=\\frac{x^2}{a^2}-\\frac{y^2}{b^2}\\)</td><td>수평 쌍곡선, 수직 포물선</td></tr>\n<tr><td>일엽쌍곡면</td><td>\\(\\frac{x^2}{a^2}+\\frac{y^2}{b^2}-\\frac{z^2}{c^2}=1\\)</td><td>수평 타원, 수직 쌍곡선(한 덩어리)</td></tr>\n<tr><td>이엽쌍곡면</td><td>\\(-\\frac{x^2}{a^2}-\\frac{y^2}{b^2}+\\frac{z^2}{c^2}=1\\)</td><td>수평 타원(\\(|z|\\ge c\\)), 두 덩어리</td></tr></table></div>", "exam": []}, {"id": "p4-concept-5", "type": "concept", "part": 4, "title": "빠진 변수 방향으로 민 곡면 = 기둥면 · x·y·z 의 2차식 = 이차곡면 (5/5)", "html": "<div class=\"concept\"><p><b>알아보는 요령</b>: ① 1차로 들어간 변수가 있으면 포물면(부호가 같으면 타원포물면, 다르면 쌍곡포물면) ② 모두 2차면 = 1의 부호를 센다: + 셋이면 타원면, − 하나면 일엽쌍곡면, − 둘이면 이엽쌍곡면, 우변이 0이면 원뿔.</p></div><div class=\"one\">한 줄: 빠진 변수 방향으로 민 것 = 기둥면 · 자취로 모양 판단 · 이차곡면 6종(타원면·원뿔·타원포물면·쌍곡포물면·일엽·이엽쌍곡면).</div>\n  ", "exam": []}, {"id": "p4-mu", "type": "mu", "part": 4, "title": "12.6 기둥면과 이차곡면 — 자취(단면)로 모양 알아보기", "mem": ["변수 하나가 빠지면 그 축 방향 기둥면", "이차곡면 6종의 표준형", "부호로 구별: 1차 변수 → 포물면, − 개수 → 일엽/이엽"], "und": ["\\(\\mathbb R^2\\)의 원이 \\(\\mathbb R^3\\)에서 원기둥이 되는 이유", "자취로 입체를 그리는 방법"]}, {"id": "p4-b1", "type": "q", "part": 4, "kind": "기초", "qn": "기초 4-1 · 기둥면", "html": "<p>\\(\\mathbb R^3\\)에서 \\(x^2+y^2=4\\)가 나타내는 도형은?</p>", "ans": "\\(z\\)가 빠져 있어 모든 \\(z\\)에서 성립 → \\(xy\\)평면의 원 \\(x^2+y^2=4\\)를 \\(z\\)축 방향으로 민 원기둥. 원으로 답하면 \\(\\mathbb R^2\\)의 답이다.", "choices": [{"html": "\\(z\\)축 방향으로 뻗은 반지름 2인 원기둥", "ok": true, "k": 0}, {"html": "반지름 2인 원", "ok": false, "k": 1}, {"html": "반지름 2인 구", "ok": false, "k": 2}, {"html": "\\(z=4\\)인 평면", "ok": false, "k": 3}], "exam": []}, {"id": "p4-b2", "type": "q", "part": 4, "kind": "기초", "qn": "기초 4-2 · 이차곡면 이름", "html": "<p>\\(z=y^2-x^2\\)이 나타내는 곡면은?</p>", "ans": "\\(z\\)가 1차 → 포물면. \\(x^2\\)과 \\(y^2\\)의 부호가 다르다 → 쌍곡포물면. 수평 자취 \\(y^2-x^2=k\\)는 쌍곡선, 수직 자취는 포물선.", "choices": [{"html": "원뿔", "ok": false, "k": 2}, {"html": "타원포물면", "ok": false, "k": 1}, {"html": "쌍곡포물면(말안장)", "ok": true, "k": 0}, {"html": "일엽쌍곡면", "ok": false, "k": 3}], "exam": []}, {"id": "p4-b3", "type": "q", "part": 4, "kind": "기초", "qn": "기초 4-3 · 부호 세기", "html": "<p>\\(x^2+y^2-z^2=1\\)이 나타내는 곡면은?</p>", "ans": "모두 2차이고 우변 1, − 부호가 하나 → 일엽쌍곡면(한 덩어리). 수평 자취 \\(x^2+y^2=1+k^2\\)는 어떤 높이에서도 원이 있다. − 둘이면 이엽, 우변 0이면 원뿔.", "choices": [{"html": "원뿔", "ok": false, "k": 3}, {"html": "타원면", "ok": false, "k": 2}, {"html": "일엽쌍곡면", "ok": true, "k": 0}, {"html": "이엽쌍곡면", "ok": false, "k": 1}], "exam": []}, {"id": "p4-a4", "type": "q", "part": 4, "kind": "응용", "qn": "응용 4-1 · 자취로 모양 알기", "html": "<p>곡면 \\(z=4x^2+y^2\\)의 자취를 (a) \\(z=4\\) (b) \\(x=0\\)에서 구하고 곡면 이름을 쓰라.</p>", "ans": "(a) \\(4x^2+y^2=4\\) → \\(x^2+\\frac{y^2}{4}=1\\) — 타원. (b) \\(z=y^2\\) — 포물선. 수평 자취가 타원, 수직 자취가 포물선이고 \\(z\\)가 1차 → <b>타원포물면</b>(\\(z\\ge0\\), 원점이 꼭짓점).", "choices": null, "exam": []}, {"id": "p4-result", "type": "result", "part": 4, "title": "12.6 기둥면과 이차곡면 — 자취(단면)로 모양 알아보기"}, {"id": "p5-cover", "type": "cover", "part": 5, "no": "파트 5 · 교재 선행", "title": "13.1 벡터함수와 공간곡선", "star": false}, {"id": "p5-concept", "type": "concept", "part": 5, "title": "r(t) = ⟨f(t), g(t), h(t)⟩ — 실수 t 하나에 벡터 하나, 끝점이 그리는 것이 공간곡선 (1/4)", "html": "<div class=\"why\">12.5의 직선 \\(\\vec r=\\vec r_0+t\\vec v\\)가 사실 벡터함수의 가장 간단한 예다. 성분을 \\(t\\)의 아무 함수로 바꾸면 공간의 곡선(나선, 교선 등)을 나타낼 수 있다. 계산은 늘 「성분별로」다.</div>\n  <div class=\"concept\"><p><b>벡터함수</b>: 정의역이 실수, 값이 벡터인 함수 \\(\\vec r(t)=\\langle f(t),g(t),h(t)\\rangle=f(t)\\vec i+g(t)\\vec j+h(t)\\vec k\\). \\(f,g,h\\)를 성분함수라 한다. 정의역은 세 성분함수가 <b>모두</b> 정의되는 \\(t\\).</p></div><div class=\"concept\"><p><b>극한</b>: 성분별로 \\(\\lim_{t\\to a}\\vec r(t)=\\left\\langle\\lim f,\\lim g,\\lim h\\right\\rangle\\)(셋 다 존재할 때). <b>연속</b>: \\(\\lim_{t\\to a}\\vec r(t)=\\vec r(a)\\) ⇔ 세 성분이 모두 연속.</p></div><div class=\"concept\"><p><b>공간곡선</b>: \\(x=f(t),\\ y=g(t),\\ z=h(t)\\)(매개방정식)를 만족하는 점들의 모임. \\(\\vec r(t)\\)는 원점에서 곡선 위 점까지의 위치벡터.</p></div>", "exam": []}, {"id": "p5-concept-2", "type": "concept", "part": 5, "title": "r(t) = ⟨f(t), g(t), h(t)⟩ — 실수 t 하나에 벡터 하나, 끝점이 그리는 것이 공간곡선 (2/4)", "html": "<div class=\"concept\"><figure class=\"fig\" data-fig=\"helix\"><svg class=\"fig-svg\" style=\"max-width:100%;height:auto\" viewbox=\"0 0 480 258\" width=\"480\" height=\"258\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"></path></marker></defs><line x1=\"150\" y1=\"190\" x2=\"270\" y2=\"190\" stroke=\"#1F2A44\" stroke-width=\"1.5\" marker-end=\"url(#ah)\"></line><line x1=\"150\" y1=\"190\" x2=\"150\" y2=\"70\" stroke=\"#1F2A44\" stroke-width=\"1.5\" marker-end=\"url(#ah)\"></line><line x1=\"150\" y1=\"190\" x2=\"78.0\" y2=\"250.0\" stroke=\"#1F2A44\" stroke-width=\"1.5\" marker-end=\"url(#ah)\"></line><text x=\"276\" y=\"195\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">y</text><text x=\"146\" y=\"64\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"end\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">z</text><text x=\"72.0\" y=\"240.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"end\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">x</text><path d=\"M111.6 222.0 L115.0 221.3 L118.5 220.6 L122.1 219.8 L125.7 218.8 L129.5 217.8 L133.3 216.7 L137.1 215.6 L141.0 214.3 L144.8 213.0 L148.7 211.6 L152.7 210.1 L156.6 208.5 L160.4 206.9 L164.3 205.2 L168.1 203.4 L171.9 201.6 L175.6 199.7 L179.2 197.7 L182.8 195.7 L186.2 193.7 L189.6 191.6 L192.8 189.5 L196.0 187.3 L199.0 185.1 L201.9 182.9 L204.6 180.6 L207.2 178.4 L209.6 176.1 L211.9 173.8 L214.0 171.5 L215.9 169.2 L217.7 166.9 L219.2 164.7 L220.6 162.4 L221.8 160.2 L222.7 157.9 L223.5 155.7 L224.1 153.6 L224.5 151.4 L224.6 149.4 L224.6 147.3 L224.3 145.3 L223.9 143.4 L223.3 141.5 L222.4 139.7 L221.4 137.9 L220.1 136.2 L218.7 134.5 L217.1 133.0 L215.3 131.5 L213.3 130.1 L211.1 128.7 L208.8 127.5 L206.3 126.3 L203.7 125.2 L200.9 124.2 L197.9 123.3 L194.9 122.4 L191.7 121.7 L188.4 121.0 L185.0 120.5 L181.5 120.0 L177.9 119.6 L174.3 119.3 L170.5 119.1 L166.7 118.9 L162.9 118.9 L159.0 118.9 L155.2 119.0 L151.3 119.2 L147.3 119.4 L143.4 119.8 L139.6 120.2 L135.7 120.6 L131.9 121.2 L128.1 121.8 L124.4 122.4 L120.8 123.1 L117.2 123.9 L113.8 124.7 L110.4 125.6 L107.2 126.5 L104.0 127.4 L101.0 128.4 L98.1 129.4 L95.4 130.4 L92.8 131.4 L90.4 132.4 L88.1 133.5 L86.0 134.6 L84.1 135.6 L82.3 136.7 L80.8 137.7 L79.4 138.7 L78.2 139.8 L77.3 140.8 L76.5 141.7 L75.9 142.6 L75.5 143.5 L75.4 144.4 L75.4 145.2 L75.7 146.0 L76.1 146.7 L76.7 147.3 L77.6 147.9 L78.6 148.5 L79.9 149.0 L81.3 149.4 L82.9 149.7 L84.7 150.0 L86.7 150.1 L88.9 150.2 L91.2 150.3 L93.7 150.2 L96.3 150.1 L99.1 149.8 L102.1 149.5 L105.1 149.1 L108.3 148.7 L111.6 148.1 L115.0 147.4 L118.5 146.7 L122.1 145.8 L125.7 144.9 L129.5 143.9 L133.3 142.8 L137.1 141.6 L141.0 140.4 L144.8 139.0 L148.7 137.6 L152.7 136.1 L156.6 134.6 L160.4 132.9 L164.3 131.2 L168.1 129.5 L171.9 127.6 L175.6 125.7 L179.2 123.8 L182.8 121.8 L186.2 119.8 L189.6 117.7 L192.8 115.5 L196.0 113.4 L199.0 111.2 L201.9 109.0 L204.6 106.7 L207.2 104.5 L209.6 102.2 L211.9 99.9 L214.0 97.6 L215.9 95.3 L217.7 93.0 L219.2 90.7 L220.6 88.5 L221.8 86.2 L222.7 84.0 L223.5 81.8 L224.1 79.7 L224.5 77.5 L224.6 75.4 L224.6 73.4 L224.3 71.4 L223.9 69.5 L223.3 67.6 L222.4 65.7 L221.4 64.0 L220.1 62.3 L218.7 60.6 L217.1 59.1 L215.3 57.6 L213.3 56.2 L211.1 54.8 L208.8 53.6 L206.3 52.4 L203.7 51.3 L200.9 50.3 L197.9 49.4 L194.9 48.5 L191.7 47.8 L188.4 47.1 L185.0 46.5 L181.5 46.1 L177.9 45.7 L174.3 45.4 L170.5 45.1 L166.7 45.0 L162.9 44.9 L159.0 45.0 L155.2 45.1 L151.3 45.2 L147.3 45.5 L143.4 45.8 L139.6 46.2 L135.7 46.7 L131.9 47.3 L128.1 47.9 L124.4 48.5 L120.8 49.2 L117.2 50.0 L113.8 50.8 L110.4 51.7 L107.2 52.6 L104.0 53.5 L101.0 54.4 L98.1 55.4 L95.4 56.5 L92.8 57.5 L90.4 58.5 L88.1 59.6 L86.0 60.6 L84.1 61.7 L82.3 62.8 L80.8 63.8 L79.4 64.8 L78.2 65.8 L77.3 66.8 L76.5 67.8 L75.9 68.7 L75.5 69.6 L75.4 70.5 L75.4 71.3 L75.7 72.1 L76.1 72.8 L76.7 73.4 L77.6 74.0 L78.6 74.6 L79.9 75.0 L81.3 75.4 L82.9 75.8 L84.7 76.0 L86.7 76.2 L88.9 76.3 L91.2 76.3 L93.7 76.3 L96.3 76.1 L99.1 75.9 L102.1 75.6 L105.1 75.2 L108.3 74.7 L111.6 74.2\" fill=\"none\" stroke=\"#E03131\" stroke-width=\"2.4\"></path><text x=\"360\" y=\"60\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">r(t) = ⟨cos t, sin t, t⟩ 모양</text><text x=\"360\" y=\"84\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">원기둥 둘레를 돌며 올라가는 나선</text></svg><figcaption style=\"font-size:.86em;opacity:.85;margin-top:4px\">공간곡선 = 벡터함수 \\(\\vec r(t)\\)의 끝점이 그리는 곡선. 나선은 \\(x,y\\)가 원을 돌고 \\(z\\)가 일정하게 늘어난다.</figcaption></figure></div>", "exam": []}, {"id": "p5-concept-3", "type": "concept", "part": 5, "title": "r(t) = ⟨f(t), g(t), h(t)⟩ — 실수 t 하나에 벡터 하나, 끝점이 그리는 것이 공간곡선 (3/4)", "html": "<div class=\"concept\"><p><b>예(나선)</b>: \\(\\vec r(t)=\\langle\\cos t,\\sin t,t\\rangle\\) — \\(x^2+y^2=\\cos^2t+\\sin^2t=1\\)이라 늘 원기둥 위에 있고, \\(t\\)가 늘면 \\(z\\)가 올라가 나선이 된다.</p></div><div class=\"concept\"><p><b>선분</b>: \\(\\vec r_0\\)에서 \\(\\vec r_1\\)까지 \\(\\vec r(t)=(1-t)\\vec r_0+t\\vec r_1,\\ 0\\le t\\le1\\).</p></div><div class=\"concept\"><p><b>두 곡면의 교선 매개화</b>: 원기둥 \\(x^2+y^2=R^2\\)이 들어 있으면 \\(x=R\\cos t,\\ y=R\\sin t\\)로 두고 나머지 식에서 \\(z\\)를 \\(t\\)로 쓴다.</p></div><div class=\"concept\"><p><b>[고등 수학 복습]</b> \\(\\lim_{t\\to0}\\frac{\\sin t}{t}=1\\), \\(\\lim_{t\\to0}\\frac{e^t-1}{t}=1\\), \\(\\ln u\\)는 \\(u&gt;0\\)에서만, \\(\\sqrt u\\)는 \\(u\\ge0\\)에서만 정의된다.</p></div>", "exam": []}, {"id": "p5-concept-4", "type": "concept", "part": 5, "title": "r(t) = ⟨f(t), g(t), h(t)⟩ — 실수 t 하나에 벡터 하나, 끝점이 그리는 것이 공간곡선 (4/4)", "html": "<div class=\"one\">한 줄: \\(\\vec r(t)=\\langle f,g,h\\rangle\\) · 정의역은 세 성분 공통 · 극한·연속은 성분별 · 선분 \\((1-t)\\vec r_0+t\\vec r_1\\) · 원기둥 교선은 \\(x=R\\cos t,\\ y=R\\sin t\\).</div>\n  ", "exam": []}, {"id": "p5-mu", "type": "mu", "part": 5, "title": "13.1 벡터함수와 공간곡선", "mem": ["정의역 = 성분함수 정의역의 교집합", "극한·연속은 성분별", "선분 \\((1-t)\\vec r_0+t\\vec r_1\\), \\(0\\le t\\le1\\)", "나선 \\(\\langle\\cos t,\\sin t,t\\rangle\\)"], "und": ["직선 \\(\\vec r_0+t\\vec v\\)도 벡터함수인 것", "교선을 매개화할 때 원기둥을 \\(\\cos,\\sin\\)으로 두는 이유"]}, {"id": "p5-b1", "type": "q", "part": 5, "kind": "기초", "qn": "기초 5-1 · 정의역", "html": "<p>\\(\\vec r(t)=\\left\\langle e^t,\\ \\ln(t-1),\\ \\sqrt{5-t}\\right\\rangle\\)의 정의역은?</p>", "ans": "\\(e^t\\)는 모든 \\(t\\), \\(\\ln(t-1)\\)은 \\(t>1\\), \\(\\sqrt{5-t}\\)는 \\(t\\le5\\) → 교집합 \\(1\\lt t\\le5\\).", "choices": [{"html": "\\(t>1\\)", "ok": false, "k": 2}, {"html": "\\(1\\lt t\\le5\\)", "ok": true, "k": 0}, {"html": "\\(1\\le t\\le5\\)", "ok": false, "k": 1}, {"html": "\\(t\\le5\\)", "ok": false, "k": 3}], "exam": []}, {"id": "p5-b2", "type": "q", "part": 5, "kind": "기초", "qn": "기초 5-2 · 극한", "html": "<p>\\(\\lim_{t\\to0}\\left\\langle\\cos t,\\ \\frac{e^t-1}{t},\\ t^2+2\\right\\rangle\\)은?</p>", "ans": "성분별: \\(\\cos0=1\\), \\(\\lim\\frac{e^t-1}{t}=1\\), \\(0+2=2\\). 가운데를 그냥 넣으면 \\(\\frac00\\)이라 막히는데 알려진 극한 1이다.", "choices": [{"html": "\\(\\langle0,1,2\\rangle\\)", "ok": false, "k": 2}, {"html": "존재하지 않는다", "ok": false, "k": 3}, {"html": "\\(\\langle1,0,2\\rangle\\)", "ok": false, "k": 1}, {"html": "\\(\\langle1,1,2\\rangle\\)", "ok": true, "k": 0}], "exam": []}, {"id": "p5-b3", "type": "q", "part": 5, "kind": "기초", "qn": "기초 5-3 · 곡선 알아보기", "html": "<p>\\(\\vec r(t)=\\langle\\cos t,\\sin t,t\\rangle\\)이 그리는 곡선은?</p>", "ans": "\\(x^2+y^2=1\\)을 늘 만족하고 \\(z=t\\)가 계속 늘어난다 → 나선. \\(z\\)가 없으면 원이 된다.", "choices": [{"html": "원기둥 \\(x^2+y^2=1\\) 둘레를 돌며 올라가는 나선", "ok": true, "k": 0}, {"html": "원점을 지나는 직선", "ok": false, "k": 2}, {"html": "\\(xy\\)평면의 원", "ok": false, "k": 1}, {"html": "구면에 놓인 원", "ok": false, "k": 3}], "exam": []}, {"id": "p5-a4", "type": "q", "part": 5, "kind": "응용", "qn": "응용 5-1 · 선분의 벡터함수", "html": "<p>P\\((1,3,-2)\\)에서 Q\\((2,-1,3)\\)까지의 선분을 벡터함수로 나타내라.</p>", "ans": "\\(\\vec r(t)=(1-t)\\langle1,3,-2\\rangle+t\\langle2,-1,3\\rangle=\\langle1+t,\\ 3-4t,\\ -2+5t\\rangle\\), \\(0\\le t\\le1\\). 검산: \\(t=0\\)이면 P, \\(t=1\\)이면 Q ✓. 이것은 방향벡터 \\(\\overrightarrow{PQ}=(1,-4,5)\\)인 직선의 일부.", "choices": null, "exam": []}, {"id": "p5-a5", "type": "q", "part": 5, "kind": "응용", "qn": "응용 5-2 · 교선의 매개화", "html": "<p>원기둥 \\(x^2+y^2=4\\)와 평면 \\(z=1+x\\)가 만나는 곡선을 벡터함수로 나타내라.</p>", "ans": "① 원기둥: \\(x=2\\cos t,\\ y=2\\sin t\\)(\\(x^2+y^2=4\\cos^2t+4\\sin^2t=4\\) ✓). ② 평면: \\(z=1+x=1+2\\cos t\\). ∴ \\(\\vec r(t)=\\langle2\\cos t,\\ 2\\sin t,\\ 1+2\\cos t\\rangle\\), \\(0\\le t\\le2\\pi\\) — 기울어진 타원.", "choices": null, "exam": []}, {"id": "p5-result", "type": "result", "part": 5, "title": "13.1 벡터함수와 공간곡선"}, {"id": "p6-cover", "type": "cover", "part": 6, "no": "파트 6 · 교재 선행", "title": "13.2 벡터함수의 미분과 적분 — 접선벡터 · 단위접선벡터 · 미분 규칙", "star": false}, {"id": "p6-concept", "type": "concept", "part": 6, "title": "r′(t) = ⟨f′, g′, h′⟩ — 곡선의 접선 방향. 적분도 성분별 (1/4)", "html": "<div class=\"why\">1학기 미분을 성분마다 한 번씩 하면 된다. 새로 생기는 뜻은 방향: \\(\\vec r'(t)\\)는 곡선에 접하는 벡터라 접선의 방정식을 만들 수 있다.</div>\n  <div class=\"concept\"><p><b>도함수</b>: \\(\\vec r'(t)=\\lim_{h\\to0}\\dfrac{\\vec r(t+h)-\\vec r(t)}{h}=\\langle f'(t),g'(t),h'(t)\\rangle\\). 성분별로 미분한다.</p></div>", "exam": []}, {"id": "p6-concept-2", "type": "concept", "part": 6, "title": "r′(t) = ⟨f′, g′, h′⟩ — 곡선의 접선 방향. 적분도 성분별 (2/4)", "html": "<div class=\"concept\"><figure class=\"fig\" data-fig=\"tangent\"><svg class=\"fig-svg\" style=\"max-width:100%;height:auto\" viewbox=\"0 0 470 212\" width=\"470\" height=\"212\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\"><defs><marker id=\"ah\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"></path></marker></defs><path d=\"M70.0 135.0 L74.7 131.6 L79.3 128.1 L84.0 124.7 L88.7 121.3 L93.4 117.9 L98.0 114.6 L102.7 111.3 L107.4 108.0 L112.1 104.8 L116.8 101.6 L121.4 98.5 L126.1 95.5 L130.8 92.5 L135.4 89.6 L140.1 86.8 L144.8 84.1 L149.5 81.4 L154.1 78.9 L158.8 76.5 L163.5 74.1 L168.2 71.9 L172.8 69.8 L177.5 67.8 L182.2 66.0 L186.9 64.2 L191.6 62.6 L196.2 61.1 L200.9 59.8 L205.6 58.6 L210.2 57.5 L214.9 56.6 L219.6 55.8 L224.3 55.1 L228.9 54.6 L233.6 54.3 L238.3 54.1 L243.0 54.0 L247.6 54.1 L252.3 54.3 L257.0 54.7 L261.7 55.2 L266.3 55.9 L271.0 56.7 L275.7 57.6 L280.4 58.7 L285.1 59.9 L289.7 61.3 L294.4 62.8 L299.1 64.4 L303.8 66.1 L308.4 68.0 L313.1 70.0 L317.8 72.1 L322.4 74.3 L327.1 76.7 L331.8 79.1 L336.5 81.6 L341.1 84.3 L345.8 87.0 L350.5 89.8 L355.2 92.7 L359.8 95.7 L364.5 98.7 L369.2 101.9 L373.9 105.0 L378.6 108.2 L383.2 111.5 L387.9 114.8 L392.6 118.2 L397.2 121.6 L401.9 125.0 L406.6 128.4 L411.3 131.8 L415.9 135.3 L420.6 138.7 L425.3 142.2 L430.0 145.6 L434.6 149.0 L439.3 152.4 L444.0 155.7\" fill=\"none\" stroke=\"#1971C2\" stroke-width=\"2.4\"></path><circle cx=\"40\" cy=\"196\" r=\"4\" fill=\"#1F2A44\"></circle><text x=\"34\" y=\"200\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">O</text><line x1=\"40\" y1=\"196\" x2=\"158.0\" y2=\"76.89415663713865\" stroke=\"#8A97A6\" stroke-width=\"1.6\" marker-end=\"url(#ah)\"></line><line x1=\"40\" y1=\"196\" x2=\"218.5\" y2=\"55.96640801604062\" stroke=\"#8A97A6\" stroke-width=\"1.6\" marker-end=\"url(#ah)\"></line><text x=\"78\" y=\"128\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"end\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">r(t)</text><text x=\"186\" y=\"170\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">r(t+h)</text><line x1=\"158.0\" y1=\"76.89415663713865\" x2=\"238.07677595056566\" y2=\"35.81240943277904\" stroke=\"#E03131\" stroke-width=\"2.6\" marker-end=\"url(#ah)\"></line><text x=\"242.07677595056566\" y=\"29.81240943277904\" font-size=\"14\" fill=\"#E03131\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">r′(t)</text><circle cx=\"158.0\" cy=\"76.89415663713865\" r=\"4\" fill=\"#1F2A44\"></circle></svg><figcaption style=\"font-size:.86em;opacity:.85;margin-top:4px\">\\(\\vec r'(t)=\\lim_{h\\to0}\\dfrac{\\vec r(t+h)-\\vec r(t)}{h}\\) — 곡선에 접하는 방향(접선벡터).</figcaption></figure></div>", "exam": []}, {"id": "p6-concept-3", "type": "concept", "part": 6, "title": "r′(t) = ⟨f′, g′, h′⟩ — 곡선의 접선 방향. 적분도 성분별 (3/4)", "html": "<div class=\"concept\"><p><b>접선벡터</b>: \\(\\vec r'(t)\\neq\\vec0\\)이면 점 \\(\\vec r(t)\\)에서 곡선에 접하는 방향. <b>단위접선벡터</b> \\(\\vec T(t)=\\dfrac{\\vec r'(t)}{|\\vec r'(t)|}\\). <b>접선</b>: 점 \\(\\vec r(t_0)\\)을 지나고 방향 \\(\\vec r'(t_0)\\)인 직선(12.5 매개방정식).</p></div><div class=\"concept\"><p><b>미분 규칙</b>(\\(\\vec u,\\vec v\\): 벡터함수, \\(c\\): 상수, \\(f\\): 실수함수): \\((\\vec u+\\vec v)'=\\vec u'+\\vec v'\\) · \\((c\\vec u)'=c\\vec u'\\) · \\((f\\vec u)'=f'\\vec u+f\\vec u'\\) · \\((\\vec u\\cdot\\vec v)'=\\vec u'\\cdot\\vec v+\\vec u\\cdot\\vec v'\\) · \\((\\vec u\\times\\vec v)'=\\vec u'\\times\\vec v+\\vec u\\times\\vec v'\\)(외적은 순서 유지) · \\(\\vec u(f(t))'=f'(t)\\,\\vec u'(f(t))\\).</p></div><div class=\"concept\"><p><b>중요한 결과</b>: \\(|\\vec r(t)|=c\\)(일정)이면 \\(\\vec r(t)\\cdot\\vec r'(t)=0\\) — 구면 위를 움직이면 위치와 접선이 늘 수직. 이유: \\(\\vec r\\cdot\\vec r=c^2\\)을 미분하면 \\(2\\vec r\\cdot\\vec r'=0\\).</p></div>", "exam": []}, {"id": "p6-concept-4", "type": "concept", "part": 6, "title": "r′(t) = ⟨f′, g′, h′⟩ — 곡선의 접선 방향. 적분도 성분별 (4/4)", "html": "<div class=\"concept\"><p><b>적분</b>: 성분별로 \\(\\int_a^b\\vec r(t)\\,dt=\\left\\langle\\int_a^bf,\\int_a^bg,\\int_a^bh\\right\\rangle\\). 부정적분은 \\(\\vec R(t)+\\vec C\\)(\\(\\vec C\\): 상수 벡터), 미적분학의 기본정리 \\(\\int_a^b\\vec r\\,dt=\\vec R(b)-\\vec R(a)\\)도 그대로.</p></div><div class=\"one\">한 줄: \\(\\vec r'=\\langle f',g',h'\\rangle\\) = 접선 방향 · \\(\\vec T=\\vec r'/|\\vec r'|\\) · 내적·외적의 곱 미분(외적은 순서 유지) · \\(|\\vec r|\\) 일정 → \\(\\vec r\\cdot\\vec r'=0\\) · 적분은 성분별 + 상수 벡터.</div>\n  ", "exam": []}, {"id": "p6-mu", "type": "mu", "part": 6, "title": "13.2 벡터함수의 미분과 적분 — 접선벡터 · 단위접선벡터 · 미분 규칙", "mem": ["\\(\\vec r'(t)\\), \\(\\vec T(t)=\\vec r'/|\\vec r'|\\)", "\\((\\vec u\\cdot\\vec v)'\\), \\((\\vec u\\times\\vec v)'\\) 곱의 미분", "\\(|\\vec r|=c\\Rightarrow\\vec r\\cdot\\vec r'=0\\)", "적분 = 성분별, 부정적분 + \\(\\vec C\\)"], "und": ["\\(\\vec r'\\)가 접선 방향인 이유(할선 → 접선)", "외적 미분에서 순서를 바꾸면 안 되는 이유"]}, {"id": "p6-b1", "type": "q", "part": 6, "kind": "기초", "qn": "기초 6-1 · 도함수", "html": "<p>\\(\\vec r(t)=\\langle t^3,\\ e^{2t},\\ \\sin3t\\rangle\\)의 \\(\\vec r'(t)\\)는?</p>", "ans": "성분별로: \\((t^3)'=3t^2\\), \\((e^{2t})'=2e^{2t}\\)(합성함수), \\((\\sin3t)'=3\\cos3t\\).", "choices": [{"html": "\\(\\langle3t^2,\\ e^{2t},\\ \\cos3t\\rangle\\)", "ok": false, "k": 1}, {"html": "\\(\\langle t^2,\\ 2e^{t},\\ -3\\cos3t\\rangle\\)", "ok": false, "k": 2}, {"html": "\\(\\langle3t^2,\\ 2e^{2t},\\ 3\\cos3t\\rangle\\)", "ok": true, "k": 0}, {"html": "\\(\\langle3t^2,\\ 2e^{2t},\\ -3\\cos3t\\rangle\\)", "ok": false, "k": 3}], "exam": []}, {"id": "p6-b2", "type": "q", "part": 6, "kind": "기초", "qn": "기초 6-2 · 단위접선벡터", "html": "<p>\\(\\vec r(t)=\\langle1+t,\\ 2t,\\ t^2\\rangle\\)의 \\(t=0\\)에서 단위접선벡터는?</p>", "ans": "\\(\\vec r'(t)=\\langle1,2,2t\\rangle\\) → \\(\\vec r'(0)=\\langle1,2,0\\rangle\\), 크기 \\(\\sqrt5\\) → \\(\\vec T(0)=\\frac{1}{\\sqrt5}\\langle1,2,0\\rangle\\). 크기로 나누지 않으면 단위벡터가 아니다.", "choices": [{"html": "\\(\\frac{1}{\\sqrt5}\\langle1,2,0\\rangle\\)", "ok": true, "k": 0}, {"html": "\\(\\frac{1}{3}\\langle1,2,2\\rangle\\)", "ok": false, "k": 3}, {"html": "\\(\\frac{1}{\\sqrt5}\\langle1,0,0\\rangle\\)", "ok": false, "k": 2}, {"html": "\\(\\langle1,2,0\\rangle\\)", "ok": false, "k": 1}], "exam": []}, {"id": "p6-b3", "type": "q", "part": 6, "kind": "기초", "qn": "기초 6-3 · 외적의 미분", "html": "<p>\\(\\dfrac{d}{dt}[\\vec u(t)\\times\\vec v(t)]\\)는?</p>", "ans": "곱의 미분과 같은 모양, 단 외적은 \\(\\vec a\\times\\vec b=-\\vec b\\times\\vec a\\)라 순서를 그대로 둔다. 셋째 보기는 순서를 뒤집어 부호가 반대.", "choices": [{"html": "\\(\\vec u'\\cdot\\vec v+\\vec u\\cdot\\vec v'\\)", "ok": false, "k": 3}, {"html": "\\(\\vec u'\\times\\vec v+\\vec u\\times\\vec v'\\)", "ok": true, "k": 0}, {"html": "\\(\\vec u'\\times\\vec v'\\)", "ok": false, "k": 1}, {"html": "\\(\\vec v'\\times\\vec u+\\vec v\\times\\vec u'\\)", "ok": false, "k": 2}], "exam": []}, {"id": "p6-b4", "type": "q", "part": 6, "kind": "기초", "qn": "기초 6-4 · 적분", "html": "<p>\\(\\int_0^1\\langle2t,\\ 3t^2,\\ 1\\rangle\\,dt\\)는?</p>", "ans": "성분별 정적분: \\([t^2]_0^1=1\\), \\([t^3]_0^1=1\\), \\([t]_0^1=1\\). 정적분의 답은 벡터 하나(상수)다.", "choices": [{"html": "\\(\\langle2,3,1\\rangle\\)", "ok": false, "k": 1}, {"html": "\\(\\langle t^2,t^3,t\\rangle\\)", "ok": false, "k": 2}, {"html": "\\(\\langle1,1,0\\rangle\\)", "ok": false, "k": 3}, {"html": "\\(\\langle1,1,1\\rangle\\)", "ok": true, "k": 0}], "exam": []}, {"id": "p6-a5", "type": "q", "part": 6, "kind": "응용", "qn": "응용 6-1 · 접선의 방정식", "html": "<p>곡선 \\(\\vec r(t)=\\langle2\\cos t,\\ \\sin t,\\ t\\rangle\\)에서 \\(t=\\frac\\pi2\\)인 점의 접선의 매개방정식을 구하라.</p>", "ans": "① 점: \\(\\vec r(\\frac\\pi2)=\\langle0,1,\\frac\\pi2\\rangle\\). ② \\(\\vec r'(t)=\\langle-2\\sin t,\\ \\cos t,\\ 1\\rangle\\) → \\(\\vec r'(\\frac\\pi2)=\\langle-2,0,1\\rangle\\). ③ 접선: \\(x=-2s,\\ y=1,\\ z=\\frac\\pi2+s\\)(\\(s\\): 매개변수).", "choices": null, "exam": []}, {"id": "p6-a6", "type": "q", "part": 6, "kind": "응용", "qn": "응용 6-2 · 도함수에서 원래 함수", "html": "<p>\\(\\vec r'(t)=\\langle2t,\\ 3t^2,\\ 4t^3\\rangle\\)이고 \\(\\vec r(0)=\\langle1,0,-1\\rangle\\)일 때 \\(\\vec r(t)\\)를 구하라.</p>", "ans": "성분별 부정적분: \\(\\vec r(t)=\\langle t^2,\\ t^3,\\ t^4\\rangle+\\vec C\\). \\(t=0\\): \\(\\vec C=\\langle1,0,-1\\rangle\\). ∴ \\(\\vec r(t)=\\langle t^2+1,\\ t^3,\\ t^4-1\\rangle\\). 검산: 미분하면 \\(\\langle2t,3t^2,4t^3\\rangle\\) ✓.", "choices": null, "exam": []}, {"id": "p6-a7", "type": "q", "part": 6, "kind": "응용", "qn": "응용 6-3 · 증명 — 크기가 일정하면 수직", "html": "<p>모든 \\(t\\)에서 \\(|\\vec r(t)|=c\\)(상수)인 미분가능한 벡터함수에 대해 \\(\\vec r(t)\\cdot\\vec r'(t)=0\\)임을 보여라.</p>", "ans": "① \\(\\vec r(t)\\cdot\\vec r(t)=|\\vec r(t)|^2=c^2\\)(상수). ② 양변을 \\(t\\)로 미분: 왼쪽은 내적의 곱 미분으로 \\(\\vec r'\\cdot\\vec r+\\vec r\\cdot\\vec r'=2\\vec r\\cdot\\vec r'\\), 오른쪽은 0. ③ \\(2\\vec r\\cdot\\vec r'=0\\) → \\(\\vec r\\cdot\\vec r'=0\\). 뜻: 원점 중심 구면 위를 움직이는 점의 속도(접선)는 늘 위치벡터에 수직.", "choices": null, "exam": []}, {"id": "p6-result", "type": "result", "part": 6, "title": "13.2 벡터함수의 미분과 적분 — 접선벡터 · 단위접선벡터 · 미분 규칙"}, {"id": "final", "type": "final"}];
+const PARTS=[{"n": 1, "title": "12.4 외적 계산 — 3×3 행렬식 1행 여인수 전개 · 넓이", "hint": "한 줄: \\(\\vec a\\times\\vec b=|\\,\\vec i\\ \\vec j\\ \\vec k;\\ \\vec a;\\ \\vec b\\,|\\)를 1행 + − +로 전개(사라스 금지) · 결과는 \\(\\vec a,\\vec b\\)에 수직 · \\(|\\vec a\\times\\vec b|\\) = 평행사변형 넓이."}, {"n": 2, "title": "12.5 ① 직선의 방정식 — 방향코사인 · 방향비 · 매개방정식 · 대칭방정식", "hint": "한 줄: \\(l,m,n=\\pm\\frac{x_0,y_0,z_0}{|\\overrightarrow{OP_0}|}\\), 방향비 \\(x_0:y_0:z_0\\) · \\(\\overrightarrow{P_0P}=t\\vec v\\) → 매개 \\(x=x_0+tA\\) … → 대칭 \\(\\frac{x-x_0}A=\\frac{y-y_0}B=\\frac{z-z_0}C\\)."}, {"n": 3, "title": "12.5 ② 평면의 방정식 — 법선벡터 · 두 평면 · 점과 평면 사이 거리", "hint": "한 줄: \\(a(x-x_0)+b(y-y_0)+c(z-z_0)=0\\), 법선 = 계수 · 세 점 → \\(\\vec n=\\overrightarrow{PQ}\\times\\overrightarrow{PR}\\) · 두 평면 각 = 법선 각, 교선 방향 \\(\\vec n_1\\times\\vec n_2\\) · 거리 \\(\\frac{|ax_1+by_1+cz_1+d|}{\\sqrt{a^2+b^2+c^2}}\\)."}, {"n": 4, "title": "12.6 기둥면과 이차곡면 — 자취(단면)로 모양 알아보기", "hint": "한 줄: 빠진 변수 방향으로 민 것 = 기둥면 · 자취로 모양 판단 · 이차곡면 6종(타원면·원뿔·타원포물면·쌍곡포물면·일엽·이엽쌍곡면)."}, {"n": 5, "title": "13.1 벡터함수와 공간곡선", "hint": "한 줄: \\(\\vec r(t)=\\langle f,g,h\\rangle\\) · 정의역은 세 성분 공통 · 극한·연속은 성분별 · 선분 \\((1-t)\\vec r_0+t\\vec r_1\\) · 원기둥 교선은 \\(x=R\\cos t,\\ y=R\\sin t\\)."}, {"n": 6, "title": "13.2 벡터함수의 미분과 적분 — 접선벡터 · 단위접선벡터 · 미분 규칙", "hint": "한 줄: \\(\\vec r'=\\langle f',g',h'\\rangle\\) = 접선 방향 · \\(\\vec T=\\vec r'/|\\vec r'|\\) · 내적·외적의 곱 미분(외적은 순서 유지) · \\(|\\vec r|\\) 일정 → \\(\\vec r\\cdot\\vec r'=0\\) · 적분은 성분별 + 상수 벡터."}];
+/* V6E-QUIZ: #quiz 로 열면 문제 장만(시작·전체 결과 포함). 저장 키를 분리하고 이어서-학습 위치는 건드리지 않는다 (대표님 2026-09-24 시험 대비) */
+const QUIZ=(location.hash==="#quiz");
+if(QUIZ){ const qs=SLIDES.filter(x=>x.type==="q"); SLIDES.length=0; SLIDES.push({id:"start",type:"start"}); qs.forEach(q=>SLIDES.push(q)); SLIDES.push({id:"final",type:"final"}); }
+/* 진행 저장: 지침 §0은 브라우저 저장소 금지. 저장 방식(앱 상태 vs 저장 안 함)은 아토 결정 대기라 그때까지 localStorage 유지 (2026-09-17). */
+const KEY="mc-slides-"+DECK_ID+(QUIZ?"-quiz":"");
+let ST={idx:0,done:{},correct:{},revealed:{},answer:{},ink:{},finger:false,padBig:false,skip:{}};
+try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}
+/* V5A-RESUME: 마지막 학습 위치 — 앱의 「이어서 학습하기」 카드가 읽는다 (아토 2026-09-21). #check(빌드 검사) 중에는 쓰지 않는다 */
+const LAST_KEY="mc-slides-last";
+function lastInfo(){
+  const s=SLIDES[Math.max(0,Math.min(ST.idx,SLIDES.length-1))]; if(!s) return null;
+  const p=s.part?PARTS.find(x=>x.n===s.part):null; const qs=SLIDES.filter(x=>x.type==="q");
+  const clean=t=>String(t||"").replace(/[\s★]+$/,"");
+  const where= s.type==="q"?((s.kind||"")+" 문제 · "+(s.qn||"")).trim() : s.type==="concept"?("개념 · "+clean(s.title)) : s.type==="mu"?"암기 vs 이해" : s.type==="cover"?"파트 시작" : s.type==="result"?"파트 결과" : s.type==="final"?"전체 결과" : s.type==="jump"?"시작 위치 고르기" : "표지";
+  return {deck:DECK_ID,title:document.title,href:location.href.split("#")[0],idx:ST.idx,n:SLIDES.length,sid:s.id,part:s.part||null,partTitle:p?clean(p.title):"",where:where,qDone:qs.filter(q=>ST.done[q.id]).length,qN:qs.length,ts:Date.now()};
+}
+const save=()=>{ if(location.hash==="#check") return; /* 빌드 검사 상태는 저장하지 않는다(오타 RED 2026-09-21) */ try{ localStorage.setItem(KEY,JSON.stringify(ST)); const li=QUIZ?null:lastInfo(); if(li){ const j=JSON.stringify(li); localStorage.setItem(LAST_KEY,j); localStorage.setItem(LAST_KEY+"-"+DECK_ID,j); } }catch(e){} };
+window.addEventListener("pagehide",()=>{ try{ save(); }catch(e){} });
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const partOf=n=>PARTS.find(p=>p.n===n)||null;
+const num=v=>'<span class="num">'+esc(v)+'</span>';   /* UI 숫자는 정자(지침 §1) */
+function partScore(p){ ST.skip=ST.skip||{}; const qs=SLIDES.filter(s=>s.type==="q"&&s.part===p&&!ST.skip[s.id]); const b=qs.filter(q=>q.kind==="기초"), a=qs.filter(q=>q.kind==="응용");
+  const cnt=arr=>({n:arr.length,ok:arr.filter(q=>ST.correct[q.id]===true).length,done:arr.filter(q=>ST.done[q.id]).length});
+  return {b:cnt(b),a:cnt(a)}; }
+function partDone(p){ return SLIDES.filter(s=>s.part===p&&s.type!=="result").every(s=>ST.done[s.id]); }
+
+/* ---------- 수식: KaTeX (지침 §1). 렌더 끝나기 전엔 작업 영역을 감춘다(§0 raw LaTeX 노출 금지) ---------- */
+function typeset(el){
+  if(window.renderMathInElement){
+    try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true},{left:"$$",right:"$$",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){}
+  }
+  const cl=el.cloneNode(true); cl.querySelectorAll(".katex,.katex-display").forEach(k=>k.remove());
+  const raw=/\\\(|\\\[|\\frac|\\vec|\\begin\{|\$\$/.test(cl.textContent||"");
+  el.dataset.raw=raw?"1":"0";
+  if(raw&&el.id==="body"){ el.dataset.ready="false"; el.innerHTML='<div class="kicker">수식 오류</div><h2>이 장의 수식이 그대로 드러나 표시를 멈췄습니다</h2><p>정리노트의 수식 표기를 고쳐 다시 만들어야 합니다.</p>'; }
+  el.dataset.ready="true";
+  return !raw;
+}
+
+/* ---------- 풀이 메모장 (손글씨 캔버스 · 애플펜슬) ---------- */
+const PAD={tool:"pen",cv:null,ctx:null,id:null,cur:null,ro:null,dpr:1,W:0,H:0};
+function padStrokes(id){ ST.ink=ST.ink||{}; if(!ST.ink[id]) ST.ink[id]={strokes:[]}; return ST.ink[id].strokes; }
+function padResize(){ const cv=PAD.cv; if(!cv||!cv.isConnected) return; const r=cv.getBoundingClientRect(); if(r.width<10||r.height<10) return;
+  PAD.dpr=Math.min(3,window.devicePixelRatio||1); PAD.W=r.width; PAD.H=r.height; cv.width=Math.round(r.width*PAD.dpr); cv.height=Math.round(r.height*PAD.dpr);
+  PAD.ctx=cv.getContext("2d"); PAD.ctx.setTransform(PAD.dpr,0,0,PAD.dpr,0,0); PAD.ctx.lineCap="round"; PAD.ctx.lineJoin="round"; padRedraw(); }
+function padLine(ctx,t,x0,y0,x1,y1,p){ if(!ctx) return; const W=PAD.W; ctx.globalCompositeOperation=t==="e"?"destination-out":"source-over"; ctx.strokeStyle="#111111";
+  ctx.lineWidth=t==="e"?W*0.03:Math.max(1.2,W*0.0035*(0.6+(p||0.5)*1.2)); ctx.beginPath(); ctx.moveTo(x0*W,y0*W); ctx.lineTo(x1*W,y1*W); ctx.stroke(); }
+function padRedraw(){ const ctx=PAD.ctx; if(!ctx) return; ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,PAD.cv.width,PAD.cv.height); ctx.restore();
+  for(const st of padStrokes(PAD.id)){ const c=st.c; if(c.length<3) continue; if(c.length===3){ padLine(ctx,st.t,c[0],c[1],c[0]+0.0005,c[1],c[2]); continue; }
+    for(let i=3;i<c.length;i+=3) padLine(ctx,st.t,c[i-3],c[i-2],c[i],c[i+1],c[i+2]); } }
+function padPt(e){ const r=PAD.cv.getBoundingClientRect(); return [Math.round((e.clientX-r.left)/PAD.W*1000)/1000, Math.round((e.clientY-r.top)/PAD.W*1000)/1000, Math.round((e.pressure||0.5)*100)/100]; }
+function padAllowed(e){ return e.pointerType==="pen"||e.pointerType==="mouse"||(e.pointerType==="touch"&&ST.finger); }
+function mountPad(id){
+  const cv=$("#pad"); if(!cv) return; PAD.cv=cv; PAD.id=id; PAD.cur=null;
+  cv.onpointerdown=e=>{ if(!padAllowed(e)) return; e.preventDefault(); try{ cv.setPointerCapture(e.pointerId); }catch(x){} const pt=padPt(e); PAD.cur={t:PAD.tool==="eraser"?"e":"p",c:pt.slice()}; padLine(PAD.ctx,PAD.cur.t,pt[0],pt[1],pt[0]+0.0005,pt[1],pt[2]); };
+  cv.onpointermove=e=>{ if(!PAD.cur||!padAllowed(e)) return; e.preventDefault(); const evs=(e.getCoalescedEvents&&e.getCoalescedEvents().length)?e.getCoalescedEvents():[e];
+    for(const ev of evs){ const pt=padPt(ev), c=PAD.cur.c, n=c.length; padLine(PAD.ctx,PAD.cur.t,c[n-3],c[n-2],pt[0],pt[1],pt[2]); c.push(pt[0],pt[1],pt[2]); } };
+  const end=()=>{ if(!PAD.cur) return; padStrokes(id).push(PAD.cur); PAD.cur=null; save(); };
+  cv.onpointerup=end; cv.onpointercancel=end; cv.onpointerleave=e=>{ if(PAD.cur&&e.pointerType!=="pen") end(); };
+  cv.oncontextmenu=e=>e.preventDefault();
+  const bar=cv.previousElementSibling;
+  bar.querySelectorAll("[data-tool]").forEach(b=>{ b.onclick=()=>{ PAD.tool=b.dataset.tool; bar.querySelectorAll("[data-tool]").forEach(x=>x.classList.toggle("on",x===b)); }; });
+  bar.querySelector('[data-act="undo"]').onclick=()=>{ padStrokes(id).pop(); save(); padRedraw(); };
+  bar.querySelector('[data-act="clear"]').onclick=()=>{ if(!padStrokes(id).length||confirm("이 문제의 풀이 메모를 지울까요?")){ ST.ink[id]={strokes:[]}; save(); padRedraw(); } };
+  bar.querySelector('[data-act="finger"]').onclick=function(){ ST.finger=!ST.finger; save(); this.classList.toggle("on",ST.finger); };
+  if(window.ResizeObserver){ PAD.ro=new ResizeObserver(()=>padResize()); PAD.ro.observe(cv); }
+  setTimeout(padResize,30);
+}
+
+/* ---------- 필기 판 여닫기 (V4-PADPANEL) ---------- */
+function openPad(id){ const pp=$("#padPanel"); pp.classList.add("on"); $("#padBtn").classList.add("on"); const fb=pp.querySelector('[data-act="finger"]'); if(fb) fb.classList.toggle("on",!!ST.finger); mountPad(id); const cb=pp.querySelector('[data-act="close"]'); if(cb) cb.onclick=closePad; }
+function closePad(){ const pp=$("#padPanel"); if(pp) pp.classList.remove("on"); const b=$("#padBtn"); if(b) b.classList.remove("on"); if(PAD.ro){ PAD.ro.disconnect(); PAD.ro=null; } }
+/* ---------- 시험 언급 상자 (지침 §3) ---------- */
+function examHTML(s){
+  const list=Array.isArray(s.exam)?s.exam:[]; if(!list.length) return "";
+  return list.map(x=>'<aside class="exam-callout" aria-label="시험 언급"><div class="exam-label"><b>📌 시험 언급</b> · '+esc(x.level||"강조")+(x.when?' · '+esc(x.when):'')+'</div><blockquote class="exam-quote">"'+esc(x.quote||"")+'"</blockquote></aside>').join("");
+}
+
+/* ---------- 시작 위치 점프 ---------- */
+function startFrom(id,mode){
+  const n=SLIDES.findIndex(x=>x.id===id); if(n<0) return;
+  ST.skip=ST.skip||{}; mode=mode||"skip";
+  if(mode!=="at") SLIDES.forEach((x,i)=>{ if(i<n&&x.type!=="start"&&x.type!=="jump"&&!ST.done[x.id]){ ST.done[x.id]=true; if(mode==="skip") ST.skip[x.id]=true; } });
+  ST.idx=n; save(); render();
+}
+function unskipAll(){ ST.skip=ST.skip||{}; Object.keys(ST.skip).forEach(k=>{ delete ST.done[k]; }); ST.skip={}; save(); render(); }
+function jumpListHTML(){
+  ST.skip=ST.skip||{};
+  const rows=[]; let cur=null;
+  SLIDES.forEach((x,i)=>{
+    if(x.type==="cover"){ cur={part:x.part,title:x.title,items:[]}; rows.push(cur); return; }
+    if(!cur) return;
+    if(x.type==="concept"||x.type==="mu"||x.type==="q"){
+      const lab= x.type==="concept"?(x.title||"개념"): x.type==="mu"?"암기 vs 이해": x.qn;
+      const st= ST.skip[x.id]?"skip": ST.done[x.id]?"done": (i===ST.idx?"cur":"");
+      cur.items.push('<button class="jp '+st+'" data-jump="'+x.id+'">'+esc(lab)+'</button>');
+    }
+  });
+  const nSkip=Object.keys(ST.skip).length;
+  return '<div class="jump"><div class="jump-h">아는 부분은 건너뛰고 막히는 곳부터. 누른 장 앞은 전부 「건너뜀」이 되고 채점에서 빠진다.'+
+    (nSkip?'<button class="btn xs" id="unskip">건너뜀 '+num(nSkip)+'장 되돌리기</button>':'')+'</div>'+
+    rows.map(r=>'<div class="jump-part"><div class="jump-pt">파트 '+num(r.part)+' · '+esc(String(r.title).replace(/[\s★]+$/,""))+'</div><div class="jump-items">'+r.items.join("")+'</div></div>').join("")+'</div>';
+}
+
+/* ---------- 출처 발췌 ---------- */
+function renderSrc(s){
+  const box=$("#srcs"); const list=Array.isArray(s.src)?s.src:[];
+  box.innerHTML=list.map((x,i)=>'<button class="src-th" data-si="'+i+'" title="'+esc(x.label||"출처")+'"><img src="'+esc(x.img)+'" alt="" loading="lazy"><span class="src-n">'+(i+1)+'</span></button>').join("");
+  box.querySelectorAll(".src-th").forEach(b=>{ b.onclick=()=>openSrc(list,+b.dataset.si); });
+}
+function openSrc(list,i){
+  let lb=$("#srclb"); if(!lb){ lb=document.createElement("div"); lb.id="srclb"; $("#stage").appendChild(lb); }
+  const x=list[i];
+  lb.innerHTML='<div class="src-top"><b>출처</b><span>'+esc(x.label||"")+'</span><span class="src-pos">'+(i+1)+' / '+list.length+'</span><button class="src-x" aria-label="닫기">✕</button></div>'+
+    '<div class="src-body"><img src="'+esc(x.img)+'" alt="'+esc(x.label||"")+'"></div>'+
+    '<div class="src-foot"><button class="btn xs" id="srcPrev"'+(i<=0?" disabled":"")+'>← 이전 출처</button><span class="sp" style="flex:1"></span><button class="btn xs" id="srcNext"'+(i>=list.length-1?" disabled":"")+'>다음 출처 →</button></div>';
+  lb.classList.add("on");
+  const img=lb.querySelector(".src-body img"), bd=lb.querySelector(".src-body");
+  img.onclick=()=>{ const z=img.classList.toggle("zoom"); if(!z) bd.scrollTo(0,0); };
+  lb.querySelector(".src-x").onclick=()=>lb.classList.remove("on");
+  const p=$("#srcPrev"), n=$("#srcNext"); if(p) p.onclick=()=>openSrc(list,i-1); if(n) n.onclick=()=>openSrc(list,i+1);
+}
+
+/* ---------- 답·풀이 판 ---------- */
+/* v7: 보기는 빌드 때 섞인다(quizmix). 저장값 = 원문 순서 k → 화면 칸 찾기 */
+const ckey=(c,i)=>String(c&&c.k!=null?c.k:i), cpick=(s,my)=>(s.choices||[]).findIndex((c,i)=>my!=null&&my!==""&&ckey(c,i)===String(my));
+function openAns(s){
+  let lb=$("#anslb"); if(!lb){ lb=document.createElement("div"); lb.id="anslb"; $("#stage").appendChild(lb); }
+  const my=(ST.answer||{})[s.id]; const mc=Array.isArray(s.choices)&&s.choices.length>0;
+  const mi=mc?cpick(s,my):-1; const mine= mc ? (mi>=0?'<span class="num">'+(mi+1)+'</span>번 — '+s.choices[mi].html:'') : esc(my||"");
+  lb.innerHTML='<div class="ans-top"><span class="kicker">'+esc(s.qn)+'</span><span class="verdict '+(ST.correct[s.id]===true?"ok":ST.correct[s.id]===false?"bad":"")+'">'+(ST.correct[s.id]===true?"정답":ST.correct[s.id]===false?"오답":"내 답")+'</span><button class="src-x" id="ansX" aria-label="닫기">✕</button></div>'+
+    '<div class="myans-show"><div class="kicker">내 답</div><div class="myans-txt">'+mine+'</div></div>'+
+    '<div class="ans"><div class="kicker">답 · 풀이</div>'+s.ans+'</div>';
+  lb.classList.add("on"); $("#ansX").onclick=()=>lb.classList.remove("on"); typeset(lb);
+}
+/* ---------- 상단 진행점 (파트 안의 단계 · 시험 언급은 핑크) ---------- */
+function renderTop(s){
+  const inPart=s.part?SLIDES.filter(x=>x.part===s.part&&x.type!=="cover"&&x.type!=="result"):[];
+  $("#progress").innerHTML=inPart.map(x=>'<span class="dot'+(ST.done[x.id]?" done":"")+(Array.isArray(x.exam)&&x.exam.length?" exam":"")+(x.id===s.id?" cur":"")+'"></span>').join("");
+  const p=partOf(s.part); $("#chapter").textContent=p?("파트 "+p.n+" · "+String(p.title).replace(/[\s★]+$/,"")):"미분적분학2 · 중간고사 대비 2 (12.4 외적 계산 · 12.5 직선과 평면 · 12.6 기둥면 · 13.1~13.2 벡터함수)";
+  $("#pos").textContent=(ST.idx+1)+" / "+SLIDES.length;
+}
+
+/* ---------- 힌트: 문제 장에서는 그 파트의 한 줄 요약, 개념 장에서는 없음 ---------- */
+function hintFor(s){ const p=partOf(s.part); if(s.type==="q"&&p&&p.hint) return p.hint; return null; }
+
+function render(){
+  const i=Math.max(0,Math.min(ST.idx,SLIDES.length-1)); ST.idx=i; const s=SLIDES[i]; const body=$("#body"), act=$("#act");
+  body.dataset.ready="false"; $("#hintBox").hidden=true; { const al=$("#anslb"); if(al) al.classList.remove("on"); } /* V4-ANSLB */
+  act.innerHTML=""; ST.skip=ST.skip||{}; $("#doneTag").textContent=ST.skip[s.id]?"건너뜀":ST.done[s.id]?"완료":"";
+  body.classList.remove("q-mode","rev","scrollable"); closePad(); $("#padBtn").hidden=true;
+  renderTop(s); if(s.scroll) body.classList.add("scrollable");   /* --soft 임시 덱: 넘친 장만 스크롤 */
+  if(s.type==="start"){
+    body.innerHTML='<div class="cover"><div class="kicker">'+(QUIZ?"문제만 풀기 · 시험 대비":"학습 슬라이드")+'</div><div class="big">미분적분학2 · 중간고사 대비 2 (12.4 외적 계산 · 12.5 직선과 평면 · 12.6 기둥면 · 13.1~13.2 벡터함수)</div>'+
+            '<div class="sub">'+(QUIZ?'문제 '+num(SLIDES.filter(x=>x.type==="q").length)+'개':'파트 '+num(PARTS.length)+'개 · 문제 '+num(SLIDES.filter(x=>x.type==="q").length)+'개')+'</div></div>';
+    act.innerHTML='<button class="btn xs" id="reset">진행 기록 지우기</button>';
+    $("#reset").onclick=()=>{ if(confirm("진행 기록을 지울까요?")){ ST={idx:0,done:{},correct:{},revealed:{},answer:{},ink:{},finger:false,padBig:false,skip:{}}; save(); render(); } };
+    ST.done[s.id]=true;
+  } else if(s.type==="jump"){
+    body.classList.add("scrollable"); body.innerHTML='<div class="kicker">시작 위치</div><h2>어디서부터 할까?</h2>'+jumpListHTML();
+    body.querySelectorAll("[data-jump]").forEach(b=>{ b.onclick=()=>startFrom(b.dataset.jump); }); const u=$("#unskip"); if(u) u.onclick=unskipAll;
+    act.innerHTML='<button class="btn" id="ok">처음부터 차례로</button>'; $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); go(1); };
+    ST.done[s.id]=true;
+  } else if(s.type==="cover"){
+    body.innerHTML=examHTML(s)+'<div class="cover"><div class="kicker">'+esc(s.no)+'</div><div class="big">'+esc(String(s.title).replace(/[\s★]+$/,""))+'</div></div>';
+    act.innerHTML='<button class="btn" id="ok">시작</button>'; $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); go(1); };
+  } else if(s.type==="concept"){
+    body.innerHTML=examHTML(s)+'<div class="kicker">'+(s.part?'파트 '+num(s.part)+' · 개념':'')+'</div><h2>'+esc(s.title)+'</h2>'+s.html;
+    act.innerHTML='<button class="btn" id="ok">'+(ST.done[s.id]?"다시 읽음 표시":"이해했어요")+'</button>';
+    $("#ok").onclick=()=>{ const was=!!ST.done[s.id]; ST.done[s.id]=true; save(); render(); if(!was) ev("read",{sid:s.id,n:pNd(s),clean:true}); };
+  } else if(s.type==="mu"){
+    const li=xs=>xs.map(x=>'<li>'+x+'</li>').join("");
+    body.innerHTML=examHTML(s)+'<div class="kicker">파트 '+num(s.part)+' · 암기 vs 이해</div><h2>'+esc(String(s.title).replace(/[\s★]+$/,""))+' — 무엇을 외우고 무엇을 이해하나</h2>'+
+      '<div class="mu"><div class="mu-mem"><div class="mu-h">암기</div><ul>'+li(s.mem)+'</ul></div>'+
+      '<div class="mu-und"><div class="mu-h">이해</div><ul>'+li(s.und)+'</ul></div></div>';
+    act.innerHTML='<button class="btn" id="ok">'+(ST.done[s.id]?"다시 확인 표시":"구분했어요")+'</button>';
+    $("#ok").onclick=()=>{ ST.done[s.id]=true; save(); render(); };
+  } else if(s.type==="q"){
+    const rev=!!ST.revealed[s.id];
+    ST.answer=ST.answer||{}; ST.ink=ST.ink||{}; const my=ST.answer[s.id]||"";
+    const mc=Array.isArray(s.choices)&&s.choices.length>0;
+    body.classList.add("q-mode"); body.classList.toggle("rev",rev);
+    const choiceHTML=()=>'<div class="choices'+(rev?" rev":"")+'">'+s.choices.map((c,i)=>{ const sel=my!=null&&my!==""&&String(my)===ckey(c,i); const cls=(sel?" sel":"")+(rev?(c.ok?" ok":(sel?" bad":"")):"");
+      return '<button class="choice'+cls+'" data-ci="'+i+'"'+(rev?" disabled":"")+'><span class="cn">'+(i+1)+'</span><span class="ct">'+c.html+'</span></button>'; }).join("")+'</div>';
+    body.innerHTML=examHTML(s)+'<div class="kicker">파트 '+num(s.part)+'</div><h2><span class="q-kind">'+s.kind+'</span>'+esc(s.qn)+'</h2><div class="qbody">'+s.html+'</div>'+
+      (mc ? choiceHTML() : rev
+        ? '<div class="myans-show"><div class="kicker">내 답</div><div class="myans-txt">'+esc(my)+'</div></div>'
+        : '<div class="myans"><label for="myans">내 답</label><textarea id="myans" rows="2">'+esc(my)+'</textarea></div>')+
+      (rev?'<div class="myans-note"><button class="btn xs" id="showAns">답 · 풀이 다시 보기</button></div>':'');
+    if(rev){ if(ST.correct[s.id]!==true) openAns(s); /* V5A: 정답이면 풀이 판을 띄우지 않는다 (아토 2026-09-21) */ const sa=$("#showAns"); if(sa) sa.onclick=()=>openAns(s); }
+    closePad(); $("#padBtn").hidden=false;
+    if(mc&&!rev){
+      /* V5A: 보기를 누르는 순간 제출·채점 (아토 2026-09-21 "객관식은 고르면 바로 정답으로 제출") */
+      act.innerHTML='';
+      body.querySelectorAll(".choice").forEach(b=>{ b.onclick=()=>{ const ci=b.dataset.ci; if(ST.revealed[s.id]) return; const c=s.choices[+ci]; const ok=!!(c&&c.ok); ST.answer[s.id]=ckey(c,+ci); ST.revealed[s.id]=true; ST.correct[s.id]=ok; ST.done[s.id]=true; save(); render(); ev("quiz",{qid:s.id,ok:ok,n:qNd(s)}); }; });
+    } else if(mc&&rev){
+      const c=ST.correct[s.id];
+      act.innerHTML='<span class="verdict '+(c?"ok":"bad")+'">'+(c?"정답":"오답 — 풀이를 읽고 다시")+'</span><button class="btn xs" id="retry1">다시 풀기</button>';
+      $("#retry1").onclick=()=>{ delete ST.revealed[s.id]; delete ST.done[s.id]; delete ST.correct[s.id]; delete ST.answer[s.id]; save(); render(); };
+    } else if(!rev){
+      act.innerHTML='<button class="btn primary" id="reveal" disabled>답 확인</button>';
+      const ta=$("#myans"), rb=$("#reveal");
+      const sync=()=>{ ST.answer[s.id]=ta.value; rb.disabled=!ta.value.trim(); };
+      ta.oninput=sync; ta.onchange=()=>{ sync(); save(); }; sync();
+      rb.onclick=()=>{ if(!ta.value.trim()){ ta.focus(); return; } ST.answer[s.id]=ta.value.trim(); ST.revealed[s.id]=true; save(); render(); };
+      ta.onkeydown=e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); rb.click(); } };
+      setTimeout(()=>{ try{ ta.focus({preventScroll:true}); }catch(e){} },50);
+    } else {
+      const c=ST.correct[s.id];
+      act.innerHTML='<button class="btn" id="yes">맞았어요'+(c===true?" ✓":"")+'</button><button class="btn" id="no">틀렸어요 · 다시'+(c===false?" ✓":"")+'</button>';
+      $("#yes").onclick=()=>{ ST.correct[s.id]=true; ST.done[s.id]=true; save(); render(); ev("quiz",{qid:s.id,ok:true,n:qNd(s)}); };
+      $("#no").onclick=()=>{ ST.correct[s.id]=false; ST.done[s.id]=true; save(); render(); ev("quiz",{qid:s.id,ok:false,n:qNd(s)}); };
+    }
+  } else if(s.type==="result"){
+    /* V6B-RESULT: 정답·오답·안 푼 3칸 + 숫자 기준 + 틀린 문제 목록 + 주버튼 하나 (브리프 v49 r3 §3) */
+    const sc=partScore(s.part);
+    const qs=SLIDES.filter(x=>x.type==="q"&&x.part===s.part&&!ST.skip[x.id]);
+    const wrong=qs.filter(q=>ST.correct[q.id]===false), left=qs.filter(q=>!ST.done[q.id]||ST.correct[q.id]==null&&!ST.revealed[q.id]);
+    const okN=qs.filter(q=>ST.correct[q.id]===true).length;
+    const passB=sc.b.n===0||sc.b.ok===sc.b.n, needA=Math.ceil(sc.a.n*2/3), passA=sc.a.n===0||sc.a.ok>=needA;
+    const rule=(sc.b.n?'기초 '+sc.b.n+'문제 전부 정답':'')+(sc.b.n&&sc.a.n?' + ':'')+(sc.a.n?'응용 '+sc.a.n+'문제 중 '+needA+'문제 이상':'');
+    body.classList.add("scrollable");
+    body.innerHTML='<div class="kicker">파트 '+num(s.part)+' 결과</div><h1>'+esc(String(s.title).replace(/[\s★]+$/,""))+'</h1>'+
+      '<div class="score"><div class="c ok"><b>'+okN+'</b>정답</div><div class="c bad"><b>'+wrong.length+'</b>오답</div><div class="c"><b>'+left.length+'</b>안 푼 문제</div></div>'+
+      '<p class="rs-rule">통과 기준: '+esc(rule||'문제 없음')+' · 지금 '+(passB&&passA?'<b class="rs-pass">통과</b>':'<b class="rs-fail">미달</b>')+' (기초 '+sc.b.ok+'/'+sc.b.n+' · 응용 '+sc.a.ok+'/'+sc.a.n+')</p>'+
+      (wrong.length?'<div class="rs-list"><div class="kicker">틀린 문제</div>'+wrong.map(q=>'<button class="rs-q" data-go="'+q.id+'"><span class="q-kind">'+esc(q.kind||"")+'</span>'+esc(q.qn||q.id)+'</button>').join("")+'</div>':'')+
+      (left.length&&!wrong.length?'<div class="rs-list"><div class="kicker">안 푼 문제</div>'+left.map(q=>'<button class="rs-q" data-go="'+q.id+'"><span class="q-kind">'+esc(q.kind||"")+'</span>'+esc(q.qn||q.id)+'</button>').join("")+'</div>':'');
+    body.querySelectorAll(".rs-q").forEach(b=>{ b.onclick=()=>startFrom(b.dataset.go,"at"); });
+    const nextPart=PARTS.find(p=>p.n===s.part+1);
+    let primary;
+    if(wrong.length) primary='<button class="btn primary" id="rsGo">틀린 문제 복습</button>';
+    else if(left.length) primary='<button class="btn primary" id="rsGo">안 푼 문제 풀기</button>';
+    else primary='<button class="btn primary" id="rsGo">'+(nextPart?'다음 파트':'전체 결과')+'</button>';
+    act.innerHTML='<button class="btn xs" id="back">이 파트 처음으로</button>'+(wrong.length&&left.length?'<button class="btn xs" id="rsLeft">안 푼 문제 '+left.length+'개</button>':'')+primary;
+    $("#back").onclick=()=>{ ST.idx=SLIDES.findIndex(x=>x.id==="p"+s.part+"-cover"); save(); render(); };
+    const rl=$("#rsLeft"); if(rl) rl.onclick=()=>startFrom(left[0].id,"at");
+    $("#rsGo").onclick=()=>{ ST.done[s.id]=true; save();
+      if(wrong.length){ wrong.forEach(q=>{ delete ST.revealed[q.id]; delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; }); save(); startFrom(wrong[0].id,"at"); }
+      else if(left.length) startFrom(left[0].id,"at");
+      else go(1); };
+  } else if(s.type==="final"){
+    const qs=SLIDES.filter(x=>x.type==="q"&&!(ST.skip||{})[x.id]); const ok=qs.filter(q=>ST.correct[q.id]===true).length, done=qs.filter(q=>ST.done[q.id]).length;
+    const wrong=SLIDES.filter(x=>x.type==="q"&&ST.correct[x.id]===false);
+    body.innerHTML='<div class="kicker">전체 결과</div><h1>미분적분학2 · 중간고사 대비 2 (12.4 외적 계산 · 12.5 직선과 평면 · 12.6 기둥면 · 13.1~13.2 벡터함수)</h1><div class="score"><div class="c"><b>'+ok+'/'+qs.length+'</b>정답 · 푼 문제 '+num(done)+'</div><div class="c"><b>'+wrong.length+'</b>틀린 문제</div></div>'+
+      '<p>'+(wrong.length?'틀린 문제: '+wrong.slice(0,6).map(w=>esc(w.qn)).join(", ")+(wrong.length>6?' 외 '+num(wrong.length-6)+'개':''):'틀린 문제가 없습니다.')+'</p>';
+    act.innerHTML='<button class="btn xs" id="retry"'+(wrong.length?"":" disabled")+'>틀린 문제만 다시</button><button class="btn xs" id="first">처음으로</button>';
+    $("#retry").onclick=()=>{ if(!wrong.length) return; wrong.forEach(q=>{ delete ST.revealed[q.id]; delete ST.done[q.id]; delete ST.correct[q.id]; }); ST.idx=SLIDES.indexOf(wrong[0]); save(); render(); };
+    $("#first").onclick=()=>{ ST.idx=0; save(); render(); };
+    ST.done[s.id]=true; save();
+  }
+  renderSrc(s);
+  const h=hintFor(s); const hb=$("#hintBtn"); hb.disabled=!h; hb.title=h?"":"이 장에는 힌트가 없습니다";
+  const nxt=$("#next"), prv=$("#prev");
+  const unlocked=i<SLIDES.length-1;
+  nxt.disabled=!unlocked; nxt.classList.toggle("undone",!ST.done[s.id]&&unlocked); prv.disabled=(i===0);
+  typeset(body);
+  body.scrollTop=0;
+}
+function go(d){ const n=ST.idx+d; if(n<0||n>=SLIDES.length) return; ST.idx=n; save(); render(); }
+$("#next").onclick=()=>go(1); $("#prev").onclick=()=>go(-1);
+$("#padBtn").onclick=()=>{ const s=SLIDES[ST.idx]; if(s.type!=="q") return; if($("#padPanel").classList.contains("on")) closePad(); else openPad(s.id); };
+$("#hintBtn").onclick=()=>{ const s=SLIDES[ST.idx], h=hintFor(s); if(!h) return; const hb=$("#hintBox"); if(!hb.hidden){ hb.hidden=true; return; } hb.innerHTML='<div class="kicker">힌트 · 파트 '+num(s.part)+' 한 줄</div><div>'+esc(h)+'</div>'; hb.hidden=false; typeset(hb); };
+document.addEventListener("keydown",e=>{ const t=e.target; if(t&&/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||(t&&t.isContentEditable)) return; if(e.key==="ArrowRight") go(1); else if(e.key==="ArrowLeft") go(-1); });
+
+/* ---------- 검사 모드 (#check): 전 장을 돌며 오버플로·raw LaTeX를 잰다. 빌드 뒤 헤드리스로 캡처해 확인한다 ---------- */
+async function runCheck(){
+  try{ await document.fonts.ready; }catch(e){}
+  const body=$("#body"); const fails=[]; const saved=JSON.stringify(ST);
+  const foot=$("#foot"), stage=$("#stage");
+  const measure=(tag)=>{ const over=SLIDES[ST.idx].type!=="jump"&&!SLIDES[ST.idx].scroll&&(body.scrollHeight>body.clientHeight||body.scrollWidth>body.clientWidth); const fo=SLIDES[ST.idx].type!=="jump"&&!SLIDES[ST.idx].scroll&&(foot.scrollWidth>foot.clientWidth||stage.scrollHeight>stage.clientHeight); const raw=body.dataset.raw==="1"; if(over||fo||raw) fails.push(SLIDES[ST.idx].id+tag+(over?" 넘침 "+body.scrollHeight+">"+body.clientHeight:"")+(fo?" 하단/무대 넘침":"")+(raw?" rawLaTeX":"")); };
+  for(let i=0;i<SLIDES.length;i++){
+    const s=SLIDES[i];
+    ST.idx=i; delete ST.revealed[s.id]; render(); await new Promise(r=>setTimeout(r,20)); measure("");
+    if(s.type==="q"){ /* 답 공개 상태 */ ST.revealed[s.id]=true; ST.answer[s.id]=Array.isArray(s.choices)&&s.choices.length?"0":"x"; ST.correct[s.id]=false; render(); await new Promise(r=>setTimeout(r,20)); measure(" [답공개]"); { const al=$("#anslb"); if(al&&al.classList.contains("on")){ const a=al.querySelector(".ans"); if(a&&(a.scrollHeight>a.clientHeight||al.scrollHeight>al.clientHeight)) fails.push(s.id+" [풀이판] 넘침 "+a.scrollHeight+">"+a.clientHeight); al.classList.remove("on"); } }
+      /* 힌트 열림 */ $("#hintBtn").click(); await new Promise(r=>setTimeout(r,20)); const hb=$("#hintBox"); if(!hb.hidden&&hb.getBoundingClientRect().top<body.getBoundingClientRect().top) fails.push(s.id+" [힌트] 상단 침범"); hb.hidden=true; }
+  }
+  try{ ST=JSON.parse(saved); }catch(e){}
+  const c=$("#chk"); c.style.display="block";
+  c.innerHTML='<h2 id="chkTitle">검사: '+SLIDES.length+'장 · 실패 '+fails.length+'</h2><pre id="chkList">'+esc(fails.join("\n"))+'</pre>';
+  window.CHECK_RESULT={n:SLIDES.length,fails};
+}
+/* V5B-CTX: 학습 질문 패널용 문맥 (아토 2026-09-21). 앱이 gen 을 주기 전엔 보내지 않는다 — 이전 창의 늦은 메시지를 앱이 gen 으로 걸러낸다 */
+let CTX_GEN=null;
+const ctxPlain=(h,n)=>{ const t=String(h||"").replace(/<[^>]+>/g," ").replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/\s+/g," ").trim(); return t.length>n?t.slice(0,n)+"…(잘림)":t; };
+function postCtx(){
+  try{
+    if(location.hash==="#check"||!CTX_GEN||window.parent===window) return;
+    const s=SLIDES[Math.max(0,Math.min(ST.idx,SLIDES.length-1))]; if(!s) return;
+    const p=s.part?PARTS.find(x=>x.n===s.part):null; const li=lastInfo()||{};
+    const msg={type:"mc-slide",v:1,gen:CTX_GEN,deck:DECK_ID,title:String(document.title).slice(0,80),sid:s.id,stype:s.type,part:s.part||null,
+      partTitle:p?String(p.title).replace(/[\s★]+$/,"").slice(0,60):"",label:String(li.where||"").slice(0,80),q:null};
+    if(s.type==="q"){
+      const rev=!!ST.revealed[s.id], mc=Array.isArray(s.choices)&&s.choices.length>0, my=(ST.answer||{})[s.id];
+      msg.q={qn:String(s.qn||"").slice(0,80),kind:String(s.kind||"").slice(0,10),text:ctxPlain(s.html,600),
+        choices:mc?s.choices.slice(0,6).map(c=>ctxPlain(c.html,120)):[],
+        my: my==null||my===""?null:(mc?(cpick(s,my)>=0?ctxPlain(s.choices[cpick(s,my)].html,120):null):String(my).slice(0,200)),
+        revealed:rev, correct: rev&&typeof ST.correct[s.id]==="boolean"?ST.correct[s.id]:null,
+        answer: rev&&mc?(s.choices.map((c,i)=>c.ok?i+1:0).filter(Boolean).join(",")||null):null};
+    } else if(s.type==="concept"||s.type==="mu"){ msg.q={qn:String(s.title||"").slice(0,80),kind:s.type==="mu"?"암기·이해":"개념",text:ctxPlain(s.type==="mu"?[].concat(s.mem||[],s.und||[]).join(" · "):s.html,600),choices:[],my:null,revealed:true,correct:null,answer:null}; }
+    window.parent.postMessage(msg, location.origin);
+  }catch(e){}
+}
+window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; postCtx(); } });
+const _renderV5b=render; render=function(){ _renderV5b(); postCtx(); };
+function boot(){
+  { const m=/^#(from|done|at)=([\w-]+)(?:,pad)?$/.exec(location.hash||""); if(m){ startFrom(m[2], m[1]==="from"?"skip":m[1]); if(/,pad$/.test(location.hash)) setTimeout(()=>$("#padBtn").click(),300); return; } }
+  if(location.hash==="#check"){ runCheck(); return; }
+  if(location.hash==="#resume"){ render(); save(); return; }   /* V5A: 저장된 위치 그대로 */
+  render();
+  if(location.hash==="#src"){ setTimeout(()=>{ const b=$("#srcs .src-th"); if(b) b.click(); },400); }
+}
+function fontCheck(){ try{ const ok=document.fonts.check("22px 'Gowun Dodum'"); if(ok){ const w0=$("#fontWarn"); if(w0) w0.hidden=true; return; } setTimeout(fontCheck,3000); /* V6B: 늦게 로드되면 경고를 지운다 */ if(!ok){ let w=$("#fontWarn"); if(!w){ w=document.createElement("div"); w.id="fontWarn"; $("#stage").appendChild(w); } w.hidden=false; w.textContent="손글씨 글꼴을 불러오지 못해 대체 글꼴로 보입니다. 인터넷 연결을 확인하고 새로 고침하세요."; } }catch(e){} }
+function whenReady(){ if(window.renderMathInElement){ fontCheck(); boot(); } else setTimeout(whenReady,40); }
+document.addEventListener("DOMContentLoaded",()=>{ (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(whenReady,whenReady); });
+</script>
+</body>
+</html>

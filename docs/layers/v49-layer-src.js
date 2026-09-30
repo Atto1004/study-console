@@ -112,6 +112,7 @@
   window.addEventListener("storage",function(e){ if(e&&/^mc-slides-/.test(e.key||"")&&ui.view==="study"){ try{ V49.render(); }catch(x){} } });
   /* ---- 시험 범위 덱을 과목 화면 노트 목록에도 (V41 방식) ---- */
   V49.NOTES=[
+    {course:"미분적분학2",file:"notes/calc2-mid2-slides.html",title:"미분적분학2 · 중간고사 대비 2 (12.4 외적 계산 · 12.5 직선과 평면 · 12.6 기둥면 · 13.1~13.2 벡터함수) — 6파트 · 문제 33",week:5,date:"2026-09-30",sub:""},
     {course:"미분적분학2",file:"notes/calc2-vectors-slides.html",title:"미분적분학2 · 중간고사 대비 벡터 (12.1 좌표 · 12.2 벡터 · 12.3 내적 · 12.4 외적) — 5파트 · 문제 25",week:4,date:"2026-09-24",sub:""},
     {course:"공업수학1",file:"notes/em1-mid-slides.html",title:"공업수학1 · 중간고사 대비 (1장 1계 ODE · 2.1~2.3 · 2.5 오일러-코시) — 6파트 · 문제 36",week:4,date:"2026-09-24",sub:""},
     {course:"공업수학1",file:"notes/em1-mid2-slides.html",title:"공업수학1 · 중간고사 대비 2 (2.4 자유진동 · 2.7~2.10 비제차 · 3장 고계) — 교재 선행 — 6파트 · 문제 35",week:5,date:"2026-09-30",sub:""},

@@ -75,6 +75,7 @@ OVR = {
 }
 DECK_OVR = {
  "calc2-vectors": {"parts": {"5": ["vec.cross"]}},
+ "calc2-mid2": {"parts": {"1": ["vec.cross", "lin.cofactor"], "2": ["vec.line_eq"], "3": ["vec.plane_eq"], "4": ["vec.quadric"], "5": ["vec.vector_func"], "6": ["vec.vector_calc"]}},
  "calc2-matrix": {"parts": {"3": ["lin.det2", "lin.det3"], "6": ["lin.linear_system", "lin.inverse", "lin.cramer"]}},
  "phys2-mid": {"parts": {"1": ["em.charge", "em.coulomb", "em.field"], "2": ["em.superposition", "em.continuous", "em.dipole"], "4": ["em.potential_energy", "em.potential", "em.potential_dist"], "5": ["em.capacitance", "em.dielectric"]}},
  "phys2-mid2": {"parts": {"1": ["em.current"], "2": ["em.resistance"], "3": ["em.power"], "4": ["em.emf_loop"], "5": ["em.kirchhoff"], "6": ["em.rc"]}},
