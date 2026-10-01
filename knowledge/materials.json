@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-10-01T13:58:31",
+ "generatedAt": "2026-10-01T13:58:43",
  "asOf": "2026-10-01",
  "termEnd": "2026-12-21",
  "courses": {
@@ -535,7 +535,8 @@
      "title": "Homework Assignment - Chapter 3",
      "given": "2026-09-23",
      "due": "2026-09-30T23:59",
-     "src": "LMS"
+     "src": "LMS",
+     "status": "LMS 미제출"
     },
     {
      "title": "Homework Assignment - Chapter 4",
@@ -592,13 +593,15 @@
      "title": "Week3 과제 제출란",
      "given": "2026-09-15",
      "due": "2026-09-21T23:59",
-     "src": "LMS"
+     "src": "LMS",
+     "status": "제출"
     },
     {
      "title": "Week4 과제 제출란",
      "given": "2026-09-22",
-     "due": "2026-09-28T23:59",
-     "src": "LMS"
+     "due": "2026-10-05T23:59",
+     "src": "LMS",
+     "status": "제출"
     },
     {
      "title": "Week2 과제 제출란",
@@ -662,13 +665,15 @@
      "title": "[글쓰기 활동 ②] 글의 구성 파악 + 단락 개요 작성하기",
      "given": "2026-09-15",
      "due": "2026-09-15T12:40",
-     "src": "LMS"
+     "src": "LMS",
+     "status": "제출"
     },
     {
      "title": "[글쓰기 활동 ③ ] 집단지성의 힘으로 한글 맞춤법 · 띄어쓰기 연습문제 정복하기!",
      "given": "2026-09-22",
      "due": "2026-09-27T23:59",
-     "src": "LMS"
+     "src": "LMS",
+     "status": "제출"
     },
     {
      "title": "[글쓰기 활동 ④] 자기서사를 잘 쓰기 위한 활동지를 제출해 주세요.",
@@ -680,7 +685,8 @@
      "title": "[글쓰기 활동① ] 주제문 쓰기",
      "given": "2026-09-08",
      "due": "",
-     "src": "2주차 주제문 쓰기"
+     "src": "2주차 주제문 쓰기",
+     "status": "제출"
     }
    ]
   },
@@ -728,19 +734,22 @@
      "title": "2026-2학기 사회봉사 주요일정 및 유의사항",
      "given": "",
      "due": "2026-08-31T23:59",
-     "src": "LMS"
+     "src": "LMS",
+     "status": "제출"
     },
     {
      "title": "글로벌한양 3.0 퀴즈",
      "given": "",
      "due": "2026-08-31T23:59",
-     "src": "LMS"
+     "src": "LMS",
+     "status": "제출"
     },
     {
      "title": "모든 교육 종료 후 확인 사항",
      "given": "",
      "due": "2026-08-31T23:59",
-     "src": "LMS"
+     "src": "LMS",
+     "status": "제출"
     }
    ]
   }
