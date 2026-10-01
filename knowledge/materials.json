@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-10-01T09:53:04",
+ "generatedAt": "2026-10-01T10:24:00",
  "asOf": "2026-10-01",
  "termEnd": "2026-12-21",
  "courses": {
@@ -288,6 +288,7 @@
      "k": {
       "rec": 1,
       "summary": 1,
+      "note": 1,
       "pre": 1,
       "derived": 2
      }
@@ -295,7 +296,8 @@
     "2026-09-03": {
      "k": {
       "rec": 1,
-      "summary": 1
+      "summary": 1,
+      "note": 1
      }
     },
     "2026-09-08": {
@@ -315,7 +317,8 @@
      "k": {
       "rec": 1,
       "summary": 1,
-      "board": 5
+      "board": 5,
+      "note": 1
      }
     },
     "2026-09-17": {
@@ -324,7 +327,7 @@
       "rec": 1,
       "summary": 1,
       "board": 7,
-      "note": 2
+      "note": 3
      }
     },
     "2026-09-22": {
@@ -332,14 +335,20 @@
       "rec": 1,
       "summary": 1,
       "board": 6,
-      "note": 1
+      "note": 2
      }
     },
     "2026-09-29": {
      "k": {
       "rec": 1,
       "summary": 1,
-      "board": 8
+      "board": 8,
+      "note": 1
+     }
+    },
+    "2026-10-01": {
+     "k": {
+      "note": 1
      }
     }
    }
