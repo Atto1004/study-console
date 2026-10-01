@@ -71,7 +71,7 @@ OVR = {
  "calc2-2026-09-15": {"q2": ["vec.coords3d"]},
  "calc2-2026-09-17": {"s2": ["vec.position_ops"], "q2": ["vec.position_ops"]},
  "calc2-2026-09-22": {"s1": ["vec.dot_calc2"], "s2": ["vec.unit", "vec.dot_calc2"], "s3": ["vec.unit"], "s4": ["vec.cross"], "s5": ["vec.cross"],
-                      "q1": ["vec.unit"], "q2": ["vec.unit"], "q3": ["vec.unit"], "q4": ["vec.cross"], "q5": ["vec.cross"], "q6": ["vec.cross"]},
+                      "q1": ["vec.unit"], "q2": ["vec.unit"], "q3": ["vec.unit"], "q4": ["vec.cross"], "q5": ["vec.cross"], "q6": ["vec.cross"], "q7": ["vec.dot_calc2"]},
 }
 DECK_OVR = {
  "calc2-vectors": {"parts": {"5": ["vec.cross"]}},

@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
-"""미분적분학2 · 2026-09-22 수업 노트 (근거: 2026-09-22/정리.md — 판서 6장(09:45~10:13) + 필기 1장. 녹음 없음. 9:05~9:45 지각 구간(Thm 01 증명)은 교재로 보충)"""
+"""미분적분학2 · 2026-09-22 수업 노트 (근거: 2026-09-22/정리.md — 판서 6장(09:45~10:13) + 필기 + 녹음 30분(09:45~). 9:05~9:45 지각 구간 = 대표님 연습노트(10/1 수신): 정리 1 복습 → [Th2] 수직조건 → 교재 ex1~ex3)"""
 import io, os, sys, math
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from figs import *
 OUT = r"C:\Users\user\Desktop\아톰OS\기술실\study-materials\미분적분학2\_수업노트\2026-09-22.html"
 
-fig_cos = canvas(560, 190,
-    step(1, dot(70, 150, "", 5, INK), text(56, 168, "O", 13, INK, "middle", True), dot(270, 50, "", 5, PINK), text(270, 38, "A", 13, PINK, "middle"), dot(400, 140, "", 5, PINK), text(412, 144, "B", 13, PINK),
-        arrow(76, 146, 264, 54, BLUE, "", 3), text(150, 92, "|a⃗|", 13, BLUE, "middle", True), arrow(76, 149, 394, 141, RED, "", 3), text(230, 162, "|b⃗|", 13, RED, "middle", True),
-        arc(70, 150, 44, -27, -2, GRAY, 1.5, "θ", 54)),
-    step(2, arrow(394, 136, 276, 56, GREEN, "", 2.6), text(307, 138, "|a⃗ − b⃗|", 13, GREEN, "middle", True)),
-    step(3, text(452, 40, "코사인 제2법칙 (일각삼변)", 12.5, INK, "middle", True), text(452, 62, "|a−b|² = |a|² + |b|² − 2|a||b|cos θ", 11, INK, "middle")),
-    step(4, text(452, 96, "한편 |a−b|² = (a−b)·(a−b)", 12, INK, "middle"), text(452, 116, "= |a|² − 2 a·b + |b|²", 12, INK, "middle")),
-    step(5, text(452, 174, "∴ a⃗·b⃗ = |a⃗||b⃗| cos θ", 14, RED, "middle", True)),
-    cap="Thm 01 의 증명(교재) — 지각 구간(9:05~9:45)의 내용으로 추정. 두 식의 |a|², |b|² 이 지워지고 내적만 남는다.", name="cos")
+fig_perp = canvas(560, 172,
+    step(1, fbox(14, 16, 250, 54, "정리 1 (9/17)  a⃗·b⃗ = |a⃗||b⃗| cos θ", INK, sub="cos θ = a⃗·b⃗ / (|a⃗||b⃗|)", size=13)),
+    step(2, fbox(290, 16, 256, 54, "[Th 2] 수직조건", RED, sub="a⃗ ⊥ b⃗  ⇔  θ = π/2  ⇔  a⃗·b⃗ = 0", size=13)),
+    step(3, fbox(14, 96, 170, 58, "ex1 (교재 p.884)", BLUE, sub="|a|=4, |b|=6, θ=π/3 → a·b = 12", size=12.5)),
+    step(4, fbox(195, 96, 170, 58, "ex2 (교재 p.884)", BLUE, sub="cos θ = 6/(3·2√11) = √11/11", size=12.5)),
+    step(5, fbox(376, 96, 170, 58, "ex3 (교재 p.885)", BLUE, sub="(2,2,−1)·(5,−4,2) = 0 → 수직", size=12.5)),
+    cap="9:05~9:45(지각 구간) — 대표님 연습노트로 확인한 순서. 정리 1 을 다시 쓰고, cos θ = 0 인 경우가 수직조건 [Th 2], 교재 예제 셋.", name="perp")
 
 ox, oy = 150, 160
 T = p3(ox, oy, 45, 95, 80)
@@ -55,17 +53,17 @@ fig_der = canvas(560, 150,
 html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미분적분학2 · 9/22 내적 정리 · 방향각·방향코사인 · 외적 정의·유도</title></head><body>
 <header>
 <h1>12.3 방향각·방향코사인 → 12.4 외적 — "두 벡터에 수직인 벡터"</h1>
-<p class="lead">9:45 지각으로 앞 40분(12.3 정리 1의 증명으로 추정)은 못 들었고 녹음도 없어, 그 부분은 교재 증명으로 채웠다. 판서 6장(09:45~10:13)의 내용: <b>방향각·방향코사인</b>(사이각 공식에 i, j, k를 넣은 것)과 Ex04, 그리고 <b>12.4 외적</b>의 정의(2×2 행렬식 셋)와 <b>유도</b>(두 벡터에 수직인 벡터를 내적 0 조건으로). 정역학 9/9(방향여현)·9/14(외적)와 같은 내용이라 서로 예습·복습이 된다.</p>
-<p class="meta"><span>판서 6장 (09:45~10:13)</span><span>녹음 없음 · 필기 1장</span><span>교재 12.3~12.4</span><span>4주차 · 화 · 지각 2회 누적</span></p>
+<p class="lead">9:45 지각으로 앞 40분은 판서·녹음이 없어 대표님 연습노트로 채웠다 — <b>정리 1 복습 → [Th2] 수직조건 → 교재 예제 ex1~ex3</b>. 판서 6장(09:45~10:13)의 내용: <b>방향각·방향코사인</b>(사이각 공식에 i, j, k를 넣은 것)과 Ex04, 그리고 <b>12.4 외적</b>의 정의(2×2 행렬식 셋)와 <b>유도</b>(두 벡터에 수직인 벡터를 내적 0 조건으로). 정역학 9/9(방향여현)·9/14(외적)와 같은 내용이라 서로 예습·복습이 된다.</p>
+<p class="meta"><span>판서 6장 (09:45~10:13)</span><span>녹음 30분 (09:45~) · 필기 + 연습노트</span><span>교재 12.3~12.4</span><span>4주차 · 화 · 지각 2회 누적</span></p>
 </header>
 
 <section class="s" data-id="s1">
-<h2>1. Thm 01 증명 — 코사인 제2법칙에서 a·b = |a||b|cos θ (지각 구간 보충)</h2>
-{fig_cos}
-<div class="formula">\\[|\\vec a-\\vec b|^2=|\\vec a|^2+|\\vec b|^2-2|\\vec a||\\vec b|\\cos\\theta\\quad\\text{{와}}\\quad |\\vec a-\\vec b|^2=(\\vec a-\\vec b)\\cdot(\\vec a-\\vec b)=|\\vec a|^2-2\\,\\vec a\\cdot\\vec b+|\\vec b|^2\\ \\Rightarrow\\ \\vec a\\cdot\\vec b=|\\vec a||\\vec b|\\cos\\theta\\]</div>
-<div class="why">9/17 마지막에 세운 삼각형 OAB(\\(\\overrightarrow{{BA}}=\\vec a-\\vec b\\)). (\\(\\vec a,\\vec b\\ne\\vec0\\)) 한 각 \\(\\theta\\)와 세 변을 아는 삼각형 = <b>코사인 제2법칙</b>. 같은 변 \\(|\\vec a-\\vec b|^2\\)을 내적의 분배법칙으로도 전개하면 \\(|\\vec a|^2,|\\vec b|^2\\)이 지워지고 \\(\\vec a\\cdot\\vec b\\)만 남는다. 이 부분은 판서에 없어(9:45 이전) 교재 증명 — 녹음이 오면 교수님 순서로 고친다.</div>
-<div class="analogy">같은 물건을 두 저울(기하: 코사인법칙, 대수: 성분 전개)로 재서 눈금을 맞추면 미지의 항(내적)이 정해진다.</div>
-<div class="memo"><b>외울 것</b> \\(\\vec a\\cdot\\vec b=|\\vec a||\\vec b|\\cos\\theta\\) · \\(\\cos\\theta=\\vec a\\cdot\\vec b/(|\\vec a||\\vec b|)\\) · 증명 = 코사인법칙 + 분배 전개</div>
+<h2>1. 정리 1 · [Th2] 수직조건 · 교재 예제 ex1~ex3 (9:05~9:45)</h2>
+{fig_perp}
+<div class="formula">\\[\\vec a\\cdot\\vec b=|\\vec a||\\vec b|\\cos\\theta\\ \\Rightarrow\\ \\cos\\theta=\\frac{{\\vec a\\cdot\\vec b}}{{|\\vec a||\\vec b|}}\\qquad [\\text{{Th 2}}]\\ \\vec a\\perp\\vec b\\ \\Leftrightarrow\\ \\theta=\\frac\\pi2\\ \\Leftrightarrow\\ \\vec a\\cdot\\vec b=0\\]</div>
+<div class="why">9/17에 배운 정리 1(사이각 공식, \\(\\vec a,\\vec b\\ne\\vec0\\))을 다시 쓰고 시작했다. \\(\\cos\\theta\\)가 0이 되는 각은 \\(\\theta=\\pi/2\\)(90°)뿐이라, <b>내적이 0이면 수직</b>이고 수직이면 내적이 0이다 — 이것이 [Th 2] 수직조건. 각도를 몰라도 성분 곱의 합 하나로 수직을 판정할 수 있다. 교재 예제: <b>ex1</b> 크기 4·6, 사이각 \\(\\pi/3\\) → \\(\\vec a\\cdot\\vec b=4\\cdot6\\cdot\\tfrac12=12\\). <b>ex2</b> \\(\\vec a=(2,2,-1)\\), \\(\\vec b=(6,-2,2)\\): \\(|\\vec a|=3\\), \\(|\\vec b|=\\sqrt{{44}}=2\\sqrt{{11}}\\), \\(\\vec a\\cdot\\vec b=12-4-2=6\\) → \\(\\cos\\theta=\\frac{{6}}{{3\\cdot2\\sqrt{{11}}}}=\\frac{{\\sqrt{{11}}}}{{11}}\\), \\(\\theta=\\cos^{{-1}}\\frac{{\\sqrt{{11}}}}{{11}}\\)(특수각이 아니라 역코사인 꼴 그대로). <b>ex3</b> \\(2\\vec i+2\\vec j-\\vec k\\)와 \\(5\\vec i-4\\vec j+2\\vec k\\): \\((2,2,-1)\\cdot(5,-4,2)=10-8-2=0\\) → 수직.</div>
+<div class="analogy">두 화살표가 직각인지는 각도기 없이 성분 곱의 합이 0인지로 안다 — 수직이면 서로의 방향으로 내린 그림자의 길이가 0.</div>
+<div class="memo"><b>외울 것</b> \\(\\cos\\theta=\\vec a\\cdot\\vec b/(|\\vec a||\\vec b|)\\) · [Th 2] \\(\\vec a\\perp\\vec b\\Leftrightarrow\\vec a\\cdot\\vec b=0\\) · ex2 답 \\(\\cos^{{-1}}(\\sqrt{{11}}/11)\\) · ex3 내적 0 → 수직</div>
 </section>
 
 <section class="s" data-id="s2">
@@ -113,6 +111,7 @@ html = f'''<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>미
 <div class="q" data-qid="q4"><div class="qn">확인 4 · 외적 정의</div><div class="qb">\\(\\vec a\\times\\vec b\\)의 첫째 성분은?</div><ol class="choices"><li data-ok="1">\\(a_2b_3-a_3b_2\\)</li><li>\\(a_1b_1\\)</li><li>\\(a_3b_2-a_2b_3\\)</li><li>\\(a_1b_2-a_2b_1\\)</li></ol><div class="ans">자기 번호(1)를 뺀 (2,3) 순환 행렬식. 3번은 부호 반대(\\(\\vec b\\times\\vec a\\)), 4번은 셋째 성분.</div></div>
 <div class="q" data-qid="q5"><div class="qn">확인 5 · 유도의 뜻</div><div class="qb">외적 \\(\\vec c=\\vec a\\times\\vec b\\)를 유도할 때 출발한 조건은?</div><ol class="choices"><li data-ok="1">\\(\\vec c\\)가 \\(\\vec a\\)와 \\(\\vec b\\) 둘 다에 수직 — \\(\\vec a\\cdot\\vec c=0,\\ \\vec b\\cdot\\vec c=0\\)</li><li>\\(\\vec c\\)가 \\(\\vec a\\)와 평행</li><li>\\(|\\vec c|=|\\vec a||\\vec b|\\)</li><li>\\(\\vec c=\\vec a+\\vec b\\)</li></ol><div class="ans">두 내적이 0이라는 조건을 만족하는 성분을 택해 확인했다. 수직 조건만으로 외적 전체(크기·오른손 방향)가 결정되지는 않는다.</div></div>
 <div class="q" data-qid="q6"><div class="qn">확인 6 · 계산과 검산</div><div class="qb">\\(\\vec a=(1,2,3)\\), \\(\\vec b=(4,5,6)\\)의 \\(\\vec a\\times\\vec b\\)를 구하고 \\(\\vec a\\cdot(\\vec a\\times\\vec b)=0\\)임을 확인하라.</div><div class="ans">\\((2\\cdot6-3\\cdot5,\\ 3\\cdot4-1\\cdot6,\\ 1\\cdot5-2\\cdot4)=(-3,6,-3)\\). \\(\\vec a\\cdot(-3,6,-3)=-3+12-9=0\\) ✓ (정역학 9/14 연습과 같은 답).</div></div>
+<div class="q" data-qid="q7"><div class="qn">확인 7 · 수직조건 [Th 2]</div><div class="qb">\\(\\vec a=(1,2,-2)\\)와 \\(\\vec b=(4,-1,1)\\)의 관계로 옳은 것은?</div><ol class="choices"><li data-ok="1">수직이다 — \\(\\vec a\\cdot\\vec b=0\\)</li><li>평행이다</li><li>사이각이 \\(\\pi/3\\)이다</li><li>크기를 모르면 판정할 수 없다</li></ol><div class="ans">\\(\\vec a\\cdot\\vec b=4-2-2=0\\) → [Th 2]에 의해 수직(9/22 앞 40분, 교재 ex3과 같은 판정). 성분만 있으면 크기 없이도 판정된다.</div></div>
 </body></html>'''
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 io.open(OUT, "w", encoding="utf-8", newline="\n").write(html)
