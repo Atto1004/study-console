@@ -1,5 +1,5 @@
 /* ============================================================
-   V58 LAYER — 과목 화면 「수업 자료」: 일차별 출결 · 강의자료 · 녹음 · 판서 · 내 필기 · 정리 (BUILD 2026-10-01.98)
+   V58 LAYER — 과목 화면 「수업 자료」: 일차별 출결 · 강의자료 · 녹음 · 판서 · 내 필기 · 정리 · 과제(마감) (BUILD 2026-10-01.98 · 과제 .100)
    대표님 2026-10-01 「각과목별로 수업자료 업로드 현황 일차별로 업로드되었는지 확인할 수 있는 영역 … 내 필기본, 녹음본, 교수님 칠판판서,
    강의자료 등 … 내 출결과 관련해서 과목별로 확인할수 있게 … 강의자료 미리 나와있는건 일차별로 미리 생성」
    데이터: knowledge/materials.json(PC 폴더 실측 개수 + _회차계획.json 의 미리 나온 강의자료 — _진도커버리지.py, 파일명·실명 없음)
@@ -37,7 +37,12 @@
       out.push({date:p.date,hol:p.holiday||(s&&s.cancelled?{name:"휴강"}:null)}); seen[p.date]=1; });
     (typeof V32!=="undefined"&&V32.meetings?V32.meetings(c):[]).forEach(function(d){ if(!seen[d]){ out.push({date:d,hol:null,extra:true}); seen[d]=1; } });
     (term().exams||[]).forEach(function(e){ if(e.courseId===c.id&&e.date) out.push({date:e.date,exam:e}); });
-    out.sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:(a.exam?1:0)-(b.exam?1:0); });
+    var mc=V58.M&&V58.M.courses&&V58.M.courses[c.name];
+    ((mc&&mc.assignments)||[]).forEach(function(a){
+      if(a.given) out.push({date:a.given,asg:a,kind:"given"});
+      if(a.due) out.push({date:a.due.slice(0,10),asg:a,kind:"due"}); });
+    var ord=function(r){ return r.exam?3:r.asg?(r.kind==="due"?2:1):0; };
+    out.sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:ord(a)-ord(b); });
     out.forEach(function(r){ r.past=r.date<td; r.today=r.date===td; r.future=r.date>td; });
     return out;
   };
@@ -68,6 +73,7 @@
     return '<span class="v58-a none">미기록</span>';
   };
   V58.rowHTML=function(c,r,counts){
+    if(r.asg) return V58.asgHTML(r);
     if(r.exam) return '<tr class="v58-exam"><td></td><td colspan="7"><b>'+esc(r.exam.kind)+'고사</b> '+esc(md(r.date))+(r.exam.time?' '+esc(r.exam.time):'')+'</td></tr>';
     var s=sessionOn(c.id,r.date), sl=(s&&s.slots)||{}, st=s&&s.status;
     var mc=V58.M&&V58.M.courses&&V58.M.courses[c.name], item=(mc&&mc.sessions&&mc.sessions[r.date])||{}, plan=item.plan||null;
@@ -84,6 +90,25 @@
       '<td class="v58-d"><b>'+esc(md(r.date))+'</b>'+sub+'</td>'+
       '<td>'+V58.attHTML(r,s)+'</td>'+cells+'</tr>';
   };
+  V58.dueTxt=function(a){ if(!a.due) return "마감 없음"; var t=a.due.slice(11,16); return md(a.due.slice(0,10))+(t?" "+t:""); };
+  V58.asgState=function(a){
+    if(a.status==="제출") return {cls:"ok",t:"제출"};
+    if(a.status) return {cls:"warn",t:a.status};
+    if(!a.due) return null;
+    var now=new Date(), d=new Date(a.due.replace("T"," ").replace(/-/g,"/")+":00");
+    if(isNaN(d)) return null;
+    if(d<now) return {cls:"past",t:"마감 지남"};
+    var n=Math.ceil((D(a.due.slice(0,10))-D(today()))/86400000);
+    return {cls:n<=2?"soon":"fut",t:n<=0?"오늘 마감":"D-"+n};
+  };
+  V58.asgHTML=function(r){
+    var a=r.asg, st=V58.asgState(a);
+    var chip=st?' <span class="v58-st '+st.cls+'">'+esc(st.t)+'</span>':'';
+    var est=a.dueNote?' <small title="'+esc(a.dueNote)+'">(추정)</small>':'';
+    if(r.kind==="given") return '<tr class="v58-asg"><td></td><td colspan="7"><span class="v58-tag g">과제</span> <b>'+esc(a.title)+'</b> <span class="v58-arrow">'+(a.due?'→ 마감 '+esc(V58.dueTxt(a)):'· 마감 없음')+'</span>'+est+'</td></tr>';
+    var sh=a.title.replace(/Homework Assignment\s*-\s*/i,"HW ").replace(/\s*(을|를)?\s*제출해\s*주세요\.?$/,"").replace(/\s+/g," ").trim(); if(sh.length>26) sh=sh.slice(0,26)+"…";
+    return '<tr class="v58-asg due"><td></td><td colspan="7"><span class="v58-tag d">마감</span> '+esc(V58.dueTxt(a))+est+' · <span title="'+esc(a.title)+'">'+two(a.title,sh)+'</span>'+chip+'</td></tr>';
+  };
   V58.html=function(c){
     var rows=V58.rows(c), td=today(), lim=addDays(td,14), all=!!V58.all[c.id];
     var shown=rows.filter(function(r){ return all||r.date<=lim; }), hidden=rows.length-shown.length;
@@ -98,7 +123,9 @@
     var at=(typeof attStats==="function")?attStats(c):{held:0,n:{}}, n=at.n||{}, held=at.held||0;
     var miss=$$("#v58Card tr.v58-r.miss").length;
     var asOf=V58.M&&V58.M.generatedAt?V58.M.generatedAt.replace(/^\d{4}-(\d\d)-(\d\d)T(\d\d:\d\d).*$/,function(_,m,d,t){ return (+m)+"/"+(+d)+" "+t; }):"";
-    return (held?"출석 "+((n.present||0)+(n.late||0)+(n.vlate||0))+"/"+held:"")+(miss?" · 빠진 자료 "+miss+"회차":"")+(asOf?" · PC 자료 "+asOf:"");
+    var mc=V58.M&&V58.M.courses&&V58.M.courses[c.name], nx=null, now=new Date();
+    ((mc&&mc.assignments)||[]).forEach(function(a){ if(!a.due||a.status==="제출") return; var d=new Date(a.due.replace("T"," ").replace(/-/g,"/")+":00"); if(!isNaN(d)&&d>=now&&(!nx||a.due<nx.due)) nx=a; });
+    return (held?"출석 "+((n.present||0)+(n.late||0)+(n.vlate||0))+"/"+held:"")+(miss?" · 빠진 자료 "+miss+"회차":"")+(nx?" · 다음 마감 "+V58.dueTxt(nx):"")+(asOf?" · PC 자료 "+asOf:"");
   };
   V58.fill=function(c,card){
     var tok=++V58.tok;
@@ -159,6 +186,10 @@
     ".v58-t tr.hol td{color:var(--ink-3)}.v58-holcell{text-align:left!important;font-size:12px}",
     ".v58-t tr.v58-exam td{background:color-mix(in srgb,#FFC800 14%,transparent);font-size:12.5px;text-align:left;color:#7A5200}",
     ".v58-more{display:flex;justify-content:center;margin-top:10px}.v58-load{color:var(--ink-3);padding:8px}",
+    ".v58-t tr.v58-asg td{text-align:left;font-size:12.5px;padding:6px 6px;background:color-mix(in srgb,#1CB0F6 7%,transparent)}.v58-t tr.v58-asg.due td{background:color-mix(in srgb,#FF9600 9%,transparent)}",
+    ".v58-tag{display:inline-block;font-size:11px;font-weight:800;padding:1px 7px;border-radius:6px;margin-right:4px;color:#fff}.v58-tag.g{background:#1E5FA8}.v58-tag.d{background:#B85C00}",
+    ".v58-arrow{color:var(--ink-3);font-weight:700;white-space:nowrap}.v58-t tr.v58-asg small{color:var(--ink-3)}",
+    ".v58-st{display:inline-block;font-size:11px;font-weight:800;padding:1px 7px;border-radius:99px;margin-left:6px;border:1.5px solid currentColor}.v58-st.ok{color:#1B7A2E}.v58-st.warn{color:#9A5B00}.v58-st.past{color:var(--ink-3)}.v58-st.soon{color:#C7261B}.v58-st.fut{color:#1E5FA8}",
     ".v58 .sm{display:none}",
     "@media (max-width:600px){.v58-b{padding:8px 6px 12px}.v58-t{min-width:0;font-size:12px}.v58 .lg{display:none}.v58 .sm{display:inline}.v58-t th,.v58-t td{padding:6px 2px}.v58-d{min-width:0}.v58-d small{display:none}.v58-n{width:22px}.v58-n small{display:none}.v58-a{font-size:10.5px;padding:1px 6px}.v58-c{font-size:11.5px}.v58-tab{padding:4px 10px;font-size:12px}}"
   ].join("\n");
