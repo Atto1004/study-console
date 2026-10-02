@@ -14,6 +14,7 @@ from PIL import Image, ImageOps
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 MAT = os.path.join(os.path.dirname(ROOT), "study-materials")
+FACE_PY = r"C:\Users\user\본사\atom\.venv-face\Scripts\python.exe"   # face_guard.py 를 돌릴 환경(MTCNN)
 
 EM1_SLIDE1 = "제1장_1계ODE_이기영_46p.pdf"
 EM1_SLIDE2 = "제1장5절_제2장_2계선형ODE_이기영_61p_아토회차태그.pdf"
@@ -37,9 +38,9 @@ COURSES = {
    ("2.6", "해의 존재성과 유일성 · 론스키안", [(EM1_SLIDE2, 36, 38)], ["2026-09-23"], "론스키|Wronsk|존재", ""),
    ("2.7", "비제차 상미분방정식 · 미정계수법", [(EM1_SLIDE2, 39, 45)], ["2026-09-30"], "비제차|미정계수|해의 구조|선택 규칙|표 2\\.1|Ex\\.|예제", ""),
    ("2.8", "모델화: 강제진동 · 공진", [(EM1_SLIDE2, 46, 48)], ["2026-09-30"], "강제진동|공진|맥놀이|과도해", ""),
-   ("2.9", "모델화: 전기회로 (RLC)", [(EM1_SLIDE2, 49, 51)], [], "회로|RLC", "10/2 · 10/7 예정"),
-   ("2.10", "매개변수변환법", [(EM1_SLIDE2, 52, 61)], [], "매개변수", "10/2 · 10/7 예정"),
-   ("3.1", "고계 제차 선형 상미분방정식", [(EM1_SLIDE3, 3, 7)], [], "고계|n계", "10/7 예정"),
+   ("2.9", "모델화: 전기회로 (RLC)", [(EM1_SLIDE2, 49, 51)], ["2026-10-02"], "회로|RLC", ""),  # 대표님 10/2 「3.1 앞부분까지」 — 2.9 진행 여부는 녹음으로 확인
+   ("2.10", "매개변수변환법", [(EM1_SLIDE2, 52, 61)], ["2026-10-02"], "매개변수", ""),
+   ("3.1", "고계 제차 선형 상미분방정식", [(EM1_SLIDE3, 3, 7)], ["2026-10-02", "2026-10-07"], "고계|n계", ""),  # 10/2 앞부분 · 10/7 이어서
    ("3.2", "상수계수 · 변수계수(고계 오일러-코시) 제차", [(EM1_SLIDE3, 8, 12)], [], "고계|오일러", "10/7 예정"),
    ("3.3", "고계 비제차 선형 상미분방정식", [(EM1_SLIDE3, 13, 18)], [], "비제차|들보", "10/7 예정 · 중간 범위 끝"),
   ],
@@ -144,6 +145,37 @@ def main():
                 k, lab, hm = label_of(f)
                 lst.append({"f": "notes/lessons/_private/%s/photos/%s/%s" % (slug, d, name), "kind": k, "label": lab, "t": hm})
             photos[d] = lst
+        # 셀카 검사(대표님 10/2 「내 셀카를 수업자료에 넣으면 안 되지」 · 칠판 속 교수님 얼굴은 괜찮음) — 큰 얼굴이 잡힌 사본은 지우고 목록에서 뺀다. 검사기를 못 돌리면 사진 칸 전체를 비운다.
+        import subprocess, tempfile
+        allp = [os.path.join(ROOT, x["f"].replace("/", os.sep)) for v in photos.values() for x in v]
+        bad = set()
+        if allp:
+            lst = tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".txt", delete=False)
+            lst.write("\n".join(allp)); lst.close()
+            try:
+                r = subprocess.run([FACE_PY, os.path.join(ROOT, "docs", "tools", "face_guard.py"), lst.name],
+                                   capture_output=True, encoding="utf-8", errors="replace", timeout=1800)
+                if r.returncode != 0:
+                    raise RuntimeError(r.stderr[-300:])
+                bad = {os.path.normcase(os.path.abspath(l.strip())) for l in r.stdout.splitlines() if l.strip()}
+            except Exception as e:
+                print("  얼굴 검사 실패 → 사진 칸 비움:", type(e).__name__, str(e)[:200])
+                bad = {os.path.normcase(os.path.abspath(p)) for p in allp}
+            finally:
+                os.remove(lst.name)
+        nbad = 0
+        for d in list(photos):
+            keep = []
+            for x in photos[d]:
+                fp = os.path.normcase(os.path.abspath(os.path.join(ROOT, x["f"].replace("/", os.sep))))
+                if fp in bad:
+                    nbad += 1
+                    try: os.remove(fp)
+                    except OSError: pass
+                else:
+                    keep.append(x)
+            photos[d] = keep
+        print("  셀카(큰 얼굴)로 뺀 사진", nbad, "장")
         json.dump(photos, io.open(os.path.join(priv, "photos.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
         # 절
         secs = []

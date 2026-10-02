@@ -420,8 +420,10 @@
      "no": "2.9",
      "ch": "2",
      "title": "모델화: 전기회로 (RLC)",
-     "dates": [],
-     "note": "10/2 · 10/7 예정",
+     "dates": [
+      "2026-10-02"
+     ],
+     "note": "",
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/2.9.pdf",
@@ -443,8 +445,10 @@
      "no": "2.10",
      "ch": "2",
      "title": "매개변수변환법",
-     "dates": [],
-     "note": "10/2 · 10/7 예정",
+     "dates": [
+      "2026-10-02"
+     ],
+     "note": "",
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/2.10.pdf",
@@ -466,8 +470,11 @@
      "no": "3.1",
      "ch": "3",
      "title": "고계 제차 선형 상미분방정식",
-     "dates": [],
-     "note": "10/7 예정",
+     "dates": [
+      "2026-10-02",
+      "2026-10-07"
+     ],
+     "note": "",
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/3.1.pdf",
