@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-02.112";
+var BUILD="2026-10-02.113";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,9 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-02.113",d:"10-02",items:[
+    "세부단원 데이터(sections.json) 배포 · 그날 수업 사진은 판서 · 자료 · 필기 · 과제만 (미분류 사진 제외)"
+  ]},
   {v:"2026-10-02.112",d:"10-02",items:[
     "공부계획: 같은 일정은 한 블록으로 — 근로장학처럼 루틴과 캘린더에 겹쳐 있거나 점심 앞뒤로 쪼개진 일정(90분 안에 이어짐)을 하나로 합침"
   ]},
@@ -12550,7 +12553,7 @@ var V33={};
         return '<button class="v63-th" data-href="'+esc(p.f)+'" data-title="'+esc(md(d)+" "+p.kind+(p.label?" · "+p.label:""))+'"><img loading="lazy" src="'+esc(p.f)+'" alt="'+esc(p.kind+" "+p.label)+'"><span>'+esc(p.kind)+(p.t?" "+esc(p.t):"")+'</span></button>'; }).join(""):'<span class="v63-empty"></span>')+'</div>'; }).join("");
     return '<div class="v63-r st-'+st+(V63.open[s.no]?' on':'')+'" data-no="'+esc(s.no)+'">'+
       '<button class="v63-h" aria-expanded="'+(V63.open[s.no]?"true":"false")+'"><b class="v63-no">'+esc(s.no)+'</b><span class="v63-t">'+esc(s.title)+'</span>'+
-        '<span class="v63-d">'+(s.dates.length?s.dates.map(md).join(" · "):esc(s.note||""))+'</span><span class="v63-st '+lab[1]+'">'+lab[0]+'</span></button>'+
+        '<span class="v63-d">'+(s.dates.length?s.dates.map(md).join(" · "):(st==="plan"?esc(s.note||""):""))+'</span><span class="v63-st '+lab[1]+'">'+lab[0]+'</span></button>'+
       '<div class="v63-body">'+
         step(1,sl||'<span class="v63-empty"></span>')+
         step(2,cls||'<span class="v63-empty"></span>')+
