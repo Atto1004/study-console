@@ -25,7 +25,7 @@
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/1.1.pdf",
-       "label": "p.10~20",
+       "label": "p.2~12",
        "pages": 11
       }
      ],
@@ -63,7 +63,7 @@
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/1.3.pdf",
-       "label": "p.21~28",
+       "label": "p.13~20",
        "pages": 8
       }
      ],
@@ -96,7 +96,7 @@
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/1.4.pdf",
-       "label": "p.29~36",
+       "label": "p.21~28",
        "pages": 8
       }
      ],
@@ -135,7 +135,7 @@
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/1.5.pdf",
-       "label": "p.37~46",
+       "label": "p.29~38",
        "pages": 10
       }
      ],
@@ -167,14 +167,13 @@
      "ch": "2",
      "title": "2계 제차 선형 상미분방정식",
      "dates": [
-      "2026-09-16",
-      "2026-09-18"
+      "2026-09-16"
      ],
      "note": "",
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/2.1.pdf",
-       "label": "p.13~19",
+       "label": "p.40~46",
        "pages": 7
       }
      ],
@@ -184,12 +183,6 @@
        "note": "notes/lessons/em1/2026-09-16.html#s=s4",
        "cls": "notes/classroom/em1/2026-09-16.html#ch=4",
        "title": "1장을 닫고 2장을 열다 — 베르누이 연습, 해법 총정리, 중첩 원리와 기저"
-      },
-      {
-       "date": "2026-09-18",
-       "note": "notes/lessons/em1/2026-09-18.html#s=s1",
-       "cls": "notes/classroom/em1/2026-09-18.html#ch=1",
-       "title": "2.2 상수계수 제차 선형 ODE — 특성방정식 하나로 세 가지 해"
       }
      ],
      "decks": [
@@ -212,7 +205,7 @@
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/2.2.pdf",
-       "label": "p.20~24",
+       "label": "p.47~51",
        "pages": 5
       }
      ],
@@ -244,7 +237,7 @@
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/2.3.pdf",
-       "label": "p.25~26",
+       "label": "p.52~53",
        "pages": 2
       }
      ],
@@ -269,16 +262,25 @@
      "no": "2.4",
      "ch": "2",
      "title": "모델화: 자유진동 (질량-용수철)",
-     "dates": [],
-     "note": "수업 진행 확인 못 함",
+     "dates": [
+      "2026-09-18"
+     ],
+     "note": "",
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/2.4.pdf",
-       "label": "p.27~30",
+       "label": "p.54~57",
        "pages": 4
       }
      ],
-     "lessons": [],
+     "lessons": [
+      {
+       "date": "2026-09-18",
+       "note": "notes/lessons/em1/2026-09-18.html",
+       "cls": "notes/classroom/em1/2026-09-18.html",
+       "title": "2.2 상수계수 제차 선형 ODE — 특성방정식 하나로 세 가지 해"
+      }
+     ],
      "decks": [
       {
        "href": "notes/em1-mid2-slides.html#at=p1-cover",
@@ -299,7 +301,7 @@
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/2.5.pdf",
-       "label": "p.31~35",
+       "label": "p.58~62",
        "pages": 5
       }
      ],
@@ -331,7 +333,7 @@
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/2.6.pdf",
-       "label": "p.36~38",
+       "label": "p.63~65",
        "pages": 3
       }
      ],
@@ -363,7 +365,7 @@
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/2.7.pdf",
-       "label": "p.39~45",
+       "label": "p.66~72",
        "pages": 7
       }
      ],
@@ -395,7 +397,7 @@
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/2.8.pdf",
-       "label": "p.46~48",
+       "label": "p.73~75",
        "pages": 3
       }
      ],
@@ -427,7 +429,7 @@
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/2.9.pdf",
-       "label": "p.49~51",
+       "label": "p.76~78",
        "pages": 3
       }
      ],
@@ -452,7 +454,7 @@
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/2.10.pdf",
-       "label": "p.52~61",
+       "label": "p.79~88",
        "pages": 10
       }
      ],
@@ -478,7 +480,7 @@
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/3.1.pdf",
-       "label": "p.3~7",
+       "label": "p.90~94",
        "pages": 5
       }
      ],
@@ -496,12 +498,14 @@
      "no": "3.2",
      "ch": "3",
      "title": "상수계수 · 변수계수(고계 오일러-코시) 제차",
-     "dates": [],
+     "dates": [
+      "2026-10-07"
+     ],
      "note": "10/7 예정",
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/3.2.pdf",
-       "label": "p.8~12",
+       "label": "p.95~99",
        "pages": 5
       }
      ],
@@ -519,12 +523,14 @@
      "no": "3.3",
      "ch": "3",
      "title": "고계 비제차 선형 상미분방정식",
-     "dates": [],
+     "dates": [
+      "2026-10-07"
+     ],
      "note": "10/7 예정 · 중간 범위 끝",
      "slides": [
       {
        "href": "notes/lessons/_private/em1/slides/3.3.pdf",
-       "label": "p.13~18",
+       "label": "p.100~105",
        "pages": 6
       }
      ],
