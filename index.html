@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-02.106";
+var BUILD="2026-10-02.107";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,10 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-02.107",d:"10-02",items:[
+    "공부계획 「과제 · 할 일」에 직접 추가(과목 · 할 일 · 마감 · 예상 시간) — LMS 에 없는 일(메일 제출 등)도 오늘 죽어도 · 오늘 무조건에 들어감",
+    "아톰이 받아 적은 할 일도 같은 자리에(atom 안에서만): 정역학 HW Ch.3 손글씨 옮겨 적기 → 메일 첨부·발송, 오늘 23:59 · 약 1시간 30분"
+  ]},
   {v:"2026-10-02.106",d:"10-02",items:[
     "공부계획 하루 흐름: 붙어 있는 수업 사이 틈(30분 이하)은 이동, 학교 일정이 끝나면 귀가 → 바로 저녁 → 휴식 30분 뒤부터 공부 (대표님 10/2 「5시 퇴근하면 집 이동, 밥 먹고 쉬다가 공부」)",
     "수업 끝나는 시각을 과목 · 요일별로 고칠 수 있게 (설정 맨 아래 · CADD 기본 16:00)",
@@ -12008,6 +12012,10 @@ var V33={};
       o.k=V60.key(o); o.est=+(st.est[o.k]||V60.EST[n]||60); o.done=!!st.done[o.k];
       out.push(o);
     }); });
+    /* 직접 넣은 할 일(공부계획 「+ 추가」) · 대표님이 말로 준 할 일(_private/tasks.json, atom 안에서만) */
+    (st.extra||[]).concat(V60.priv||[]).forEach(function(x){ if(!x||!x.t||!x.due) return;
+      var o={c:x.c||"기타",t:x.t,due:x.due,time:x.time||"23:59",st:"",own:1,id:x.id||""};
+      o.k=V60.key(o); o.est=+(st.est[o.k]||x.est||60); o.done=!!st.done[o.k]; out.push(o); });
     return out.sort(function(a,b){ return (a.due+a.time)<(b.due+b.time)?-1:1; });
   };
 
@@ -12150,6 +12158,7 @@ var V33={};
     if(!V60.R) pend.push(V60.loadRoutine());
     if(V60.files==null) pend.push(V60.loadFiles());
     if(ATOM_HOSTED&&!V60._sl) pend.push(V60.loadSleep());
+    if(ATOM_HOSTED&&V60.priv==null) pend.push(fetch("_private/tasks.json",{cache:"no-cache"}).then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; }).then(function(j){ V60.priv=(j&&j.tasks)||[]; }));
     if(pend.length&&!V60._wait){ V60._wait=1; Promise.all(pend).then(function(){ V60._wait=0; if(ui.view==="plan") V60.render(); }); if(!V60.R){ body.innerHTML='<div class="v44-mut" style="padding:16px">…</div>'; return; } }
     var td=today(), mon=addDays(mondayOf(td),7*V60.ui.week);
     if(ATOM_HOSTED&&window.V25&&V25.atomCal&&!V60._cal){ V60._cal=1; V25.atomCal(mon,addDays(mon,6),function(fresh){ V60._cal=0; if(fresh&&ui.view==="plan") V60.render(); }); }
@@ -12210,7 +12219,8 @@ var V33={};
       '<div class="v60-sh">오늘 수면</div><div class="v60-sf">'+(function(){ var sl=V60.sleepOf(td)||{}; return '<label>취침<input class="input" type="time" data-v60sleep="bed" value="'+esc(sl.bed||"")+'"></label><label>기상<input class="input" type="time" data-v60sleep="wake" value="'+esc(sl.wake||"")+'"></label>'; })()+'</div>'+
       '<div class="v60-sh">수업 끝나는 시각</div><div class="v60-sf">'+V60.slotRows()+'</div></details>';
     body.innerHTML='<div class="v60-top">'+die+mustDo+'</div>'+nums+grid+
-      '<div class="card"><div class="card-h"><h3>과제</h3><span class="hs">'+P.asg.filter(function(a){ return a.due>=td&&!a.done; }).length+'</span></div><div class="card-b tight">'+(hwRows||'<div class="empty">남은 과제가 없습니다.</div>')+'</div></div>'+
+      '<div class="card"><div class="card-h"><h3>과제 · 할 일</h3><span class="hs">'+P.asg.filter(function(a){ return a.due>=td&&!a.done; }).length+'</span></div><div class="card-b tight">'+(hwRows||'<div class="empty">남은 과제가 없습니다.</div>')+
+        '<div class="v60-add"><select class="input" id="v60aC">'+V60.MID.concat(["아카데믹글쓰기","창업아이디어탐색","사회봉사","기타"]).map(function(n){ return '<option>'+esc(n)+'</option>'; }).join("")+'</select><input class="input" id="v60aT" placeholder="할 일"><input class="input" type="date" id="v60aD" value="'+td+'"><input class="input" type="time" id="v60aH" value="23:59"><input class="input" type="number" id="v60aM" value="60" min="10" step="10"><button type="button" class="btn a" id="v60aB">추가</button></div></div></div>'+
       '<div class="card"><div class="card-h"><h3>진도</h3></div><div class="card-b tight">'+prog+'</div></div>'+set;
     /* 이벤트 */
     $$("[data-v60done]",body).forEach(function(b){ b.onclick=function(){ var st=V60.st(), k=b.dataset.v60done; if(st.done[k]) delete st.done[k]; else { st.done[k]=Date.now(); toast("과제 완료 — 남은 시간을 다시 배정합니다"); } persist(); V60.render(); }; });
@@ -12218,6 +12228,8 @@ var V33={};
     $$("[data-v60cfg]",body).forEach(function(inp){ inp.onchange=function(){ V60.st().cfg[inp.dataset.v60cfg]=inp.type==="number"?+inp.value:inp.value; persist(); V60.render(); }; });
     $$("[data-v60go]",body).forEach(function(b){ b.onclick=function(){ var q=b.dataset.v60go.split("|"); openStudy(q[0],+q[1],q[2]); }; });
     $$("[data-v60memo]",body).forEach(function(b){ b.onclick=function(){ openNote(V60.CADD_MEMO+"#flip","CADD 암기카드"); }; });
+    var ab=$("#v60aB",body); if(ab) ab.onclick=function(){ var t=($("#v60aT",body).value||"").trim(); if(!t){ toast("할 일을 적어 주세요"); return; } var st=V60.st(); st.extra=st.extra||[];
+      st.extra.push({id:uid(),c:$("#v60aC",body).value,t:t,due:$("#v60aD",body).value||td,time:$("#v60aH",body).value||"23:59",est:+$("#v60aM",body).value||60}); persist(); V60.render(); };
     $$("[data-v60sdone]",body).forEach(function(b){ b.onclick=function(){ var st=V60.st(); st.sdone=st.sdone||{}; st.sdone[b.dataset.v60sdone]=Date.now(); persist(); toast("완료 — 남은 시간을 다시 배정합니다"); V60.render(); }; });
     $$("[data-v60mdone]",body).forEach(function(b){ b.onclick=function(){ var st=V60.st(); st.mdone=st.mdone||{}; st.mdone[b.dataset.v60mdone]=Date.now(); persist(); V60.render(); }; });
     $$("[data-v60sleep]",body).forEach(function(inp){ inp.onchange=function(){ var st=V60.st(); st.sleep=st.sleep||{}; var o=st.sleep[td]||{}; o[inp.dataset.v60sleep]=inp.value; st.sleep[td]=o; persist(); V60.render(); }; });
@@ -12293,6 +12305,8 @@ var V33={};
     ".v60-hw .v60-est{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:var(--ink-2);margin:0 8px;white-space:nowrap}.v60-hw .v60-est input{width:62px;min-height:36px;border:1px solid var(--line);border-radius:8px;padding:0 6px;font:inherit}",
     ".v60-hw.done .t{text-decoration:line-through;color:var(--ink-3)}.v60-warn{color:#C7261B}",
     ".v60-set{margin:4px 0 20px}.v60-set summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}.v60-sf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.v60-sf label{display:flex;flex-direction:column;font-size:12.5px;gap:3px}",
+    ".v60-add{display:grid;grid-template-columns:130px 1fr 140px 110px 80px auto;gap:6px;padding:10px 12px}.v60-add .input{min-height:42px}",
+    "@media (max-width:760px){.v60-add{grid-template-columns:1fr 1fr}.v60-add #v60aT{grid-column:1/-1}}",
     ".v60-sh{font-weight:800;font-size:13px;margin:12px 0 6px}.v60-ok{border-color:var(--ok,#15803D)!important;color:var(--ok,#15803D)!important}",
     ".v60-callist{margin-top:12px;display:flex;flex-direction:column;gap:6px}",
     ".v60-cev{background:#1E5FA8!important;color:#fff!important}.v60-cev.hot{background:#C7261B!important}",
