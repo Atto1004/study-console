@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CADD · 중간고사 암기</title>
+<!-- CADD 중간고사 암기 (대표님 2026-10-02 「캐드는 암기만 하면 되니까 암기카드 게임 + 원페이퍼 암기노트」).
+     출처: LMS 영상 3주차 투상도법 · 5주차 치수기입법 전사, 강의자료 1~4주차 슬라이드. 「표준」 표시 = 수업 영상을 못 받은 2주차(선과 문자) 자리를 KS 제도 통칙으로 채운 것.
+     카드 상태 localStorage mc-memo-cadd = {id: 상자 0~4}. 화면에 설명 문장 금지(지침 §24). -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{--ink:#1F2A44;--ink-2:#55627A;--ink-3:#6B7689;--line:rgba(31,42,68,.14);--ok:#15803D;--bad:#C2410C;--ac:#7C3AED;--ac-s:rgba(124,58,237,.09);
+  --f:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+*{box-sizing:border-box}
+html{background:linear-gradient(160deg,#F1EEF8 0%,#F2F5F0 55%,#EDF1F6 100%) fixed}
+body{margin:0;font-family:var(--f);font-size:16px;line-height:1.6;color:var(--ink);word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased}
+#top{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-bottom:1px solid rgba(31,42,68,.08)}
+#top .in{max-width:980px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#top .ttl{font-weight:800;font-size:17px;margin-right:auto}
+.seg{display:inline-flex;background:rgba(31,42,68,.06);border-radius:12px;padding:3px}
+.seg button{border:0;background:transparent;font:inherit;font-weight:700;font-size:14px;color:var(--ink-2);padding:0 14px;min-height:40px;border-radius:9px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--ac);box-shadow:0 1px 3px rgba(31,42,68,.12)}
+main{max-width:980px;margin:0 auto;padding:16px}
+.gap{font-size:13px;color:var(--ink-3);margin:0 0 12px}
+/* ---- 원페이퍼 ---- */
+#sheet{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.box{background:rgba(255,255,255,.86);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.box h2{font-size:15px;margin:0 0 8px;display:flex;align-items:center;gap:6px}
+.box h2 i{font-style:normal;font-size:11px;font-weight:800;padding:1px 7px;border-radius:6px;background:var(--ac-s);color:var(--ac)}
+.box h2 i.std{background:rgba(180,83,9,.1);color:#B45309}
+.box table{width:100%;border-collapse:collapse;font-size:13.5px}
+.box td{padding:4px 6px;border-bottom:1px solid rgba(31,42,68,.07);vertical-align:top}
+.box td:first-child{font-weight:800;white-space:nowrap;color:var(--ac);width:1%}
+.box ul{margin:0;padding-left:18px;font-size:13.5px}.box li{margin:2px 0}
+.box .x{display:inline-block;font-size:11px;font-weight:800;color:#fff;background:#C2410C;border-radius:5px;padding:0 6px;margin-left:4px;vertical-align:1px}
+.wide{grid-column:1/-1}
+.hide-a .box td:last-child,.hide-a .box .a{filter:blur(5px);cursor:pointer;transition:filter .15s}
+.hide-a .box td.shown,.hide-a .box .a.shown{filter:none}
+.tools{display:flex;gap:8px;margin:0 0 12px;flex-wrap:wrap}
+.btn{border:1.5px solid var(--line);background:#fff;font:inherit;font-weight:700;font-size:14px;color:var(--ink);padding:0 16px;min-height:44px;border-radius:12px;cursor:pointer}
+.btn.a{background:var(--ac);border-color:var(--ac);color:#fff}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}.btn.bad{background:#fff;border-color:var(--bad);color:var(--bad)}
+/* ---- 카드 게임 ---- */
+#game{max-width:620px;margin:0 auto}
+.hud{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.bar{flex:1 1 200px;height:10px;border-radius:99px;background:rgba(31,42,68,.08);overflow:hidden}.bar i{display:block;height:100%;background:var(--ac);transition:width .25s}
+.hud b{font-variant-numeric:tabular-nums}
+.combo{font-weight:800;color:#B45309}
+.card{position:relative;min-height:260px;perspective:1200px;cursor:pointer;margin-bottom:12px}
+.card .in{position:absolute;inset:0;transition:transform .35s;transform-style:preserve-3d}
+.card.flip .in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:20px;background:#fff;border:1px solid var(--line);box-shadow:0 8px 24px rgba(31,42,68,.08);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:22px}
+.face.b{transform:rotateY(180deg);background:#FBF9FF}
+.face .tag{position:absolute;top:12px;left:14px;font-size:12px;font-weight:800;color:var(--ac);background:var(--ac-s);padding:2px 8px;border-radius:7px}
+.face .tag.std{color:#B45309;background:rgba(180,83,9,.1)}
+.face .q{font-size:21px;font-weight:800;line-height:1.45}
+.face .ans{font-size:19px;font-weight:700;line-height:1.5}
+.face .sub{font-size:13px;color:var(--ink-3);margin-top:8px}
+.face .lv{position:absolute;top:12px;right:14px;font-size:12px;color:var(--ink-3)}
+.row{display:flex;gap:10px}.row .btn{flex:1;min-height:52px;font-size:16px}
+.opts{display:grid;gap:8px;margin-bottom:12px}
+.opt{border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:12px 14px;text-align:left;font:inherit;font-size:15.5px;font-weight:600;color:var(--ink);cursor:pointer;min-height:52px}
+.opt.ok{border-color:var(--ok);background:rgba(21,128,61,.08)}.opt.bad{border-color:var(--bad);background:rgba(194,65,12,.07)}
+.end{text-align:center;padding:30px 10px}.end .big{font-size:40px;font-weight:800;color:var(--ac)}
+.boxes{display:flex;gap:6px;justify-content:center;margin:10px 0 16px}.boxes span{min-width:56px;padding:6px 8px;border-radius:10px;background:#fff;border:1px solid var(--line);font-size:12px}.boxes b{display:block;font-size:18px}
+@media (max-width:700px){#sheet{grid-template-columns:1fr}.face .q{font-size:19px}main{padding:12px}}
+@media print{#top,.tools,.gap{display:none}html{background:#fff}main{max-width:none;padding:0}#sheet{gap:6px}.box{padding:6px 8px;border-radius:6px;break-inside:avoid}.box table,.box ul{font-size:10.5px}.box h2{font-size:12px;margin-bottom:3px}.box td{padding:2px 4px}}
+</style>
+</head>
+<body>
+<div id="top"><div class="in"><span class="ttl">CADD · 중간고사 암기</span>
+  <div class="seg" id="mode"><button data-m="sheet" aria-pressed="true">원페이퍼</button><button data-m="flip" aria-pressed="false">카드</button><button data-m="quiz" aria-pressed="false">4지선다</button></div>
+</div></div>
+<main>
+  <section id="vSheet">
+    <p class="gap">빠진 회차: 2주차 영상 「서론 및 선과 문자」 · 4주차 영상 「형상의 표시」 — 받으면 추가. 「표준」 = KS 제도 통칙.</p>
+    <div class="tools"><button class="btn" id="hideA">답 가리기</button><button class="btn" onclick="window.print()">인쇄</button></div>
+    <div id="sheet"></div>
+  </section>
+  <section id="vGame" hidden><div id="game"></div></section>
+</main>
+<script>
+/* g: 묶음 · q: 앞면 · a: 뒷면 · s: 출처(없으면 묶음 출처) · ex: 시험 직접 언급 · std: 표준(수업 영상 아님) */
+var CARDS=[
+ /* ---------- 투상도법 (3주차 영상) ---------- */
+ {g:"투상",q:"투상법",a:"물체에 광선을 비춰 한 평면에 맺히는 형상·크기·위치를 일정한 법칙으로 표시하는 도법"},
+ {g:"투상",q:"투상면",a:"대상물의 형태를 투영하는 평면"},
+ {g:"투상",q:"시점",a:"눈의 위치"},
+ {g:"투상",q:"투사선",a:"시점과 대상물을 잇는 선"},
+ {g:"투상",q:"투상도",a:"투상면에 그려진 그림 전체"},
+ {g:"투상",q:"앞에서 본 그림 (가장 주된 면)",a:"정면도 · front view"},
+ {g:"투상",q:"위에서 본 그림",a:"평면도(상면도) · top view"},
+ {g:"투상",q:"오른쪽에서 본 그림",a:"우측면도 · right side view"},
+ {g:"투상",q:"왼쪽에서 본 그림",a:"좌측면도 · left side view"},
+ {g:"투상",q:"아래에서 본 그림",a:"저면도 · bottom view"},
+ {g:"투상",q:"뒤에서 본 그림",a:"배면도 · rear view"},
+ {g:"투상",q:"반대쪽에서 보면 앞에서 외형선이던 모서리는?",a:"숨은선(파선)으로"},
+ {g:"투상",q:"E = 저면도, F = 배면도로 지정됐다. 그 반대쪽 면 A는?",a:"정면도 (B = 평면도, C·D = 좌·우측면도)",ex:1},
+ {g:"투상",q:"정투상법",a:"투사선이 서로 평행하게, 투상면에 수직으로 닿는 투상 → 실제 형상·크기 그대로"},
+ {g:"투상",q:"완전한 표현에 필요한 투상도 수",a:"두 개 이상"},
+ {g:"투상",q:"제1각법 · 제3각법은 물체를 어디에 두나",a:"제1상한 · 제3상한"},
+ {g:"투상",q:"한국(KS)·미국·캐나다의 각법",a:"제3각법"},
+ {g:"투상",q:"독일의 각법",a:"제1각법"},
+ {g:"투상",q:"제3각법 배치",a:"평면도는 정면도 위, 우측면도는 정면도 오른쪽"},
+ {g:"투상",q:"제1각법 배치",a:"평면도는 정면도 아래, 우측면도는 정면도 왼쪽",std:1},
+ {g:"투상",q:"도면에 꼭 밝힐 것 (배치가 달라지므로)",a:"어느 각법인지"},
+ {g:"투상",q:"축측투상 세 가지",a:"등각 · 이등각 · 부등각"},
+ {g:"투상",q:"사투상",a:"정면은 실제 모양, 평면·측면은 한쪽으로 경사지게 붙여 입체감"},
+ {g:"투상",q:"주투상도",a:"모양·기능을 가장 명확하게 보여주는 면"},
+ {g:"투상",q:"보조투상도",a:"경사면을 실제 모양으로 · 생략한 부분은 파단선"},
+ {g:"투상",q:"국부투상도",a:"구멍·홈처럼 한 부분만 · 주투상도와 중심선·기준선·치수보조선으로 연결"},
+ {g:"투상",q:"단면에서 잘린 부분 표시",a:"해칭(빗금)"},
+ {g:"투상",q:"꺾인 절단선의 꺾이는 부분",a:"굵은 선"},
+ {g:"투상",q:"가상선 도시를 쓰는 때",a:"인접 부분 · 가공 전후 형상 · 회전 · 공구 위치 · 반복 형상"},
+ /* ---------- 치수기입법 (5주차 영상) ---------- */
+ {g:"치수",q:"φ",a:"지름 (치수 앞)"},
+ {g:"치수",q:"R",a:"반지름 (치수 앞)"},
+ {g:"치수",q:"Sφ",a:"구의 지름"},
+ {g:"치수",q:"SR",a:"구의 반지름"},
+ {g:"치수",q:"□ (치수 앞)",a:"정사각형의 변"},
+ {g:"치수",q:"t",a:"판의 두께 (t= 로 씀)"},
+ {g:"치수",q:"⌒ (치수 위)",a:"원호의 길이"},
+ {g:"치수",q:"C",a:"45° 모따기"},
+ {g:"치수",q:"치수를 직사각형 틀로 감쌈",a:"이론적으로 정확한 치수"},
+ {g:"치수",q:"( ) 로 감싼 치수",a:"참고 치수"},
+ {g:"치수",q:"치수 아래 밑줄",a:"비례치수가 아님 (척도대로 그리지 않은 치수)"},
+ {g:"치수",q:"외형선 → 첫 번째 치수선 간격",a:"8~12 mm"},
+ {g:"치수",q:"치수선 ↔ 치수선 간격",a:"10 mm 정도, 일정하게"},
+ {g:"치수",q:"치수 보조선은 원칙적으로 어디에",a:"형상 밖"},
+ {g:"치수",q:"형상 안에 치수를 넣어도 되는 경우",a:"밖으로 빼면 더 복잡할 때 · 안이 더 명료할 때 · 외형선을 치수 보조선으로 쓸 수 있을 때"},
+ {g:"치수",q:"치수 숫자의 위치",a:"치수선 중앙에서 약간 띄워"},
+ {g:"치수",q:"수평 치수선의 숫자",a:"위쪽을 향해 읽히게 (선 위)"},
+ {g:"치수",q:"수직 치수선의 숫자",a:"왼쪽을 향해 읽히게 (선 왼쪽)"},
+ {g:"치수",q:"좁아서 숫자가 안 들어갈 때",a:"치수선을 바깥으로 연장하거나 지시선으로 빼서"},
+ {g:"치수",q:"치수를 모아 넣을 투상도",a:"정면도(주투상도) — 없는 것만 평면도·측면도에"},
+ {g:"치수",q:"특별한 언급이 없으면 치수는",a:"다듬질 치수(완성 치수)"},
+ {g:"치수",q:"중복 치수",a:"피한다 — 한 면에 치수 하나",ex:1},
+ {g:"치수",q:"다른 치수로 계산되는 치수(예: 각도)",a:"적지 않는다 — 계산할 필요 없게 기입",ex:1},
+ {g:"치수",q:"관련 치수는",a:"한 곳에 모아서"},
+ {g:"치수",q:"공정이 여러 개면",a:"공정마다 배열을 분리"},
+ {g:"치수",q:"누진 치수",a:"한 기준에서 차례로 이어 적는다 (기준이 가운데면 양방향)"},
+ {g:"치수",q:"좌표 치수",a:"원점 기준 x, y 좌표를 표로 — 구멍이 많거나 반복 형상"},
+ {g:"치수",q:"형상 치수 / 위치 치수",a:"부품 자체의 크기 / 기준에 대한 위치"},
+ {g:"치수",q:"PCD",a:"피치원 지름 (등간격 구멍이 놓인 원)"},
+ {g:"치수",q:"4-φ20",a:"지름 20 mm 구멍 4개"},
+ {g:"치수",q:"C2",a:"45° 모따기, 길이 2 mm"},
+ {g:"치수",q:"반지름 치수선을 원호 중심으로 그을 때",a:"R 생략 가능"},
+ {g:"치수",q:"반지름이 아주 클 때",a:"치수선을 꺾어서"},
+ {g:"치수",q:"대칭 도형을 반쪽만 그렸을 때 지름 치수선",a:"중심을 넘어 적당히 연장"},
+ {g:"치수",q:"구멍 치수에 같이 적을 것",a:"지름 · 깊이 · 관통 여부 · 가공 방법"},
+ {g:"치수",q:"테이퍼",a:"원통에서 축 방향으로 지름이 줄어드는 형태"},
+ {g:"치수",q:"설계 변경으로 치수를 고칠 때",a:"원래 숫자를 지우지 않고 고쳐 적고, 변경 기호·일자·사유"},
+ /* ---------- 선 (2주차 영상 못 받음 → 표준) ---------- */
+ {g:"선",q:"외형선",a:"굵은 실선",std:1},
+ {g:"선",q:"숨은선",a:"파선",std:1},
+ {g:"선",q:"중심선",a:"가는 1점 쇄선",std:1},
+ {g:"선",q:"가상선",a:"가는 2점 쇄선",std:1},
+ {g:"선",q:"치수선 · 치수 보조선 · 지시선",a:"가는 실선",std:1},
+ {g:"선",q:"해칭선",a:"가는 실선 (빗금)",std:1},
+ {g:"선",q:"파단선",a:"가는 자유 실선 (지그재그)",std:1},
+ {g:"선",q:"절단선",a:"가는 1점 쇄선 + 끝·꺾이는 부분은 굵게",std:1},
+ /* ---------- CATIA (1~4주차 슬라이드 · 5주차 영상) ---------- */
+ {g:"CATIA",q:"Part Design 시작 경로",a:"Start → Mechanical Design → Part Design"},
+ {g:"CATIA",q:"언어 바꾸기",a:"Tools → Options → General → User Interface Language"},
+ {g:"CATIA",q:"단축키 지정 위치",a:"Tools → Customize → Commands → All Commands → Accelerator"},
+ {g:"CATIA",q:"Ctrl + W (수업 권장)",a:"평면 선택 후 Sketcher 시작"},
+ {g:"CATIA",q:"Space (수업 권장)",a:"간단한 구속 (길이·각도)"},
+ {g:"CATIA",q:"Ctrl + Space (수업 권장)",a:"Constraint Definition 창"},
+ {g:"CATIA",q:"Ctrl + U (수업 권장)",a:"Update"},
+ {g:"CATIA",q:"트리가 사라졌다 (가장 흔함)",a:"F3 을 한 번 더"},
+ {g:"CATIA",q:"트리가 작업창 밖에 있다",a:"Shift + F2 → 창 안 트리 왼쪽 위 더블 클릭"},
+ {g:"CATIA",q:"2D 스케치 툴바 6개",a:"Profile · Constraints · Operation · Sketch tools · User Selection Filter · View"},
+ {g:"CATIA",q:"3D 모델링 툴바 6개",a:"Sketch-Based · Dress-Up · Transformation · Reference Elements · Measures · Apply Material"},
+ {g:"CATIA",q:"Corner (Operation)",a:"두 요소의 모서리를 둥글게"},
+ {g:"CATIA",q:"Chamfer (Operation)",a:"두 요소의 모서리를 직선으로 깎기"},
+ {g:"CATIA",q:"Trim All Elements",a:"선택한 두 요소의 남는 부분을 모두 잘라 냄"},
+ {g:"CATIA",q:"Pad",a:"스케치를 밀어 올려 입체"},
+ {g:"CATIA",q:"Pocket",a:"스케치 모양으로 파냄"},
+ {g:"CATIA",q:"Shaft",a:"단면을 축으로 돌려 입체 (열린 윤곽은 축으로 닫혀야)"},
+ {g:"CATIA",q:"Groove",a:"돌려서 파냄 (Shaft 의 반대)"},
+ {g:"CATIA",q:"Hole",a:"스케치 없이 구멍 · Thread · Drafting 옵션"},
+ {g:"CATIA",q:"Rib",a:"윤곽을 중심 곡선 따라 쓸어 입체"},
+ {g:"CATIA",q:"Slot",a:"윤곽을 중심 곡선 따라 쓸어 파냄"},
+ {g:"CATIA",q:"Stiffener",a:"보강 리브 (윤곽 · 두께)"},
+ {g:"CATIA",q:"Pad 길이 종류",a:"Dimension · Up to last · Up to next · Up to plane · Up to surface"},
+ {g:"CATIA",q:"Mirrored extent",a:"양쪽으로 같은 길이"},
+ {g:"CATIA",q:"Edge Fillet",a:"모서리 둥글리기 — 반지름"},
+ {g:"CATIA",q:"Chamfer (Dress-Up)",a:"모서리 모따기 — 길이 · 각도"},
+ {g:"CATIA",q:"Transformation Features",a:"Translation · Rotation · Symmetry · Mirror · Pattern"},
+ {g:"CATIA",q:"Hole 만드는 순서",a:"면 선택 → Hole 아이콘 → 크기·깊이 → 트리에 Hole 확인"},
+ {g:"CATIA",q:"Groove 만드는 순서",a:"원통에서 스케치 면 정하고 축(axis) 잡기 → 단면 스케치 → Groove Definition"}
+];
+var SRC={"투상":"3주차 영상 · 투상도법","치수":"5주차 영상 · 치수기입법","선":"표준 · KS 제도 통칙","CATIA":"1~4주차 슬라이드 · 5주차 영상"};
+CARDS.forEach(function(c,i){ c.id="c"+i; });
+var KEY="mc-memo-cadd", ST={}; try{ ST=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ ST={}; }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(ST)); }catch(e){} }
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function $(s){ return document.querySelector(s); }
+
+/* ---------- 원페이퍼 ---------- */
+function sheet(){
+  var groups=["투상","치수","선","CATIA"], h="";
+  groups.forEach(function(g){
+    var cs=CARDS.filter(function(c){ return c.g===g; });
+    h+='<div class="box'+(g==="치수"||g==="투상"?" wide":"")+'"><h2>'+esc(g==="투상"?"투상도법":g==="치수"?"치수기입법":g==="선"?"선의 종류":"CATIA")+'<i'+(g==="선"?' class="std"':'')+'>'+esc(SRC[g])+'</i></h2><table>'+
+      cs.map(function(c){ return '<tr><td>'+esc(c.q)+(c.ex?'<span class="x">시험</span>':'')+'</td><td>'+esc(c.a)+'</td></tr>'; }).join("")+'</table></div>';
+  });
+  $("#sheet").innerHTML=h;
+  [].forEach.call(document.querySelectorAll("#sheet td:last-child"),function(td){ td.onclick=function(){ td.classList.toggle("shown"); }; });
+}
+$("#hideA").onclick=function(){ var on=document.body.classList.toggle("hide-a"); this.textContent=on?"답 보이기":"답 가리기"; };
+
+/* ---------- 게임 ---------- */
+var G=null;
+function lv(c){ return ST[c.id]||0; }
+function deck(n){
+  var a=CARDS.slice().sort(function(x,y){ return (lv(x)-lv(y))||(Math.random()-.5); });
+  return a.slice(0,n);
+}
+function newGame(kind){ G={kind:kind,list:deck(20),i:0,ok:0,combo:0,best:0,flipped:false,answered:false}; draw(); }
+function hud(){
+  var n=G.list.length, p=Math.round(G.i/n*100);
+  return '<div class="hud"><b>'+(G.i+1>n?n:G.i+1)+' / '+n+'</b><div class="bar"><i style="width:'+p+'%"></i></div><span>정답 <b>'+G.ok+'</b></span>'+(G.combo>=3?'<span class="combo">'+G.combo+'연속</span>':'')+'</div>';
+}
+function mastered(){ return CARDS.filter(function(c){ return lv(c)>=3; }).length; }
+function endHTML(){
+  var b=[0,0,0,0,0]; CARDS.forEach(function(c){ b[Math.min(4,lv(c))]++; });
+  return '<div class="end"><div class="big">'+G.ok+' / '+G.list.length+'</div><div>최고 '+G.best+'연속 · 외운 카드 '+mastered()+' / '+CARDS.length+'</div>'+
+    '<div class="boxes">'+b.map(function(x,i){ return '<span><b>'+x+'</b>'+["새로","1단","2단","3단","완료"][i]+'</span>'; }).join("")+'</div>'+
+    '<div class="row"><button class="btn a" id="again">한 판 더</button></div></div>';
+}
+function mark(c,good){
+  if(good){ G.ok++; G.combo++; G.best=Math.max(G.best,G.combo); ST[c.id]=Math.min(4,lv(c)+1); }
+  else { G.combo=0; ST[c.id]=0; G.list.push(c); }
+  save();
+}
+function draw(){
+  var g=$("#game");
+  if(G.i>=G.list.length){ g.innerHTML=endHTML(); $("#again").onclick=function(){ newGame(G.kind); }; return; }
+  var c=G.list[G.i], tag='<span class="tag'+(c.std?' std':'')+'">'+esc(c.g)+(c.std?' · 표준':'')+(c.ex?' · 시험':'')+'</span>', lvl='<span class="lv">'+["새로","1단","2단","3단","완료"][Math.min(4,lv(c))]+'</span>';
+  if(G.kind==="flip"){
+    g.innerHTML=hud()+'<div class="card'+(G.flipped?' flip':'')+'" id="cd"><div class="in"><div class="face">'+tag+lvl+'<div class="q">'+esc(c.q)+'</div></div><div class="face b">'+tag+'<div class="ans">'+esc(c.a)+'</div><div class="sub">'+esc(c.q)+'</div></div></div></div>'+
+      (G.flipped?'<div class="row"><button class="btn bad" id="no">몰랐다</button><button class="btn ok" id="yes">알았다</button></div>':'<div class="row"><button class="btn a" id="fl">뒤집기</button></div>');
+    $("#cd").onclick=function(){ if(!G.flipped){ G.flipped=true; draw(); } };
+    if(G.flipped){ $("#yes").onclick=function(){ mark(c,true); G.i++; G.flipped=false; draw(); }; $("#no").onclick=function(){ mark(c,false); G.i++; G.flipped=false; draw(); }; }
+    else $("#fl").onclick=function(){ G.flipped=true; draw(); };
+  } else {
+    if(!c._opts){ var pool=CARDS.filter(function(x){ return x.g===c.g&&x.a!==c.a; }).sort(function(){ return Math.random()-.5; }).slice(0,3).map(function(x){ return x.a; });
+      c._opts=pool.concat([c.a]).sort(function(){ return Math.random()-.5; }); }
+    g.innerHTML=hud()+'<div class="card" style="min-height:150px;cursor:default"><div class="face" style="position:relative;min-height:150px">'+tag+lvl+'<div class="q">'+esc(c.q)+'</div></div></div>'+
+      '<div class="opts">'+c._opts.map(function(o,i){ return '<button class="opt" data-i="'+i+'">'+esc(o)+'</button>'; }).join("")+'</div>'+
+      (G.answered?'<div class="row"><button class="btn a" id="nx">다음</button></div>':'');
+    [].forEach.call(document.querySelectorAll(".opt"),function(b){ b.onclick=function(){
+      if(G.answered) return; G.answered=true; var pick=c._opts[+b.dataset.i], good=pick===c.a;
+      mark(c,good);
+      [].forEach.call(document.querySelectorAll(".opt"),function(x){ var t=c._opts[+x.dataset.i]; if(t===c.a) x.classList.add("ok"); else if(x===b) x.classList.add("bad"); });
+      var r=document.createElement("div"); r.className="row"; r.innerHTML='<button class="btn a" id="nx">다음</button>'; $("#game").appendChild(r);
+      $("#nx").onclick=function(){ c._opts=null; G.i++; G.answered=false; draw(); };
+    }; });
+    if(G.answered) $("#nx").onclick=function(){ c._opts=null; G.i++; G.answered=false; draw(); };
+  }
+}
+function setMode(m){
+  [].forEach.call(document.querySelectorAll("#mode button"),function(b){ b.setAttribute("aria-pressed",b.dataset.m===m?"true":"false"); });
+  $("#vSheet").hidden=m!=="sheet"; $("#vGame").hidden=m==="sheet";
+  if(m!=="sheet") newGame(m);
+  try{ history.replaceState(null,"","#"+m); }catch(e){}
+}
+[].forEach.call(document.querySelectorAll("#mode button"),function(b){ b.onclick=function(){ setMode(b.dataset.m); }; });
+sheet();
+var h0=(location.hash||"").slice(1); setMode(h0==="flip"||h0==="quiz"?h0:"sheet");
+</script>
+</body>
+</html>

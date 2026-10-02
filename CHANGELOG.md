@@ -4,6 +4,12 @@
 
 ## 2026-10-01
 
+### .102 — 공부계획(얼라이브위크형) · 시험 모드 · 할 일 · 달력 · CADD 암기
+- 대표님 10/2 두 번째 요청. V60 LAYER(`docs/layers/v60-layer-src.js`, `docs/tools/_v60_splice.py`). V59 공부계획 화면을 V60.render 로 바꿔 끼움.
+- 고정 일정: 앱 시간표(CADD 는 16시 종료로 — routine typical_end) + atom `/api/routine` 근무 루틴(밖이면 `knowledge/routine-week.json`, gitignore) + atom 캘린더(gcalOn, 공부·준비·이동 제목 제외) + 활동 블록. 수면은 취침 01:00 · 7시간 기본, 첫 일정 − 이동 − 준비 60분이 더 이르면 그 시각에 기상(수면 부족 표시). 점심 12:00 · 저녁 18:30 은 겹치면 앞뒤로 옮김.
+- 제출 파일: `_private/submit.json` + `_private/submit/`(gitignore) — atom `/study/` 에서만 링크가 열린다. 과제 풀이를 마감 전 공개 저장소에 올리지 않는 규칙 때문.
+- 상태 저장: `S.v60 = {est, done, cfg}`.
+
 ### .101 — 공부계획 탭 · 학습 큐 5개 · 플레이어 카드 정리 · 공수1 절 칩 · 출결 보정
 - 대표님 10/2 다섯 가지. V59 LAYER(`docs/layers/v59-layer-src.js`, `docs/tools/_v59_splice.py`).
 - 공부계획 탭: 시험까지 · 이번 주(월~일 7칸, 폰은 지난 날 숨김) · 2주 안 마감. 밀린 회차 = 수업 따라가기(V50) todo, 마감 = knowledge/materials.json assignments(제출 제외).

@@ -33,3 +33,8 @@ notes/lessons/_private/
 
 _shot_lm.html
 _shot_cr_m.html
+
+# 제출 파일 · 제출 매핑 — atom /study/ 로컬 서빙에서만 (대표님 2026-10-02)
+/_private/
+# 근무 루틴(개인 일정) — atom /study/ 로컬 서빙에서만
+knowledge/routine-week.json
