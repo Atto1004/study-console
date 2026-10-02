@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>알짜힘 없이 돌리기 — 우력, 등가계, 그리고 렌치</title>
+<!-- 수업 노트 템플릿 v1 (대표님 2026-09-26 결정: 개념은 스크롤 교재 · 문제는 카드 · 아톰 SVG 그림 · 판서 사진은 atom 안에서만 · 원리 먼저 15~20분)
+     build_lesson.py 가 BODY·QUIZ·META 자리를 채운다(자리표시 글자를 이 주석에 쓰면 본문이 주석에 한 번 더 들어가니 금지). 저장: localStorage mc-lesson-<id> (읽은 섹션·문제 결과), mc-slides-last* (앱 「이어서 학습하기」). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<style>
+:root{--ink:#1F2A44;--ink-2:#55627A;--ink-3:#7C889B;--line:rgba(31,42,68,.14);--paper:rgba(255,255,255,.72);--paper-2:rgba(255,255,255,.5);--accent:#15803D;
+  --red:#E03131;--blue:#1971C2;--green:#2F9E44;--pink:#D0397A;--yel:#F59F00;--f:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --fs:18px;--lh:1.72;--r:18px}
+*{box-sizing:border-box}
+html{background:linear-gradient(160deg,#E9F0F5 0%,#F2F5F0 48%,#EDF2EE 100%) fixed}
+body{margin:0;font-family:var(--f);font-size:var(--fs);line-height:var(--lh);color:var(--ink);word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;pointer-events:none;filter:blur(60px)}
+body::before{width:52vw;height:52vw;max-width:640px;max-height:640px;left:-14vw;top:-18vh;background:radial-gradient(circle at 40% 40%,rgba(74,222,128,.30),transparent 68%)}
+body::after{width:60vw;height:60vw;max-width:760px;max-height:760px;right:-20vw;bottom:-24vh;background:radial-gradient(circle at 50% 50%,rgba(96,165,250,.28),transparent 66%)}
+/* 상단 고정: 과목 · 회차 · 진행 */
+#top{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.66);-webkit-backdrop-filter:blur(20px) saturate(140%);backdrop-filter:blur(20px) saturate(140%);border-bottom:1px solid rgba(255,255,255,.8)}
+#top .in{max-width:820px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--ink-2)}
+#top b{color:var(--ink);font-weight:700}
+#top .sp{flex:1}
+#bar{height:5px;background:rgba(31,42,68,.10)}
+#bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+#top .pct{font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
+/* 본문 */
+main{max-width:820px;margin:0 auto;padding:22px 20px 120px}
+header.h{padding:8px 0 18px}
+header.h .kicker{font-size:13.5px;color:var(--ink-3);font-weight:600;letter-spacing:.02em}
+header.h h1{font-size:30px;line-height:1.25;margin:6px 0 10px;letter-spacing:-.02em}
+header.h .meta{font-size:14px;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:6px 14px}
+header.h .lead{margin-top:14px;padding:14px 18px;border-radius:14px;background:var(--paper);border:1px solid rgba(255,255,255,.8);font-size:17px}
+section.s{margin:26px 0 0;padding:22px 22px 18px;border-radius:var(--r);background:var(--paper);border:1px solid rgba(255,255,255,.85);box-shadow:0 8px 26px rgba(20,40,60,.07),inset 0 1px 0 rgba(255,255,255,.8);scroll-margin-top:70px;position:relative}
+section.s .no{font-size:12.5px;color:var(--ink-3);font-weight:700;letter-spacing:.04em}
+section.s h2{font-size:23px;line-height:1.3;margin:2px 0 12px;letter-spacing:-.02em}
+section.s h3{font-size:18px;margin:18px 0 6px}
+section.s p{margin:0 0 10px}
+section.s.read::after{content:"읽음";position:absolute;right:16px;top:14px;font-size:12px;color:var(--accent);font-weight:700;border:1px solid rgba(21,128,61,.35);border-radius:999px;padding:1px 9px;background:rgba(21,128,61,.06)}
+/* 상자들 */
+.why,.say,.analogy,.formula,.pitfall,.memo{margin:12px 0;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:var(--paper-2);font-size:17px}
+/* 암기·이해 구분(대표님 2026-09-29): 상자 머리말 = 알약. 암기(주황) = 공식·외울 것, 이해(파랑) = 왜·비유 */
+.why::before,.analogy::before,.formula::before,.pitfall::before,.say::before,.memo.am::before{display:table;font-size:12px;font-weight:800;line-height:1;padding:5px 10px;border-radius:999px;margin:0 0 8px;color:#fff;letter-spacing:.02em}
+.why{border-left:5px solid var(--blue)}.why::before{content:"이해 · 왜";background:#1D4ED8}
+.say{border-left:5px solid var(--pink);background:rgba(255,77,141,.06)}.say::before{content:"교수님 말";background:#A61E4D}
+.analogy{border-left:5px solid var(--yel);background:rgba(245,159,0,.07)}.analogy{border-left-color:var(--blue)}.analogy::before{content:"이해 · 비유";background:#1D4ED8}
+.formula{border-left:5px solid var(--green);background:rgba(47,158,68,.06)}.formula{border-left-color:#D97706;background:rgba(217,119,6,.06)}.formula::before{content:"암기 · 공식";background:#B45309}
+.pitfall{border-left:5px solid var(--red);background:rgba(224,49,49,.05)}.pitfall::before{content:"함정";background:#C92A2A}
+.memo{border-left:5px solid var(--ink-3)}
+.memo.am{border-left-color:#D97706;background:rgba(217,119,6,.06)}.memo.am::before{content:"암기";background:#B45309}
+/* 인라인 식은 줄에서 끊지 않는다(대표님 2026-09-29 「수식 한 줄로」) — 넘치면 fitInline 이 줄인다 */
+.katex{white-space:nowrap}
+#top a.memo-l{color:var(--ink);font-weight:700;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:rgba(255,255,255,.6);min-height:32px;display:inline-flex;align-items:center}
+.katex-display{margin:10px 0;overflow-x:auto;overflow-y:hidden}
+/* 그림 */
+figure.fig{margin:14px auto;text-align:center;max-width:560px}
+figure.fig svg{max-width:100%;height:auto}
+figure.fig figcaption{font-size:13.5px;color:var(--ink-2);margin-top:6px;text-align:center}
+figure.board{margin:14px 0;text-align:center}
+figure.board img{max-width:100%;max-height:440px;object-fit:contain;border-radius:12px;border:1px solid var(--line);background:#111}
+figure.board figcaption{font-size:13px;color:var(--ink-3);margin-top:4px}
+figure.board[hidden]{display:none}
+/* 예제 */
+details.ex{margin:12px 0;border:1px solid var(--line);border-radius:12px;background:var(--paper-2);padding:0}
+details.ex summary{cursor:pointer;padding:12px 16px;font-weight:700;list-style:none;display:block;line-height:1.6}
+details.ex summary::before{content:"예제";display:inline-block;vertical-align:middle;margin-right:10px;font-size:12px;line-height:1.5;color:#fff;background:var(--ink);border-radius:6px;padding:2px 7px}
+details.ex summary::-webkit-details-marker{display:none}
+details.ex .body{padding:0 16px 14px;border-top:1px solid var(--line)}
+details.ex .body p{margin:8px 0}
+/* 문제 카드 */
+#quiz{margin-top:30px}
+#quiz h2{font-size:22px;margin:0 0 6px}
+#quiz .hint{font-size:14px;color:var(--ink-2);margin-bottom:12px}
+.q{margin:12px 0;padding:18px 20px;border-radius:var(--r);background:var(--paper);border:1px solid rgba(255,255,255,.85);box-shadow:0 8px 26px rgba(20,40,60,.07)}
+.q .qn{font-size:13px;font-weight:700;color:var(--ink-3);margin-bottom:4px}
+.q .qb{font-size:17.5px;margin-bottom:10px}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;list-style:none;padding:0;margin:0}
+@media(max-width:640px){.choices{grid-template-columns:1fr}}
+.choice{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.6);cursor:pointer;font:inherit;font-size:16.5px;text-align:left;color:var(--ink);min-height:48px;box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+.choice .cn{flex:0 0 26px;height:26px;border-radius:50%;border:1px solid var(--ink-3);display:flex;align-items:center;justify-content:center;font-size:13px}
+.choice[disabled]{cursor:default}
+.choice.ok{border-color:var(--green);background:rgba(47,158,68,.10)}.choice.ok .cn{background:var(--green);border-color:var(--green);color:#fff}
+.choice.bad{border-color:var(--red);background:rgba(224,49,49,.08)}.choice.bad .cn{background:var(--red);border-color:var(--red);color:#fff}
+.q .ans{display:none;margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(31,42,68,.05);font-size:16px}
+.q.rev .ans{display:block}
+.q .verdict{display:inline-block;margin-top:10px;font-size:14px;font-weight:700;padding:3px 10px;border-radius:999px}
+.q .verdict.ok{background:rgba(47,158,68,.12);color:var(--green)}.q .verdict.bad{background:rgba(224,49,49,.10);color:var(--red)}
+.q .myans{width:100%;font:inherit;font-size:16px;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.7);resize:vertical;min-height:52px}
+.q .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center}
+.btn{font:inherit;font-size:15px;font-weight:600;padding:8px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.7);color:var(--ink);cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}
+.btn.a{background:var(--accent);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(21,128,61,.25)}
+.btn.xs{font-size:13px;padding:5px 10px;border-radius:8px}
+.btn[disabled]{opacity:.5;cursor:default}
+#result{margin-top:16px;padding:16px 20px;border-radius:var(--r);background:var(--paper);border:1px solid rgba(255,255,255,.85);display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+#result b{font-size:22px}
+#done{margin-top:20px;text-align:center;font-size:14px;color:var(--ink-3)}
+/* 다크 */
+@media(prefers-color-scheme:dark){
+  :root{--ink:#F1F6F2;--ink-2:#B7C2BB;--ink-3:#8F9C95;--line:rgba(255,255,255,.12);--paper:rgba(18,26,24,.62);--paper-2:rgba(255,255,255,.05);--accent:#4ADE80;--blue:#74C0FC;--green:#69DB7C;--pink:#FF8AB8;--yel:#FFD43B;--red:#FF8787}
+  html{background:linear-gradient(160deg,#0B1020 0%,#0E1A16 48%,#0B1412 100%) fixed}
+  body::before{background:radial-gradient(circle at 40% 40%,rgba(74,222,128,.18),transparent 68%)}body::after{background:radial-gradient(circle at 50% 50%,rgba(59,130,246,.2),transparent 66%)}
+  #top{background:rgba(18,26,24,.7);border-bottom-color:rgba(255,255,255,.1)}
+  section.s,.q,#result,header.h .lead{border-color:rgba(255,255,255,.1);box-shadow:0 12px 34px rgba(0,0,0,.35)}
+  .choice{background:rgba(255,255,255,.06)}.q .ans{background:rgba(255,255,255,.06)}.q .myans{background:rgba(255,255,255,.06)}
+  .btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}.btn.a{color:#052E16}
+  .say{background:rgba(255,77,141,.10)}.analogy{background:rgba(59,130,246,.10)}.formula{background:rgba(217,119,6,.12)}.memo.am{background:rgba(217,119,6,.12)}.pitfall{background:rgba(224,49,49,.10)}#top a.memo-l{background:rgba(255,255,255,.08)}
+  figure.fig svg{filter:invert(1) hue-rotate(180deg) saturate(1.2)}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#top{background:#FFFFFF}section.s,.q,#result{background:#FFFFFF}}
+@media(max-width:640px){:root{--fs:17px}main{padding:16px 14px 110px}section.s{padding:18px 16px 14px}header.h h1{font-size:25px}
+  /* 폰에서는 그림을 축소하지 않고(글자가 7px 로 줄어든다) 가로 스크롤로 본다 */
+  figure.fig{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:none;margin-left:-6px;margin-right:-6px;padding:0 6px}figure.fig svg{min-width:500px}}
+</style>
+</head>
+<body>
+<div id="top"><div class="in"><b id="tCourse">정역학</b><span id="tSess">9/28(월) · 5주차 · 약 18분</span><span class="sp"></span><span id="tRead">읽음 0/0</span><span class="pct" id="tPct">0%</span><a class="memo-l" href="../../memo/statics.html#d2026-09-28">암기노트</a></div><div id="bar"><i id="barI"></i></div></div>
+<main>
+<header class="h"><div class="kicker">정역학 · 9/28(월) · 5주차 · 약 18분</div><h1>알짜힘 없이 돌리기 — 우력, 등가계, 그리고 렌치</h1><div class="meta"><span>교수 필기본 W5-1 14p</span><span>영상 미게시 · 녹음 없음</span><span>5주차 · 월 · 중간 범위 Ch.4</span><span>교재 대응 Pytel 4e 2.7·2.8·3.2·3.5</span></div><div class="lead">4주차까지는 힘 <b>하나</b>의 모멘트였다. 이 회차는 <b>힘계 전체를 더 간단한 계로 바꾸는 법</b>이다. 먼저 <b>우력(couple)</b> — 알짜힘 0인데 모멘트만 주는 힘 한 쌍. 다음 <b>등가계(equivalent systems)</b> — 어떤 힘계든 <b>한 점의 힘 하나 + 우력 하나</b>로 바꿀 수 있다. 힘을 옮기면 \(\mathbf r\times\mathbf F\)가 붙고 그것은 늘 힘에 수직이라, 끝까지 남는 평행 성분까지 챙긴 것이 <b>렌치(wrench)</b>. 이 회차는 영상이 아직 올라오지 않아 교수님 필기본 14쪽 순서대로 정리했다.</div></header>
+<section class="s" data-id="s1" data-nodes="mech.couple mech.moment">
+<div class="no">1 / 6</div><h2>1. 우력(couple) — ΣF = 0 인데 ΣM ≠ 0</h2>
+<p>필기 첫 줄 질문: 물체에 <b>알짜힘 없이 모멘트만</b> 줄 수 있는가? 답은 빨간 글씨로 <b>Yes</b>. 그 도구가 <b>우력</b>이다 — <b>크기가 같고, 방향이 반대이고, 작용선이 다른</b> 두 힘. 두 힘을 더하면 \(\mathbf F+(-\mathbf F)=0\)이라 물체를 밀어 옮기지는 못하지만, 작용선이 어긋나 있어 돌리는 효과는 남는다.</p>
+<p>임의의 점 P에서 \(\mathbf F\) 작용선 위 점까지 \(\mathbf r_1\), \(-\mathbf F\) 작용선 위 점까지 \(\mathbf r_2\)라 하면 두 힘의 모멘트 합은 \(\mathbf r_1\times\mathbf F+\mathbf r_2\times(-\mathbf F)=(\mathbf r_1-\mathbf r_2)\times\mathbf F\). 여기서 \(\mathbf r=\mathbf r_1-\mathbf r_2\)는 \(-\mathbf F\) 쪽 점에서 \(\mathbf F\) 쪽 점으로 가는 벡터다 — P가 사라졌다.</p>
+<figure class="fig" data-fig="couple"><svg class="fig-svg" viewbox="0 0 560 230" width="560" height="230" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><line x1="300" y1="70" x2="300" y2="214" stroke="#8A97A6" stroke-width="1.2" stroke-dasharray="5 4"></line><line x1="430" y1="70" x2="430" y2="214" stroke="#8A97A6" stroke-width="1.2" stroke-dasharray="5 4"></line><line x1="430" y1="170" x2="430" y2="96" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="442" y="112" font-size="15" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F</text><line x1="300" y1="96" x2="300" y2="170" stroke="#E03131" stroke-width="3" marker-end="url(#ah)"></line><text x="292" y="72" font-size="15" fill="#E03131" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">−F</text></g><g data-step="2"><circle cx="70" cy="200" r="4" fill="#1F2A44"></circle><text x="62" y="222" font-size="12" fill="#1F2A44" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">P (아무 점)</text><line x1="74" y1="198" x2="426" y2="172" stroke="#1971C2" stroke-width="2" marker-end="url(#ah)"></line><text x="250" y="205" font-size="14" fill="#1971C2" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">r₁</text><line x1="74" y1="197" x2="296" y2="98" stroke="#FF4D8D" stroke-width="2" marker-end="url(#ah)"></line><text x="162" y="132" font-size="14" fill="#FF4D8D" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">r₂</text></g><g data-step="3"><line x1="304" y1="133" x2="426" y2="133" stroke="#F59F00" stroke-width="2.6" marker-end="url(#ah)"></line><text x="365" y="125" font-size="15" fill="#F59F00" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">r</text></g><g data-step="4"><text x="20" y="30" font-size="13.5" fill="#1F2A44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M = r₁×F + r₂×(−F) = (r₁ − r₂)×F = r × F</text><text x="20" y="54" font-size="13" fill="#E03131" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">r 은 P 와 무관 → 어느 점에 대해서나 같다</text></g></svg><figcaption>우력: 크기가 같고 방향이 반대이며 작용선이 다른 두 힘. \(\mathbf r=\mathbf r_1-\mathbf r_2\)는 \(-\mathbf F\) 쪽 점에서 \(\mathbf F\) 쪽 점으로 가는 벡터라 P를 어디에 잡든 그대로다(필기 p.2).</figcaption></figure>
+<div class="formula">\[\mathbf M=\mathbf r_1\times\mathbf F+\mathbf r_2\times(-\mathbf F)=(\mathbf r_1-\mathbf r_2)\times\mathbf F=\mathbf r\times\mathbf F\]</div>
+<div class="why">파란 메모 그대로 <b>\(\mathbf r\)은 점 P의 위치와 관계없다</b>. 그러므로 <b>우력의 모멘트는 어느 점에 대해서나 같다</b>. 4주차의 힘 하나의 모멘트 \(\mathbf r\times\mathbf F\)는 기준점을 바꾸면 값이 바뀌었는데, 우력은 기준점을 묻지 않는다 — 그래서 우력은 "어디에 붙어 있는지"를 따지지 않고 벡터 하나 \(\mathbf M\)으로만 다룬다.</div>
+<div class="analogy">자동차 핸들을 두 손으로 돌릴 때 한 손은 위로, 한 손은 아래로 같은 힘을 준다. 핸들은 어느 쪽으로도 밀려가지 않고 돌기만 한다 — 그게 우력이다. 핸들 중심에서 재든 문 손잡이에서 재든 돌리는 세기는 같다.</div>
+<div class="memo am">우력 = 같은 크기 · 반대 방향 · 다른 작용선 · \(\sum\mathbf F=0\), \(\sum\mathbf M\ne0\) · \(\mathbf M=\mathbf r\times\mathbf F\)(\(\mathbf r\): \(-\mathbf F\) 쪽 → \(\mathbf F\) 쪽) · 어느 점에 대해서나 같다</div>
+</section>
+
+<section class="s" data-id="s2" data-nodes="mech.couple mech.cross_apps">
+<div class="no">2 / 6</div><h2>2. 우력 모멘트의 크기 |M| = DF · Example 4.18</h2>
+<p>크기는 \(|\mathbf M|=|\mathbf r\times\mathbf F|\). 두 작용선 사이 <b>수직거리</b>를 \(D\)라 하면 \(|\mathbf r\times\mathbf F|=|\mathbf r||\mathbf F|\sin\theta\)에서 \(|\mathbf r|\sin\theta\)가 바로 \(D\)라서 <b>\(|\mathbf M|=DF\)</b>(필기 빨간 "DF"). 방향은 두 힘이 놓인 평면에 수직, 오른손 법칙 — 평면 그림에서는 반시계가 \(+z\)다. \(D\)는 두 작용선 사이 거리이지 점 P까지의 거리가 아니다.</p>
+<div class="formula">\[|\mathbf M|=DF\qquad(D:\ \text{두 작용선 사이 수직거리})\]</div>
+<figure class="fig" data-fig="ex418"><svg class="fig-svg" viewbox="0 0 560 260" width="560" height="260" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><line x1="60" y1="222" x2="280" y2="222" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><line x1="60" y1="222" x2="60" y2="14" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><text x="276" y="240" font-size="13" fill="#1F2A44" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">x (m)</text><text x="54" y="18" font-size="13" fill="#1F2A44" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">y (m)</text><circle cx="132" cy="54" r="4" fill="#1F2A44"></circle><text x="122" y="52" font-size="12" fill="#1F2A44" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">(3, 7, 0)</text><line x1="132" y1="54" x2="132" y2="112" stroke="#E03131" stroke-width="3" marker-end="url(#ah)"></line><text x="144" y="88" font-size="13" fill="#E03131" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">−2j kN</text><circle cx="228" cy="174" r="4" fill="#1F2A44"></circle><text x="238" y="188" font-size="12" fill="#1F2A44" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">(7, 2, 0)</text><line x1="228" y1="174" x2="228" y2="116" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="238" y="134" font-size="13" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">2j kN</text></g><g data-step="2"><line x1="62" y1="220" x2="225" y2="176" stroke="#1971C2" stroke-width="1.8" marker-end="url(#ah)"></line><text x="170" y="212" font-size="12.5" fill="#1971C2" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">r₁ = 7i + 2j</text><line x1="61" y1="219" x2="130" y2="58" stroke="#FF4D8D" stroke-width="1.8" marker-end="url(#ah)"></line><text x="140" y="128" font-size="12" fill="#FF4D8D" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">r₂ = 3i + 7j</text></g><g data-step="3"><line x1="132" y1="240" x2="228" y2="240" stroke="#8A97A6" stroke-width="1.2"></line><line x1="132" y1="234" x2="132" y2="246" stroke="#8A97A6" stroke-width="1.2"></line><line x1="228" y1="234" x2="228" y2="246" stroke="#8A97A6" stroke-width="1.2"></line><text x="180.0" y="256" font-size="12" fill="#8A97A6" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">D = 4 m</text></g><g data-step="4"><path d="M472.5 79.0 A 26 26 0 1 0 472.5 105.0" fill="none" stroke="#2F9E44" stroke-width="2" marker-end="url(#ah)"></path><text x="450" y="150" font-size="15" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M = 8k kN·m</text><text x="450" y="172" font-size="13" fill="#2F9E44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">반시계 (+z)</text><text x="450" y="196" font-size="12.5" fill="#8A97A6" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">검산 D·F = 4 × 2 = 8</text></g></svg><figcaption>Example 4.18 (필기 p.4). 위로 미는 힘이 오른쪽, 아래로 미는 힘이 왼쪽 → 반시계. \(\mathbf r\times\mathbf F\)로 계산한 값과 \(DF\)가 같다.</figcaption></figure>
+<p><b>Example 4.18.</b> \((3,7,0)\) m에 \(-2\mathbf j\) kN, \((7,2,0)\) m에 \(2\mathbf j\) kN. 크기가 같고 방향이 반대인 두 힘이니 우력이다. 원점 O에서 \(\mathbf r_1=7\mathbf i+2\mathbf j\), \(\mathbf r_2=3\mathbf i+7\mathbf j\).</p>
+<div class="formula">\[\mathbf M=(7\mathbf i+2\mathbf j)\times(2\mathbf j)+(3\mathbf i+7\mathbf j)\times(-2\mathbf j)=14\mathbf k-6\mathbf k=8\mathbf k\ \text{kN·m}\]</div>
+<div class="why">필기의 파란 물결: \(\mathbf j\times\mathbf j=0\)이라 <b>\(\mathbf i\times\mathbf j\) 짝만 남는다</b>. \(7\mathbf i\times2\mathbf j=14\mathbf k\), \(3\mathbf i\times(-2\mathbf j)=-6\mathbf k\). 검산: 두 작용선 \(x=7\)과 \(x=3\) 사이 \(D=4\) m, \(F=2\) kN → \(DF=8\) kN·m, 오른쪽이 위로·왼쪽이 아래로 미니 반시계(\(+z\)). 두 방법이 같다.</div>
+<details class="ex"><summary>연습 — A(0, 3, 0) m에 \(4\mathbf i\) kN, B(2, 0, 0) m에 \(-4\mathbf i\) kN</summary><div class="body"><p>\(DF\): 작용선 \(y=3\)과 \(y=0\) → \(D=3\) m → \(|\mathbf M|=12\) kN·m, 위는 오른쪽·아래는 왼쪽으로 밀어 시계 방향. \(\mathbf r\times\mathbf F\): \(\mathbf r=\mathbf r_A-\mathbf r_B=-2\mathbf i+3\mathbf j\) → \((-2\mathbf i+3\mathbf j)\times4\mathbf i=12(\mathbf j\times\mathbf i)=-12\mathbf k\) kN·m. 점 P(5, 5, 0) 기준으로 다시 해도 \((-5\mathbf i-2\mathbf j)\times4\mathbf i+(-3\mathbf i-5\mathbf j)\times(-4\mathbf i)=8\mathbf k-20\mathbf k=-12\mathbf k\) — 어느 점이나 같다.</p></div></details>
+<div class="analogy">렌치(공구)로 볼트를 돌릴 때 손잡이가 길수록 쉽다 — 우력도 같다. 같은 힘이라도 두 손을 멀리 벌릴수록(\(D\)가 클수록) 더 세게 돌린다.</div>
+<div class="memo am">\(|\mathbf M|=DF\)(\(D\) = 작용선 사이 수직거리) · 방향 = 평면에 수직, 반시계 \(+z\) · Example 4.18 → \(8\mathbf k\) kN·m · \(\mathbf r\times\mathbf F\)와 \(DF\) 두 방법으로 검산</div>
+</section>
+
+<section class="s" data-id="s3" data-nodes="mech.couple">
+<div class="no">3 / 6</div><h2>3. 등가계(equivalent systems) — 합력 같고, 한 점의 합모멘트 같으면</h2>
+<p>두 힘계가 물체에 <b>같은 효과</b>를 주려면 미는 효과와 돌리는 효과가 둘 다 같아야 한다. 필기 p.5의 두 조건:</p>
+<div class="formula">\[(\textstyle\sum\mathbf F)_1=(\sum\mathbf F)_2,\qquad(\sum\mathbf M_P)_1=(\sum\mathbf M_P)_2\]</div>
+<figure class="fig" data-fig="equiv"><svg class="fig-svg" viewbox="0 0 560 230" width="560" height="230" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><rect x="20" y="40" width="200" height="130" rx="10" fill="none" stroke="#8A97A6" stroke-width="1.4" stroke-dasharray="5 4"></rect><text x="120" y="32" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">System 1</text><circle cx="50" cy="150" r="4" fill="#1F2A44"></circle><text x="44" y="166" font-size="13" fill="#1F2A44" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">P</text><line x1="110" y1="120" x2="150" y2="70" stroke="#2F9E44" stroke-width="2.6" marker-end="url(#ah)"></line><text x="160" y="70" font-size="13" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F<tspan baseline-shift="sub" font-size="72%">A</tspan></text><line x1="170" y1="150" x2="205" y2="120" stroke="#2F9E44" stroke-width="2.6" marker-end="url(#ah)"></line><text x="186" y="160" font-size="13" fill="#2F9E44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F<tspan baseline-shift="sub" font-size="72%">B</tspan></text><path d="M93.9 74.0 A 16 16 0 1 0 93.9 90.0" fill="none" stroke="#E03131" stroke-width="2" marker-end="url(#ah)"></path><text x="80" y="120" font-size="13" fill="#E03131" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M<tspan baseline-shift="sub" font-size="72%">C</tspan></text></g><g data-step="2"><rect x="340" y="40" width="200" height="130" rx="10" fill="none" stroke="#8A97A6" stroke-width="1.4" stroke-dasharray="5 4"></rect><text x="440" y="32" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">System 2</text><circle cx="370" cy="150" r="4" fill="#1F2A44"></circle><text x="364" y="166" font-size="13" fill="#1F2A44" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">P</text><line x1="450" y1="140" x2="500" y2="80" stroke="#1971C2" stroke-width="2.6" marker-end="url(#ah)"></line><text x="510" y="80" font-size="13" fill="#1971C2" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F<tspan baseline-shift="sub" font-size="72%">D</tspan></text><path d="M413.9 74.0 A 16 16 0 1 0 413.9 90.0" fill="none" stroke="#E03131" stroke-width="2" marker-end="url(#ah)"></path><text x="400" y="120" font-size="13" fill="#E03131" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M<tspan baseline-shift="sub" font-size="72%">E</tspan></text><path d="M459.6 144.0 A 12 12 0 1 1 459.6 156.0" fill="none" stroke="#E03131" stroke-width="2" marker-end="url(#ah)"></path><text x="505" y="160" font-size="13" fill="#E03131" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M<tspan baseline-shift="sub" font-size="72%">F</tspan></text></g><g data-step="3"><text x="280" y="112" font-size="22" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">≡ ?</text><text x="280" y="196" font-size="13.5" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">(ΣF)₁ = (ΣF)₂   그리고   (ΣM<tspan baseline-shift="sub" font-size="72%">P</tspan>)₁ = (ΣM<tspan baseline-shift="sub" font-size="72%">P</tspan>)₂</text></g><g data-step="4"><text x="280" y="220" font-size="13" fill="#E03131" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">한 점 P 에서 같으면 → 다른 모든 점 P* 에서도 같다</text></g></svg><figcaption>등가 조건(필기 p.5·p.6). 우력 \(\mathbf M_C,\mathbf M_E,\mathbf M_F\)는 어느 점에서나 같으므로 모멘트 식에 그대로 더한다.</figcaption></figure>
+<p>그림의 System 1(\(\mathbf F_A,\mathbf F_B\) + 우력 \(\mathbf M_C\))과 System 2(\(\mathbf F_D\) + 우력 \(\mathbf M_E,\mathbf M_F\))에 적용하면 \(\mathbf F_A+\mathbf F_B=\mathbf F_D\), \(\mathbf r_A\times\mathbf F_A+\mathbf r_B\times\mathbf F_B+\mathbf M_C=\mathbf r_D\times\mathbf F_D+\mathbf M_E+\mathbf M_F\). 우력은 어느 점에서나 같으니 모멘트 식에 그대로 더한다.</p>
+<div class="why">필기 p.6: <b>합력이 같고 점 P에 대한 합모멘트가 같으면 다른 어떤 점 P*에 대해서도 합모멘트가 같다</b>. 이유는 기준점 바꾸기 식 \(\sum\mathbf M_{P^*}=\sum\mathbf M_P+\mathbf r_{P^*P}\times\sum\mathbf F\) — 오른쪽 두 항이 두 계에서 모두 같으니 왼쪽도 같다. 그래서 등가 판정은 <b>점 하나만</b> 골라 확인하면 끝이다(9/30 평형 조건에서 다시 쓴다).</div>
+<div class="analogy">두 사람이 같은 상자를 각자 다른 손 위치로 밀어도, 미는 총량과 한 모서리 기준으로 돌리는 총량이 같으면 상자의 움직임은 똑같다. 어느 모서리를 기준으로 재도 결론이 같으니 한 번만 재면 된다.</div>
+<div class="memo am">등가 = \((\sum\mathbf F)_1=(\sum\mathbf F)_2\) 그리고 \((\sum\mathbf M_P)_1=(\sum\mathbf M_P)_2\) · 한 점에서 같으면 모든 점에서 같다 · 우력은 모멘트 식에 그대로 더한다</div>
+</section>
+
+<section class="s" data-id="s4" data-nodes="mech.couple mech.moment">
+<div class="no">4 / 6</div><h2>4. 힘 하나 + 우력 하나 · 힘을 다른 점으로 옮기기</h2>
+<p>필기 p.7: 임의의 힘·모멘트 계는 <b>언제나</b> 더 간단한 계 — <b>점 P에 작용하는 힘 하나 + 우력 하나</b> — 로 나타낼 수 있다. 힘은 \(\mathbf F=\sum\mathbf F\), 우력은 \(\mathbf M=\sum\mathbf M_P\). 두 조건(합력·P에 대한 합모멘트)을 그대로 맞춘 것이니 3절의 등가 조건을 만족한다.</p>
+<div class="formula">\[\text{일반 힘계}\ \equiv\ \mathbf F=\sum\mathbf F\ (\text{P에 작용})\ +\ \mathbf M=\sum\mathbf M_P\ (\text{우력})\]</div>
+<p>필기 p.8: P에 작용하는 힘 \(\mathbf F_P\)를 점 Q로 옮기면 <b>그 힘이 만드는 모멘트가 달라진다</b>. 그래서 Q에 같은 힘을 놓고 우력 \(\mathbf M=\mathbf r\times\mathbf F_P\)를 더해야 등가가 된다. 여기서 \(\mathbf r\)은 <b>Q에서 P로</b> 가는 위치벡터다.</p>
+<figure class="fig" data-fig="move"><svg class="fig-svg" viewbox="0 0 580 220" width="580" height="220" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><rect x="20" y="120" width="150" height="14" rx="3" fill="#F1F3F5" stroke="#1F2A44" stroke-width="1.5"></rect><circle cx="50" cy="127" r="4" fill="#1F2A44"></circle><text x="50" y="156" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">P</text><circle cx="140" cy="127" r="4" fill="#1F2A44"></circle><text x="140" y="156" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">Q</text><line x1="50" y1="120" x2="50" y2="50" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="62" y="64" font-size="14" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F</text></g><g data-step="2"><text x="188" y="132" font-size="20" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">=</text><rect x="205" y="120" width="150" height="14" rx="3" fill="#F1F3F5" stroke="#1F2A44" stroke-width="1.5"></rect><circle cx="235" cy="127" r="4" fill="#1F2A44"></circle><text x="235" y="156" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">P</text><circle cx="325" cy="127" r="4" fill="#1F2A44"></circle><text x="325" y="156" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">Q</text><line x1="235" y1="120" x2="235" y2="50" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="247" y="64" font-size="14" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F</text><line x1="320" y1="120" x2="320" y2="50" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="308" y="64" font-size="14" fill="#2F9E44" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F</text><line x1="332" y1="134" x2="332" y2="200" stroke="#8A97A6" stroke-width="2.4" marker-end="url(#ah)" stroke-dasharray="5 3"></line><text x="344" y="186" font-size="13" fill="#8A97A6" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">−F</text></g><g data-step="3"><text x="372" y="132" font-size="20" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">=</text><rect x="390" y="120" width="150" height="14" rx="3" fill="#F1F3F5" stroke="#1F2A44" stroke-width="1.5"></rect><circle cx="420" cy="127" r="4" fill="#1F2A44"></circle><text x="420" y="156" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">P</text><circle cx="510" cy="127" r="4" fill="#1F2A44"></circle><text x="510" y="156" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">Q</text><line x1="510" y1="120" x2="510" y2="50" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="522" y="64" font-size="14" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F</text><path d="M455.6 61.0 A 18 18 0 1 0 455.6 79.0" fill="none" stroke="#E03131" stroke-width="2" marker-end="url(#ah)"></path><text x="440" y="40" font-size="14" fill="#E03131" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M</text></g><g data-step="4"><text x="290" y="210" font-size="14" fill="#E03131" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M = r × F<tspan baseline-shift="sub" font-size="72%">P</tspan>   (r = Q → P)</text></g></svg><figcaption>힘 옮기기(필기 p.8). Q에 \(\mathbf F\)와 \(-\mathbf F\)를 같이 놓아도(합 0) 아무것도 안 바뀐다 — 그중 P의 \(\mathbf F\)와 Q의 \(-\mathbf F\)가 우력이 되어 \(\mathbf M=\mathbf r\times\mathbf F_P\)로 남는다. 가운데 그림은 아톰 보충.</figcaption></figure>
+<div class="formula">\[\text{P의 }\mathbf F_P\ \equiv\ \text{Q의 }\mathbf F_P+\mathbf r\times\mathbf F_P\qquad(\mathbf r:\ \text{Q}\to\text{P})\]</div>
+<div class="why">왜 \(\mathbf r\times\mathbf F_P\)인가: Q에서 본 원래 힘의 모멘트가 \(\mathbf r_{Q\to P}\times\mathbf F_P\)다. 옮긴 힘은 Q를 지나니 Q에 대한 모멘트가 0 — 잃어버린 모멘트를 우력으로 채워 넣는 것이다. 우력은 어느 점에서나 같으니 다른 점에서 확인해도 등가가 유지된다.</div>
+<details class="ex"><summary>연습 — P(2, 0, 0) m의 \(10\mathbf j\) N을 원점 O로 옮기기</summary><div class="body"><p>\(\mathbf r=\text{O}\to\text{P}=2\mathbf i\) → 붙는 우력 \(2\mathbf i\times10\mathbf j=20\mathbf k\) N·m. 결과: O에 \(10\mathbf j\) N + 우력 \(20\mathbf k\) N·m. 검산(다른 점 A(0, 5, 0)): 원래 \((2\mathbf i-5\mathbf j)\times10\mathbf j=20\mathbf k\), 새 계 \((-5\mathbf j)\times10\mathbf j+20\mathbf k=20\mathbf k\) — 같다.</p></div></details>
+<div class="analogy">문을 손잡이에서 미는 것과 경첩 바로 옆에서 같은 힘으로 미는 것은 다르다. 경첩 옆으로 손을 옮겼다면 "손잡이에서 밀 때만큼 돌리는 효과"를 따로 더해 줘야 같은 결과가 된다 — 그 더하는 몫이 \(\mathbf r\times\mathbf F\)다.</div>
+<div class="memo am">일반 힘계 ≡ P의 \(\mathbf F=\sum\mathbf F\) + 우력 \(\mathbf M=\sum\mathbf M_P\) · P의 힘 ≡ Q의 같은 힘 + \(\mathbf r\times\mathbf F_P\)(\(\mathbf r\): Q → P) · 옮기면 우력이 붙는다</div>
+</section>
+
+<section class="s" data-id="s5" data-nodes="mech.couple mech.projection">
+<div class="no">5 / 6</div><h2>5. 렌치(wrench) 정의 · 옮겨서 만들 수 있는 모멘트는 F에 수직뿐</h2>
+<p>필기 p.9: 일반 힘계 ≡ P의 힘 \(\mathbf F\) + 우력 \(\mathbf M_P\). 한 단계 더 줄일 수 있는가? ⇒ <b>렌치(wrench)</b>. 빨간 정의: <b>힘 하나 \(\mathbf F\)와, 그 힘에 평행한 우력 모멘트 하나 \(\mathbf M_p\)</b>로 이루어진 가장 간단한 등가계.</p>
+<p>왜 "평행"인가 — 필기 p.10. 힘을 P에서 Q로 옮겨서 생기는 모멘트는 \(\mathbf r\times\mathbf F\)(물결 밑줄)이고, <b>외적 \(\mathbf r\times\mathbf F\)는 언제나 \(\mathbf F\)에 수직</b>이다. 그래서 작용점을 옮겨서는 <b>힘에 수직인 모멘트 성분만</b> 만들 수 있다.</p>
+<figure class="fig" data-fig="perp"><svg class="fig-svg" viewbox="0 0 560 230" width="560" height="230" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><circle cx="110" cy="170" r="4" fill="#1F2A44"></circle><text x="98" y="186" font-size="13" fill="#1F2A44" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">P</text><line x1="110" y1="170" x2="110" y2="70" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="122" y="84" font-size="15" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F</text></g><g data-step="2"><circle cx="260" cy="170" r="4" fill="#1F2A44"></circle><text x="272" y="186" font-size="13" fill="#1F2A44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">Q</text><line x1="114" y1="170" x2="256" y2="170" stroke="#F59F00" stroke-width="2.4" marker-end="url(#ah)"></line><text x="185" y="162" font-size="12.5" fill="#F59F00" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">r (P → Q)</text><circle cx="185" cy="110" r="11" fill="none" stroke="#E03131" stroke-width="2"></circle><circle cx="185" cy="110" r="3" fill="#E03131"></circle><text x="204" y="106" font-size="13" fill="#E03131" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">r × F</text><text x="204" y="124" font-size="12" fill="#E03131" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F 에 수직</text></g><g data-step="3"><line x1="330" y1="20" x2="330" y2="210" stroke="#8A97A6" stroke-width="1" stroke-dasharray="3 4"></line><circle cx="440" cy="170" r="4" fill="#1F2A44"></circle><line x1="440" y1="170" x2="440" y2="70" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="452" y="84" font-size="15" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F</text><line x1="410" y1="170" x2="410" y2="98" stroke="#E03131" stroke-width="2.4" marker-end="url(#ah)"></line><text x="398" y="106" font-size="13" fill="#E03131" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M<tspan baseline-shift="sub" font-size="72%">y</tspan> j</text><line x1="440" y1="172" x2="376" y2="204" stroke="#1971C2" stroke-width="2.4" marker-end="url(#ah)"></line><text x="470" y="206" font-size="13" fill="#1971C2" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M<tspan baseline-shift="sub" font-size="72%">x</tspan> i</text></g><g data-step="4"><text x="445" y="44" font-size="12.5" fill="#E03131" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">평행 M<tspan baseline-shift="sub" font-size="72%">y</tspan> j : 옮겨서 못 만든다</text><text x="445" y="20" font-size="12.5" fill="#1971C2" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">수직 M<tspan baseline-shift="sub" font-size="72%">x</tspan> i : 옮겨서 만든다</text></g></svg><figcaption>필기 p.10·p.11. 왼쪽: 힘을 옮겨 생기는 모멘트 \(\mathbf r\times\mathbf F\)는 늘 \(\mathbf F\)에 수직(여기서는 종이 밖으로 ⊙). 오른쪽: 우력을 \(\mathbf F\)에 평행한 성분과 수직한 성분으로 나누면 평행 성분은 끝까지 남는다.</figcaption></figure>
+<div class="why">필기 p.11: 원래 우력 \(\mathbf M\)에 힘에 수직인 성분과 평행한 성분이 둘 다 있으면(그림: \(\mathbf F\)는 \(y\) 방향, \(\mathbf M=M_x\mathbf i+M_y\mathbf j\)) — <b>수직 성분은 힘을 옮겨서 만들 수 있지만, 평행 성분은 힘을 옮기는 것만으로는 절대 만들 수 없다</b>. 그러므로 <b>힘 하나로는 충분하지 않다</b>. 평행 성분 몫의 우력이 하나 꼭 남는다 — 그게 렌치의 \(\mathbf M_p\)다.</div>
+<div class="analogy">외적은 "두 벡터 모두에 수직"이라는 성질을 가진 계산이다. 힘을 아무리 옆으로 옮겨도 그 힘 방향 축 둘레로 비트는 몫은 생기지 않는다 — 망치를 어디로 옮겨 쳐도 못이 저절로 돌지 않는 것과 같다.</div>
+<div class="memo am">렌치 = 힘 \(\mathbf F\) + \(\mathbf F\)에 평행한 우력 \(\mathbf M_p\)(가장 간단한 등가계) · 옮겨서 생기는 모멘트 \(\mathbf r\times\mathbf F\)는 늘 \(\mathbf F\)에 수직 · 평행 성분은 옮겨서 못 만든다</div>
+</section>
+
+<section class="s" data-id="s6" data-nodes="mech.couple mech.projection">
+<div class="no">6 / 6</div><h2>6. 모멘트를 두 성분으로 — M = M_p + M_n, r_PQ × F = M_n</h2>
+<p>필기 p.12~p.13: 힘 \(\mathbf F\)를 기준으로 우력을 나눈다. <b>\(\mathbf M_p\)</b> = \(\mathbf F\)에 <b>평행</b>한 성분, <b>\(\mathbf M_n\)</b> = \(\mathbf F\)에 <b>수직</b>인 성분. 평행 성분은 없앨 수 없고, 수직 성분은 힘의 작용점을 옮겨서 만들 수 있다.</p>
+<div class="formula">\[\mathbf M=\mathbf M_p+\mathbf M_n,\qquad \mathbf r_{PQ}\times\mathbf F=\mathbf M_n\]</div>
+<figure class="fig" data-fig="wrench"><svg class="fig-svg" viewbox="0 0 560 220" width="560" height="220" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><circle cx="80" cy="180" r="4" fill="#1F2A44"></circle><text x="68" y="196" font-size="13" fill="#1F2A44" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">P</text><line x1="80" y1="180" x2="80" y2="70" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="92" y="82" font-size="15" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F</text><line x1="130" y1="180" x2="130" y2="110" stroke="#E03131" stroke-width="2.4" marker-end="url(#ah)"></line><text x="142" y="120" font-size="13" fill="#E03131" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M<tspan baseline-shift="sub" font-size="72%">p</tspan></text><line x1="160" y1="182" x2="210" y2="206" stroke="#1971C2" stroke-width="2.4" marker-end="url(#ah)"></line><text x="222" y="200" font-size="13" fill="#1971C2" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M<tspan baseline-shift="sub" font-size="72%">n</tspan></text><text x="120" y="40" font-size="14" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M = M<tspan baseline-shift="sub" font-size="72%">p</tspan> + M<tspan baseline-shift="sub" font-size="72%">n</tspan></text></g><g data-step="2"><line x1="250" y1="130" x2="320" y2="130" stroke="#1F2A44" stroke-width="2" marker-end="url(#ah)"></line><text x="285" y="118" font-size="12" fill="#8A97A6" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">옮긴다</text><text x="285" y="156" font-size="13" fill="#1971C2" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">r<tspan baseline-shift="sub" font-size="72%">PQ</tspan> × F = M<tspan baseline-shift="sub" font-size="72%">n</tspan></text></g><g data-step="3"><circle cx="430" cy="180" r="4" fill="#1F2A44"></circle><text x="418" y="196" font-size="13" fill="#1F2A44" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">Q</text><line x1="430" y1="180" x2="430" y2="60" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="442" y="72" font-size="15" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F</text><line x1="480" y1="180" x2="480" y2="110" stroke="#E03131" stroke-width="2.4" marker-end="url(#ah)"></line><text x="492" y="120" font-size="13" fill="#E03131" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M<tspan baseline-shift="sub" font-size="72%">p</tspan> ∥ F</text></g><g data-step="4"><path d="M412 150 C 412 138, 448 138, 448 150" fill="none" stroke="#E03131" stroke-width="1.8"></path><path d="M412 126 C 412 114, 448 114, 448 126" fill="none" stroke="#E03131" stroke-width="1.8"></path><text x="450" y="30" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">렌치 = 밀면서 돌리는 나사</text></g></svg><figcaption>필기 p.12~p.14. 수직 성분 \(\mathbf M_n\)은 힘의 작용선을 옮겨 흡수하고, 평행 성분 \(\mathbf M_p\)만 남긴 것이 렌치 — 가장 간단한 등가계.</figcaption></figure>
+<p>〈원래 계〉 P에 \(\mathbf F\), 우력 \(\mathbf M=\mathbf M_p+\mathbf M_n\) ⇒ 〈새 계〉 같은 힘 \(\mathbf F\)가 Q에, 우력은 \(\mathbf M_p\)만. P에서 Q로 힘을 옮겨 생기는 모멘트가 \(\mathbf M_n\)을 대신하도록 Q를 고른다: \(\mathbf r_{PQ}\times\mathbf F=\mathbf M_n\). 필기 p.14 그림 정리: 반대 힘 두 개 ⇒ 우력 하나 / 여러 힘·우력 ⇒ 한 점의 \(\mathbf F\)와 \(\mathbf M\) ⇒ \(\mathbf F\)와 평행한 \(\mathbf M_p\)(렌치).</p>
+<div class="why">계산 순서(아톰 보충): \(\mathbf e=\mathbf F/|\mathbf F|\) → \(\mathbf M_p=(\mathbf e\cdot\mathbf M)\mathbf e\)(2장 평행 성분, 4주차 \(\mathbf M_L\)과 같은 모양) → \(\mathbf M_n=\mathbf M-\mathbf M_p\) → \(\mathbf r_{PQ}\)를 \(\mathbf F\)에 수직으로 잡으면 \(\mathbf r_{PQ}=(\mathbf F\times\mathbf M_n)/|\mathbf F|^2\)(필기에 없는 식 — 아래 연습에서 검산). 7절 \(\mathbf r\)은 Q→P, 여기 \(\mathbf r_{PQ}\)는 P→Q라 방향이 반대일 뿐 같은 내용이다 — 문제에서 \(\mathbf r\)의 출발·도착점을 꼭 적는다.</div>
+<details class="ex"><summary>연습 — 원점 P에 \(\mathbf F=10\mathbf j\) N, 우력 \(\mathbf M=6\mathbf i+8\mathbf j\) N·m를 렌치로</summary><div class="body"><p>\(\mathbf e=\mathbf j\) → \(\mathbf M_p=(\mathbf e\cdot\mathbf M)\mathbf e=8\mathbf j\), \(\mathbf M_n=6\mathbf i\). \(\mathbf r_{PQ}=(10\mathbf j\times6\mathbf i)/100=-0.6\mathbf k\) m. 렌치: \(\mathbf F=10\mathbf j\) N이 \((0,0,-0.6)\) m를 지나는 \(y\) 방향 선 위에 + 평행 우력 \(\mathbf M_p=8\mathbf j\) N·m. 검산(P 기준): \((-0.6\mathbf k)\times10\mathbf j+8\mathbf j=6\mathbf i+8\mathbf j=\mathbf M\).</p></div></details>
+<div class="analogy">드라이버로 나사를 박을 때 손은 나사 축 방향으로 <b>밀면서</b>(힘 \(\mathbf F\)) 같은 축 둘레로 <b>돌린다</b>(평행 우력 \(\mathbf M_p\)). 렌치는 이 "밀면서 돌리기" 하나로 어떤 힘계든 대신할 수 있다는 말이다.</div>
+<div class="memo am">\(\mathbf M=\mathbf M_p\ (\parallel\mathbf F)+\mathbf M_n\ (\perp\mathbf F)\) · \(\mathbf M_p=(\mathbf e\cdot\mathbf M)\mathbf e\) · \(\mathbf r_{PQ}\times\mathbf F=\mathbf M_n\) 이 되게 Q를 고른다 · 남는 것 = \(\mathbf F\) + \(\mathbf M_p\)(렌치)</div>
+</section>
+
+
+<section id="quiz"><h2>확인 문제</h2><div id="qlist"></div><div id="result"></div></section>
+<div id="done"></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script>/* 김주영 스앵님 판정 (대표님 2026-09-29 「개념 마인드맵은 스앵님이 학습을 통해 내가 뭘 알고 뭘 모르는지 알아서 파악」) — 원본은 이 파일 하나.
+   빌더가 교실·수업 노트·학습 덱·암기노트 페이지에 그대로 넣고(__JUDGE__), learn.html 은 patch_learn_judge.py 가 TJ-START~TJ-END 사이를 이 파일로 갈아 끼운다.
+   기록 = localStorage atto.evidence [{t, k, n:[노드], ok, v, lid, sid, qid, a, clean}] (최대 4000건 — 넘치면 읽기·질문 기록부터 버리고 노드마다 최근 문제 6건은 남긴다)
+     k: quiz(ok) 확인 문제 · read(clean) 챕터·섹션 끝(다시 설명·질문 없이 끝났으면 clean) · again 다시 설명 · ask 질문 · memo(ok) 암기노트 외움 · self(v) 카드 자가평가
+     a: 같은 시도 표시(카드 「다시 저장」) — 같은 a·qid 는 새 기록으로 바꿔 넣는다(정답 수가 늘지 않는다)
+   판정 = 노드마다 atto.mastery[id] = {quiz:{correct,total,ts}, self, sts, ts, score, state, auto} — learn.html 은 TJ.score 로 같은 식을 쓴다.
+     quiz = 최근 6번 · self(설명할 수 있나 1~5) = 읽음 4 · 다시 설명·질문 2번 이상이면 3 · 외움 +1 · 카드 자가평가가 더 최근이면 그 값
+     → 문제 없이 읽기만 하면 최대 「흔들림」, 「안다」는 문제로만. 점수식 = (0.5·정답률·감쇠(quiz.ts) + 0.2·self/5·감쇠(sts))/0.7, 문제 없으면 self/5·0.6·감쇠(sts)
+     감쇠 = 60일에 걸쳐 1 → 0.4 (최저 0.4). 정답 근거와 읽기·암기 근거를 따로 감쇠한다 — 오늘 암기 체크 하나로 90일 전 정답이 새것처럼 되지 않게(오타 .91 설계 검수 ⑦)
+   저장이 막히면(용량·사생활 모드) 이 페이지 안에서는 메모리 사본으로 이어 가고 rec 은 false 를 돌려준다. */
+(function(g){
+  var EK="atto.evidence", MK="atto.mastery", CAP=4000, KEEPQ=6, MEM={}, DIRTY={};
+  function rd(k,d){ if(DIRTY[k]) return MEM[k]; try{ var v=JSON.parse(localStorage.getItem(k)||"null"); return v==null?d:v; }catch(e){ return DIRTY[k]?MEM[k]:d; } }
+  function wr(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); DIRTY[k]=false; return true; }catch(e){ MEM[k]=v; DIRTY[k]=true; return false; } }
+  function decay(ts){ if(!ts) return 1; var d=Math.max(0,(Date.now()/1000-ts)/86400); return Math.max(.4,1-d/60); }
+  function score(e){ if(!e||typeof e!=="object") return {score:0,state:"unrated"};
+    var q=e.quiz||{}, tot=+q.total||0, cor=+q.correct||0, sv=e.self==null?null:Math.max(1,Math.min(5,+e.self));
+    if(tot<=0&&sv==null) return {score:0,state:"unrated"};
+    var dq=decay(+q.ts||+e.ts||0), ds=decay(+e.sts||+e.ts||0);
+    var raw=tot>0?(0.5*(cor/tot)*dq+0.2*((sv||0)/5)*ds)/0.7:(sv/5)*0.6*ds, s=Math.min(1,raw), st;
+    if(tot<=0) st=(sv>=4&&s>=.4)?"shaky":"unknown"; else st=s>=.7?"known":s>=.4?"shaky":"unknown";
+    return {score:Math.round(s*1000)/1000,state:st}; }
+  function why(evs){ var qz=evs.filter(function(e){return e.k==="quiz";}).slice(-KEEPQ), r={q:qz.length,c:qz.filter(function(e){return e.ok;}).length,
+      read:evs.filter(function(e){return e.k==="read";}).length, clean:evs.filter(function(e){return e.k==="read"&&e.clean;}).length,
+      conf:evs.filter(function(e){return (e.k==="again"||e.k==="ask")&&Date.now()-e.t<21*864e5;}).length,
+      memo:null, self:null, last:0, selfLast:0};
+    evs.forEach(function(e){ if(e.k==="memo") r.memo=!!e.ok; if(e.k==="self") r.self={v:+e.v,t:e.t}; if(e.t>r.last) r.last=e.t; if(e.k!=="quiz"&&e.t>r.selfLast) r.selfLast=e.t; });
+    return r; }
+  function judgeOne(id,L,M){ var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); if(!evs.length) return;
+    var r=why(evs), e=Object.assign({},M[id]||{}), qz=evs.filter(function(x){return x.k==="quiz";}).slice(-KEEPQ);
+    var self=null; if(r.read||r.conf||r.memo!=null){ self=r.read?4:3; if(r.conf>=2) self=3; if(r.memo) self=Math.min(5,self+1); }
+    var autoLast=0; evs.forEach(function(x){ if(x.k!=="self"&&x.t>autoLast) autoLast=x.t; });
+    if(r.self&&r.self.t>=autoLast) self=r.self.v;
+    e.quiz=qz.length?{correct:r.c,total:qz.length,ts:Math.round(qz[qz.length-1].t/1000)}:undefined; if(!e.quiz) delete e.quiz;
+    e.self=self; if(self==null){ delete e.self; delete e.sts; } else e.sts=Math.round(r.selfLast/1000);
+    e.ts=Math.round(r.last/1000); e.auto={by:"tutor",q:r.q,c:r.c,read:r.read,clean:r.clean,conf:r.conf,memo:r.memo};
+    var s=score(e); e.score=s.score; e.state=s.state; M[id]=e; }
+  function judge(ids){ var L=rd(EK,[]), M=rd(MK,{}); if(!Array.isArray(L)) L=[]; if(!M||typeof M!=="object") M={}; (ids||[]).forEach(function(id){ judgeOne(id,L,M); });
+    wr(MK,M); return M; }
+  function all(){ var L=rd(EK,[]), o={}; if(Array.isArray(L)) L.forEach(function(e){ (e&&e.n||[]).forEach(function(i){ o[i]=1; }); }); return judge(Object.keys(o)); }
+  /* 상한 넘침: 노드마다 최근 문제 KEEPQ 건은 지키고, 나머지(읽기·질문·오래된 문제)에서 오래된 것부터 버린다 — 다른 노드 활동으로 정답 기록이 사라지지 않게 */
+  function trim(L,cap){ cap=cap||CAP; if(L.length<=cap) return L; var seen={}, keep=[], rest=[], i;
+    for(i=L.length-1;i>=0;i--){ var e=L[i], k=false; if(e&&e.k==="quiz") (e.n||[]).forEach(function(id){ seen[id]=(seen[id]||0)+1; if(seen[id]<=KEEPQ) k=true; }); (k?keep:rest).push(e); }
+    keep.reverse(); rest.reverse(); rest=rest.slice(Math.max(0,rest.length-Math.max(0,cap-keep.length)));
+    return keep.concat(rest).sort(function(a,b){ return (a.t||0)-(b.t||0); }); }
+  function rec(ev){ if(!ev||!Array.isArray(ev.n)||!ev.n.length) return false; var L=rd(EK,[]); if(!Array.isArray(L)) L=[];
+    ev.t=Date.now();
+    if(ev.a!=null&&ev.qid!=null){ for(var i=L.length-1;i>=0;i--){ var x=L[i]; if(x&&x.k===ev.k&&x.qid===ev.qid&&x.a===ev.a){ L.splice(i,1); break; } } }
+    L.push(ev); L=trim(L);
+    /* 저장 실패 → 절반 상한으로 다시(이때도 노드마다 최근 정답은 지킨다, 오타 설계 2차) · 그래도 실패면 메모리 사본은 자르지 않은 전체로 */
+    var ok=wr(EK,L); if(!ok){ var half=trim(L,Math.floor(CAP/2)); if(wr(EK,half)){ L=half; ok=true; } else { MEM[EK]=L; DIRTY[EK]=true; } }
+    judge(ev.n); return ok; }
+  function reasons(id){ var L=rd(EK,[]); if(!Array.isArray(L)) return null; var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); return evs.length?why(evs):null; }
+  g.TJ={rec:rec,judge:judge,all:all,score:score,reasons:reasons,trim:trim};
+})(typeof window!=="undefined"?window:this);
+</script>
+<script>/* 여러 식을 이은 식 줄 나누기(대표님 2026-09-29 「수식 한 줄로, 배치구조 신경」) — 원본은 이 파일 하나(수업 노트·암기노트 템플릿에 빌더가 넣는다, __SPLITTEX__).
+   \[ A,\qquad B \] 처럼 서로 다른 식을 \qquad 또는 「,\quad」로 이어 붙인 줄은 식마다 한 줄(\[A\]\[B\])로 — 한 식 안은 가르지 않는다.
+   괄호 { } 와 \begin…\end 안의 구분자는 건드리지 않고, 연결 기호만 남은 조각(\Rightarrow·\to·\Leftrightarrow·\therefore)은 다음 식 앞에 붙인다. */
+/* 괄호 깊이: ( ) [ ] 와 \left…\right 안에서는 나누지 않는다 — \left(a\qquad b\right) 가 갈렸다(오타 .91 설계 검수 ④) */
+function parenStep(t,i,p){
+  if(t.startsWith("\\left",i)&&!/[a-zA-Z]/.test(t[i+5]||"")) return p+1;
+  if(t.startsWith("\\right",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) return Math.max(0,p-1);
+  const c=t[i]; if(c==="("||c==="[") return p+1; if(c===")"||c==="]") return Math.max(0,p-1); return p;
+}
+function splitTex(t){
+  const parts=[]; let d=0, env=0, p=0, cur="", i=0;
+  while(i<t.length){
+    if(t.startsWith("\\begin{",i)) env++;
+    else if(t.startsWith("\\end{",i)) env=Math.max(0,env-1);
+    const c=t[i];
+    if(c==="\\"&&(t[i+1]==="{"||t[i+1]==="}")){ cur+=t.slice(i,i+2); i+=2; continue; }
+    if(c==="{") d++; else if(c==="}") d=Math.max(0,d-1);
+    p=parenStep(t,i,p);
+    if(!d&&!env&&!p){
+      let m=0;
+      if(t.startsWith("\\qquad",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) m=6;
+      else if(t.startsWith(",\\quad",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) m=6;
+      if(m){ parts.push(cur); cur=""; i+=m; continue; }
+    }
+    cur+=c; i++;
+  }
+  parts.push(cur);
+  const out=[]; let carry="";
+  parts.map(p=>p.trim().replace(/^,\s*/,"").replace(/,\s*$/,"")).forEach(p=>{
+    if(!p) return;
+    if(/^(\\(Rightarrow|Leftarrow|Leftrightarrow|to|therefore|because|implies|iff)\s*)+$/.test(p)){ carry+=p+" "; return; }
+    out.push(carry+p); carry="";
+  });
+  if(carry&&out.length) out[out.length-1]+=" "+carry.trim();
+  return out.length?out:[t];
+}
+/* 좁은 화면(폰)에서만: 글자 덩어리(\text{…})를 화살표(\to·\Rightarrow)로 이은 「흐름」 줄은 화살표 단위로 줄을 나눈다 — 수식이 아니라 단계 나열이라 나눠도 식이 갈리지 않는다 */
+function splitFlow(t){
+  const segs=[]; let d=0, p=0, cur="", i=0;
+  while(i<t.length){ const c=t[i];
+    if(c==="\\"&&(t[i+1]==="{"||t[i+1]==="}")){ cur+=t.slice(i,i+2); i+=2; continue; }
+    if(c==="{") d++; else if(c==="}") d=Math.max(0,d-1);
+    p=parenStep(t,i,p);
+    if(!d&&!p){ const m=/^\\ ?\\(to|Rightarrow)(?![a-zA-Z])\\ ?/.exec(t.slice(i))||/^\s*\\(to|Rightarrow)(?![a-zA-Z])\s*/.exec(t.slice(i)); if(m&&cur.trim()){ segs.push(cur); cur="\\"+m[1]+"\\ "; i+=m[0].length; continue; } }
+    cur+=c; i++; }
+  segs.push(cur);
+  const ok=segs.length>=3&&segs.every(s=>/^(\\(to|Rightarrow)\\ )?\s*\\text\{/.test(s.trim()));
+  return ok?segs.map(s=>s.trim()):[t];
+}
+function splitDisplays(html,narrow){
+  return String(html).replace(/\\\[([\s\S]*?)\\\]/g,(m,tex)=>{ let ps=splitTex(tex); if(narrow) ps=[].concat(...ps.map(splitFlow)); return ps.length>1?ps.map(p=>"\\["+p+"\\]").join(""):m; });
+}
+</script>
+<script>
+const LESSON_ID="statics-2026-09-28", QUIZ=[{"id": "q1", "qn": "확인 1 · 우력의 성질", "html": "우력(couple)에 대해 옳은 것은?", "choices": [{"html": "\\(\\sum\\mathbf F\\ne0\\)이고 \\(\\sum\\mathbf M=0\\)이다", "ok": false, "k": 1}, {"html": "\\(\\sum\\mathbf F=0\\)이지만 \\(\\sum\\mathbf M\\ne0\\) — 알짜힘 없이 모멘트만 준다", "ok": true, "k": 0}, {"html": "두 힘의 작용선이 같아야 한다", "ok": false, "k": 2}, {"html": "우력의 모멘트는 기준점에 따라 달라진다", "ok": false, "k": 3}], "ans": "크기 같고 방향 반대, 작용선이 다른 두 힘. \\(\\mathbf M=\\mathbf r\\times\\mathbf F\\)이고 \\(\\mathbf r\\)이 기준점과 무관해 어느 점에서나 같다."}, {"id": "q2", "qn": "확인 2 · Example 4.18", "html": "\\((3,7,0)\\) m에 \\(-2\\mathbf j\\) kN, \\((7,2,0)\\) m에 \\(2\\mathbf j\\) kN이 작용한다. 우력 모멘트 \\(\\mathbf M\\)은?", "choices": [{"html": "\\(-8\\mathbf k\\) kN·m", "ok": false, "k": 1}, {"html": "\\(4\\mathbf k\\) kN·m", "ok": false, "k": 3}, {"html": "\\(20\\mathbf k\\) kN·m", "ok": false, "k": 2}, {"html": "\\(8\\mathbf k\\) kN·m", "ok": true, "k": 0}], "ans": "\\((7\\mathbf i+2\\mathbf j)\\times2\\mathbf j+(3\\mathbf i+7\\mathbf j)\\times(-2\\mathbf j)=14\\mathbf k-6\\mathbf k=8\\mathbf k\\). 검산 \\(DF=4\\times2=8\\), 반시계(\\(+z\\)). 20은 두 항을 더해 버린 실수."}, {"id": "q3", "qn": "확인 3 · 기준점 바꾸기", "html": "A(0, 3, 0) m에 \\(4\\mathbf i\\) kN, B(2, 0, 0) m에 \\(-4\\mathbf i\\) kN. 점 P(5, 5, 0)에 대한 두 힘의 모멘트 합은?", "choices": [{"html": "\\(12\\mathbf k\\) kN·m", "ok": false, "k": 1}, {"html": "0 — 두 힘의 합이 0이므로", "ok": false, "k": 2}, {"html": "\\(-12\\mathbf k\\) kN·m — 원점이나 B 기준과 같다", "ok": true, "k": 0}, {"html": "P까지 거리에 따라 달라 \\(-20\\mathbf k\\) kN·m", "ok": false, "k": 3}], "ans": "\\((-5\\mathbf i-2\\mathbf j)\\times4\\mathbf i+(-3\\mathbf i-5\\mathbf j)\\times(-4\\mathbf i)=8\\mathbf k-20\\mathbf k=-12\\mathbf k\\). \\(DF=3\\times4=12\\), 시계 방향."}, {"id": "q4", "qn": "확인 4 · 교재 Sample Problem 2.10 (Pytel 4e)", "html": "기계 부품의 점 A에 작용하는 150 kN 힘을 점 B로 옮겨 힘-우력 계로 바꾼다. B에서 그 힘의 작용선까지 수직거리는 \\(80+40=120\\) mm다. 옮길 때 붙여야 하는 우력의 크기는?", "choices": [{"html": "18 kN·m", "ok": true, "k": 0}, {"html": "12 kN·m", "ok": false, "k": 1}, {"html": "6 kN·m", "ok": false, "k": 2}, {"html": "0 — 같은 힘이므로 우력이 필요 없다", "ok": false, "k": 3}], "ans": "\\(150\\times0.120=18\\) kN·m(교재 답: 시계 방향 \\(-18\\) kN·m). 교재 2번째 물음처럼 이 우력을 40 mm 떨어진 수평 힘 한 쌍으로 바꾸면 \\(18/0.040=450\\) kN."}, {"id": "q5", "qn": "확인 5 · 힘 옮기기", "html": "P(2, 0, 0) m에 작용하는 \\(10\\mathbf j\\) N을 원점 O로 옮긴다. O에 같은 힘과 함께 붙는 우력은?", "choices": [{"html": "\\(20\\mathbf i\\) N·m", "ok": false, "k": 2}, {"html": "\\(20\\mathbf k\\) N·m", "ok": true, "k": 0}, {"html": "\\(-20\\mathbf k\\) N·m", "ok": false, "k": 1}, {"html": "붙지 않는다", "ok": false, "k": 3}], "ans": "\\(\\mathbf r=\\text{O}\\to\\text{P}=2\\mathbf i\\), \\(2\\mathbf i\\times10\\mathbf j=20\\mathbf k\\). 다른 점 A(0, 5, 0)에서 검산해도 두 계 모두 \\(20\\mathbf k\\)."}, {"id": "q6", "qn": "확인 6 · 렌치가 필요한 이유", "html": "힘의 작용점을 옮겨서 만들 수 있는 모멘트 성분은?", "choices": [{"html": "힘에 평행한 성분뿐", "ok": false, "k": 1}, {"html": "수직·평행 성분 모두", "ok": false, "k": 2}, {"html": "어떤 성분도 만들 수 없다", "ok": false, "k": 3}, {"html": "힘에 수직인 성분뿐 — \\(\\mathbf r\\times\\mathbf F\\)는 늘 \\(\\mathbf F\\)에 수직", "ok": true, "k": 0}], "ans": "그래서 평행 성분 \\(\\mathbf M_p\\)는 끝까지 남고, 가장 간단한 등가계 = 렌치(\\(\\mathbf F\\) + 평행 우력 \\(\\mathbf M_p\\))."}, {"id": "q7", "qn": "확인 7 · 렌치로 줄이기", "html": "원점 P에 \\(\\mathbf F=10\\mathbf j\\) N, 우력 \\(\\mathbf M=6\\mathbf i+8\\mathbf j\\) N·m. 렌치의 평행 우력 \\(\\mathbf M_p\\)와, \\(\\mathbf F\\)에 수직으로 잡은 \\(\\mathbf r_{PQ}\\)를 구하라.", "choices": null, "ans": "\\(\\mathbf M_p=8\\mathbf j\\) N·m, \\(\\mathbf M_n=6\\mathbf i\\). \\(\\mathbf r_{PQ}=(\\mathbf F\\times\\mathbf M_n)/|\\mathbf F|^2=-0.6\\mathbf k\\) m. 검산 \\((-0.6\\mathbf k)\\times10\\mathbf j+8\\mathbf j=6\\mathbf i+8\\mathbf j\\)."}], NDS={"sec": {}, "q": {}}, N_SEC=document.querySelectorAll("section.s[data-id]").length;
+const KEY="mc-lesson-"+LESSON_ID;
+let ST={read:{},done:{},correct:{},answer:{},ts:0};
+try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}
+const $=s=>document.querySelector(s), $$=(s,el)=>Array.from((el||document).querySelectorAll(s)); /* el 범위 필수 — 문제 카드마다 보기를 따로 묶는다 (오타 RED 2026-09-26: 범위를 무시해 모든 보기가 마지막 문제로 채점됐다) */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function save(){ ST.ts=Date.now(); try{ localStorage.setItem(KEY,JSON.stringify(ST)); const qs=QUIZ.length, qd=QUIZ.filter(q=>ST.done[q.id]).length, rd=Object.keys(ST.read).length;
+  const li={deck:LESSON_ID,title:document.title,href:location.href.split("#")[0],idx:Math.max(0,rd-1),n:N_SEC,sid:curSec||"",part:null,partTitle:document.title.slice(0,60),where:(rd>=N_SEC?"확인 문제":"읽는 중 · "+(curTitle||"")),qDone:qd,qN:qs,ts:Date.now()};
+  const j=JSON.stringify(li); localStorage.setItem("mc-slides-last",j); localStorage.setItem("mc-slides-last-"+LESSON_ID,j); }catch(e){} }
+/* 스앵님 판정 기록(대표님 2026-09-29) — 섹션 읽음 · 문제 채점 → 개념 노드(knowledge/lesson_nodes.json) */
+function ev(k,x){ try{ if(!window.TJ) return; const o=Object.assign({k:k,lid:LESSON_ID},x||{}); if(o.n&&o.n.length) TJ.rec(o); }catch(e){} }
+/* 객관식 보기는 빌드 때 섞인다(quizmix) — 고른 보기를 원문 순서 k 로 저장 */
+const ck=(c,i)=>String(c&&c.k!=null?c.k:i);
+/* 인라인 식이 줄보다 길면 글자를 줄여 한 줄에(14px 까지) */
+function fitInline(root){ $$(".katex",root).forEach(k=>{ if(k.closest(".katex-display")) return; k.style.fontSize=""; const box=k.parentElement&&k.parentElement.closest("p,li,div,summary,button,td"); if(!box) return; const cw=box.clientWidth, w=k.getBoundingClientRect().width; if(!(cw>0&&w>cw-2)) return; const fs=parseFloat(getComputedStyle(k).fontSize)||17; k.style.fontSize=Math.max(14,Math.floor(fs*(cw-6)/w))+"px"; }); }
+window.addEventListener("resize",()=>fitInline(document.querySelector("main")),{passive:true});
+function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} fitInline(el); }
+/* ---- 읽음: 섹션이 화면의 절반 이상 1.2초 보이면 읽음 ---- */
+let curSec=null, curTitle="";
+function renderTop(){ const rd=Object.keys(ST.read).filter(k=>ST.read[k]).length, qd=QUIZ.filter(q=>ST.done[q.id]).length, tot=N_SEC+QUIZ.length;
+  $("#tRead").textContent="읽음 "+rd+"/"+N_SEC+(QUIZ.length?" · 문제 "+qd+"/"+QUIZ.length:""); const p=tot?Math.round((rd+qd)/tot*100):0; $("#tPct").textContent=p+"%"; $("#barI").style.width=p+"%";
+  $$("section.s[data-id]").forEach(s=>s.classList.toggle("read",!!ST.read[s.dataset.id]));
+  /* 따라감 기준은 앱(V52)과 같다: 섹션 전부 + 문제 90% 풀고 60% 정답 */
+  const okN=QUIZ.filter(q=>ST.correct[q.id]===true).length, need=Math.ceil(QUIZ.length*.6);
+  $("#done").textContent= rd>=N_SEC&&qd>=QUIZ.length&&QUIZ.length? (okN>=need? "완료 · 정답 "+okN+"/"+QUIZ.length : "정답 "+okN+"/"+QUIZ.length+" · "+need+"개 이상이면 완료") : ""; }
+const timers={};
+const io=new IntersectionObserver(es=>{ es.forEach(e=>{ const id=e.target.dataset.id; if(e.isIntersecting){ curSec=id; curTitle=(e.target.querySelector("h2")||{}).textContent||""; postCtx(e.target);
+    if(!ST.read[id]&&!timers[id]) timers[id]=setTimeout(()=>{ ST.read[id]=true; save(); renderTop(); ev("read",{sid:id,n:(NDS.sec||{})[id]||[],clean:true}); },1200); } else { if(timers[id]){ clearTimeout(timers[id]); delete timers[id]; } } }); },{threshold:.5});
+$$("section.s[data-id]").forEach(s=>io.observe(s));
+/* 짧은 섹션(화면보다 작아 50%가 금방 차는) 은 그대로, 긴 섹션은 끝까지 스크롤하면 읽음 */
+window.addEventListener("scroll",()=>{ $$("section.s[data-id]").forEach(s=>{ if(ST.read[s.dataset.id]) return; const r=s.getBoundingClientRect(); if(r.bottom<window.innerHeight*.6&&r.bottom>-2000){ ST.read[s.dataset.id]=true; save(); renderTop(); ev("read",{sid:s.dataset.id,n:(NDS.sec||{})[s.dataset.id]||[],clean:true}); } }); },{passive:true});
+/* ---- 판서 사진: atom 안에서만 (없으면 숨김) ---- */
+$$("figure.board img").forEach(img=>{ img.addEventListener("error",()=>{ img.closest("figure").hidden=true; }); });
+/* ---- 문제 카드 ---- */
+function qHTML(q,i){ const mc=Array.isArray(q.choices)&&q.choices.length, rev=!!ST.done[q.id], my=ST.answer[q.id];
+  let inner='<div class="qn">'+esc(q.qn||("문제 "+(i+1)))+'</div><div class="qb">'+q.html+'</div>';
+  if(mc){ inner+='<ol class="choices">'+q.choices.map((c,ci)=>{ const sel=my!=null&&String(my)===ck(c,ci); const cls=rev?(c.ok?" ok":(sel?" bad":"")):""; return '<li><button class="choice'+cls+'" data-ci="'+ci+'"'+(rev?" disabled":"")+'><span class="cn">'+(ci+1)+'</span><span>'+c.html+'</span></button></li>'; }).join("")+'</ol>'; }
+  else { inner+= rev? '<div class="memo"><b>내 답</b> '+esc(my||"")+'</div>' : '<textarea class="myans" placeholder="답만 간단히">'+esc(my||"")+'</textarea><div class="row"><button class="btn a" data-reveal>답 보기</button></div>'; }
+  if(rev){ const c=ST.correct[q.id]; inner+='<span class="verdict '+(c===true?"ok":c===false?"bad":"")+'">'+(c===true?"정답":c===false?"오답":"채점 전")+'</span>';
+    if(!mc&&c==null) inner+='<div class="row"><button class="btn" data-grade="1">맞았어요</button><button class="btn" data-grade="0">틀렸어요</button></div>';
+    inner+='<div class="row"><button class="btn xs" data-retry>다시 풀기</button></div>'; }
+  inner+='<div class="ans"><b>답 · 풀이</b><div>'+splitDisplays(q.ans||"",innerWidth<700)+'</div></div>';
+  return '<div class="q'+(rev?" rev":"")+'" data-q="'+q.id+'">'+inner+'</div>'; }
+function bindQ(){ const box=$("#qlist"); box.innerHTML=QUIZ.map(qHTML).join(""); typeset(box);
+  $$("#qlist .q").forEach(el=>{ const q=QUIZ.find(x=>x.id===el.dataset.q);
+    $$(".choice",el).forEach(b=>{ b.onclick=()=>{ if(ST.done[q.id]) return; const ci=+b.dataset.ci, c=q.choices[ci]; ST.answer[q.id]=(c&&c.k!=null)?c.k:ci; ST.done[q.id]=true; ST.correct[q.id]=!!(c&&c.ok); save(); bindQ(); renderTop(); ev("quiz",{qid:q.id,ok:ST.correct[q.id],n:(NDS.q||{})[q.id]||[]}); }; });
+    const rv=el.querySelector("[data-reveal]"); if(rv) rv.onclick=()=>{ const ta=el.querySelector(".myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); bindQ(); renderTop(); };
+    $$("[data-grade]",el).forEach(b=>{ b.onclick=()=>{ ST.correct[q.id]=b.dataset.grade==="1"; save(); bindQ(); renderTop(); ev("quiz",{qid:q.id,ok:ST.correct[q.id],n:(NDS.q||{})[q.id]||[]}); }; });
+    const rt=el.querySelector("[data-retry]"); if(rt) rt.onclick=()=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; save(); bindQ(); renderTop(); };
+  });
+  const done=QUIZ.filter(q=>ST.done[q.id]).length, ok=QUIZ.filter(q=>ST.correct[q.id]===true).length, wrong=QUIZ.filter(q=>ST.correct[q.id]===false);
+  $("#result").innerHTML= QUIZ.length? '<b>'+ok+'/'+QUIZ.length+'</b><span>정답 · 푼 문제 '+done+'</span>'+(wrong.length?'<button class="btn" id="retryWrong">틀린 문제 '+wrong.length+'개 다시</button>':'')+'<span class="sp" style="flex:1"></span><button class="btn xs" id="resetAll">이 회차 기록 지우기</button>' : '';
+  const rw=$("#retryWrong"); if(rw) rw.onclick=()=>{ wrong.forEach(q=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; }); save(); bindQ(); renderTop(); const f=$("#qlist .q:not(.rev)"); if(f) f.scrollIntoView({behavior:"smooth",block:"start"}); };
+  const ra=$("#resetAll"); if(ra) ra.onclick=()=>{ if(confirm("이 회차의 읽음·문제 기록을 지울까요?")){ ST={read:{},done:{},correct:{},answer:{},ts:0}; save(); bindQ(); renderTop(); } }; }
+/* ---- 앱 질문 패널 문맥 (V45 와 같은 규약) ---- */
+let CTX_GEN=null;
+function postCtx(sec){ try{ if(!CTX_GEN||window.parent===window) return; const s=sec||document.querySelector("section.s.read:last-of-type")||document.querySelector("section.s"); if(!s) return;
+  const t=(s.querySelector("h2")||{}).textContent||"", txt=(s.textContent||"").replace(/\s+/g," ").trim().slice(0,600);
+  window.parent.postMessage({type:"mc-slide",v:1,gen:CTX_GEN,deck:LESSON_ID,title:document.title.slice(0,80),sid:s.dataset.id,stype:"concept",part:null,partTitle:document.title.slice(0,60),label:"읽는 중 · "+t.slice(0,60),q:{qn:t.slice(0,80),kind:"개념",text:txt,choices:[],my:null,revealed:true,correct:null,answer:null}},location.origin); }catch(e){} }
+window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; postCtx(); } });
+/* ---- 시작 ---- */
+/* 넘치는 식 줄은 글자를 줄여 한 줄에(14px 까지) — 그래도 넘치면 식 칸 안에서 민다 */
+function fitDisplay(root){ $$(".katex-display",root).forEach(k=>{ k.style.fontSize=""; const cw=k.clientWidth, sw=k.scrollWidth; if(!(cw>0&&sw>cw+1)) return; const kx=k.querySelector(".katex"), fz=parseFloat(getComputedStyle(kx||k).fontSize)||20, lo=Math.min(1,Math.max(.6,14/fz)); k.style.fontSize=Math.max(lo,Math.floor(cw/sw*100)/100)+"em"; }); }
+window.addEventListener("resize",()=>fitDisplay(document.querySelector("main")),{passive:true});
+function boot(){ $$("section.s").forEach(s=>{ const h=s.innerHTML, n=splitDisplays(h,innerWidth<700); if(n!==h) s.innerHTML=n; }); typeset(document.querySelector("main")); fitDisplay(document.querySelector("main")); try{ document.fonts.ready.then(()=>fitDisplay(document.querySelector("main"))); }catch(e){} bindQ(); renderTop(); save();
+  const m=/^#s=([\w-]+)$/.exec(location.hash||""); if(m){ const el=document.querySelector('section.s[data-id="'+m[1]+'"]'); if(el) el.scrollIntoView(); }
+  else if(location.hash==="#resume"){ const ids=$$("section.s[data-id]").map(s=>s.dataset.id); const next=ids.find(id=>!ST.read[id]); if(next){ const el=document.querySelector('section.s[data-id="'+next+'"]'); if(el) el.scrollIntoView(); } else if(QUIZ.length){ $("#quiz").scrollIntoView(); } } }
+(function wait(){ if(window.renderMathInElement) boot(); else setTimeout(wait,40); })();
+</script>
+</body>
+</html>

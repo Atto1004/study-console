@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>"점은 r × F, 직선은 삼중곱" — 바리뇽 정리와 직선(축)에 대한 모멘트</title>
+<!-- 수업 노트 템플릿 v1 (대표님 2026-09-26 결정: 개념은 스크롤 교재 · 문제는 카드 · 아톰 SVG 그림 · 판서 사진은 atom 안에서만 · 원리 먼저 15~20분)
+     build_lesson.py 가 BODY·QUIZ·META 자리를 채운다(자리표시 글자를 이 주석에 쓰면 본문이 주석에 한 번 더 들어가니 금지). 저장: localStorage mc-lesson-<id> (읽은 섹션·문제 결과), mc-slides-last* (앱 「이어서 학습하기」). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<style>
+:root{--ink:#1F2A44;--ink-2:#55627A;--ink-3:#7C889B;--line:rgba(31,42,68,.14);--paper:rgba(255,255,255,.72);--paper-2:rgba(255,255,255,.5);--accent:#15803D;
+  --red:#E03131;--blue:#1971C2;--green:#2F9E44;--pink:#D0397A;--yel:#F59F00;--f:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --fs:18px;--lh:1.72;--r:18px}
+*{box-sizing:border-box}
+html{background:linear-gradient(160deg,#E9F0F5 0%,#F2F5F0 48%,#EDF2EE 100%) fixed}
+body{margin:0;font-family:var(--f);font-size:var(--fs);line-height:var(--lh);color:var(--ink);word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;pointer-events:none;filter:blur(60px)}
+body::before{width:52vw;height:52vw;max-width:640px;max-height:640px;left:-14vw;top:-18vh;background:radial-gradient(circle at 40% 40%,rgba(74,222,128,.30),transparent 68%)}
+body::after{width:60vw;height:60vw;max-width:760px;max-height:760px;right:-20vw;bottom:-24vh;background:radial-gradient(circle at 50% 50%,rgba(96,165,250,.28),transparent 66%)}
+/* 상단 고정: 과목 · 회차 · 진행 */
+#top{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.66);-webkit-backdrop-filter:blur(20px) saturate(140%);backdrop-filter:blur(20px) saturate(140%);border-bottom:1px solid rgba(255,255,255,.8)}
+#top .in{max-width:820px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--ink-2)}
+#top b{color:var(--ink);font-weight:700}
+#top .sp{flex:1}
+#bar{height:5px;background:rgba(31,42,68,.10)}
+#bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+#top .pct{font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
+/* 본문 */
+main{max-width:820px;margin:0 auto;padding:22px 20px 120px}
+header.h{padding:8px 0 18px}
+header.h .kicker{font-size:13.5px;color:var(--ink-3);font-weight:600;letter-spacing:.02em}
+header.h h1{font-size:30px;line-height:1.25;margin:6px 0 10px;letter-spacing:-.02em}
+header.h .meta{font-size:14px;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:6px 14px}
+header.h .lead{margin-top:14px;padding:14px 18px;border-radius:14px;background:var(--paper);border:1px solid rgba(255,255,255,.8);font-size:17px}
+section.s{margin:26px 0 0;padding:22px 22px 18px;border-radius:var(--r);background:var(--paper);border:1px solid rgba(255,255,255,.85);box-shadow:0 8px 26px rgba(20,40,60,.07),inset 0 1px 0 rgba(255,255,255,.8);scroll-margin-top:70px;position:relative}
+section.s .no{font-size:12.5px;color:var(--ink-3);font-weight:700;letter-spacing:.04em}
+section.s h2{font-size:23px;line-height:1.3;margin:2px 0 12px;letter-spacing:-.02em}
+section.s h3{font-size:18px;margin:18px 0 6px}
+section.s p{margin:0 0 10px}
+section.s.read::after{content:"읽음";position:absolute;right:16px;top:14px;font-size:12px;color:var(--accent);font-weight:700;border:1px solid rgba(21,128,61,.35);border-radius:999px;padding:1px 9px;background:rgba(21,128,61,.06)}
+/* 상자들 */
+.why,.say,.analogy,.formula,.pitfall,.memo{margin:12px 0;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:var(--paper-2);font-size:17px}
+/* 암기·이해 구분(대표님 2026-09-29): 상자 머리말 = 알약. 암기(주황) = 공식·외울 것, 이해(파랑) = 왜·비유 */
+.why::before,.analogy::before,.formula::before,.pitfall::before,.say::before,.memo.am::before{display:table;font-size:12px;font-weight:800;line-height:1;padding:5px 10px;border-radius:999px;margin:0 0 8px;color:#fff;letter-spacing:.02em}
+.why{border-left:5px solid var(--blue)}.why::before{content:"이해 · 왜";background:#1D4ED8}
+.say{border-left:5px solid var(--pink);background:rgba(255,77,141,.06)}.say::before{content:"교수님 말";background:#A61E4D}
+.analogy{border-left:5px solid var(--yel);background:rgba(245,159,0,.07)}.analogy{border-left-color:var(--blue)}.analogy::before{content:"이해 · 비유";background:#1D4ED8}
+.formula{border-left:5px solid var(--green);background:rgba(47,158,68,.06)}.formula{border-left-color:#D97706;background:rgba(217,119,6,.06)}.formula::before{content:"암기 · 공식";background:#B45309}
+.pitfall{border-left:5px solid var(--red);background:rgba(224,49,49,.05)}.pitfall::before{content:"함정";background:#C92A2A}
+.memo{border-left:5px solid var(--ink-3)}
+.memo.am{border-left-color:#D97706;background:rgba(217,119,6,.06)}.memo.am::before{content:"암기";background:#B45309}
+/* 인라인 식은 줄에서 끊지 않는다(대표님 2026-09-29 「수식 한 줄로」) — 넘치면 fitInline 이 줄인다 */
+.katex{white-space:nowrap}
+#top a.memo-l{color:var(--ink);font-weight:700;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:rgba(255,255,255,.6);min-height:32px;display:inline-flex;align-items:center}
+.katex-display{margin:10px 0;overflow-x:auto;overflow-y:hidden}
+/* 그림 */
+figure.fig{margin:14px auto;text-align:center;max-width:560px}
+figure.fig svg{max-width:100%;height:auto}
+figure.fig figcaption{font-size:13.5px;color:var(--ink-2);margin-top:6px;text-align:center}
+figure.board{margin:14px 0;text-align:center}
+figure.board img{max-width:100%;max-height:440px;object-fit:contain;border-radius:12px;border:1px solid var(--line);background:#111}
+figure.board figcaption{font-size:13px;color:var(--ink-3);margin-top:4px}
+figure.board[hidden]{display:none}
+/* 예제 */
+details.ex{margin:12px 0;border:1px solid var(--line);border-radius:12px;background:var(--paper-2);padding:0}
+details.ex summary{cursor:pointer;padding:12px 16px;font-weight:700;list-style:none;display:block;line-height:1.6}
+details.ex summary::before{content:"예제";display:inline-block;vertical-align:middle;margin-right:10px;font-size:12px;line-height:1.5;color:#fff;background:var(--ink);border-radius:6px;padding:2px 7px}
+details.ex summary::-webkit-details-marker{display:none}
+details.ex .body{padding:0 16px 14px;border-top:1px solid var(--line)}
+details.ex .body p{margin:8px 0}
+/* 문제 카드 */
+#quiz{margin-top:30px}
+#quiz h2{font-size:22px;margin:0 0 6px}
+#quiz .hint{font-size:14px;color:var(--ink-2);margin-bottom:12px}
+.q{margin:12px 0;padding:18px 20px;border-radius:var(--r);background:var(--paper);border:1px solid rgba(255,255,255,.85);box-shadow:0 8px 26px rgba(20,40,60,.07)}
+.q .qn{font-size:13px;font-weight:700;color:var(--ink-3);margin-bottom:4px}
+.q .qb{font-size:17.5px;margin-bottom:10px}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;list-style:none;padding:0;margin:0}
+@media(max-width:640px){.choices{grid-template-columns:1fr}}
+.choice{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.6);cursor:pointer;font:inherit;font-size:16.5px;text-align:left;color:var(--ink);min-height:48px;box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+.choice .cn{flex:0 0 26px;height:26px;border-radius:50%;border:1px solid var(--ink-3);display:flex;align-items:center;justify-content:center;font-size:13px}
+.choice[disabled]{cursor:default}
+.choice.ok{border-color:var(--green);background:rgba(47,158,68,.10)}.choice.ok .cn{background:var(--green);border-color:var(--green);color:#fff}
+.choice.bad{border-color:var(--red);background:rgba(224,49,49,.08)}.choice.bad .cn{background:var(--red);border-color:var(--red);color:#fff}
+.q .ans{display:none;margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(31,42,68,.05);font-size:16px}
+.q.rev .ans{display:block}
+.q .verdict{display:inline-block;margin-top:10px;font-size:14px;font-weight:700;padding:3px 10px;border-radius:999px}
+.q .verdict.ok{background:rgba(47,158,68,.12);color:var(--green)}.q .verdict.bad{background:rgba(224,49,49,.10);color:var(--red)}
+.q .myans{width:100%;font:inherit;font-size:16px;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.7);resize:vertical;min-height:52px}
+.q .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center}
+.btn{font:inherit;font-size:15px;font-weight:600;padding:8px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.7);color:var(--ink);cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}
+.btn.a{background:var(--accent);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(21,128,61,.25)}
+.btn.xs{font-size:13px;padding:5px 10px;border-radius:8px}
+.btn[disabled]{opacity:.5;cursor:default}
+#result{margin-top:16px;padding:16px 20px;border-radius:var(--r);background:var(--paper);border:1px solid rgba(255,255,255,.85);display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+#result b{font-size:22px}
+#done{margin-top:20px;text-align:center;font-size:14px;color:var(--ink-3)}
+/* 다크 */
+@media(prefers-color-scheme:dark){
+  :root{--ink:#F1F6F2;--ink-2:#B7C2BB;--ink-3:#8F9C95;--line:rgba(255,255,255,.12);--paper:rgba(18,26,24,.62);--paper-2:rgba(255,255,255,.05);--accent:#4ADE80;--blue:#74C0FC;--green:#69DB7C;--pink:#FF8AB8;--yel:#FFD43B;--red:#FF8787}
+  html{background:linear-gradient(160deg,#0B1020 0%,#0E1A16 48%,#0B1412 100%) fixed}
+  body::before{background:radial-gradient(circle at 40% 40%,rgba(74,222,128,.18),transparent 68%)}body::after{background:radial-gradient(circle at 50% 50%,rgba(59,130,246,.2),transparent 66%)}
+  #top{background:rgba(18,26,24,.7);border-bottom-color:rgba(255,255,255,.1)}
+  section.s,.q,#result,header.h .lead{border-color:rgba(255,255,255,.1);box-shadow:0 12px 34px rgba(0,0,0,.35)}
+  .choice{background:rgba(255,255,255,.06)}.q .ans{background:rgba(255,255,255,.06)}.q .myans{background:rgba(255,255,255,.06)}
+  .btn{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}.btn.a{color:#052E16}
+  .say{background:rgba(255,77,141,.10)}.analogy{background:rgba(59,130,246,.10)}.formula{background:rgba(217,119,6,.12)}.memo.am{background:rgba(217,119,6,.12)}.pitfall{background:rgba(224,49,49,.10)}#top a.memo-l{background:rgba(255,255,255,.08)}
+  figure.fig svg{filter:invert(1) hue-rotate(180deg) saturate(1.2)}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){#top{background:#FFFFFF}section.s,.q,#result{background:#FFFFFF}}
+@media(max-width:640px){:root{--fs:17px}main{padding:16px 14px 110px}section.s{padding:18px 16px 14px}header.h h1{font-size:25px}
+  /* 폰에서는 그림을 축소하지 않고(글자가 7px 로 줄어든다) 가로 스크롤로 본다 */
+  figure.fig{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:none;margin-left:-6px;margin-right:-6px;padding:0 6px}figure.fig svg{min-width:500px}}
+</style>
+</head>
+<body>
+<div id="top"><div class="in"><b id="tCourse">정역학</b><span id="tSess">9/23(수) · 4주차 · 약 18분</span><span class="sp"></span><span id="tRead">읽음 0/0</span><span class="pct" id="tPct">0%</span><a class="memo-l" href="../../memo/statics.html#d2026-09-23">암기노트</a></div><div id="bar"><i id="barI"></i></div></div>
+<main>
+<header class="h"><div class="kicker">정역학 · 9/23(수) · 4주차 · 약 18분</div><h1>"점은 r × F, 직선은 삼중곱" — 바리뇽 정리와 직선(축)에 대한 모멘트</h1><div class="meta"><span>교수 필기본 W4-2 9p</span><span>LMS 영상 65분</span><span>녹음 없음</span><span>4주차 · 수 · 중간 범위(Ch.3~5)</span></div><div class="lead">지난 시간 <b>점에 대한 모멘트</b>를 예제 하나로 두 방법(\(DF\) · \(\mathbf r\times\mathbf F\))으로 마무리하고, <b>바리뇽 정리</b>(합력의 모멘트 = 각 힘 모멘트의 합 → 성분으로 쪼개도 된다)를 정리했다. 본론은 <b>직선(축)에 대한 모멘트</b>: \(\mathbf M_P\) 중 L 과 평행한 성분, 식은 3주차의 <b>혼합삼중적</b> \(\mathbf e\cdot(\mathbf r\times\mathbf F)\). L 위 어느 점을 골라도 같고, 예제 2개(터빈 · 두 점 직선)와 계산 없이 끝나는 <b>특수한 경우 3가지</b>로 마쳤다. 녹음이 없어 교수님 필기본 9쪽과 LMS 영상으로 정리했다.</div></header>
+<section class="s" data-id="s1" data-nodes="mech.moment">
+<div class="no">1 / 8</div><h2>1. 예제 — 점 (4, 2, 0) 에 10j N, 원점에 대한 모멘트를 두 방법으로</h2>
+<p>필기 p.2: 점 \((4,2,0)\) m 에 위쪽 힘 \(\mathbf F=10\mathbf j\) N. 원점 O 에 대한 모멘트 \(\mathbf M_O\) 를 W4-1 에서 배운 두 방법으로 구한다.</p>
+<figure class="fig" data-fig="ex1"><svg class="fig-svg" viewbox="0 0 560 230" width="560" height="230" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><line x1="70" y1="190" x2="330" y2="190" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><line x1="70" y1="190" x2="70" y2="30" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><text x="326" y="208" font-size="13" fill="#1F2A44" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">x (m)</text><text x="64" y="34" font-size="13" fill="#1F2A44" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">y (m)</text><text x="64" y="208" font-size="13" fill="#1F2A44" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">O</text><circle cx="230" cy="110" r="4" fill="#1F2A44"></circle><text x="238" y="128" font-size="12" fill="#1F2A44" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">(4, 2, 0)</text><line x1="230" y1="110" x2="230" y2="50" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="260.0" y="80.0" text-anchor="middle" font-size="13" fill="#2F9E44">10j N</text><text x="230" y="208" font-size="12" fill="#8A97A6" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">4</text><text x="62" y="114" font-size="12" fill="#8A97A6" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">2</text></g><g data-step="2"><line x1="230" y1="26" x2="230" y2="48" stroke="#1971C2" stroke-width="1.6" stroke-dasharray="6 5"></line><line x1="230" y1="110" x2="230" y2="190" stroke="#1971C2" stroke-width="1.6" stroke-dasharray="6 5"></line><line x1="70" y1="190" x2="230" y2="190" stroke="#E03131" stroke-width="3.2"></line><text x="150" y="178" font-size="13" fill="#E03131" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">D = 4 m</text></g><g data-step="3"><text x="350" y="66" font-size="12.5" fill="#1F2A44" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">방법 1 : D × F = 4 × 10 = 40 N·m</text><text x="350" y="90" font-size="12.5" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">반시계 → +z → M<tspan baseline-shift="sub" font-size="72%">O</tspan> = 40k N·m</text></g><g data-step="4"><line x1="70" y1="190" x2="226" y2="112" stroke="#E03131" stroke-width="2.2" marker-end="url(#ah)" stroke-dasharray="6 4"></line><text x="122.0" y="133.0" text-anchor="middle" font-size="13" fill="#E03131">r = 4i + 2j</text><text x="350" y="140" font-size="12.5" fill="#1F2A44" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">방법 2 : r × F = (4i + 2j) × 10j</text><text x="350" y="164" font-size="12.5" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">= 40k + 20(j × j) = 40k N·m</text><text x="350" y="188" font-size="12.5" fill="#FF4D8D" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">j × j = 0</text></g></svg><figcaption>필기 p.2 예제: 점 \((4,2,0)\) m 에 \(10\mathbf j\) N. 세로 힘의 작용선은 \(x=4\) 인 세로선이라 원점에서 수직거리 \(D=4\) m. 두 방법 모두 \(\mathbf M_O=40\mathbf k\) N·m.</figcaption></figure>
+<div class="formula">\[\text{방법 1}:\ |\mathbf M_O|=DF=4\ \mathrm{m}\times10\ \mathrm{N}=40\ \mathrm{N\cdot m},\ \text{반시계}\Rightarrow+z\qquad \text{방법 2}:\ \mathbf r\times\mathbf F=(4\mathbf i+2\mathbf j)\times10\mathbf j=40\mathbf k+20(\mathbf j\times\mathbf j)=40\mathbf k\]</div>
+<div class="why">방법 1 에서 \(D\) 는 원점에서 힘의 <b>작용선</b>(\(x=4\) 세로선)까지의 수직거리라 4 m 다. 점까지 거리 \(\sqrt{4^2+2^2}\) 가 아니다. 방향은 이 힘이 원점을 반시계로 돌리므로 +z(C.C.W). 방법 2 에서는 \(\mathbf i\times\mathbf j=\mathbf k\), \(\mathbf j\times\mathbf j=0\)(같은 벡터끼리 외적은 0). y 성분 2 m 는 힘과 평행한 방향이라 모멘트에 기여하지 않는다 — W4-1 의 「r 은 작용선 위 아무 점」 그대로 \(\mathbf r=4\mathbf i\) 로 잡아도 같다.</div>
+<div class="analogy">2D 처럼 그림이 바로 보이면 방법 1(팔 길이 × 힘)이 빠르고, 3D 처럼 수직거리가 안 보이면 방법 2(외적)가 안전하다. 두 개를 다 쓸 줄 알면 하나로 풀고 다른 하나로 검산할 수 있다.</div>
+<div class="memo am">\(\mathbf M_O=40\mathbf k\) N·m (두 방법 같음) · \(D\) = 작용선까지 · \(\mathbf j\times\mathbf j=0\), \(\mathbf i\times\mathbf j=\mathbf k\) · 반시계 = +z</div>
+</section>
+
+<section class="s" data-id="s2" data-nodes="mech.moment mech.moment_line">
+<div class="no">2 / 8</div><h2>2. 바리뇽 정리 (Varignon's theorem) — 합력의 모멘트 = 각 힘 모멘트의 합</h2>
+<p>필기 p.3: 작용선이 한 점 Q 에서 만나는 힘들 \(\mathbf F_1,\mathbf F_2,\dots,\mathbf F_N\)(<b>공점력계, concurrent system</b>)을 생각한다. 다른 점 P 에서 Q 로 가는 위치벡터 \(\mathbf r_{PQ}\) 를 모든 힘이 같이 쓸 수 있다 — 작용선이 모두 Q 를 지나니까.</p>
+<figure class="fig" data-fig="var"><svg class="fig-svg" viewbox="0 0 560 290" width="560" height="290" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><circle cx="300" cy="110" r="5" fill="#1F2A44"></circle><text x="286" y="96" font-size="14" fill="#1F2A44" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">Q</text><line x1="300" y1="110" x2="400" y2="60" stroke="#2F9E44" stroke-width="2.6" marker-end="url(#ah)"></line><text x="338.0" y="71.0" text-anchor="middle" font-size="13" fill="#2F9E44">F<tspan baseline-shift="sub" font-size="72%">1</tspan></text><line x1="300" y1="110" x2="260" y2="30" stroke="#1971C2" stroke-width="2.6" marker-end="url(#ah)"></line><text x="264.0" y="70.0" text-anchor="middle" font-size="13" fill="#1971C2">F<tspan baseline-shift="sub" font-size="72%">2</tspan></text><line x1="300" y1="110" x2="360" y2="190" stroke="#FF4D8D" stroke-width="2.6" marker-end="url(#ah)"></line><text x="346.0" y="150.0" text-anchor="middle" font-size="13" fill="#FF4D8D">F<tspan baseline-shift="sub" font-size="72%">3</tspan></text><text x="440" y="130" font-size="12" fill="#8A97A6" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">작용선이 Q 에서 만남</text><text x="440" y="150" font-size="12" fill="#8A97A6" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">(concurrent)</text></g><g data-step="2"><circle cx="80" cy="190" r="5" fill="#1F2A44"></circle><text x="72" y="210" font-size="14" fill="#1F2A44" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">P</text><line x1="80" y1="190" x2="296" y2="112" stroke="#E03131" stroke-width="2.6" marker-end="url(#ah)"></line><text x="178.0" y="137.0" text-anchor="middle" font-size="13" fill="#E03131">r<tspan baseline-shift="sub" font-size="72%">PQ</tspan></text></g><g data-step="3"><text x="40" y="230" font-size="13" fill="#1F2A44" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">ΣM<tspan baseline-shift="sub" font-size="72%">P</tspan> = r<tspan baseline-shift="sub" font-size="72%">PQ</tspan> × F<tspan baseline-shift="sub" font-size="72%">1</tspan> + r<tspan baseline-shift="sub" font-size="72%">PQ</tspan> × F<tspan baseline-shift="sub" font-size="72%">2</tspan> + r<tspan baseline-shift="sub" font-size="72%">PQ</tspan> × F<tspan baseline-shift="sub" font-size="72%">3</tspan></text><text x="40" y="252" font-size="13" fill="#E03131" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">= r<tspan baseline-shift="sub" font-size="72%">PQ</tspan> × (F<tspan baseline-shift="sub" font-size="72%">1</tspan> + F<tspan baseline-shift="sub" font-size="72%">2</tspan> + F<tspan baseline-shift="sub" font-size="72%">3</tspan>) = r<tspan baseline-shift="sub" font-size="72%">PQ</tspan> × ΣF</text></g><g data-step="4"><text x="40" y="274" font-size="13" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">→ M<tspan baseline-shift="sub" font-size="72%">P</tspan>(F) = M<tspan baseline-shift="sub" font-size="72%">P</tspan>(F<tspan baseline-shift="sub" font-size="72%">x</tspan>) + M<tspan baseline-shift="sub" font-size="72%">P</tspan>(F<tspan baseline-shift="sub" font-size="72%">y</tspan>) + M<tspan baseline-shift="sub" font-size="72%">P</tspan>(F<tspan baseline-shift="sub" font-size="72%">z</tspan>)</text></g></svg><figcaption>바리뇽 정리(필기 p.3): 한 점 Q 에서 만나는 힘들은 같은 \(\mathbf r_{PQ}\) 를 공유하므로 외적의 분배법칙으로 묶인다. 합력의 모멘트 = 각 힘 모멘트의 합.</figcaption></figure>
+<div class="formula">\[\sum\mathbf M_P=\mathbf r_{PQ}\times\mathbf F_1+\mathbf r_{PQ}\times\mathbf F_2+\cdots+\mathbf r_{PQ}\times\mathbf F_N=\mathbf r_{PQ}\times(\mathbf F_1+\cdots+\mathbf F_N)=\mathbf r_{PQ}\times\sum\mathbf F\]</div>
+<div class="say">뜻(필기 빨간 글씨): <b>합력의 모멘트 = 각 힘 모멘트의 합</b>. "각각 계산해서 더해도, 합력 하나로 계산해도 결과가 같다."</div>
+<div class="why">근거는 외적의 <b>분배법칙</b> 하나다. 정역학에서 이 정리를 쓰는 방식은 한 힘을 x, y, z 성분으로 쪼개는 것 — 세 성분은 같은 점에 걸린 공점력이니까. \(M_P(\mathbf F)=M_P(F_x)+M_P(F_y)+M_P(F_z)\). 왜 쪼개나: <b>모멘트가 0 인 성분을 바로 날릴 수 있어서</b>(작용선이 P 를 지나거나 축과 평행한 성분). W4-1 에서 "상황 보고 쪼개라"고 한 이유가 이것.</div>
+<div class="formula">\[M_P(\mathbf F)=M_P(F_x)+M_P(F_y)+M_P(F_z)\]</div>
+<div class="analogy">세 사람이 한 지점에 묶은 줄을 각자 당긴다. 세 사람 힘을 먼저 합쳐 한 사람 힘으로 보고 돌리는 효과를 재든, 한 명씩 재서 더하든 같다. 영수증을 품목별로 계산해 더하든 합계로 계산하든 같은 것처럼.</div>
+<div class="memo am">\(\sum\mathbf M_P=\mathbf r_{PQ}\times\sum\mathbf F\) (공점력, 분배법칙) · 합력의 모멘트 = 각 힘 모멘트의 합 · \(M_P(\mathbf F)=M_P(F_x)+M_P(F_y)+M_P(F_z)\) · 쪼개는 이유 = 0 인 성분 날리기</div>
+</section>
+
+<section class="s" data-id="s3" data-nodes="mech.moment_line mech.projection">
+<div class="no">3 / 8</div><h2>3. 직선에 대한 힘의 모멘트 — M_P 중 L 과 평행한 성분</h2>
+<p>필기 p.4 <b>Moment of a force about a line</b>. 직선 L 과 힘 \(\mathbf F\). <b>L 위 아무 점 P</b> 를 고르고 \(\mathbf M_P\) 를 구한다. F 의 L 에 대한 모멘트 = \(\mathbf M_P\) 중 <b>L 에 평행한 성분</b>.</p>
+<figure class="fig" data-fig="proj"><svg class="fig-svg" viewbox="0 0 560 240" width="560" height="240" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><line x1="40" y1="200" x2="520" y2="80" stroke="#1971C2" stroke-width="2"></line><text x="530" y="76" font-size="14" fill="#1971C2" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">L</text><circle cx="150" cy="172.5" r="5" fill="#1F2A44"></circle><text x="150" y="196" font-size="12" fill="#1F2A44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">P (L 위 아무 점)</text><line x1="400" y1="110.0" x2="442.7" y2="99.3" stroke="#1971C2" stroke-width="3" marker-end="url(#ah)"></line><text x="422" y="94.0" font-size="14" fill="#1971C2" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">e</text></g><g data-step="2"><line x1="150" y1="172.5" x2="260" y2="40" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="268" y="38" font-size="13" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M<tspan baseline-shift="sub" font-size="72%">P</tspan> = r × F</text></g><g data-step="3"><line x1="260" y1="40" x2="284.7" y2="138.8" stroke="#8A97A6" stroke-width="1.4" stroke-dasharray="5 4"></line><line x1="150" y1="172.5" x2="284.7" y2="138.8" stroke="#FF4D8D" stroke-width="4.5" marker-end="url(#ah)"></line><text x="225" y="178" font-size="14" fill="#FF4D8D" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M<tspan baseline-shift="sub" font-size="72%">L</tspan></text></g><g data-step="4"><text x="330" y="186" font-size="14" fill="#1F2A44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M<tspan baseline-shift="sub" font-size="72%">L</tspan> = (e · M<tspan baseline-shift="sub" font-size="72%">P</tspan>) e</text><text x="330" y="210" font-size="12.5" fill="#8A97A6" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">= M<tspan baseline-shift="sub" font-size="72%">P</tspan> 를 L 위로 정사영</text></g></svg><figcaption>필기 p.4: 직선 L 위 아무 점 P 의 모멘트 \(\mathbf M_P\) 중 <b>L 에 평행한 성분</b>만 남긴 것이 L 에 대한 모멘트. 내적 \(\mathbf e\cdot\mathbf M_P\) 가 평행한 크기를 뽑는다.</figcaption></figure>
+<div class="formula">\[\mathbf M_L=(\mathbf e\cdot\mathbf M_P)\,\mathbf e\qquad(\mathbf e:\ \text{L 방향 단위벡터})\]</div>
+<div class="say">교수님 질문 "<b>평행? 수직?</b>" → <b>평행</b>. 그리고 "2장 「직선에 평행·수직인 벡터 성분」 부분을 다시 확인할 것"(필기 파란 메모).</div>
+<div class="why">축 L 을 "뱅글뱅글" 돌리는 모멘트는 방향(오른손 엄지)이 L 과 나란해야 한다. \(\mathbf M_P\) 에서 L 과 수직인 성분은 축을 꺾으려는(베어링이 받아 주는) 몫이라 축을 돌리지 못한다. 평행한 크기는 내적 \(\mathbf e\cdot\mathbf M_P\) 로 뽑고 방향은 \(\mathbf e\) 를 붙인다 — 2장의 \(\mathbf U_\parallel=(\mathbf U\cdot\mathbf e)\mathbf e\), 즉 \(\mathbf M_P\) 를 L 위에 <b>정사영(projection)</b> 한 것이다.</div>
+<div class="analogy">문의 경첩 축이 L 이다. 문을 비스듬히 밀면 그 힘의 모멘트 중 경첩 축 방향 몫만 문을 돌리고, 나머지는 경첩을 위아래로 비트는 데 쓰여 경첩이 버텨 준다.</div>
+<div class="memo am">L 에 대한 모멘트 = \(\mathbf M_P\)(P 는 L 위 아무 점) 의 <b>L 평행 성분</b> · \(\mathbf M_L=(\mathbf e\cdot\mathbf M_P)\mathbf e\) = 정사영 · 2장 평행·수직 성분 복습</div>
+</section>
+
+<section class="s" data-id="s4" data-nodes="mech.moment_line mech.triple_product">
+<div class="no">4 / 8</div><h2>4. M_L = [e·(r × F)] e — 혼합삼중적 · 행렬식 · 부호</h2>
+<p>\(\mathbf M_P=\mathbf r\times\mathbf F\) 를 넣으면 괄호 안이 3주차에 배운 <b>혼합삼중적(mixed triple product, 삼중곱)</b>이 된다. 결과는 <b>스칼라</b>이고 3×3 행렬식으로 계산한다.</p>
+<div class="formula">\[\mathbf M_L=[\mathbf e\cdot(\mathbf r\times\mathbf F)]\,\mathbf e,\qquad \mathbf e\cdot(\mathbf r\times\mathbf F)=\begin{vmatrix}e_x&amp;e_y&amp;e_z\\r_x&amp;r_y&amp;r_z\\F_x&amp;F_y&amp;F_z\end{vmatrix}\]</div>
+<div class="say">"<b>기억하셔야 됩니다</b>" — 행렬식. 한 줄 정리: "<b>점에 대한 모멘트는 r × F, 직선에 대한 모멘트는 삼중곱</b>."</div>
+<figure class="fig" data-fig="sign"><svg class="fig-svg" viewbox="0 0 560 200" width="560" height="200" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><line x1="30" y1="100" x2="260" y2="100" stroke="#1971C2" stroke-width="2"></line><line x1="40" y1="100" x2="92" y2="100" stroke="#1971C2" stroke-width="3" marker-end="url(#ah)"></line><text x="66.0" y="88.0" text-anchor="middle" font-size="13" fill="#1971C2">e</text><line x1="130" y1="100" x2="236" y2="100" stroke="#FF4D8D" stroke-width="4.5" marker-end="url(#ah)"></line><text x="183.0" y="88.0" text-anchor="middle" font-size="13" fill="#FF4D8D">M<tspan baseline-shift="sub" font-size="72%">L</tspan></text><text x="145" y="146" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">e · (r × F) &gt; 0</text><text x="145" y="170" font-size="13" fill="#2F9E44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">→ M<tspan baseline-shift="sub" font-size="72%">L</tspan> 은 e 방향</text></g><g data-step="2"><line x1="300" y1="100" x2="530" y2="100" stroke="#1971C2" stroke-width="2"></line><line x1="310" y1="100" x2="362" y2="100" stroke="#1971C2" stroke-width="3" marker-end="url(#ah)"></line><text x="336.0" y="88.0" text-anchor="middle" font-size="13" fill="#1971C2">e</text><line x1="510" y1="100" x2="404" y2="100" stroke="#FF4D8D" stroke-width="4.5" marker-end="url(#ah)"></line><text x="457.0" y="88.0" text-anchor="middle" font-size="13" fill="#FF4D8D">M<tspan baseline-shift="sub" font-size="72%">L</tspan></text><text x="415" y="146" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">e · (r × F) &lt; 0</text><text x="415" y="170" font-size="13" fill="#E03131" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">→ M<tspan baseline-shift="sub" font-size="72%">L</tspan> 은 e 반대 방향</text></g></svg><figcaption>괄호 안 \(\mathbf e\cdot(\mathbf r\times\mathbf F)\) 는 스칼라(혼합삼중적). 부호가 방향을 알려 준다. \(\mathbf e\) 는 처음에 아무 쪽으로나 정해도 된다.</figcaption></figure>
+<div class="why">부호(필기 p.4): 계산값 <b>&gt; 0 이면 \(\mathbf M_L\) 은 \(\mathbf e\) 방향, &lt; 0 이면 \(\mathbf e\) 반대 방향</b>. \(\mathbf e\) 는 처음에 L 의 두 방향 중 아무 쪽으로 정해도 되고, 반대로 잡으면 값의 부호만 바뀌어 결과 벡터 \([\cdot]\mathbf e\) 는 같다. 행 순서는 \(\mathbf e\) → \(\mathbf r\) → \(\mathbf F\) — 두 행을 바꾸면 부호가 반대(3주차).</div>
+<div class="analogy">점 모멘트가 "어느 방향으로 얼마나 돌리나"의 화살표라면, 직선 모멘트는 그 화살표를 축에 비춘 그림자의 길이. 그림자가 축의 + 쪽에 생기면 양수, 반대쪽이면 음수.</div>
+<div class="memo am">\(\mathbf M_L=[\mathbf e\cdot(\mathbf r\times\mathbf F)]\mathbf e\) · \(\mathbf e\cdot(\mathbf r\times\mathbf F)=\det[\mathbf e;\mathbf r;\mathbf F]\) (스칼라) · 양수 → \(\mathbf e\) 방향, 음수 → 반대 · 점은 \(\mathbf r\times\mathbf F\), 직선은 삼중곱</div>
+</section>
+
+<section class="s" data-id="s5" data-nodes="mech.moment_line mech.triple_product">
+<div class="no">5 / 8</div><h2>5. 직선 위 어느 점을 골라도 같다 (Independence of the point chosen on the line)</h2>
+<p>필기 p.5: L 위 다른 점 P′ 을 고르면 \(\mathbf r'=\mathbf r+\mathbf u\) (\(\mathbf u\) = P′ 에서 P 로, L 위의 벡터). 넣어서 전개한다.</p>
+<figure class="fig" data-fig="anyp"><svg class="fig-svg" viewbox="0 0 560 262" width="560" height="262" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><line x1="30" y1="170" x2="530" y2="170" stroke="#1971C2" stroke-width="2"></line><text x="530" y="160" font-size="14" fill="#1971C2" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">L</text><line x1="44" y1="170" x2="96" y2="170" stroke="#1971C2" stroke-width="3" marker-end="url(#ah)"></line><text x="70.0" y="158.0" text-anchor="middle" font-size="13" fill="#1971C2">e</text><circle cx="170" cy="170" r="5" fill="#1F2A44"></circle><text x="170" y="192" font-size="14" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">P</text><circle cx="260" cy="60" r="4" fill="#1F2A44"></circle><line x1="260" y1="60" x2="370" y2="40" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="319.0" y="38.0" text-anchor="middle" font-size="13" fill="#2F9E44">F</text><line x1="170" y1="170" x2="257" y2="64" stroke="#E03131" stroke-width="2.6" marker-end="url(#ah)"></line><text x="199.5" y="117.0" text-anchor="middle" font-size="13" fill="#E03131">r</text></g><g data-step="2"><circle cx="350" cy="170" r="5" fill="#1F2A44"></circle><text x="350" y="192" font-size="14" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">P′</text><line x1="350" y1="170" x2="263" y2="64" stroke="#E03131" stroke-width="2.2" marker-end="url(#ah)" stroke-dasharray="7 4"></line><text x="318" y="112" font-size="14" fill="#E03131" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">r′</text><line x1="346" y1="170" x2="176" y2="170" stroke="#FF4D8D" stroke-width="3" marker-end="url(#ah)"></line><text x="261.0" y="192.0" text-anchor="middle" font-size="13" fill="#FF4D8D">u</text></g><g data-step="3"><text x="40" y="226" font-size="13" fill="#FF4D8D" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">e · (u × F) = 0 : e ∥ u → 평행육면체를 못 만든다 (부피 0)</text><text x="40" y="246" font-size="13" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">→ M<tspan baseline-shift="sub" font-size="72%">L</tspan> 은 L 위에서 고른 점과 무관</text></g></svg><figcaption>필기 p.5: L 위 다른 점 P′ 에서 \(\mathbf r'=\mathbf r+\mathbf u\). \(\mathbf u\) 는 L 위에 놓여 \(\mathbf e\) 와 평행하므로 \(\mathbf e\cdot(\mathbf u\times\mathbf F)=0\). 그래서 r 은 계산이 제일 쉬운 점에서 잡는다.</figcaption></figure>
+<div class="formula">\[\mathbf M_L=[\mathbf e\cdot(\mathbf r'\times\mathbf F)]\mathbf e=[\mathbf e\cdot(\mathbf r\times\mathbf F)+\mathbf e\cdot(\mathbf u\times\mathbf F)]\mathbf e=[\mathbf e\cdot(\mathbf r\times\mathbf F)]\mathbf e\]</div>
+<div class="why">\(\mathbf e\cdot(\mathbf u\times\mathbf F)\) 는 세 벡터가 만드는 평행육면체의 부피다. \(\mathbf e\) 와 \(\mathbf u\) 가 같은 직선 위에 있어 평행하므로 상자가 납작하게 눌려 <b>부피 0</b>. 그래서 <b>\(\mathbf M_L\) 은 L 위에서 고른 점과 무관</b>하다. 교수님 팁: 삼중적은 <b>행렬식</b>과 <b>평행육면체 부피</b> 두 가지로 기억해 두면 빠르다 — 두 벡터가 평행하거나 셋이 한 평면이면 계산 없이 0. 바리뇽으로 x, y, z 로 쪼개는 이유도 이렇게 0 으로 날릴 항이 생겨서.</div>
+<div class="say">"<b>r 은 제일 계산하기 쉬운 점에서 잡아라.</b>"</div>
+<div class="analogy">W4-1 의 「r 은 작용선 위 아무 점」과 짝이다. 점 모멘트는 <b>힘의 작용선 위</b>에서 r 의 끝을 옮겨도 같고, 직선 모멘트는 거기에 더해 <b>L 위</b>에서 r 의 시작점을 옮겨도 같다. 양쪽 끝을 다 편한 곳으로 옮길 수 있다.</div>
+<div class="memo am">\(\mathbf r'=\mathbf r+\mathbf u\), \(\mathbf u\parallel\mathbf e\) → \(\mathbf e\cdot(\mathbf u\times\mathbf F)=0\)(부피 0) → <b>M_L 은 L 위 점 선택과 무관</b> · 0 이 많은 점을 고른다</div>
+</section>
+
+<section class="s" data-id="s6" data-nodes="mech.moment_line">
+<div class="no">6 / 8</div><h2>6. 예제 1 — 터빈 (교재 Fig 4.14) : M_L = aF_y k</h2>
+<p>필기 p.6: 터빈이 축 L 둘레로 돈다. <b>L = z 축</b>. 축 위 점 Q 에서 힘이 걸린 점 P 까지 \(\mathbf r=a\mathbf i-b\mathbf k\), 힘 \(\mathbf F=F_x\mathbf i+F_y\mathbf j+F_z\mathbf k\).</p>
+<figure class="fig" data-fig="turb"><svg class="fig-svg" viewbox="0 0 560 280" width="560" height="280" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><line x1="200" y1="140" x2="290" y2="140" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><line x1="200" y1="140" x2="200" y2="50" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><line x1="200" y1="140" x2="146.0" y2="185.0" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><text x="296" y="145" font-size="13" fill="#1F2A44" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">y</text><text x="196" y="44" font-size="13" fill="#1F2A44" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">z</text><text x="140.0" y="175.0" font-size="13" fill="#1F2A44" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">x</text><line x1="200" y1="140" x2="200" y2="272" stroke="#1971C2" stroke-width="2" stroke-dasharray="7 5"></line><text x="208" y="266" font-size="12" fill="#1971C2" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">L = z축 (터빈 축)</text><circle cx="200" cy="140" r="5" fill="#1F2A44"></circle><text x="192" y="132" font-size="13" fill="#1F2A44" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">Q</text></g><g data-step="2"><line x1="200" y1="140" x2="166" y2="220" stroke="#E03131" stroke-width="2.6" marker-end="url(#ah)"></line><text x="208" y="192" font-size="13" fill="#E03131" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">r = a i − b k</text><circle cx="164" cy="224" r="4" fill="#1F2A44"></circle><text x="156" y="230" font-size="13" fill="#1F2A44" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">P</text></g><g data-step="3"><line x1="164" y1="224" x2="140" y2="244" stroke="#8A97A6" stroke-width="2.4" marker-end="url(#ah)"></line><text x="134" y="262" font-size="13" fill="#8A97A6" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F<tspan baseline-shift="sub" font-size="72%">x</tspan></text><line x1="164" y1="224" x2="164" y2="178" stroke="#1971C2" stroke-width="2.4" marker-end="url(#ah)"></line><text x="156" y="196" font-size="13" fill="#1971C2" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F<tspan baseline-shift="sub" font-size="72%">z</tspan></text><line x1="164" y1="224" x2="252" y2="224" stroke="#2F9E44" stroke-width="3.2" marker-end="url(#ah)"></line><text x="258" y="230" font-size="13" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F<tspan baseline-shift="sub" font-size="72%">y</tspan></text></g><g data-step="4"><text x="310" y="60" font-size="13" fill="#1F2A44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M<tspan baseline-shift="sub" font-size="72%">Q</tspan> = r × F</text><text x="310" y="84" font-size="12.5" fill="#1F2A44" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">= bF<tspan baseline-shift="sub" font-size="72%">y</tspan> i − (aF<tspan baseline-shift="sub" font-size="72%">z</tspan> + bF<tspan baseline-shift="sub" font-size="72%">x</tspan>) j + aF<tspan baseline-shift="sub" font-size="72%">y</tspan> k</text></g><g data-step="5"><text x="310" y="176" font-size="14" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M<tspan baseline-shift="sub" font-size="72%">L</tspan> = (k · M<tspan baseline-shift="sub" font-size="72%">Q</tspan>) k = aF<tspan baseline-shift="sub" font-size="72%">y</tspan> k</text><text x="310" y="200" font-size="12.5" fill="#E03131" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F<tspan baseline-shift="sub" font-size="72%">x</tspan> · F<tspan baseline-shift="sub" font-size="72%">z</tspan> 는 축에 대한 모멘트 0</text></g></svg><figcaption>필기 p.6(교재 Fig 4.14): 터빈은 z 축 둘레로만 돈다. 축 위 점 Q 에서 힘이 걸린 점 P 까지 \(\mathbf r=a\mathbf i-b\mathbf k\). 축 방향 단위벡터가 \(\mathbf k\) 라서 \(\mathbf M_Q\) 의 \(\mathbf k\) 성분만 남는다.</figcaption></figure>
+<div class="formula">\[\mathbf M_Q=\mathbf r\times\mathbf F=(a\mathbf i-b\mathbf k)\times(F_x\mathbf i+F_y\mathbf j+F_z\mathbf k)=bF_y\,\mathbf i-(aF_z+bF_x)\,\mathbf j+aF_y\,\mathbf k\]</div>
+<div class="formula">\[\mathbf e=\mathbf k\ \Rightarrow\ \mathbf M_L=(\mathbf k\cdot\mathbf M_Q)\,\mathbf k=aF_y\,\mathbf k\]</div>
+<div class="why">축이 z 축이면 단위벡터가 \(\mathbf k\) 라서 \(\mathbf M_Q\) 의 \(\mathbf k\) 성분만 남는다. 결론(필기 파란 메모): <b>\(F_x\) 와 \(F_z\) 는 터빈 축에 대한 모멘트를 만들지 않는다. \(F_y\) 만.</b> \(F_z\) 는 축과 평행(밀어도 안 돈다), \(F_x\) 는 작용선이 축을 향해 축과 만난다(당겨도 안 돈다). 축을 돌리는 건 옆으로 치는 \(F_y\), 팔 길이는 축에서 P 까지 거리 \(a\) — 8절의 특수한 경우가 그대로 보인다.</div>
+<div class="say">"옆으로 탕탕 쳐줘야 돈다." "다 풀어도 되지만 <b>aF_y 가 눈으로 바로 보이면 제일 좋다</b>. 눈으로 풀 수 있는 문제가 생각보다 많다."</div>
+<div class="analogy">회전문을 돌리려면 문짝 면을 옆으로 밀어야 한다. 기둥 쪽으로 밀거나(반지름 방향) 위아래로 밀면(축 방향) 아무리 세게 해도 안 돈다.</div>
+<div class="memo am">터빈(L = z 축): \(\mathbf M_Q=bF_y\mathbf i-(aF_z+bF_x)\mathbf j+aF_y\mathbf k\) → \(\mathbf M_L=aF_y\mathbf k\) · 축 모멘트는 \(F_y\) 만 (\(F_x\)·\(F_z\) 는 0)</div>
+</section>
+
+<section class="s" data-id="s7" data-nodes="mech.moment_line">
+<div class="no">7 / 8</div><h2>7. 예제 2 — 두 점으로 정한 직선 (교재 Fig 4.15) : M_L = 109 e_AB N·m</h2>
+<p>필기 p.7~8: \(\mathbf F=10\mathbf i+60\mathbf j-20\mathbf k\) N, 작용점 Q \((8,6,4)\) m, 직선 L 은 A \((2,0,4)\) m 와 B \((-7,6,2)\) m 를 지난다. \(\mathbf M_L\) 은?</p>
+<figure class="fig" data-fig="f415"><svg class="fig-svg" viewbox="0 0 560 260" width="560" height="260" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><line x1="170.0" y1="180.0" x2="100.0" y2="229.0" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><line x1="170.0" y1="180.0" x2="310.0" y2="180.0" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><line x1="170.0" y1="180.0" x2="170.0" y2="82.0" stroke="#1F2A44" stroke-width="1.5" marker-end="url(#ah)"></line><text x="94.0" y="233.0" font-size="13" fill="#1F2A44" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">x</text><text x="316.0" y="185.0" font-size="13" fill="#1F2A44" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">y</text><text x="164.0" y="86.0" font-size="13" fill="#1F2A44" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">z</text><line x1="82.5" y1="141.9" x2="391.2" y2="108.0" stroke="#1971C2" stroke-width="2" stroke-dasharray="7 5"></line><text x="397.2" y="110.0" font-size="14" fill="#1971C2" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">L</text><circle cx="156.0" cy="133.8" r="4" fill="#1971C2"></circle><text x="150.0" y="121.80000000000001" font-size="12" fill="#1971C2" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">A(2, 0, 4)</text><circle cx="303.0" cy="117.7" r="4" fill="#1971C2"></circle><text x="303.0" y="103.7" font-size="12" fill="#1971C2" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">B(−7, 6, 2)</text></g><g data-step="2"><circle cx="198.0" cy="163.2" r="4" fill="#1F2A44"></circle><text x="214.0" y="157.2" font-size="12" fill="#1F2A44" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">Q(8, 6, 4)</text><line x1="198.0" y1="163.2" x2="290.4" y2="202.7" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="230.39999999999998" y="216.7" font-size="12" fill="#2F9E44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F = 10i + 60j − 20k</text></g><g data-step="3"><line x1="156.0" y1="133.8" x2="195.0" y2="161.2" stroke="#E03131" stroke-width="2.4" marker-end="url(#ah)"></line><text x="150.0" y="163.8" font-size="12" fill="#E03131" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">r<tspan baseline-shift="sub" font-size="72%">AQ</tspan> = 6i + 6j</text></g><g data-step="4"><line x1="207.4" y1="128.2" x2="253.1" y2="123.2" stroke="#FF4D8D" stroke-width="3.4" marker-end="url(#ah)"></line><text x="247.1" y="111.2" font-size="13" fill="#FF4D8D" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">e<tspan baseline-shift="sub" font-size="72%">AB</tspan></text></g><g data-step="5"><text x="360" y="176" font-size="12.5" fill="#1F2A44" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M<tspan baseline-shift="sub" font-size="72%">A</tspan> = −120i + 120j + 300k</text><text x="360" y="198" font-size="12.5" fill="#FF4D8D" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">e<tspan baseline-shift="sub" font-size="72%">AB</tspan> = (−9i + 6j − 2k)/11</text><text x="360" y="220" font-size="12.5" fill="#1F2A44" text-anchor="start" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">e<tspan baseline-shift="sub" font-size="72%">AB</tspan> · M<tspan baseline-shift="sub" font-size="72%">A</tspan> = 1200/11 ≈ 109</text><text x="360" y="244" font-size="14" fill="#2F9E44" text-anchor="start" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">M<tspan baseline-shift="sub" font-size="72%">L</tspan> = 109 e<tspan baseline-shift="sub" font-size="72%">AB</tspan> N·m</text></g></svg><figcaption>필기 p.7~8(교재 Fig 4.15): 직선 L 은 A, B 를 지나고 힘은 Q 에 걸린다. 0 이 들어 있어 계산이 편한 점 A 를 골랐다. 그림은 축척을 맞춘 사시도가 아니라 배치만 보인다.</figcaption></figure>
+<p>① <b>L 위 점 선택 → A</b> ("0 이 들어가 있어 계산이 편할 것 같아서"). \(\mathbf r_{AQ}=(8-2)\mathbf i+(6-0)\mathbf j+(4-4)\mathbf k=6\mathbf i+6\mathbf j\) m.</p>
+<div class="formula">\[\text{②}\ \mathbf M_A=\mathbf r_{AQ}\times\mathbf F=\begin{vmatrix}\mathbf i&amp;\mathbf j&amp;\mathbf k\\6&amp;6&amp;0\\10&amp;60&amp;-20\end{vmatrix}=-120\mathbf i+120\mathbf j+300\mathbf k\ \ \mathrm{N\cdot m}\]</div>
+<p>③ 방향벡터는 "나중 점에서 첫 점 빼기": \(\mathbf r_{AB}=(-7-2)\mathbf i+(6-0)\mathbf j+(2-4)\mathbf k=-9\mathbf i+6\mathbf j-2\mathbf k\) m, \(|\mathbf r_{AB}|=\sqrt{81+36+4}=\sqrt{121}=11\).</p>
+<div class="formula">\[\mathbf e_{AB}=-\tfrac{9}{11}\mathbf i+\tfrac{6}{11}\mathbf j-\tfrac{2}{11}\mathbf k,\qquad \text{④}\ \mathbf e_{AB}\cdot\mathbf M_A=\tfrac{(-9)(-120)+6(120)+(-2)(300)}{11}=\tfrac{1200}{11}\approx109\]</div>
+<div class="formula">\[\text{⑤}\ \mathbf M_L=109\,\mathbf e_{AB}\ \mathrm{N\cdot m}\ \approx-89.3\mathbf i+59.5\mathbf j-19.8\mathbf k\ \mathrm{N\cdot m}\]</div>
+<div class="say">"<b>고민하기 싫을 땐 일단 삼중곱으로 계산할 수 있다는 건 알고 있어야 한다.</b>" · "스스로 한번 쭉 계산해 보라."</div>
+<div class="why">5단계 = <b>점 선택 → r → M_P → e → 내적</b>. 값이 양수(109)라 \(\mathbf M_L\) 은 \(\mathbf e_{AB}\) 방향(A → B 쪽 축을 오른손으로 감는 회전). 정확값은 \(1200/11=109.09\). ②와 ④를 한 번에 하면 행렬식 \(\det[\mathbf e_{AB};\mathbf r_{AQ};\mathbf F]\) 하나다.</div>
+<details class="ex"><summary>연습(아톰) — 같은 문제를 점 B 기준으로 (점 선택 무관 확인)</summary><div class="body"><p>\(\mathbf r_{BQ}=(8+7)\mathbf i+(6-6)\mathbf j+(4-2)\mathbf k=15\mathbf i+2\mathbf k\). \(\mathbf M_B=\begin{vmatrix}\mathbf i&amp;\mathbf j&amp;\mathbf k\\15&amp;0&amp;2\\10&amp;60&amp;-20\end{vmatrix}=-120\mathbf i+320\mathbf j+900\mathbf k\) — \(\mathbf M_A\) 와 다르다. 그런데 \(\mathbf e_{AB}\cdot\mathbf M_B=\frac{1080+1920-1800}{11}=\frac{1200}{11}\approx109\) — 같다. 점 모멘트는 점마다 다르지만, 그 L 방향 성분은 같다.</p></div></details>
+<div class="analogy">요리 레시피처럼 순서를 외워 두면 어떤 숫자가 와도 손이 먼저 간다. 고민 없이 5단계를 돌리고, 시간이 남으면 8절의 특수한 경우로 눈풀이 검산.</div>
+<div class="memo am">5단계: ① L 위 점(0 많은 점) ② \(\mathbf r\) → \(\mathbf M_P=\mathbf r\times\mathbf F\) ③ \(\mathbf e=\mathbf r_{AB}/|\mathbf r_{AB}|\) (B − A) ④ \(\mathbf e\cdot\mathbf M_P\) ⑤ \(\mathbf M_L=(\cdot)\mathbf e\) · Fig 4.15 답 \(109\,\mathbf e_{AB}\) N·m</div>
+</section>
+
+<section class="s" data-id="s8" data-nodes="mech.moment_line">
+<div class="no">8 / 8</div><h2>8. 유용한 특수한 경우 3 — 수직이면 FD, 평행이면 0, 만나면 0</h2>
+<p>필기 p.9 <b>Useful special cases</b>. 계산 없이 눈으로 끝나는 경우들.</p>
+<figure class="fig" data-fig="spec"><svg class="fig-svg" viewbox="0 0 560 220" width="560" height="220" role="img" xmlns="http://www.w3.org/2000/svg" font-family="Pretendard,-apple-system,sans-serif" font-size="14" fill="#1F2A44"><defs><marker id="ah" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="7" markerheight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="context-stroke"></path></marker></defs><g data-step="1"><line x1="50" y1="30" x2="50" y2="170" stroke="#1971C2" stroke-width="2"></line><text x="42" y="40" font-size="14" fill="#1971C2" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">L</text><line x1="50" y1="100" x2="120" y2="100" stroke="#E03131" stroke-width="1.8" stroke-dasharray="5 4"></line><text x="85" y="92" font-size="13" fill="#E03131" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">D</text><circle cx="130" cy="100" r="9" fill="none" stroke="#2F9E44" stroke-width="2"></circle><circle cx="130" cy="100" r="3" fill="#2F9E44"></circle><text x="130" y="128" font-size="12" fill="#2F9E44" text-anchor="middle" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">F (지면 밖)</text><text x="100" y="160" font-size="13" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">|M<tspan baseline-shift="sub" font-size="72%">L</tspan>| = F·D</text><text x="100" y="200" font-size="12.5" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">① 평면에 수직 → F·D</text></g><g data-step="2"><line x1="230" y1="30" x2="230" y2="170" stroke="#1971C2" stroke-width="2"></line><text x="222" y="40" font-size="14" fill="#1971C2" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">L</text><line x1="300" y1="26" x2="300" y2="60" stroke="#2F9E44" stroke-width="1.4" stroke-dasharray="5 4"></line><line x1="300" y1="150" x2="300" y2="172" stroke="#2F9E44" stroke-width="1.4" stroke-dasharray="5 4"></line><line x1="300" y1="150" x2="300" y2="62" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="314.0" y="106.0" text-anchor="middle" font-size="13" fill="#2F9E44">F</text><text x="270" y="200" font-size="12.5" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">② 평행 → M<tspan baseline-shift="sub" font-size="72%">L</tspan> = 0</text></g><g data-step="3"><line x1="420" y1="30" x2="420" y2="170" stroke="#1971C2" stroke-width="2"></line><text x="412" y="40" font-size="14" fill="#1971C2" text-anchor="end" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">L</text><line x1="420" y1="143" x2="466" y2="113" stroke="#2F9E44" stroke-width="1.4" stroke-dasharray="5 4"></line><line x1="466" y1="113" x2="528" y2="72" stroke="#2F9E44" stroke-width="3" marker-end="url(#ah)"></line><text x="509.0" y="102.5" text-anchor="middle" font-size="13" fill="#2F9E44">F</text><circle cx="420" cy="143" r="4" fill="#E03131"></circle><text x="412" y="160" font-size="12" fill="#E03131" text-anchor="end" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">교점</text><text x="460" y="200" font-size="12.5" fill="#1F2A44" text-anchor="middle" font-weight="700" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">③ 만남 → M<tspan baseline-shift="sub" font-size="72%">L</tspan> = 0</text></g></svg><figcaption>필기 p.9 유용한 특수한 경우. ② 평행이면 그 힘으로는 축을 못 돌리고, ③ 작용선(연장선 포함)이 L 과 만나면 L 에서 작용선까지 거리가 0.</figcaption></figure>
+<div class="formula">\[\text{① 작용선이 L 을 포함하는 평면에 수직}\Rightarrow|\mathbf M_L|=FD\qquad \text{② 작용선}\parallel L\Rightarrow\mathbf M_L=0\qquad \text{③ 작용선이 L 과 만남}\Rightarrow\mathbf M_L=0\]</div>
+<div class="why">① 힘이 축을 포함하는 평면을 수직으로 뚫으면 힘 전체가 축을 돌리는 데 쓰이고, 팔 길이는 L 에서 작용선까지 거리 \(D\) — "외우지 않아도 보면 느껴진다". ② 축과 평행한 힘은 축을 밀기만 한다("이 힘으로는 돌려도 안 돈다"). 삼중적으로도 \(\mathbf F\parallel\mathbf e\) 면 두 행이 비례해 행렬식 0. ③ 작용선(연장선 포함)이 L 과 만나면 그 교점을 P 로 잡을 수 있어 \(\mathbf r=0\) → 0. 6절 터빈의 \(F_z\)(평행)·\(F_x\)(만남)가 바로 ②·③.</div>
+<div class="say">교수님 질문 "평행한 힘의 M_L 은?", "만나는 힘의 M_L 은?" → 둘 다 0. "<b>고민을 해보셔야 됩니다, 이거.</b>"</div>
+<details class="ex"><summary>연습(아톰) — x 축에 대한 모멘트: 점 (2, 4, 0) m 에 \(\mathbf F=3\mathbf i+5\mathbf j+10\mathbf k\) N</summary><div class="body"><p>삼중적: \(\mathbf e=\mathbf i\), \(\mathbf r=2\mathbf i+4\mathbf j\) → \(\begin{vmatrix}1&amp;0&amp;0\\2&amp;4&amp;0\\3&amp;5&amp;10\end{vmatrix}=1\cdot(4\cdot10-0\cdot5)=40\) → \(\mathbf M_L=40\mathbf i\) N·m. 눈풀이: \(F_x\) 는 x 축과 <b>평행 → 0</b>, \(F_y\) 의 작용선(점 \((2,y,0)\) 들, 즉 \(x=2,\ z=0\) 인 직선)은 x 축과 \((2,0,0)\) 에서 <b>만남 → 0</b>, \(F_z=10\) N 은 x 축에서 거리 \(y=4\) m, 수직 → \(4\times10=40\) ✓.</p></div></details>
+<div class="analogy">자전거 바퀴 축을 생각하자. 축 방향으로 밀거나(평행) 바퀴살을 따라 축 중심을 향해 당기면(만남) 안 돈다. 바퀴 둘레를 옆으로 쳐야(수직) 돈다.</div>
+<div class="memo am">특수한 경우: 수직 → \(|\mathbf M_L|=FD\) · <b>평행 → 0</b> · <b>만남(연장선 포함) → 0</b> · 계산 전에 먼저 0 인 성분부터 지운다</div>
+</section>
+
+
+<section id="quiz"><h2>확인 문제</h2><div id="qlist"></div><div id="result"></div></section>
+<div id="done"></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script>/* 김주영 스앵님 판정 (대표님 2026-09-29 「개념 마인드맵은 스앵님이 학습을 통해 내가 뭘 알고 뭘 모르는지 알아서 파악」) — 원본은 이 파일 하나.
+   빌더가 교실·수업 노트·학습 덱·암기노트 페이지에 그대로 넣고(__JUDGE__), learn.html 은 patch_learn_judge.py 가 TJ-START~TJ-END 사이를 이 파일로 갈아 끼운다.
+   기록 = localStorage atto.evidence [{t, k, n:[노드], ok, v, lid, sid, qid, a, clean}] (최대 4000건 — 넘치면 읽기·질문 기록부터 버리고 노드마다 최근 문제 6건은 남긴다)
+     k: quiz(ok) 확인 문제 · read(clean) 챕터·섹션 끝(다시 설명·질문 없이 끝났으면 clean) · again 다시 설명 · ask 질문 · memo(ok) 암기노트 외움 · self(v) 카드 자가평가
+     a: 같은 시도 표시(카드 「다시 저장」) — 같은 a·qid 는 새 기록으로 바꿔 넣는다(정답 수가 늘지 않는다)
+   판정 = 노드마다 atto.mastery[id] = {quiz:{correct,total,ts}, self, sts, ts, score, state, auto} — learn.html 은 TJ.score 로 같은 식을 쓴다.
+     quiz = 최근 6번 · self(설명할 수 있나 1~5) = 읽음 4 · 다시 설명·질문 2번 이상이면 3 · 외움 +1 · 카드 자가평가가 더 최근이면 그 값
+     → 문제 없이 읽기만 하면 최대 「흔들림」, 「안다」는 문제로만. 점수식 = (0.5·정답률·감쇠(quiz.ts) + 0.2·self/5·감쇠(sts))/0.7, 문제 없으면 self/5·0.6·감쇠(sts)
+     감쇠 = 60일에 걸쳐 1 → 0.4 (최저 0.4). 정답 근거와 읽기·암기 근거를 따로 감쇠한다 — 오늘 암기 체크 하나로 90일 전 정답이 새것처럼 되지 않게(오타 .91 설계 검수 ⑦)
+   저장이 막히면(용량·사생활 모드) 이 페이지 안에서는 메모리 사본으로 이어 가고 rec 은 false 를 돌려준다. */
+(function(g){
+  var EK="atto.evidence", MK="atto.mastery", CAP=4000, KEEPQ=6, MEM={}, DIRTY={};
+  function rd(k,d){ if(DIRTY[k]) return MEM[k]; try{ var v=JSON.parse(localStorage.getItem(k)||"null"); return v==null?d:v; }catch(e){ return DIRTY[k]?MEM[k]:d; } }
+  function wr(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); DIRTY[k]=false; return true; }catch(e){ MEM[k]=v; DIRTY[k]=true; return false; } }
+  function decay(ts){ if(!ts) return 1; var d=Math.max(0,(Date.now()/1000-ts)/86400); return Math.max(.4,1-d/60); }
+  function score(e){ if(!e||typeof e!=="object") return {score:0,state:"unrated"};
+    var q=e.quiz||{}, tot=+q.total||0, cor=+q.correct||0, sv=e.self==null?null:Math.max(1,Math.min(5,+e.self));
+    if(tot<=0&&sv==null) return {score:0,state:"unrated"};
+    var dq=decay(+q.ts||+e.ts||0), ds=decay(+e.sts||+e.ts||0);
+    var raw=tot>0?(0.5*(cor/tot)*dq+0.2*((sv||0)/5)*ds)/0.7:(sv/5)*0.6*ds, s=Math.min(1,raw), st;
+    if(tot<=0) st=(sv>=4&&s>=.4)?"shaky":"unknown"; else st=s>=.7?"known":s>=.4?"shaky":"unknown";
+    return {score:Math.round(s*1000)/1000,state:st}; }
+  function why(evs){ var qz=evs.filter(function(e){return e.k==="quiz";}).slice(-KEEPQ), r={q:qz.length,c:qz.filter(function(e){return e.ok;}).length,
+      read:evs.filter(function(e){return e.k==="read";}).length, clean:evs.filter(function(e){return e.k==="read"&&e.clean;}).length,
+      conf:evs.filter(function(e){return (e.k==="again"||e.k==="ask")&&Date.now()-e.t<21*864e5;}).length,
+      memo:null, self:null, last:0, selfLast:0};
+    evs.forEach(function(e){ if(e.k==="memo") r.memo=!!e.ok; if(e.k==="self") r.self={v:+e.v,t:e.t}; if(e.t>r.last) r.last=e.t; if(e.k!=="quiz"&&e.t>r.selfLast) r.selfLast=e.t; });
+    return r; }
+  function judgeOne(id,L,M){ var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); if(!evs.length) return;
+    var r=why(evs), e=Object.assign({},M[id]||{}), qz=evs.filter(function(x){return x.k==="quiz";}).slice(-KEEPQ);
+    var self=null; if(r.read||r.conf||r.memo!=null){ self=r.read?4:3; if(r.conf>=2) self=3; if(r.memo) self=Math.min(5,self+1); }
+    var autoLast=0; evs.forEach(function(x){ if(x.k!=="self"&&x.t>autoLast) autoLast=x.t; });
+    if(r.self&&r.self.t>=autoLast) self=r.self.v;
+    e.quiz=qz.length?{correct:r.c,total:qz.length,ts:Math.round(qz[qz.length-1].t/1000)}:undefined; if(!e.quiz) delete e.quiz;
+    e.self=self; if(self==null){ delete e.self; delete e.sts; } else e.sts=Math.round(r.selfLast/1000);
+    e.ts=Math.round(r.last/1000); e.auto={by:"tutor",q:r.q,c:r.c,read:r.read,clean:r.clean,conf:r.conf,memo:r.memo};
+    var s=score(e); e.score=s.score; e.state=s.state; M[id]=e; }
+  function judge(ids){ var L=rd(EK,[]), M=rd(MK,{}); if(!Array.isArray(L)) L=[]; if(!M||typeof M!=="object") M={}; (ids||[]).forEach(function(id){ judgeOne(id,L,M); });
+    wr(MK,M); return M; }
+  function all(){ var L=rd(EK,[]), o={}; if(Array.isArray(L)) L.forEach(function(e){ (e&&e.n||[]).forEach(function(i){ o[i]=1; }); }); return judge(Object.keys(o)); }
+  /* 상한 넘침: 노드마다 최근 문제 KEEPQ 건은 지키고, 나머지(읽기·질문·오래된 문제)에서 오래된 것부터 버린다 — 다른 노드 활동으로 정답 기록이 사라지지 않게 */
+  function trim(L,cap){ cap=cap||CAP; if(L.length<=cap) return L; var seen={}, keep=[], rest=[], i;
+    for(i=L.length-1;i>=0;i--){ var e=L[i], k=false; if(e&&e.k==="quiz") (e.n||[]).forEach(function(id){ seen[id]=(seen[id]||0)+1; if(seen[id]<=KEEPQ) k=true; }); (k?keep:rest).push(e); }
+    keep.reverse(); rest.reverse(); rest=rest.slice(Math.max(0,rest.length-Math.max(0,cap-keep.length)));
+    return keep.concat(rest).sort(function(a,b){ return (a.t||0)-(b.t||0); }); }
+  function rec(ev){ if(!ev||!Array.isArray(ev.n)||!ev.n.length) return false; var L=rd(EK,[]); if(!Array.isArray(L)) L=[];
+    ev.t=Date.now();
+    if(ev.a!=null&&ev.qid!=null){ for(var i=L.length-1;i>=0;i--){ var x=L[i]; if(x&&x.k===ev.k&&x.qid===ev.qid&&x.a===ev.a){ L.splice(i,1); break; } } }
+    L.push(ev); L=trim(L);
+    /* 저장 실패 → 절반 상한으로 다시(이때도 노드마다 최근 정답은 지킨다, 오타 설계 2차) · 그래도 실패면 메모리 사본은 자르지 않은 전체로 */
+    var ok=wr(EK,L); if(!ok){ var half=trim(L,Math.floor(CAP/2)); if(wr(EK,half)){ L=half; ok=true; } else { MEM[EK]=L; DIRTY[EK]=true; } }
+    judge(ev.n); return ok; }
+  function reasons(id){ var L=rd(EK,[]); if(!Array.isArray(L)) return null; var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); return evs.length?why(evs):null; }
+  g.TJ={rec:rec,judge:judge,all:all,score:score,reasons:reasons,trim:trim};
+})(typeof window!=="undefined"?window:this);
+</script>
+<script>/* 여러 식을 이은 식 줄 나누기(대표님 2026-09-29 「수식 한 줄로, 배치구조 신경」) — 원본은 이 파일 하나(수업 노트·암기노트 템플릿에 빌더가 넣는다, __SPLITTEX__).
+   \[ A,\qquad B \] 처럼 서로 다른 식을 \qquad 또는 「,\quad」로 이어 붙인 줄은 식마다 한 줄(\[A\]\[B\])로 — 한 식 안은 가르지 않는다.
+   괄호 { } 와 \begin…\end 안의 구분자는 건드리지 않고, 연결 기호만 남은 조각(\Rightarrow·\to·\Leftrightarrow·\therefore)은 다음 식 앞에 붙인다. */
+/* 괄호 깊이: ( ) [ ] 와 \left…\right 안에서는 나누지 않는다 — \left(a\qquad b\right) 가 갈렸다(오타 .91 설계 검수 ④) */
+function parenStep(t,i,p){
+  if(t.startsWith("\\left",i)&&!/[a-zA-Z]/.test(t[i+5]||"")) return p+1;
+  if(t.startsWith("\\right",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) return Math.max(0,p-1);
+  const c=t[i]; if(c==="("||c==="[") return p+1; if(c===")"||c==="]") return Math.max(0,p-1); return p;
+}
+function splitTex(t){
+  const parts=[]; let d=0, env=0, p=0, cur="", i=0;
+  while(i<t.length){
+    if(t.startsWith("\\begin{",i)) env++;
+    else if(t.startsWith("\\end{",i)) env=Math.max(0,env-1);
+    const c=t[i];
+    if(c==="\\"&&(t[i+1]==="{"||t[i+1]==="}")){ cur+=t.slice(i,i+2); i+=2; continue; }
+    if(c==="{") d++; else if(c==="}") d=Math.max(0,d-1);
+    p=parenStep(t,i,p);
+    if(!d&&!env&&!p){
+      let m=0;
+      if(t.startsWith("\\qquad",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) m=6;
+      else if(t.startsWith(",\\quad",i)&&!/[a-zA-Z]/.test(t[i+6]||"")) m=6;
+      if(m){ parts.push(cur); cur=""; i+=m; continue; }
+    }
+    cur+=c; i++;
+  }
+  parts.push(cur);
+  const out=[]; let carry="";
+  parts.map(p=>p.trim().replace(/^,\s*/,"").replace(/,\s*$/,"")).forEach(p=>{
+    if(!p) return;
+    if(/^(\\(Rightarrow|Leftarrow|Leftrightarrow|to|therefore|because|implies|iff)\s*)+$/.test(p)){ carry+=p+" "; return; }
+    out.push(carry+p); carry="";
+  });
+  if(carry&&out.length) out[out.length-1]+=" "+carry.trim();
+  return out.length?out:[t];
+}
+/* 좁은 화면(폰)에서만: 글자 덩어리(\text{…})를 화살표(\to·\Rightarrow)로 이은 「흐름」 줄은 화살표 단위로 줄을 나눈다 — 수식이 아니라 단계 나열이라 나눠도 식이 갈리지 않는다 */
+function splitFlow(t){
+  const segs=[]; let d=0, p=0, cur="", i=0;
+  while(i<t.length){ const c=t[i];
+    if(c==="\\"&&(t[i+1]==="{"||t[i+1]==="}")){ cur+=t.slice(i,i+2); i+=2; continue; }
+    if(c==="{") d++; else if(c==="}") d=Math.max(0,d-1);
+    p=parenStep(t,i,p);
+    if(!d&&!p){ const m=/^\\ ?\\(to|Rightarrow)(?![a-zA-Z])\\ ?/.exec(t.slice(i))||/^\s*\\(to|Rightarrow)(?![a-zA-Z])\s*/.exec(t.slice(i)); if(m&&cur.trim()){ segs.push(cur); cur="\\"+m[1]+"\\ "; i+=m[0].length; continue; } }
+    cur+=c; i++; }
+  segs.push(cur);
+  const ok=segs.length>=3&&segs.every(s=>/^(\\(to|Rightarrow)\\ )?\s*\\text\{/.test(s.trim()));
+  return ok?segs.map(s=>s.trim()):[t];
+}
+function splitDisplays(html,narrow){
+  return String(html).replace(/\\\[([\s\S]*?)\\\]/g,(m,tex)=>{ let ps=splitTex(tex); if(narrow) ps=[].concat(...ps.map(splitFlow)); return ps.length>1?ps.map(p=>"\\["+p+"\\]").join(""):m; });
+}
+</script>
+<script>
+const LESSON_ID="statics-2026-09-23", QUIZ=[{"id": "q1", "qn": "확인 1 · 점 모멘트 예제 (필기 p.2)", "html": "점 \\((4,2,0)\\) m 에 \\(\\mathbf F=10\\mathbf j\\) N 이 작용한다. 원점에 대한 모멘트 \\(\\mathbf M_O\\) 는?", "choices": [{"html": "\\(-40\\mathbf k\\) N·m", "ok": false, "k": 1}, {"html": "\\(40\\mathbf k\\) N·m", "ok": true, "k": 0}, {"html": "\\(20\\mathbf k\\) N·m", "ok": false, "k": 2}, {"html": "\\(10\\sqrt{20}\\,\\mathbf k\\) N·m", "ok": false, "k": 3}], "ans": "\\((4\\mathbf i+2\\mathbf j)\\times10\\mathbf j=40\\mathbf k+20(\\mathbf j\\times\\mathbf j)=40\\mathbf k\\). 수직거리 4 m × 10 N, 반시계라 +z. 점까지 거리 \\(\\sqrt{20}\\) 를 곱하면 틀린다."}, {"id": "q2", "qn": "확인 2 · 바리뇽 정리", "html": "한 점에서 만나는 힘들에 대한 바리뇽 정리 \\(\\sum\\mathbf M_P=\\mathbf r_{PQ}\\times\\sum\\mathbf F\\) 의 뜻은?", "choices": [{"html": "합력의 모멘트 = 각 힘 모멘트의 합 (그래서 성분으로 쪼개 계산해도 된다)", "ok": true, "k": 0}, {"html": "한 점에서 만나는 힘들은 모멘트를 만들지 않는다", "ok": false, "k": 3}, {"html": "힘의 합은 모멘트와 무관하다", "ok": false, "k": 2}, {"html": "모멘트의 합은 항상 0 이다", "ok": false, "k": 1}], "ans": "외적의 분배법칙. \\(M_P(\\mathbf F)=M_P(F_x)+M_P(F_y)+M_P(F_z)\\) — 0 인 성분을 바로 날리려고 쪼갠다."}, {"id": "q3", "qn": "확인 3 · 직선 모멘트의 정의 (교수님 질문)", "html": "힘 F 의 직선 L 에 대한 모멘트는 L 위 점 P 의 \\(\\mathbf M_P\\) 의 어떤 성분인가?", "choices": [{"html": "L 에 수직한 성분", "ok": false, "k": 1}, {"html": "\\(\\mathbf F\\) 의 L 방향 성분", "ok": false, "k": 3}, {"html": "\\(\\mathbf M_P\\) 전체", "ok": false, "k": 2}, {"html": "L 에 평행한 성분 \\((\\mathbf e\\cdot\\mathbf M_P)\\mathbf e\\)", "ok": true, "k": 0}], "ans": "축을 돌리는 모멘트는 방향이 축과 나란해야 한다. \\(\\mathbf M_P\\) 를 L 위로 정사영한 것."}, {"id": "q4", "qn": "확인 4 · 삼중적의 부호", "html": "\\(\\mathbf e\\cdot(\\mathbf r\\times\\mathbf F)=-30\\) N·m 이 나왔다. \\(\\mathbf M_L\\) 은?", "choices": [{"html": "0", "ok": false, "k": 3}, {"html": "크기 30 N·m, \\(\\mathbf e\\) 방향", "ok": false, "k": 1}, {"html": "크기 30 N·m, \\(\\mathbf e\\) 와 반대 방향", "ok": true, "k": 0}, {"html": "계산이 틀렸다 — 크기는 음수가 될 수 없다", "ok": false, "k": 2}], "ans": "\\(\\mathbf M_L=-30\\,\\mathbf e\\). 값이 음수면 \\(\\mathbf e\\) 반대 방향. \\(\\mathbf e\\) 를 반대로 잡았다면 +30 이 나와 같은 벡터."}, {"id": "q5", "qn": "확인 5 · 점 선택 무관", "html": "L 위 다른 점을 골라도 \\(\\mathbf M_L\\) 이 같은 이유는?", "choices": [{"html": "\\(\\mathbf u\\) 가 \\(\\mathbf F\\) 와 평행해서", "ok": false, "k": 1}, {"html": "\\(\\mathbf M_P\\) 가 점마다 같아서", "ok": false, "k": 2}, {"html": "\\(\\mathbf F\\) 가 L 과 수직이라서", "ok": false, "k": 3}, {"html": "\\(\\mathbf u\\)(L 위의 벡터)가 \\(\\mathbf e\\) 와 평행해서 \\(\\mathbf e\\cdot(\\mathbf u\\times\\mathbf F)\\) = 평행육면체 부피 0", "ok": true, "k": 0}], "ans": "\\(\\mathbf M_P\\) 자체는 점마다 다르다(7절 연습: \\(\\mathbf M_A\\ne\\mathbf M_B\\)). L 방향 성분만 같다."}, {"id": "q6", "qn": "확인 6 · 터빈 (교재 Fig 4.14)", "html": "z 축 둘레로 도는 터빈에서 \\(\\mathbf r=a\\mathbf i-b\\mathbf k\\), \\(\\mathbf F=F_x\\mathbf i+F_y\\mathbf j+F_z\\mathbf k\\). 축에 대한 모멘트 \\(\\mathbf M_L\\) 은?", "choices": [{"html": "\\(-(aF_z+bF_x)\\,\\mathbf k\\)", "ok": false, "k": 2}, {"html": "\\(bF_y\\,\\mathbf k\\)", "ok": false, "k": 1}, {"html": "\\(aF_y\\,\\mathbf k\\)", "ok": true, "k": 0}, {"html": "\\((aF_y+bF_x)\\,\\mathbf k\\)", "ok": false, "k": 3}], "ans": "\\(\\mathbf M_Q\\) 의 \\(\\mathbf k\\) 성분 \\(aF_y\\). \\(F_z\\) 는 축과 평행, \\(F_x\\) 는 축과 만나서 0."}, {"id": "q7", "qn": "확인 7 · 교재 Fig 4.15", "html": "\\(\\mathbf F=10\\mathbf i+60\\mathbf j-20\\mathbf k\\) N 이 Q \\((8,6,4)\\) m 에, 직선 L 은 A \\((2,0,4)\\), B \\((-7,6,2)\\) m 를 지난다. \\(\\mathbf M_L\\) 은?", "choices": [{"html": "\\(\\approx109\\,\\mathbf e_{AB}\\) N·m", "ok": true, "k": 0}, {"html": "\\(300\\,\\mathbf e_{AB}\\) N·m", "ok": false, "k": 1}, {"html": "\\(-120\\mathbf i+120\\mathbf j+300\\mathbf k\\) N·m", "ok": false, "k": 3}, {"html": "\\(1200\\,\\mathbf e_{AB}\\) N·m", "ok": false, "k": 2}], "ans": "\\(\\mathbf M_A=-120\\mathbf i+120\\mathbf j+300\\mathbf k\\) 는 점 A 에 대한 모멘트(3번). 여기에 \\(\\mathbf e_{AB}=(-9,6,-2)/11\\) 을 내적하면 \\(1200/11\\approx109\\). 11 로 나누는 것을 잊으면 1200(4번)."}, {"id": "q8", "qn": "확인 8 · 특수한 경우 (교수님 질문)", "html": "힘의 작용선(연장선 포함)이 직선 L 과 한 점에서 만난다. \\(\\mathbf M_L\\) 은?", "choices": [{"html": "\\(F\\times\\) (교점까지 거리)", "ok": false, "k": 1}, {"html": "0", "ok": true, "k": 0}, {"html": "점을 어디로 잡느냐에 따라 다르다", "ok": false, "k": 3}, {"html": "\\(F\\) 의 L 방향 성분 × 거리", "ok": false, "k": 2}], "ans": "교점을 L 위의 점으로 잡으면 \\(\\mathbf r=0\\). L 과 평행해도 0, 평면에 수직이면 \\(FD\\). \"고민을 해보셔야 됩니다, 이거.\""}, {"id": "q9", "qn": "확인 9 · x 축에 대한 모멘트 (연습)", "html": "점 \\((2,4,0)\\) m 에 \\(\\mathbf F=3\\mathbf i+5\\mathbf j+10\\mathbf k\\) N 이 작용한다. x 축에 대한 모멘트 \\(\\mathbf M_L\\) 을 삼중적으로 구하고, 특수한 경우로 검산하라.", "choices": null, "ans": "\\(\\det[\\mathbf i;\\ 2\\mathbf i+4\\mathbf j;\\ \\mathbf F]=1\\cdot(4\\cdot10-0\\cdot5)=40\\) → \\(\\mathbf M_L=40\\mathbf i\\) N·m. 검산: \\(F_x\\) 평행 → 0, \\(F_y\\) 작용선이 x 축과 만남 → 0, \\(F_z\\) 는 거리 4 m 에서 수직 → 40."}], NDS={"sec": {}, "q": {}}, N_SEC=document.querySelectorAll("section.s[data-id]").length;
+const KEY="mc-lesson-"+LESSON_ID;
+let ST={read:{},done:{},correct:{},answer:{},ts:0};
+try{ const s=JSON.parse(localStorage.getItem(KEY)||"null"); if(s&&typeof s==="object") ST=Object.assign(ST,s); }catch(e){}
+const $=s=>document.querySelector(s), $$=(s,el)=>Array.from((el||document).querySelectorAll(s)); /* el 범위 필수 — 문제 카드마다 보기를 따로 묶는다 (오타 RED 2026-09-26: 범위를 무시해 모든 보기가 마지막 문제로 채점됐다) */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function save(){ ST.ts=Date.now(); try{ localStorage.setItem(KEY,JSON.stringify(ST)); const qs=QUIZ.length, qd=QUIZ.filter(q=>ST.done[q.id]).length, rd=Object.keys(ST.read).length;
+  const li={deck:LESSON_ID,title:document.title,href:location.href.split("#")[0],idx:Math.max(0,rd-1),n:N_SEC,sid:curSec||"",part:null,partTitle:document.title.slice(0,60),where:(rd>=N_SEC?"확인 문제":"읽는 중 · "+(curTitle||"")),qDone:qd,qN:qs,ts:Date.now()};
+  const j=JSON.stringify(li); localStorage.setItem("mc-slides-last",j); localStorage.setItem("mc-slides-last-"+LESSON_ID,j); }catch(e){} }
+/* 스앵님 판정 기록(대표님 2026-09-29) — 섹션 읽음 · 문제 채점 → 개념 노드(knowledge/lesson_nodes.json) */
+function ev(k,x){ try{ if(!window.TJ) return; const o=Object.assign({k:k,lid:LESSON_ID},x||{}); if(o.n&&o.n.length) TJ.rec(o); }catch(e){} }
+/* 객관식 보기는 빌드 때 섞인다(quizmix) — 고른 보기를 원문 순서 k 로 저장 */
+const ck=(c,i)=>String(c&&c.k!=null?c.k:i);
+/* 인라인 식이 줄보다 길면 글자를 줄여 한 줄에(14px 까지) */
+function fitInline(root){ $$(".katex",root).forEach(k=>{ if(k.closest(".katex-display")) return; k.style.fontSize=""; const box=k.parentElement&&k.parentElement.closest("p,li,div,summary,button,td"); if(!box) return; const cw=box.clientWidth, w=k.getBoundingClientRect().width; if(!(cw>0&&w>cw-2)) return; const fs=parseFloat(getComputedStyle(k).fontSize)||17; k.style.fontSize=Math.max(14,Math.floor(fs*(cw-6)/w))+"px"; }); }
+window.addEventListener("resize",()=>fitInline(document.querySelector("main")),{passive:true});
+function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} fitInline(el); }
+/* ---- 읽음: 섹션이 화면의 절반 이상 1.2초 보이면 읽음 ---- */
+let curSec=null, curTitle="";
+function renderTop(){ const rd=Object.keys(ST.read).filter(k=>ST.read[k]).length, qd=QUIZ.filter(q=>ST.done[q.id]).length, tot=N_SEC+QUIZ.length;
+  $("#tRead").textContent="읽음 "+rd+"/"+N_SEC+(QUIZ.length?" · 문제 "+qd+"/"+QUIZ.length:""); const p=tot?Math.round((rd+qd)/tot*100):0; $("#tPct").textContent=p+"%"; $("#barI").style.width=p+"%";
+  $$("section.s[data-id]").forEach(s=>s.classList.toggle("read",!!ST.read[s.dataset.id]));
+  /* 따라감 기준은 앱(V52)과 같다: 섹션 전부 + 문제 90% 풀고 60% 정답 */
+  const okN=QUIZ.filter(q=>ST.correct[q.id]===true).length, need=Math.ceil(QUIZ.length*.6);
+  $("#done").textContent= rd>=N_SEC&&qd>=QUIZ.length&&QUIZ.length? (okN>=need? "완료 · 정답 "+okN+"/"+QUIZ.length : "정답 "+okN+"/"+QUIZ.length+" · "+need+"개 이상이면 완료") : ""; }
+const timers={};
+const io=new IntersectionObserver(es=>{ es.forEach(e=>{ const id=e.target.dataset.id; if(e.isIntersecting){ curSec=id; curTitle=(e.target.querySelector("h2")||{}).textContent||""; postCtx(e.target);
+    if(!ST.read[id]&&!timers[id]) timers[id]=setTimeout(()=>{ ST.read[id]=true; save(); renderTop(); ev("read",{sid:id,n:(NDS.sec||{})[id]||[],clean:true}); },1200); } else { if(timers[id]){ clearTimeout(timers[id]); delete timers[id]; } } }); },{threshold:.5});
+$$("section.s[data-id]").forEach(s=>io.observe(s));
+/* 짧은 섹션(화면보다 작아 50%가 금방 차는) 은 그대로, 긴 섹션은 끝까지 스크롤하면 읽음 */
+window.addEventListener("scroll",()=>{ $$("section.s[data-id]").forEach(s=>{ if(ST.read[s.dataset.id]) return; const r=s.getBoundingClientRect(); if(r.bottom<window.innerHeight*.6&&r.bottom>-2000){ ST.read[s.dataset.id]=true; save(); renderTop(); ev("read",{sid:s.dataset.id,n:(NDS.sec||{})[s.dataset.id]||[],clean:true}); } }); },{passive:true});
+/* ---- 판서 사진: atom 안에서만 (없으면 숨김) ---- */
+$$("figure.board img").forEach(img=>{ img.addEventListener("error",()=>{ img.closest("figure").hidden=true; }); });
+/* ---- 문제 카드 ---- */
+function qHTML(q,i){ const mc=Array.isArray(q.choices)&&q.choices.length, rev=!!ST.done[q.id], my=ST.answer[q.id];
+  let inner='<div class="qn">'+esc(q.qn||("문제 "+(i+1)))+'</div><div class="qb">'+q.html+'</div>';
+  if(mc){ inner+='<ol class="choices">'+q.choices.map((c,ci)=>{ const sel=my!=null&&String(my)===ck(c,ci); const cls=rev?(c.ok?" ok":(sel?" bad":"")):""; return '<li><button class="choice'+cls+'" data-ci="'+ci+'"'+(rev?" disabled":"")+'><span class="cn">'+(ci+1)+'</span><span>'+c.html+'</span></button></li>'; }).join("")+'</ol>'; }
+  else { inner+= rev? '<div class="memo"><b>내 답</b> '+esc(my||"")+'</div>' : '<textarea class="myans" placeholder="답만 간단히">'+esc(my||"")+'</textarea><div class="row"><button class="btn a" data-reveal>답 보기</button></div>'; }
+  if(rev){ const c=ST.correct[q.id]; inner+='<span class="verdict '+(c===true?"ok":c===false?"bad":"")+'">'+(c===true?"정답":c===false?"오답":"채점 전")+'</span>';
+    if(!mc&&c==null) inner+='<div class="row"><button class="btn" data-grade="1">맞았어요</button><button class="btn" data-grade="0">틀렸어요</button></div>';
+    inner+='<div class="row"><button class="btn xs" data-retry>다시 풀기</button></div>'; }
+  inner+='<div class="ans"><b>답 · 풀이</b><div>'+splitDisplays(q.ans||"",innerWidth<700)+'</div></div>';
+  return '<div class="q'+(rev?" rev":"")+'" data-q="'+q.id+'">'+inner+'</div>'; }
+function bindQ(){ const box=$("#qlist"); box.innerHTML=QUIZ.map(qHTML).join(""); typeset(box);
+  $$("#qlist .q").forEach(el=>{ const q=QUIZ.find(x=>x.id===el.dataset.q);
+    $$(".choice",el).forEach(b=>{ b.onclick=()=>{ if(ST.done[q.id]) return; const ci=+b.dataset.ci, c=q.choices[ci]; ST.answer[q.id]=(c&&c.k!=null)?c.k:ci; ST.done[q.id]=true; ST.correct[q.id]=!!(c&&c.ok); save(); bindQ(); renderTop(); ev("quiz",{qid:q.id,ok:ST.correct[q.id],n:(NDS.q||{})[q.id]||[]}); }; });
+    const rv=el.querySelector("[data-reveal]"); if(rv) rv.onclick=()=>{ const ta=el.querySelector(".myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); bindQ(); renderTop(); };
+    $$("[data-grade]",el).forEach(b=>{ b.onclick=()=>{ ST.correct[q.id]=b.dataset.grade==="1"; save(); bindQ(); renderTop(); ev("quiz",{qid:q.id,ok:ST.correct[q.id],n:(NDS.q||{})[q.id]||[]}); }; });
+    const rt=el.querySelector("[data-retry]"); if(rt) rt.onclick=()=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; save(); bindQ(); renderTop(); };
+  });
+  const done=QUIZ.filter(q=>ST.done[q.id]).length, ok=QUIZ.filter(q=>ST.correct[q.id]===true).length, wrong=QUIZ.filter(q=>ST.correct[q.id]===false);
+  $("#result").innerHTML= QUIZ.length? '<b>'+ok+'/'+QUIZ.length+'</b><span>정답 · 푼 문제 '+done+'</span>'+(wrong.length?'<button class="btn" id="retryWrong">틀린 문제 '+wrong.length+'개 다시</button>':'')+'<span class="sp" style="flex:1"></span><button class="btn xs" id="resetAll">이 회차 기록 지우기</button>' : '';
+  const rw=$("#retryWrong"); if(rw) rw.onclick=()=>{ wrong.forEach(q=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; }); save(); bindQ(); renderTop(); const f=$("#qlist .q:not(.rev)"); if(f) f.scrollIntoView({behavior:"smooth",block:"start"}); };
+  const ra=$("#resetAll"); if(ra) ra.onclick=()=>{ if(confirm("이 회차의 읽음·문제 기록을 지울까요?")){ ST={read:{},done:{},correct:{},answer:{},ts:0}; save(); bindQ(); renderTop(); } }; }
+/* ---- 앱 질문 패널 문맥 (V45 와 같은 규약) ---- */
+let CTX_GEN=null;
+function postCtx(sec){ try{ if(!CTX_GEN||window.parent===window) return; const s=sec||document.querySelector("section.s.read:last-of-type")||document.querySelector("section.s"); if(!s) return;
+  const t=(s.querySelector("h2")||{}).textContent||"", txt=(s.textContent||"").replace(/\s+/g," ").trim().slice(0,600);
+  window.parent.postMessage({type:"mc-slide",v:1,gen:CTX_GEN,deck:LESSON_ID,title:document.title.slice(0,80),sid:s.dataset.id,stype:"concept",part:null,partTitle:document.title.slice(0,60),label:"읽는 중 · "+t.slice(0,60),q:{qn:t.slice(0,80),kind:"개념",text:txt,choices:[],my:null,revealed:true,correct:null,answer:null}},location.origin); }catch(e){} }
+window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; postCtx(); } });
+/* ---- 시작 ---- */
+/* 넘치는 식 줄은 글자를 줄여 한 줄에(14px 까지) — 그래도 넘치면 식 칸 안에서 민다 */
+function fitDisplay(root){ $$(".katex-display",root).forEach(k=>{ k.style.fontSize=""; const cw=k.clientWidth, sw=k.scrollWidth; if(!(cw>0&&sw>cw+1)) return; const kx=k.querySelector(".katex"), fz=parseFloat(getComputedStyle(kx||k).fontSize)||20, lo=Math.min(1,Math.max(.6,14/fz)); k.style.fontSize=Math.max(lo,Math.floor(cw/sw*100)/100)+"em"; }); }
+window.addEventListener("resize",()=>fitDisplay(document.querySelector("main")),{passive:true});
+function boot(){ $$("section.s").forEach(s=>{ const h=s.innerHTML, n=splitDisplays(h,innerWidth<700); if(n!==h) s.innerHTML=n; }); typeset(document.querySelector("main")); fitDisplay(document.querySelector("main")); try{ document.fonts.ready.then(()=>fitDisplay(document.querySelector("main"))); }catch(e){} bindQ(); renderTop(); save();
+  const m=/^#s=([\w-]+)$/.exec(location.hash||""); if(m){ const el=document.querySelector('section.s[data-id="'+m[1]+'"]'); if(el) el.scrollIntoView(); }
+  else if(location.hash==="#resume"){ const ids=$$("section.s[data-id]").map(s=>s.dataset.id); const next=ids.find(id=>!ST.read[id]); if(next){ const el=document.querySelector('section.s[data-id="'+next+'"]'); if(el) el.scrollIntoView(); } else if(QUIZ.length){ $("#quiz").scrollIntoView(); } } }
+(function wait(){ if(window.renderMathInElement) boot(); else setTimeout(wait,40); })();
+</script>
+</body>
+</html>

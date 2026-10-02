@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-01T11:50:46",
+ "generated": "2026-10-02T10:16:26",
  "lessons": {
   "phys2-2026-09-04": {
    "course": "일반물리학2",
@@ -307,6 +307,82 @@
     ]
    }
   },
+  "phys2-2026-09-30": {
+   "course": "일반물리학2",
+   "date": "2026-09-30",
+   "nodes": [
+    "em.field",
+    "em.gauss_apps",
+    "em.potential",
+    "em.capacitance",
+    "em.current",
+    "em.resistance",
+    "em.emf_loop",
+    "em.kirchhoff",
+    "em.rc",
+    "alg.exponent_rules"
+   ],
+   "sec": {
+    "s1": [
+     "em.field",
+     "em.potential",
+     "em.gauss_apps",
+     "em.capacitance"
+    ],
+    "s2": [
+     "em.current"
+    ],
+    "s3": [
+     "em.resistance"
+    ],
+    "s4": [
+     "em.resistance"
+    ],
+    "s5": [
+     "em.resistance",
+     "em.rc",
+     "alg.exponent_rules"
+    ],
+    "s6": [
+     "em.emf_loop",
+     "em.kirchhoff"
+    ]
+   },
+   "q": {
+    "q1": [
+     "em.field",
+     "em.potential"
+    ],
+    "q2": [
+     "em.gauss_apps"
+    ],
+    "q3": [
+     "em.current"
+    ],
+    "q4": [
+     "em.current"
+    ],
+    "q5": [
+     "em.resistance"
+    ],
+    "q6": [
+     "em.resistance"
+    ],
+    "q7": [
+     "em.resistance"
+    ],
+    "q8": [
+     "em.kirchhoff"
+    ],
+    "q9": [
+     "em.emf_loop"
+    ],
+    "q10": [
+     "em.emf_loop",
+     "em.kirchhoff"
+    ]
+   }
+  },
   "statics-2026-09-07": {
    "course": "정역학",
    "date": "2026-09-07",
@@ -508,6 +584,277 @@
     ],
     "q6": [
      "mech.equilibrium_particle"
+    ]
+   }
+  },
+  "statics-2026-09-21": {
+   "course": "정역학",
+   "date": "2026-09-21",
+   "nodes": [
+    "mech.cross_apps",
+    "mech.equilibrium_particle",
+    "mech.moment",
+    "mech.particle_2d",
+    "mech.fbd",
+    "vec.cross"
+   ],
+   "sec": {
+    "s1": [
+     "mech.particle_2d",
+     "mech.fbd"
+    ],
+    "s2": [
+     "mech.fbd",
+     "mech.equilibrium_particle"
+    ],
+    "s3": [
+     "mech.moment"
+    ],
+    "s4": [
+     "mech.moment"
+    ],
+    "s5": [
+     "mech.moment",
+     "mech.cross_apps",
+     "vec.cross"
+    ],
+    "s6": [
+     "mech.moment",
+     "mech.cross_apps"
+    ]
+   },
+   "q": {
+    "q1": [
+     "mech.particle_2d",
+     "mech.fbd"
+    ],
+    "q2": [
+     "mech.fbd"
+    ],
+    "q3": [
+     "mech.moment"
+    ],
+    "q4": [
+     "mech.moment"
+    ],
+    "q5": [
+     "mech.moment"
+    ],
+    "q6": [
+     "mech.moment",
+     "mech.cross_apps"
+    ],
+    "q7": [
+     "mech.moment",
+     "mech.cross_apps"
+    ],
+    "q8": [
+     "mech.particle_2d",
+     "mech.fbd"
+    ]
+   }
+  },
+  "statics-2026-09-23": {
+   "course": "정역학",
+   "date": "2026-09-23",
+   "nodes": [
+    "mech.moment",
+    "mech.projection",
+    "mech.triple_product",
+    "mech.moment_line"
+   ],
+   "sec": {
+    "s1": [
+     "mech.moment"
+    ],
+    "s2": [
+     "mech.moment",
+     "mech.moment_line"
+    ],
+    "s3": [
+     "mech.moment_line",
+     "mech.projection"
+    ],
+    "s4": [
+     "mech.moment_line",
+     "mech.triple_product"
+    ],
+    "s5": [
+     "mech.moment_line",
+     "mech.triple_product"
+    ],
+    "s6": [
+     "mech.moment_line"
+    ],
+    "s7": [
+     "mech.moment_line"
+    ],
+    "s8": [
+     "mech.moment_line"
+    ]
+   },
+   "q": {
+    "q1": [
+     "mech.moment"
+    ],
+    "q2": [
+     "mech.moment",
+     "mech.moment_line"
+    ],
+    "q3": [
+     "mech.moment_line",
+     "mech.projection"
+    ],
+    "q4": [
+     "mech.moment_line",
+     "mech.triple_product"
+    ],
+    "q5": [
+     "mech.moment_line",
+     "mech.triple_product"
+    ],
+    "q6": [
+     "mech.moment_line"
+    ],
+    "q7": [
+     "mech.moment_line"
+    ],
+    "q8": [
+     "mech.moment_line"
+    ],
+    "q9": [
+     "mech.moment_line",
+     "mech.triple_product"
+    ]
+   }
+  },
+  "statics-2026-09-28": {
+   "course": "정역학",
+   "date": "2026-09-28",
+   "nodes": [
+    "mech.cross_apps",
+    "mech.moment",
+    "mech.projection",
+    "mech.couple"
+   ],
+   "sec": {
+    "s1": [
+     "mech.couple",
+     "mech.moment"
+    ],
+    "s2": [
+     "mech.couple",
+     "mech.cross_apps"
+    ],
+    "s3": [
+     "mech.couple"
+    ],
+    "s4": [
+     "mech.couple",
+     "mech.moment"
+    ],
+    "s5": [
+     "mech.couple",
+     "mech.projection"
+    ],
+    "s6": [
+     "mech.couple",
+     "mech.projection"
+    ]
+   },
+   "q": {
+    "q1": [
+     "mech.couple"
+    ],
+    "q2": [
+     "mech.couple",
+     "mech.cross_apps"
+    ],
+    "q3": [
+     "mech.couple"
+    ],
+    "q4": [
+     "mech.couple",
+     "mech.moment"
+    ],
+    "q5": [
+     "mech.couple",
+     "mech.moment"
+    ],
+    "q6": [
+     "mech.couple",
+     "mech.projection"
+    ],
+    "q7": [
+     "mech.couple",
+     "mech.projection"
+    ]
+   }
+  },
+  "statics-2026-09-30": {
+   "course": "정역학",
+   "date": "2026-09-30",
+   "nodes": [
+    "mech.couple",
+    "mech.rigid_2d",
+    "mech.fbd"
+   ],
+   "sec": {
+    "s1": [
+     "mech.couple"
+    ],
+    "s2": [
+     "mech.rigid_2d"
+    ],
+    "s3": [
+     "mech.rigid_2d",
+     "mech.fbd"
+    ],
+    "s4": [
+     "mech.rigid_2d"
+    ],
+    "s5": [
+     "mech.rigid_2d"
+    ],
+    "s6": [
+     "mech.fbd",
+     "mech.rigid_2d"
+    ],
+    "s7": [
+     "mech.rigid_2d",
+     "mech.fbd"
+    ]
+   },
+   "q": {
+    "q1": [
+     "mech.rigid_2d"
+    ],
+    "q2": [
+     "mech.rigid_2d"
+    ],
+    "q3": [
+     "mech.rigid_2d"
+    ],
+    "q4": [
+     "mech.rigid_2d"
+    ],
+    "q5": [
+     "mech.rigid_2d"
+    ],
+    "q6": [
+     "mech.rigid_2d",
+     "mech.indeterminate"
+    ],
+    "q7": [
+     "mech.fbd",
+     "mech.rigid_2d"
+    ],
+    "q8": [
+     "mech.fbd",
+     "mech.rigid_2d"
+    ],
+    "q9": [
+     "mech.rigid_2d"
     ]
    }
   },
@@ -896,6 +1243,91 @@
     ]
    }
   },
+  "em1-2026-09-30": {
+   "course": "공업수학1",
+   "date": "2026-09-30",
+   "nodes": [
+    "ode.ivp",
+    "ode.const_coeff",
+    "ode.free_oscillation",
+    "ode.undetermined_coeff",
+    "ode.forced_oscillation"
+   ],
+   "sec": {
+    "s1": [
+     "ode.undetermined_coeff",
+     "ode.const_coeff"
+    ],
+    "s2": [
+     "ode.undetermined_coeff"
+    ],
+    "s3": [
+     "ode.undetermined_coeff"
+    ],
+    "s4": [
+     "ode.undetermined_coeff",
+     "ode.ivp"
+    ],
+    "s5": [
+     "ode.undetermined_coeff",
+     "ode.ivp"
+    ],
+    "s6": [
+     "ode.undetermined_coeff",
+     "ode.ivp"
+    ],
+    "s7": [
+     "ode.undetermined_coeff"
+    ],
+    "s8": [
+     "ode.undetermined_coeff",
+     "ode.ivp"
+    ],
+    "s9": [
+     "ode.forced_oscillation",
+     "ode.free_oscillation"
+    ],
+    "s10": [
+     "ode.forced_oscillation"
+    ],
+    "s11": [
+     "ode.forced_oscillation"
+    ]
+   },
+   "q": {
+    "q1": [
+     "ode.undetermined_coeff"
+    ],
+    "q2": [
+     "ode.undetermined_coeff"
+    ],
+    "q3": [
+     "ode.undetermined_coeff"
+    ],
+    "q4": [
+     "ode.undetermined_coeff"
+    ],
+    "q5": [
+     "ode.undetermined_coeff"
+    ],
+    "q6": [
+     "ode.undetermined_coeff"
+    ],
+    "q7": [
+     "ode.undetermined_coeff",
+     "ode.ivp"
+    ],
+    "q8": [
+     "ode.undetermined_coeff"
+    ],
+    "q9": [
+     "ode.forced_oscillation"
+    ],
+    "q10": [
+     "ode.forced_oscillation"
+    ]
+   }
+  },
   "calc2-2026-09-01": {
    "course": "미분적분학2",
    "date": "2026-09-01",
@@ -1249,6 +1681,142 @@
      "vec.cross"
     ],
     "q7": [
+     "vec.dot_calc2"
+    ]
+   }
+  },
+  "calc2-2026-09-29": {
+   "course": "미분적분학2",
+   "date": "2026-09-29",
+   "nodes": [
+    "lin.det3",
+    "lin.cofactor",
+    "lin.det_props",
+    "vec.position_ops",
+    "vec.dot_calc2",
+    "vec.line_eq",
+    "vec.unit",
+    "vec.cross"
+   ],
+   "sec": {
+    "s1": [
+     "vec.cross",
+     "lin.cofactor",
+     "lin.det3"
+    ],
+    "s2": [
+     "vec.cross",
+     "lin.det_props",
+     "lin.cofactor"
+    ],
+    "s3": [
+     "vec.cross",
+     "lin.cofactor"
+    ],
+    "s4": [
+     "vec.line_eq",
+     "vec.unit"
+    ],
+    "s5": [
+     "vec.line_eq",
+     "vec.dot_calc2",
+     "vec.unit"
+    ],
+    "s6": [
+     "vec.line_eq"
+    ],
+    "s7": [
+     "vec.line_eq",
+     "vec.position_ops"
+    ]
+   },
+   "q": {
+    "q1": [
+     "lin.cofactor",
+     "lin.det3"
+    ],
+    "q2": [
+     "lin.det_props"
+    ],
+    "q3": [
+     "vec.cross"
+    ],
+    "q4": [
+     "vec.cross"
+    ],
+    "q5": [
+     "vec.cross",
+     "lin.cofactor"
+    ],
+    "q6": [
+     "vec.line_eq",
+     "vec.unit"
+    ],
+    "q7": [
+     "vec.line_eq"
+    ],
+    "q8": [
+     "vec.line_eq"
+    ]
+   }
+  },
+  "calc2-2026-10-01": {
+   "course": "미분적분학2",
+   "date": "2026-10-01",
+   "nodes": [
+    "vec.position_ops",
+    "vec.dot_calc2",
+    "vec.line_eq",
+    "vec.plane_eq"
+   ],
+   "sec": {
+    "s1": [
+     "vec.line_eq",
+     "vec.position_ops"
+    ],
+    "s2": [
+     "vec.line_eq"
+    ],
+    "s3": [
+     "vec.line_eq",
+     "vec.position_ops"
+    ],
+    "s4": [
+     "vec.line_eq"
+    ],
+    "s5": [
+     "vec.plane_eq"
+    ],
+    "s6": [
+     "vec.plane_eq",
+     "vec.dot_calc2"
+    ]
+   },
+   "q": {
+    "q1": [
+     "vec.line_eq"
+    ],
+    "q2": [
+     "vec.line_eq"
+    ],
+    "q3": [
+     "vec.line_eq",
+     "vec.position_ops"
+    ],
+    "q4": [
+     "vec.line_eq"
+    ],
+    "q5": [
+     "vec.line_eq"
+    ],
+    "q6": [
+     "vec.line_eq"
+    ],
+    "q7": [
+     "vec.plane_eq"
+    ],
+    "q8": [
+     "vec.plane_eq",
      "vec.dot_calc2"
     ]
    }

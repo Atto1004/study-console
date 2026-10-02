@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-02.103";
+var BUILD="2026-10-02.104";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,10 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-02.104",d:"10-02",items:[
+    "공업수학1 중간 범위 = 1장 ~ 3.3 (교수 10/2, 10/7 수업에서 범위 끝까지) — 시험 카드 범위 갱신",
+    "5주차 수업 노트 · 교실 8회차 추가 — 미적2 9/29 · 10/1, 공수1 9/30, 일물2 9/30, 정역학 9/21 · 9/23 · 9/28 · 9/30 (암기노트 · 개념 판정 연결 포함)"
+  ]},
   {v:"2026-10-02.103",d:"10-02",items:[
     "공부계획 맨 위 「시간」 카드 — 남은 시간(오늘 남은 빈 시간 · 이번 주 남은 빈 시간 · 과목별 중간고사 D-day 와 시험까지 빈 시간)과 과목별 공부 시간(오늘 · 이번 주 · 누적 · 합계)을 따로 셈",
     "과목마다 ▶ 로 바로 타이머 시작, ■ 로 끝내면 그 과목 공부 시간에 기록 (오늘 탭 공부 타이머와 같은 기록)"
@@ -12351,6 +12355,22 @@ var V33={};
     "@media (max-width:760px){.v61-g{grid-template-columns:1fr}.v61-t{font-size:12.5px}.v61-t td,.v61-t th{padding:5px 3px}.v61-t .crow-chip{display:none}.v61-er{flex-wrap:wrap;row-gap:0}.v61-eh{width:100%;padding-left:38px}.v61-t .btn{min-width:40px}}"
   ].join("\n");
   document.head.appendChild(css);
+})();
+/* ============================================================
+   V62 LAYER — 대표님 2026-10-02 「공업수학 3.3까지가 시험범위, 다음주 수요일에 시험범위 다 나간다」 (BUILD 2026-10-02.104)
+   boot 패치 1회: 공업수학1 중간 범위 = 1장 ~ 3.3 (10/7 수업에서 범위 끝까지). 시험 카드·시험 모드 범위 주차가 이 문자열을 읽는다.
+   ============================================================ */
+(function(){
+  if(window.V62) return;
+  var V62=window.V62={};
+  V62.SCOPE="1장 1계 상미분방정식(1.1 · 1.3 ~ 1.5) · 2장 2계 선형 상미분방정식(2.1 ~ 2.10) · 3장 고계 선형 상미분방정식(3.1 ~ 3.3) — 교수 10/2, 10/7(수) 수업에서 범위 끝까지";
+  V62.patch=function(){
+    var t=term(); if(!t||t.patchV62a) return;
+    var c=(t.courses||[]).filter(function(x){ return x.name==="공업수학1"; })[0];
+    if(c) (t.exams||[]).forEach(function(e){ if(e.courseId===c.id&&e.kind==="중간"&&!/3\.3/.test(e.scope||"")) e.scope=V62.SCOPE; });
+    t.patchV62a=true; persist();
+  };
+  var _boot=boot; boot=function(){ _boot(); try{ V62.patch(); }catch(e){ if(window.console) console.warn("V62 패치", e); } };
 })();
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start);
 else start();

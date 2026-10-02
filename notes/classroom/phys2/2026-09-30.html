@@ -1,0 +1,924 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>26장 전류와 저항 — 그리고 27장 회로 도입</title>
+<!-- 교실 모드 템플릿 v4 (대표님 2026-09-28 레퍼런스 「인강 전자칠판」: 초록 칠판 + 흰 활자 판서(Gothic A1) + 민트 테두리 식 상자(식 챕터-번호) + 【그림 챕터-번호】 캡션, 칠판 오른쪽에 전신으로 서서 지시봉으로 판서를 가리키는 김주영 스앵님, 대사 = 아래 자막(Gowun Dodum, 표정 얼굴), 조작 = 칠판 아래 줄)
+     v2 회차(D.v===2)는 판서 파일(BOARD)로 만든 단계(판서 줄 누적 + 그림 단계 + 대사), v1 회차는 원문 문단 그대로(「구버전 판서」 표시).
+     저장: mc-tutor(전역 XP·연속일·하트·호감도 + 회차 위치 {mode,cid,sid,qi,ver}) + mc-lesson-<id>(챕터 읽음·문제, 수업 노트·앱 V52 와 공유). 오타 설계 회의 1·2차 + 구현 검수 1~6차 조건 반영. -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Gothic+A1:wght@500;600;700;800&family=Inter:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<style>
+/* 교실 v4 = 인강 전자칠판 (대표님 2026-09-28 레퍼런스 「칠판 판서 이런 느낌으로」: 초록 칠판 + 흰 활자 판서 + 민트 테두리 식 상자 + 【그림 n-k】 캡션 + 오른쪽에 서 있는 강사)
+   오타 디자인 검수 1차(RED 8) 반영: 칠판을 레퍼런스(#446B53)보다 한 단계 어둡게(#41664F → #31543E) — classroom_design_audit.cjs 실측(가장 밝은 곳 + 노이즈 최대 위 합성): 글자 전부 4.5:1 이상, 기호(★→!✓) 3:1 이상.
+   작은 설명 글자는 흰색 계열로만, 색은 선·테두리·기호에. 지난 단계 판서는 흐리게 하지 않고(번호 원 테두리만 옅게) 이번 단계 줄에 노란 표시.
+   글꼴 역할: 판서(칠판 위 #bc) = Gothic A1(레퍼런스의 굵은 고딕, 판서 예외) · 그 밖(자막·버튼·HUD) = 앱 본문 Gowun Dodum · 숫자 Inter. 손글씨·분필 질감은 쓰지 않는다(칠판 면에 3.5% 잡티만). */
+:root{--chalk:#F4F8F5;--chalk-2:rgba(244,248,245,.86);--chalk-3:rgba(244,248,245,.62);
+  --mint:#C9F4E1;--mint-line:rgba(207,243,227,.85);--yel:#FFE89A;--yel-fill:#FFE27A;--yel-soft:rgba(255,232,154,.09);--coral:#FFDDD6;--coral-line:#FFA497;--coral-soft:rgba(255,164,151,.1);--sky:#C8E6FF;--sky-soft:rgba(200,230,255,.09);
+  --page:#0C1511;
+  --fh:"Gothic A1","Pretendard Variable",Pretendard,sans-serif;--fbd:"Gothic A1","Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --fb:"Gowun Dodum","Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;--ft:"Gowun Dodum","Pretendard Variable",Pretendard,sans-serif;--fn:Inter,"Pretendard Variable",Pretendard,sans-serif;
+  --hud:52px;--tw:320px}
+*{box-sizing:border-box}
+html{background:var(--page)}
+body{margin:0;font-family:var(--fb);font-size:16px;color:var(--chalk);word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased;line-height:1.6;min-height:100vh;background:radial-gradient(1100px 520px at 62% -12%,#1C3327 0%,rgba(12,21,17,0) 72%),var(--page)}
+button{font-family:inherit}
+::selection{background:rgba(255,226,122,.35);color:#fff}
+/* ---------- HUD (어두운 스튜디오 띠) ---------- */
+#hud{position:sticky;top:0;z-index:9;height:var(--hud);background:rgba(10,18,14,.9);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.07)}
+#hud .in{max-width:1040px;margin:0 auto;height:100%;padding:0 20px;display:flex;align-items:center;gap:16px}
+#hud .hl{display:flex;flex-direction:column;line-height:1.2;min-width:0}
+#hud .hl b{font-family:var(--fh);font-weight:800;font-size:15px;white-space:nowrap;color:#fff}
+#hud .hl span{font-size:12px;color:var(--chalk-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hud .hc{flex:1;display:flex;align-items:center;gap:8px;min-width:0}
+#hud .chp{font-family:var(--fn);font-weight:700;font-size:12px;color:var(--mint);white-space:nowrap;letter-spacing:.06em}
+#hud .seg{display:flex;gap:4px;flex:1;max-width:300px}#hud .seg i{display:block;flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.13)}#hud .seg i.on{background:var(--mint)}#hud .seg i.cur{background:var(--yel)}
+#hud .hr{display:flex;align-items:center;gap:8px}
+.stat{display:inline-flex;align-items:center;gap:5px;font-family:var(--fn);font-weight:700;font-size:12.5px;padding:4px 10px;border-radius:999px;position:relative;white-space:nowrap;background:rgba(255,255,255,.07);color:#fff;border:1px solid rgba(255,255,255,.08)}
+.stat svg{width:15px;height:15px;display:block}.stat small{font-weight:600;color:var(--chalk-3);margin-left:2px}
+.stat.hp{gap:3px}
+.stat .gauge{display:inline-block;width:52px;height:8px;border-radius:99px;background:rgba(255,255,255,.13);overflow:hidden}.stat .gauge b{display:block;height:100%;width:0;background:#F783AC;transition:width .4s}
+.pop{position:absolute;left:50%;top:-6px;transform:translate(-50%,0);font-size:13px;font-weight:900;color:#8EF0A8;pointer-events:none;opacity:0;animation:pop 1.1s ease-out forwards;white-space:nowrap}
+.pop.bad{color:#FF8A80}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,0)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-30px)}}
+#hToc{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font-weight:700;font-size:13px;padding:7px 12px;border-radius:12px;cursor:pointer;min-height:36px}
+/* ---------- 전자칠판 ---------- */
+main{max-width:1040px;margin:0 auto;padding:14px 20px 18px}
+#room{display:block}#board{position:relative}#side{display:none}
+.slide{position:relative;display:grid;grid-template-columns:minmax(0,1fr) var(--tw);grid-template-rows:auto minmax(0,1fr) auto;height:clamp(560px,calc(100vh - var(--hud) - 140px),980px);border-radius:16px;overflow:hidden;
+  background:radial-gradient(150% 125% at 46% 42%,rgba(0,0,0,0) 58%,rgba(0,0,0,.26) 100%),url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .035 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"),linear-gradient(158deg,#41664F 0%,#3A5E48 46%,#31543E 100%);
+  box-shadow:0 18px 48px rgba(0,0,0,.46),inset 0 0 0 1px rgba(255,255,255,.07)}
+.chk{grid-column:1;grid-row:1;display:flex;align-items:center;gap:10px;padding:14px 26px 11px;white-space:nowrap;overflow:visible;min-width:0;border-bottom:1px solid rgba(255,255,255,.12)}
+.chk>span:first-child{font-family:var(--fh);font-weight:800;font-size:16.5px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1;color:#fff}
+.chk small{font-family:var(--fn);font-size:12px;font-weight:700;color:var(--mint);letter-spacing:.08em;flex:0 0 auto;padding:3px 10px;border:1px solid rgba(201,244,225,.5);border-radius:99px}
+.chk .old{font-family:var(--fb);font-size:11px;color:#FFE1DC;border:1px dashed rgba(255,213,208,.6);border-radius:6px;padding:1px 6px;flex:0 0 auto}
+#bwrap{grid-column:1;grid-row:2;min-height:0;overflow:auto;padding:16px 26px 18px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.28) transparent}
+#bwrap::-webkit-scrollbar{width:8px}#bwrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,.26);border-radius:99px}
+#upHint{flex:0 0 auto;position:relative;font-family:var(--fb);font-weight:700;font-size:12px;line-height:1.2;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.32);border-radius:99px;padding:3px 10px;cursor:pointer}#upHint{z-index:5}#upHint::before{content:"";position:absolute;left:-6px;right:-6px;top:-9px;bottom:-15px}#upHint:hover{background:rgba(255,255,255,.16)}   /* 위 판서: 머리글 안 쪽수 앞 — 판서 위에 뜨면 식 번호를 가렸다(2차 캡처) */
+#upHint[hidden]{display:none}
+#bc{font-family:var(--fbd);font-weight:600;font-size:17px;line-height:1.62;width:100%;margin:0;color:var(--chalk)}
+#bc.v1{font-weight:500;font-size:16.5px;line-height:1.75}
+#bc .katex-display{margin:8px 0;overflow-x:auto;overflow-y:hidden;padding:2px 0;scrollbar-width:thin}
+/* 판서 줄: 흰 활자 · 번호 = 민트 원 · 소제목 = 800 + 노란 밑줄 · 식 = 민트 테두리 상자 + (식 챕터-번호) · 함정 = 산호 띠 상자 · 시험/비유 = 연노랑 · 결론 = 하늘 화살표 · 외울 것 = 노란 상자 · 이번 단계 = 왼쪽 노란 표시 */
+.bd-title{display:none}
+.bl{position:relative;padding:5px 8px 5px 36px;margin:0 0 6px;border-radius:10px;border:1px solid transparent;opacity:0;transform:translateY(6px);transition:opacity .4s ease-out,transform .4s ease-out}
+.bl.on,.bl.now{opacity:1;transform:none}.bl.now{transition:none}
+.bl::before{content:attr(data-n);position:absolute;left:5px;top:8px;width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(201,244,225,.78);color:var(--mint);display:grid;place-items:center;font-family:var(--fn);font-weight:700;font-size:11.5px;line-height:1;box-sizing:border-box}
+.bl>.bt{min-width:0}
+.bl.dim::before{border-color:rgba(201,244,225,.42)}   /* 번호 글자는 그대로(대비 4.5↑), 테두리만 옅게 — 투명도 .55 는 번호 대비 2.7 이었다(가상 요소 대비 실측) */
+.bl.cur:is(.k-li,.k-star,.k-res){background:rgba(255,255,255,.05);box-shadow:inset 3px 0 0 var(--yel)}
+.bl.k-li.cur::before{background:var(--mint);border-color:var(--mint);color:#173026}
+.bl.k-h{padding:10px 0 11px;margin-top:6px;font-size:20px;background:linear-gradient(var(--yel),var(--yel)) 0 100%/46px 3px no-repeat}
+.bl.k-h::before{display:none}.bl.k-h>.bt{font-family:var(--fh);font-weight:800;color:#fff;letter-spacing:-.01em}
+.bl.k-f{display:block;padding:8px 88px 8px 18px;margin:8px 0 12px;background:rgba(255,255,255,.03);border:1.5px solid var(--mint-line);border-radius:12px;box-shadow:0 0 0 3px rgba(207,243,227,.05),inset 0 0 22px rgba(207,243,227,.05);counter-increment:eq}
+.bl.k-f.dim{border-color:rgba(207,243,227,.5)}.bl.k-f.cur{border-color:#E6FCF2;box-shadow:0 0 0 3px rgba(207,243,227,.1),inset 0 0 22px rgba(207,243,227,.06),inset 3px 0 0 var(--yel)}
+.bl.k-f::before{display:none}
+.bl.k-f::after{content:"(식 " counter(chn) "-" counter(eq) ")";position:absolute;right:14px;top:50%;transform:translateY(-50%);font-family:var(--fh);font-weight:700;font-size:13.5px;color:var(--chalk);white-space:nowrap}
+.bl.k-f .katex-display{margin:2px 0;text-align:left}.bl.k-f .katex-display>.katex{text-align:left}.bl.k-f .katex{font-size:1.2em}
+.bl.k-pit{padding:8px 12px 8px 40px;background:var(--coral-soft);border-color:rgba(255,164,151,.38);border-left:3px solid var(--coral-line);border-radius:4px 12px 12px 4px}
+.bl.k-pit::before{content:"!";left:9px;top:11px;border-color:var(--coral-line);background:var(--coral-line);color:#3A1510;font-size:13px}
+.bl.k-star>.bt{color:#FFEDB5}.bl.k-star::before{content:"★";border-color:rgba(255,232,154,.8);color:var(--yel);font-size:11px}
+.bl.k-res>.bt{color:#fff;font-weight:700}.bl.k-res::before{content:"→";border:0;color:var(--sky);font-size:18px;font-weight:800}
+.bl.k-memo{padding:9px 14px 9px 42px;margin:8px 0 10px;background:var(--yel-soft);border:1.5px solid rgba(255,232,154,.7);border-radius:12px}
+.bl.k-memo::before{content:"✓";left:11px;top:12px;border-color:var(--yel-fill);background:var(--yel-fill);color:#2B2A12;font-size:12px}.bl.k-memo>.bt{color:#FFF6D8}
+.bl.k-memo.cur,.bl.k-pit.cur{box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.bl b,.bl strong{font-weight:800}
+.bl .ul{color:#FFF0BE;font-weight:800;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;text-decoration-color:rgba(255,232,154,.8)}
+/* 그림 = 칠판 위 흰 선화 + 【그림 챕터-번호】 캡션 (읽기용 노트의 색은 CSS 로만 칠판 색으로 바꾼다 — 원본 SVG·검사기는 그대로) */
+.bd-fig{margin:12px 0 6px}
+.bd-fig .fh{display:flex;align-items:center;gap:8px;font-family:var(--fn);font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--chalk-2);margin:0 0 4px}
+.bd-fig .fh .pl{margin-left:auto;display:flex;gap:6px}
+.bd-fig .fh button{font-family:var(--fb);font-size:12.5px;font-weight:700;letter-spacing:0;border:1px solid rgba(255,255,255,.32);background:rgba(255,255,255,.07);border-radius:99px;padding:5px 12px;cursor:pointer;color:#fff;min-height:32px}
+.bd-fig .fh button:hover{background:rgba(255,255,255,.14)}.bd-fig .fh .zoom{display:none}.bd-fig:not(.big) .fh .zoom{display:inline-block}.bd-fig:not(.big) figure{cursor:zoom-in}
+.bd-fig figure{margin:0}.bd-fig figure>svg.fpan+svg.fpan{margin-top:10px;border-top:1px dashed rgba(255,255,255,.2)}.bd-fig figure>svg{width:100%;height:auto;display:block;overflow:visible;max-width:600px;margin:0 auto}   /* figure>svg 만 — 캡션 KaTeX 의 √ 도 svg 라 전체 svg 에 걸면 근호가 사라진다(2026-09-28 캡처) */
+.bd-fig figcaption{font-family:var(--fbd);font-weight:500;font-size:13.5px;color:var(--chalk-2);margin-top:8px;text-align:center;line-height:1.55}
+.bd-fig figcaption::before{content:"【그림 " counter(chn) "-" counter(fno) "】";font-weight:800;color:#fff;margin-right:6px}
+.bd-fig [data-step][hidden]{display:none}
+.bd-fig .pre{opacity:0}
+.bd-fig .draw{transition:stroke-dashoffset var(--dur,1s) ease-out}
+.bd-fig .fade{opacity:0;transition:opacity .35s ease-out}.bd-fig .fade.on{opacity:1}
+.bd-fig .pulse{transform-box:fill-box;transform-origin:center;animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+/* 그림 색(칠판용): 선·도형은 채도를 남기고(그래픽 3:1 이상), 글자는 더 밝게(4.5:1 이상). 빨강=양전하 · 파랑=음전하 · 초록=장/힘 · 분홍=가우스면 뜻 유지 */
+:is(.bd-fig figure,#bc .paper,#figov .fz figure)>svg{fill:#F4F8F5}
+:is(.bd-fig,#bc .paper,#figov) [stroke="#1F2A44"]{stroke:#F2F7F4}:is(.bd-fig,#bc .paper,#figov) [fill="#1F2A44"]{fill:#F2F7F4}
+:is(.bd-fig,#bc .paper,#figov) [stroke="#E03131"]{stroke:#FF9C8F}:is(.bd-fig,#bc .paper,#figov) [fill="#E03131"]{fill:#FF9C8F}:is(.bd-fig,#bc .paper,#figov) text[fill="#E03131"]{fill:#FFDAD3}
+:is(.bd-fig,#bc .paper,#figov) [stroke="#1971C2"]{stroke:#9CCBFF}:is(.bd-fig,#bc .paper,#figov) [fill="#1971C2"]{fill:#9CCBFF}:is(.bd-fig,#bc .paper,#figov) text[fill="#1971C2"]{fill:#CFE5FF}
+:is(.bd-fig,#bc .paper,#figov) [stroke="#2F9E44"]{stroke:#9FEAB4}:is(.bd-fig,#bc .paper,#figov) [fill="#2F9E44"]{fill:#9FEAB4}:is(.bd-fig,#bc .paper,#figov) text[fill="#2F9E44"]{fill:#BDF3CB}
+:is(.bd-fig,#bc .paper,#figov) [stroke="#FF4D8D"]{stroke:#FFA3C6}:is(.bd-fig,#bc .paper,#figov) [fill="#FF4D8D"]{fill:#FFA3C6}:is(.bd-fig,#bc .paper,#figov) text[fill="#FF4D8D"]{fill:#FFDCEA}
+:is(.bd-fig,#bc .paper,#figov) [stroke="#8A97A6"]{stroke:#B9C9C0}:is(.bd-fig,#bc .paper,#figov) [fill="#8A97A6"]{fill:#B9C9C0}:is(.bd-fig,#bc .paper,#figov) text[fill="#8A97A6"]{fill:#E0E8E3}
+:is(.bd-fig,#bc .paper,#figov) [stroke="#F59F00"]{stroke:#FFE27A}:is(.bd-fig,#bc .paper,#figov) [fill="#F59F00"]{fill:#FFE27A}:is(.bd-fig,#bc .paper,#figov) text[fill="#F59F00"]{fill:#FFE89A}
+:is(.bd-fig,#bc .paper,#figov) [stroke="#B26A00"]{stroke:#FFD08A}:is(.bd-fig,#bc .paper,#figov) [fill="#B26A00"]{fill:#FFD9A0}:is(.bd-fig,#bc .paper,#figov) text[fill="#B26A00"]{fill:#FFE2B8}
+:is(.bd-fig,#bc .paper,#figov) [fill="#F1F3F5"]{fill:rgba(255,255,255,.1)}
+:is(.bd-fig,#bc .paper,#figov) :is([fill="#fff"],[fill="#FFF"],[fill="#ffffff"],[fill="#FFFFFF"],[fill="white"]){fill:#3D624C}
+:is(.bd-fig,#bc .paper,#figov) :is([stroke="#fff"],[stroke="#FFF"],[stroke="#ffffff"],[stroke="#FFFFFF"],[stroke="white"]){stroke:#3D624C}
+:is(.bd-fig,#bc .paper,#figov) [fill^="rgba(255,255,255"]{fill:rgba(255,255,255,.06)}
+:is(.bd-fig,#bc .paper,#figov) [fill^="rgba(31,42,68"]{fill:rgba(255,255,255,.07)}:is(.bd-fig,#bc .paper,#figov) [fill="rgba(31,42,68,.35)"]{fill:rgba(255,255,255,.34)}
+:is(.bd-fig,#bc .paper,#figov) [fill^="rgba(138,151,166"]{fill:rgba(255,255,255,.06)}
+:is(.bd-fig,#bc .paper,#figov) [fill^="rgba(224,49,49"]{fill:rgba(255,156,143,.14)}:is(.bd-fig,#bc .paper,#figov) :is([fill="rgba(224,49,49,.25)"],[fill="rgba(224,49,49,.3)"]){fill:rgba(255,156,143,.28)}
+:is(.bd-fig,#bc .paper,#figov) [fill^="rgba(25,113,194"]{fill:rgba(156,203,255,.15)}
+:is(.bd-fig,#bc .paper,#figov) [fill^="rgba(47,158,68"]{fill:rgba(159,234,180,.13)}
+:is(.bd-fig,#bc .paper,#figov) [fill^="rgba(255,77,141"]{fill:rgba(255,163,198,.11)}
+:is(.bd-fig,#bc .paper,#figov) [fill^="rgba(245,159,0"]{fill:rgba(255,226,122,.15)}
+@media (prefers-reduced-motion: reduce){.bl{transition:none}.bd-fig .draw,.bd-fig .fade{transition:none}.bd-fig .pulse{animation:none}#tutor.raster #tutorImg{animation:none}}
+/* 그림 크게 보기(폰) */
+#figov{position:fixed;inset:0;z-index:30;background:#050B08;display:flex;flex-direction:column}
+#figov[hidden]{display:none}
+#figov .fzh{display:flex;align-items:center;gap:10px;padding:12px 14px;color:#fff;font-family:var(--fh);font-weight:800;font-size:15px}
+#figov .fzh>span{min-width:0}#figov .fzh small{display:block;margin-top:2px;font-family:var(--fb);font-weight:400;font-size:12.5px;color:var(--chalk-3)}
+#figov .fzh button{margin-left:auto;font-family:var(--fb);font-weight:700;font-size:14px;color:#1C2A21;background:var(--yel-fill);border:0;border-radius:12px;padding:10px 18px;min-height:44px;cursor:pointer}
+#figov .fz{flex:1;overflow:auto;padding:12px 14px 28px;background:linear-gradient(158deg,#41664F,#31543E);-webkit-overflow-scrolling:touch}
+#figov .fz figure{margin:0;width:max-content}#figov .fz figure>svg{width:620px;max-width:none;height:auto;display:block;overflow:visible}
+#figov .fz figcaption{max-width:min(620px,calc(100vw - 28px));position:sticky;left:0;color:var(--chalk-2);font-family:var(--fbd);font-weight:500;font-size:14.5px;line-height:1.6;margin-top:10px}
+/* v1(구버전) 판서 */
+#bc .tk{font-size:17px}#bc p{margin:0 0 10px}#bc b,#bc strong{font-weight:800;color:#fff}
+#bc .sub{font-family:var(--fh);font-weight:800;font-size:17px;color:var(--yel);margin:0 0 8px;line-height:1.3}
+#bc .bx{margin:6px 0 14px;padding:12px 16px 10px;border:1px solid rgba(255,255,255,.16);border-radius:12px;position:relative;background:rgba(255,255,255,.03)}
+#bc .bx>i{display:block;font-style:normal;font-family:var(--fh);font-weight:800;font-size:12.5px;line-height:1;margin-bottom:6px;color:var(--chalk-2);letter-spacing:.02em}
+#bc .bx.why{background:var(--sky-soft);border-color:rgba(200,230,255,.4)}#bc .bx.why>i{color:var(--sky)}#bc .bx.analogy{background:var(--yel-soft);border-color:rgba(255,232,154,.4)}#bc .bx.analogy>i{color:var(--yel)}
+#bc .bx.formula{background:rgba(255,255,255,.03);border:1.5px solid var(--mint-line)}#bc .bx.formula>i{color:var(--mint)}#bc .bx.pitfall{background:var(--coral-soft);border-color:rgba(255,164,151,.45)}#bc .bx.pitfall>i{color:var(--coral)}
+#bc .bx.memo{background:var(--yel-soft);border-color:rgba(255,232,154,.6)}#bc .bx.memo>i{color:var(--yel)}#bc .bx.say{border:0;border-left:3px solid var(--yel-fill);border-radius:0;padding:4px 16px;font-style:italic;background:transparent}#bc .bx.say>i{color:var(--yel);font-style:normal}
+#bc .paper{background:none;border:0;padding:6px 0 4px;margin:8px auto 14px;max-width:620px;text-align:center}
+#bc .paper>svg{max-width:100%;height:auto;display:block;margin:0 auto}#bc .paper figcaption,#bc .paper .cap{font-size:13.5px;color:var(--chalk-2);margin-top:6px}
+#bc .paper.photo img{max-width:100%;max-height:420px;object-fit:contain;border-radius:8px;background:#111}
+#bc .ex .exq{border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:12px 16px;margin-bottom:12px;background:rgba(255,255,255,.03)}#bc .ex .exq>i,#bc .ex .exa>i{display:block;font-style:normal;font-family:var(--fh);font-weight:800;font-size:12.5px;line-height:1;margin-bottom:6px;color:var(--yel)}
+#bc .ex .exa{padding:4px 6px 0 16px;border-left:3px solid var(--mint)}#bc .ex .exa>i{color:var(--mint)}#bc .ex .exhide{color:var(--chalk-2);font-style:italic;font-size:14px}
+#bc table{border-collapse:collapse;margin:8px 0 12px;font-size:15px;width:100%}#bc th,#bc td{border:1px solid rgba(255,255,255,.18);padding:6px 10px;text-align:left;vertical-align:top}#bc th{background:rgba(255,255,255,.05);font-weight:800}
+/* 문제 */
+#bc .qz{font-size:17px}
+#bc .qz .qn{font-family:var(--fh);font-weight:800;font-size:18px;color:var(--yel);line-height:1.3;margin-bottom:8px}
+#bc .qz .qb{margin-bottom:14px;font-size:17.5px;color:#fff}
+#bc .qz ol.ch{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+#bc .qz .cb{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:#F4F8F5;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:11px 14px;cursor:pointer;transition:transform .1s,background .15s,border-color .15s;line-height:1.5;min-height:52px}
+#bc .qz .cb .n{flex:0 0 30px;height:30px;border-radius:50%;border:1.5px solid rgba(201,244,225,.75);color:var(--mint);display:grid;place-items:center;font-family:var(--fn);font-weight:700;font-size:13.5px}
+#bc .qz .cb:hover:not([disabled]){background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.34)}#bc .qz .cb[disabled]{cursor:default}
+#bc .qz .cb.ok{border-color:var(--mint);background:rgba(201,244,225,.1)}#bc .qz .cb.ok .n{background:var(--mint);border-color:var(--mint);color:#173026}
+#bc .qz .cb.bad{border-color:var(--coral-line);background:rgba(255,164,151,.1)}#bc .qz .cb.bad .n{background:var(--coral-line);border-color:var(--coral-line);color:#3A1510}
+#bc .qz textarea{width:100%;min-height:74px;font:inherit;font-weight:500;color:#fff;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.24);border-radius:12px;padding:10px 14px;resize:vertical}
+#bc .qz textarea::placeholder{color:var(--chalk-2)}#bc .qz .my{margin:8px 0;color:var(--chalk-2)}#bc .qz .my b{color:#fff}
+#bc .qz .vd{display:inline-block;font-weight:800;font-size:13.5px;padding:3px 12px;border-radius:99px;margin:10px 0 4px}
+#bc .qz .vd.ok{background:var(--mint);color:#173026}#bc .qz .vd.bad{background:var(--coral-line);color:#3A1510}#bc .qz .vd.wait{background:rgba(0,0,0,.3);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}   /* 흰 바탕 14% 위 흰 글자는 4.36 */
+#bc .qz .ans{margin-top:12px;padding:12px 16px;border-left:3px solid var(--mint);background:rgba(201,244,225,.06);border-radius:0 12px 12px 0;font-weight:500}
+#bc .qz .ans>i{display:block;font-style:normal;font-family:var(--fh);font-weight:800;font-size:12.5px;color:#E6FCF2;line-height:1;margin-bottom:6px}
+#bc .qz .row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+/* 목차 · 결과 */
+#bc .ttl{font-family:var(--fh);font-weight:800;font-size:26px;line-height:1.3;color:#fff;margin:4px 0 8px}
+#bc .lead{color:var(--chalk-2);font-size:15.5px;font-weight:500;margin:0 0 16px;line-height:1.7}
+#bc .toc{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:0;font-size:16px}
+#bc .toc li{display:flex;align-items:center;gap:12px;padding:9px 4px;border-bottom:1px dashed rgba(255,255,255,.2)}
+#bc .toc .st{flex:0 0 28px;height:28px;border-radius:50%;border:1.5px solid rgba(201,244,225,.7);color:var(--mint);display:grid;place-items:center;font-family:var(--fn);font-size:12.5px;font-weight:700}
+#bc .toc li.done .st{background:var(--mint);border-color:var(--mint);color:#173026}#bc .toc li.cur{color:var(--yel)}#bc .toc li.cur .st{border-color:var(--yel);color:var(--yel)}
+#bc .toc small{margin-left:auto;font-size:12px;color:var(--chalk-2);white-space:nowrap;font-family:var(--fn);font-weight:600}
+#bc .res{text-align:center}#bc .res .big{font-family:var(--fh);font-weight:800;font-size:34px;line-height:1.15;color:#fff;margin:12px 0}
+#bc .res .stats{display:flex;justify-content:center;gap:26px;flex-wrap:wrap;font-size:15px;margin:6px 0 12px}#bc .res .stats b{display:block;font-family:var(--fn);font-size:28px;line-height:1.1;color:var(--yel)}#bc .res .stats span{display:block;font-size:12.5px;color:var(--chalk-2);font-weight:600;font-family:var(--fb)}
+#bc .res .badge{margin:4px auto 0;width:130px;height:130px;display:block}#bc .res .bl2{font-size:12.5px;font-weight:600;color:var(--chalk-2);margin-top:4px}#bc .res .wrong{margin-top:10px;color:var(--coral);font-size:14.5px}
+#bc .res .stk{display:block;width:150px;height:150px;margin:2px auto 0;object-fit:contain;filter:drop-shadow(0 10px 16px rgba(0,0,0,.35))}
+/* ---------- 칠판 오른쪽에 서 있는 김주영 스앵님(전신, 지시봉이 판서 쪽) + 아래 자막 ---------- */
+#tutorCard{grid-column:2;grid-row:1 / 4;position:relative;z-index:1;pointer-events:none;min-height:0;overflow:hidden}
+#tutorCard .nm{display:none}
+#tutor{position:absolute;inset:0}
+#tutor svg{position:absolute;right:12%;bottom:130px;width:76%;height:auto;display:block;overflow:visible}
+#tutorImg{display:none;position:absolute;left:0;right:0;bottom:-54px;width:100%;height:calc(100% + 44px);object-fit:contain;object-position:50% 100%;-webkit-user-select:none;user-select:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.38));animation:stand 6s ease-in-out infinite}
+#tutor.raster #tutorImg{display:block}#tutor.raster svg{display:none}
+#tutor.raster.pose #tutorImg{transform:scaleX(-1)}   /* 지시봉이 판서(왼쪽)를 가리키게 좌우 반전 */
+#tutor.raster:not(.pose) #tutorImg{height:58%}
+@keyframes stand{0%,100%{translate:0 0}50%{translate:0 -3px}}
+.box{grid-column:1 / 3;grid-row:3;position:relative;z-index:2;margin:0 14px 14px;padding:10px 16px 10px 12px;display:flex;gap:12px;align-items:flex-start;background:rgba(8,16,12,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:14px;box-shadow:0 10px 26px rgba(0,0,0,.3)}
+#faceImg{flex:0 0 48px;width:48px;height:48px;border-radius:50%;object-fit:cover;object-position:50% 12%;background:#23392E;border:2px solid rgba(255,232,154,.8)}
+#faceImg[hidden]{display:none}
+.box .sb{flex:1;min-width:0;position:relative}
+.tmore{position:absolute;top:-2px;right:-4px;font-family:var(--fb);font-weight:700;font-size:11.5px;line-height:1.2;color:var(--mint);background:rgba(201,244,225,.08);border:1px solid rgba(201,244,225,.45);border-radius:99px;padding:2px 9px;cursor:pointer}.tmore::before{content:"";position:absolute;left:-6px;right:-6px;top:-13px;bottom:-13px}.tmore:hover{background:rgba(201,244,225,.16)}.tmore[hidden]{display:none}   /* 자막 네 줄 넘으면(오타 디자인 1차 R6) */
+.name{font-family:var(--fh);font-weight:800;font-size:12px;color:var(--yel);margin:1px 0 2px;letter-spacing:.02em}.name.prof{color:var(--sky)}
+.text{font-family:var(--ft);font-size:16px;line-height:1.62;min-height:calc(1.62em * 2);max-height:calc(1.62em * 4 + 2px);overflow-y:auto;cursor:pointer;color:#F6FAF7;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.3) transparent}
+.text.open{max-height:min(44vh,calc(1.62em * 12 + 2px))}
+.text .cur{display:inline-block;width:.5em;height:1.05em;background:#F6FAF7;vertical-align:-.15em;margin-left:2px;animation:blinkc .8s step-end infinite}
+@keyframes blinkc{50%{opacity:0}}
+/* ---------- 칠판 아래 조작 줄 (앱과 같은 버튼 규격: 모서리 12px · 높이 44px 이상 · 본문 글꼴 700) ---------- */
+#ctl{display:flex;align-items:center;gap:12px;margin:12px 2px 0;min-height:48px}
+.choices{display:flex;flex-wrap:wrap;gap:10px}
+.tip{font-size:12.5px;color:var(--chalk-3);margin-left:auto;text-align:right}
+.cbt{font-family:var(--fb);font-weight:700;font-size:15.5px;padding:12px 20px;border-radius:12px;cursor:pointer;color:#EAF2EC;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);transition:transform .08s,filter .15s,background .15s;width:auto;text-align:center;min-height:46px;white-space:nowrap}
+.cbt:hover{background:rgba(255,255,255,.11)}.cbt:active{transform:translateY(1px)}
+.cbt.p{background:var(--yel-fill);color:#1C2A21;border-color:var(--yel-fill);box-shadow:0 4px 0 #B89A3E,0 10px 22px rgba(255,226,122,.16);min-width:168px}
+.cbt.p:hover{filter:brightness(1.04);background:var(--yel-fill)}.cbt.p:active{transform:translateY(3px);box-shadow:0 1px 0 #B89A3E}
+.cbt.t{background:transparent;color:var(--mint);border-color:rgba(201,244,225,.6)}
+.cbt.r{background:#C2412F;color:#fff;border-color:#C2412F}   /* 흰 글자 5.1:1(오타 디자인 2차: #E5675A 는 3.27) */
+.cbt kbd{font-family:var(--fn);font-size:10.5px;opacity:.8;margin-left:8px}   /* 노란 버튼 위 6.6:1(.6 은 3.78, 오타 3차 검사 전 실측) */
+@media (hover:none),(pointer:coarse){.cbt kbd{display:none}}
+:where(#hud,.bd-fig .fh,#chpills,#ov .row) button{position:relative}:where(#hud,.bd-fig .fh,#chpills,#ov .row) button::before{content:"";position:absolute;left:0;right:0;top:50%;height:max(100%,44px);transform:translateY(-50%)}   /* 누르는 자리 44px(오타 디자인 2차 R7) — 보이는 크기는 그대로 */
+#chpills{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+#chpills .lb{font-size:12px;color:var(--chalk-3);font-weight:700;margin-right:4px}
+.pill{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--chalk-3);font-family:var(--fb);font-weight:700;font-size:12px;padding:5px 11px;border-radius:999px;cursor:pointer;min-height:30px}
+.pill.done{color:var(--mint);border-color:rgba(201,244,225,.4)}.pill.cur{background:var(--yel-fill);color:#1C2A21;border-color:var(--yel-fill)}
+/* ---------- 목차 오버레이 ---------- */
+#ov{position:fixed;inset:0;z-index:20;background:rgba(4,10,7,.66);display:none;align-items:center;justify-content:center;padding:20px}
+#ov.on{display:flex}
+#ov .pn{background:#16251E;color:var(--chalk);border:1px solid rgba(255,255,255,.1);border-radius:20px;width:min(560px,100%);max-height:86vh;overflow:auto;padding:22px 22px 18px;box-shadow:0 30px 70px rgba(0,0,0,.5)}
+#ov h2{margin:0 0 4px;font-family:var(--fh);font-weight:800;font-size:20px;color:#fff}#ov .mt{font-size:13px;color:var(--chalk-3);margin-bottom:12px}
+#ov ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+#ov li button{width:100%;display:flex;align-items:center;gap:12px;text-align:left;font:inherit;font-size:15px;font-weight:700;color:#fff;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:12px 14px;cursor:pointer}
+#ov li button:hover{border-color:var(--mint)}#ov li .st{flex:0 0 30px;height:30px;border-radius:50%;border:1.5px solid rgba(201,244,225,.6);display:grid;place-items:center;font-family:var(--fn);font-size:13px;font-weight:700;color:var(--mint)}
+#ov li.done .st{background:var(--mint);border-color:var(--mint);color:#173026}#ov li.cur button{border-color:var(--yel);background:rgba(255,232,154,.08)}#ov li small{margin-left:auto;color:var(--chalk-3);font-weight:600;white-space:nowrap}
+#ov .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}#ov .row .cbt{width:auto}
+/* ---------- 아이패드 세로(761~1000): 전신 스앵님은 빼고 판서를 전체 폭으로 — 표정은 자막 얼굴로 (오타 디자인 1차 R5) ---------- */
+@media(max-width:1000px) and (min-width:761px){
+  :root{--tw:0px}#tutorCard{display:none}main{padding:12px 12px 16px}.chk{padding:12px 20px 9px}.chk>span:first-child{font-size:15.5px}#bwrap{padding:14px 20px 16px}
+  #bc{font-size:16.5px}.bl.k-h{font-size:18.5px}.text{font-size:15.5px}.cbt{font-size:15px;padding:11px 16px}.cbt.p{min-width:150px}
+}
+/* ---------- 폰 ---------- */
+@media(max-width:760px){
+  :root{--hud:50px}
+  #hud .in{gap:6px;padding:0 8px}#hud .hl{display:none}#hud .hc{flex:1 1 auto;min-width:70px;gap:6px}#hud .chp{font-size:11px}#hud .hr{gap:4px;flex:0 0 auto}.stat{padding:3px 6px;font-size:11.5px;gap:3px}.stat svg{width:13px;height:13px}.stat .gauge{width:30px;height:7px}#hToc{padding:5px 8px;font-size:12px}
+  main{padding:10px 8px 10px}
+  /* 화면 높이에 맞춤: #board = 세로 줄(칠판 → 조작 줄), 칠판이 남는 높이를 다 쓰고 그 안에서 판서만 스크롤. 조작 줄은 몇 줄로 접혀도 늘 화면 안(오타 디자인 1차 R6 「조작 버튼 접근」) */
+  #board{display:flex;flex-direction:column;height:calc(100vh - var(--hud) - 20px);height:calc(100dvh - var(--hud) - 20px);min-height:430px}
+  .slide{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;height:auto;border-radius:14px}
+  #ctl{flex:0 0 auto;position:sticky;bottom:0;z-index:6}
+  .chk{padding:10px 14px 8px}.chk>span:first-child{font-size:15px}
+  #bwrap{flex:1 1 auto;min-height:120px;max-height:none;padding:12px 12px 14px}
+  #tutorCard{display:none}
+  .box{margin:0 10px 10px}#faceImg{flex-basis:40px;width:40px;height:40px}.text{font-size:15px}
+  #bc{font-size:15.5px}.bl{padding:4px 6px 4px 31px}.bl::before{width:20px;height:20px;top:7px;left:2px;font-size:11px}
+  .bl.k-h{font-size:17px}.bl.k-f{padding:19px 12px 8px}.bl.k-f::after{top:4px;right:10px;transform:none;font-size:11px}
+  .bl.k-pit{padding:7px 10px 7px 34px}.bl.k-pit::before{left:6px;top:9px}.bl.k-memo{padding:8px 10px 8px 36px}.bl.k-memo::before{left:7px;top:10px}
+  #bc .ttl{font-size:22px}#bc .res .big{font-size:26px}
+  #bc .paper{overflow-x:auto}#bc .paper>svg{min-width:0;width:100%}
+  .bd-fig figure>svg{min-width:0;width:100%}.bd-fig figcaption{font-size:14px}
+  #ctl{flex-wrap:wrap}.choices{width:100%}.cbt{flex:1 1 auto;font-size:14.5px;min-height:46px;padding:10px 12px}.cbt.p{min-width:0}.tip{display:none}#chpills{display:none}
+}
+/* 암기·이해 구분(대표님 2026-09-29): 판서 줄 앞 알약 — 암기(노랑) · 이해(하늘) · 시험(산호) · 연습(민트). 글자는 짙은 색(대비 7 이상) */
+.tg{display:inline-block;vertical-align:.12em;margin-right:8px;padding:1px 9px 2px;border-radius:99px;font-family:var(--fh);font-weight:800;font-size:12.5px;line-height:1.5;letter-spacing:.02em;white-space:nowrap}
+.tg-am{background:#FFE27A;color:#2B2A12}.tg-ih{background:#9ADCFF;color:#0B2A3A}.tg-ex{background:#FFB09C;color:#3A1510}.tg-pr{background:#B8F2D0;color:#173026}
+/* 인라인 식은 줄에서 끊지 않는다(대표님 2026-09-29 「수식 한 줄로, 중간에 들여쓰기 안 되게」) — 넘치면 fitInline 이 줄인다 */
+#bc .katex{white-space:nowrap}
+/* 스앵님 동작(대표님 2026-09-29 「팔은 안 움직이고 멀뚱히 서 있다 → 움직임·표정」): 동작 세트(assets/tutor/g, 640×1000 · 다리 가운데 x=260) 두 겹(#tg1·#tg2) 교차 페이드.
+   예전 전신 그림(459×1000 contain)과 같은 키·같은 자리 — 키 = min(칸 높이+44, 칸 폭×1000/459), 몸 중심 = 칸 폭 68.4%(좌우 반전 뒤) */
+#tutor{container-type:size}
+#tutor .gimg{display:none;position:absolute;bottom:-54px;-webkit-user-select:none;user-select:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.38));animation:stand 6s ease-in-out infinite;opacity:0;transition:opacity .22s ease}
+#tutor.raster.pose.gset .gimg{display:block}
+#tutor.raster.pose.gset #tutorImg,#tutor.raster.pose.gset .gimg{left:68.4%;right:auto;width:auto;max-width:none;height:min(calc(100cqh + 44px),217.86cqw);object-fit:fill;transform:translateX(-59.375%) scaleX(-1)}
+#tutorImg{transition:opacity .22s ease}
+#tutor.gon #tutorImg{opacity:0}
+#tutor .gimg.on{opacity:1}
+@media (prefers-reduced-motion: reduce){#tutor .gimg,#tutorImg{transition:none}#tutor .gimg{animation:none}}
+</style>
+</head>
+<body>
+<div id="hud"><div class="in">
+  <div class="hl"><b id="hCourse"></b><span id="hSess"></span></div>
+  <div class="hc"><span class="chp" id="hCh">CH 0/0</span><div class="seg" id="hSeg"></div></div>
+  <div class="hr">
+    <span class="stat xp" id="sXp" title="경험치"><svg viewBox="0 0 24 24" fill="#FFC800" stroke="#8A5A00" stroke-width="1.5" stroke-linejoin="round"><path d="M12 2.5l2.9 6.2 6.8.8-5 4.7 1.3 6.8L12 17.7 5.9 21l1.3-6.8-5-4.7 6.8-.8z"/></svg><b id="hXp">0</b><small id="hLv">Lv 1</small></span>
+    <span class="stat sk" id="sSk" title="연속 학습일"><svg viewBox="0 0 24 24" fill="#FF9600" stroke="#C2410C" stroke-width="1.4" stroke-linejoin="round"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2 .8-3.3 1.6-4.4.4 1.4 1.2 2.2 2.4 2.4C10.5 8.5 10.5 5 12 2z"/></svg><b id="hStreak">0</b></span>
+    <span class="stat hp" id="hHearts" title="하트"></span>
+    <span class="stat af" id="sAf" title="호감도"><svg viewBox="0 0 24 24" fill="#F783AC" stroke="#B8286A" stroke-width="1.5" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.3-9.2C1.5 8.5 3.6 5 7 5c2 0 3.6 1.1 5 2.6C13.4 6.1 15 5 17 5c3.4 0 5.5 3.5 4.3 6.8C19.5 16.4 12 21 12 21z"/></svg><i class="gauge"><b id="hAff"></b></i></span>
+    <button id="hToc" type="button">목차</button>
+  </div>
+</div></div>
+<main><div id="room">
+  <div id="board">
+    <div class="slide"><div class="chk" id="chk"></div><div id="bwrap"><div id="bc"></div></div><button id="upHint" type="button" hidden>↑ 위 판서</button>
+      <div id="tutorCard"><div class="nm"><b id="dName">김주영 스앵님</b></div><div id="tutor"><img id="tutorImg" alt="" decoding="async" draggable="false"><img id="tg1" class="gimg" alt="" decoding="async" draggable="false"><img id="tg2" class="gimg" alt="" decoding="async" draggable="false"><svg class="chibi" data-face="neutral" viewBox="0 0 220 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="김주영 스앵님">
+
+<style>
+.chibi .f{display:none}
+.chibi[data-face="neutral"] .f-neutral,.chibi[data-face="sharp"] .f-sharp,.chibi[data-face="smile"] .f-smile,.chibi[data-face="angry"] .f-angry,.chibi[data-face="wide"] .f-wide,.chibi[data-face="proud"] .f-proud{display:block}
+.chibi .eye{transform-box:fill-box;transform-origin:center;animation:chibi-blink 4.8s ease-in-out infinite}
+@keyframes chibi-blink{0%,92%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.08)}}
+</style>
+
+<path d="M42 132 C28 56 68 24 110 24 C152 24 192 56 178 132 C174 104 152 82 110 82 C68 82 46 104 42 132 Z" fill="#1E1B22"/>
+<circle cx="161" cy="136" r="21" fill="#1E1B22" stroke="#141218" stroke-width="1.5"/>
+<path d="M148 126 C156 120 168 122 174 132 M150 142 C158 146 168 146 176 140" fill="none" stroke="#3A3642" stroke-width="1.5" stroke-linecap="round"/>
+<rect x="139" y="122" width="9" height="17" rx="3" fill="#B08D57"/>
+
+<rect x="96" y="172" width="28" height="26" fill="#EBCDB8"/>
+<path d="M96 172 C100 182 120 182 124 172 L124 186 L96 186 Z" fill="#D9B39C" opacity=".55"/>
+<path d="M90 194 C92 182 128 182 130 194 L110 236 Z" fill="#2B2A33"/>
+<path d="M92 190 C92 178 128 178 128 190 C124 198 96 198 92 190 Z" fill="#2B2A33"/>
+<path d="M42 258 C44 218 60 200 90 194 L110 236 L130 194 C160 200 176 218 178 258 Z" fill="#17161C"/>
+<path d="M90 194 L110 236 L98 244 L76 218 Z" fill="#201F27"/>
+<path d="M130 194 L110 236 L122 244 L144 218 Z" fill="#201F27"/>
+<path d="M90 194 L110 236 M130 194 L110 236" fill="none" stroke="#3A3642" stroke-width="1.2"/>
+<circle cx="140" cy="226" r="3.4" fill="#C9A24A"/><circle cx="139" cy="225" r="1.1" fill="#F2DDA0"/>
+
+<ellipse cx="48" cy="126" rx="7" ry="10" fill="#F2D9C6" stroke="#2A2325" stroke-width="1.4"/>
+<ellipse cx="172" cy="126" rx="7" ry="10" fill="#F2D9C6" stroke="#2A2325" stroke-width="1.4"/>
+<circle cx="48" cy="136" r="3.2" fill="#FFFFFF" stroke="#9A9AA0" stroke-width="1"/><circle cx="47" cy="135" r="1" fill="#FFFFFF"/>
+<circle cx="172" cy="136" r="3.2" fill="#FFFFFF" stroke="#9A9AA0" stroke-width="1"/><circle cx="171" cy="135" r="1" fill="#FFFFFF"/>
+
+<path d="M48 118 C48 64 78 42 110 42 C142 42 172 64 172 118 C172 152 148 184 110 184 C72 184 48 152 48 118 Z" fill="#F7E4D4" stroke="#2A2325" stroke-width="1.6"/>
+<path d="M74 166 C88 182 132 182 146 166 C132 174 88 174 74 166 Z" fill="#E6C2AE" opacity=".5"/>
+
+<path d="M48 112 C48 60 78 40 110 40 C142 40 172 60 172 112 C168 86 150 62 110 62 C70 62 52 86 48 112 Z" fill="#1E1B22"/>
+<path d="M110 42 C109 48 109 54 110 62" fill="none" stroke="#3A3642" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M78 52 C90 46 104 44 118 46" fill="none" stroke="#4A4553" stroke-width="1.6" stroke-linecap="round" opacity=".85"/>
+<path d="M60 74 C56 88 54 102 56 116" fill="none" stroke="#1E1B22" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M160 74 C164 88 166 102 164 116" fill="none" stroke="#1E1B22" stroke-width="2.2" stroke-linecap="round"/>
+
+<path d="M108 136 q2 4 4 0" fill="none" stroke="#C89A86" stroke-width="1.4" stroke-linecap="round"/>
+
+<g class="f f-neutral">
+  <g class="eye"><path d="M70 126 C75 115 93 115 98 126 C93 135 75 135 70 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="85" cy="127" r="5.2" fill="#3A2A28"/><circle cx="85" cy="127" r="2.4" fill="#14100F"/><circle cx="83" cy="124.5" r="1.6" fill="#FFFFFF"/><circle cx="87.5" cy="129.5" r=".8" fill="#FFFFFF"/><path d="M70 126 C75 115 93 115 98 126" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/><path d="M98 126 L102 122" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <g class="eye"><path d="M122 126 C127 115 145 115 150 126 C145 135 127 135 122 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="135" cy="127" r="5.2" fill="#3A2A28"/><circle cx="135" cy="127" r="2.4" fill="#14100F"/><circle cx="133" cy="124.5" r="1.6" fill="#FFFFFF"/><circle cx="137.5" cy="129.5" r=".8" fill="#FFFFFF"/><path d="M122 126 C127 115 145 115 150 126" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/><path d="M122 126 L118 122" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <path d="M70 108 C78 103 90 103 98 107" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/><path d="M122 107 C130 103 142 103 150 108" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M101 152 C105 150 115 150 119 152 C115 156.5 105 156.5 101 152 Z" fill="#A8323F"/><path d="M104 151.5 C108 150.5 112 150.5 116 151.5" fill="none" stroke="#7E1F2C" stroke-width="1"/>
+</g>
+
+<g class="f f-sharp">
+  <g class="eye"><path d="M70 127 C76 119 92 119 98 127 C92 133 76 133 70 127 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="85" cy="127.5" r="4.8" fill="#3A2A28"/><circle cx="85" cy="127.5" r="2.2" fill="#14100F"/><circle cx="83.2" cy="125.4" r="1.3" fill="#FFFFFF"/><path d="M70 127 C76 119 92 119 98 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M98 127 L103 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <g class="eye"><path d="M122 127 C128 119 144 119 150 127 C144 133 128 133 122 127 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="135" cy="127.5" r="4.8" fill="#3A2A28"/><circle cx="135" cy="127.5" r="2.2" fill="#14100F"/><circle cx="133.2" cy="125.4" r="1.3" fill="#FFFFFF"/><path d="M122 127 C128 119 144 119 150 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M122 127 L117 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <path d="M70 106 C80 104 90 106 98 111" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/><path d="M122 111 C130 106 140 104 150 106" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M101 153 L119 153" fill="none" stroke="#A8323F" stroke-width="2.8" stroke-linecap="round"/>
+</g>
+
+<g class="f f-smile">
+  <path d="M71 127 C76 118 92 118 97 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M97 127 L102 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M123 127 C128 118 144 118 149 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M123 127 L118 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M70 108 C78 103 90 103 98 107" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/><path d="M122 107 C130 103 142 103 150 108" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/>
+  <ellipse cx="70" cy="142" rx="8" ry="4" fill="#F2B4B4" opacity=".5"/><ellipse cx="150" cy="142" rx="8" ry="4" fill="#F2B4B4" opacity=".5"/>
+  <path d="M100 151 C106 157.5 114 157.5 120 151 C114 154.5 106 154.5 100 151 Z" fill="#A8323F"/>
+</g>
+
+<g class="f f-angry">
+  <g class="eye"><path d="M70 127 C76 119 92 119 98 127 C92 132 76 132 70 127 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="85" cy="127.5" r="4.6" fill="#3A2A28"/><circle cx="85" cy="127.5" r="2.1" fill="#14100F"/><path d="M70 127 C76 119 92 119 98 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M98 127 L103 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <g class="eye"><path d="M122 127 C128 119 144 119 150 127 C144 132 128 132 122 127 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="135" cy="127.5" r="4.6" fill="#3A2A28"/><circle cx="135" cy="127.5" r="2.1" fill="#14100F"/><path d="M122 127 C128 119 144 119 150 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M122 127 L117 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <path d="M68 102 L98 112" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M122 112 L152 102" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/>
+  <path d="M101 156 C106 151 114 151 119 156 C114 154.5 106 154.5 101 156 Z" fill="#A8323F"/>
+  <path d="M160 66 l6 -6 M164 74 l8 -2 M156 60 l2 -8" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round"/>
+</g>
+
+<g class="f f-wide">
+  <g class="eye"><path d="M70 126 C74 112 96 112 100 126 C96 140 74 140 70 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="85" cy="127" r="5.8" fill="#3A2A28"/><circle cx="85" cy="127" r="2.6" fill="#14100F"/><circle cx="82.6" cy="124" r="2" fill="#FFFFFF"/><path d="M70 126 C74 112 96 112 100 126" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/></g>
+  <g class="eye"><path d="M120 126 C124 112 146 112 150 126 C146 140 124 140 120 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="135" cy="127" r="5.8" fill="#3A2A28"/><circle cx="135" cy="127" r="2.6" fill="#14100F"/><circle cx="132.6" cy="124" r="2" fill="#FFFFFF"/><path d="M120 126 C124 112 146 112 150 126" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/></g>
+  <path d="M70 102 C78 97 90 97 98 101" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/><path d="M122 101 C130 97 142 97 150 102" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/>
+  <ellipse cx="110" cy="154" rx="4.6" ry="5.6" fill="#A8323F"/><ellipse cx="110" cy="155.5" rx="2.6" ry="3" fill="#5A1B25"/>
+</g>
+
+<g class="f f-proud">
+  <g><path d="M70 126 C75 115 93 115 98 126 C93 135 75 135 70 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="85" cy="128" r="5" fill="#3A2A28"/><circle cx="85" cy="128" r="2.2" fill="#14100F"/><circle cx="83.2" cy="126" r="1.2" fill="#FFFFFF"/><path d="M70 126 C75 115 93 115 98 126 L98 125 C93 119 75 119 70 125 Z" fill="#F7E4D4"/><path d="M70 125 C75 119 93 119 98 125" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/><path d="M98 125 L103 121" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <g><path d="M122 126 C127 115 145 115 150 126 C145 135 127 135 122 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="135" cy="128" r="5" fill="#3A2A28"/><circle cx="135" cy="128" r="2.2" fill="#14100F"/><circle cx="133.2" cy="126" r="1.2" fill="#FFFFFF"/><path d="M122 126 C127 115 145 115 150 126 L150 125 C145 119 127 119 122 125 Z" fill="#F7E4D4"/><path d="M122 125 C127 119 145 119 150 125" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/><path d="M122 125 L117 121" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <path d="M70 108 C78 103 90 103 98 107" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/><path d="M122 104 C130 99 142 100 150 106" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/>
+  <ellipse cx="70" cy="142" rx="8" ry="4" fill="#F2B4B4" opacity=".4"/><ellipse cx="150" cy="142" rx="8" ry="4" fill="#F2B4B4" opacity=".4"/>
+  <path d="M100 152 C106 156 114 155 121 148" fill="none" stroke="#A8323F" stroke-width="2.8" stroke-linecap="round"/>
+</g>
+</svg></div></div>
+      <div class="box" id="sub"><img id="faceImg" alt="" decoding="async" draggable="false" hidden><div class="sb"><div class="name" id="dNameTag">김주영 스앵님</div><button type="button" id="tMore" class="tmore" hidden aria-controls="dText" aria-expanded="false">전체 ▾</button><div class="text" id="dText"></div></div></div>
+    </div>
+    <div id="ctl"><div class="choices" id="dCh"></div><div class="tip" id="dTip"></div></div>
+    <div id="chpills"></div>
+  </div>
+  <aside id="side"><div id="prog"><div class="k">이 챕터</div><div class="v" id="pV"></div><div class="bar"><i id="pBar"></i></div></div></aside>
+</div></main>
+<div id="ov"><div class="pn"><h2>목차</h2><div class="mt" id="ovMeta"></div><ul id="ovList"></ul><div class="row"><button class="cbt g" id="ovClose" type="button">닫기</button><span style="flex:1"></span><button class="cbt g" id="ovMemo" type="button">암기노트</button><button class="cbt g" id="ovBook" type="button">교재 보기</button><button class="cbt g" id="ovReset" type="button">이 회차 기록 지우기</button></div></div></div>
+<div id="figov" hidden role="dialog" aria-modal="true" aria-label="그림 크게 보기"><div class="fzh"><span>그림 크게 보기</span><button type="button" id="figovX" aria-keyshortcuts="Escape">닫기</button></div><div class="fz"></div></div>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script>/* 김주영 스앵님 판정 (대표님 2026-09-29 「개념 마인드맵은 스앵님이 학습을 통해 내가 뭘 알고 뭘 모르는지 알아서 파악」) — 원본은 이 파일 하나.
+   빌더가 교실·수업 노트·학습 덱·암기노트 페이지에 그대로 넣고(__JUDGE__), learn.html 은 patch_learn_judge.py 가 TJ-START~TJ-END 사이를 이 파일로 갈아 끼운다.
+   기록 = localStorage atto.evidence [{t, k, n:[노드], ok, v, lid, sid, qid, a, clean}] (최대 4000건 — 넘치면 읽기·질문 기록부터 버리고 노드마다 최근 문제 6건은 남긴다)
+     k: quiz(ok) 확인 문제 · read(clean) 챕터·섹션 끝(다시 설명·질문 없이 끝났으면 clean) · again 다시 설명 · ask 질문 · memo(ok) 암기노트 외움 · self(v) 카드 자가평가
+     a: 같은 시도 표시(카드 「다시 저장」) — 같은 a·qid 는 새 기록으로 바꿔 넣는다(정답 수가 늘지 않는다)
+   판정 = 노드마다 atto.mastery[id] = {quiz:{correct,total,ts}, self, sts, ts, score, state, auto} — learn.html 은 TJ.score 로 같은 식을 쓴다.
+     quiz = 최근 6번 · self(설명할 수 있나 1~5) = 읽음 4 · 다시 설명·질문 2번 이상이면 3 · 외움 +1 · 카드 자가평가가 더 최근이면 그 값
+     → 문제 없이 읽기만 하면 최대 「흔들림」, 「안다」는 문제로만. 점수식 = (0.5·정답률·감쇠(quiz.ts) + 0.2·self/5·감쇠(sts))/0.7, 문제 없으면 self/5·0.6·감쇠(sts)
+     감쇠 = 60일에 걸쳐 1 → 0.4 (최저 0.4). 정답 근거와 읽기·암기 근거를 따로 감쇠한다 — 오늘 암기 체크 하나로 90일 전 정답이 새것처럼 되지 않게(오타 .91 설계 검수 ⑦)
+   저장이 막히면(용량·사생활 모드) 이 페이지 안에서는 메모리 사본으로 이어 가고 rec 은 false 를 돌려준다. */
+(function(g){
+  var EK="atto.evidence", MK="atto.mastery", CAP=4000, KEEPQ=6, MEM={}, DIRTY={};
+  function rd(k,d){ if(DIRTY[k]) return MEM[k]; try{ var v=JSON.parse(localStorage.getItem(k)||"null"); return v==null?d:v; }catch(e){ return DIRTY[k]?MEM[k]:d; } }
+  function wr(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); DIRTY[k]=false; return true; }catch(e){ MEM[k]=v; DIRTY[k]=true; return false; } }
+  function decay(ts){ if(!ts) return 1; var d=Math.max(0,(Date.now()/1000-ts)/86400); return Math.max(.4,1-d/60); }
+  function score(e){ if(!e||typeof e!=="object") return {score:0,state:"unrated"};
+    var q=e.quiz||{}, tot=+q.total||0, cor=+q.correct||0, sv=e.self==null?null:Math.max(1,Math.min(5,+e.self));
+    if(tot<=0&&sv==null) return {score:0,state:"unrated"};
+    var dq=decay(+q.ts||+e.ts||0), ds=decay(+e.sts||+e.ts||0);
+    var raw=tot>0?(0.5*(cor/tot)*dq+0.2*((sv||0)/5)*ds)/0.7:(sv/5)*0.6*ds, s=Math.min(1,raw), st;
+    if(tot<=0) st=(sv>=4&&s>=.4)?"shaky":"unknown"; else st=s>=.7?"known":s>=.4?"shaky":"unknown";
+    return {score:Math.round(s*1000)/1000,state:st}; }
+  function why(evs){ var qz=evs.filter(function(e){return e.k==="quiz";}).slice(-KEEPQ), r={q:qz.length,c:qz.filter(function(e){return e.ok;}).length,
+      read:evs.filter(function(e){return e.k==="read";}).length, clean:evs.filter(function(e){return e.k==="read"&&e.clean;}).length,
+      conf:evs.filter(function(e){return (e.k==="again"||e.k==="ask")&&Date.now()-e.t<21*864e5;}).length,
+      memo:null, self:null, last:0, selfLast:0};
+    evs.forEach(function(e){ if(e.k==="memo") r.memo=!!e.ok; if(e.k==="self") r.self={v:+e.v,t:e.t}; if(e.t>r.last) r.last=e.t; if(e.k!=="quiz"&&e.t>r.selfLast) r.selfLast=e.t; });
+    return r; }
+  function judgeOne(id,L,M){ var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); if(!evs.length) return;
+    var r=why(evs), e=Object.assign({},M[id]||{}), qz=evs.filter(function(x){return x.k==="quiz";}).slice(-KEEPQ);
+    var self=null; if(r.read||r.conf||r.memo!=null){ self=r.read?4:3; if(r.conf>=2) self=3; if(r.memo) self=Math.min(5,self+1); }
+    var autoLast=0; evs.forEach(function(x){ if(x.k!=="self"&&x.t>autoLast) autoLast=x.t; });
+    if(r.self&&r.self.t>=autoLast) self=r.self.v;
+    e.quiz=qz.length?{correct:r.c,total:qz.length,ts:Math.round(qz[qz.length-1].t/1000)}:undefined; if(!e.quiz) delete e.quiz;
+    e.self=self; if(self==null){ delete e.self; delete e.sts; } else e.sts=Math.round(r.selfLast/1000);
+    e.ts=Math.round(r.last/1000); e.auto={by:"tutor",q:r.q,c:r.c,read:r.read,clean:r.clean,conf:r.conf,memo:r.memo};
+    var s=score(e); e.score=s.score; e.state=s.state; M[id]=e; }
+  function judge(ids){ var L=rd(EK,[]), M=rd(MK,{}); if(!Array.isArray(L)) L=[]; if(!M||typeof M!=="object") M={}; (ids||[]).forEach(function(id){ judgeOne(id,L,M); });
+    wr(MK,M); return M; }
+  function all(){ var L=rd(EK,[]), o={}; if(Array.isArray(L)) L.forEach(function(e){ (e&&e.n||[]).forEach(function(i){ o[i]=1; }); }); return judge(Object.keys(o)); }
+  /* 상한 넘침: 노드마다 최근 문제 KEEPQ 건은 지키고, 나머지(읽기·질문·오래된 문제)에서 오래된 것부터 버린다 — 다른 노드 활동으로 정답 기록이 사라지지 않게 */
+  function trim(L,cap){ cap=cap||CAP; if(L.length<=cap) return L; var seen={}, keep=[], rest=[], i;
+    for(i=L.length-1;i>=0;i--){ var e=L[i], k=false; if(e&&e.k==="quiz") (e.n||[]).forEach(function(id){ seen[id]=(seen[id]||0)+1; if(seen[id]<=KEEPQ) k=true; }); (k?keep:rest).push(e); }
+    keep.reverse(); rest.reverse(); rest=rest.slice(Math.max(0,rest.length-Math.max(0,cap-keep.length)));
+    return keep.concat(rest).sort(function(a,b){ return (a.t||0)-(b.t||0); }); }
+  function rec(ev){ if(!ev||!Array.isArray(ev.n)||!ev.n.length) return false; var L=rd(EK,[]); if(!Array.isArray(L)) L=[];
+    ev.t=Date.now();
+    if(ev.a!=null&&ev.qid!=null){ for(var i=L.length-1;i>=0;i--){ var x=L[i]; if(x&&x.k===ev.k&&x.qid===ev.qid&&x.a===ev.a){ L.splice(i,1); break; } } }
+    L.push(ev); L=trim(L);
+    /* 저장 실패 → 절반 상한으로 다시(이때도 노드마다 최근 정답은 지킨다, 오타 설계 2차) · 그래도 실패면 메모리 사본은 자르지 않은 전체로 */
+    var ok=wr(EK,L); if(!ok){ var half=trim(L,Math.floor(CAP/2)); if(wr(EK,half)){ L=half; ok=true; } else { MEM[EK]=L; DIRTY[EK]=true; } }
+    judge(ev.n); return ok; }
+  function reasons(id){ var L=rd(EK,[]); if(!Array.isArray(L)) return null; var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); return evs.length?why(evs):null; }
+  g.TJ={rec:rec,judge:judge,all:all,score:score,reasons:reasons,trim:trim};
+})(typeof window!=="undefined"?window:this);
+</script>
+<script>
+const D={"id": "phys2-2026-09-30", "slug": "phys2", "course": "일반물리학2", "date": "2026-09-30", "sess": "9/30(수) · 5주차", "title": "26장 전류와 저항 — 그리고 27장 회로 도입", "lead": "수업은 <b>21~25장을 한 판에 정리<\/b>하며 시작했다 — 「여기까지가 전기」이고 거의 다 시험에 나온다. 26장은 전하가 <b>움직이기<\/b> 시작하는 장: 전류 \\(i\\), 전류 밀도 \\(J=nev_d\\), 그리고 <b>\\(R=\\rho L/A\\)를 유도<\/b>하는 것이 핵심(교수님: 시험 문제는 이것). 미시적 이론에서는 <b>완화 시간 \\(\\tau=m/b\\)<\/b>를 용어로만, 끝 15분은 27장 회로의 출발점인 <b>키르히호프 두 법칙<\/b>.", "minutes": 18, "chapters": [{"id": "s1", "title": "21~25장 복습 — 「여기까지가 전기」 (판서 ①)", "steps": [{"id": "s1-1", "t": "v2", "b": [{"k": "h", "h": "21~25장 복습 — 「여기까지가 전기」"}, {"k": "li", "h": "21장 전하 q = ne · 22장 전기장 · 23장 가우스"}, {"k": "li", "h": "24장 전위 · 25장 전기 용량·유전체"}], "braw": ["# 21~25장 복습 — 「여기까지가 전기」", "• 21장 전하 q = ne · 22장 전기장 · 23장 가우스", "• 24장 전위 · 25장 전기 용량·유전체"], "s": "자, 9/30이에요. 교수님이 지난 시간까지 한 걸 칠판 한 판에 정리하셨어요. 여기까지가 전기라는 걸 확인하려고요.", "fig": null, "fs": 0}, {"id": "s1-2", "t": "v2", "b": [{"k": "li", "h": "불균일 Σ : 점전하 · 점전하군 · 전기쌍극자"}, {"k": "f", "h": "\\[E=\\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{r^2}\\quad\\longleftrightarrow\\quad V=\\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{r}\\]"}], "braw": ["• 불균일 Σ : 점전하 · 점전하군 · 전기쌍극자", "= E=\\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{r^2}\\quad\\longleftrightarrow\\quad V=\\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{r}"], "s": "22장 전기장과 24장 전위는 같은 분포 여섯 개를 다뤄요. 점들의 합으로 구하는 불균일 셋, E 는 r 제곱 분의 1, V 는 r 분의 1. 짝으로 보세요.", "fig": "review", "fs": 1}, {"id": "s1-3", "t": "v2", "b": [{"k": "li", "h": "균일 ∫ : 직선도선(λ) · 원판(σ) · 원형도선"}, {"k": "res", "h": "V 는 E 를 선적분한 것 — 같은 분포끼리 짝"}], "braw": ["• 균일 ∫ : 직선도선(λ) · 원판(σ) · 원형도선", "→ V 는 E 를 선적분한 것 — 같은 분포끼리 짝"], "s": "연속 분포를 적분으로 구하는 셋이 직선도선, 원판, 원형도선. V 는 E 를 선적분한 거라 짝으로 외우면 일이 반으로 줄어요.", "fig": "review", "fs": 2}, {"id": "s1-4", "t": "v2", "b": [{"k": "star", "h": "「짝지어가지고 10점짜리로 — 12개 중에 두 개」 = 20점", "tg": "ex"}, {"k": "star", "h": "「3개 중에 하나 — 연습 문제 값으로 산수 계산」", "tg": "ex"}], "braw": ["☆ 시험 : 「짝지어가지고 10점짜리로 — 12개 중에 두 개」 = 20점", "☆ 시험 : 「3개 중에 하나 — 연습 문제 값으로 산수 계산」"], "s": "교수님 말씀 그대로예요. E 여섯, V 여섯, 열두 개 중 두 개가 10점씩. 판서 노란 메모가 이 말이에요. 3개 중 하나라는 말씀은 가우스면 셋인지 축전기 셋인지 녹음만으로는 확인을 못 했어요.", "fig": "review", "fs": 3}, {"id": "s1-5", "t": "v2", "b": [{"k": "li", "h": "도체구 : r ≥ R 이면 kq/r², r &lt; R 이면 E = 0"}, {"k": "f", "h": "\\[\\text{부도체구 }r\\lt R:\\ E=\\frac{1}{4\\pi\\varepsilon_0}\\frac{r}{R^3}q\\]"}, {"k": "star", "h": "「가우스 법칙은 전체 다 해야 돼요」 — q_enc", "tg": "ex"}], "braw": ["• 도체구 : r ≥ R 이면 kq/r², r < R 이면 E = 0", "= \\text{부도체구 }r\\lt R:\\ E=\\frac{1}{4\\pi\\varepsilon_0}\\frac{r}{R^3}q", "☆ 시험 : 「가우스 법칙은 전체 다 해야 돼요」 — q_enc"], "s": "가우스 법칙은 전부 하라고 하셨어요. 둘러싸인 전하 q enc 로 도체구, 부도체구까지. 크기 식은 q 가 양수라는 약속이고, 음전하면 방향만 반대예요.", "fig": null, "fs": 0}, {"id": "s1-6", "t": "v2", "b": [{"k": "star", "h": "「여기까지 거의 다 시험 문제」 · 「한 10개, 11개 정도」", "tg": "ex"}, {"k": "star", "h": "비유 : 같은 동네 두 지도 — 바람(E)과 땅 높이(V)", "tg": "ih"}, {"k": "memo", "h": "E 6개 ↔ V 6개 짝 · 가우스 전부(q_enc) · 면·원통 2πrL·구 4πr²", "tg": "am"}], "braw": ["☆ 시험 : 「여기까지 거의 다 시험 문제」 · 「한 10개, 11개 정도」", "☆ 비유 : 같은 동네 두 지도 — 바람(E)과 땅 높이(V)", "■ 외울 것 : E 6개 ↔ V 6개 짝 · 가우스 전부(q_enc) · 면·원통 2πrL·구 4πr²"], "s": "문제는 열 개, 열한 개 정도, 1학기와 거의 같은 형식이라고 하셨어요. 같은 동네를 바람 지도와 높이 지도로 그린 거라고 생각하세요.", "fig": null, "fs": 0}], "figs": {"review": {"svg": "<figure class=\"fig lite\" data-fig=\"review\"><svg class=\"fig-svg\" viewbox=\"0 0 560 270\" width=\"560\" height=\"270\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\" id=\"fig-phys2-2026-09-30-s1-review\"><defs><marker id=\"ah-phys2-2026-09-30-s1-review\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><g data-step=\"1\"><text x=\"140\" y=\"22\" font-size=\"13.5\" fill=\"#2F9E44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">22장 전기장 E<\/text><text x=\"420\" y=\"22\" font-size=\"13.5\" fill=\"#1971C2\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">24장 전위 V<\/text><rect x=\"40\" y=\"36\" width=\"200\" height=\"26\" rx=\"9\" fill=\"rgba(255,255,255,.75)\" stroke=\"#2F9E44\" stroke-width=\"1.6\"><\/rect><text x=\"140.0\" y=\"54.0\" font-size=\"12.5\" fill=\"#2F9E44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">점전하 · E<\/text><line x1=\"240\" y1=\"49\" x2=\"268\" y2=\"49\" stroke=\"#8A97A6\" stroke-width=\"1.4\"><\/line><text x=\"280\" y=\"54\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">Σ<\/text><line x1=\"292\" y1=\"49\" x2=\"320\" y2=\"49\" stroke=\"#8A97A6\" stroke-width=\"1.4\"><\/line><rect x=\"320\" y=\"36\" width=\"200\" height=\"26\" rx=\"9\" fill=\"rgba(255,255,255,.75)\" stroke=\"#1971C2\" stroke-width=\"1.6\"><\/rect><text x=\"420.0\" y=\"54.0\" font-size=\"12.5\" fill=\"#1971C2\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">점전하 · V<\/text><rect x=\"40\" y=\"68\" width=\"200\" height=\"26\" rx=\"9\" fill=\"rgba(255,255,255,.75)\" stroke=\"#2F9E44\" stroke-width=\"1.6\"><\/rect><text x=\"140.0\" y=\"86.0\" font-size=\"12.5\" fill=\"#2F9E44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">점전하군 · E<\/text><line x1=\"240\" y1=\"81\" x2=\"268\" y2=\"81\" stroke=\"#8A97A6\" stroke-width=\"1.4\"><\/line><text x=\"280\" y=\"86\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">Σ<\/text><line x1=\"292\" y1=\"81\" x2=\"320\" y2=\"81\" stroke=\"#8A97A6\" stroke-width=\"1.4\"><\/line><rect x=\"320\" y=\"68\" width=\"200\" height=\"26\" rx=\"9\" fill=\"rgba(255,255,255,.75)\" stroke=\"#1971C2\" stroke-width=\"1.6\"><\/rect><text x=\"420.0\" y=\"86.0\" font-size=\"12.5\" fill=\"#1971C2\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">점전하군 · V<\/text><rect x=\"40\" y=\"100\" width=\"200\" height=\"26\" rx=\"9\" fill=\"rgba(255,255,255,.75)\" stroke=\"#2F9E44\" stroke-width=\"1.6\"><\/rect><text x=\"140.0\" y=\"118.0\" font-size=\"12.5\" fill=\"#2F9E44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">전기쌍극자 · E<\/text><line x1=\"240\" y1=\"113\" x2=\"268\" y2=\"113\" stroke=\"#8A97A6\" stroke-width=\"1.4\"><\/line><text x=\"280\" y=\"118\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">Σ<\/text><line x1=\"292\" y1=\"113\" x2=\"320\" y2=\"113\" stroke=\"#8A97A6\" stroke-width=\"1.4\"><\/line><rect x=\"320\" y=\"100\" width=\"200\" height=\"26\" rx=\"9\" fill=\"rgba(255,255,255,.75)\" stroke=\"#1971C2\" stroke-width=\"1.6\"><\/rect><text x=\"420.0\" y=\"118.0\" font-size=\"12.5\" fill=\"#1971C2\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">전기쌍극자 · V<\/text><\/g><g data-step=\"2\"><rect x=\"40\" y=\"140\" width=\"200\" height=\"26\" rx=\"9\" fill=\"rgba(255,255,255,.75)\" stroke=\"#2F9E44\" stroke-width=\"1.6\"><\/rect><text x=\"140.0\" y=\"158.0\" font-size=\"12.5\" fill=\"#2F9E44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">직선도선 (λ) · E<\/text><line x1=\"240\" y1=\"153\" x2=\"268\" y2=\"153\" stroke=\"#8A97A6\" stroke-width=\"1.4\"><\/line><text x=\"280\" y=\"158\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">∫<\/text><line x1=\"292\" y1=\"153\" x2=\"320\" y2=\"153\" stroke=\"#8A97A6\" stroke-width=\"1.4\"><\/line><rect x=\"320\" y=\"140\" width=\"200\" height=\"26\" rx=\"9\" fill=\"rgba(255,255,255,.75)\" stroke=\"#1971C2\" stroke-width=\"1.6\"><\/rect><text x=\"420.0\" y=\"158.0\" font-size=\"12.5\" fill=\"#1971C2\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">직선도선 (λ) · V<\/text><rect x=\"40\" y=\"172\" width=\"200\" height=\"26\" rx=\"9\" fill=\"rgba(255,255,255,.75)\" stroke=\"#2F9E44\" stroke-width=\"1.6\"><\/rect><text x=\"140.0\" y=\"190.0\" font-size=\"12.5\" fill=\"#2F9E44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">원판 (σ) · E<\/text><line x1=\"240\" y1=\"185\" x2=\"268\" y2=\"185\" stroke=\"#8A97A6\" stroke-width=\"1.4\"><\/line><text x=\"280\" y=\"190\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">∫<\/text><line x1=\"292\" y1=\"185\" x2=\"320\" y2=\"185\" stroke=\"#8A97A6\" stroke-width=\"1.4\"><\/line><rect x=\"320\" y=\"172\" width=\"200\" height=\"26\" rx=\"9\" fill=\"rgba(255,255,255,.75)\" stroke=\"#1971C2\" stroke-width=\"1.6\"><\/rect><text x=\"420.0\" y=\"190.0\" font-size=\"12.5\" fill=\"#1971C2\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">원판 (σ) · V<\/text><rect x=\"40\" y=\"204\" width=\"200\" height=\"26\" rx=\"9\" fill=\"rgba(255,255,255,.75)\" stroke=\"#2F9E44\" stroke-width=\"1.6\"><\/rect><text x=\"140.0\" y=\"222.0\" font-size=\"12.5\" fill=\"#2F9E44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">원형도선 · E<\/text><line x1=\"240\" y1=\"217\" x2=\"268\" y2=\"217\" stroke=\"#8A97A6\" stroke-width=\"1.4\"><\/line><text x=\"280\" y=\"222\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">∫<\/text><line x1=\"292\" y1=\"217\" x2=\"320\" y2=\"217\" stroke=\"#8A97A6\" stroke-width=\"1.4\"><\/line><rect x=\"320\" y=\"204\" width=\"200\" height=\"26\" rx=\"9\" fill=\"rgba(255,255,255,.75)\" stroke=\"#1971C2\" stroke-width=\"1.6\"><\/rect><text x=\"420.0\" y=\"222.0\" font-size=\"12.5\" fill=\"#1971C2\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">원형도선 · V<\/text><\/g><g data-step=\"3\"><text x=\"280\" y=\"254\" font-size=\"14\" fill=\"#E03131\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">짝지어서 12개 중 2개 → 10점 × 2 = 20점<\/text><\/g><\/svg><figcaption>판서 ①의 22장·24장 항목을 짝지은 표. 위 셋은 점들의 합(\\(\\Sigma\\), 불균일), 아래 셋은 연속 분포의 적분(\\(\\int\\), 균일 분포).<\/figcaption><\/figure>", "max": 3}}, "say": null}, {"id": "s2", "title": "26장 전류 — 유동 속도와 전류 밀도 (판서 ②)", "steps": [{"id": "s2-1", "t": "v2", "b": [{"k": "h", "h": "26장 전류 — 유동 속도와 전류 밀도"}, {"k": "li", "h": "전류(current) = 전자의 흐름"}, {"k": "li", "h": "v_d = 유동(표류) 속도 (drift velocity)"}], "braw": ["# 26장 전류 — 유동 속도와 전류 밀도", "• 전류(current) = 전자의 흐름", "• v_d = 유동(표류) 속도 (drift velocity)"], "s": "26장이에요. 전류는 전자의 흐름이고, 전자가 평균적으로 가는 속력이 유동 속도 v d. 어려운 거 아니라고 하셨어요.", "fig": "drift", "fs": 1}, {"id": "s2-2", "t": "v2", "b": [{"k": "f", "h": "\\[\\Delta L=v_d\\,\\Delta t\\]"}, {"k": "li", "h": "두 단면 사이 전자는 Δt 동안 전부 단면을 지난다"}], "braw": ["= \\Delta L=v_d\\,\\Delta t", "• 두 단면 사이 전자는 Δt 동안 전부 단면을 지난다"], "s": "Δt 동안 전자가 가는 거리는 v d 곱하기 Δt. 거리는 속력 곱하기 시간, 그거예요.", "fig": "drift", "fs": 2}, {"id": "s2-3", "t": "v2", "b": [{"k": "li", "h": "수밀도 n = N/V : 단위 부피당 전자 수"}, {"k": "f", "h": "\\[dN=n\\,dV=nA\\,dL=nAv_d\\,dt\\]"}, {"k": "f", "h": "\\[dq=e\\,dN=neAv_d\\,dt\\]"}], "braw": ["• 수밀도 n = N/V : 단위 부피당 전자 수", "= dN=n\\,dV=nA\\,dL=nAv_d\\,dt", "= dq=e\\,dN=neAv_d\\,dt"], "s": "얼마나 흘렀나는 개수로 세요. 수밀도 n 은 단위 부피당 개수, 이 장에서만 개수를 대문자 N 으로 써요. 부피 A dL 안의 개수에 e 를 곱하면 전하량.", "fig": "drift", "fs": 3}, {"id": "s2-4", "t": "v2", "b": [{"k": "f", "h": "\\[i=\\frac{dq}{dt}=neAv_d,\\qquad J=\\frac{i}{A}=nev_d\\ [\\mathrm{A/m^2}]\\]"}, {"k": "pit", "h": "e 는 크기(양수) — 전류·J 방향은 E 방향, 전자는 반대로 간다"}], "braw": ["= i=\\frac{dq}{dt}=neAv_d,\\qquad J=\\frac{i}{A}=nev_d\\ [\\mathrm{A/m^2}]", "! e 는 크기(양수) — 전류·J 방향은 E 방향, 전자는 반대로 간다"], "s": "dt 로 나누면 전류, 넓이로 나누면 전류 밀도 J. 여기서 e 는 크기라서 식은 크기예요. 방향은 양전하가 가는 쪽이 전류 방향, 전자는 반대로 가요. 여기서 반은 헷갈립니다.", "fig": "drift", "fs": 4}, {"id": "s2-5", "t": "v2", "b": [{"k": "star", "h": "「J 는 32장 맥스웰 방정식에 들어가는 기호」 — 기호를 기억", "tg": "ex"}, {"k": "star", "h": "비유 : 요금소 — 차 밀도 × 도로 폭 × 속력", "tg": "ih"}, {"k": "memo", "h": "i = neAv_d · J = nev_d [A/m²]", "tg": "am"}], "braw": ["☆ 시험 : 「J 는 32장 맥스웰 방정식에 들어가는 기호」 — 기호를 기억", "☆ 비유 : 요금소 — 차 밀도 × 도로 폭 × 속력", "■ 외울 것 : i = neAv_d · J = nev_d [A/m²]"], "s": "J 는 맨 마지막 맥스웰 방정식에 다시 나오니까 기호를 기억하라고 하셨어요. 요금소를 1초에 지나는 차 수가 밀도 곱하기 폭 곱하기 속력인 것과 같아요.", "fig": null, "fs": 0}], "figs": {"drift": {"svg": "<figure class=\"fig lite\" data-fig=\"drift\"><svg class=\"fig-svg\" viewbox=\"0 0 560 262\" width=\"560\" height=\"262\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\" id=\"fig-phys2-2026-09-30-s2-drift\"><defs><marker id=\"ah-phys2-2026-09-30-s2-drift\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><g data-step=\"1\"><rect x=\"40\" y=\"80\" width=\"480\" height=\"56\" rx=\"0\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"1.6\"><\/rect><circle cx=\"90\" cy=\"108\" r=\"10\" fill=\"#fff\"><\/circle><circle cx=\"90\" cy=\"108\" r=\"10\" fill=\"#1971C2\" fill-opacity=\".15\" stroke=\"#1971C2\" stroke-width=\"2\"><\/circle><text x=\"90\" y=\"111.8\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"700\" fill=\"#1971C2\">−<\/text><circle cx=\"150\" cy=\"108\" r=\"10\" fill=\"#fff\"><\/circle><circle cx=\"150\" cy=\"108\" r=\"10\" fill=\"#1971C2\" fill-opacity=\".15\" stroke=\"#1971C2\" stroke-width=\"2\"><\/circle><text x=\"150\" y=\"111.8\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"700\" fill=\"#1971C2\">−<\/text><circle cx=\"280\" cy=\"108\" r=\"10\" fill=\"#fff\"><\/circle><circle cx=\"280\" cy=\"108\" r=\"10\" fill=\"#1971C2\" fill-opacity=\".15\" stroke=\"#1971C2\" stroke-width=\"2\"><\/circle><text x=\"280\" y=\"111.8\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"700\" fill=\"#1971C2\">−<\/text><circle cx=\"400\" cy=\"108\" r=\"10\" fill=\"#fff\"><\/circle><circle cx=\"400\" cy=\"108\" r=\"10\" fill=\"#1971C2\" fill-opacity=\".15\" stroke=\"#1971C2\" stroke-width=\"2\"><\/circle><text x=\"400\" y=\"111.8\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"700\" fill=\"#1971C2\">−<\/text><circle cx=\"460\" cy=\"108\" r=\"10\" fill=\"#fff\"><\/circle><circle cx=\"460\" cy=\"108\" r=\"10\" fill=\"#1971C2\" fill-opacity=\".15\" stroke=\"#1971C2\" stroke-width=\"2\"><\/circle><text x=\"460\" y=\"111.8\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"700\" fill=\"#1971C2\">−<\/text><line x1=\"310\" y1=\"62\" x2=\"230\" y2=\"62\" stroke=\"#1971C2\" stroke-width=\"2\" marker-end=\"url(#ah-phys2-2026-09-30-s2-drift)\"><\/line><text x=\"320\" y=\"66\" font-size=\"12.5\" fill=\"#1971C2\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">v<tspan baseline-shift=\"sub\" font-size=\"72%\">d<\/tspan> (전자의 유동 속도)<\/text><\/g><g data-step=\"2\"><line x1=\"200\" y1=\"70\" x2=\"200\" y2=\"146\" stroke=\"#FF4D8D\" stroke-width=\"2\" stroke-dasharray=\"6 4\"><\/line><line x1=\"340\" y1=\"70\" x2=\"340\" y2=\"146\" stroke=\"#FF4D8D\" stroke-width=\"2\" stroke-dasharray=\"6 4\"><\/line><line x1=\"200\" y1=\"160\" x2=\"340\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"200\" y1=\"156\" x2=\"200\" y2=\"164\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"340\" y1=\"156\" x2=\"340\" y2=\"164\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><text x=\"270.0\" y=\"176\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">ΔL = v<tspan baseline-shift=\"sub\" font-size=\"72%\">d<\/tspan> Δt<\/text><\/g><g data-step=\"3\"><text x=\"280\" y=\"200\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">부피 A·ΔL 속 전자 수 N = nAΔL · 전하량 q = Ne<\/text><\/g><g data-step=\"4\"><line x1=\"60\" y1=\"30\" x2=\"180\" y2=\"30\" stroke=\"#2F9E44\" stroke-width=\"2\" marker-end=\"url(#ah-phys2-2026-09-30-s2-drift)\"><\/line><text x=\"190\" y=\"35\" font-size=\"14\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">E<\/text><line x1=\"380\" y1=\"30\" x2=\"500\" y2=\"30\" stroke=\"#E03131\" stroke-width=\"2.4\" marker-end=\"url(#ah-phys2-2026-09-30-s2-drift)\"><\/line><text x=\"510\" y=\"35\" font-size=\"14\" fill=\"#E03131\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">i<\/text><text x=\"280\" y=\"238\" font-size=\"13.5\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">i = Δq/Δt = neAv<tspan baseline-shift=\"sub\" font-size=\"72%\">d<\/tspan>  →  J = i/A = nev<tspan baseline-shift=\"sub\" font-size=\"72%\">d<\/tspan>  [A/m²]<\/text><\/g><\/svg><figcaption>전자는 \\(\\vec E\\)와 반대로 흐르고(전하가 음수), 전류 \\(i\\)의 방향은 양전하가 가는 쪽 = \\(\\vec E\\) 방향으로 약속한다. 판서는 전자의 이동 방향만 화살표로 그렸다.<\/figcaption><\/figure>", "max": 4}}, "say": null}, {"id": "s3", "title": "비저항과 저항 — R = ρL/A 유도 (판서 ③)", "steps": [{"id": "s3-1", "t": "v2", "b": [{"k": "h", "h": "비저항과 저항 — R = ρL/A 유도"}, {"k": "li", "h": "등방성 도체 = 안의 전기장 E 가 일정"}, {"k": "li", "h": "길이 L, 단면 A — 높은 쪽 s = 0, 낮은 쪽 s = L"}], "braw": ["# 비저항과 저항 — R = ρL/A 유도", "• 등방성 도체 = 안의 전기장 E 가 일정", "• 길이 L, 단면 A — 높은 쪽 s = 0, 낮은 쪽 s = L"], "s": "도선을 등방성 도체, 안의 전기장이 일정한 도체로 둬요. 앞으로도 많이 나온다고 하셨어요.", "fig": "res", "fs": 1}, {"id": "s3-2", "t": "v2", "b": [{"k": "f", "h": "\\[\\Delta V=-\\int_L^0\\vec E\\cdot d\\vec s=EL\\]"}, {"k": "f", "h": "\\[\\vec E=\\rho\\vec J\\quad(\\rho:\\ \\text{비저항})\\]"}], "braw": ["= \\Delta V=-\\int_L^0\\vec E\\cdot d\\vec s=EL", "= \\vec E=\\rho\\vec J\\quad(\\rho:\\ \\text{비저항})"], "s": "전기장이 일정하니 두 끝의 전위차는 E 곱하기 L. 출발점은 E 는 로 J. 같은 전기장에서 물질마다 흐르는 정도가 다르고, 그 비율이 비저항이에요.", "fig": "res", "fs": 2}, {"id": "s3-3", "t": "v2", "b": [{"k": "f", "h": "\\[\\Delta V=EL=\\rho JL\\]"}, {"k": "f", "h": "\\[\\rho=\\frac{\\Delta V}{JL}=\\frac{\\Delta V}{(i/A)L}=\\frac{\\Delta V}{i}\\cdot\\frac{A}{L}=R\\frac{A}{L}\\]"}], "braw": ["= \\Delta V=EL=\\rho JL", "= \\rho=\\frac{\\Delta V}{JL}=\\frac{\\Delta V}{(i/A)L}=\\frac{\\Delta V}{i}\\cdot\\frac{A}{L}=R\\frac{A}{L}"], "s": "E 자리에 로 J 를 넣고, J 자리에 i 나누기 A. ΔV 나누기 i 가 저항 R 이에요. 오른쪽 그림은 판서의 예, 길이 반에 넓이 두 배면 4분의 1.", "fig": "res", "fs": 3}, {"id": "s3-4", "t": "v2", "b": [{"k": "f", "h": "\\[\\therefore\\ R=\\rho\\frac{L}{A}\\ [\\Omega]\\]"}, {"k": "li", "h": "ρ : 비저항 [Ω·m] · σ = 1/ρ : 전기 전도도 [mho/m]"}], "braw": ["= \\therefore\\ R=\\rho\\frac{L}{A}\\ [\\Omega]", "• ρ : 비저항 [Ω·m] · σ = 1/ρ : 전기 전도도 [mho/m]"], "s": "그래서 R 은 로 L 나누기 A. 판서에서 동그라미 두 겹 친 식이에요. 로의 역수가 전도도 시그마.", "fig": "res", "fs": 4}, {"id": "s3-5", "t": "v2", "b": [{"k": "star", "h": "「시험 문제 나오는 건 이것밖에 없어요」", "tg": "ex"}, {"k": "star", "h": "「배수 문제는 안 나올 거고, 핵심은 R 식을 유도할 줄 아는 것」", "tg": "ex"}, {"k": "pit", "h": "ρ(물질의 성질, Ω·m) ≠ R(도선 한 개, Ω)"}], "braw": ["☆ 시험 : 「시험 문제 나오는 건 이것밖에 없어요」", "☆ 시험 : 「배수 문제는 안 나올 거고, 핵심은 R 식을 유도할 줄 아는 것」", "! ρ(물질의 성질, Ω·m) ≠ R(도선 한 개, Ω)"], "s": "고등학교 때 많이 나온 배수 문제는 안 낸다, 핵심은 유도라고 분명히 말씀하셨어요. 손으로 한 번 유도해 보세요. 비저항과 저항은 단위부터 달라요.", "fig": null, "fs": 0}, {"id": "s3-6", "t": "v2", "b": [{"k": "star", "h": "비유 : 수도관 — 길면 덜, 굵으면 잘 흐른다", "tg": "ih"}, {"k": "memo", "h": "E = ρJ → ΔV = ρJL → J = i/A → R = ρL/A", "tg": "am"}], "braw": ["☆ 비유 : 수도관 — 길면 덜, 굵으면 잘 흐른다", "■ 외울 것 : E = ρJ → ΔV = ρJL → J = i/A → R = ρL/A"], "s": "수도관이 길면 덜 흐르고 굵으면 잘 흐르죠. 관 안쪽이 거친 정도가 로예요.", "fig": null, "fs": 0}], "figs": {"res": {"svg": "<figure class=\"fig lite\" data-fig=\"res\"><svg class=\"fig-svg\" viewbox=\"0 0 560 236\" width=\"560\" height=\"236\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\" id=\"fig-phys2-2026-09-30-s3-res\"><defs><marker id=\"ah-phys2-2026-09-30-s3-res\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><g data-step=\"1\"><rect x=\"60\" y=\"70\" width=\"300\" height=\"60\" rx=\"0\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"1.6\"><\/rect><ellipse cx=\"60\" cy=\"100\" rx=\"12\" ry=\"30\" fill=\"#E9ECEF\" stroke=\"#1F2A44\" stroke-width=\"1.6\"><\/ellipse><ellipse cx=\"360\" cy=\"100\" rx=\"12\" ry=\"30\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.6\"><\/ellipse><text x=\"60\" y=\"54\" font-size=\"12.5\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">단면 A<\/text><line x1=\"60\" y1=\"150\" x2=\"360\" y2=\"150\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"60\" y1=\"146\" x2=\"60\" y2=\"154\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"360\" y1=\"146\" x2=\"360\" y2=\"154\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><text x=\"210.0\" y=\"166\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">L<\/text><text x=\"60\" y=\"194\" font-size=\"12.5\" fill=\"#E03131\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">높은 전위<\/text><text x=\"360\" y=\"194\" font-size=\"12.5\" fill=\"#1971C2\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">낮은 전위<\/text><\/g><g data-step=\"2\"><line x1=\"100\" y1=\"100\" x2=\"320\" y2=\"100\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-phys2-2026-09-30-s3-res)\"><\/line><text x=\"210\" y=\"90\" font-size=\"14\" fill=\"#2F9E44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">E<\/text><text x=\"210\" y=\"40\" font-size=\"12.5\" fill=\"#2F9E44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">등방성 도체 : E 가 일정<\/text><\/g><g data-step=\"3\"><text x=\"470\" y=\"70\" font-size=\"12.5\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">예 : L → ½L<\/text><text x=\"470\" y=\"94\" font-size=\"12.5\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A → 2A<\/text><text x=\"470\" y=\"124\" font-size=\"13.5\" fill=\"#E03131\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">R → ¼ 배<\/text><\/g><g data-step=\"4\"><text x=\"280\" y=\"226\" font-size=\"13.5\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">ΔV = EL = ρJL = ρ(i/A)L  →  R = ΔV/i = ρL/A<\/text><\/g><\/svg><figcaption>판서 ③. 길이 \\(L\\)·단면 \\(A\\)인 도선 안의 전기장이 일정하면 두 끝의 전위차는 \\(EL\\). 오른쪽은 판서의 배수 예(길이 반, 넓이 두 배 → 저항 1/4).<\/figcaption><\/figure>", "max": 4}}, "say": null}, {"id": "s4", "title": "미시적 이론 — 충돌과 완화 시간 (판서 ④ 왼쪽)", "steps": [{"id": "s4-1", "t": "v2", "b": [{"k": "h", "h": "미시적 이론 — 충돌과 완화 시간"}, {"k": "li", "h": "전자는 이온과 충돌하며 간다"}], "braw": ["# 미시적 이론 — 충돌과 완화 시간", "• 전자는 이온과 충돌하며 간다"], "s": "실제 전자는 곧게 가지 않고 이온에 계속 부딪혀요. 그 손실을 1학기의 저항력으로 씁니다.", "fig": "micro", "fs": 1}, {"id": "s4-2", "t": "v2", "b": [{"k": "li", "h": "지그재그여도 평균하면 일정한 속도 v_d"}, {"k": "li", "h": "전자는 q = −e 라 E 반대쪽으로"}], "braw": ["• 지그재그여도 평균하면 일정한 속도 v_d", "• 전자는 q = −e 라 E 반대쪽으로"], "s": "지그재그로 가도 평균을 내면 일정한 속도, 그게 유동 속도예요. 전자는 전하가 음수라 E 반대로 가요.", "fig": "micro", "fs": 2}, {"id": "s4-3", "t": "v2", "b": [{"k": "f", "h": "\\[\\vec F=q\\vec E-b\\vec v\\]"}, {"k": "li", "h": "−bv : 충돌에 의한 저항력 (판서 「마찰」, n = 1)"}], "braw": ["= \\vec F=q\\vec E-b\\vec v", "• −bv : 충돌에 의한 저항력 (판서 「마찰」, n = 1)"], "s": "전기력 q E 가 밀고, 충돌이 마이너스 b v 로 붙잡아요. 판서에 마찰이라고 메모하셨어요.", "fig": "micro", "fs": 3}, {"id": "s4-4", "t": "v2", "b": [{"k": "f", "h": "\\[\\vec F=0:\\ \\vec v=\\frac{q\\vec E}{b}=\\frac{q\\vec E}{m}\\cdot\\frac{m}{b}\\]"}, {"k": "f", "h": "\\[\\tau=\\frac{m}{b}\\ (\\text{완화 시간}),\\qquad \\vec v=\\frac{q\\vec E\\tau}{m}\\]"}], "braw": ["= \\vec F=0:\\ \\vec v=\\frac{q\\vec E}{b}=\\frac{q\\vec E}{m}\\cdot\\frac{m}{b}", "= \\tau=\\frac{m}{b}\\ (\\text{완화 시간}),\\qquad \\vec v=\\frac{q\\vec E\\tau}{m}"], "s": "둘이 같아지면 알짜힘 0, 일정한 속도. 분자 분모에 m 을 곱해서 m 나누기 b 를 한 묶음으로 본 게 충돌 완화 시간 타우예요.", "fig": "micro", "fs": 4}, {"id": "s4-5", "t": "v2", "b": [{"k": "li", "h": "전자 100개 vs 200개 → 200개가 충돌이 잦아 τ 가 짧다"}, {"k": "li", "h": "보충 : v_d = eEτ/m 을 J = nev_d 에 → ρ = m/(ne²τ)"}], "braw": ["• 전자 100개 vs 200개 → 200개가 충돌이 잦아 τ 가 짧다", "• 보충 : v_d = eEτ/m 을 J = nev_d 에 → ρ = m/(ne²τ)"], "s": "같은 공간에 전자가 많으면 충돌이 잦아서 충돌 사이 간격이 짧아요. 보충으로, 이 속도를 J 식에 넣으면 3절의 비저항이 m 나누기 n e 제곱 타우로 나와요.", "fig": null, "fs": 0}, {"id": "s4-6", "t": "v2", "b": [{"k": "star", "h": "「충돌 완화 시간 정도만, 용어만 기억」 · 「26장 핵심은 이것밖에 없어요」", "tg": "ex"}, {"k": "star", "h": "비유 : 붐비는 지하철 통로 — 밀어도 부딪혀 일정한 걸음", "tg": "ih"}, {"k": "memo", "h": "F = qE − bv · τ = m/b (relaxation time) · v = qEτ/m", "tg": "am"}], "braw": ["☆ 시험 : 「충돌 완화 시간 정도만, 용어만 기억」 · 「26장 핵심은 이것밖에 없어요」", "☆ 비유 : 붐비는 지하철 통로 — 밀어도 부딪혀 일정한 걸음", "■ 외울 것 : F = qE − bv · τ = m/b (relaxation time) · v = qEτ/m"], "s": "완화 시간은 용어만 기억하면 된다, 이런 문제는 시험에 낼 일 없다고 하셨어요. 26장은 자기의 소스가 전류라는 걸 말하려는 장이에요.", "fig": null, "fs": 0}], "figs": {"micro": {"svg": "<figure class=\"fig lite\" data-fig=\"micro\"><svg class=\"fig-svg\" viewbox=\"0 0 560 226\" width=\"560\" height=\"226\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\" id=\"fig-phys2-2026-09-30-s4-micro\"><defs><marker id=\"ah-phys2-2026-09-30-s4-micro\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><g data-step=\"1\"><circle cx=\"70\" cy=\"60\" r=\"8\" fill=\"#fff\"><\/circle><circle cx=\"70\" cy=\"60\" r=\"8\" fill=\"#E03131\" fill-opacity=\".15\" stroke=\"#E03131\" stroke-width=\"2\"><\/circle><text x=\"70\" y=\"62.9\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"700\" fill=\"#E03131\">+<\/text><circle cx=\"70\" cy=\"120\" r=\"8\" fill=\"#fff\"><\/circle><circle cx=\"70\" cy=\"120\" r=\"8\" fill=\"#E03131\" fill-opacity=\".15\" stroke=\"#E03131\" stroke-width=\"2\"><\/circle><text x=\"70\" y=\"122.9\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"700\" fill=\"#E03131\">+<\/text><circle cx=\"70\" cy=\"180\" r=\"8\" fill=\"#fff\"><\/circle><circle cx=\"70\" cy=\"180\" r=\"8\" fill=\"#E03131\" fill-opacity=\".15\" stroke=\"#E03131\" stroke-width=\"2\"><\/circle><text x=\"70\" y=\"182.9\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"700\" fill=\"#E03131\">+<\/text><circle cx=\"150\" cy=\"60\" r=\"8\" fill=\"#fff\"><\/circle><circle cx=\"150\" cy=\"60\" r=\"8\" fill=\"#E03131\" fill-opacity=\".15\" stroke=\"#E03131\" stroke-width=\"2\"><\/circle><text x=\"150\" y=\"62.9\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"700\" fill=\"#E03131\">+<\/text><circle cx=\"150\" cy=\"120\" r=\"8\" fill=\"#fff\"><\/circle><circle cx=\"150\" cy=\"120\" r=\"8\" fill=\"#E03131\" fill-opacity=\".15\" stroke=\"#E03131\" stroke-width=\"2\"><\/circle><text x=\"150\" y=\"122.9\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"700\" fill=\"#E03131\">+<\/text><circle cx=\"150\" cy=\"180\" r=\"8\" fill=\"#fff\"><\/circle><circle cx=\"150\" cy=\"180\" r=\"8\" fill=\"#E03131\" fill-opacity=\".15\" stroke=\"#E03131\" stroke-width=\"2\"><\/circle><text x=\"150\" y=\"182.9\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"700\" fill=\"#E03131\">+<\/text><circle cx=\"230\" cy=\"60\" r=\"8\" fill=\"#fff\"><\/circle><circle cx=\"230\" cy=\"60\" r=\"8\" fill=\"#E03131\" fill-opacity=\".15\" stroke=\"#E03131\" stroke-width=\"2\"><\/circle><text x=\"230\" y=\"62.9\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"700\" fill=\"#E03131\">+<\/text><circle cx=\"230\" cy=\"120\" r=\"8\" fill=\"#fff\"><\/circle><circle cx=\"230\" cy=\"120\" r=\"8\" fill=\"#E03131\" fill-opacity=\".15\" stroke=\"#E03131\" stroke-width=\"2\"><\/circle><text x=\"230\" y=\"122.9\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"700\" fill=\"#E03131\">+<\/text><circle cx=\"230\" cy=\"180\" r=\"8\" fill=\"#fff\"><\/circle><circle cx=\"230\" cy=\"180\" r=\"8\" fill=\"#E03131\" fill-opacity=\".15\" stroke=\"#E03131\" stroke-width=\"2\"><\/circle><text x=\"230\" y=\"182.9\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"700\" fill=\"#E03131\">+<\/text><line x1=\"70\" y1=\"22\" x2=\"230\" y2=\"22\" stroke=\"#2F9E44\" stroke-width=\"2\" marker-end=\"url(#ah-phys2-2026-09-30-s4-micro)\"><\/line><text x=\"240\" y=\"27\" font-size=\"14\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">E<\/text><\/g><g data-step=\"2\"><path d=\"M298.0 90.0 L210.0 90.0 L170.0 150.0 L130.0 150.0 L90.0 90.0\" fill=\"none\" stroke=\"#1971C2\" stroke-width=\"2\"><\/path><line x1=\"90\" y1=\"90\" x2=\"42\" y2=\"90\" stroke=\"#1971C2\" stroke-width=\"2\" marker-end=\"url(#ah-phys2-2026-09-30-s4-micro)\"><\/line><circle cx=\"312\" cy=\"90\" r=\"10\" fill=\"#fff\"><\/circle><circle cx=\"312\" cy=\"90\" r=\"10\" fill=\"#1971C2\" fill-opacity=\".15\" stroke=\"#1971C2\" stroke-width=\"2\"><\/circle><text x=\"312\" y=\"93.8\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"700\" fill=\"#1971C2\">−<\/text><text x=\"260\" y=\"208\" font-size=\"12.5\" fill=\"#1971C2\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">충돌하며 E 반대쪽으로 평균 v<tspan baseline-shift=\"sub\" font-size=\"72%\">d<\/tspan><\/text><\/g><g data-step=\"3\"><text x=\"350\" y=\"66\" font-size=\"15\" fill=\"#1F2A44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">F = qE − bv<\/text><text x=\"350\" y=\"90\" font-size=\"12.5\" fill=\"#8A97A6\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">−bv : 충돌 = 마찰(저항력)<\/text><\/g><g data-step=\"4\"><text x=\"350\" y=\"132\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">F = 0 → v = qE/b<\/text><text x=\"350\" y=\"158\" font-size=\"14\" fill=\"#E03131\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">τ = m/b (완화 시간)<\/text><text x=\"350\" y=\"184\" font-size=\"14\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">v = qEτ/m<\/text><\/g><\/svg><figcaption>판서 ④ 미시적 이론. 이온(빨강 +)에 부딪히며 지그재그로 가지만 평균하면 일정한 속도 \\(v_d\\)로 흐른다. \\(q\\)는 운반자 전하 — 전자면 \\(q=-e\\)라 \\(\\vec v\\)는 \\(\\vec E\\)와 반대.<\/figcaption><\/figure>", "max": 4}}, "say": null}, {"id": "s5", "title": "1학기 진동 복습 — 단순 · 감쇠 · 강제 (판서 ④ 오른쪽)", "steps": [{"id": "s5-1", "t": "v2", "b": [{"k": "h", "h": "1학기 진동 복습 — 단순 · 감쇠 · 강제"}, {"k": "li", "h": "「모르면 제일 중요하다고 한 거」 — 31장 RLC 에서 다시"}], "braw": ["# 1학기 진동 복습 — 단순 · 감쇠 · 강제", "• 「모르면 제일 중요하다고 한 거」 — 31장 RLC 에서 다시"], "s": "저항력이 나온 김에 1학기 진동을 짚으셨어요. 31장 교류 회로에서 똑같이 다시 나와요.", "fig": "osc", "fs": 1}, {"id": "s5-2", "t": "v2", "b": [{"k": "f", "h": "\\[F=-kx\\ \\Rightarrow\\ x=A\\cos(\\omega t+\\theta),\\quad \\omega=\\sqrt{k/m}\\]"}, {"k": "li", "h": "단순조화진동 : 주파수 하나 = simple, 정수배 = harmonic"}], "braw": ["= F=-kx\\ \\Rightarrow\\ x=A\\cos(\\omega t+\\theta),\\quad \\omega=\\sqrt{k/m}", "• 단순조화진동 : 주파수 하나 = simple, 정수배 = harmonic"], "s": "용수철만 있으면 단순조화진동. 주파수가 하나라서 simple, 정수배라서 harmonic 이라고 설명하셨어요.", "fig": "osc", "fs": 1}, {"id": "s5-3", "t": "v2", "b": [{"k": "f", "h": "\\[m\\frac{d^2x}{dt^2}+b\\frac{dx}{dt}+kx=0\\]"}, {"k": "f", "h": "\\[x(t)=Ae^{-bt/2m}\\cos(\\omega' t+\\theta)\\]"}, {"k": "li", "h": "감쇠조화진동 : 진폭이 지수적으로 감소"}], "braw": ["= m\\frac{d^2x}{dt^2}+b\\frac{dx}{dt}+kx=0", "= x(t)=Ae^{-bt/2m}\\cos(\\omega' t+\\theta)", "• 감쇠조화진동 : 진폭이 지수적으로 감소"], "s": "저항 마이너스 b v 를 넣으면 진폭이 e 의 마이너스 b t 나누기 2m 으로 줄어요. 판서는 진동수를 오메가로 적었지만 녹음은 오메가 프라임으로 구분하셨어요.", "fig": "osc", "fs": 2}, {"id": "s5-4", "t": "v2", "b": [{"k": "li", "h": "외력 F_m cos ω_d t : ω_d ≈ ω 이면 진폭 최대"}, {"k": "res", "h": "b 항 = 전기의 저항 (31장 LC · RLC · RL)"}], "braw": ["• 외력 F_m cos ω_d t : ω_d ≈ ω 이면 진폭 최대", "→ b 항 = 전기의 저항 (31장 LC · RLC · RL)"], "s": "바깥에서 오메가 d 로 밀면, 그게 고유 진동수와 거의 같을 때 진폭이 최대예요. 회로에서는 b 자리가 저항이 됩니다.", "fig": "osc", "fs": 3}, {"id": "s5-5", "t": "v2", "b": [{"k": "star", "h": "비유 : 그네 — 그냥 두면, 공기 저항이 있으면, 박자 맞춰 밀면", "tg": "ih"}, {"k": "li", "h": "같은 날 공업수학1 2.8 강제진동·공진과 같은 방정식"}, {"k": "memo", "h": "x = A cos(ωt + θ) · x = Ae^(−bt/2m) cos(ω′t + θ) · ω_d ≈ ω → 진폭 최대", "tg": "am"}], "braw": ["☆ 비유 : 그네 — 그냥 두면, 공기 저항이 있으면, 박자 맞춰 밀면", "• 같은 날 공업수학1 2.8 강제진동·공진과 같은 방정식", "■ 외울 것 : x = A cos(ωt + θ) · x = Ae^(−bt/2m) cos(ω′t + θ) · ω_d ≈ ω → 진폭 최대"], "s": "지금 몰라도 상관없으니 나중에 다시 하자고 하셨어요. 같은 날 공업수학 2.8 공진과 같은 식이라 같이 보면 좋아요.", "fig": null, "fs": 0}], "figs": {"osc": {"svg": "<figure class=\"fig lite\" data-fig=\"osc\"><svg class=\"fig-svg\" viewbox=\"0 0 560 240\" width=\"560\" height=\"240\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\" id=\"fig-phys2-2026-09-30-s5-osc\"><defs><marker id=\"ah-phys2-2026-09-30-s5-osc\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><g data-step=\"1\"><line x1=\"30\" y1=\"36\" x2=\"30\" y2=\"100\" stroke=\"#1F2A44\" stroke-width=\"3\"><\/line><path d=\"M30.0 70.0 L38.0 70.0 L42.6 78.0 L51.7 62.0 L60.9 78.0 L70.0 62.0 L79.1 78.0 L88.3 62.0 L97.4 78.0 L102.0 70.0 L110.0 70.0\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/path><text x=\"70\" y=\"54\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">k<\/text><rect x=\"110\" y=\"50\" width=\"50\" height=\"40\" rx=\"6\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/rect><text x=\"135.0\" y=\"75.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">m<\/text><line x1=\"160\" y1=\"70\" x2=\"204\" y2=\"70\" stroke=\"#E03131\" stroke-width=\"2\" marker-end=\"url(#ah-phys2-2026-09-30-s5-osc)\"><\/line><text x=\"212\" y=\"75\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">F<\/text><text x=\"250\" y=\"46\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">F = −kx → x = A cos(ωt + θ)  단순조화<\/text><\/g><g data-step=\"2\"><text x=\"250\" y=\"74\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">m x″ + b x′ + kx = 0  (−bv 저항)<\/text><text x=\"250\" y=\"100\" font-size=\"13\" fill=\"#1971C2\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">x = A e^(−bt/2m) cos(ω′t + θ)  감쇠조화<\/text><line x1=\"40\" y1=\"192\" x2=\"528\" y2=\"192\" stroke=\"#1F2A44\" stroke-width=\"1.4\" marker-end=\"url(#ah-phys2-2026-09-30-s5-osc)\"><\/line><text x=\"532\" y=\"196\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">t<\/text><path d=\"M40.0 154.0 L46.0 155.4 L52.0 156.7 L58.0 158.0 L64.0 159.3 L70.0 160.5 L76.0 161.7 L82.0 162.8 L88.0 163.8 L94.0 164.9 L100.0 165.9 L106.0 166.8 L112.0 167.8 L118.0 168.7 L124.0 169.5 L130.0 170.3 L136.0 171.1 L142.0 171.9 L148.0 172.7 L154.0 173.4 L160.0 174.1 L166.0 174.7 L172.0 175.3 L178.0 176.0 L184.0 176.6 L190.0 177.1 L196.0 177.7 L202.0 178.2 L208.0 178.7 L214.0 179.2 L220.0 179.7 L226.0 180.1 L232.0 180.6 L238.0 181.0 L244.0 181.4 L250.0 181.8 L256.0 182.1 L262.0 182.5 L268.0 182.9 L274.0 183.2 L280.0 183.5 L286.0 183.8 L292.0 184.1 L298.0 184.4 L304.0 184.7 L310.0 185.0 L316.0 185.2 L322.0 185.5 L328.0 185.7 L334.0 185.9 L340.0 186.2 L346.0 186.4 L352.0 186.6 L358.0 186.8 L364.0 187.0 L370.0 187.2 L376.0 187.3 L382.0 187.5 L388.0 187.7 L394.0 187.8 L400.0 188.0 L406.0 188.1 L412.0 188.3 L418.0 188.4 L424.0 188.6 L430.0 188.7 L436.0 188.8 L442.0 188.9 L448.0 189.0 L454.0 189.1 L460.0 189.2 L466.0 189.3 L472.0 189.4 L478.0 189.5 L484.0 189.6 L490.0 189.7 L496.0 189.8 L502.0 189.9 L508.0 190.0 L514.0 190.0 L520.0 190.1\" fill=\"none\" stroke=\"#8A97A6\" stroke-width=\"1.2\" stroke-dasharray=\"5 4\"><\/path><path d=\"M40.0 230.0 L46.0 228.6 L52.0 227.3 L58.0 226.0 L64.0 224.7 L70.0 223.5 L76.0 222.3 L82.0 221.2 L88.0 220.2 L94.0 219.1 L100.0 218.1 L106.0 217.2 L112.0 216.2 L118.0 215.3 L124.0 214.5 L130.0 213.7 L136.0 212.9 L142.0 212.1 L148.0 211.3 L154.0 210.6 L160.0 209.9 L166.0 209.3 L172.0 208.7 L178.0 208.0 L184.0 207.4 L190.0 206.9 L196.0 206.3 L202.0 205.8 L208.0 205.3 L214.0 204.8 L220.0 204.3 L226.0 203.9 L232.0 203.4 L238.0 203.0 L244.0 202.6 L250.0 202.2 L256.0 201.9 L262.0 201.5 L268.0 201.1 L274.0 200.8 L280.0 200.5 L286.0 200.2 L292.0 199.9 L298.0 199.6 L304.0 199.3 L310.0 199.0 L316.0 198.8 L322.0 198.5 L328.0 198.3 L334.0 198.1 L340.0 197.8 L346.0 197.6 L352.0 197.4 L358.0 197.2 L364.0 197.0 L370.0 196.8 L376.0 196.7 L382.0 196.5 L388.0 196.3 L394.0 196.2 L400.0 196.0 L406.0 195.9 L412.0 195.7 L418.0 195.6 L424.0 195.4 L430.0 195.3 L436.0 195.2 L442.0 195.1 L448.0 195.0 L454.0 194.9 L460.0 194.8 L466.0 194.7 L472.0 194.6 L478.0 194.5 L484.0 194.4 L490.0 194.3 L496.0 194.2 L502.0 194.1 L508.0 194.0 L514.0 194.0 L520.0 193.9\" fill=\"none\" stroke=\"#8A97A6\" stroke-width=\"1.2\" stroke-dasharray=\"5 4\"><\/path><path d=\"M40.0 154.0 L41.2 154.5 L42.4 155.4 L43.6 156.7 L44.8 158.3 L46.0 160.3 L47.2 162.6 L48.4 165.3 L49.6 168.1 L50.8 171.2 L52.0 174.5 L53.2 177.9 L54.4 181.4 L55.6 185.0 L56.8 188.6 L58.0 192.1 L59.2 195.7 L60.4 199.1 L61.6 202.4 L62.8 205.6 L64.0 208.5 L65.2 211.2 L66.4 213.7 L67.6 215.9 L68.8 217.8 L70.0 219.4 L71.2 220.7 L72.4 221.6 L73.6 222.2 L74.8 222.4 L76.0 222.3 L77.2 221.9 L78.4 221.2 L79.6 220.1 L80.8 218.8 L82.0 217.2 L83.2 215.3 L84.4 213.2 L85.6 210.9 L86.8 208.4 L88.0 205.8 L89.2 203.1 L90.4 200.3 L91.6 197.4 L92.8 194.5 L94.0 191.7 L95.2 188.8 L96.4 186.1 L97.6 183.5 L98.8 181.0 L100.0 178.6 L101.2 176.5 L102.4 174.5 L103.6 172.8 L104.8 171.3 L106.0 170.0 L107.2 169.0 L108.4 168.3 L109.6 167.9 L110.8 167.7 L112.0 167.8 L113.2 168.1 L114.4 168.7 L115.6 169.6 L116.8 170.7 L118.0 172.0 L119.2 173.5 L120.4 175.2 L121.6 177.1 L122.8 179.0 L124.0 181.1 L125.2 183.3 L126.4 185.6 L127.6 187.9 L128.8 190.2 L130.0 192.5 L131.2 194.7 L132.4 196.9 L133.6 199.0 L134.8 201.0 L136.0 202.8 L137.2 204.5 L138.4 206.1 L139.6 207.5 L140.8 208.6 L142.0 209.6 L143.2 210.4 L144.4 211.0 L145.6 211.3 L146.8 211.4 L148.0 211.3 L149.2 211.0 L150.4 210.5 L151.6 209.8 L152.8 208.9 L154.0 207.9 L155.2 206.7 L156.4 205.3 L157.6 203.8 L158.8 202.2 L160.0 200.5 L161.2 198.8 L162.4 197.0 L163.6 195.2 L164.8 193.3 L166.0 191.5 L167.2 189.7 L168.4 188.0 L169.6 186.3 L170.8 184.7 L172.0 183.2 L173.2 181.9 L174.4 180.6 L175.6 179.6 L176.8 178.6 L178.0 177.9 L179.2 177.3 L180.4 176.8 L181.6 176.6 L182.8 176.5 L184.0 176.6 L185.2 176.8 L186.4 177.2 L187.6 177.8 L188.8 178.5 L190.0 179.4 L191.2 180.4 L192.4 181.5 L193.6 182.7 L194.8 183.9 L196.0 185.3 L197.2 186.7 L198.4 188.1 L199.6 189.6 L200.8 191.1 L202.0 192.5 L203.2 194.0 L204.4 195.3 L205.6 196.7 L206.8 197.9 L208.0 199.1 L209.2 200.2 L210.4 201.1 L211.6 202.0 L212.8 202.7 L214.0 203.3 L215.2 203.8 L216.4 204.2 L217.6 204.3 L218.8 204.4 L220.0 204.3 L221.2 204.1 L222.4 203.8 L223.6 203.3 L224.8 202.7 L226.0 202.0 L227.2 201.2 L228.4 200.3 L229.6 199.4 L230.8 198.4 L232.0 197.3 L233.2 196.1 L234.4 195.0 L235.6 193.8 L236.8 192.7 L238.0 191.5 L239.2 190.4 L240.4 189.2 L241.6 188.2 L242.8 187.2 L244.0 186.3 L245.2 185.4 L246.4 184.6 L247.6 184.0 L248.8 183.4 L250.0 182.9 L251.2 182.5 L252.4 182.3 L253.6 182.1 L254.8 182.1 L256.0 182.2 L257.2 182.3 L258.4 182.6 L259.6 183.0 L260.8 183.5 L262.0 184.0 L263.2 184.7 L264.4 185.4 L265.6 186.2 L266.8 187.0 L268.0 187.9 L269.2 188.8 L270.4 189.7 L271.6 190.6 L272.8 191.6 L274.0 192.5 L275.2 193.4 L276.4 194.3 L277.6 195.1 L278.8 195.9 L280.0 196.6 L281.2 197.3 L282.4 197.9 L283.6 198.5 L284.8 198.9 L286.0 199.3 L287.2 199.6 L288.4 199.8 L289.6 199.9 L290.8 199.9 L292.0 199.9 L293.2 199.7 L294.4 199.5 L295.6 199.2 L296.8 198.8 L298.0 198.3 L299.2 197.8 L300.4 197.2 L301.6 196.6 L302.8 195.9 L304.0 195.3 L305.2 194.5 L306.4 193.8 L307.6 193.0 L308.8 192.3 L310.0 191.6 L311.2 190.8 L312.4 190.1 L313.6 189.5 L314.8 188.8 L316.0 188.2 L317.2 187.7 L318.4 187.2 L319.6 186.8 L320.8 186.4 L322.0 186.1 L323.2 185.9 L324.4 185.8 L325.6 185.7 L326.8 185.7 L328.0 185.7 L329.2 185.9 L330.4 186.0 L331.6 186.3 L332.8 186.6 L334.0 187.0 L335.2 187.4 L336.4 187.9 L337.6 188.4 L338.8 188.9 L340.0 189.4 L341.2 190.0 L342.4 190.6 L343.6 191.2 L344.8 191.8 L346.0 192.4 L347.2 193.0 L348.4 193.5 L349.6 194.1 L350.8 194.6 L352.0 195.0 L353.2 195.5 L354.4 195.8 L355.6 196.2 L356.8 196.5 L358.0 196.7 L359.2 196.9 L360.4 197.0 L361.6 197.0 L362.8 197.1 L364.0 197.0 L365.2 196.9 L366.4 196.7 L367.6 196.5 L368.8 196.3 L370.0 196.0 L371.2 195.6 L372.4 195.3 L373.6 194.9 L374.8 194.5 L376.0 194.0 L377.2 193.5 L378.4 193.1 L379.6 192.6 L380.8 192.1 L382.0 191.6 L383.2 191.2 L384.4 190.7 L385.6 190.3 L386.8 189.9 L388.0 189.5 L389.2 189.2 L390.4 188.9 L391.6 188.6 L392.8 188.4 L394.0 188.2 L395.2 188.1 L396.4 188.0 L397.6 188.0 L398.8 188.0 L400.0 188.0 L401.2 188.1 L402.4 188.2 L403.6 188.4 L404.8 188.6 L406.0 188.8 L407.2 189.1 L408.4 189.4 L409.6 189.7 L410.8 190.1 L412.0 190.4 L413.2 190.8 L414.4 191.2 L415.6 191.6 L416.8 191.9 L418.0 192.3 L419.2 192.7 L420.4 193.0 L421.6 193.4 L422.8 193.7 L424.0 194.0 L425.2 194.3 L426.4 194.5 L427.6 194.7 L428.8 194.9 L430.0 195.0 L431.2 195.1 L432.4 195.2 L433.6 195.2 L434.8 195.2 L436.0 195.2 L437.2 195.1 L438.4 195.0 L439.6 194.9 L440.8 194.7 L442.0 194.5 L443.2 194.3 L444.4 194.1 L445.6 193.8 L446.8 193.5 L448.0 193.2 L449.2 192.9 L450.4 192.6 L451.6 192.3 L452.8 192.0 L454.0 191.7 L455.2 191.4 L456.4 191.2 L457.6 190.9 L458.8 190.6 L460.0 190.4 L461.2 190.2 L462.4 190.0 L463.6 189.8 L464.8 189.7 L466.0 189.6 L467.2 189.5 L468.4 189.4 L469.6 189.4 L470.8 189.4 L472.0 189.5 L473.2 189.5 L474.4 189.6 L475.6 189.7 L476.8 189.9 L478.0 190.0 L479.2 190.2 L480.4 190.4 L481.6 190.6 L482.8 190.8 L484.0 191.0 L485.2 191.3 L486.4 191.5 L487.6 191.8 L488.8 192.0 L490.0 192.2 L491.2 192.5 L492.4 192.7 L493.6 192.9 L494.8 193.1 L496.0 193.3 L497.2 193.5 L498.4 193.6 L499.6 193.7 L500.8 193.9 L502.0 193.9 L503.2 194.0 L504.4 194.0 L505.6 194.1 L506.8 194.1 L508.0 194.0 L509.2 194.0 L510.4 193.9 L511.6 193.8 L512.8 193.7 L514.0 193.6 L515.2 193.4 L516.4 193.3 L517.6 193.1 L518.8 192.9 L520.0 192.8\" fill=\"none\" stroke=\"#1971C2\" stroke-width=\"2\"><\/path><\/g><g data-step=\"3\"><text x=\"250\" y=\"128\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">외력 F<tspan baseline-shift=\"sub\" font-size=\"72%\">m<\/tspan> cos ω<tspan baseline-shift=\"sub\" font-size=\"72%\">d<\/tspan> t : ω<tspan baseline-shift=\"sub\" font-size=\"72%\">d<\/tspan> ≈ ω 이면 진폭 최대<\/text><\/g><\/svg><figcaption>판서 ④ 오른쪽 — 1학기 진동 복습. 저항력 \\(-bv\\)가 들어가면 진폭이 \\(e^{-bt/2m}\\)로 줄어든다. 같은 꼴이 31장 RLC 회로에서 다시 나온다(b 자리가 전기 저항).<\/figcaption><\/figure>", "max": 3}}, "say": null}, {"id": "s6", "title": "27장 회로 — 전위차와 키르히호프 두 법칙 (판서 ⑤)", "steps": [{"id": "s6-1", "t": "v2", "b": [{"k": "h", "h": "27장 회로 — 전위차와 키르히호프"}, {"k": "star", "h": "「여기까지 시험 범위 할 거야」 — 27장 회로까지", "tg": "ex"}, {"k": "li", "h": "시험 요일 미정 — 이 반 다수 금요일, 교수님 수요일 선호"}], "braw": ["# 27장 회로 — 전위차와 키르히호프", "☆ 시험 : 「여기까지 시험 범위 할 거야」 — 27장 회로까지", "• 시험 요일 미정 — 이 반 다수 금요일, 교수님 수요일 선호"], "s": "27장은 오늘 마지막으로 설명하신 부분이고, 여기까지가 시험 범위예요. 시험 요일은 다음 시간에 또 물어보신다고 했어요.", "fig": null, "fs": 0}, {"id": "s6-2", "t": "v2", "b": [{"k": "f", "h": "\\[V_A-V_B=iR\\quad(V_A&gt;V_B)\\]"}, {"k": "res", "h": "전류가 들어가는 쪽이 높은 전위"}], "braw": ["= V_A-V_B=iR\\quad(V_A>V_B)", "→ 전류가 들어가는 쪽이 높은 전위"], "s": "저항에 A 에서 B 로 전류가 흐르면 A 가 높아요. 그 차가 i R. 이 개념만 알면 된다고 하셨어요.", "fig": "circ", "fs": 1}, {"id": "s6-3", "t": "v2", "b": [{"k": "f", "h": "\\[V_A-V_B=\\Delta V=\\frac{q}{C}\\]"}], "braw": ["= V_A-V_B=\\Delta V=\\frac{q}{C}"], "s": "축전기는 25장 그대로, 전위차는 q 나누기 C.", "fig": "circ", "fs": 2}, {"id": "s6-4", "t": "v2", "b": [{"k": "f", "h": "\\[\\sum i=0\\ \\Rightarrow\\ i_1=i_2+i_3\\]"}, {"k": "res", "h": "제1법칙(접점 규칙) = 전하량 보존"}], "braw": ["= \\sum i=0\\ \\Rightarrow\\ i_1=i_2+i_3", "→ 제1법칙(접점 규칙) = 전하량 보존"], "s": "키르히호프 제1법칙. 분기점에 전하가 쌓이지 않으니까 들어온 만큼 나가요. 하나 들어와 둘로 나가면 i 1 은 i 2 더하기 i 3.", "fig": "circ", "fs": 3}, {"id": "s6-5", "t": "v2", "b": [{"k": "f", "h": "\\[\\sum\\varepsilon=\\sum\\Delta V\\]"}, {"k": "res", "h": "제2법칙(고리 규칙) = 에너지 보존"}, {"k": "pit", "h": "고리 방향으로 −극 → +극이면 +ε, 반대면 −ε"}], "braw": ["= \\sum\\varepsilon=\\sum\\Delta V", "→ 제2법칙(고리 규칙) = 에너지 보존", "! 고리 방향으로 −극 → +극이면 +ε, 반대면 −ε"], "s": "제2법칙은 고리를 한 바퀴 돌면 전위가 제자리라는 것, 에너지 보존이에요. 전지를 마이너스에서 플러스로 지나면 플러스 엡실론, 반대면 마이너스. 여기서 반은 틀립니다.", "fig": "circ", "fs": 4}, {"id": "s6-6", "t": "v2", "b": [{"k": "f", "h": "\\[\\varepsilon_1-\\varepsilon_2=iR_1+iR_2\\]"}, {"k": "li", "h": "전류 방향 · 고리 방향 · 변수 이름은 마음대로 (「엿장수」)"}, {"k": "res", "h": "반대로 잡으면 답이 음수로 나올 뿐 — 다음 시간 산수 계산"}], "braw": ["= \\varepsilon_1-\\varepsilon_2=iR_1+iR_2", "• 전류 방향 · 고리 방향 · 변수 이름은 마음대로 (「엿장수」)", "→ 반대로 잡으면 답이 음수로 나올 뿐 — 다음 시간 산수 계산"], "s": "방향은 엿장수 마음대로 잡아도 돼요. 반대로 잡으면 답이 음수로 나올 뿐이에요. 왜 그래도 되는지는 다음 시간 회로 계산에서 보여 주신대요.", "fig": "circ", "fs": 5}, {"id": "s6-7", "t": "v2", "b": [{"k": "star", "h": "비유 : 등산로 한 바퀴 — 케이블카로 오른 높이 = 걸어 내려온 높이", "tg": "ih"}, {"k": "memo", "h": "V_A − V_B = iR · q/C · Σi = 0 (전하량 보존) · Σε = ΣΔV (에너지 보존)", "tg": "am"}], "braw": ["☆ 비유 : 등산로 한 바퀴 — 케이블카로 오른 높이 = 걸어 내려온 높이", "■ 외울 것 : V_A − V_B = iR · q/C · Σi = 0 (전하량 보존) · Σε = ΣΔV (에너지 보존)"], "s": "케이블카가 전지, 걸어 내려오는 길이 저항이에요. 출발점에 돌아오면 높이는 그대로죠.", "fig": null, "fs": 0}], "figs": {"circ": {"svg": "<figure class=\"fig lite\" data-fig=\"circ\"><svg class=\"fig-svg\" viewbox=\"0 0 560 300\" width=\"560\" height=\"300\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\" id=\"fig-phys2-2026-09-30-s6-circ\"><defs><marker id=\"ah-phys2-2026-09-30-s6-circ\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><g data-step=\"1\"><circle cx=\"40\" cy=\"50\" r=\"4\" fill=\"#fff\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/circle><text x=\"29\" y=\"54.55\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"end\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<\/text><path d=\"M40.0 50.0 L100.0 50.0 L106.7 57.0 L113.3 43.0 L120.0 57.0 L126.7 43.0 L133.3 57.0 L140.0 50.0 L200.0 50.0\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/path><text x=\"120.0\" y=\"36.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">R<\/text><circle cx=\"200\" cy=\"50\" r=\"4\" fill=\"#fff\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/circle><text x=\"211\" y=\"54.55\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">B<\/text><line x1=\"46\" y1=\"50\" x2=\"92\" y2=\"50\" stroke=\"#E03131\" stroke-width=\"2.6\" marker-end=\"url(#ah-phys2-2026-09-30-s6-circ)\"><\/line><text x=\"69.0\" y=\"41.0\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">i<\/text><text x=\"120\" y=\"96\" font-size=\"12.5\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">V<tspan baseline-shift=\"sub\" font-size=\"72%\">A<\/tspan> − V<tspan baseline-shift=\"sub\" font-size=\"72%\">B<\/tspan> = iR  (V<tspan baseline-shift=\"sub\" font-size=\"72%\">A<\/tspan> &gt; V<tspan baseline-shift=\"sub\" font-size=\"72%\">B<\/tspan>)<\/text><\/g><g data-step=\"2\"><circle cx=\"260\" cy=\"50\" r=\"4\" fill=\"#fff\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/circle><text x=\"249\" y=\"54.55\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"end\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<\/text><line x1=\"260\" y1=\"50\" x2=\"325.0\" y2=\"50.0\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/line><line x1=\"335.0\" y1=\"50.0\" x2=\"400\" y2=\"50\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/line><line x1=\"325.0\" y1=\"37.0\" x2=\"325.0\" y2=\"63.0\" stroke=\"#1F2A44\" stroke-width=\"3\"><\/line><line x1=\"335.0\" y1=\"37.0\" x2=\"335.0\" y2=\"63.0\" stroke=\"#1F2A44\" stroke-width=\"3\"><\/line><text x=\"330.0\" y=\"31.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">C<\/text><circle cx=\"400\" cy=\"50\" r=\"4\" fill=\"#fff\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/circle><text x=\"411\" y=\"54.55\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">B<\/text><text x=\"330\" y=\"96\" font-size=\"12.5\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">V<tspan baseline-shift=\"sub\" font-size=\"72%\">A<\/tspan> − V<tspan baseline-shift=\"sub\" font-size=\"72%\">B<\/tspan> = q/C<\/text><\/g><g data-step=\"3\"><path d=\"M430.0 50.0 L545.0 50.0\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/path><path d=\"M482.0 50.0 L482.0 112.0\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/path><circle cx=\"482\" cy=\"50\" r=\"3.6\" fill=\"#1F2A44\"><\/circle><line x1=\"434\" y1=\"50\" x2=\"474\" y2=\"50\" stroke=\"#E03131\" stroke-width=\"2.6\" marker-end=\"url(#ah-phys2-2026-09-30-s6-circ)\"><\/line><text x=\"454.0\" y=\"41.0\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">i₁<\/text><line x1=\"492\" y1=\"50\" x2=\"538\" y2=\"50\" stroke=\"#E03131\" stroke-width=\"2.6\" marker-end=\"url(#ah-phys2-2026-09-30-s6-circ)\"><\/line><text x=\"515.0\" y=\"41.0\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">i₂<\/text><line x1=\"482\" y1=\"60\" x2=\"482\" y2=\"106\" stroke=\"#E03131\" stroke-width=\"2.6\" marker-end=\"url(#ah-phys2-2026-09-30-s6-circ)\"><\/line><text x=\"491.0\" y=\"87.55\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">i₃<\/text><text x=\"482\" y=\"134\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">i₁ = i₂ + i₃<\/text><\/g><g data-step=\"4\"><line x1=\"120\" y1=\"250\" x2=\"120.0\" y2=\"210.0\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/line><line x1=\"120.0\" y1=\"200.0\" x2=\"120\" y2=\"160\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/line><line x1=\"106.0\" y1=\"200.0\" x2=\"134.0\" y2=\"200.0\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/line><line x1=\"113.0\" y1=\"210.0\" x2=\"127.0\" y2=\"210.0\" stroke=\"#1F2A44\" stroke-width=\"4.5\"><\/line><text x=\"141.0\" y=\"196.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">+<\/text><text x=\"100.0\" y=\"209.55\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"end\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">ε₁<\/text><path d=\"M120.0 160.0 L180.0 160.0 L186.7 167.0 L193.3 153.0 L200.0 167.0 L206.7 153.0 L213.3 167.0 L220.0 160.0 L280.0 160.0\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/path><text x=\"200.0\" y=\"146.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">R₁<\/text><path d=\"M280.0 160.0 L340.0 160.0 L346.7 167.0 L353.3 153.0 L360.0 167.0 L366.7 153.0 L373.3 167.0 L380.0 160.0 L440.0 160.0\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/path><text x=\"360.0\" y=\"146.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">R₂<\/text><line x1=\"440\" y1=\"160\" x2=\"440.0\" y2=\"200.0\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/line><line x1=\"440.0\" y1=\"210.0\" x2=\"440\" y2=\"250\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/line><line x1=\"426.0\" y1=\"200.0\" x2=\"454.0\" y2=\"200.0\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/line><line x1=\"433.0\" y1=\"210.0\" x2=\"447.0\" y2=\"210.0\" stroke=\"#1F2A44\" stroke-width=\"4.5\"><\/line><text x=\"419.0\" y=\"196.0\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">+<\/text><text x=\"460.0\" y=\"209.55\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">ε₂<\/text><path d=\"M120.0 250.0 L440.0 250.0\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/path><line x1=\"330\" y1=\"250\" x2=\"230\" y2=\"250\" stroke=\"#E03131\" stroke-width=\"2.6\" marker-end=\"url(#ah-phys2-2026-09-30-s6-circ)\"><\/line><text x=\"280.0\" y=\"269.4\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">i<\/text><path d=\"M264.4 196.0 A 18 18 0 1 1 264.4 214.0\" fill=\"none\" stroke=\"#2F9E44\" stroke-width=\"2\" marker-end=\"url(#ah-phys2-2026-09-30-s6-circ)\"><\/path><\/g><g data-step=\"5\"><text x=\"280\" y=\"292\" font-size=\"13.5\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">고리 규칙 Σε = ΣΔV :  ε₁ − ε₂ = iR₁ + iR₂<\/text><\/g><\/svg><figcaption>판서 ⑤. 저항은 전류가 들어가는 쪽이 높은 전위, 분기점은 들어온 전류 = 나간 전류, 고리를 한 바퀴 돌면 기전력의 합 = 전위 강하의 합. 고리를 시계 방향으로 돌면 \\(\\varepsilon_1\\)은 −극→+극이라 \\(+\\), \\(\\varepsilon_2\\)는 +극→−극이라 \\(-\\).<\/figcaption><\/figure>", "max": 5}}, "say": null}], "quiz": [{"id": "q1", "qn": "확인 1 · 22장 ↔ 24장 짝", "html": "점전하 \\(q\\)에서 거리 \\(r\\)인 곳의 전기장 크기와 전위의 짝으로 옳은 것은? (\\(k=\\frac{1}{4\\pi\\varepsilon_0}\\), \\(q&gt;0\\))", "choices": [{"html": "\\(E=kq/r,\\ V=kq/r^2\\)", "ok": false, "k": 1}, {"html": "\\(E=kq/r^2,\\ V=kq/r\\)", "ok": true, "k": 0}, {"html": "\\(E=kq/r,\\ V=kqr\\)", "ok": false, "k": 3}, {"html": "\\(E=kq/r^2,\\ V=kq/r^2\\)", "ok": false, "k": 2}], "ans": "\\(V\\)는 \\(E\\)를 선적분한 것 — \\(1/r^2\\)을 적분하면 \\(1/r\\)."}, {"id": "q2", "qn": "확인 2 · 가우스 법칙 구", "html": "반지름 \\(R\\)인 부도체구에 전하 \\(q(&gt;0)\\)가 고르게 퍼져 있다. 구 안(\\(r&lt;R\\))의 전기장 크기는?", "choices": [{"html": "\\(\\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{r^2}\\)", "ok": false, "k": 2}, {"html": "\\(\\frac{1}{4\\pi\\varepsilon_0}\\frac{q}{R^2}\\)", "ok": false, "k": 3}, {"html": "\\(0\\)", "ok": false, "k": 1}, {"html": "\\(\\frac{1}{4\\pi\\varepsilon_0}\\frac{r}{R^3}q\\)", "ok": true, "k": 0}], "ans": "\\(q_{enc}=q\\,r^3/R^3\\) → \\(E\\cdot4\\pi r^2=q_{enc}/\\varepsilon_0\\). 3번(\\(E=0\\))은 도체구 안."}, {"id": "q3", "qn": "확인 3 · 전류 밀도", "html": "전류 밀도 \\(J\\)의 식과 단위로 옳은 것은? (\\(n\\): 수밀도, \\(e\\): 기본 전하의 크기, \\(v_d\\): 유동 속도)", "choices": [{"html": "\\(J=ne/v_d\\), A/m", "ok": false, "k": 3}, {"html": "\\(J=nev_d\\), A", "ok": false, "k": 1}, {"html": "\\(J=nev_d\\), A/m²", "ok": true, "k": 0}, {"html": "\\(J=nev_dA\\), A/m²", "ok": false, "k": 2}], "ans": "\\(J=i/A=nev_d\\). \\(neAv_d\\)는 \\(J\\)가 아니라 전류 \\(i\\)."}, {"id": "q4", "qn": "확인 4 · 유동 속도", "html": "단면적 \\(1.0\\ \\mathrm{mm^2}\\)인 구리선에 \\(1.0\\) A가 흐른다. \\(n=8.5\\times10^{28}\\ \\mathrm{m^{-3}}\\), \\(e=1.6\\times10^{-19}\\) C일 때 유동 속도는?", "choices": [{"html": "약 \\(7.4\\times10^{-5}\\) m/s", "ok": true, "k": 0}, {"html": "약 \\(3\\times10^{8}\\) m/s", "ok": false, "k": 3}, {"html": "약 \\(1.4\\times10^{4}\\) m/s", "ok": false, "k": 2}, {"html": "약 \\(7.4\\times10^{-2}\\) m/s", "ok": false, "k": 1}], "ans": "\\(v_d=\\dfrac{i}{neA}=\\dfrac{1.0}{8.5\\times10^{28}\\times1.6\\times10^{-19}\\times1.0\\times10^{-6}}\\approx7.4\\times10^{-5}\\) m/s — 1초에 0.07 mm. mm²를 m²로(\\(10^{-6}\\)) 바꾸는 것을 잊지 말 것."}, {"id": "q5", "qn": "확인 5 · R = ρL/A 유도", "html": "등방성 도체(길이 \\(L\\), 단면 \\(A\\))에서 \\(R=\\rho L/A\\)를 유도하라.", "choices": null, "ans": "\\(\\vec E=\\rho\\vec J\\), \\(E\\) 일정 → \\(\\Delta V=EL=\\rho JL\\). \\(J=i/A\\)를 넣으면 \\(\\Delta V=\\rho\\frac{i}{A}L\\) → \\(R=\\frac{\\Delta V}{i}=\\rho\\frac{L}{A}\\). (교수님: 시험 핵심은 이 유도)"}, {"id": "q6", "qn": "확인 6 · 판서 ③ 예", "html": "같은 물질로 길이를 \\(\\tfrac12\\)로, 단면적을 2배로 만든 도선의 저항은 원래의 몇 배인가?", "choices": [{"html": "4배", "ok": false, "k": 2}, {"html": "\\(\\tfrac14\\)배", "ok": true, "k": 0}, {"html": "\\(\\tfrac12\\)배", "ok": false, "k": 3}, {"html": "1배", "ok": false, "k": 1}], "ans": "\\(R\\propto L/A=\\frac{1/2}{2}=\\frac14\\). 수업 예(교수님: 이런 배수 문제는 시험에 안 낸다)."}, {"id": "q7", "qn": "확인 7 · 완화 시간", "html": "\\(\\vec F=q\\vec E-b\\vec v\\)에서 \\(\\vec F=0\\)일 때 정의하는 충돌 완화 시간 \\(\\tau\\)는?", "choices": [{"html": "\\(\\tau=qE/b\\)", "ok": false, "k": 2}, {"html": "\\(\\tau=b/m\\)", "ok": false, "k": 1}, {"html": "\\(\\tau=mb\\)", "ok": false, "k": 3}, {"html": "\\(\\tau=m/b\\)", "ok": true, "k": 0}], "ans": "\\(\\vec v=q\\vec E/b=\\frac{q\\vec E}{m}\\cdot\\frac mb\\) → \\(\\tau=m/b\\), \\(\\vec v=q\\vec E\\tau/m\\)."}, {"id": "q8", "qn": "확인 8 · 접점 규칙", "html": "분기점으로 \\(i_1=5\\) A가 들어오고 한쪽으로 \\(i_2=2\\) A가 나간다. 나머지 가지의 전류 \\(i_3\\)와 이 법칙의 뿌리는?", "choices": [{"html": "2.5 A, 에너지 보존", "ok": false, "k": 3}, {"html": "7 A, 전하량 보존", "ok": false, "k": 1}, {"html": "3 A, 전하량 보존", "ok": true, "k": 0}, {"html": "3 A, 에너지 보존", "ok": false, "k": 2}], "ans": "\\(i_1=i_2+i_3\\) → \\(i_3=3\\) A. 제1법칙 = 전하량 보존, 제2법칙(고리) = 에너지 보존."}, {"id": "q9", "qn": "확인 9 · 저항의 전위차", "html": "\\(R=3\\ \\Omega\\)인 저항에 A → B 방향으로 \\(2\\) A가 흐른다. \\(V_A-V_B\\)는?", "choices": [{"html": "\\(+6\\) V (A가 높다)", "ok": true, "k": 0}, {"html": "\\(0\\) V", "ok": false, "k": 3}, {"html": "\\(+1.5\\) V", "ok": false, "k": 2}, {"html": "\\(-6\\) V (B가 높다)", "ok": false, "k": 1}], "ans": "\\(V_A-V_B=iR=2\\times3=6\\) V. 전류가 들어가는 쪽이 높은 전위."}, {"id": "q10", "qn": "확인 10 · 고리 규칙", "html": "한 고리에 기전력 \\(\\varepsilon_1=12\\) V, \\(\\varepsilon_2=3\\) V인 전지가 서로 반대 방향으로, 저항 \\(R_1=2\\ \\Omega\\), \\(R_2=1\\ \\Omega\\)이 직렬로 있다. 고리 전류는? (\\(\\varepsilon_1\\)이 미는 방향을 고리 방향으로)", "choices": [{"html": "9 A", "ok": false, "k": 3}, {"html": "4 A", "ok": false, "k": 2}, {"html": "3 A", "ok": true, "k": 0}, {"html": "5 A", "ok": false, "k": 1}], "ans": "\\(\\sum\\varepsilon=\\sum\\Delta V\\): \\(\\varepsilon_1-\\varepsilon_2=i(R_1+R_2)\\) → \\(12-3=3i\\) → \\(i=3\\) A."}], "v": 2, "ver": "2026-10-02a", "nodes": {"sec": {}, "q": {}}};
+const V2=D.v===2, VER=String(D.ver||"");
+const LESSON_REL="../../lessons/phys2/2026-09-30.html", LESSON_APP="notes/lessons/phys2/2026-09-30.html";
+const $=s=>document.querySelector(s), $$=(s,el)=>Array.from((el||document).querySelectorAll(s));
+const UPH=document.getElementById("upHint");   /* 위 판서 버튼 — 그리는 곳은 머리글(#chk) 안 쪽수 앞. board() 가 머리글을 새로 쓸 때마다 다시 끼운다 */
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const TODAY=()=>fmt(new Date()), YDAY=()=>{const d=new Date();d.setDate(d.getDate()-1);return fmt(d);};
+const KEY="mc-tutor", LKEY="mc-lesson-"+D.id;
+const load=(k,def)=>{ try{ const v=JSON.parse(localStorage.getItem(k)||"null"); return (v&&typeof v==="object")?Object.assign(def,v):def; }catch(e){ return def; } };
+let T=load(KEY,{v:1,xp:0,streak:0,last:"",hearts:3,hday:"",aff:20,lessons:{}});
+if(!T.lessons||typeof T.lessons!=="object") T.lessons={};
+function dayReset(){ const td=TODAY(); if(T.hday!==td){ T.hearts=3; T.hday=td; } if(T.last&&T.last!==td&&T.last!==YDAY()) T.streak=0; }
+dayReset();
+let L=T.lessons[D.id]||(T.lessons[D.id]={pos:null,ch:{},done:false,xp:0,rew:{}});
+if(!L.rew||typeof L.rew!=="object") L.rew={}; if(!L.ch||typeof L.ch!=="object") L.ch={};
+/* 구버전(.79 이전) 지급 이력 이행: 그때는 L.ch/L.done 이 곧 지급 기록이었다 → 새 보상 키로 옮겨 재진입 때 챕터 +10·완료 +20 을 다시 주지 않는다(오타 2차 R5). 문제 키 rew[qid] 는 그대로 */
+Object.keys(L.ch).forEach(id=>{ if(L.ch[id]&&!L.rew["ch:"+id]) L.rew["ch:"+id]=true; }); if(L.done&&!L.rew.done) L.rew.done=true;
+let ST=load(LKEY,{read:{},done:{},correct:{},answer:{},ts:0});
+const CH=D.chapters, QZ=D.quiz||[], NCH=CH.length+(QZ.length?1:0);
+/* 스앵님 판정 기록 — 무엇을 알고 모르는지는 스앵님이 학습 기록으로 판단한다(대표님 2026-09-29). 노드 연결 = D.nodes(knowledge/lesson_nodes.json), 판정 = tutor_judge.js(TJ) */
+const NDS=D.nodes||{sec:{},q:{}}, CONF={}, secN=id=>(NDS.sec||{})[id]||[], qN=id=>(NDS.q||{})[id]||[];
+function ev(k,x){ try{ if(!window.TJ) return; const o=Object.assign({k:k,lid:D.id},x||{}); if(o.n&&o.n.length) TJ.rec(o); }catch(e){} }
+/* 객관식 보기는 빌드 때 섞인다(quizmix). 보기 k = 원문 순서 → 고른 보기를 k 로 저장(섞기 전 저장값 = 원문 순서라 그대로 맞는다) */
+const ck=(c,i)=>String(c&&c.k!=null?c.k:i);
+const EMB=window.parent!==window;
+let REDUCE=false; try{ REDUCE=!!(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches); }catch(e){}
+let S={mode:"intro",ci:0,si:0,qi:0,rev:false,again:0,resume:false,pre:"",preFace:""};   /* pre = 다음 화면 대사 앞에 붙일 안내 대사 */
+/* ---------- 저장 위치: 정수·범위 정리 + v2 는 고정 id·버전 (오타 v55 1 · 설계 2차 5) ----------
+   규칙: v2 — ver 불일치 → 그 챕터 처음(cid 없으면 목차) · sid 없음 → 챕터 처음 · v1 저장값(ci/si) 은 범위 안이면 그대로 · qi 는 항상 범위로 · fs 는 저장하지 않고 단계에서 다시 계산 */
+const toInt=v=>Number.isInteger(v)?v:((typeof v==="string"&&/^-?\d+$/.test(v))?parseInt(v,10):NaN);   /* "1junk" 같은 값은 숫자로 안 본다 */
+function posOf(){ const p=(L.pos&&typeof L.pos==="object")?L.pos:{}; const mode=(p.mode==="quiz"||p.mode==="step"||p.mode==="result")?p.mode:"step";
+  let qi=toInt(p.qi); if(!Number.isInteger(qi)||qi<0||qi>=QZ.length) qi=0;
+  let ci=-1, si=0, note="";
+  if(V2){ const v2save=("ver" in p)||("cid" in p)||("sid" in p);   /* v2 저장값(손상 포함)과 구버전(v1: ci/si 만) 저장값을 구분 */
+    if(v2save){ if(typeof p.cid==="string") ci=CH.findIndex(c=>c.id===p.cid);
+      if(ci<0) return {mode:mode==="quiz"?"quiz":"intro",ci:0,si:0,qi:qi,note:"챕터 못 찾음"};
+      if(String(p.ver||"")!==VER){ si=0; note="판서가 바뀌어 챕터 처음부터"; }
+      else if(typeof p.sid==="string"){ si=CH[ci].steps.findIndex(s=>s.id===p.sid); if(si<0){ si=0; note="단계 못 찾음"; } }
+      else { si=0; note="단계 못 찾음"; } }
+    else { const c2=toInt(p.ci); if(!Number.isInteger(c2)||c2<0||c2>=CH.length) return {mode:mode==="quiz"?"quiz":"intro",ci:0,si:0,qi:qi,note:"구버전 저장값"};
+      ci=c2; si=0; note="구버전 저장값이라 챕터 처음부터"; } }
+  else { ci=toInt(p.ci); if(!Number.isInteger(ci)||ci<0||ci>=CH.length) ci=0;
+    const n=(CH[ci]||{steps:[]}).steps.length; si=toInt(p.si); if(!Number.isInteger(si)||si<0) si=0; else if(si>=n) si=Math.max(0,n-1); }
+  return {mode:mode,ci:ci,si:si,qi:qi,note:note}; }
+/* 저장 위치로 화면을 옮긴다 — #resume 해시와 목차의 「이어서 하기」가 같은 함수를 쓴다(오타 R4). 문제 위치는 저장한 qi 그대로(범위는 posOf 가 정리), 전부 채점됐으면 결과 */
+function resumeTo(p){ cancelAll(); S=Object.assign(S,{mode:p.mode,ci:p.ci,si:p.si,qi:p.qi,rev:false,again:0,resume:true,pre:"",preFace:""});
+  if(S.mode==="quiz"){ if(!QZ.length) S.mode="result"; else if(QZ.every(q=>typeof ST.correct[q.id]==="boolean")) S.mode="result"; }
+  if(S.mode==="step"&&!CH.length) S.mode="intro";
+  if(S.mode==="intro"||S.mode==="result") S.resume=false;
+  render(); if(p.note) $("#dTip").textContent=p.note; }
+/* 안내 대사(챕터 완료·문제 시작)는 다음 화면 대사 앞에 붙인다 — render 뒤 say() 를 또 부르면 단계의 완료 콜백이 사라진다(오타 R2) */
+function preLine(line,face){ if(S.pre){ line=S.pre+" "+line; face=S.preFace||face; S.pre=""; S.preFace=""; } return [line,face]; }
+function savePos(){ if(S.mode!=="step"&&S.mode!=="quiz") return; const ch=CH[S.ci]||{}, st=(ch.steps||[])[S.si]||{};
+  L.pos= V2? {mode:S.mode,cid:ch.id||null,sid:st.id||null,qi:S.qi,ver:VER,ci:S.ci,si:S.si} : {mode:S.mode,ci:S.ci,si:S.si,qi:S.qi}; }
+/* ---------- 저장 ---------- */
+function save(){
+  T.lessons[D.id]=L; try{ localStorage.setItem(KEY,JSON.stringify(T)); ST.ts=Date.now(); localStorage.setItem(LKEY,JSON.stringify(ST)); }catch(e){}
+  try{ const dc=CH.filter(c=>L.ch[c.id]).length, qd=QZ.filter(q=>ST.done[q.id]).length;
+    const where= S.mode==="quiz"?"확인 문제 "+(S.qi+1)+"/"+QZ.length : S.mode==="result"?"결과" : S.mode==="step"?"CH "+(S.ci+1)+" · "+(CH[S.ci]||{}).title : "목차";
+    const li={deck:D.id,title:document.title,href:location.href.split("#")[0],idx:Math.max(0,dc-1),n:CH.length,sid:(CH[S.ci]||{}).id||"",part:null,partTitle:document.title.slice(0,60),where:String(where).slice(0,80),qDone:qd,qN:QZ.length,ts:Date.now()};
+    const j=JSON.stringify(li); localStorage.setItem("mc-slides-last",j); localStorage.setItem("mc-slides-last-"+D.id,j); }catch(e){}
+}
+/* ---------- HUD ---------- */
+const lvl=xp=>1+Math.floor(xp/150);
+function hud(){
+  $("#hCourse").textContent=D.course; $("#hSess").textContent=D.sess;
+  const dc=CH.filter(c=>L.ch[c.id]).length, qAll=QZ.length&&QZ.every(q=>ST.done[q.id]);
+  const cur= S.mode==="quiz"||S.mode==="result"? NCH : S.mode==="step"? S.ci+1 : Math.min(NCH,dc+1);
+  $("#hCh").textContent="CH "+cur+"/"+NCH;
+  $("#hSeg").innerHTML=CH.map((c,i)=>'<i class="'+(L.ch[c.id]?"on":(S.mode==="step"&&S.ci===i?"cur":""))+'"></i>').join("")+(QZ.length?'<i class="'+(qAll?"on":(S.mode==="quiz"?"cur":""))+'"></i>':"");
+  $("#hXp").textContent=T.xp; $("#hLv").textContent="Lv "+lvl(T.xp); $("#sXp").title="경험치 "+T.xp+" · 다음 레벨까지 "+(150-T.xp%150);
+  $("#hStreak").textContent=T.streak; $("#sSk").title="연속 학습 "+T.streak+"일";
+  $("#hHearts").innerHTML=[0,1,2].map(i=>'<svg viewBox="0 0 24 24" fill="'+(i<T.hearts?"#FF4B4B":"none")+'" stroke="'+(i<T.hearts?"#D42020":"#C9C9C9")+'" stroke-width="1.8" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.3-9.2C1.5 8.5 3.6 5 7 5c2 0 3.6 1.1 5 2.6C13.4 6.1 15 5 17 5c3.4 0 5.5 3.5 4.3 6.8C19.5 16.4 12 21 12 21z"/></svg>').join("");
+  $("#hHearts").title="하트 "+T.hearts+"/3 · 틀리면 하나씩, 매일 3개로";
+  $("#hAff").style.width=Math.max(0,Math.min(100,T.aff))+"%"; $("#sAf").title="호감도 "+T.aff+" · "+affName();
+  const ch=CH[S.ci]; if(S.mode==="step"&&ch){ $("#pV").textContent=(S.si+1)+" / "+ch.steps.length+" 단계"; $("#pBar").style.width=Math.round((S.si+1)/ch.steps.length*100)+"%"; } else { $("#pV").textContent= S.mode==="quiz"?"확인 문제 "+(S.qi+1)+"/"+QZ.length : "—"; $("#pBar").style.width= S.mode==="quiz"?Math.round((S.qi+1)/Math.max(1,QZ.length)*100)+"%":"0%"; }
+  $("#chpills").innerHTML='<span class="lb">챕터</span>'+CH.map((c,i)=>'<button type="button" class="pill'+(L.ch[c.id]?" done":"")+(S.mode==="step"&&S.ci===i?" cur":"")+'" data-pill="'+i+'">'+(i+1)+' · '+esc(shortT(c.title))+'</button>').join("")+(QZ.length?'<button type="button" class="pill'+(qAll?" done":"")+(S.mode==="quiz"||S.mode==="result"?" cur":"")+'" data-pill="q">확인 문제</button>':"");
+  $$("#chpills [data-pill]").forEach(b=>{ b.onclick=()=>{ cancelAll(); if(b.dataset.pill==="q"){ if(!QZ.length) return; if(T.hearts<=0&&QZ.some(q=>!ST.done[q.id])){ S.mode="nohearts"; return render(); } S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; } else { S=Object.assign(S,{mode:"step",ci:+b.dataset.pill,si:0,rev:false,again:0,resume:false}); } render(); }; });
+}
+const shortT=t=>{ t=String(t||""); const i=t.indexOf(" — "); t=i>0?t.slice(0,i):t; return t.length>13?t.slice(0,12)+"…":t; };
+function affName(){ return T.aff>=85?"전적으로 믿는":T.aff>=60?"인정":T.aff>=30?"지켜보는 중":"무관심"; }
+function pop(sel,txt,bad){ const el=$(sel); if(!el) return; const p=document.createElement("span"); p.className="pop"+(bad?" bad":""); p.textContent=txt; el.appendChild(p); setTimeout(()=>p.remove(),1200); }
+function gainXP(n){ T.xp+=n; L.xp=(L.xp||0)+n; pop("#sXp","+"+n+" XP"); }
+function gainAff(n){ T.aff=Math.max(0,Math.min(100,T.aff+n)); pop("#sAf",(n>0?"+":"")+n,n<0); }
+function touchStreak(){ dayReset(); const td=TODAY(); if(T.last===td) return; T.streak=(T.last===YDAY())?T.streak+1:1; T.last=td; pop("#sSk","+1"); }
+/* ---------- 대사 풀 (v1 회차 · 공통 안내) — 일타강사 구어체 존댓말 ---------- */
+/* 말투 = 일타강사 구어체 존댓말(대표님 2026-09-27 확정, 9/28 「말투 수정 안 됨」 → 전부 다시 씀): 「자, ~해 볼게요 / ~예요 / ~입니다」, 짧게 끊고 이유 한 줄과 다음 행동 하나. 명령·협박·비꼼 금지 */
+const LINES={
+  intro:["자, 앉으세요. 오늘은 {n}챕터, 대략 {min}분이면 됩니다. 눈으로만 훑으면 남는 게 없으니까 한 장씩 같이 넘겨 볼게요.","오늘 분량은 {n}챕터예요. 길지 않아요. 시작하면 끝까지 한 번에 가는 게 제일 편합니다.","오늘 {n}챕터, 순서대로만 따라오시면 됩니다. 막히면 「다시 설명」 누르세요. 그러라고 있는 버튼이에요."],
+  again_intro:["다시 오셨네요. 지난번 자리에서 이어갈게요. 앞이 흐릿하면 목차에서 한 챕터 앞으로 돌아가도 됩니다.","이어서 해요. 어제 한 건 어제 것이고, 오늘은 오늘 몫만 하면 됩니다."],
+  done_intro:["이 회차는 이미 끝내셨어요. 다시 보는 건 아주 좋은 습관이에요. 틀렸던 문제부터 보면 효율이 제일 좋습니다.","복습이네요. 두 번째는 빠르게 가고, 대신 외울 것 상자는 눈 감고 말할 수 있는지만 확인해 봅시다."],
+  chapter:["자, 챕터 {c}. {title}. 여기서부터 시험 문제가 나오기 시작해요.","{title}입니다. 이 챕터가 잡혀야 다음 챕터가 읽히니까, 여기서 천천히 갈게요.","챕터 {c}예요. 제목을 한 번 소리 내 읽고 시작해 보세요. 그게 목차를 머리에 심는 방법이에요."],
+  talk:["자, 읽어 볼게요. 굵은 글씨는 시험에 그대로 나오는 말이에요.","한 문장씩이요. 이해 안 되는 문장이 있으면 넘기지 말고 「다시 설명」을 눌러 주세요.","여기까지 읽고, 방금 읽은 걸 한 줄로 말해 보세요. 말로 나오면 아는 거예요.","천천히 가도 됩니다. 빨리 넘기는 것보다 한 번 제대로 읽는 게 훨씬 빨라요."],
+  fig:["글보다 그림이 먼저예요. 그림부터 보세요.","이 그림을 백지에 다시 그릴 수 있으면 이 챕터는 끝난 거예요.","화살표 방향이랑 글자 위치까지 눈에 넣어 두세요. 시험 그림이 바로 이 그림입니다."],
+  why:["왜 그런지 한 번만 붙잡고 가요. 「왜」를 알면 공식을 잊어도 다시 만들 수 있어요.","이유를 읽는 학생이 끝까지 남습니다. 여기가 그 부분이에요."],
+  analogy:["비유예요. 비유로 감을 잡고, 식은 비유 없이도 쓸 수 있어야 해요.","이해가 안 될 때 돌아올 자리예요. 지금은 가볍게 읽고 넘어가도 됩니다."],
+  formula:["이 식은 외우셔야 해요. 이해했다고 안 외우면 시험장에서 손이 안 움직입니다. 세 번만 써 보세요.","시험지에는 이 식이 안 적혀 있어요. 머릿속에서 나와야 합니다."],
+  pitfall:["여기서 반은 틀려요. 눈에 새겨 두세요.","채점할 때 제일 많이 깎이는 자리예요. 실수가 아니라 준비 부족이니까, 지금 준비해 두면 됩니다."],
+  memo:["정리예요. 이 상자는 시험 전날 한 번 더 봅니다.","여기 있는 것만 외워도 기본 점수는 나와요. 하나도 빼지 마세요."],
+  say:["교수님이 직접 하신 말이에요. 강조한 건 그대로 시험에 나옵니다.","교수님 말은 출제 의도예요. 문장 그대로 기억해 두세요."],
+  ex:["예제예요. 답부터 보지 말고 30초만 생각해 보세요. 그다음 풀이를 열어요.","풀이 보기 전에 첫 식부터 세워 볼까요. 안 세워지면 앞 챕터로 잠깐 돌아가도 됩니다."],
+  exopen:["풀이예요. 식이 왜 그렇게 세워졌는지만 보세요. 계산은 나중이에요.","한 줄 한 줄 「왜」를 붙여 보세요. 답만 맞는 건 의미가 없어요."],
+  again:["자, 다시 볼게요. 이번엔 굵은 글씨만 먼저 읽고, 그다음 문장을 읽어 보세요.","좋아요. 모른다고 말하는 게 실력이 느는 시작이에요. 한 번 더 갑니다.","한 번 더요. 이번엔 판서를 손가락으로 짚으면서 읽어 보세요."],
+  ask:["물어보세요. 애매하게 넘어가는 게 제일 손해예요.","질문은 구체적으로요. 어디서 막혔는지 말해 주시면 거기서부터 풀어 드릴게요."],
+  askoff:["질문은 앱 안에서 열었을 때 받을 수 있어요. 지금은 막힌 곳만 적어 두세요."],
+  chdone:["챕터 {c} 끝. 넘어갈게요.","됐어요. 다음이요.","좋아요. 이 속도로 가면 됩니다."],
+  chdone_warm:["잘 따라오고 있어요. 다음 챕터 갑니다.","좋아요. 오늘 집중이 괜찮네요."],
+  quiz:["자, 확인 문제 {n}개예요. 하트는 {h}개. 틀리면 하나씩 줄어드니까 찍지 말고 풀어 보세요.","이제 확인해 볼게요. 읽은 게 남았는지, 지나갔는지 여기서 갈립니다."],
+  q:["문제 {k}. 읽고 고르세요.","{k}번이에요. 보기를 다 읽고 나서 고르세요.","문제 {k}. 서두를 것 없어요."],
+  qin:["답을 쓰는 문제예요. 답만 간단히 쓰고 「답 보기」를 눌러 주세요."],
+  ok:["맞아요.","정답. 왜 맞았는지도 말할 수 있으면 완전히 아는 거예요.","좋아요. 계속 가요."],
+  ok_warm:["맞아요. 이런 학생이면 가르칠 맛이 나요.","정답. 오늘 눈빛이 다르네요."],
+  bad:["틀렸어요. 해설을 읽어 보세요. 같은 문제를 두 번 틀리지 않게만 하면 됩니다.","아니에요. 어디서 갈렸는지 해설에서 찾아보세요. 거기가 오늘 배운 자리예요."],
+  nohearts:["하트가 없네요. 챕터 하나를 다시 보고 오면 하트 하나 돌려드릴게요."],
+  heartback:["하트 하나 돌려드릴게요. 이번엔 읽은 대로 풀어 보세요."],
+  res_good:["오늘은 됐어요. 이 결과는 운이 아니라 순서대로 한 결과예요.","{ok}/{n}. 인정합니다. 내일도 같은 시간에 봐요."],
+  res_mid:["{ok}/{n}. 반은 넘겼지만 아직이에요. 틀린 문제를 지금 바로 다시 풀어 볼까요."],
+  res_bad:["{ok}/{n}. 읽은 게 아니라 본 거예요. 괜찮아요, 챕터부터 다시 가면 됩니다."],
+  chapter_face:{talk:"neutral",fig:"neutral",why:"sharp",analogy:"smile",formula:"sharp",pitfall:"angry",memo:"neutral",say:"neutral",ex:"sharp",exopen:"neutral",board:"neutral",v2:"neutral"}
+};
+function hash(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return (h>>>0); }
+function pick(pool,seed,vars){ const arr=LINES[pool]||[]; if(!arr.length) return ""; const t=arr[hash(D.id+"|"+pool+"|"+seed)%arr.length]; return t.replace(/\{(\w+)\}/g,(m,k)=>(vars&&k in vars)?vars[k]:m); }
+const warm=()=>T.aff>=60;
+/* ---------- 애니메이션 예약 관리: 타이머·RAF·전환 콜백을 한 곳에서 취소 (설계 2차 4) ---------- */
+const pend={t:[],raf:[],tr:[]}; let anim=null;   /* anim = {phase, finish} 진행 중 단계 */
+/* 실행된 예약은 목록에서 빼서 pending 이 실제 미실행 수가 되게 한다(오타 구현 검수 1차) */
+function later(fn,ms){ const id=setTimeout(()=>{ const k=pend.t.indexOf(id); if(k>=0) pend.t.splice(k,1); fn(); },ms); pend.t.push(id); return id; }
+function raf(fn){ const id=requestAnimationFrame(()=>{ const k=pend.raf.indexOf(id); if(k>=0) pend.raf.splice(k,1); fn(); }); pend.raf.push(id); return id; }
+/* fn(real): real=true 는 실제 transitionend, false 는 예비 타임아웃(탭이 숨겨져 RAF·전환이 멈춘 경우) */
+function onEnd(el,dur,fn){ let done=false; const ent={el:el,fn:null}; const go=real=>{ if(done) return; done=true; el.removeEventListener("transitionend",ent.fn); const k=pend.tr.indexOf(ent); if(k>=0) pend.tr.splice(k,1); fn(real); }; ent.fn=e=>{ if(e.target===el) go(true); }; el.addEventListener("transitionend",ent.fn); pend.tr.push(ent); later(()=>go(false),dur+80); }
+function cancelAll(){ pend.t.forEach(clearTimeout); pend.t=[]; pend.raf.forEach(id=>cancelAnimationFrame(id)); pend.raf=[]; pend.tr.forEach(x=>x.el.removeEventListener("transitionend",x.fn)); pend.tr=[]; if(typing){ clearInterval(typing); typing=null; } anim=null; geRest(); }
+function finishNow(){ const a=anim; if(typing){ clearInterval(typing); typing=null; $("#dText").textContent=fullText; typeDone=null; moreChk(); } cancelAll(); if(a&&a.finish) a.finish(); }
+/* ---------- 타자 ---------- */
+let typing=null, fullText="", typeDone=null, TYPE_MS=22;   /* TYPE_MS 는 검사기가 빠르게 돌릴 때 줄인다(__cr.speed) */
+let FIGONLY=false, SAY_INSTANT=false;   /* 「다시 보기」: 대사·판서는 즉시, 그림 애니메이션만 다시 */
+/* 김주영 스앵님 실사풍 일러스트: notes/classroom/assets/tutor/<face>.png (이 페이지 기준 ../assets/tutor/). neutral 이 열리면 그림으로, 아니면 SVG 치비 그대로. 끄기: ?tutor=svg 또는 localStorage mc-tutor-svg=1 */
+const TUTOR_IMG="../assets/tutor/", FACES=["neutral","sharp","smile","angry","wide","proud"]; let curFace="neutral", RASTER=false;
+/* v4 전자칠판: 칠판 옆 전신 — 목차·단계 = 지시봉(pose-point, 좌우 반전해 판서를 가리킴) · 문제 = 노트(pose-book) · 결과 = 팔짱(pose-cross). 표정은 자막 옆 얼굴(#faceImg). 포즈 파일이 없으면 흉상으로 */
+const POSE_OK={}; function poseFile(mode){ return mode==="result"?"pose-cross":(mode==="quiz"||mode==="nohearts")?"pose-book":"pose-point"; }
+function faceImg(face){ const im=$("#tutorImg"), box=$("#tutor"), av=$("#faceImg"); if(!im||!RASTER) return; const p=poseFile(S.mode); const usePose=!!(p&&POSE_OK[p]!==false);
+  const fsrc=TUTOR_IMG+(FACES.indexOf(face)>=0?face:"neutral")+".png";
+  if(av){ if(av.getAttribute("src")!==fsrc) av.setAttribute("src",fsrc); av.hidden=false; }   /* v4: 표정 = 자막 옆 얼굴 · 칠판 옆 = 전신 포즈 */
+  const gn=p?p.replace("pose-",""):"", useG=!!(usePose&&GE.has[gn]===true);   /* 동작 세트가 있으면 쉬는 자세도 세트 그림(같은 캔버스) */
+  const src=usePose?(useG?TUTOR_G+gn+".png":TUTOR_IMG+p+".png"):fsrc; box.classList.toggle("pose",usePose); box.classList.toggle("gset",useG);
+  if(im.getAttribute("src")!==src){ im.onerror=usePose?function(){ POSE_OK[p]=false; im.onerror=null; box.classList.remove("pose"); faceImg(face); }:null; im.setAttribute("src",src); } }
+(function(){ let off=false; try{ off=/[?&]tutor=svg\b/.test(location.search)||localStorage.getItem("mc-tutor-svg")==="1"; }catch(e){} if(off) return;
+  const probe=new Image(); probe.onload=function(){ RASTER=true; $("#tutor").classList.add("raster"); faceImg(curFace); gePreload(); }; probe.onerror=function(){ RASTER=false; }; probe.src=TUTOR_IMG+"neutral.png"; })();
+/* 스앵님 동작·표정 엔진 — 동작 그림 pose-<이름>.png: talk 설명 · stress 강조 · up 지시봉 위 · think 생각 · praise 엄지 · strict 허리에 손 (+ 쉬는 자세 point · book · cross).
+   말하는 동안 1.9초마다 두 겹(#tg1·#tg2)을 번갈아 교차 페이드, 타자가 끝나면 0.9초 뒤 쉬는 자세(#tutorImg). 없는 그림은 건너뛰고, 동작 줄이기·즉시 대사면 쉬는 자세 그대로 */
+const GEST={neutral:["talk","point","up"],sharp:["stress","point","talk"],smile:["talk","praise"],angry:["strict","stress"],proud:["praise","talk"],wide:["think","talk"]};
+/* 동작 세트 = notes/classroom/assets/tutor/g/<이름>.png (640×1000, 같은 키·발 줄·몸 중심 — docs/tools/tutor_gesture_cut.py). 쉬는 자세(point·book·cross)도 이 세트로 바꿔야 겹칠 때 안 튄다 */
+const TUTOR_G=TUTOR_IMG+"g/";
+const GE={has:{point:null,book:null,cross:null,talk:null,stress:null,up:null,think:null,praise:null,strict:null},t:null,h:null,cur:null,flip:0};
+function gePreload(){ let left=Object.keys(GE.has).length; const done=()=>{ if(--left===0) faceImg(curFace); };   /* 다 받으면 쉬는 자세도 세트로 */
+  Object.keys(GE.has).forEach(n=>{ const im=new Image(); im.onload=()=>{ GE.has[n]=true; done(); }; im.onerror=()=>{ GE.has[n]=false; done(); }; im.src=TUTOR_G+n+".png"; }); }
+function geShow(n){ const box=$("#tutor"), a=$("#tg1"), b=$("#tg2"); if(!box||!a||!b||!box.classList.contains("gset")) return;
+  const nx=GE.flip?a:b, pv=GE.flip?b:a, src=TUTOR_G+n+".png"; GE.cur=n;
+  const go=()=>{ nx.classList.add("on"); pv.classList.remove("on"); box.classList.add("gon"); GE.flip^=1; };
+  /* 못 받은 그림은 세트에서 빼고 쉬는 자세로, 늦게 온 onload 는 지금 그림(GE.cur)이 아니면 무시(오타 .91 설계 검수 ⑥) */
+  if(nx.getAttribute("src")===src&&nx.complete&&nx.naturalWidth) go(); else { nx.onload=()=>{ nx.onload=null; nx.onerror=null; if(GE.cur===n) go(); }; nx.onerror=()=>{ nx.onload=null; nx.onerror=null; GE.has[n]=false; if(GE.cur===n) geRest(); }; nx.setAttribute("src",src); } }
+function geRest(){ clearInterval(GE.t); GE.t=null; clearTimeout(GE.h); GE.h=null; GE.cur=null; const box=$("#tutor"); if(box) box.classList.remove("gon"); $$("#tutor .gimg").forEach(g=>g.classList.remove("on")); }
+function geStart(face){ geRest(); if(REDUCE||!RASTER) return;
+  const set=(S.mode==="quiz"||S.mode==="nohearts"?(face==="angry"?["strict","think"]:(face==="smile"||face==="proud")?["praise","book"]:["think","book"]):S.mode==="result"?(face==="angry"?["strict","cross"]:face==="proud"?["praise","cross"]:["talk","cross"]):(GEST[face]||GEST.neutral)).filter(n=>GE.has[n]===true);
+  if(!set.length) return; let i=hash(String(fullText))%set.length; geShow(set[i]); if(set.length>1) GE.t=setInterval(()=>{ i=(i+1)%set.length; geShow(set[i]); },1900); }
+function geEnd(){ clearInterval(GE.t); GE.t=null; clearTimeout(GE.h); GE.h=setTimeout(geRest,S.mode==="result"?4000:900); }
+function say(text,face,name,onDone){
+  const ch=$("#tutor .chibi"); if(ch) ch.setAttribute("data-face",face||"neutral"); curFace=face||"neutral"; faceImg(curFace);
+  const nm=$("#dNameTag"); nm.textContent=name||"김주영 스앵님"; nm.classList.toggle("prof",name==="교수님");
+  const el=$("#dText"); el.classList.remove("open"); { const b=$("#tMore"); if(b) b.hidden=true; } if(typing){ clearInterval(typing); typing=null; }
+  fullText=text; typeDone=onDone||null; el.innerHTML="";
+  if(REDUCE||S.resume||SAY_INSTANT){ geRest(); el.textContent=text; moreChk(); const f=typeDone; typeDone=null; if(f) f(); return; }
+  let i=0; const cur=document.createElement("i"); cur.className="cur"; geStart(curFace);
+  typing=setInterval(()=>{ i++; el.textContent=text.slice(0,i); if(i<text.length){ el.appendChild(cur); el.scrollTop=el.scrollHeight; } else { clearInterval(typing); typing=null; moreChk(); geEnd(); const f=typeDone; typeDone=null; if(f) f(); } },TYPE_MS);
+}
+function skipTyping(){ if(!typing) return false; clearInterval(typing); typing=null; $("#dText").textContent=fullText; moreChk(); geEnd(); const f=typeDone; typeDone=null; if(f) f(); return true; }
+$("#dText").onclick=()=>{ if(!skipTyping()) toggleText(); };   /* 타자 중이면 건너뛰기, 아니면 긴 대사 펼치기(오타 디자인 1차 R6) */
+$("#tMore").onclick=e=>{ e.stopPropagation(); if(!skipTyping()) toggleText(); };
+function toggleText(){ const el=$("#dText"); const o=el.classList.toggle("open"); el.scrollTop=o?0:el.scrollHeight; moreChk(); }
+/* 자막이 네 줄을 넘으면 이름 줄 오른쪽에 「전체 ▾」(타자가 끝난 뒤에만) — 잘린 줄 표시가 없었다(오타 디자인 1차 R6 · 2차 캡처). 펼쳐도 44vh 까지라 조작 줄은 그대로 */
+function moreChk(){ const el=$("#dText"), b=$("#tMore"); if(!el||!b) return; const open=el.classList.contains("open"); b.hidden=!!typing||!(open||el.scrollHeight>el.clientHeight+3); b.textContent=open?"접기 ▴":"전체 ▾"; b.setAttribute("aria-expanded",open?"true":"false"); }
+/* 넘치는 식은 줄여서 한 줄에 — 식을 두 줄로 나누지 않는다(대표님 2026-09-29 「수식 한 줄로」). 식 글자 14px(오타 기준) 아래로는 안 줄이고, 그래도 넘치면 식 상자 안에서 밀어 본다 */
+function fitMath(root){ if(!root) return; $$(".katex-display",root).forEach(k=>{ k.style.fontSize=""; const cw=k.clientWidth, sw=k.scrollWidth; if(!(cw>0&&sw>cw+1)) return;
+  const kx=k.querySelector(".katex"), fz=parseFloat(getComputedStyle(kx||k).fontSize)||20, lo=Math.min(1,Math.max(.6,14/fz));
+  let r=Math.max(lo,Math.floor(cw/sw*100)/100); k.style.fontSize=r+"em"; for(let i=0;i<20&&r>lo&&k.scrollWidth>k.clientWidth+1;i++){ r=Math.max(lo,Math.round((r-.02)*100)/100); k.style.fontSize=r+"em"; } }); }   /* 한글 \\text 폭은 배율과 딱 비례하지 않아 모자라면 2% 씩 더 */
+/* 인라인 식은 줄에서 끊지 않는다(CSS #bc .katex nowrap) — 줄보다 길면 글자를 줄여 한 줄에(14px 까지) */
+function fitInline(root){ if(!root) return; $$(".katex",root).forEach(k=>{ if(k.closest(".katex-display")) return; k.style.fontSize=""; const box=k.parentElement&&k.parentElement.closest(".bt,.qb,.ans,.cb,.tk,.bx,.ex,li,p,div"); if(!box) return;
+  const cw=box.clientWidth, w=k.getBoundingClientRect().width; if(!(cw>0&&w>cw-2)) return; const fs=parseFloat(getComputedStyle(k).fontSize)||16; k.style.fontSize=Math.max(14,Math.floor(fs*(cw-6)/w))+"px"; }); }
+window.addEventListener("resize",()=>{ fitMath($("#bc")); fitInline($("#bc")); moreChk(); reCur(); },{passive:true});
+try{ document.fonts.ready.then(()=>{ fitMath($("#bc")); fitInline($("#bc")); moreChk(); reCur(); }); document.fonts.addEventListener("loadingdone",()=>{ fitMath($("#bc")); fitInline($("#bc")); moreChk(); reCur(); }); }catch(e){}   /* KaTeX 글꼴이 늦게 붙으면 폭·높이가 바뀐다 */
+$("#bwrap").addEventListener("scroll",()=>upHint(),{passive:true}); UPH.onclick=()=>{ const w=$("#bwrap"); userScr=true; if(w) w.scrollTo({top:0,behavior:REDUCE?"auto":"smooth"}); };
+let figRet=null;   /* 확대창을 연 버튼(닫으면 포커스를 돌려준다) */
+function closeFig(){ const ov=$("#figov"); if(!ov||ov.hidden) return; ov.hidden=true; const r=figRet; figRet=null; try{ if(r&&document.contains(r)) r.focus(); }catch(e){} }
+$("#figovX").onclick=()=>closeFig(); document.addEventListener("keyup",e=>{ if(!$("#figov").hidden&&(e.key==="Enter"||e.key===" ")) e.preventDefault(); },true);
+function choices(list){ const box=$("#dCh"); box.innerHTML=""; $("#dTip").textContent=""; list.forEach(c=>{ if("tip" in c){ if(c.tip) $("#dTip").textContent=c.tip; return; }
+  const b=document.createElement("button"); b.type="button"; b.className="cbt "+(c.cls||"g"); b.innerHTML=esc(c.t); b.onclick=c.f; if(c.primary) b.dataset.primary="1"; box.appendChild(b); }); }
+/* ---------- 칠판 ---------- */
+function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} }
+function board(html,tag,v1){ const ck=$("#chk"); ck.innerHTML=tag||""; if(UPH) ck.insertBefore(UPH,ck.querySelector("small")); const bc=$("#bc"); bc.classList.toggle("v1",!!v1); bc.style.counterReset=""; bc.innerHTML=html; typeset(bc); fitMath(bc); fitInline(bc); $("#bwrap").scrollTop=0; upHint(); }
+const BOX={why:"왜 그런가",analogy:"비유",formula:"외울 것",pitfall:"함정",memo:"정리",say:"교수님 말"};
+const TGN={am:"암기",ih:"이해",ex:"시험",pr:"연습"};   /* 판서 줄 알약 — 암기·이해 구분(대표님 2026-09-29) */
+function stepHTML(st,rev){
+  const sub=st.sub?'<div class="sub">'+esc(st.sub)+'</div>':'';
+  switch(st.t){
+    case "talk": return sub+'<div class="tk">'+st.html+'</div>';
+    case "fig": return sub+'<figure class="paper">'+st.html+'</figure>';
+    case "board": return sub+'<figure class="paper photo"><img src="'+esc(st.src)+'" alt="판서 사진" onerror="this.closest(\'figure\').style.display=\'none\'">'+(st.cap?'<div class="cap">'+st.cap+'</div>':'')+'</figure>';
+    case "ex": return sub+'<div class="ex"><div class="exq"><i>예제</i>'+st.q+'</div>'+(rev?'<div class="exa"><i>풀이</i>'+st.a+'</div>':'')+'</div>';
+    default: return sub+'<div class="bx '+esc(st.t)+'"><i>'+(BOX[st.t]||"")+'</i>'+st.html+'</div>';
+  }
+}
+function tocHTML(){
+  let h='<ul class="toc">'+CH.map((c,i)=>{ const done=!!L.ch[c.id], cur=S.mode==="step"&&S.ci===i; return '<li class="'+(done?"done":"")+(cur?" cur":"")+'"><span class="st">'+(done?"✓":i+1)+'</span><span>'+esc(c.title)+'</span><small>'+c.steps.length+'단계</small></li>'; }).join("");
+  if(QZ.length){ const qd=QZ.filter(q=>ST.done[q.id]).length, qo=QZ.filter(q=>ST.correct[q.id]===true).length; h+='<li class="'+(qd>=QZ.length?"done":"")+(S.mode==="quiz"?" cur":"")+'"><span class="st">'+(qd>=QZ.length?"✓":"?")+'</span><span>확인 문제</span><small>'+(qd?qo+"/"+qd+" 정답":QZ.length+"문제")+'</small></li>'; }
+  return h+'</ul>';
+}
+/* ---------- 화면 ---------- */
+function render(){
+  hud(); savePos(); save();
+  try{
+    if(S.mode==="intro") renderIntro();
+    else if(S.mode==="step"){ if(V2) renderStepV2(); else renderStep(); }
+    else if(S.mode==="quiz") renderQuiz();
+    else if(S.mode==="nohearts") renderNoHearts();
+    else if(S.mode==="result") renderResult();
+  } finally { S.pre=""; S.preFace=""; }   /* 안내 대사는 바로 다음 화면 한 번만 — 하트 0·목차·pill 이동으로 다른 화면이 뜨면 버린다(오타 2차 R2) */
+}
+function renderIntro(){
+  const dc=CH.filter(c=>L.ch[c.id]).length, p0=(L.pos&&typeof L.pos==="object")?posOf():null;
+  const resume=!!(p0&&!L.done&&(dc>0||QZ.some(q=>ST.done[q.id])||p0.mode==="quiz"||(p0.mode==="step"&&(p0.ci>0||p0.si>0))));
+  board('<div class="ttl">'+esc(D.title)+'</div>'+(D.lead?'<div class="lead">'+D.lead+'</div>':'')+'<div class="sub">오늘의 목차</div>'+tocHTML(),'<span>오늘 수업</span><small>'+esc(D.course)+'</small>',true);
+  const line= L.done? pick("done_intro","i") : resume? pick("again_intro","i") : pick("intro","i",{n:CH.length,min:D.minutes||18});
+  say(line, L.done?"proud":"neutral");
+  const cs=[];
+  if(resume) cs.push({t:"이어서 하기",cls:"p",primary:1,key:"Enter",f:()=>resumeTo(posOf())});
+  cs.push({t:resume?"처음부터":"시작하기",cls:resume?"g":"p",primary:resume?0:1,key:resume?"":"Enter",f:()=>{ S=Object.assign(S,{mode:"step",ci:0,si:0,rev:false,again:0,resume:false}); render(); }});
+  cs.push({t:"교재 보기",cls:"g",f:()=>openBook((CH[0]||{}).id)}); cs.push({t:"암기노트",cls:"g",f:openMemo});
+  choices(cs);
+}
+/* ---- v1 단계 (구버전 판서) ---- */
+function renderStep(){
+  const ch=CH[S.ci]; if(!ch){ S.mode=QZ.length?"quiz":"result"; return render(); }
+  if(S.si<0||S.si>=ch.steps.length) S.si=Math.max(0,ch.steps.length-1);
+  const st=ch.steps[S.si]; if(!st){ S.mode="intro"; return render(); }
+  board(stepHTML(st,S.rev),'<span>CH '+(S.ci+1)+' · '+esc(ch.title)+'</span><small>'+(S.si+1)+' / '+ch.steps.length+'</small><span class="old">구버전 판서 · 판서 정리 전</span>',true);
+  const seed=S.ci+":"+S.si+":"+S.again; let line, face=LINES.chapter_face[st.t]||"neutral";
+  if(S.again>0){ line=pick("again",seed); face="sharp"; } else if(st.say){ line=st.say; } else if(S.si===0){ line=pick("chapter",seed,{c:S.ci+1,title:ch.title}); face="sharp"; } else if(st.t==="ex"&&S.rev){ line=pick("exopen",seed); } else line=pick(st.t in LINES?st.t:"talk",seed);
+  [line,face]=preLine(line,face); say(line,face); S.resume=false;
+  const cs=[];
+  if(st.t==="ex"&&!S.rev) cs.push({t:"풀이 보기",cls:"p",primary:1,key:"Enter",f:()=>{ S.rev=true; S.again=0; render(); }});
+  else cs.push({t:"이해했어요",cls:"p",primary:1,key:"Enter",f:()=>next()});
+  cs.push({t:"다시 설명",cls:"g",f:()=>{ again(); S.again++; render(); }});
+  cs.push({t:"질문할게요",cls:"t",f:ask});
+  choices(cs);
+}
+/* ---- v2 단계: 판서 누적 + 그림 단계 + 대사 (상태 기계: 대사 → 판서 줄 → 그림 → 대기) ---- */
+let figCur={ci:-1,name:null};
+const figNo=(ch,name)=>Math.max(1,[...new Set(ch.steps.map(s=>s.fig).filter(Boolean))].indexOf(name)+1);   /* 【그림 챕터-번호】: 챕터 안에서 그림이 처음 나온 순서 */
+/* 이번 단계가 보이게: 이 단계 첫 줄이 위로 밀려나지 않는 한에서 이 단계 끝(그림 포함)까지 보이게 스크롤 — 무조건 맨 아래로 내리면 앞 식이 머리글 밑에 반만 남았다(오타 디자인 1차 R4) */
+let userScr=false;   /* 사용자가 판서 창을 직접 밀었는가(휠·터치·포인터·위 판서 버튼) — 그러면 글꼴·크기 변화 때 다시 맞추지 않는다. scrollCur 가 새로 맞추면 풀린다 */
+function scrollCur(){ const w=$("#bwrap"); if(!w) return; userScr=false; const first=$("#bc .bl.cur"); if(!first){ w.scrollTop=w.scrollHeight; upHint(); return; }
+  const endEl=$("#bc .bd-fig")||$$("#bc .bl.cur").pop(), wr=w.getBoundingClientRect(), st0=w.scrollTop, ch=w.clientHeight;
+  const a=first.getBoundingClientRect().top-wr.top+st0, b=endEl.getBoundingClientRect().bottom-wr.top+st0;
+  /* 여유(위 10·아래 14)까지 들어가면 끝에 맞추고, 여유 없이만 들어가면 가운데, 안 들어가면 첫 줄을 위에(2차 실측: 창을 거의 채우는 단계에서 끝이 몇 px 잘렸다) */
+  w.scrollTop=Math.max(0,(b-a)+24<=ch?b+14-ch:(b-a)<=ch?a-(ch-(b-a))/2:a-10); upHint(); }
+/* 글꼴(KaTeX·한글 조각 글꼴)이 늦게 붙어 판서·자막 높이가 바뀌면 이번 단계 위치를 다시 맞춘다 — 360px 캡처에서 이번 단계 끝줄이 창 아래로 밀렸다(2차).
+   판서 창·판서 크기 변화(ResizeObserver)와 글꼴 로드 끝에서 부른다. 사용자가 직접 밀었으면 그대로 둔다 */
+function reCur(){ const w=$("#bwrap"); if(S.mode!=="step"||!V2||!w||userScr) return; scrollCur(); }
+["wheel","touchstart","pointerdown"].forEach(ev=>$("#bwrap").addEventListener(ev,()=>{ userScr=true; },{passive:true}));
+try{ let q=0; const ro=new ResizeObserver(()=>{ if(q) return; q=requestAnimationFrame(()=>{ q=0; reCur(); }); }); ro.observe($("#bwrap")); ro.observe($("#bc")); }catch(e){}
+function upHint(){ const w=$("#bwrap"); if(w&&UPH) UPH.hidden=!(w.scrollTop>12); }
+/* 폰에서 그림을 크게: 지금 보이는 그림 단계 그대로 복제해 겹창에(두 손가락 확대·옆으로 밀기) — 오타 디자인 1차 R2 */
+function zoomFig(){ const f=$("#bc .bd-fig figure"), ov=$("#figov"), box=$("#figov .fz"); if(!f||!ov||!box) return; box.innerHTML=""; const c=f.cloneNode(true); const sv=c.querySelector("svg"); if(sv) sv.removeAttribute("id");
+  $$(".pre,.draw,.fade",c).forEach(e=>{ e.classList.remove("pre","draw","fade"); e.style.strokeDasharray=""; e.style.strokeDashoffset=""; e.style.opacity=""; }); $$(".pulse",c).forEach(e=>e.classList.remove("pulse")); box.appendChild(c); figRet=document.activeElement; ov.hidden=false; try{ $("#figovX").focus(); }catch(e){}
+  /* 겹창에서는 가장 작은 글자(첨자 제외 font-size)가 14px 이 되게 키운다(오타 디자인 1차 R2 「설명 14px 이상」) — 넘치는 쪽은 겹창 안에서 밀어 본다 */
+  $$(":scope>svg",c).forEach(v=>{ const vb=v.viewBox&&v.viewBox.baseVal; if(!vb||!vb.width) return; let mu=99; v.querySelectorAll("text").forEach(t=>{ const z=parseFloat(getComputedStyle(t).fontSize); if(z>=6) mu=Math.min(mu,z); });   /* 6 미만은 자리 채움(점 등) */ if(mu>=99) mu=14; v.style.width=Math.round(vb.width*Math.max(1,14/mu))+"px"; v.style.maxWidth="none"; }); }
+/* 폰(≤760px): 가로로 늘어선 그림 칸(면·원통·구 비교처럼)을 세로로 쌓는다 — 통으로 줄이면 글자가 6px 까지 작아졌다(오타 디자인 1차 R2 「단순 축소 말고 세로 재배치」).
+   칸 = 가로 빈틈(24 또는 폭 3% 이상)으로 갈리는 요소 무리, 폭 12% 미만 무리는 가까운 이웃에 붙인다. 원본 요소를 칸별 svg 로 「옮기므로」(복제 아님) 그림 단계 숨김·그리기 애니메이션이 그대로 돈다.
+   칸이 하나면 그대로 두고 「크게 보기」. 칸 글자가 전부 14px 이상이면 .big → 「크게 보기」 숨김(오타 기준 14px). 모르는 요소가 있으면 손대지 않는다 */
+function stackFig(){
+  const fg=$("#bc .bd-fig figure"), sv=fg&&fg.querySelector(":scope>svg"); if(!sv) return;
+  let phone=false; try{ phone=window.matchMedia("(max-width:760px)").matches; }catch(e){} if(!phone) return;
+  const vb=sv.viewBox&&sv.viewBox.baseVal, sc=sv.getScreenCTM&&sv.getScreenCTM(); if(!vb||!vb.width||!vb.height||!sc) return;
+  const OKT=/^(g|a|line|path|circle|ellipse|polyline|polygon|rect|text|tspan|textPath|image|use|defs|style|title|desc|marker|clipPath|mask|pattern|symbol|linearGradient|radialGradient|stop|filter|fe[A-Za-z]+)$/;
+  if([...sv.querySelectorAll("*")].some(n=>!OKT.test(n.tagName))) return;
+  const W=vb.width, iv=sc.inverse(), NS="http://www.w3.org/2000/svg", items=[];
+  for(const e of $$("line,path,circle,ellipse,polyline,polygon,rect,text,image,use",sv)){
+    if(e.closest("defs,marker,clipPath,mask,pattern,symbol")||(e.parentNode&&e.parentNode.closest&&e.parentNode.closest("text"))) continue;
+    let b, m; try{ b=e.getBBox(); m=iv.multiply(e.getScreenCTM()); }catch(x){ return; }
+    const sw=(parseFloat(getComputedStyle(e).strokeWidth)||0)/2, xs=[], ys=[];
+    [[b.x,b.y],[b.x+b.width,b.y],[b.x,b.y+b.height],[b.x+b.width,b.y+b.height]].forEach(([x,y])=>{ xs.push(m.a*x+m.c*y+m.e); ys.push(m.b*x+m.d*y+m.f); });
+    items.push({e:e,x0:Math.min(...xs)-sw,x1:Math.max(...xs)+sw,y0:Math.min(...ys)-sw,y1:Math.max(...ys)+sw,bg:e.tagName==="rect"&&b.width>=W*.9}); }
+  const fgi=items.filter(t=>!t.bg); if(fgi.length<2) return;
+  const GAP=Math.max(24,W*.03), cl=[];
+  fgi.map(t=>[t.x0,t.x1]).sort((a,b)=>a[0]-b[0]).forEach(([a,b])=>{ const L=cl[cl.length-1]; if(L&&a<=L[1]+GAP) L[1]=Math.max(L[1],b); else cl.push([a,b]); });
+  for(let i=0;i<cl.length&&cl.length>1;){ if(cl[i][1]-cl[i][0]>=W*.12){ i++; continue; }
+    const gl=i>0?cl[i][0]-cl[i-1][1]:Infinity, gr=i<cl.length-1?cl[i+1][0]-cl[i][1]:Infinity, j=gl<=gr?i-1:i+1;
+    cl[j]=[Math.min(cl[j][0],cl[i][0]),Math.max(cl[j][1],cl[i][1])]; cl.splice(i,1); i=0; }
+  if(cl.length<2) return;
+  const which=t=>{ const cx=(t.x0+t.x1)/2; let k=0; cl.forEach((c,i)=>{ if(cx>=c[0]-.5) k=i; }); return k; };
+  const P=cl.map((c,i)=>{ const own=fgi.filter(t=>which(t)===i), pl=Math.min(10,i?(c[0]-cl[i-1][1])/2:c[0]-vb.x), pr=Math.min(10,i<cl.length-1?(cl[i+1][0]-c[1])/2:vb.x+W-c[1]);
+    const x0=c[0]-Math.max(0,pl), x1=c[1]+Math.max(0,pr), y0=Math.max(vb.y,Math.min(...own.map(t=>t.y0))-8), y1=Math.min(vb.y+vb.height,Math.max(...own.map(t=>t.y1))+8);
+    const p=document.createElementNS(NS,"svg"); [...sv.attributes].forEach(a=>{ if(!/^(id|viewBox|width|height|style)$/.test(a.name)) p.setAttribute(a.name,a.value); });
+    p.setAttribute("viewBox",x0.toFixed(1)+" "+y0.toFixed(1)+" "+(x1-x0).toFixed(1)+" "+(y1-y0).toFixed(1)); p.setAttribute("width",(x1-x0).toFixed(1)); p.setAttribute("height",(y1-y0).toFixed(1));
+    p.classList.add("fpan"); p.style.maxWidth=Math.round((x1-x0)*1.8)+"px"; return {p:p,map:new Map()}; });
+  const holder=(k,node)=>{ if(node===sv) return P[k].p; let c=P[k].map.get(node); if(c) return c;   /* 원본 묶음(g)의 칸 k 사본 — 속성(data-step·transform·글꼴·색) 그대로, id 는 처음 만든 칸에만 */
+    c=node.cloneNode(false); if(P.some((q,j)=>j!==k&&q.map.has(node))) c.removeAttribute("id"); holder(k,node.parentNode).appendChild(c); P[k].map.set(node,c); return c; };
+  [...sv.children].filter(n=>/^(defs|style|title|desc|marker|clipPath|mask|pattern|symbol|linearGradient|radialGradient|filter)$/.test(n.tagName)).forEach(n=>P[0].p.appendChild(n));
+  items.forEach(t=>{ if(t.bg) P.forEach((q,k)=>holder(k,t.e.parentNode).appendChild(k?t.e.cloneNode(true):t.e)); else holder(which(t),t.e.parentNode).appendChild(t.e); });   /* 문서 순서대로 = 칸마다 겹침 순서 유지 */
+  sv.replaceWith(...P.map(q=>q.p));
+  const box=fg.closest(".bd-fig"); box.classList.add("split"); box.dataset.pn=P.length;
+}
+/* 모든 폭: 그림에서 가장 작은 글자가 14px 미만이면 「크게 보기」·그림 누르기 확대(아이패드 1040 에서도 그림 글자 8.6~11px 가 있었다 — 2차 실측). 14px 이상이면 .big → 숨김 */
+function figZoomFlag(){ const bx=$("#bc .bd-fig"); if(!bx) return; let mn=99; $$("figure>svg text",bx).forEach(t=>{ const m=t.getScreenCTM&&t.getScreenCTM(), z=parseFloat(getComputedStyle(t).fontSize)||14; if(m&&z>=6) mn=Math.min(mn,z*Math.hypot(m.a,m.b)); }); bx.dataset.minfp=mn.toFixed(1); bx.classList.toggle("big",mn>=14); }
+function renderStepV2(){
+  cancelAll();
+  const ch=CH[S.ci]; if(!ch){ S.mode=QZ.length?"quiz":"result"; return render(); }
+  if(S.si<0||S.si>=ch.steps.length) S.si=Math.max(0,ch.steps.length-1);
+  const st=ch.steps[S.si]; if(!st){ S.mode="intro"; return render(); }
+  const instant=REDUCE||S.resume;
+  /* 판서: 이 단계까지의 줄 전부. 지난 단계 줄은 바로, 이 단계 줄은 (즉시가 아니면) 순서대로 써진다 */
+  /* v3: 판서 줄 = 핵심 카드(li 는 번호, h 소제목, f 식 카드, pit 함정, star 비유·시험, res 결론, memo 외울 것). 현재 단계 줄은 cur(초록), 지난 단계 줄은 dim. 「다시 보기」는 그림 애니메이션만 다시 */
+  let h='<div class="bd-title">핵심 정리 · '+(S.si+1)+' / '+ch.steps.length+'단계</div>', nLi=0;
+  ch.steps.slice(0,S.si+1).forEach((s,k)=>{ (s.b||[]).forEach((ln,j)=>{ const mine=k===S.si; if(ln.k==="li") nLi++; h+='<div class="bl k-'+esc(ln.k)+(mine?" cur":" dim")+((mine&&!instant&&!FIGONLY)?"":" now")+'" data-step="'+esc(s.id)+'" data-ln="'+j+'"'+(ln.k==="li"?' data-n="'+nLi+'"':'')+'><div class="bt">'+(ln.tg&&TGN[ln.tg]?'<span class="tg tg-'+esc(ln.tg)+'">'+TGN[ln.tg]+'</span>':'')+ln.h+'</div></div>'; }); });
+  const fig=st.fig?ch.figs[st.fig]:null;
+  if(fig) h+='<div class="bd-fig" data-fig="'+esc(st.fig)+'" style="counter-reset:fno '+figNo(ch,st.fig)+'"><div class="fh">그림 · 단계 '+st.fs+' / '+fig.max+'<span class="pl"><button type="button" class="zoom" data-zoom="1">크게 보기</button><button type="button" class="a" data-replay="1">▶ 다시 보기</button></span></div>'+fig.svg+'</div>';
+  board(h,'<span>CH '+(S.ci+1)+' · '+esc(ch.title)+'</span><small>'+(S.si+1)+' / '+ch.steps.length+'</small>',false);
+  $("#bc").style.counterReset="eq 0 chn "+(S.ci+1);   /* (식 챕터-번호) · 【그림 챕터-번호】 */
+  /* 작은 채움 원(전하·점)은 맥동 — 물리 그림에 생동감(대표님 9/28). 동작 줄이기면 CSS 가 끈다 */
+  $$("#bc .bd-fig circle").forEach(c=>{ if(c.closest("defs")) return; const r=+c.getAttribute("r")||0, f=c.getAttribute("fill"); if(r>0&&r<=20&&f&&f!=="none"&&!/^rgba\(.*,\s*0?\.[0-4]\d*\)$/.test(f)) c.classList.add("pulse"); });
+  stackFig(); figZoomFlag();   /* 폰: 가로 칸 그림을 세로로(오타 디자인 1차 R2) · 모든 폭: 작은 글자 그림은 크게 보기 — 그림 단계 숨김보다 먼저(숨긴 요소는 크기를 못 잰다) */
+  { const rb=$("#bc [data-replay]"); if(rb) rb.onclick=function(){ replayFig(); }; } { const zb=$("#bc [data-zoom]"); if(zb) zb.onclick=function(){ zoomFig(); }; }
+  { const fe=$("#bc .bd-fig figure"), bx=$("#bc .bd-fig"); if(fe&&bx&&!bx.classList.contains("big")) fe.addEventListener("click",()=>zoomFig()); }   /* 글자가 작은 그림은 그림을 눌러도 크게 */
+  /* 그림: 단계 ≤ fs 만 보이게. 이전 단계에서 이미 보였던 것은 바로, 이 단계에서 새로 보이는 것은 그려진다 */
+  const prevFs=FIGONLY?0:(()=>{ for(let k=S.si-1;k>=0;k--){ const p=ch.steps[k]; if(p.fig===st.fig) return p.fs||0; } return 0; })();   /* 다시 보기면 보이는 그림 전부를 처음부터 */
+  let newEls=[];
+  /* SVG 요소에는 hidden IDL 속성이 없다 — 속성으로 직접 (CSS .bd-fig [data-step][hidden]) */
+  /* 이 단계에서 새로 나올 그림 단계는 대사·판서가 끝나 그림 차례가 올 때까지 가린다(class pre, 오타 R3) */
+  if(fig){ const root=$("#bc .bd-fig"); $$("[data-step]",root).forEach(g=>{ const n=+g.getAttribute("data-step")||0; if(n>st.fs){ g.setAttribute("hidden",""); g.setAttribute("aria-hidden","true"); } else { g.removeAttribute("hidden"); g.removeAttribute("aria-hidden"); if(n>prevFs&&!instant){ g.classList.add("pre"); newEls.push(g); } } }); }
+  const wrap=$("#bwrap"); if(instant&&wrap) scrollCur();
+  const finishBoard=()=>{ $$("#bc .bl").forEach(l=>{ l.classList.add("now"); l.classList.remove("on"); }); };
+  const finishFig=()=>{ newEls.forEach(g=>{ g.classList.remove("pre"); $$(".draw,.fade",g).forEach(el=>{ el.classList.remove("draw","fade"); el.style.strokeDasharray=""; el.style.strokeDashoffset=""; el.style.opacity=""; el.style.transition=""; if(el.dataset.mk){ el.setAttribute("marker-end",el.dataset.mk); delete el.dataset.mk; } }); }); };
+  const seed=S.ci+":"+S.si+":"+S.again; let line=st.s, face= /반은 틀립|틀립니다|찍지/.test(st.s)?"angry": /정리|외우세요|외울 것/.test(st.s)?"sharp": /좋|맞습|됐/.test(st.s)?"smile":"neutral";
+  if(S.again>0){ line=pick("again",seed)+" "+st.s; face="sharp"; }
+  [line,face]=preLine(line,face);
+  if(!instant) anim={phase:"say",finish:()=>{ finishBoard(); finishFig(); }};
+  say(line,face,null,()=>{ if(instant){ finishBoard(); finishFig(); anim=null; return; }
+    /* 판서 줄 쓰기 */
+    anim={phase:"board",finish:()=>{ finishBoard(); finishFig(); }};
+    const lines=$$("#bc .bl:not(.now)"); lines.forEach((l,i)=>{ later(()=>{ l.classList.add("on"); if(wrap) scrollCur(); },i*220); });
+    later(()=>{ /* 그림 단계 */
+      if(!newEls.length){ finishBoard(); anim=null; return; }
+      anim={phase:"fig",finish:()=>{ finishBoard(); finishFig(); }};
+      let longest=null, longestDur=0;
+      newEls.forEach(g=>{ $$("line,path,circle,ellipse,polyline,polygon,text,tspan,rect",g).forEach(el=>{ if(el.closest("defs")) return;
+        const stroked=el.getAttribute("stroke")&&el.getAttribute("stroke")!=="none", filled=el.getAttribute("fill")&&el.getAttribute("fill")!=="none", dashed=!!el.getAttribute("stroke-dasharray"), isText=/^(text|tspan)$/i.test(el.tagName);
+        if(stroked&&!filled&&!dashed&&!isText&&typeof el.getTotalLength==="function"){ let len=0; try{ len=el.getTotalLength(); }catch(e){} if(len>0){ const dur=Math.min(1200,Math.max(400,len*4)); if(el.getAttribute("marker-end")){ el.dataset.mk=el.getAttribute("marker-end"); el.removeAttribute("marker-end"); }
+          el.style.strokeDasharray=len; el.style.strokeDashoffset=len; el.style.setProperty("--dur",dur+"ms"); el.classList.add("draw"); raf(()=>raf(()=>{ el.style.strokeDashoffset="0"; }));
+          /* 화살촉은 선이 실제로 다 그려진 사건(transitionend)에서만 — 예비 타임아웃(전환이 멈춘 탭)이면 그림 단계 완료(finishFig)에서 한꺼번에 */
+          onEnd(el,dur,real=>{ if(real&&el.dataset.mk){ el.setAttribute("marker-end",el.dataset.mk); delete el.dataset.mk; } }); if(dur>longestDur){ longestDur=dur; longest=el; } return; } }
+        el.classList.add("fade"); raf(()=>raf(()=>{ el.classList.add("on"); })); }); g.classList.remove("pre"); /* 자식이 전부 초기(안 보임) 상태가 된 뒤 가림을 푼다 */ });
+      if(wrap) scrollCur();
+      const settleFig=()=>{ finishBoard(); finishFig(); anim=null; };   /* 이름은 문제 채점 settle(q,ok) 와 겹치지 않게 */
+      if(longest) onEnd(longest,longestDur,settleFig); else later(settleFig,400);
+    },lines.length*220+120);
+  });
+  S.resume=false; S.again=0;
+  choices([{t:"이해했어요",cls:"p",primary:1,key:"Enter",f:()=>next()},{t:"다시 설명",cls:"g",f:()=>{ again(); S.again=1; render(); }},{t:"질문할게요",cls:"t",f:ask}]);
+}
+/* 「다시 보기」: 같은 단계를 대사·판서는 즉시 보인 채로 그림 애니메이션만 다시 돌린다(단계·보상·저장 위치 변화 없음) */
+function replayFig(){ if(S.mode!=="step"||!V2) return; cancelAll(); FIGONLY=true; SAY_INSTANT=true; try{ render(); } finally { FIGONLY=false; SAY_INSTANT=false; } }
+function next(){ if(anim){ finishNow(); } cancelAll(); S.again=0; S.rev=false; const ch=CH[S.ci]; if(!ch||S.si+1>=ch.steps.length) return finishChapter(); S.si++; S.resume=false; render(); }
+function enter(){ if(anim||typing){ finishNow(); if(typing) skipTyping(); return; } const b=$("#dCh [data-primary]"); if(b) b.click(); }
+function finishChapter(){
+  const ch=CH[S.ci]; if(!ch){ S.mode="intro"; return render(); } const was=!!L.ch[ch.id]; dayReset();
+  L.ch[ch.id]=true; ST.read[ch.id]=true; touchStreak(); ev("read",{sid:ch.id,n:secN(ch.id),clean:!CONF[ch.id]}); delete CONF[ch.id];
+  let extra="";
+  /* 보상은 회차 기록을 지워도 한 번만(L.rew 는 초기화에서 남긴다, 오타 R5). 하트 회복은 이미 끝낸 챕터를 다시 읽었을 때 */
+  if(!L.rew["ch:"+ch.id]){ L.rew["ch:"+ch.id]=true; gainXP(10); gainAff(2); } else if(was&&T.hearts<3){ T.hearts++; extra=" "+pick("heartback",S.ci); pop("#hHearts","+1"); }
+  save(); hud();
+  S.si=0; S.ci++; S.resume=false;
+  if(S.ci>=CH.length){ if(QZ.length){ S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; } else S.mode="result"; }
+  const line=(warm()?pick("chdone_warm",S.ci):pick("chdone",S.ci,{c:S.ci}))+extra;
+  /* 안내 대사는 다음 화면 대사 앞에 붙인다(render 뒤 say 를 또 부르면 새 단계의 완료 콜백이 사라진다, 오타 R2) */
+  if(S.mode==="quiz"&&S.ci===CH.length){ S.pre=pick("quiz","q",{n:QZ.length,h:T.hearts}); S.preFace="sharp"; } else { S.pre=line; S.preFace="proud"; }
+  render();
+}
+function renderQuiz(){
+  cancelAll();
+  const q=QZ[S.qi]; if(!q){ S.mode="result"; return render(); }
+  dayReset(); if(T.hearts<=0&&!ST.done[q.id]){ S.mode="nohearts"; return render(); }
+  const mc=Array.isArray(q.choices)&&q.choices.length, rev=!!ST.done[q.id], my=ST.answer[q.id], c=ST.correct[q.id];
+  let h='<div class="qz"><div class="qn">'+esc(q.qn||("문제 "+(S.qi+1)))+'</div><div class="qb">'+q.html+'</div>';
+  if(mc) h+='<ol class="ch">'+q.choices.map((x,i)=>'<li><button type="button" class="cb'+(rev?(x.ok?" ok":(my!=null&&String(my)===ck(x,i)?" bad":"")):"")+'" data-i="'+i+'"'+(rev?" disabled":"")+'><span class="n">'+(i+1)+'</span><span>'+x.html+'</span></button></li>').join("")+'</ol>';
+  else h+= rev? '<div class="my"><b>내 답</b> '+esc(my||"(빈칸)")+'</div>' : '<textarea id="myans" placeholder="답만 간단히">'+esc(my||"")+'</textarea><div class="row"><button type="button" class="cbt p" id="reveal" style="width:auto">답 보기</button></div>';
+  if(rev){ h+='<span class="vd '+(c===true?"ok":c===false?"bad":"wait")+'">'+(c===true?"정답":c===false?"오답":"채점 전")+'</span>';
+    if(!mc&&c==null) h+='<div class="row"><button type="button" class="cbt p" data-g="1" style="width:auto">맞았어요</button><button type="button" class="cbt r" data-g="0" style="width:auto">틀렸어요</button></div>';
+    h+='<div class="ans"><i>해설</i>'+(q.ans||"")+'</div>'; }
+  h+='</div>';
+  board(h,'<span>확인 문제</span><small>'+(S.qi+1)+' / '+QZ.length+'</small>',true);
+  $$("#bc .cb").forEach(b=>{ b.onclick=()=>answer(q,+b.dataset.i); });
+  const rv=$("#reveal"); if(rv) rv.onclick=()=>{ dayReset(); if(T.hearts<=0){ S.mode="nohearts"; return render(); } const ta=$("#myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); render(); say("자, 해설이랑 비교해 보세요. 채점은 본인이 하는 거예요. 봐주지만 마세요.","sharp"); };
+  $$("#bc [data-g]").forEach(b=>{ b.onclick=()=>grade(q,b.dataset.g==="1"); });
+  S.resume=false;
+  if(!rev){ const [ql,qf]=preLine(mc?pick("q",S.qi,{k:S.qi+1}):pick("qin",S.qi),"neutral"); say(ql,qf); choices([{t:"질문할게요",cls:"t",f:ask}]); }
+  else { const last=S.qi>=QZ.length-1; const [rl,rf]=preLine(c===true?"맞힌 문제예요. 다음으로 갈게요.":c===false?"틀렸던 문제예요. 해설을 한 번 더 읽고 가요.":"답은 봤고 채점이 남았어요. 봐주지 말고 본인이 채점해 주세요.", c===true?"neutral":"sharp"); say(rl,rf);
+    choices([{t:last?"결과 보기":"다음 문제",cls:"p",primary:1,key:"Enter",f:()=>{ if(last){ S.mode="result"; } else S.qi++; render(); }},{t:"다시 풀기",cls:"g",f:()=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; save(); render(); }},{t:"질문할게요",cls:"t",f:ask}]); }
+}
+function settle(q,ok){
+  ST.correct[q.id]=ok; touchStreak(); ev("quiz",{qid:q.id,ok:!!ok,n:qN(q.id)});
+  if(ok){ if(!L.rew[q.id]){ L.rew[q.id]=true; gainXP(15); gainAff(3); } }
+  else { T.hearts=Math.max(0,T.hearts-1); gainAff(-1); pop("#hHearts","-1",true); }
+  save(); render(); say(ok?(warm()?pick("ok_warm",S.qi):pick("ok",S.qi)):pick("bad",S.qi), ok?(warm()?"proud":"smile"):"angry");
+}
+function answer(q,i){ if(ST.done[q.id]) return; dayReset(); if(T.hearts<=0){ S.mode="nohearts"; return render(); } const c=q.choices[i]; ST.answer[q.id]=(c&&c.k!=null)?c.k:i; ST.done[q.id]=true; settle(q,!!(c&&c.ok)); }
+function grade(q,ok){ if(typeof ST.correct[q.id]==="boolean") return; dayReset(); if(T.hearts<=0){ S.mode="nohearts"; return render(); } settle(q,ok); }
+function renderNoHearts(){
+  cancelAll();
+  board('<div class="ttl">하트 0</div><div class="sub">목차</div>'+tocHTML(),'<span>잠깐</span>',true);
+  say(pick("nohearts","nh"),"angry");
+  choices([{t:"목차에서 챕터 고르기",cls:"p",primary:1,key:"Enter",f:openToc},{t:"교재 보기",cls:"g",f:()=>openBook((CH[0]||{}).id)}]);
+}
+function renderResult(){
+  cancelAll();
+  /* 완료 보상은 전부 채점된 뒤에만 — 입력형은 「답 보기」만 하고 자기 채점을 안 하면 채점 전(오타 구현 검수 1차) */
+  const n=QZ.length, ok=QZ.filter(q=>ST.correct[q.id]===true).length, wrong=QZ.filter(q=>ST.correct[q.id]===false), ung=QZ.filter(q=>typeof ST.correct[q.id]!=="boolean"), graded=n-ung.length;
+  const wasDone=!!L.done; if(graded>=n) L.done=true; const first=graded>=n&&!L.rew.done; if(first){ L.rew.done=true; gainXP(20); touchStreak(); }   /* 완료 보상도 회차당 한 번(L.rew, 오타 R5·R6) */
+  if(first||L.done!==wasDone) save();   /* 보상과 별개로 완료 상태 변화는 바로 저장 — render() 의 save 는 이보다 앞이라 재완료가 안 남았다(오타 2차 R6) */
+  const ratio=n?ok/n:1, good=ratio>=.8, mid=ratio>=.5;
+  /* 배지: 그림 세트가 있으면 스티커(전부 맞히면 트로피, 아니면 월계관), 없으면 SVG 배지 */
+  /* 스티커를 먼저 쓰고 못 열면 SVG 배지로 — RASTER 탐색(비동기)이 끝나기 전에 결과 화면이 뜰 수 있어 탐색 결과에 기대지 않는다 */
+  const badge='<img class="stk" alt="" src="../assets/stickers/'+(good?"trophy":"laurel")+'.png" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"><svg class="badge" style="display:none" viewBox="0 0 120 120" fill="none" stroke="#FFE27A" stroke-width="2.5" stroke-linejoin="round"><circle cx="60" cy="60" r="50" stroke-dasharray="4 3"/><circle cx="60" cy="60" r="40"/><path d="M60 30l8.8 18 19.8 2.9-14.3 13.9 3.4 19.7L60 75.2l-17.7 9.3 3.4-19.7L31.4 50.9l19.8-2.9z" fill="rgba(255,226,122,.18)"/></svg><div class="bl2">'+esc(D.course)+' · '+esc(D.sess)+' · 챕터 '+CH.length+'</div>';
+  board('<div class="res"><div class="big">'+(ung.length?"채점이 남았습니다":good?"수고했습니다":mid?"절반은 넘겼습니다":"다시 합니다")+'</div><div class="stats">'+(ung.length?'<div><b>'+graded+'/'+n+'</b><span>채점 완료</span></div><div><b>'+(graded?ok+'/'+graded:'—')+'</b><span>정답</span></div>':'<div><b>'+ok+'/'+n+'</b><span>정답</span></div>')+'<div><b>+'+(L.xp||0)+'</b><span>이 회차 XP</span></div><div><b>'+T.streak+'</b><span>연속일</span></div><div><b>'+T.aff+'</b><span>호감도 · '+affName()+'</span></div></div>'+(ung.length?'':badge)+(ung.length?'<div class="wrong">채점 전 '+ung.length+'개</div>':'')+(wrong.length?'<div class="wrong">틀린 문제 '+wrong.length+'개</div>':'')+'</div>','<span>오늘의 결과</span>',true);
+  { const [rl,rf]=preLine(ung.length?"채점을 안 한 문제가 있어요. 봐주지 말고 본인이 채점해 주세요. 그래야 오늘 공부가 끝난 거예요.":pick(good?"res_good":mid?"res_mid":"res_bad","r",{ok:ok,n:n}), ung.length?"sharp":good?"proud":mid?"sharp":"angry"); say(rl,rf); }
+  const cs=[];
+  if(ung.length) cs.push({t:"채점 안 한 문제 ("+ung.length+")",cls:"p",primary:1,key:"Enter",f:()=>{ S.mode="quiz"; S.qi=QZ.indexOf(ung[0]); render(); }});
+  if(wrong.length) cs.push({t:"틀린 문제 다시 ("+wrong.length+")",cls:ung.length?"g":"p",primary:ung.length?0:1,key:ung.length?"":"Enter",f:()=>{ wrong.forEach(q=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; }); save(); S.mode="quiz"; S.qi=QZ.findIndex(q=>!ST.done[q.id]); render(); }});
+  cs.push({t:"교재 보기",cls:"g",f:()=>openBook(null)}); cs.push({t:"목차",cls:"g",f:openToc});
+  if(EMB) cs.push({t:"앱으로",cls:wrong.length?"g":"p",primary:wrong.length?0:1,f:()=>post({type:"mc-close",v:1})});
+  choices(cs);
+}
+/* ---------- 목차 · 교재 · 질문 ---------- */
+function openToc(){ const ov=$("#ov"); $("#ovMeta").textContent=D.course+" · "+D.sess;
+  $("#ovList").innerHTML=CH.map((c,i)=>'<li class="'+(L.ch[c.id]?"done":"")+(S.mode==="step"&&S.ci===i?" cur":"")+'"><button type="button" data-ci="'+i+'"><span class="st">'+(L.ch[c.id]?"✓":i+1)+'</span><span>'+esc(c.title)+'</span><small>'+c.steps.length+'단계</small></button></li>').join("")
+    +(QZ.length?'<li class="'+(QZ.every(q=>ST.done[q.id])?"done":"")+(S.mode==="quiz"?" cur":"")+'"><button type="button" data-q="1"><span class="st">?</span><span>확인 문제</span><small>'+QZ.filter(q=>ST.done[q.id]).length+'/'+QZ.length+'</small></button></li>':"");
+  $$("#ovList [data-ci]").forEach(b=>{ b.onclick=()=>{ ov.classList.remove("on"); cancelAll(); S=Object.assign(S,{mode:"step",ci:+b.dataset.ci,si:0,rev:false,again:0,resume:false}); render(); }; });
+  const qb=$("#ovList [data-q]"); if(qb) qb.onclick=()=>{ ov.classList.remove("on"); cancelAll(); if(T.hearts<=0&&QZ.some(q=>!ST.done[q.id])){ S.mode="nohearts"; return render(); } S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; render(); };
+  ov.classList.add("on"); }
+$("#hToc").onclick=openToc; $("#ovClose").onclick=()=>$("#ov").classList.remove("on"); $("#ov").onclick=e=>{ if(e.target.id==="ov") $("#ov").classList.remove("on"); };
+$("#ovBook").onclick=()=>openBook(S.mode==="step"?(CH[S.ci]||{}).id:null);
+/* 학습 기록(챕터·문제)과 보상 기록(L.rew·L.xp)을 분리 — 초기화해도 같은 챕터·문제로 XP 를 다시 받지 않는다(오타 R5) */
+$("#ovReset").onclick=()=>{ if(!confirm("이 회차의 챕터·문제 기록을 지울까요? (XP·연속일과 이미 받은 보상은 그대로 — 같은 챕터·문제로 XP 를 다시 받지는 않습니다)")) return; cancelAll(); L={pos:null,ch:{},done:false,xp:L.xp||0,rew:(L.rew&&typeof L.rew==="object")?L.rew:{}}; ST={read:{},done:{},correct:{},answer:{},ts:0}; S=Object.assign(S,{mode:"intro",ci:0,si:0,qi:0,rev:false,again:0,resume:false,pre:"",preFace:""}); $("#ov").classList.remove("on"); render(); };
+function post(m){ try{ window.parent.postMessage(m,location.origin); }catch(e){} }
+function openMemo(){ const h="#d"+D.date; if(EMB) post({type:"mc-open",v:1,file:"notes/memo/"+D.slug+".html"+h,title:D.course+" 암기노트"}); else location.href="../../memo/"+D.slug+".html"+h; }
+$("#ovMemo").onclick=()=>{ $("#ov").classList.remove("on"); openMemo(); };
+function openBook(sid){ const hash=sid?"#s="+sid:""; if(EMB){ post({type:"mc-open",v:1,file:LESSON_APP+hash,title:document.title}); } else location.href=LESSON_REL+hash; }
+function again(){ const c=CH[S.ci]; if(c){ CONF[c.id]=true; ev("again",{sid:c.id,n:secN(c.id)}); } }
+function ask(){ if(anim||typing) finishNow(); if(S.mode==="step"){ const c=CH[S.ci]; if(c){ CONF[c.id]=true; ev("ask",{sid:c.id,n:secN(c.id)}); } } else if(S.mode==="quiz"){ const q=QZ[S.qi]; if(q) ev("ask",{qid:q.id,n:qN(q.id)}); }   /* 질문 대사가 진행 중인 단계의 완료 콜백을 지우지 않게 먼저 즉시 완료(오타 R2) */
+  if(EMB){ post({type:"mc-ask",v:1}); say(pick("ask",S.ci+":"+S.si),"wide"); gainAff(1); save(); hud(); } else say(pick("askoff",S.ci),"sharp"); }
+/* ---------- 앱 질문 패널 문맥 (V45 규약) ---------- */
+let CTX_GEN=null;
+function ctx(){ if(!CTX_GEN||!EMB) return; let label="", q=null, sid="";
+  if(S.mode==="step"){ const ch=CH[S.ci]||{}, st=(ch.steps||[])[S.si]||{}; sid=ch.id||""; label="CH "+(S.ci+1)+" · "+(ch.title||""); const tmp=document.createElement("div"); tmp.innerHTML= st.t==="v2"? ((st.b||[]).map(l=>l.h).join(" ")+" "+(st.s||"")) : (st.t==="ex"?(st.q+" "+(S.rev?st.a:"")):(st.html||"")); q={qn:(ch.title||"").slice(0,80),kind:"개념",text:(tmp.textContent||"").replace(/\s+/g," ").trim().slice(0,600),choices:[],my:null,revealed:true,correct:null,answer:null}; }
+  else if(S.mode==="quiz"){ const qq=QZ[S.qi]; if(qq){ const tmp=document.createElement("div"); tmp.innerHTML=qq.html; label="확인 문제 "+(S.qi+1); const tc=x=>{ const d=document.createElement("div"); d.innerHTML=x; return (d.textContent||"").trim(); };
+    q={qn:qq.qn,kind:"문제",text:(tmp.textContent||"").replace(/\s+/g," ").trim().slice(0,600),choices:(qq.choices||[]).map(c=>tc(c.html)),my:(ST.answer[qq.id]==null?null:(Array.isArray(qq.choices)&&qq.choices.length?(()=>{ const j=qq.choices.findIndex((c,i)=>ck(c,i)===String(ST.answer[qq.id])); return j>=0?(j+1)+"번 "+tc(qq.choices[j].html):null; })():String(ST.answer[qq.id]))),revealed:!!ST.done[qq.id],correct:(typeof ST.correct[qq.id]==="boolean"?ST.correct[qq.id]:null),answer:null}; } }
+  else label=S.mode;
+  post({type:"mc-slide",v:1,gen:CTX_GEN,deck:D.id,title:document.title.slice(0,80),sid:sid,stype:S.mode==="quiz"?"quiz":"concept",part:null,partTitle:document.title.slice(0,60),label:("교실 · "+label).slice(0,80),q:q}); }
+window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; ctx(); } });
+const _render=render; render=function(){ _render(); ctx(); };
+/* ---------- 키보드 ---------- */
+document.addEventListener("keydown",e=>{ if(e.target&&/TEXTAREA|INPUT/.test(e.target.tagName)) return; if($("#ov").classList.contains("on")){ if(e.key==="Escape") $("#ov").classList.remove("on"); return; }
+  if(!$("#figov").hidden){ if(e.key==="Escape"){ e.preventDefault(); closeFig(); } else if(e.key==="Tab"){ e.preventDefault(); $("#figovX").focus(); } else if(e.key==="Enter"||e.key===" "){ e.preventDefault(); } return; }   /* 그림 확대창이 열려 있으면 뒤 교실 단축키(Enter·Space·숫자) 차단, 닫기는 Esc·닫기 버튼 — 오타 디자인 2차 */
+  if(e.key==="Enter"||e.key===" "){ e.preventDefault(); if(e.repeat) return; enter(); }
+  else if(/^[1-6]$/.test(e.key)&&S.mode==="quiz"){ const b=$$("#bc .cb")[+e.key-1]; if(b&&!b.disabled) b.click(); } });
+/* ---------- 시작 ---------- */
+/* 해시: #resume(저장 위치) · #ch=N(챕터 N) · #ch=N.M(챕터 N 의 M 단계) · #quiz · #result */
+function boot(){ const m=/^#(resume|ch=(\d+)(?:\.(\d+))?|quiz|result)$/.exec(location.hash||"");
+  if(m&&m[1]==="resume"&&L.pos&&!L.done){ return resumeTo(posOf()); }
+  else if(m&&m[2]){ const ci=Math.max(0,Math.min(CH.length-1,+m[2]-1)); const si=m[3]?Math.max(0,Math.min(CH[ci].steps.length-1,+m[3]-1)):0; S=Object.assign(S,{mode:"step",ci:ci,si:si,rev:(CH[ci].steps[si]||{}).t==="ex"&&/\.\d+r$/.test(location.hash),resume:!!m[3]}); }
+  else if(m&&m[1]==="quiz"&&QZ.length){ S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; }
+  else if(m&&m[1]==="result"){ S.mode="result"; }
+  render(); }
+window.__cr={get D(){return D;},get S(){return S;},set S(v){S=v;},get T(){return T;},get L(){return L;},set L(v){L=v;T.lessons[D.id]=L;},get ST(){return ST;},set ST(v){ST=v;},get fullText(){return fullText;},get anim(){return anim;},get pending(){return pend.t.length+pend.raf.length+pend.tr.length;},set reduce(v){REDUCE=!!v;},get reduce(){return REDUCE;},set speed(v){TYPE_MS=Math.max(1,+v||22);},get typing(){return !!typing;},
+  render:function(){ return render(); },next:function(){ return next(); },boot:function(){ return boot(); },enter:function(){ return enter(); },cancelAll:function(){ return cancelAll(); },posOf:function(){ return posOf(); },replay:function(){ return replayFig(); }};  /* 검사기(classroom_check.cjs)용 창구 */
+(function wait(){ if(window.renderMathInElement) boot(); else setTimeout(wait,40); })();
+</script>
+</body>
+</html>

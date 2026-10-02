@@ -150,6 +150,36 @@
     "classroom": "notes/classroom/phys2/2026-09-23.html",
     "chapters": 5,
     "steps": 35
+   },
+   "2026-09-30": {
+    "id": "phys2-2026-09-30",
+    "file": "notes/lessons/phys2/2026-09-30.html",
+    "title": "26장 전류와 저항 — 그리고 27장 회로 도입",
+    "minutes": 18,
+    "sids": [
+     "s1",
+     "s2",
+     "s3",
+     "s4",
+     "s5",
+     "s6"
+    ],
+    "qids": [
+     "q1",
+     "q2",
+     "q3",
+     "q4",
+     "q5",
+     "q6",
+     "q7",
+     "q8",
+     "q9",
+     "q10"
+    ],
+    "week": 5,
+    "classroom": "notes/classroom/phys2/2026-09-30.html",
+    "chapters": 6,
+    "steps": 35
    }
   },
   "정역학": {
@@ -253,6 +283,122 @@
     "classroom": "notes/classroom/statics/2026-09-16.html",
     "chapters": 5,
     "steps": 34
+   },
+   "2026-09-28": {
+    "id": "statics-2026-09-28",
+    "file": "notes/lessons/statics/2026-09-28.html",
+    "title": "알짜힘 없이 돌리기 — 우력, 등가계, 그리고 렌치",
+    "minutes": 18,
+    "sids": [
+     "s1",
+     "s2",
+     "s3",
+     "s4",
+     "s5",
+     "s6"
+    ],
+    "qids": [
+     "q1",
+     "q2",
+     "q3",
+     "q4",
+     "q5",
+     "q6",
+     "q7"
+    ],
+    "week": 5,
+    "classroom": "notes/classroom/statics/2026-09-28.html",
+    "chapters": 6,
+    "steps": 40
+   },
+   "2026-09-21": {
+    "id": "statics-2026-09-21",
+    "file": "notes/lessons/statics/2026-09-21.html",
+    "title": "\"FBD는 외력만\" — 두 블록으로 평형을 마무리하고, 모멘트를 시작한다",
+    "minutes": 18,
+    "sids": [
+     "s1",
+     "s2",
+     "s3",
+     "s4",
+     "s5",
+     "s6"
+    ],
+    "qids": [
+     "q1",
+     "q2",
+     "q3",
+     "q4",
+     "q5",
+     "q6",
+     "q7",
+     "q8"
+    ],
+    "week": 4,
+    "classroom": "notes/classroom/statics/2026-09-21.html",
+    "chapters": 6,
+    "steps": 36
+   },
+   "2026-09-30": {
+    "id": "statics-2026-09-30",
+    "file": "notes/lessons/statics/2026-09-30.html",
+    "title": "움직임을 막는 곳에만 힘이 생긴다 — 평형식 3개와 지지대 반력",
+    "minutes": 18,
+    "sids": [
+     "s1",
+     "s2",
+     "s3",
+     "s4",
+     "s5",
+     "s6",
+     "s7"
+    ],
+    "qids": [
+     "q1",
+     "q2",
+     "q3",
+     "q4",
+     "q5",
+     "q6",
+     "q7",
+     "q8",
+     "q9"
+    ],
+    "week": 5,
+    "classroom": "notes/classroom/statics/2026-09-30.html",
+    "chapters": 7,
+    "steps": 45
+   },
+   "2026-09-23": {
+    "id": "statics-2026-09-23",
+    "file": "notes/lessons/statics/2026-09-23.html",
+    "title": "\"점은 r × F, 직선은 삼중곱\" — 바리뇽 정리와 직선(축)에 대한 모멘트",
+    "minutes": 18,
+    "sids": [
+     "s1",
+     "s2",
+     "s3",
+     "s4",
+     "s5",
+     "s6",
+     "s7",
+     "s8"
+    ],
+    "qids": [
+     "q1",
+     "q2",
+     "q3",
+     "q4",
+     "q5",
+     "q6",
+     "q7",
+     "q8",
+     "q9"
+    ],
+    "week": 4,
+    "classroom": "notes/classroom/statics/2026-09-23.html",
+    "chapters": 8,
+    "steps": 43
    }
   },
   "공업수학1": {
@@ -433,6 +579,41 @@
     "classroom": "notes/classroom/em1/2026-09-23.html",
     "chapters": 5,
     "steps": 28
+   },
+   "2026-09-30": {
+    "id": "em1-2026-09-30",
+    "file": "notes/lessons/em1/2026-09-30.html",
+    "title": "2.7 비제차 ODE — 미정계수법, 그리고 2.8 강제진동 · 공진",
+    "minutes": 18,
+    "sids": [
+     "s1",
+     "s2",
+     "s3",
+     "s4",
+     "s5",
+     "s6",
+     "s7",
+     "s8",
+     "s9",
+     "s10",
+     "s11"
+    ],
+    "qids": [
+     "q1",
+     "q2",
+     "q3",
+     "q4",
+     "q5",
+     "q6",
+     "q7",
+     "q8",
+     "q9",
+     "q10"
+    ],
+    "week": 5,
+    "classroom": "notes/classroom/em1/2026-09-30.html",
+    "chapters": 11,
+    "steps": 61
    }
   },
   "미분적분학2": {
@@ -610,8 +791,65 @@
     "classroom": "notes/classroom/calc2/2026-09-10.html",
     "chapters": 4,
     "steps": 17
+   },
+   "2026-09-29": {
+    "id": "calc2-2026-09-29",
+    "file": "notes/lessons/calc2/2026-09-29.html",
+    "title": "12.4 외적을 3×3 행렬식으로 → 12.5 직선의 방정식 (방향코사인 · 방향비 · 매개 · 대칭)",
+    "minutes": 18,
+    "sids": [
+     "s1",
+     "s2",
+     "s3",
+     "s4",
+     "s5",
+     "s6",
+     "s7"
+    ],
+    "qids": [
+     "q1",
+     "q2",
+     "q3",
+     "q4",
+     "q5",
+     "q6",
+     "q7",
+     "q8"
+    ],
+    "week": 5,
+    "classroom": "notes/classroom/calc2/2026-09-29.html",
+    "chapters": 7,
+    "steps": 34
+   },
+   "2026-10-01": {
+    "id": "calc2-2026-10-01",
+    "file": "notes/lessons/calc2/2026-10-01.html",
+    "title": "12.5 두 점을 지나는 직선 · Ex01 · Ex02 → 평면의 방정식 (법선벡터)",
+    "minutes": 18,
+    "sids": [
+     "s1",
+     "s2",
+     "s3",
+     "s4",
+     "s5",
+     "s6"
+    ],
+    "qids": [
+     "q1",
+     "q2",
+     "q3",
+     "q4",
+     "q5",
+     "q6",
+     "q7",
+     "q8"
+    ],
+    "week": 5,
+    "classroom": "notes/classroom/calc2/2026-10-01.html",
+    "chapters": 6,
+    "steps": 31
    }
   }
  },
- "generated": "2026-10-01T11:50:50"
+ "generated": "2026-10-02T10:15:05"
 }

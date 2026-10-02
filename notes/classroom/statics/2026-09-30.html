@@ -1,0 +1,924 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>움직임을 막는 곳에만 힘이 생긴다 — 평형식 3개와 지지대 반력</title>
+<!-- 교실 모드 템플릿 v4 (대표님 2026-09-28 레퍼런스 「인강 전자칠판」: 초록 칠판 + 흰 활자 판서(Gothic A1) + 민트 테두리 식 상자(식 챕터-번호) + 【그림 챕터-번호】 캡션, 칠판 오른쪽에 전신으로 서서 지시봉으로 판서를 가리키는 김주영 스앵님, 대사 = 아래 자막(Gowun Dodum, 표정 얼굴), 조작 = 칠판 아래 줄)
+     v2 회차(D.v===2)는 판서 파일(BOARD)로 만든 단계(판서 줄 누적 + 그림 단계 + 대사), v1 회차는 원문 문단 그대로(「구버전 판서」 표시).
+     저장: mc-tutor(전역 XP·연속일·하트·호감도 + 회차 위치 {mode,cid,sid,qi,ver}) + mc-lesson-<id>(챕터 읽음·문제, 수업 노트·앱 V52 와 공유). 오타 설계 회의 1·2차 + 구현 검수 1~6차 조건 반영. -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Gothic+A1:wght@500;600;700;800&family=Inter:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<style>
+/* 교실 v4 = 인강 전자칠판 (대표님 2026-09-28 레퍼런스 「칠판 판서 이런 느낌으로」: 초록 칠판 + 흰 활자 판서 + 민트 테두리 식 상자 + 【그림 n-k】 캡션 + 오른쪽에 서 있는 강사)
+   오타 디자인 검수 1차(RED 8) 반영: 칠판을 레퍼런스(#446B53)보다 한 단계 어둡게(#41664F → #31543E) — classroom_design_audit.cjs 실측(가장 밝은 곳 + 노이즈 최대 위 합성): 글자 전부 4.5:1 이상, 기호(★→!✓) 3:1 이상.
+   작은 설명 글자는 흰색 계열로만, 색은 선·테두리·기호에. 지난 단계 판서는 흐리게 하지 않고(번호 원 테두리만 옅게) 이번 단계 줄에 노란 표시.
+   글꼴 역할: 판서(칠판 위 #bc) = Gothic A1(레퍼런스의 굵은 고딕, 판서 예외) · 그 밖(자막·버튼·HUD) = 앱 본문 Gowun Dodum · 숫자 Inter. 손글씨·분필 질감은 쓰지 않는다(칠판 면에 3.5% 잡티만). */
+:root{--chalk:#F4F8F5;--chalk-2:rgba(244,248,245,.86);--chalk-3:rgba(244,248,245,.62);
+  --mint:#C9F4E1;--mint-line:rgba(207,243,227,.85);--yel:#FFE89A;--yel-fill:#FFE27A;--yel-soft:rgba(255,232,154,.09);--coral:#FFDDD6;--coral-line:#FFA497;--coral-soft:rgba(255,164,151,.1);--sky:#C8E6FF;--sky-soft:rgba(200,230,255,.09);
+  --page:#0C1511;
+  --fh:"Gothic A1","Pretendard Variable",Pretendard,sans-serif;--fbd:"Gothic A1","Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --fb:"Gowun Dodum","Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;--ft:"Gowun Dodum","Pretendard Variable",Pretendard,sans-serif;--fn:Inter,"Pretendard Variable",Pretendard,sans-serif;
+  --hud:52px;--tw:320px}
+*{box-sizing:border-box}
+html{background:var(--page)}
+body{margin:0;font-family:var(--fb);font-size:16px;color:var(--chalk);word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased;line-height:1.6;min-height:100vh;background:radial-gradient(1100px 520px at 62% -12%,#1C3327 0%,rgba(12,21,17,0) 72%),var(--page)}
+button{font-family:inherit}
+::selection{background:rgba(255,226,122,.35);color:#fff}
+/* ---------- HUD (어두운 스튜디오 띠) ---------- */
+#hud{position:sticky;top:0;z-index:9;height:var(--hud);background:rgba(10,18,14,.9);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.07)}
+#hud .in{max-width:1040px;margin:0 auto;height:100%;padding:0 20px;display:flex;align-items:center;gap:16px}
+#hud .hl{display:flex;flex-direction:column;line-height:1.2;min-width:0}
+#hud .hl b{font-family:var(--fh);font-weight:800;font-size:15px;white-space:nowrap;color:#fff}
+#hud .hl span{font-size:12px;color:var(--chalk-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hud .hc{flex:1;display:flex;align-items:center;gap:8px;min-width:0}
+#hud .chp{font-family:var(--fn);font-weight:700;font-size:12px;color:var(--mint);white-space:nowrap;letter-spacing:.06em}
+#hud .seg{display:flex;gap:4px;flex:1;max-width:300px}#hud .seg i{display:block;flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.13)}#hud .seg i.on{background:var(--mint)}#hud .seg i.cur{background:var(--yel)}
+#hud .hr{display:flex;align-items:center;gap:8px}
+.stat{display:inline-flex;align-items:center;gap:5px;font-family:var(--fn);font-weight:700;font-size:12.5px;padding:4px 10px;border-radius:999px;position:relative;white-space:nowrap;background:rgba(255,255,255,.07);color:#fff;border:1px solid rgba(255,255,255,.08)}
+.stat svg{width:15px;height:15px;display:block}.stat small{font-weight:600;color:var(--chalk-3);margin-left:2px}
+.stat.hp{gap:3px}
+.stat .gauge{display:inline-block;width:52px;height:8px;border-radius:99px;background:rgba(255,255,255,.13);overflow:hidden}.stat .gauge b{display:block;height:100%;width:0;background:#F783AC;transition:width .4s}
+.pop{position:absolute;left:50%;top:-6px;transform:translate(-50%,0);font-size:13px;font-weight:900;color:#8EF0A8;pointer-events:none;opacity:0;animation:pop 1.1s ease-out forwards;white-space:nowrap}
+.pop.bad{color:#FF8A80}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,0)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-30px)}}
+#hToc{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font-weight:700;font-size:13px;padding:7px 12px;border-radius:12px;cursor:pointer;min-height:36px}
+/* ---------- 전자칠판 ---------- */
+main{max-width:1040px;margin:0 auto;padding:14px 20px 18px}
+#room{display:block}#board{position:relative}#side{display:none}
+.slide{position:relative;display:grid;grid-template-columns:minmax(0,1fr) var(--tw);grid-template-rows:auto minmax(0,1fr) auto;height:clamp(560px,calc(100vh - var(--hud) - 140px),980px);border-radius:16px;overflow:hidden;
+  background:radial-gradient(150% 125% at 46% 42%,rgba(0,0,0,0) 58%,rgba(0,0,0,.26) 100%),url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .035 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"),linear-gradient(158deg,#41664F 0%,#3A5E48 46%,#31543E 100%);
+  box-shadow:0 18px 48px rgba(0,0,0,.46),inset 0 0 0 1px rgba(255,255,255,.07)}
+.chk{grid-column:1;grid-row:1;display:flex;align-items:center;gap:10px;padding:14px 26px 11px;white-space:nowrap;overflow:visible;min-width:0;border-bottom:1px solid rgba(255,255,255,.12)}
+.chk>span:first-child{font-family:var(--fh);font-weight:800;font-size:16.5px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1;color:#fff}
+.chk small{font-family:var(--fn);font-size:12px;font-weight:700;color:var(--mint);letter-spacing:.08em;flex:0 0 auto;padding:3px 10px;border:1px solid rgba(201,244,225,.5);border-radius:99px}
+.chk .old{font-family:var(--fb);font-size:11px;color:#FFE1DC;border:1px dashed rgba(255,213,208,.6);border-radius:6px;padding:1px 6px;flex:0 0 auto}
+#bwrap{grid-column:1;grid-row:2;min-height:0;overflow:auto;padding:16px 26px 18px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.28) transparent}
+#bwrap::-webkit-scrollbar{width:8px}#bwrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,.26);border-radius:99px}
+#upHint{flex:0 0 auto;position:relative;font-family:var(--fb);font-weight:700;font-size:12px;line-height:1.2;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.32);border-radius:99px;padding:3px 10px;cursor:pointer}#upHint{z-index:5}#upHint::before{content:"";position:absolute;left:-6px;right:-6px;top:-9px;bottom:-15px}#upHint:hover{background:rgba(255,255,255,.16)}   /* 위 판서: 머리글 안 쪽수 앞 — 판서 위에 뜨면 식 번호를 가렸다(2차 캡처) */
+#upHint[hidden]{display:none}
+#bc{font-family:var(--fbd);font-weight:600;font-size:17px;line-height:1.62;width:100%;margin:0;color:var(--chalk)}
+#bc.v1{font-weight:500;font-size:16.5px;line-height:1.75}
+#bc .katex-display{margin:8px 0;overflow-x:auto;overflow-y:hidden;padding:2px 0;scrollbar-width:thin}
+/* 판서 줄: 흰 활자 · 번호 = 민트 원 · 소제목 = 800 + 노란 밑줄 · 식 = 민트 테두리 상자 + (식 챕터-번호) · 함정 = 산호 띠 상자 · 시험/비유 = 연노랑 · 결론 = 하늘 화살표 · 외울 것 = 노란 상자 · 이번 단계 = 왼쪽 노란 표시 */
+.bd-title{display:none}
+.bl{position:relative;padding:5px 8px 5px 36px;margin:0 0 6px;border-radius:10px;border:1px solid transparent;opacity:0;transform:translateY(6px);transition:opacity .4s ease-out,transform .4s ease-out}
+.bl.on,.bl.now{opacity:1;transform:none}.bl.now{transition:none}
+.bl::before{content:attr(data-n);position:absolute;left:5px;top:8px;width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(201,244,225,.78);color:var(--mint);display:grid;place-items:center;font-family:var(--fn);font-weight:700;font-size:11.5px;line-height:1;box-sizing:border-box}
+.bl>.bt{min-width:0}
+.bl.dim::before{border-color:rgba(201,244,225,.42)}   /* 번호 글자는 그대로(대비 4.5↑), 테두리만 옅게 — 투명도 .55 는 번호 대비 2.7 이었다(가상 요소 대비 실측) */
+.bl.cur:is(.k-li,.k-star,.k-res){background:rgba(255,255,255,.05);box-shadow:inset 3px 0 0 var(--yel)}
+.bl.k-li.cur::before{background:var(--mint);border-color:var(--mint);color:#173026}
+.bl.k-h{padding:10px 0 11px;margin-top:6px;font-size:20px;background:linear-gradient(var(--yel),var(--yel)) 0 100%/46px 3px no-repeat}
+.bl.k-h::before{display:none}.bl.k-h>.bt{font-family:var(--fh);font-weight:800;color:#fff;letter-spacing:-.01em}
+.bl.k-f{display:block;padding:8px 88px 8px 18px;margin:8px 0 12px;background:rgba(255,255,255,.03);border:1.5px solid var(--mint-line);border-radius:12px;box-shadow:0 0 0 3px rgba(207,243,227,.05),inset 0 0 22px rgba(207,243,227,.05);counter-increment:eq}
+.bl.k-f.dim{border-color:rgba(207,243,227,.5)}.bl.k-f.cur{border-color:#E6FCF2;box-shadow:0 0 0 3px rgba(207,243,227,.1),inset 0 0 22px rgba(207,243,227,.06),inset 3px 0 0 var(--yel)}
+.bl.k-f::before{display:none}
+.bl.k-f::after{content:"(식 " counter(chn) "-" counter(eq) ")";position:absolute;right:14px;top:50%;transform:translateY(-50%);font-family:var(--fh);font-weight:700;font-size:13.5px;color:var(--chalk);white-space:nowrap}
+.bl.k-f .katex-display{margin:2px 0;text-align:left}.bl.k-f .katex-display>.katex{text-align:left}.bl.k-f .katex{font-size:1.2em}
+.bl.k-pit{padding:8px 12px 8px 40px;background:var(--coral-soft);border-color:rgba(255,164,151,.38);border-left:3px solid var(--coral-line);border-radius:4px 12px 12px 4px}
+.bl.k-pit::before{content:"!";left:9px;top:11px;border-color:var(--coral-line);background:var(--coral-line);color:#3A1510;font-size:13px}
+.bl.k-star>.bt{color:#FFEDB5}.bl.k-star::before{content:"★";border-color:rgba(255,232,154,.8);color:var(--yel);font-size:11px}
+.bl.k-res>.bt{color:#fff;font-weight:700}.bl.k-res::before{content:"→";border:0;color:var(--sky);font-size:18px;font-weight:800}
+.bl.k-memo{padding:9px 14px 9px 42px;margin:8px 0 10px;background:var(--yel-soft);border:1.5px solid rgba(255,232,154,.7);border-radius:12px}
+.bl.k-memo::before{content:"✓";left:11px;top:12px;border-color:var(--yel-fill);background:var(--yel-fill);color:#2B2A12;font-size:12px}.bl.k-memo>.bt{color:#FFF6D8}
+.bl.k-memo.cur,.bl.k-pit.cur{box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.bl b,.bl strong{font-weight:800}
+.bl .ul{color:#FFF0BE;font-weight:800;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;text-decoration-color:rgba(255,232,154,.8)}
+/* 그림 = 칠판 위 흰 선화 + 【그림 챕터-번호】 캡션 (읽기용 노트의 색은 CSS 로만 칠판 색으로 바꾼다 — 원본 SVG·검사기는 그대로) */
+.bd-fig{margin:12px 0 6px}
+.bd-fig .fh{display:flex;align-items:center;gap:8px;font-family:var(--fn);font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--chalk-2);margin:0 0 4px}
+.bd-fig .fh .pl{margin-left:auto;display:flex;gap:6px}
+.bd-fig .fh button{font-family:var(--fb);font-size:12.5px;font-weight:700;letter-spacing:0;border:1px solid rgba(255,255,255,.32);background:rgba(255,255,255,.07);border-radius:99px;padding:5px 12px;cursor:pointer;color:#fff;min-height:32px}
+.bd-fig .fh button:hover{background:rgba(255,255,255,.14)}.bd-fig .fh .zoom{display:none}.bd-fig:not(.big) .fh .zoom{display:inline-block}.bd-fig:not(.big) figure{cursor:zoom-in}
+.bd-fig figure{margin:0}.bd-fig figure>svg.fpan+svg.fpan{margin-top:10px;border-top:1px dashed rgba(255,255,255,.2)}.bd-fig figure>svg{width:100%;height:auto;display:block;overflow:visible;max-width:600px;margin:0 auto}   /* figure>svg 만 — 캡션 KaTeX 의 √ 도 svg 라 전체 svg 에 걸면 근호가 사라진다(2026-09-28 캡처) */
+.bd-fig figcaption{font-family:var(--fbd);font-weight:500;font-size:13.5px;color:var(--chalk-2);margin-top:8px;text-align:center;line-height:1.55}
+.bd-fig figcaption::before{content:"【그림 " counter(chn) "-" counter(fno) "】";font-weight:800;color:#fff;margin-right:6px}
+.bd-fig [data-step][hidden]{display:none}
+.bd-fig .pre{opacity:0}
+.bd-fig .draw{transition:stroke-dashoffset var(--dur,1s) ease-out}
+.bd-fig .fade{opacity:0;transition:opacity .35s ease-out}.bd-fig .fade.on{opacity:1}
+.bd-fig .pulse{transform-box:fill-box;transform-origin:center;animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+/* 그림 색(칠판용): 선·도형은 채도를 남기고(그래픽 3:1 이상), 글자는 더 밝게(4.5:1 이상). 빨강=양전하 · 파랑=음전하 · 초록=장/힘 · 분홍=가우스면 뜻 유지 */
+:is(.bd-fig figure,#bc .paper,#figov .fz figure)>svg{fill:#F4F8F5}
+:is(.bd-fig,#bc .paper,#figov) [stroke="#1F2A44"]{stroke:#F2F7F4}:is(.bd-fig,#bc .paper,#figov) [fill="#1F2A44"]{fill:#F2F7F4}
+:is(.bd-fig,#bc .paper,#figov) [stroke="#E03131"]{stroke:#FF9C8F}:is(.bd-fig,#bc .paper,#figov) [fill="#E03131"]{fill:#FF9C8F}:is(.bd-fig,#bc .paper,#figov) text[fill="#E03131"]{fill:#FFDAD3}
+:is(.bd-fig,#bc .paper,#figov) [stroke="#1971C2"]{stroke:#9CCBFF}:is(.bd-fig,#bc .paper,#figov) [fill="#1971C2"]{fill:#9CCBFF}:is(.bd-fig,#bc .paper,#figov) text[fill="#1971C2"]{fill:#CFE5FF}
+:is(.bd-fig,#bc .paper,#figov) [stroke="#2F9E44"]{stroke:#9FEAB4}:is(.bd-fig,#bc .paper,#figov) [fill="#2F9E44"]{fill:#9FEAB4}:is(.bd-fig,#bc .paper,#figov) text[fill="#2F9E44"]{fill:#BDF3CB}
+:is(.bd-fig,#bc .paper,#figov) [stroke="#FF4D8D"]{stroke:#FFA3C6}:is(.bd-fig,#bc .paper,#figov) [fill="#FF4D8D"]{fill:#FFA3C6}:is(.bd-fig,#bc .paper,#figov) text[fill="#FF4D8D"]{fill:#FFDCEA}
+:is(.bd-fig,#bc .paper,#figov) [stroke="#8A97A6"]{stroke:#B9C9C0}:is(.bd-fig,#bc .paper,#figov) [fill="#8A97A6"]{fill:#B9C9C0}:is(.bd-fig,#bc .paper,#figov) text[fill="#8A97A6"]{fill:#E0E8E3}
+:is(.bd-fig,#bc .paper,#figov) [stroke="#F59F00"]{stroke:#FFE27A}:is(.bd-fig,#bc .paper,#figov) [fill="#F59F00"]{fill:#FFE27A}:is(.bd-fig,#bc .paper,#figov) text[fill="#F59F00"]{fill:#FFE89A}
+:is(.bd-fig,#bc .paper,#figov) [stroke="#B26A00"]{stroke:#FFD08A}:is(.bd-fig,#bc .paper,#figov) [fill="#B26A00"]{fill:#FFD9A0}:is(.bd-fig,#bc .paper,#figov) text[fill="#B26A00"]{fill:#FFE2B8}
+:is(.bd-fig,#bc .paper,#figov) [fill="#F1F3F5"]{fill:rgba(255,255,255,.1)}
+:is(.bd-fig,#bc .paper,#figov) :is([fill="#fff"],[fill="#FFF"],[fill="#ffffff"],[fill="#FFFFFF"],[fill="white"]){fill:#3D624C}
+:is(.bd-fig,#bc .paper,#figov) :is([stroke="#fff"],[stroke="#FFF"],[stroke="#ffffff"],[stroke="#FFFFFF"],[stroke="white"]){stroke:#3D624C}
+:is(.bd-fig,#bc .paper,#figov) [fill^="rgba(255,255,255"]{fill:rgba(255,255,255,.06)}
+:is(.bd-fig,#bc .paper,#figov) [fill^="rgba(31,42,68"]{fill:rgba(255,255,255,.07)}:is(.bd-fig,#bc .paper,#figov) [fill="rgba(31,42,68,.35)"]{fill:rgba(255,255,255,.34)}
+:is(.bd-fig,#bc .paper,#figov) [fill^="rgba(138,151,166"]{fill:rgba(255,255,255,.06)}
+:is(.bd-fig,#bc .paper,#figov) [fill^="rgba(224,49,49"]{fill:rgba(255,156,143,.14)}:is(.bd-fig,#bc .paper,#figov) :is([fill="rgba(224,49,49,.25)"],[fill="rgba(224,49,49,.3)"]){fill:rgba(255,156,143,.28)}
+:is(.bd-fig,#bc .paper,#figov) [fill^="rgba(25,113,194"]{fill:rgba(156,203,255,.15)}
+:is(.bd-fig,#bc .paper,#figov) [fill^="rgba(47,158,68"]{fill:rgba(159,234,180,.13)}
+:is(.bd-fig,#bc .paper,#figov) [fill^="rgba(255,77,141"]{fill:rgba(255,163,198,.11)}
+:is(.bd-fig,#bc .paper,#figov) [fill^="rgba(245,159,0"]{fill:rgba(255,226,122,.15)}
+@media (prefers-reduced-motion: reduce){.bl{transition:none}.bd-fig .draw,.bd-fig .fade{transition:none}.bd-fig .pulse{animation:none}#tutor.raster #tutorImg{animation:none}}
+/* 그림 크게 보기(폰) */
+#figov{position:fixed;inset:0;z-index:30;background:#050B08;display:flex;flex-direction:column}
+#figov[hidden]{display:none}
+#figov .fzh{display:flex;align-items:center;gap:10px;padding:12px 14px;color:#fff;font-family:var(--fh);font-weight:800;font-size:15px}
+#figov .fzh>span{min-width:0}#figov .fzh small{display:block;margin-top:2px;font-family:var(--fb);font-weight:400;font-size:12.5px;color:var(--chalk-3)}
+#figov .fzh button{margin-left:auto;font-family:var(--fb);font-weight:700;font-size:14px;color:#1C2A21;background:var(--yel-fill);border:0;border-radius:12px;padding:10px 18px;min-height:44px;cursor:pointer}
+#figov .fz{flex:1;overflow:auto;padding:12px 14px 28px;background:linear-gradient(158deg,#41664F,#31543E);-webkit-overflow-scrolling:touch}
+#figov .fz figure{margin:0;width:max-content}#figov .fz figure>svg{width:620px;max-width:none;height:auto;display:block;overflow:visible}
+#figov .fz figcaption{max-width:min(620px,calc(100vw - 28px));position:sticky;left:0;color:var(--chalk-2);font-family:var(--fbd);font-weight:500;font-size:14.5px;line-height:1.6;margin-top:10px}
+/* v1(구버전) 판서 */
+#bc .tk{font-size:17px}#bc p{margin:0 0 10px}#bc b,#bc strong{font-weight:800;color:#fff}
+#bc .sub{font-family:var(--fh);font-weight:800;font-size:17px;color:var(--yel);margin:0 0 8px;line-height:1.3}
+#bc .bx{margin:6px 0 14px;padding:12px 16px 10px;border:1px solid rgba(255,255,255,.16);border-radius:12px;position:relative;background:rgba(255,255,255,.03)}
+#bc .bx>i{display:block;font-style:normal;font-family:var(--fh);font-weight:800;font-size:12.5px;line-height:1;margin-bottom:6px;color:var(--chalk-2);letter-spacing:.02em}
+#bc .bx.why{background:var(--sky-soft);border-color:rgba(200,230,255,.4)}#bc .bx.why>i{color:var(--sky)}#bc .bx.analogy{background:var(--yel-soft);border-color:rgba(255,232,154,.4)}#bc .bx.analogy>i{color:var(--yel)}
+#bc .bx.formula{background:rgba(255,255,255,.03);border:1.5px solid var(--mint-line)}#bc .bx.formula>i{color:var(--mint)}#bc .bx.pitfall{background:var(--coral-soft);border-color:rgba(255,164,151,.45)}#bc .bx.pitfall>i{color:var(--coral)}
+#bc .bx.memo{background:var(--yel-soft);border-color:rgba(255,232,154,.6)}#bc .bx.memo>i{color:var(--yel)}#bc .bx.say{border:0;border-left:3px solid var(--yel-fill);border-radius:0;padding:4px 16px;font-style:italic;background:transparent}#bc .bx.say>i{color:var(--yel);font-style:normal}
+#bc .paper{background:none;border:0;padding:6px 0 4px;margin:8px auto 14px;max-width:620px;text-align:center}
+#bc .paper>svg{max-width:100%;height:auto;display:block;margin:0 auto}#bc .paper figcaption,#bc .paper .cap{font-size:13.5px;color:var(--chalk-2);margin-top:6px}
+#bc .paper.photo img{max-width:100%;max-height:420px;object-fit:contain;border-radius:8px;background:#111}
+#bc .ex .exq{border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:12px 16px;margin-bottom:12px;background:rgba(255,255,255,.03)}#bc .ex .exq>i,#bc .ex .exa>i{display:block;font-style:normal;font-family:var(--fh);font-weight:800;font-size:12.5px;line-height:1;margin-bottom:6px;color:var(--yel)}
+#bc .ex .exa{padding:4px 6px 0 16px;border-left:3px solid var(--mint)}#bc .ex .exa>i{color:var(--mint)}#bc .ex .exhide{color:var(--chalk-2);font-style:italic;font-size:14px}
+#bc table{border-collapse:collapse;margin:8px 0 12px;font-size:15px;width:100%}#bc th,#bc td{border:1px solid rgba(255,255,255,.18);padding:6px 10px;text-align:left;vertical-align:top}#bc th{background:rgba(255,255,255,.05);font-weight:800}
+/* 문제 */
+#bc .qz{font-size:17px}
+#bc .qz .qn{font-family:var(--fh);font-weight:800;font-size:18px;color:var(--yel);line-height:1.3;margin-bottom:8px}
+#bc .qz .qb{margin-bottom:14px;font-size:17.5px;color:#fff}
+#bc .qz ol.ch{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+#bc .qz .cb{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:#F4F8F5;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:11px 14px;cursor:pointer;transition:transform .1s,background .15s,border-color .15s;line-height:1.5;min-height:52px}
+#bc .qz .cb .n{flex:0 0 30px;height:30px;border-radius:50%;border:1.5px solid rgba(201,244,225,.75);color:var(--mint);display:grid;place-items:center;font-family:var(--fn);font-weight:700;font-size:13.5px}
+#bc .qz .cb:hover:not([disabled]){background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.34)}#bc .qz .cb[disabled]{cursor:default}
+#bc .qz .cb.ok{border-color:var(--mint);background:rgba(201,244,225,.1)}#bc .qz .cb.ok .n{background:var(--mint);border-color:var(--mint);color:#173026}
+#bc .qz .cb.bad{border-color:var(--coral-line);background:rgba(255,164,151,.1)}#bc .qz .cb.bad .n{background:var(--coral-line);border-color:var(--coral-line);color:#3A1510}
+#bc .qz textarea{width:100%;min-height:74px;font:inherit;font-weight:500;color:#fff;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.24);border-radius:12px;padding:10px 14px;resize:vertical}
+#bc .qz textarea::placeholder{color:var(--chalk-2)}#bc .qz .my{margin:8px 0;color:var(--chalk-2)}#bc .qz .my b{color:#fff}
+#bc .qz .vd{display:inline-block;font-weight:800;font-size:13.5px;padding:3px 12px;border-radius:99px;margin:10px 0 4px}
+#bc .qz .vd.ok{background:var(--mint);color:#173026}#bc .qz .vd.bad{background:var(--coral-line);color:#3A1510}#bc .qz .vd.wait{background:rgba(0,0,0,.3);color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}   /* 흰 바탕 14% 위 흰 글자는 4.36 */
+#bc .qz .ans{margin-top:12px;padding:12px 16px;border-left:3px solid var(--mint);background:rgba(201,244,225,.06);border-radius:0 12px 12px 0;font-weight:500}
+#bc .qz .ans>i{display:block;font-style:normal;font-family:var(--fh);font-weight:800;font-size:12.5px;color:#E6FCF2;line-height:1;margin-bottom:6px}
+#bc .qz .row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+/* 목차 · 결과 */
+#bc .ttl{font-family:var(--fh);font-weight:800;font-size:26px;line-height:1.3;color:#fff;margin:4px 0 8px}
+#bc .lead{color:var(--chalk-2);font-size:15.5px;font-weight:500;margin:0 0 16px;line-height:1.7}
+#bc .toc{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:0;font-size:16px}
+#bc .toc li{display:flex;align-items:center;gap:12px;padding:9px 4px;border-bottom:1px dashed rgba(255,255,255,.2)}
+#bc .toc .st{flex:0 0 28px;height:28px;border-radius:50%;border:1.5px solid rgba(201,244,225,.7);color:var(--mint);display:grid;place-items:center;font-family:var(--fn);font-size:12.5px;font-weight:700}
+#bc .toc li.done .st{background:var(--mint);border-color:var(--mint);color:#173026}#bc .toc li.cur{color:var(--yel)}#bc .toc li.cur .st{border-color:var(--yel);color:var(--yel)}
+#bc .toc small{margin-left:auto;font-size:12px;color:var(--chalk-2);white-space:nowrap;font-family:var(--fn);font-weight:600}
+#bc .res{text-align:center}#bc .res .big{font-family:var(--fh);font-weight:800;font-size:34px;line-height:1.15;color:#fff;margin:12px 0}
+#bc .res .stats{display:flex;justify-content:center;gap:26px;flex-wrap:wrap;font-size:15px;margin:6px 0 12px}#bc .res .stats b{display:block;font-family:var(--fn);font-size:28px;line-height:1.1;color:var(--yel)}#bc .res .stats span{display:block;font-size:12.5px;color:var(--chalk-2);font-weight:600;font-family:var(--fb)}
+#bc .res .badge{margin:4px auto 0;width:130px;height:130px;display:block}#bc .res .bl2{font-size:12.5px;font-weight:600;color:var(--chalk-2);margin-top:4px}#bc .res .wrong{margin-top:10px;color:var(--coral);font-size:14.5px}
+#bc .res .stk{display:block;width:150px;height:150px;margin:2px auto 0;object-fit:contain;filter:drop-shadow(0 10px 16px rgba(0,0,0,.35))}
+/* ---------- 칠판 오른쪽에 서 있는 김주영 스앵님(전신, 지시봉이 판서 쪽) + 아래 자막 ---------- */
+#tutorCard{grid-column:2;grid-row:1 / 4;position:relative;z-index:1;pointer-events:none;min-height:0;overflow:hidden}
+#tutorCard .nm{display:none}
+#tutor{position:absolute;inset:0}
+#tutor svg{position:absolute;right:12%;bottom:130px;width:76%;height:auto;display:block;overflow:visible}
+#tutorImg{display:none;position:absolute;left:0;right:0;bottom:-54px;width:100%;height:calc(100% + 44px);object-fit:contain;object-position:50% 100%;-webkit-user-select:none;user-select:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.38));animation:stand 6s ease-in-out infinite}
+#tutor.raster #tutorImg{display:block}#tutor.raster svg{display:none}
+#tutor.raster.pose #tutorImg{transform:scaleX(-1)}   /* 지시봉이 판서(왼쪽)를 가리키게 좌우 반전 */
+#tutor.raster:not(.pose) #tutorImg{height:58%}
+@keyframes stand{0%,100%{translate:0 0}50%{translate:0 -3px}}
+.box{grid-column:1 / 3;grid-row:3;position:relative;z-index:2;margin:0 14px 14px;padding:10px 16px 10px 12px;display:flex;gap:12px;align-items:flex-start;background:rgba(8,16,12,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:14px;box-shadow:0 10px 26px rgba(0,0,0,.3)}
+#faceImg{flex:0 0 48px;width:48px;height:48px;border-radius:50%;object-fit:cover;object-position:50% 12%;background:#23392E;border:2px solid rgba(255,232,154,.8)}
+#faceImg[hidden]{display:none}
+.box .sb{flex:1;min-width:0;position:relative}
+.tmore{position:absolute;top:-2px;right:-4px;font-family:var(--fb);font-weight:700;font-size:11.5px;line-height:1.2;color:var(--mint);background:rgba(201,244,225,.08);border:1px solid rgba(201,244,225,.45);border-radius:99px;padding:2px 9px;cursor:pointer}.tmore::before{content:"";position:absolute;left:-6px;right:-6px;top:-13px;bottom:-13px}.tmore:hover{background:rgba(201,244,225,.16)}.tmore[hidden]{display:none}   /* 자막 네 줄 넘으면(오타 디자인 1차 R6) */
+.name{font-family:var(--fh);font-weight:800;font-size:12px;color:var(--yel);margin:1px 0 2px;letter-spacing:.02em}.name.prof{color:var(--sky)}
+.text{font-family:var(--ft);font-size:16px;line-height:1.62;min-height:calc(1.62em * 2);max-height:calc(1.62em * 4 + 2px);overflow-y:auto;cursor:pointer;color:#F6FAF7;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.3) transparent}
+.text.open{max-height:min(44vh,calc(1.62em * 12 + 2px))}
+.text .cur{display:inline-block;width:.5em;height:1.05em;background:#F6FAF7;vertical-align:-.15em;margin-left:2px;animation:blinkc .8s step-end infinite}
+@keyframes blinkc{50%{opacity:0}}
+/* ---------- 칠판 아래 조작 줄 (앱과 같은 버튼 규격: 모서리 12px · 높이 44px 이상 · 본문 글꼴 700) ---------- */
+#ctl{display:flex;align-items:center;gap:12px;margin:12px 2px 0;min-height:48px}
+.choices{display:flex;flex-wrap:wrap;gap:10px}
+.tip{font-size:12.5px;color:var(--chalk-3);margin-left:auto;text-align:right}
+.cbt{font-family:var(--fb);font-weight:700;font-size:15.5px;padding:12px 20px;border-radius:12px;cursor:pointer;color:#EAF2EC;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.2);transition:transform .08s,filter .15s,background .15s;width:auto;text-align:center;min-height:46px;white-space:nowrap}
+.cbt:hover{background:rgba(255,255,255,.11)}.cbt:active{transform:translateY(1px)}
+.cbt.p{background:var(--yel-fill);color:#1C2A21;border-color:var(--yel-fill);box-shadow:0 4px 0 #B89A3E,0 10px 22px rgba(255,226,122,.16);min-width:168px}
+.cbt.p:hover{filter:brightness(1.04);background:var(--yel-fill)}.cbt.p:active{transform:translateY(3px);box-shadow:0 1px 0 #B89A3E}
+.cbt.t{background:transparent;color:var(--mint);border-color:rgba(201,244,225,.6)}
+.cbt.r{background:#C2412F;color:#fff;border-color:#C2412F}   /* 흰 글자 5.1:1(오타 디자인 2차: #E5675A 는 3.27) */
+.cbt kbd{font-family:var(--fn);font-size:10.5px;opacity:.8;margin-left:8px}   /* 노란 버튼 위 6.6:1(.6 은 3.78, 오타 3차 검사 전 실측) */
+@media (hover:none),(pointer:coarse){.cbt kbd{display:none}}
+:where(#hud,.bd-fig .fh,#chpills,#ov .row) button{position:relative}:where(#hud,.bd-fig .fh,#chpills,#ov .row) button::before{content:"";position:absolute;left:0;right:0;top:50%;height:max(100%,44px);transform:translateY(-50%)}   /* 누르는 자리 44px(오타 디자인 2차 R7) — 보이는 크기는 그대로 */
+#chpills{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+#chpills .lb{font-size:12px;color:var(--chalk-3);font-weight:700;margin-right:4px}
+.pill{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--chalk-3);font-family:var(--fb);font-weight:700;font-size:12px;padding:5px 11px;border-radius:999px;cursor:pointer;min-height:30px}
+.pill.done{color:var(--mint);border-color:rgba(201,244,225,.4)}.pill.cur{background:var(--yel-fill);color:#1C2A21;border-color:var(--yel-fill)}
+/* ---------- 목차 오버레이 ---------- */
+#ov{position:fixed;inset:0;z-index:20;background:rgba(4,10,7,.66);display:none;align-items:center;justify-content:center;padding:20px}
+#ov.on{display:flex}
+#ov .pn{background:#16251E;color:var(--chalk);border:1px solid rgba(255,255,255,.1);border-radius:20px;width:min(560px,100%);max-height:86vh;overflow:auto;padding:22px 22px 18px;box-shadow:0 30px 70px rgba(0,0,0,.5)}
+#ov h2{margin:0 0 4px;font-family:var(--fh);font-weight:800;font-size:20px;color:#fff}#ov .mt{font-size:13px;color:var(--chalk-3);margin-bottom:12px}
+#ov ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+#ov li button{width:100%;display:flex;align-items:center;gap:12px;text-align:left;font:inherit;font-size:15px;font-weight:700;color:#fff;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:12px 14px;cursor:pointer}
+#ov li button:hover{border-color:var(--mint)}#ov li .st{flex:0 0 30px;height:30px;border-radius:50%;border:1.5px solid rgba(201,244,225,.6);display:grid;place-items:center;font-family:var(--fn);font-size:13px;font-weight:700;color:var(--mint)}
+#ov li.done .st{background:var(--mint);border-color:var(--mint);color:#173026}#ov li.cur button{border-color:var(--yel);background:rgba(255,232,154,.08)}#ov li small{margin-left:auto;color:var(--chalk-3);font-weight:600;white-space:nowrap}
+#ov .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}#ov .row .cbt{width:auto}
+/* ---------- 아이패드 세로(761~1000): 전신 스앵님은 빼고 판서를 전체 폭으로 — 표정은 자막 얼굴로 (오타 디자인 1차 R5) ---------- */
+@media(max-width:1000px) and (min-width:761px){
+  :root{--tw:0px}#tutorCard{display:none}main{padding:12px 12px 16px}.chk{padding:12px 20px 9px}.chk>span:first-child{font-size:15.5px}#bwrap{padding:14px 20px 16px}
+  #bc{font-size:16.5px}.bl.k-h{font-size:18.5px}.text{font-size:15.5px}.cbt{font-size:15px;padding:11px 16px}.cbt.p{min-width:150px}
+}
+/* ---------- 폰 ---------- */
+@media(max-width:760px){
+  :root{--hud:50px}
+  #hud .in{gap:6px;padding:0 8px}#hud .hl{display:none}#hud .hc{flex:1 1 auto;min-width:70px;gap:6px}#hud .chp{font-size:11px}#hud .hr{gap:4px;flex:0 0 auto}.stat{padding:3px 6px;font-size:11.5px;gap:3px}.stat svg{width:13px;height:13px}.stat .gauge{width:30px;height:7px}#hToc{padding:5px 8px;font-size:12px}
+  main{padding:10px 8px 10px}
+  /* 화면 높이에 맞춤: #board = 세로 줄(칠판 → 조작 줄), 칠판이 남는 높이를 다 쓰고 그 안에서 판서만 스크롤. 조작 줄은 몇 줄로 접혀도 늘 화면 안(오타 디자인 1차 R6 「조작 버튼 접근」) */
+  #board{display:flex;flex-direction:column;height:calc(100vh - var(--hud) - 20px);height:calc(100dvh - var(--hud) - 20px);min-height:430px}
+  .slide{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;height:auto;border-radius:14px}
+  #ctl{flex:0 0 auto;position:sticky;bottom:0;z-index:6}
+  .chk{padding:10px 14px 8px}.chk>span:first-child{font-size:15px}
+  #bwrap{flex:1 1 auto;min-height:120px;max-height:none;padding:12px 12px 14px}
+  #tutorCard{display:none}
+  .box{margin:0 10px 10px}#faceImg{flex-basis:40px;width:40px;height:40px}.text{font-size:15px}
+  #bc{font-size:15.5px}.bl{padding:4px 6px 4px 31px}.bl::before{width:20px;height:20px;top:7px;left:2px;font-size:11px}
+  .bl.k-h{font-size:17px}.bl.k-f{padding:19px 12px 8px}.bl.k-f::after{top:4px;right:10px;transform:none;font-size:11px}
+  .bl.k-pit{padding:7px 10px 7px 34px}.bl.k-pit::before{left:6px;top:9px}.bl.k-memo{padding:8px 10px 8px 36px}.bl.k-memo::before{left:7px;top:10px}
+  #bc .ttl{font-size:22px}#bc .res .big{font-size:26px}
+  #bc .paper{overflow-x:auto}#bc .paper>svg{min-width:0;width:100%}
+  .bd-fig figure>svg{min-width:0;width:100%}.bd-fig figcaption{font-size:14px}
+  #ctl{flex-wrap:wrap}.choices{width:100%}.cbt{flex:1 1 auto;font-size:14.5px;min-height:46px;padding:10px 12px}.cbt.p{min-width:0}.tip{display:none}#chpills{display:none}
+}
+/* 암기·이해 구분(대표님 2026-09-29): 판서 줄 앞 알약 — 암기(노랑) · 이해(하늘) · 시험(산호) · 연습(민트). 글자는 짙은 색(대비 7 이상) */
+.tg{display:inline-block;vertical-align:.12em;margin-right:8px;padding:1px 9px 2px;border-radius:99px;font-family:var(--fh);font-weight:800;font-size:12.5px;line-height:1.5;letter-spacing:.02em;white-space:nowrap}
+.tg-am{background:#FFE27A;color:#2B2A12}.tg-ih{background:#9ADCFF;color:#0B2A3A}.tg-ex{background:#FFB09C;color:#3A1510}.tg-pr{background:#B8F2D0;color:#173026}
+/* 인라인 식은 줄에서 끊지 않는다(대표님 2026-09-29 「수식 한 줄로, 중간에 들여쓰기 안 되게」) — 넘치면 fitInline 이 줄인다 */
+#bc .katex{white-space:nowrap}
+/* 스앵님 동작(대표님 2026-09-29 「팔은 안 움직이고 멀뚱히 서 있다 → 움직임·표정」): 동작 세트(assets/tutor/g, 640×1000 · 다리 가운데 x=260) 두 겹(#tg1·#tg2) 교차 페이드.
+   예전 전신 그림(459×1000 contain)과 같은 키·같은 자리 — 키 = min(칸 높이+44, 칸 폭×1000/459), 몸 중심 = 칸 폭 68.4%(좌우 반전 뒤) */
+#tutor{container-type:size}
+#tutor .gimg{display:none;position:absolute;bottom:-54px;-webkit-user-select:none;user-select:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.38));animation:stand 6s ease-in-out infinite;opacity:0;transition:opacity .22s ease}
+#tutor.raster.pose.gset .gimg{display:block}
+#tutor.raster.pose.gset #tutorImg,#tutor.raster.pose.gset .gimg{left:68.4%;right:auto;width:auto;max-width:none;height:min(calc(100cqh + 44px),217.86cqw);object-fit:fill;transform:translateX(-59.375%) scaleX(-1)}
+#tutorImg{transition:opacity .22s ease}
+#tutor.gon #tutorImg{opacity:0}
+#tutor .gimg.on{opacity:1}
+@media (prefers-reduced-motion: reduce){#tutor .gimg,#tutorImg{transition:none}#tutor .gimg{animation:none}}
+</style>
+</head>
+<body>
+<div id="hud"><div class="in">
+  <div class="hl"><b id="hCourse"></b><span id="hSess"></span></div>
+  <div class="hc"><span class="chp" id="hCh">CH 0/0</span><div class="seg" id="hSeg"></div></div>
+  <div class="hr">
+    <span class="stat xp" id="sXp" title="경험치"><svg viewBox="0 0 24 24" fill="#FFC800" stroke="#8A5A00" stroke-width="1.5" stroke-linejoin="round"><path d="M12 2.5l2.9 6.2 6.8.8-5 4.7 1.3 6.8L12 17.7 5.9 21l1.3-6.8-5-4.7 6.8-.8z"/></svg><b id="hXp">0</b><small id="hLv">Lv 1</small></span>
+    <span class="stat sk" id="sSk" title="연속 학습일"><svg viewBox="0 0 24 24" fill="#FF9600" stroke="#C2410C" stroke-width="1.4" stroke-linejoin="round"><path d="M12 2c1 4 5 5.5 5 11a5 5 0 0 1-10 0c0-2 .8-3.3 1.6-4.4.4 1.4 1.2 2.2 2.4 2.4C10.5 8.5 10.5 5 12 2z"/></svg><b id="hStreak">0</b></span>
+    <span class="stat hp" id="hHearts" title="하트"></span>
+    <span class="stat af" id="sAf" title="호감도"><svg viewBox="0 0 24 24" fill="#F783AC" stroke="#B8286A" stroke-width="1.5" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.3-9.2C1.5 8.5 3.6 5 7 5c2 0 3.6 1.1 5 2.6C13.4 6.1 15 5 17 5c3.4 0 5.5 3.5 4.3 6.8C19.5 16.4 12 21 12 21z"/></svg><i class="gauge"><b id="hAff"></b></i></span>
+    <button id="hToc" type="button">목차</button>
+  </div>
+</div></div>
+<main><div id="room">
+  <div id="board">
+    <div class="slide"><div class="chk" id="chk"></div><div id="bwrap"><div id="bc"></div></div><button id="upHint" type="button" hidden>↑ 위 판서</button>
+      <div id="tutorCard"><div class="nm"><b id="dName">김주영 스앵님</b></div><div id="tutor"><img id="tutorImg" alt="" decoding="async" draggable="false"><img id="tg1" class="gimg" alt="" decoding="async" draggable="false"><img id="tg2" class="gimg" alt="" decoding="async" draggable="false"><svg class="chibi" data-face="neutral" viewBox="0 0 220 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="김주영 스앵님">
+
+<style>
+.chibi .f{display:none}
+.chibi[data-face="neutral"] .f-neutral,.chibi[data-face="sharp"] .f-sharp,.chibi[data-face="smile"] .f-smile,.chibi[data-face="angry"] .f-angry,.chibi[data-face="wide"] .f-wide,.chibi[data-face="proud"] .f-proud{display:block}
+.chibi .eye{transform-box:fill-box;transform-origin:center;animation:chibi-blink 4.8s ease-in-out infinite}
+@keyframes chibi-blink{0%,92%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.08)}}
+</style>
+
+<path d="M42 132 C28 56 68 24 110 24 C152 24 192 56 178 132 C174 104 152 82 110 82 C68 82 46 104 42 132 Z" fill="#1E1B22"/>
+<circle cx="161" cy="136" r="21" fill="#1E1B22" stroke="#141218" stroke-width="1.5"/>
+<path d="M148 126 C156 120 168 122 174 132 M150 142 C158 146 168 146 176 140" fill="none" stroke="#3A3642" stroke-width="1.5" stroke-linecap="round"/>
+<rect x="139" y="122" width="9" height="17" rx="3" fill="#B08D57"/>
+
+<rect x="96" y="172" width="28" height="26" fill="#EBCDB8"/>
+<path d="M96 172 C100 182 120 182 124 172 L124 186 L96 186 Z" fill="#D9B39C" opacity=".55"/>
+<path d="M90 194 C92 182 128 182 130 194 L110 236 Z" fill="#2B2A33"/>
+<path d="M92 190 C92 178 128 178 128 190 C124 198 96 198 92 190 Z" fill="#2B2A33"/>
+<path d="M42 258 C44 218 60 200 90 194 L110 236 L130 194 C160 200 176 218 178 258 Z" fill="#17161C"/>
+<path d="M90 194 L110 236 L98 244 L76 218 Z" fill="#201F27"/>
+<path d="M130 194 L110 236 L122 244 L144 218 Z" fill="#201F27"/>
+<path d="M90 194 L110 236 M130 194 L110 236" fill="none" stroke="#3A3642" stroke-width="1.2"/>
+<circle cx="140" cy="226" r="3.4" fill="#C9A24A"/><circle cx="139" cy="225" r="1.1" fill="#F2DDA0"/>
+
+<ellipse cx="48" cy="126" rx="7" ry="10" fill="#F2D9C6" stroke="#2A2325" stroke-width="1.4"/>
+<ellipse cx="172" cy="126" rx="7" ry="10" fill="#F2D9C6" stroke="#2A2325" stroke-width="1.4"/>
+<circle cx="48" cy="136" r="3.2" fill="#FFFFFF" stroke="#9A9AA0" stroke-width="1"/><circle cx="47" cy="135" r="1" fill="#FFFFFF"/>
+<circle cx="172" cy="136" r="3.2" fill="#FFFFFF" stroke="#9A9AA0" stroke-width="1"/><circle cx="171" cy="135" r="1" fill="#FFFFFF"/>
+
+<path d="M48 118 C48 64 78 42 110 42 C142 42 172 64 172 118 C172 152 148 184 110 184 C72 184 48 152 48 118 Z" fill="#F7E4D4" stroke="#2A2325" stroke-width="1.6"/>
+<path d="M74 166 C88 182 132 182 146 166 C132 174 88 174 74 166 Z" fill="#E6C2AE" opacity=".5"/>
+
+<path d="M48 112 C48 60 78 40 110 40 C142 40 172 60 172 112 C168 86 150 62 110 62 C70 62 52 86 48 112 Z" fill="#1E1B22"/>
+<path d="M110 42 C109 48 109 54 110 62" fill="none" stroke="#3A3642" stroke-width="1.4" stroke-linecap="round"/>
+<path d="M78 52 C90 46 104 44 118 46" fill="none" stroke="#4A4553" stroke-width="1.6" stroke-linecap="round" opacity=".85"/>
+<path d="M60 74 C56 88 54 102 56 116" fill="none" stroke="#1E1B22" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M160 74 C164 88 166 102 164 116" fill="none" stroke="#1E1B22" stroke-width="2.2" stroke-linecap="round"/>
+
+<path d="M108 136 q2 4 4 0" fill="none" stroke="#C89A86" stroke-width="1.4" stroke-linecap="round"/>
+
+<g class="f f-neutral">
+  <g class="eye"><path d="M70 126 C75 115 93 115 98 126 C93 135 75 135 70 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="85" cy="127" r="5.2" fill="#3A2A28"/><circle cx="85" cy="127" r="2.4" fill="#14100F"/><circle cx="83" cy="124.5" r="1.6" fill="#FFFFFF"/><circle cx="87.5" cy="129.5" r=".8" fill="#FFFFFF"/><path d="M70 126 C75 115 93 115 98 126" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/><path d="M98 126 L102 122" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <g class="eye"><path d="M122 126 C127 115 145 115 150 126 C145 135 127 135 122 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="135" cy="127" r="5.2" fill="#3A2A28"/><circle cx="135" cy="127" r="2.4" fill="#14100F"/><circle cx="133" cy="124.5" r="1.6" fill="#FFFFFF"/><circle cx="137.5" cy="129.5" r=".8" fill="#FFFFFF"/><path d="M122 126 C127 115 145 115 150 126" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/><path d="M122 126 L118 122" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <path d="M70 108 C78 103 90 103 98 107" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/><path d="M122 107 C130 103 142 103 150 108" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M101 152 C105 150 115 150 119 152 C115 156.5 105 156.5 101 152 Z" fill="#A8323F"/><path d="M104 151.5 C108 150.5 112 150.5 116 151.5" fill="none" stroke="#7E1F2C" stroke-width="1"/>
+</g>
+
+<g class="f f-sharp">
+  <g class="eye"><path d="M70 127 C76 119 92 119 98 127 C92 133 76 133 70 127 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="85" cy="127.5" r="4.8" fill="#3A2A28"/><circle cx="85" cy="127.5" r="2.2" fill="#14100F"/><circle cx="83.2" cy="125.4" r="1.3" fill="#FFFFFF"/><path d="M70 127 C76 119 92 119 98 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M98 127 L103 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <g class="eye"><path d="M122 127 C128 119 144 119 150 127 C144 133 128 133 122 127 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="135" cy="127.5" r="4.8" fill="#3A2A28"/><circle cx="135" cy="127.5" r="2.2" fill="#14100F"/><circle cx="133.2" cy="125.4" r="1.3" fill="#FFFFFF"/><path d="M122 127 C128 119 144 119 150 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M122 127 L117 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <path d="M70 106 C80 104 90 106 98 111" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/><path d="M122 111 C130 106 140 104 150 106" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M101 153 L119 153" fill="none" stroke="#A8323F" stroke-width="2.8" stroke-linecap="round"/>
+</g>
+
+<g class="f f-smile">
+  <path d="M71 127 C76 118 92 118 97 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M97 127 L102 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M123 127 C128 118 144 118 149 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M123 127 L118 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/>
+  <path d="M70 108 C78 103 90 103 98 107" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/><path d="M122 107 C130 103 142 103 150 108" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/>
+  <ellipse cx="70" cy="142" rx="8" ry="4" fill="#F2B4B4" opacity=".5"/><ellipse cx="150" cy="142" rx="8" ry="4" fill="#F2B4B4" opacity=".5"/>
+  <path d="M100 151 C106 157.5 114 157.5 120 151 C114 154.5 106 154.5 100 151 Z" fill="#A8323F"/>
+</g>
+
+<g class="f f-angry">
+  <g class="eye"><path d="M70 127 C76 119 92 119 98 127 C92 132 76 132 70 127 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="85" cy="127.5" r="4.6" fill="#3A2A28"/><circle cx="85" cy="127.5" r="2.1" fill="#14100F"/><path d="M70 127 C76 119 92 119 98 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M98 127 L103 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <g class="eye"><path d="M122 127 C128 119 144 119 150 127 C144 132 128 132 122 127 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="135" cy="127.5" r="4.6" fill="#3A2A28"/><circle cx="135" cy="127.5" r="2.1" fill="#14100F"/><path d="M122 127 C128 119 144 119 150 127" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M122 127 L117 123" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <path d="M68 102 L98 112" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/><path d="M122 112 L152 102" fill="none" stroke="#1E1B22" stroke-width="2.8" stroke-linecap="round"/>
+  <path d="M101 156 C106 151 114 151 119 156 C114 154.5 106 154.5 101 156 Z" fill="#A8323F"/>
+  <path d="M160 66 l6 -6 M164 74 l8 -2 M156 60 l2 -8" fill="none" stroke="#C2410C" stroke-width="2" stroke-linecap="round"/>
+</g>
+
+<g class="f f-wide">
+  <g class="eye"><path d="M70 126 C74 112 96 112 100 126 C96 140 74 140 70 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="85" cy="127" r="5.8" fill="#3A2A28"/><circle cx="85" cy="127" r="2.6" fill="#14100F"/><circle cx="82.6" cy="124" r="2" fill="#FFFFFF"/><path d="M70 126 C74 112 96 112 100 126" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/></g>
+  <g class="eye"><path d="M120 126 C124 112 146 112 150 126 C146 140 124 140 120 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="135" cy="127" r="5.8" fill="#3A2A28"/><circle cx="135" cy="127" r="2.6" fill="#14100F"/><circle cx="132.6" cy="124" r="2" fill="#FFFFFF"/><path d="M120 126 C124 112 146 112 150 126" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/></g>
+  <path d="M70 102 C78 97 90 97 98 101" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/><path d="M122 101 C130 97 142 97 150 102" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/>
+  <ellipse cx="110" cy="154" rx="4.6" ry="5.6" fill="#A8323F"/><ellipse cx="110" cy="155.5" rx="2.6" ry="3" fill="#5A1B25"/>
+</g>
+
+<g class="f f-proud">
+  <g><path d="M70 126 C75 115 93 115 98 126 C93 135 75 135 70 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="85" cy="128" r="5" fill="#3A2A28"/><circle cx="85" cy="128" r="2.2" fill="#14100F"/><circle cx="83.2" cy="126" r="1.2" fill="#FFFFFF"/><path d="M70 126 C75 115 93 115 98 126 L98 125 C93 119 75 119 70 125 Z" fill="#F7E4D4"/><path d="M70 125 C75 119 93 119 98 125" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/><path d="M98 125 L103 121" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <g><path d="M122 126 C127 115 145 115 150 126 C145 135 127 135 122 126 Z" fill="#FFFFFF" stroke="#2A2325" stroke-width="1.3"/><circle cx="135" cy="128" r="5" fill="#3A2A28"/><circle cx="135" cy="128" r="2.2" fill="#14100F"/><circle cx="133.2" cy="126" r="1.2" fill="#FFFFFF"/><path d="M122 126 C127 115 145 115 150 126 L150 125 C145 119 127 119 122 125 Z" fill="#F7E4D4"/><path d="M122 125 C127 119 145 119 150 125" fill="none" stroke="#1E1B22" stroke-width="2.6" stroke-linecap="round"/><path d="M122 125 L117 121" stroke="#1E1B22" stroke-width="2" stroke-linecap="round"/></g>
+  <path d="M70 108 C78 103 90 103 98 107" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/><path d="M122 104 C130 99 142 100 150 106" fill="none" stroke="#1E1B22" stroke-width="2.4" stroke-linecap="round"/>
+  <ellipse cx="70" cy="142" rx="8" ry="4" fill="#F2B4B4" opacity=".4"/><ellipse cx="150" cy="142" rx="8" ry="4" fill="#F2B4B4" opacity=".4"/>
+  <path d="M100 152 C106 156 114 155 121 148" fill="none" stroke="#A8323F" stroke-width="2.8" stroke-linecap="round"/>
+</g>
+</svg></div></div>
+      <div class="box" id="sub"><img id="faceImg" alt="" decoding="async" draggable="false" hidden><div class="sb"><div class="name" id="dNameTag">김주영 스앵님</div><button type="button" id="tMore" class="tmore" hidden aria-controls="dText" aria-expanded="false">전체 ▾</button><div class="text" id="dText"></div></div></div>
+    </div>
+    <div id="ctl"><div class="choices" id="dCh"></div><div class="tip" id="dTip"></div></div>
+    <div id="chpills"></div>
+  </div>
+  <aside id="side"><div id="prog"><div class="k">이 챕터</div><div class="v" id="pV"></div><div class="bar"><i id="pBar"></i></div></div></aside>
+</div></main>
+<div id="ov"><div class="pn"><h2>목차</h2><div class="mt" id="ovMeta"></div><ul id="ovList"></ul><div class="row"><button class="cbt g" id="ovClose" type="button">닫기</button><span style="flex:1"></span><button class="cbt g" id="ovMemo" type="button">암기노트</button><button class="cbt g" id="ovBook" type="button">교재 보기</button><button class="cbt g" id="ovReset" type="button">이 회차 기록 지우기</button></div></div></div>
+<div id="figov" hidden role="dialog" aria-modal="true" aria-label="그림 크게 보기"><div class="fzh"><span>그림 크게 보기</span><button type="button" id="figovX" aria-keyshortcuts="Escape">닫기</button></div><div class="fz"></div></div>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script>/* 김주영 스앵님 판정 (대표님 2026-09-29 「개념 마인드맵은 스앵님이 학습을 통해 내가 뭘 알고 뭘 모르는지 알아서 파악」) — 원본은 이 파일 하나.
+   빌더가 교실·수업 노트·학습 덱·암기노트 페이지에 그대로 넣고(__JUDGE__), learn.html 은 patch_learn_judge.py 가 TJ-START~TJ-END 사이를 이 파일로 갈아 끼운다.
+   기록 = localStorage atto.evidence [{t, k, n:[노드], ok, v, lid, sid, qid, a, clean}] (최대 4000건 — 넘치면 읽기·질문 기록부터 버리고 노드마다 최근 문제 6건은 남긴다)
+     k: quiz(ok) 확인 문제 · read(clean) 챕터·섹션 끝(다시 설명·질문 없이 끝났으면 clean) · again 다시 설명 · ask 질문 · memo(ok) 암기노트 외움 · self(v) 카드 자가평가
+     a: 같은 시도 표시(카드 「다시 저장」) — 같은 a·qid 는 새 기록으로 바꿔 넣는다(정답 수가 늘지 않는다)
+   판정 = 노드마다 atto.mastery[id] = {quiz:{correct,total,ts}, self, sts, ts, score, state, auto} — learn.html 은 TJ.score 로 같은 식을 쓴다.
+     quiz = 최근 6번 · self(설명할 수 있나 1~5) = 읽음 4 · 다시 설명·질문 2번 이상이면 3 · 외움 +1 · 카드 자가평가가 더 최근이면 그 값
+     → 문제 없이 읽기만 하면 최대 「흔들림」, 「안다」는 문제로만. 점수식 = (0.5·정답률·감쇠(quiz.ts) + 0.2·self/5·감쇠(sts))/0.7, 문제 없으면 self/5·0.6·감쇠(sts)
+     감쇠 = 60일에 걸쳐 1 → 0.4 (최저 0.4). 정답 근거와 읽기·암기 근거를 따로 감쇠한다 — 오늘 암기 체크 하나로 90일 전 정답이 새것처럼 되지 않게(오타 .91 설계 검수 ⑦)
+   저장이 막히면(용량·사생활 모드) 이 페이지 안에서는 메모리 사본으로 이어 가고 rec 은 false 를 돌려준다. */
+(function(g){
+  var EK="atto.evidence", MK="atto.mastery", CAP=4000, KEEPQ=6, MEM={}, DIRTY={};
+  function rd(k,d){ if(DIRTY[k]) return MEM[k]; try{ var v=JSON.parse(localStorage.getItem(k)||"null"); return v==null?d:v; }catch(e){ return DIRTY[k]?MEM[k]:d; } }
+  function wr(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); DIRTY[k]=false; return true; }catch(e){ MEM[k]=v; DIRTY[k]=true; return false; } }
+  function decay(ts){ if(!ts) return 1; var d=Math.max(0,(Date.now()/1000-ts)/86400); return Math.max(.4,1-d/60); }
+  function score(e){ if(!e||typeof e!=="object") return {score:0,state:"unrated"};
+    var q=e.quiz||{}, tot=+q.total||0, cor=+q.correct||0, sv=e.self==null?null:Math.max(1,Math.min(5,+e.self));
+    if(tot<=0&&sv==null) return {score:0,state:"unrated"};
+    var dq=decay(+q.ts||+e.ts||0), ds=decay(+e.sts||+e.ts||0);
+    var raw=tot>0?(0.5*(cor/tot)*dq+0.2*((sv||0)/5)*ds)/0.7:(sv/5)*0.6*ds, s=Math.min(1,raw), st;
+    if(tot<=0) st=(sv>=4&&s>=.4)?"shaky":"unknown"; else st=s>=.7?"known":s>=.4?"shaky":"unknown";
+    return {score:Math.round(s*1000)/1000,state:st}; }
+  function why(evs){ var qz=evs.filter(function(e){return e.k==="quiz";}).slice(-KEEPQ), r={q:qz.length,c:qz.filter(function(e){return e.ok;}).length,
+      read:evs.filter(function(e){return e.k==="read";}).length, clean:evs.filter(function(e){return e.k==="read"&&e.clean;}).length,
+      conf:evs.filter(function(e){return (e.k==="again"||e.k==="ask")&&Date.now()-e.t<21*864e5;}).length,
+      memo:null, self:null, last:0, selfLast:0};
+    evs.forEach(function(e){ if(e.k==="memo") r.memo=!!e.ok; if(e.k==="self") r.self={v:+e.v,t:e.t}; if(e.t>r.last) r.last=e.t; if(e.k!=="quiz"&&e.t>r.selfLast) r.selfLast=e.t; });
+    return r; }
+  function judgeOne(id,L,M){ var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); if(!evs.length) return;
+    var r=why(evs), e=Object.assign({},M[id]||{}), qz=evs.filter(function(x){return x.k==="quiz";}).slice(-KEEPQ);
+    var self=null; if(r.read||r.conf||r.memo!=null){ self=r.read?4:3; if(r.conf>=2) self=3; if(r.memo) self=Math.min(5,self+1); }
+    var autoLast=0; evs.forEach(function(x){ if(x.k!=="self"&&x.t>autoLast) autoLast=x.t; });
+    if(r.self&&r.self.t>=autoLast) self=r.self.v;
+    e.quiz=qz.length?{correct:r.c,total:qz.length,ts:Math.round(qz[qz.length-1].t/1000)}:undefined; if(!e.quiz) delete e.quiz;
+    e.self=self; if(self==null){ delete e.self; delete e.sts; } else e.sts=Math.round(r.selfLast/1000);
+    e.ts=Math.round(r.last/1000); e.auto={by:"tutor",q:r.q,c:r.c,read:r.read,clean:r.clean,conf:r.conf,memo:r.memo};
+    var s=score(e); e.score=s.score; e.state=s.state; M[id]=e; }
+  function judge(ids){ var L=rd(EK,[]), M=rd(MK,{}); if(!Array.isArray(L)) L=[]; if(!M||typeof M!=="object") M={}; (ids||[]).forEach(function(id){ judgeOne(id,L,M); });
+    wr(MK,M); return M; }
+  function all(){ var L=rd(EK,[]), o={}; if(Array.isArray(L)) L.forEach(function(e){ (e&&e.n||[]).forEach(function(i){ o[i]=1; }); }); return judge(Object.keys(o)); }
+  /* 상한 넘침: 노드마다 최근 문제 KEEPQ 건은 지키고, 나머지(읽기·질문·오래된 문제)에서 오래된 것부터 버린다 — 다른 노드 활동으로 정답 기록이 사라지지 않게 */
+  function trim(L,cap){ cap=cap||CAP; if(L.length<=cap) return L; var seen={}, keep=[], rest=[], i;
+    for(i=L.length-1;i>=0;i--){ var e=L[i], k=false; if(e&&e.k==="quiz") (e.n||[]).forEach(function(id){ seen[id]=(seen[id]||0)+1; if(seen[id]<=KEEPQ) k=true; }); (k?keep:rest).push(e); }
+    keep.reverse(); rest.reverse(); rest=rest.slice(Math.max(0,rest.length-Math.max(0,cap-keep.length)));
+    return keep.concat(rest).sort(function(a,b){ return (a.t||0)-(b.t||0); }); }
+  function rec(ev){ if(!ev||!Array.isArray(ev.n)||!ev.n.length) return false; var L=rd(EK,[]); if(!Array.isArray(L)) L=[];
+    ev.t=Date.now();
+    if(ev.a!=null&&ev.qid!=null){ for(var i=L.length-1;i>=0;i--){ var x=L[i]; if(x&&x.k===ev.k&&x.qid===ev.qid&&x.a===ev.a){ L.splice(i,1); break; } } }
+    L.push(ev); L=trim(L);
+    /* 저장 실패 → 절반 상한으로 다시(이때도 노드마다 최근 정답은 지킨다, 오타 설계 2차) · 그래도 실패면 메모리 사본은 자르지 않은 전체로 */
+    var ok=wr(EK,L); if(!ok){ var half=trim(L,Math.floor(CAP/2)); if(wr(EK,half)){ L=half; ok=true; } else { MEM[EK]=L; DIRTY[EK]=true; } }
+    judge(ev.n); return ok; }
+  function reasons(id){ var L=rd(EK,[]); if(!Array.isArray(L)) return null; var evs=L.filter(function(e){ return e&&e.n&&e.n.indexOf(id)>=0; }); return evs.length?why(evs):null; }
+  g.TJ={rec:rec,judge:judge,all:all,score:score,reasons:reasons,trim:trim};
+})(typeof window!=="undefined"?window:this);
+</script>
+<script>
+const D={"id": "statics-2026-09-30", "slug": "statics", "course": "정역학", "date": "2026-09-30", "sess": "9/30(수) · 5주차", "title": "움직임을 막는 곳에만 힘이 생긴다 — 평형식 3개와 지지대 반력", "lead": "앞부분은 Ch.4를 네 줄로 정리(등가계·힘 + 우력·힘 옮기기·렌치). 그다음 <b>Ch.5 평형<\/b>에 들어가며 \"중간고사는 5장까지, 3·4·5\"를 다시 못 박았다. 평형 = \\(\\sum\\mathbf F=0\\) 그리고 \\(\\sum\\mathbf M_P=0\\), 2D에서는 식 <b>3개<\/b>. 그 3개로 풀려면 지지대가 어떤 반력을 주는지 정확히 알아야 하고, 원리는 한 줄 — <b>자유롭게 움직이는 방향으로는 힘을 못 준다<\/b>. 핀·롤러·매끈한/거친 면·슬라이더·고정을 이 원리로 판정하고 자유물체도 4단계와 예제 2개로 마쳤다. 교수님 필기본 14쪽 순서대로, 말씀은 LMS 영상에서 옮겼다.", "minutes": 18, "chapters": [{"id": "s1", "title": "Ch.4 요약 — 등가계 · 힘 하나 + 우력 하나 · M = r × F · 렌치", "steps": [{"id": "s1-1", "t": "v2", "b": [{"k": "h", "h": "Ch.4 요약 — 네 줄"}, {"k": "f", "h": "\\[(\\textstyle\\sum\\mathbf F)_1=(\\sum\\mathbf F)_2,\\qquad(\\sum\\mathbf M_P)_1=(\\sum\\mathbf M_P)_2\\]"}, {"k": "li", "h": "등가 = 합력 같고 한 점의 합모멘트 같음"}], "braw": ["# Ch.4 요약 — 네 줄", "= (\\textstyle\\sum\\mathbf F)_1=(\\sum\\mathbf F)_2,\\qquad(\\sum\\mathbf M_P)_1=(\\sum\\mathbf M_P)_2", "• 등가 = 합력 같고 한 점의 합모멘트 같음"], "s": "자, 9/30이에요. 앞부분은 4장을 네 줄로 정리하셨어요. 첫째, 등가 조건. 합력이 같고 한 점의 합모멘트가 같다. 한 점이면 충분하다는 게 오늘 평형 조건으로 바로 이어져요.", "fig": null, "fs": 0}, {"id": "s1-2", "t": "v2", "b": [{"k": "li", "h": "여러 힘 · 우력이 얽힌 계"}], "braw": ["• 여러 힘 · 우력이 얽힌 계"], "s": "아무리 복잡하게 얽힌 힘과 우력도", "fig": "recap", "fs": 1}, {"id": "s1-3", "t": "v2", "b": [{"k": "res", "h": "P 의 힘 하나 + 우력 하나 (필기 빨강)"}, {"k": "li", "h": "힘을 옮기면 M = r × F 를 더한다"}], "braw": ["→ P 의 힘 하나 + 우력 하나 (필기 빨강)", "• 힘을 옮기면 M = r × F 를 더한다"], "s": "점 P 의 힘 하나와 우력 하나로 바꿀 수 있어요. 힘을 다른 점으로 옮기면 r 곱하기 F 를 더해야 하고요.", "fig": "recap", "fs": 2}, {"id": "s1-4", "t": "v2", "b": [{"k": "res", "h": "렌치 = F + M∥ (가장 단순한 일반 등가계)"}, {"k": "li", "h": "M∥ = F 에 평행한 우력 — 수직 성분은 옮겨서 없앤다"}], "braw": ["→ 렌치 = F + M∥ (가장 단순한 일반 등가계)", "• M∥ = F 에 평행한 우력 — 수직 성분은 옮겨서 없앤다"], "s": "마지막, 가장 단순한 일반 등가계는 렌치. 힘과 그 힘에 평행한 우력. 9/28 에 본 M p 와 같은 거예요.", "fig": "recap", "fs": 3}, {"id": "s1-5", "t": "v2", "b": [{"k": "star", "h": "비유 : 장바구니 = 끌리는 힘 하나 + 손목 비틀림 하나", "tg": "ih"}, {"k": "memo", "h": "등가 = ΣF 같음 + 한 점 ΣM_P 같음 · 힘 하나 + 우력 하나 · 옮기면 r × F · 렌치 F + M∥", "tg": "am"}], "braw": ["☆ 비유 : 장바구니 = 끌리는 힘 하나 + 손목 비틀림 하나", "■ 외울 것 : 등가 = ΣF 같음 + 한 점 ΣM_P 같음 · 힘 하나 + 우력 하나 · 옮기면 r × F · 렌치 F + M∥"], "s": "짐 가득한 장바구니도 결국 어느 쪽으로 얼마나 끌리나, 손목이 얼마나 비틀리나 두 가지로 느껴지죠.", "fig": null, "fs": 0}], "figs": {"recap": {"svg": "<figure class=\"fig lite\" data-fig=\"recap\"><svg class=\"fig-svg\" viewbox=\"0 0 560 200\" width=\"560\" height=\"200\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\" id=\"fig-statics-2026-09-30-s1-recap\"><defs><marker id=\"ah-statics-2026-09-30-s1-recap\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><g data-step=\"1\"><rect x=\"20\" y=\"50\" width=\"150\" height=\"110\" rx=\"14\" fill=\"rgba(138,151,166,.08)\" stroke=\"#8A97A6\" stroke-width=\"1.6\"><\/rect><line x1=\"40\" y1=\"140\" x2=\"80\" y2=\"110\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s1-recap)\"><\/line><line x1=\"150\" y1=\"150\" x2=\"130\" y2=\"100\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s1-recap)\"><\/line><line x1=\"110\" y1=\"70\" x2=\"150\" y2=\"64\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s1-recap)\"><\/line><path d=\"M81.3 73.5 A 13 13 0 1 0 81.3 86.5\" fill=\"none\" stroke=\"#E03131\" stroke-width=\"2\" marker-end=\"url(#ah-statics-2026-09-30-s1-recap)\"><\/path><text x=\"95\" y=\"186\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">여러 힘 · 우력<\/text><\/g><g data-step=\"2\"><text x=\"196\" y=\"112\" font-size=\"22\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">⇒<\/text><circle cx=\"270\" cy=\"140\" r=\"4\" fill=\"#1F2A44\"><\/circle><text x=\"258\" y=\"156\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">P<\/text><line x1=\"270\" y1=\"140\" x2=\"300\" y2=\"70\" stroke=\"#2F9E44\" stroke-width=\"3\" marker-end=\"url(#ah-statics-2026-09-30-s1-recap)\"><\/line><text x=\"312\" y=\"80\" font-size=\"14\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">F<\/text><path d=\"M263.0 84.5 A 15 15 0 1 0 263.0 99.5\" fill=\"none\" stroke=\"#E03131\" stroke-width=\"2\" marker-end=\"url(#ah-statics-2026-09-30-s1-recap)\"><\/path><text x=\"226\" y=\"70\" font-size=\"14\" fill=\"#E03131\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">M<\/text><text x=\"270\" y=\"186\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">P 의 F + 우력 M<\/text><\/g><g data-step=\"3\"><text x=\"352\" y=\"112\" font-size=\"22\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">⇒<\/text><circle cx=\"440\" cy=\"150\" r=\"4\" fill=\"#1F2A44\"><\/circle><line x1=\"440\" y1=\"150\" x2=\"440\" y2=\"60\" stroke=\"#2F9E44\" stroke-width=\"3\" marker-end=\"url(#ah-statics-2026-09-30-s1-recap)\"><\/line><text x=\"452\" y=\"72\" font-size=\"14\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">F<\/text><line x1=\"480\" y1=\"150\" x2=\"480\" y2=\"90\" stroke=\"#E03131\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s1-recap)\"><\/line><text x=\"492\" y=\"100\" font-size=\"14\" fill=\"#E03131\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">M∥<\/text><text x=\"460\" y=\"186\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">렌치 F + M∥<\/text><\/g><\/svg><figcaption>필기 p.2·p.3 Ch.4 요약. 등가 = 합력 같고 한 점의 합모멘트 같음 → 어떤 계든 힘 하나 + 우력 하나 → 수직 성분은 힘을 옮겨 흡수해 렌치(\\(\\mathbf F+\\mathbf M_\\parallel\\)).<\/figcaption><\/figure>", "max": 3}}, "say": null}, {"id": "s2", "title": "Ch.5 평형 · 5.1 2D — 조건 두 개, 스칼라식 세 개", "steps": [{"id": "s2-1", "t": "v2", "b": [{"k": "h", "h": "Ch.5 평형 · 5.1 2D"}, {"k": "star", "h": "「중간고사는 5장까지 — 3, 4, 5」 (10/19)", "tg": "ex"}], "braw": ["# Ch.5 평형 · 5.1 2D", "☆ 시험 : 「중간고사는 5장까지 — 3, 4, 5」 (10/19)"], "s": "5장 들어가면서 다시 못 박으셨어요. 저희 중간고사는 5장까지, 3, 4, 5. 이 회차부터가 시험 범위 마지막 장이에요.", "fig": null, "fs": 0}, {"id": "s2-2", "t": "v2", "b": [{"k": "li", "h": "평형이면 두 조건을 모두"}, {"k": "f", "h": "\\[\\sum\\mathbf F=0,\\qquad\\sum\\mathbf M_P=0\\]"}, {"k": "res", "h": "모멘트 평형은 모든 점에서 확인할 필요 없다 (필기 파랑)"}], "braw": ["• 평형이면 두 조건을 모두", "= \\sum\\mathbf F=0,\\qquad\\sum\\mathbf M_P=0", "→ 모멘트 평형은 모든 점에서 확인할 필요 없다 (필기 파랑)"], "s": "평형이면 두 조건을 동시에. 외력 합이 0, 그리고 한 점에 대한 모멘트 합이 0. 모멘트는 모든 점에서 확인할 필요 없어요. 4장에서 한 점에서 같으면 모든 점에서 같다고 했죠.", "fig": null, "fs": 0}, {"id": "s2-3", "t": "v2", "b": [{"k": "li", "h": "핀 + 롤러로 받친 보에 하중"}], "braw": ["• 핀 + 롤러로 받친 보에 하중"], "s": "핀과 롤러로 받친 보에 하중이 걸린 그림으로 볼게요.", "fig": "eq3", "fs": 1}, {"id": "s2-4", "t": "v2", "b": [{"k": "li", "h": "지지대가 주는 반력 A_x, A_y, B"}], "braw": ["• 지지대가 주는 반력 A_x, A_y, B"], "s": "지지대가 보에 주는 반력, 핀에서 A x, A y, 롤러에서 B. 이 셋이 미지수예요.", "fig": "eq3", "fs": 2}, {"id": "s2-5", "t": "v2", "b": [{"k": "f", "h": "\\[\\sum F_x=0,\\quad\\sum F_y=0,\\quad\\sum M_P=0\\]"}, {"k": "li", "h": "2D 는 스칼라식 3개가 훨씬 단순"}], "braw": ["= \\sum F_x=0,\\quad\\sum F_y=0,\\quad\\sum M_P=0", "• 2D 는 스칼라식 3개가 훨씬 단순"], "s": "2D 에서는 벡터식을 성분으로 풀면 스칼라식 세 개. 평면 문제의 모멘트는 z 성분 하나뿐이라서요.", "fig": "eq3", "fs": 3}, {"id": "s2-6", "t": "v2", "b": [{"k": "res", "h": "FBD 하나에서 독립 방정식 최대 3개 → 미지수 3개까지"}], "braw": ["→ FBD 하나에서 독립 방정식 최대 3개 → 미지수 3개까지"], "s": "그래서 자유물체도 하나에서 독립 방정식은 최대 세 개, 풀 수 있는 미지수도 세 개까지. 교수님 질문, 평형이면 외력 합은? 0이에요.", "fig": "eq3", "fs": 4}, {"id": "s2-7", "t": "v2", "b": [{"k": "star", "h": "비유 : 좌우로 · 위아래로 안 밀리고 제자리에서 안 돈다", "tg": "ih"}, {"k": "memo", "h": "평형 ⇔ ΣF = 0 그리고 ΣM_P = 0 · 모멘트는 한 점만 · 2D 식 3개 · 미지수 최대 3개", "tg": "am"}], "braw": ["☆ 비유 : 좌우로 · 위아래로 안 밀리고 제자리에서 안 돈다", "■ 외울 것 : 평형 ⇔ ΣF = 0 그리고 ΣM_P = 0 · 모멘트는 한 점만 · 2D 식 3개 · 미지수 최대 3개"], "s": "좌우로 안 밀리고, 위아래로 안 밀리고, 제자리에서 안 돈다. 세 가지가 다 막혀야 가만히 있어요.", "fig": null, "fs": 0}], "figs": {"eq3": {"svg": "<figure class=\"fig lite\" data-fig=\"eq3\"><svg class=\"fig-svg\" viewbox=\"0 0 580 220\" width=\"580\" height=\"220\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\" id=\"fig-statics-2026-09-30-s2-eq3\"><defs><marker id=\"ah-statics-2026-09-30-s2-eq3\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><g data-step=\"1\"><rect x=\"40\" y=\"100\" width=\"280\" height=\"12\" rx=\"3\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/rect><path d=\"M60 110 L44 138 L76 138 Z\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/path><circle cx=\"60\" cy=\"110\" r=\"4.5\" fill=\"#fff\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/circle><line x1=\"36\" y1=\"138\" x2=\"84\" y2=\"138\" stroke=\"#1F2A44\" stroke-width=\"2.4\"><\/line><line x1=\"42.0\" y1=\"140\" x2=\"35.0\" y2=\"148\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"52.0\" y1=\"140\" x2=\"45.0\" y2=\"148\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"62.0\" y1=\"140\" x2=\"55.0\" y2=\"148\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"72.0\" y1=\"140\" x2=\"65.0\" y2=\"148\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><path d=\"M300 110 L286 130 L314 130 Z\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/path><circle cx=\"300\" cy=\"110\" r=\"4.5\" fill=\"#fff\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/circle><circle cx=\"292\" cy=\"136\" r=\"5.5\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/circle><circle cx=\"308\" cy=\"136\" r=\"5.5\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/circle><line x1=\"276\" y1=\"142\" x2=\"324\" y2=\"142\" stroke=\"#1F2A44\" stroke-width=\"2.4\"><\/line><line x1=\"282.0\" y1=\"144\" x2=\"275.0\" y2=\"152\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"292.0\" y1=\"144\" x2=\"285.0\" y2=\"152\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"302.0\" y1=\"144\" x2=\"295.0\" y2=\"152\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"312.0\" y1=\"144\" x2=\"305.0\" y2=\"152\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"180\" y1=\"36\" x2=\"180\" y2=\"96\" stroke=\"#1F2A44\" stroke-width=\"2.6\" marker-end=\"url(#ah-statics-2026-09-30-s2-eq3)\"><\/line><text x=\"192\" y=\"50\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">하중<\/text><text x=\"60\" y=\"180\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<\/text><text x=\"300\" y=\"186\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">B<\/text><\/g><g data-step=\"2\"><line x1=\"2\" y1=\"106\" x2=\"38\" y2=\"106\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s2-eq3)\"><\/line><text x=\"18\" y=\"94\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<tspan baseline-shift=\"sub\" font-size=\"72%\">x<\/tspan><\/text><line x1=\"60\" y1=\"98\" x2=\"60\" y2=\"48\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s2-eq3)\"><\/line><text x=\"72\" y=\"60\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<tspan baseline-shift=\"sub\" font-size=\"72%\">y<\/tspan><\/text><line x1=\"300\" y1=\"98\" x2=\"300\" y2=\"48\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s2-eq3)\"><\/line><text x=\"312\" y=\"60\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">B<\/text><\/g><g data-step=\"3\"><text x=\"470\" y=\"70\" font-size=\"15\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">ΣF<tspan baseline-shift=\"sub\" font-size=\"72%\">x<\/tspan> = 0<\/text><text x=\"470\" y=\"100\" font-size=\"15\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">ΣF<tspan baseline-shift=\"sub\" font-size=\"72%\">y<\/tspan> = 0<\/text><text x=\"470\" y=\"130\" font-size=\"15\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">ΣM<tspan baseline-shift=\"sub\" font-size=\"72%\">P<\/tspan> = 0<\/text><\/g><g data-step=\"4\"><text x=\"470\" y=\"170\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">독립 방정식 최대 3개<\/text><text x=\"470\" y=\"192\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">→ 미지수 3개까지 푼다<\/text><\/g><\/svg><figcaption>2D 평형(필기 p.4·p.5). 반력 화살표는 지지대가 보에 주는 힘을 지지대 옆에 따로 그린 것. 미지수 \\(A_x,A_y,B\\) 3개 = 식 3개.<\/figcaption><\/figure>", "max": 4}}, "say": null}, {"id": "s3", "title": "하중과 반력 — free of motion ⇒ cannot exert force", "steps": [{"id": "s3-1", "t": "v2", "b": [{"k": "h", "h": "하중과 반력"}, {"k": "li", "h": "지지대 = 움직이지 못하게 막는 것 (prevent it from moving)"}, {"k": "li", "h": "반력 = 지지대가 물체에 주는 힘 · 우력"}], "braw": ["# 하중과 반력", "• 지지대 = 움직이지 못하게 막는 것 (prevent it from moving)", "• 반력 = 지지대가 물체에 주는 힘 · 우력"], "s": "지지대는 물체가 움직이지 못하게 막는 것. 교수님이 prevented from moving, 이 개념을 잘 기억하라고 하셨어요. 막으려면 반대로 힘을 줘야 하니 그게 반력.", "fig": null, "fs": 0}, {"id": "s3-2", "t": "v2", "b": [{"k": "li", "h": "홈을 따라 움직이는 물체"}], "braw": ["• 홈을 따라 움직이는 물체"], "s": "홈을 따라 움직이는 물체로 원리를 볼게요.", "fig": "free", "fs": 1}, {"id": "s3-3", "t": "v2", "b": [{"k": "li", "h": "좌우는 자유 → 그 방향으로 붙잡아 주는 것이 없다"}], "braw": ["• 좌우는 자유 → 그 방향으로 붙잡아 주는 것이 없다"], "s": "좌우로는 자유롭게 움직여요. 자유롭다는 건 그 방향으로 아무것도 붙잡아 주지 않는다는 뜻이죠.", "fig": "free", "fs": 2}, {"id": "s3-4", "t": "v2", "b": [{"k": "res", "h": "위아래는 막혀 있다 → 막힌 방향에만 반력"}], "braw": ["→ 위아래는 막혀 있다 → 막힌 방향에만 반력"], "s": "위아래는 막혀 있어요. 그러니 반력은 막힌 방향에만 생겨요.", "fig": "free", "fs": 3}, {"id": "s3-5", "t": "v2", "b": [{"k": "pit", "h": "free of motion ⇒ cannot exert force (필기 빨강)"}, {"k": "li", "h": "회전이 자유면 모멘트도 못 준다"}], "braw": ["! free of motion ⇒ cannot exert force (필기 빨강)", "• 회전이 자유면 모멘트도 못 준다"], "s": "필기 빨간 글씨, 움직임이 자유로우면 그 방향으로 힘을 줄 수 없다. 회전도 똑같아요. 회전이 자유로우면 모멘트를 못 줍니다. 오늘 나머지는 전부 이 한 줄로 풀려요.", "fig": "free", "fs": 4}, {"id": "s3-6", "t": "v2", "b": [{"k": "star", "h": "비유 : 지하철 손잡이 — 앞뒤로 흔들리니 매달린 방향으로만 받쳐 준다", "tg": "ih"}, {"k": "memo", "h": "지지대 = 움직임을 막는 것 · 막는 방향에만 반력 · 회전 자유면 모멘트 0", "tg": "am"}], "braw": ["☆ 비유 : 지하철 손잡이 — 앞뒤로 흔들리니 매달린 방향으로만 받쳐 준다", "■ 외울 것 : 지지대 = 움직임을 막는 것 · 막는 방향에만 반력 · 회전 자유면 모멘트 0"], "s": "지하철 손잡이는 앞뒤로 흔들리니 앞뒤로는 못 붙잡아 줘요. 매달린 방향으로만 받쳐 주죠.", "fig": null, "fs": 0}], "figs": {"free": {"svg": "<figure class=\"fig lite\" data-fig=\"free\"><svg class=\"fig-svg\" viewbox=\"0 0 560 210\" width=\"560\" height=\"210\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\" id=\"fig-statics-2026-09-30-s3-free\"><defs><marker id=\"ah-statics-2026-09-30-s3-free\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><g data-step=\"1\"><line x1=\"40\" y1=\"140\" x2=\"520\" y2=\"140\" stroke=\"#1F2A44\" stroke-width=\"4\"><\/line><rect x=\"230\" y=\"118\" width=\"80\" height=\"44\" rx=\"8\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/rect><text x=\"130\" y=\"122\" font-size=\"12.5\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">홈(막대)을 따라 움직이는 물체<\/text><\/g><g data-step=\"2\"><line x1=\"270\" y1=\"92\" x2=\"360\" y2=\"92\" stroke=\"#8A97A6\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s3-free)\"><\/line><line x1=\"270\" y1=\"92\" x2=\"180\" y2=\"92\" stroke=\"#8A97A6\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s3-free)\"><\/line><text x=\"270\" y=\"70\" font-size=\"13\" fill=\"#8A97A6\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">움직임이 자유 → 그 방향으로 힘을 줄 수 없다<\/text><\/g><g data-step=\"3\"><line x1=\"270\" y1=\"204\" x2=\"270\" y2=\"166\" stroke=\"#2F9E44\" stroke-width=\"3\" marker-end=\"url(#ah-statics-2026-09-30-s3-free)\"><\/line><text x=\"284\" y=\"192\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">막힌 방향 → 반력<\/text><\/g><g data-step=\"4\"><text x=\"110\" y=\"30\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">free of motion ⇒ cannot exert force<\/text><\/g><\/svg><figcaption>필기 p.6 빨간 글씨. 지지대는 물체가 <b>움직이지 못하게 막는 것<\/b>, 그래서 막는 방향에만 반력이 생긴다. 회전이 자유로우면 모멘트도 못 준다.<\/figcaption><\/figure>", "max": 4}}, "say": null}, {"id": "s4", "title": "핀 지지 · 롤러 지지", "steps": [{"id": "s4-1", "t": "v2", "b": [{"k": "h", "h": "핀 지지 · 롤러 지지"}], "braw": ["# 핀 지지 · 롤러 지지"], "s": "이제 지지대를 하나씩 판정해요. 질문은 늘 같아요. 무엇을 막고 무엇이 자유인가.", "fig": null, "fs": 0}, {"id": "s4-2", "t": "v2", "b": [{"k": "li", "h": "핀 : 이동을 막는다 → 힘을 준다"}], "braw": ["• 핀 : 이동을 막는다 → 힘을 준다"], "s": "핀이에요. 땅에 박혀 있어서 잡아당겨도 이동을 못 해요. 그러니 힘을 줍니다.", "fig": "pinroller", "fs": 1}, {"id": "s4-3", "t": "v2", "b": [{"k": "res", "h": "반력 A_x, A_y (2개)"}, {"k": "pit", "h": "핀 축 둘레 회전은 자유 → 우력 모멘트는 못 준다"}], "braw": ["→ 반력 A_x, A_y (2개)", "! 핀 축 둘레 회전은 자유 → 우력 모멘트는 못 준다"], "s": "방향을 모르니 x, y 두 성분, A x 와 A y. 그런데 핀이 모멘트를 줄 수 있나요? 없는 거죠. 회전은 자유니까요. 핀에 모멘트를 그려 넣으면 미지수가 늘어서 식 3개로 못 풀어요.", "fig": "pinroller", "fs": 2}, {"id": "s4-4", "t": "v2", "b": [{"k": "li", "h": "롤러 = 바퀴 위에 올린 핀"}], "braw": ["• 롤러 = 바퀴 위에 올린 핀"], "s": "롤러는 바퀴 위에 올린 핀이에요.", "fig": "pinroller", "fs": 3}, {"id": "s4-5", "t": "v2", "b": [{"k": "res", "h": "반력 = 받치는 면에 수직인 힘 1개"}, {"k": "pit", "h": "면을 따라 자유 → 면에 평행한 힘은 못 준다"}], "braw": ["→ 반력 = 받치는 면에 수직인 힘 1개", "! 면을 따라 자유 → 면에 평행한 힘은 못 준다"], "s": "면을 따라 자유롭게 굴러가니 면에 평행한 힘은 못 줘요. 땅을 뚫지도, 떠오르지도 않게 받쳐 주는 힘 하나. 롤러에 평행력 그리는 거, 가장 흔한 감점이에요.", "fig": "pinroller", "fs": 4}, {"id": "s4-6", "t": "v2", "b": [{"k": "star", "h": "비유 : 핀 = 문 경첩 · 롤러 = 바퀴 달린 의자", "tg": "ih"}, {"k": "memo", "h": "핀 = A_x, A_y (모멘트 없음) · 롤러 = 면에 수직인 힘 1개", "tg": "am"}], "braw": ["☆ 비유 : 핀 = 문 경첩 · 롤러 = 바퀴 달린 의자", "■ 외울 것 : 핀 = A_x, A_y (모멘트 없음) · 롤러 = 면에 수직인 힘 1개"], "s": "핀은 문 경첩. 문을 떼어 갈 수는 없지만 돌리는 건 마음대로. 롤러는 바퀴 달린 의자, 바닥이 위로 받쳐 주기만 해요.", "fig": null, "fs": 0}], "figs": {"pinroller": {"svg": "<figure class=\"fig lite\" data-fig=\"pinroller\"><svg class=\"fig-svg\" viewbox=\"0 0 580 210\" width=\"580\" height=\"210\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\" id=\"fig-statics-2026-09-30-s4-pinroller\"><defs><marker id=\"ah-statics-2026-09-30-s4-pinroller\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><g data-step=\"1\"><rect x=\"20\" y=\"70\" width=\"110\" height=\"12\" rx=\"3\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/rect><path d=\"M100 80 L84 108 L116 108 Z\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/path><circle cx=\"100\" cy=\"80\" r=\"4.5\" fill=\"#fff\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/circle><line x1=\"76\" y1=\"108\" x2=\"124\" y2=\"108\" stroke=\"#1F2A44\" stroke-width=\"2.4\"><\/line><line x1=\"82.0\" y1=\"110\" x2=\"75.0\" y2=\"118\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"92.0\" y1=\"110\" x2=\"85.0\" y2=\"118\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"102.0\" y1=\"110\" x2=\"95.0\" y2=\"118\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"112.0\" y1=\"110\" x2=\"105.0\" y2=\"118\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><text x=\"100\" y=\"140\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">핀 (pin)<\/text><\/g><g data-step=\"2\"><rect x=\"160\" y=\"70\" width=\"110\" height=\"12\" rx=\"3\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/rect><line x1=\"200\" y1=\"96\" x2=\"246\" y2=\"96\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s4-pinroller)\"><\/line><text x=\"222\" y=\"116\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<tspan baseline-shift=\"sub\" font-size=\"72%\">x<\/tspan><\/text><line x1=\"250\" y1=\"146\" x2=\"250\" y2=\"88\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s4-pinroller)\"><\/line><text x=\"262\" y=\"130\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<tspan baseline-shift=\"sub\" font-size=\"72%\">y<\/tspan><\/text><text x=\"204\" y=\"168\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">모멘트 ✕<\/text><\/g><g data-step=\"3\"><line x1=\"296\" y1=\"20\" x2=\"296\" y2=\"200\" stroke=\"#8A97A6\" stroke-width=\"1\" stroke-dasharray=\"3 4\"><\/line><rect x=\"312\" y=\"70\" width=\"110\" height=\"12\" rx=\"3\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/rect><path d=\"M392 80 L378 100 L406 100 Z\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/path><circle cx=\"392\" cy=\"80\" r=\"4.5\" fill=\"#fff\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/circle><circle cx=\"384\" cy=\"106\" r=\"5.5\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/circle><circle cx=\"400\" cy=\"106\" r=\"5.5\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/circle><line x1=\"368\" y1=\"112\" x2=\"416\" y2=\"112\" stroke=\"#1F2A44\" stroke-width=\"2.4\"><\/line><line x1=\"374.0\" y1=\"114\" x2=\"367.0\" y2=\"122\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"384.0\" y1=\"114\" x2=\"377.0\" y2=\"122\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"394.0\" y1=\"114\" x2=\"387.0\" y2=\"122\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"404.0\" y1=\"114\" x2=\"397.0\" y2=\"122\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><text x=\"392\" y=\"140\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">롤러 (roller)<\/text><\/g><g data-step=\"4\"><rect x=\"450\" y=\"70\" width=\"110\" height=\"12\" rx=\"3\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/rect><line x1=\"540\" y1=\"146\" x2=\"540\" y2=\"88\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s4-pinroller)\"><\/line><text x=\"530\" y=\"130\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"end\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A ⊥ 면<\/text><text x=\"500\" y=\"168\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">면에 평행한 힘 ✕<\/text><\/g><\/svg><figcaption>필기 p.7·p.8. 핀은 이동을 막아 힘 두 성분 \\(A_x,A_y\\)를 주지만 축 둘레 회전은 자유라 모멘트는 못 준다. 롤러(바퀴 위의 핀)는 면을 따라 자유라 면에 수직인 힘 하나.<\/figcaption><\/figure>", "max": 4}}, "say": null}, {"id": "s5", "title": "매끈한 면 · 거친 면 · 슬라이더 · 고정 지지 — 반력 개수 표", "steps": [{"id": "s5-1", "t": "v2", "b": [{"k": "h", "h": "매끈한 면 · 거친 면 · 슬라이더 · 고정"}, {"k": "star", "h": "「서포트에서 힘이 몇 개냐, 미지수가 몇 개냐 싸움」"}], "braw": ["# 매끈한 면 · 거친 면 · 슬라이더 · 고정", "☆ 「서포트에서 힘이 몇 개냐, 미지수가 몇 개냐 싸움」"], "s": "교수님 말 그대로, 서포트에서 힘이 몇 개냐, 미지수가 몇 개냐 싸움이에요. 남은 네 가지를 개수까지 세 볼게요.", "fig": null, "fs": 0}, {"id": "s5-2", "t": "v2", "b": [{"k": "li", "h": "매끈한 면 (마찰 무시) : 수직력만 → 1"}], "braw": ["• 매끈한 면 (마찰 무시) : 수직력만 → 1"], "s": "매끈한 면은 쭉 미끄러지니 롤러처럼 수직력만. 1개.", "fig": "supports", "fs": 1}, {"id": "s5-3", "t": "v2", "b": [{"k": "li", "h": "거친 면 (마찰 무시 불가) : 수직력 + 마찰력 → 2"}], "braw": ["• 거친 면 (마찰 무시 불가) : 수직력 + 마찰력 → 2"], "s": "거친 면은 미끄러지지 못하니 수직력에 마찰력까지. 2개.", "fig": "supports", "fs": 2}, {"id": "s5-4", "t": "v2", "b": [{"k": "li", "h": "슬라이더 · 구속 핀 : 한 방향 자유 → 수직 방향 힘 1"}], "braw": ["• 슬라이더 · 구속 핀 : 한 방향 자유 → 수직 방향 힘 1"], "s": "슬라이더, 구속 핀. 홈을 따라 한 방향은 자유, 그 수직 방향만 막혀요. 힘 하나.", "fig": "supports", "fs": 3}, {"id": "s5-5", "t": "v2", "b": [{"k": "li", "h": "고정 지지 (built-in) : 이동 · 회전 모두 막음"}, {"k": "res", "h": "A_x, A_y, M_A → 3"}], "braw": ["• 고정 지지 (built-in) : 이동 · 회전 모두 막음", "→ A_x, A_y, M_A → 3"], "s": "고정 지지는 벽에 박힌 막대. 돌지도 움직이지도 못해요. 힘 두 성분에 우력 모멘트 하나, 3개.", "fig": "supports", "fs": 4}, {"id": "s5-6", "t": "v2", "b": [{"k": "memo", "h": "핀 2 · 롤러 1 · 매끈한 면 1 · 거친 면 2 · 슬라이더 1 · 고정 3 (A_x, A_y, M_A)", "tg": "am"}, {"k": "li", "h": "원리로 다시 만들기 : 막는 이동 방향마다 힘 1, 회전을 막으면 모멘트 1"}], "braw": ["■ 외울 것 : 핀 2 · 롤러 1 · 매끈한 면 1 · 거친 면 2 · 슬라이더 1 · 고정 3 (A_x, A_y, M_A)", "• 원리로 다시 만들기 : 막는 이동 방향마다 힘 1, 회전을 막으면 모멘트 1"], "s": "이 표는 통째로 외우되, 막히면 원리로 다시 만드세요. 막는 이동 방향마다 힘 하나, 회전까지 막으면 모멘트 하나. 교재도 이 표에 완전히 익숙해져야 한다고 강조해요.", "fig": null, "fs": 0}, {"id": "s5-7", "t": "v2", "b": [{"k": "star", "h": "비유 : 빙판 · 고무 매트 · 커튼 고리 · 벽에 박힌 선반 받침", "tg": "ih"}], "braw": ["☆ 비유 : 빙판 · 고무 매트 · 커튼 고리 · 벽에 박힌 선반 받침"], "s": "매끈한 면은 빙판, 거친 면은 고무 매트, 슬라이더는 커튼 고리, 고정은 벽에 박힌 선반 받침. 그림으로 떠올리면 개수가 저절로 나와요.", "fig": null, "fs": 0}], "figs": {"supports": {"svg": "<figure class=\"fig lite\" data-fig=\"supports\"><svg class=\"fig-svg\" viewbox=\"0 0 600 230\" width=\"600\" height=\"230\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\" id=\"fig-statics-2026-09-30-s5-supports\"><defs><marker id=\"ah-statics-2026-09-30-s5-supports\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><g data-step=\"1\"><line x1=\"12\" y1=\"150\" x2=\"140\" y2=\"150\" stroke=\"#1F2A44\" stroke-width=\"2.4\"><\/line><line x1=\"18.0\" y1=\"152\" x2=\"11.0\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"31.333333333333336\" y1=\"152\" x2=\"24.333333333333336\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"44.66666666666667\" y1=\"152\" x2=\"37.66666666666667\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"58.0\" y1=\"152\" x2=\"51.0\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"71.33333333333334\" y1=\"152\" x2=\"64.33333333333334\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"84.66666666666667\" y1=\"152\" x2=\"77.66666666666667\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"98.0\" y1=\"152\" x2=\"91.0\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"111.33333333333333\" y1=\"152\" x2=\"104.33333333333333\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"124.66666666666667\" y1=\"152\" x2=\"117.66666666666667\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><rect x=\"45\" y=\"108\" width=\"60\" height=\"42\" rx=\"5\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/rect><line x1=\"75\" y1=\"200\" x2=\"75\" y2=\"156\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s5-supports)\"><\/line><text x=\"88\" y=\"192\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">N<\/text><text x=\"75\" y=\"30\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">매끈한 면<\/text><text x=\"75\" y=\"50\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">수직력만 · 1<\/text><\/g><g data-step=\"2\"><line x1=\"162\" y1=\"150\" x2=\"290\" y2=\"150\" stroke=\"#1F2A44\" stroke-width=\"2.4\"><\/line><line x1=\"168.0\" y1=\"152\" x2=\"161.0\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"181.33333333333334\" y1=\"152\" x2=\"174.33333333333334\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"194.66666666666666\" y1=\"152\" x2=\"187.66666666666666\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"208.0\" y1=\"152\" x2=\"201.0\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"221.33333333333334\" y1=\"152\" x2=\"214.33333333333334\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"234.66666666666669\" y1=\"152\" x2=\"227.66666666666669\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"248.0\" y1=\"152\" x2=\"241.0\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"261.3333333333333\" y1=\"152\" x2=\"254.33333333333331\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"274.6666666666667\" y1=\"152\" x2=\"267.6666666666667\" y2=\"160\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><rect x=\"195\" y=\"108\" width=\"60\" height=\"42\" rx=\"5\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/rect><line x1=\"240\" y1=\"200\" x2=\"240\" y2=\"156\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s5-supports)\"><\/line><text x=\"252\" y=\"192\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">N<\/text><line x1=\"220\" y1=\"174\" x2=\"176\" y2=\"174\" stroke=\"#FF4D8D\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s5-supports)\"><\/line><text x=\"186\" y=\"194\" font-size=\"13\" fill=\"#FF4D8D\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">f<\/text><text x=\"225\" y=\"30\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">거친 면<\/text><text x=\"225\" y=\"50\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">수직력 + 마찰력 · 2<\/text><\/g><g data-step=\"3\"><line x1=\"312\" y1=\"130\" x2=\"438\" y2=\"130\" stroke=\"#1F2A44\" stroke-width=\"4\"><\/line><rect x=\"355\" y=\"118\" width=\"40\" height=\"24\" rx=\"4\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/rect><line x1=\"375\" y1=\"98\" x2=\"425\" y2=\"98\" stroke=\"#8A97A6\" stroke-width=\"2\" marker-end=\"url(#ah-statics-2026-09-30-s5-supports)\"><\/line><line x1=\"375\" y1=\"98\" x2=\"325\" y2=\"98\" stroke=\"#8A97A6\" stroke-width=\"2\" marker-end=\"url(#ah-statics-2026-09-30-s5-supports)\"><\/line><text x=\"375\" y=\"84\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">자유<\/text><line x1=\"375\" y1=\"196\" x2=\"375\" y2=\"148\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s5-supports)\"><\/line><text x=\"388\" y=\"188\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<\/text><text x=\"375\" y=\"30\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">슬라이더<\/text><text x=\"375\" y=\"50\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">움직임에 수직 · 1<\/text><\/g><g data-step=\"4\"><rect x=\"458\" y=\"70\" width=\"14\" height=\"130\" rx=\"0\" fill=\"rgba(138,151,166,.35)\" stroke=\"#1F2A44\" stroke-width=\"1.5\"><\/rect><rect x=\"472\" y=\"124\" width=\"100\" height=\"12\" rx=\"3\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/rect><line x1=\"540\" y1=\"166\" x2=\"482\" y2=\"166\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s5-supports)\"><\/line><text x=\"548\" y=\"171\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<tspan baseline-shift=\"sub\" font-size=\"72%\">x<\/tspan><\/text><line x1=\"500\" y1=\"214\" x2=\"500\" y2=\"140\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s5-supports)\"><\/line><text x=\"512\" y=\"208\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<tspan baseline-shift=\"sub\" font-size=\"72%\">y<\/tspan><\/text><path d=\"M511.3 91.5 A 13 13 0 1 0 511.3 104.5\" fill=\"none\" stroke=\"#E03131\" stroke-width=\"2\" marker-end=\"url(#ah-statics-2026-09-30-s5-supports)\"><\/path><text x=\"524\" y=\"102\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">M<tspan baseline-shift=\"sub\" font-size=\"72%\">A<\/tspan><\/text><text x=\"525\" y=\"30\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">고정 (built-in)<\/text><text x=\"525\" y=\"50\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<tspan baseline-shift=\"sub\" font-size=\"72%\">x<\/tspan>, A<tspan baseline-shift=\"sub\" font-size=\"72%\">y<\/tspan>, M<tspan baseline-shift=\"sub\" font-size=\"72%\">A<\/tspan> · 3<\/text><\/g><\/svg><figcaption>필기 p.9~p.11. 숫자는 그 지지대가 만드는 미지수 개수. 원리는 하나 — 움직임이 막힌 방향에만 반력, 회전이 막혀야 모멘트.<\/figcaption><\/figure>", "max": 4}}, "say": null}, {"id": "s6", "title": "자유물체도 → 평형식 4단계 · 예제 1 (핀 + 30° 경사면 롤러)", "steps": [{"id": "s6-1", "t": "v2", "b": [{"k": "h", "h": "자유물체도 → 평형식 4단계"}, {"k": "li", "h": "① 물체만 떼기 ② 지지대 지우기"}, {"k": "li", "h": "③ 지지대를 줄 수 있는 반력으로 바꾸기 ④ 표시 후 평형식"}], "braw": ["# 자유물체도 → 평형식 4단계", "• ① 물체만 떼기 ② 지지대 지우기", "• ③ 지지대를 줄 수 있는 반력으로 바꾸기 ④ 표시 후 평형식"], "s": "필기 p.12, 핵심 4단계. 물체만 떼고, 지지대를 지우고, 지지대를 그것이 줄 수 있는 반력으로 바꾸고, 다 표시한 뒤 평형식. 셋째 단계에서 방금 표가 쓰여요.", "fig": null, "fs": 0}, {"id": "s6-2", "t": "v2", "b": [{"k": "li", "h": "예제 1 : 왼쪽 핀, 오른쪽 30° 경사면 위 롤러"}], "braw": ["• 예제 1 : 왼쪽 핀, 오른쪽 30° 경사면 위 롤러"], "s": "예제 1. 왼쪽은 핀, 오른쪽은 30도 경사면 위 롤러. 하중 숫자는 필기에 없어요.", "fig": "fbd", "fs": 1}, {"id": "s6-3", "t": "v2", "b": [{"k": "li", "h": "① 보만 떼어 낸다 ② 지지대를 지운다"}], "braw": ["• ① 보만 떼어 낸다 ② 지지대를 지운다"], "s": "보만 떼어 내고 핀과 롤러를 지워요.", "fig": "fbd", "fs": 2}, {"id": "s6-4", "t": "v2", "b": [{"k": "li", "h": "③ 핀 → A_x, A_y · 롤러 → 경사면에 수직인 B"}, {"k": "res", "h": "경사면이 수평과 30° → B 는 수직선과 30°"}], "braw": ["• ③ 핀 → A_x, A_y · 롤러 → 경사면에 수직인 B", "→ 경사면이 수평과 30° → B 는 수직선과 30°"], "s": "핀 자리에는 A x, A y. 롤러 자리에는 경사면에 수직인 힘 B 하나. 경사면이 수평과 30도면 그 법선은 수직선과 30도, 사이각이 그대로 유지돼요.", "fig": "fbd", "fs": 3}, {"id": "s6-5", "t": "v2", "b": [{"k": "f", "h": "\\[\\sum F_x=0,\\quad\\sum F_y=0,\\quad\\sum M_A=0\\]"}, {"k": "res", "h": "미지수 A_x, A_y, B = 3개 = 식 3개 → 풀린다"}], "braw": ["= \\sum F_x=0,\\quad\\sum F_y=0,\\quad\\sum M_A=0", "→ 미지수 A_x, A_y, B = 3개 = 식 3개 → 풀린다"], "s": "B 를 x, y 로 나눠서 평형식 세 개. 미지수 세 개, 식 세 개라 풀려요. 숫자 하중이 주어지면 쉽게 풀린다고 하셨어요.", "fig": "fbd", "fs": 4}, {"id": "s6-6", "t": "v2", "b": [{"k": "li", "h": "연습 (하중은 아톰 설정) : 보 4 m, 가운데 아래로 2 kN"}, {"k": "f", "h": "\\[\\sum M_A:\\ (B\\cos30^\\circ)(4)-(2)(2)=0\\ \\Rightarrow\\ B\\approx1.155\\ \\text{kN}\\]"}, {"k": "res", "h": "A_x ≈ 0.577 kN (오른쪽) · A_y = 1.000 kN (위)"}], "braw": ["• 연습 (하중은 아톰 설정) : 보 4 m, 가운데 아래로 2 kN", "= \\sum M_A:\\ (B\\cos30^\\circ)(4)-(2)(2)=0\\ \\Rightarrow\\ B\\approx1.155\\ \\text{kN}", "→ A_x ≈ 0.577 kN (오른쪽) · A_y = 1.000 kN (위)"], "s": "숫자를 넣어 볼게요. 하중은 아톰이 정한 거예요. A 에 대한 모멘트부터 잡으면 A x, A y 가 빠져서 B 가 바로 나와요. 1.155. 나머지는 힘의 평형으로. B 기준 모멘트로 검산하면 0이 나와요.", "fig": null, "fs": 0}, {"id": "s6-7", "t": "v2", "b": [{"k": "star", "h": "비유 : 주인공만 남기고 조명을 끈다 — 배경이 주던 손길은 화살표로", "tg": "ih"}, {"k": "memo", "h": "FBD 4단계 · 경사면 30° → 롤러 반력은 수직선과 30°", "tg": "am"}], "braw": ["☆ 비유 : 주인공만 남기고 조명을 끈다 — 배경이 주던 손길은 화살표로", "■ 외울 것 : FBD 4단계 · 경사면 30° → 롤러 반력은 수직선과 30°"], "s": "자유물체도는 주인공만 남기고 조명을 끄는 거예요. 배경이 주던 손길은 화살표로만 남기고, 그 개수를 표대로 정확히 세는 게 셋째 단계.", "fig": null, "fs": 0}], "figs": {"fbd": {"svg": "<figure class=\"fig lite\" data-fig=\"fbd\"><svg class=\"fig-svg\" viewbox=\"0 0 600 262\" width=\"600\" height=\"262\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\" id=\"fig-statics-2026-09-30-s6-fbd\"><defs><marker id=\"ah-statics-2026-09-30-s6-fbd\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><g data-step=\"1\"><rect x=\"60\" y=\"90\" width=\"360\" height=\"12\" rx=\"3\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/rect><path d=\"M70 100 L54 128 L86 128 Z\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/path><circle cx=\"70\" cy=\"100\" r=\"4.5\" fill=\"#fff\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/circle><line x1=\"46\" y1=\"128\" x2=\"94\" y2=\"128\" stroke=\"#1F2A44\" stroke-width=\"2.4\"><\/line><line x1=\"52.0\" y1=\"130\" x2=\"45.0\" y2=\"138\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"62.0\" y1=\"130\" x2=\"55.0\" y2=\"138\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"72.0\" y1=\"130\" x2=\"65.0\" y2=\"138\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><line x1=\"82.0\" y1=\"130\" x2=\"75.0\" y2=\"138\" stroke=\"#8A97A6\" stroke-width=\"1.2\"><\/line><circle cx=\"410\" cy=\"110\" r=\"6\" fill=\"none\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/circle><line x1=\"350\" y1=\"155.6\" x2=\"490\" y2=\"74.8\" stroke=\"#1F2A44\" stroke-width=\"2.4\"><\/line><line x1=\"350\" y1=\"155.6\" x2=\"440\" y2=\"155.6\" stroke=\"#8A97A6\" stroke-width=\"1.2\" stroke-dasharray=\"4 3\"><\/line><path d=\"M379.4 138.6 A 34 34 0 0 1 384.0 155.6\" fill=\"none\" stroke=\"#8A97A6\" stroke-width=\"1.4\"><\/path><text x=\"382\" y=\"172.6\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">30°<\/text><line x1=\"240\" y1=\"30\" x2=\"240\" y2=\"86\" stroke=\"#1F2A44\" stroke-width=\"2.6\" marker-end=\"url(#ah-statics-2026-09-30-s6-fbd)\"><\/line><text x=\"252\" y=\"44\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">하중<\/text><text x=\"70\" y=\"160\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A (핀)<\/text><\/g><g data-step=\"2\"><text x=\"470\" y=\"22\" font-size=\"12.5\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">① 보만 떼어 낸다<\/text><text x=\"470\" y=\"42\" font-size=\"12.5\" fill=\"#1F2A44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">② 지지대를 지운다<\/text><\/g><g data-step=\"3\"><text x=\"470\" y=\"62\" font-size=\"12.5\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">③ 반력으로 바꾼다<\/text><line x1=\"12\" y1=\"96\" x2=\"56\" y2=\"96\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s6-fbd)\"><\/line><text x=\"30\" y=\"86\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<tspan baseline-shift=\"sub\" font-size=\"72%\">x<\/tspan><\/text><line x1=\"70\" y1=\"88\" x2=\"70\" y2=\"40\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s6-fbd)\"><\/line><text x=\"82\" y=\"52\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<tspan baseline-shift=\"sub\" font-size=\"72%\">y<\/tspan><\/text><line x1=\"410\" y1=\"104\" x2=\"410\" y2=\"196\" stroke=\"#8A97A6\" stroke-width=\"1\" stroke-dasharray=\"3 3\"><\/line><line x1=\"445.0\" y1=\"164.6\" x2=\"412\" y2=\"107\" stroke=\"#2F9E44\" stroke-width=\"2.6\" marker-end=\"url(#ah-statics-2026-09-30-s6-fbd)\"><\/line><text x=\"452\" y=\"178\" font-size=\"14\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">B<\/text><text x=\"452\" y=\"198\" font-size=\"12\" fill=\"#2F9E44\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">수직선과 30°<\/text><\/g><g data-step=\"4\"><text x=\"300\" y=\"224\" font-size=\"13.5\" fill=\"#1F2A44\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">④ ΣF<tspan baseline-shift=\"sub\" font-size=\"72%\">x<\/tspan> = 0 · ΣF<tspan baseline-shift=\"sub\" font-size=\"72%\">y<\/tspan> = 0 · ΣM<tspan baseline-shift=\"sub\" font-size=\"72%\">A<\/tspan> = 0<\/text><text x=\"300\" y=\"244\" font-size=\"12.5\" fill=\"#E03131\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">미지수 A<tspan baseline-shift=\"sub\" font-size=\"72%\">x<\/tspan>, A<tspan baseline-shift=\"sub\" font-size=\"72%\">y<\/tspan>, B = 3개 = 식 3개<\/text><\/g><\/svg><figcaption>예제 1(필기 p.13): 왼쪽 핀, 오른쪽 30° 경사면 위 롤러. 롤러 반력은 경사면에 수직 — 경사면이 수평과 30°면 그 법선은 수직선과 30°. 하중 숫자는 필기에 없다.<\/figcaption><\/figure>", "max": 4}}, "say": null}, {"id": "s7", "title": "예제 2 — 고정 지지 + 케이블 · 모멘트는 힘이 많이 모인 점에서", "steps": [{"id": "s7-1", "t": "v2", "b": [{"k": "h", "h": "예제 2 — 고정 지지 + 케이블"}], "braw": ["# 예제 2 — 고정 지지 + 케이블"], "s": "필기 마지막 쪽, 예제 2예요.", "fig": null, "fs": 0}, {"id": "s7-2", "t": "v2", "b": [{"k": "li", "h": "벽에 고정된 ㄴ자 부재 · 도르래를 지난 케이블이 두 곳을 당김"}], "braw": ["• 벽에 고정된 ㄴ자 부재 · 도르래를 지난 케이블이 두 곳을 당김"], "s": "벽에 고정된 ㄴ자 부재를 도르래를 지난 케이블이 두 곳에서 당겨요. 그림은 단순화한 거예요.", "fig": "ex2", "fs": 1}, {"id": "s7-3", "t": "v2", "b": [{"k": "li", "h": "고정단 → A_x, A_y, M_A"}], "braw": ["• 고정단 → A_x, A_y, M_A"], "s": "고정 지지를 지우면 A x, A y, 그리고 M A.", "fig": "ex2", "fs": 2}, {"id": "s7-4", "t": "v2", "b": [{"k": "li", "h": "케이블 장력 T 두 곳 — 같은 케이블 → 같은 크기"}], "braw": ["• 케이블 장력 T 두 곳 — 같은 케이블 → 같은 크기"], "s": "케이블 힘이 더 있나? 교수님 질문이에요. 두 곳 다 그려야 해요. 같은 케이블이니 크기는 같은 T, 3주차 도르래와 같아요.", "fig": "ex2", "fs": 3}, {"id": "s7-5", "t": "v2", "b": [{"k": "res", "h": "ΣM_A : A_x, A_y 는 팔 0 → 빠진다 · M_A 와 T 항이 남는다"}, {"k": "star", "h": "「모멘트는 한 점에서만, 힘이 많이 모인 점에서」"}], "braw": ["→ ΣM_A : A_x, A_y 는 팔 0 → 빠진다 · M_A 와 T 항이 남는다", "☆ 「모멘트는 한 점에서만, 힘이 많이 모인 점에서」"], "s": "모멘트는 한 점에서만, 되도록 힘이 많이 모인 점을 잡으라고 하셨어요. A 를 잡으면 A x, A y 는 팔이 0이라 빠져요. 단 M A 는 우력이라 그대로 남아요. 여기서 반은 M A 까지 지워 버립니다.", "fig": "ex2", "fs": 4}, {"id": "s7-6", "t": "v2", "b": [{"k": "li", "h": "필기에 숫자 없음 → T 가 주어지면 A_x, A_y, M_A 3개를 식 3개로"}, {"k": "li", "h": "연습 : 외팔보 2 m 끝에 아래로 500 N"}, {"k": "res", "h": "A_x = 0 · A_y = 500 N · M_A = 1000 N·m (반시계)"}], "braw": ["• 필기에 숫자 없음 → T 가 주어지면 A_x, A_y, M_A 3개를 식 3개로", "• 연습 : 외팔보 2 m 끝에 아래로 500 N", "→ A_x = 0 · A_y = 500 N · M_A = 1000 N·m (반시계)"], "s": "필기에 숫자는 없어요. T 가 주어지면 미지수 세 개, 식 세 개. 연습으로 외팔보. 끝에 500 뉴턴이면 A y 500, M A 는 500 곱하기 2, 1000 뉴턴미터 반시계.", "fig": null, "fs": 0}, {"id": "s7-7", "t": "v2", "b": [{"k": "star", "h": "비유 : 떠드는 사람이 몰린 쪽에 서면 그 말은 안 들린다", "tg": "ih"}, {"k": "memo", "h": "고정 = A_x, A_y, M_A · 같은 케이블 = 같은 T · 기준점은 미지수가 몰린 점", "tg": "am"}, {"k": "memo", "h": "핀 + 롤러 = 3 풀림 · 핀 + 핀 = 4 못 풂 · 고정 하나 = 3 풀림", "tg": "am"}], "braw": ["☆ 비유 : 떠드는 사람이 몰린 쪽에 서면 그 말은 안 들린다", "■ 외울 것 : 고정 = A_x, A_y, M_A · 같은 케이블 = 같은 T · 기준점은 미지수가 몰린 점", "■ 외울 것 : 핀 + 롤러 = 3 풀림 · 핀 + 핀 = 4 못 풂 · 고정 하나 = 3 풀림"], "s": "모멘트 기준점을 미지수가 몰린 점에 두면 그 미지수들이 식에서 사라져요. 마지막으로 개수 판정. 핀 더하기 롤러는 3, 풀려요. 핀 더하기 핀은 4, 식 3개로는 못 풀어요. 중간고사 범위 마지막 장이니 확인 문제로 굳혀 볼게요.", "fig": null, "fs": 0}], "figs": {"ex2": {"svg": "<figure class=\"fig lite\" data-fig=\"ex2\"><svg class=\"fig-svg\" viewbox=\"0 0 560 250\" width=\"560\" height=\"250\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\" id=\"fig-statics-2026-09-30-s7-ex2\"><defs><marker id=\"ah-statics-2026-09-30-s7-ex2\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><g data-step=\"1\"><rect x=\"26\" y=\"30\" width=\"14\" height=\"190\" rx=\"0\" fill=\"rgba(138,151,166,.35)\" stroke=\"#1F2A44\" stroke-width=\"1.5\"><\/rect><rect x=\"40\" y=\"144\" width=\"250\" height=\"12\" rx=\"3\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/rect><rect x=\"278\" y=\"70\" width=\"12\" height=\"86\" rx=\"3\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"1.8\"><\/rect><line x1=\"196\" y1=\"14\" x2=\"196\" y2=\"30\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/line><circle cx=\"196\" cy=\"44\" r=\"14\" fill=\"#fff\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/circle><circle cx=\"196\" cy=\"44\" r=\"3\" fill=\"#1F2A44\"><\/circle><line x1=\"132\" y1=\"144\" x2=\"183\" y2=\"48\" stroke=\"#8A97A6\" stroke-width=\"1.8\"><\/line><line x1=\"209\" y1=\"48\" x2=\"278\" y2=\"84\" stroke=\"#8A97A6\" stroke-width=\"1.8\"><\/line><text x=\"46\" y=\"136\" font-size=\"13\" fill=\"#1F2A44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<\/text><text x=\"250\" y=\"30\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">도르래<\/text><\/g><g data-step=\"2\"><line x1=\"104\" y1=\"168\" x2=\"48\" y2=\"168\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s7-ex2)\"><\/line><text x=\"112\" y=\"173\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<tspan baseline-shift=\"sub\" font-size=\"72%\">x<\/tspan><\/text><line x1=\"60\" y1=\"240\" x2=\"60\" y2=\"162\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#ah-statics-2026-09-30-s7-ex2)\"><\/line><text x=\"72\" y=\"232\" font-size=\"13\" fill=\"#2F9E44\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">A<tspan baseline-shift=\"sub\" font-size=\"72%\">y<\/tspan><\/text><path d=\"M88.1 93.0 A 14 14 0 1 0 88.1 107.0\" fill=\"none\" stroke=\"#E03131\" stroke-width=\"2\" marker-end=\"url(#ah-statics-2026-09-30-s7-ex2)\"><\/path><text x=\"100\" y=\"96\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">M<tspan baseline-shift=\"sub\" font-size=\"72%\">A<\/tspan><\/text><\/g><g data-step=\"3\"><line x1=\"132\" y1=\"144\" x2=\"150\" y2=\"110\" stroke=\"#1971C2\" stroke-width=\"3\" marker-end=\"url(#ah-statics-2026-09-30-s7-ex2)\"><\/line><text x=\"164\" y=\"128\" font-size=\"14\" fill=\"#1971C2\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">T<\/text><line x1=\"278\" y1=\"84\" x2=\"240\" y2=\"64\" stroke=\"#1971C2\" stroke-width=\"3\" marker-end=\"url(#ah-statics-2026-09-30-s7-ex2)\"><\/line><text x=\"258\" y=\"98\" font-size=\"14\" fill=\"#1971C2\" text-anchor=\"middle\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">T<\/text><text x=\"330\" y=\"96\" font-size=\"12.5\" fill=\"#1971C2\" text-anchor=\"start\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">같은 케이블 → 크기 같은 T<\/text><\/g><g data-step=\"4\"><text x=\"330\" y=\"180\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">ΣM<tspan baseline-shift=\"sub\" font-size=\"72%\">A<\/tspan> : A<tspan baseline-shift=\"sub\" font-size=\"72%\">x<\/tspan>, A<tspan baseline-shift=\"sub\" font-size=\"72%\">y<\/tspan> 는 팔 0 → 빠진다<\/text><text x=\"330\" y=\"202\" font-size=\"13\" fill=\"#E03131\" text-anchor=\"start\" font-weight=\"700\" paint-order=\"stroke\" stroke=\"#fff\" stroke-width=\"3\" stroke-linejoin=\"round\">남는 것 = M<tspan baseline-shift=\"sub\" font-size=\"72%\">A<\/tspan> 와 T 항<\/text><\/g><\/svg><figcaption>예제 2(필기 p.14) 단순화 그림: 벽에 고정된 ㄴ자 부재를 도르래를 지난 케이블이 두 곳에서 당긴다. 하중 숫자는 필기에 없다.<\/figcaption><\/figure>", "max": 4}}, "say": null}], "quiz": [{"id": "q1", "qn": "확인 1 · 평형 조건", "html": "강체가 평형일 때 모멘트 평형 \\(\\sum\\mathbf M_P=0\\)은 어디서 확인하면 되는가?", "choices": [{"html": "지지대가 있는 점 두 곳에서", "ok": false, "k": 3}, {"html": "모든 점에서 하나씩 확인해야 한다", "ok": false, "k": 1}, {"html": "\\(\\sum\\mathbf F=0\\)과 함께 아무 점 하나에서만", "ok": true, "k": 0}, {"html": "무게중심에서만", "ok": false, "k": 2}], "ans": "필기 p.4 파란 글씨: 모든 점에서 확인할 필요 없다. 4장 등가계 — 한 점에서 같으면 모든 점에서 같다."}, {"id": "q2", "qn": "확인 2 · 2D 평형식", "html": "2D 자유물체도 하나에서 얻을 수 있는 독립 평형 방정식의 최대 개수는?", "choices": [{"html": "3개 — \\(\\sum F_x=0,\\ \\sum F_y=0,\\ \\sum M_P=0\\)", "ok": true, "k": 0}, {"html": "지지대 개수만큼", "ok": false, "k": 3}, {"html": "6개", "ok": false, "k": 2}, {"html": "2개", "ok": false, "k": 1}], "ans": "그래서 구할 수 있는 미지수도 3개까지. 3D는 6개(Ch.5 뒷부분)."}, {"id": "q3", "qn": "확인 3 · 핀 지지", "html": "2D 핀 지지의 반력은?", "choices": [{"html": "면에 수직인 힘 하나", "ok": false, "k": 2}, {"html": "\\(A_x,A_y,M_A\\)", "ok": false, "k": 1}, {"html": "모멘트 \\(M_A\\) 하나", "ok": false, "k": 3}, {"html": "\\(A_x,A_y\\) — 힘 두 성분, 모멘트 없음", "ok": true, "k": 0}], "ans": "이동은 막지만 축 둘레 회전은 자유 → 모멘트를 못 준다(\"핀이 모멘트를 줄 수 있나요? — 없는 거죠\")."}, {"id": "q4", "qn": "확인 4 · 롤러 지지", "html": "롤러가 줄 수 없는 것은?", "choices": [{"html": "면에 수직인 힘과 평행한 힘 둘 다 준다", "ok": false, "k": 3}, {"html": "받치는 면에 평행한 힘", "ok": true, "k": 0}, {"html": "모든 힘 — 롤러는 반력이 없다", "ok": false, "k": 2}, {"html": "받치는 면에 수직인 힘", "ok": false, "k": 1}], "ans": "면을 따라 자유롭게 움직이니 그 방향으로는 힘을 못 준다(free of motion ⇒ cannot exert force). 반력은 면에 수직인 힘 하나."}, {"id": "q5", "qn": "확인 5 · 반력 개수", "html": "반력 미지수가 3개인 2D 지지대는?", "choices": [{"html": "핀", "ok": false, "k": 1}, {"html": "슬라이더", "ok": false, "k": 3}, {"html": "고정 지지(built-in)", "ok": true, "k": 0}, {"html": "거친 면", "ok": false, "k": 2}], "ans": "고정 = 이동·회전 모두 막음 → \\(A_x,A_y,M_A\\). 핀 2 · 거친 면 2 · 슬라이더 1."}, {"id": "q6", "qn": "확인 6 · 풀리는가", "html": "보 양 끝을 둘 다 핀으로 받쳤다. 평형식만으로 반력을 모두 구할 수 있는가?", "choices": [{"html": "하중에 따라 항상 풀린다", "ok": false, "k": 3}, {"html": "있다 — 미지수 2개", "ok": false, "k": 2}, {"html": "있다 — 미지수 3개", "ok": false, "k": 1}, {"html": "없다 — 미지수 4개(2 + 2) &gt; 식 3개", "ok": true, "k": 0}], "ans": "핀 + 롤러 = 2 + 1 = 3 → 풀림, 핀 + 핀 = 4 → 식 3개로 못 풂. 고정 하나 = 3 → 풀림."}, {"id": "q7", "qn": "확인 7 · 교재 Sample Problem 4.2 (Pytel 4e)", "html": "250 kg 삼각판이 A에서 핀, C에서 30° 경사면 위 롤러로 받쳐져 있다. 자유물체도의 미지수 개수는?", "choices": [{"html": "3개 — \\(A_x,A_y,N_C\\)", "ok": true, "k": 0}, {"html": "4개 — \\(A_x,A_y,N_C\\), 롤러 마찰력", "ok": false, "k": 2}, {"html": "2개 — \\(A_y,N_C\\)", "ok": false, "k": 1}, {"html": "4개 — \\(A_x,A_y,M_A,N_C\\)", "ok": false, "k": 3}], "ans": "교재 답: 미지수 \\(A_x,A_y,N_C\\) 3개. 롤러 반력 \\(N_C\\)는 경사면에 수직(수직선과 30°), 무게 \\(W=mg=250\\times9.81\\approx2453\\) N은 이미 아는 힘."}, {"id": "q8", "qn": "확인 8 · 예제 1 숫자 넣기", "html": "길이 4 m 보 AB. A = 핀, B = 30° 경사면 위 롤러(반력은 수직선과 30°). 보 가운데에 아래로 2 kN. 롤러 반력 \\(B\\)의 크기는? (하중은 아톰 설정)", "choices": [{"html": "약 0.577 kN", "ok": false, "k": 2}, {"html": "약 1.155 kN", "ok": true, "k": 0}, {"html": "2.000 kN", "ok": false, "k": 3}, {"html": "1.000 kN", "ok": false, "k": 1}], "ans": "\\(\\sum M_A=0\\): \\((B\\cos30^\\circ)(4)=2\\times2\\) → \\(B=1/\\cos30^\\circ\\approx1.155\\) kN. 1.000은 \\(B_y\\)만 구한 값, 0.577은 \\(B_x\\) 크기."}, {"id": "q9", "qn": "확인 9 · 외팔보", "html": "벽에 고정된 2 m 막대 끝에 아래로 500 N. 고정단 반력 \\(A_x,A_y,M_A\\)를 구하라.", "choices": null, "ans": "\\(A_x=0\\), \\(A_y=500\\) N(위), \\(M_A=500\\times2=1000\\) N·m(반시계). 검산(끝점 기준) \\(1000-500\\times2=0\\)."}], "v": 2, "ver": "2026-10-02a", "nodes": {"sec": {}, "q": {}}};
+const V2=D.v===2, VER=String(D.ver||"");
+const LESSON_REL="../../lessons/statics/2026-09-30.html", LESSON_APP="notes/lessons/statics/2026-09-30.html";
+const $=s=>document.querySelector(s), $$=(s,el)=>Array.from((el||document).querySelectorAll(s));
+const UPH=document.getElementById("upHint");   /* 위 판서 버튼 — 그리는 곳은 머리글(#chk) 안 쪽수 앞. board() 가 머리글을 새로 쓸 때마다 다시 끼운다 */
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const TODAY=()=>fmt(new Date()), YDAY=()=>{const d=new Date();d.setDate(d.getDate()-1);return fmt(d);};
+const KEY="mc-tutor", LKEY="mc-lesson-"+D.id;
+const load=(k,def)=>{ try{ const v=JSON.parse(localStorage.getItem(k)||"null"); return (v&&typeof v==="object")?Object.assign(def,v):def; }catch(e){ return def; } };
+let T=load(KEY,{v:1,xp:0,streak:0,last:"",hearts:3,hday:"",aff:20,lessons:{}});
+if(!T.lessons||typeof T.lessons!=="object") T.lessons={};
+function dayReset(){ const td=TODAY(); if(T.hday!==td){ T.hearts=3; T.hday=td; } if(T.last&&T.last!==td&&T.last!==YDAY()) T.streak=0; }
+dayReset();
+let L=T.lessons[D.id]||(T.lessons[D.id]={pos:null,ch:{},done:false,xp:0,rew:{}});
+if(!L.rew||typeof L.rew!=="object") L.rew={}; if(!L.ch||typeof L.ch!=="object") L.ch={};
+/* 구버전(.79 이전) 지급 이력 이행: 그때는 L.ch/L.done 이 곧 지급 기록이었다 → 새 보상 키로 옮겨 재진입 때 챕터 +10·완료 +20 을 다시 주지 않는다(오타 2차 R5). 문제 키 rew[qid] 는 그대로 */
+Object.keys(L.ch).forEach(id=>{ if(L.ch[id]&&!L.rew["ch:"+id]) L.rew["ch:"+id]=true; }); if(L.done&&!L.rew.done) L.rew.done=true;
+let ST=load(LKEY,{read:{},done:{},correct:{},answer:{},ts:0});
+const CH=D.chapters, QZ=D.quiz||[], NCH=CH.length+(QZ.length?1:0);
+/* 스앵님 판정 기록 — 무엇을 알고 모르는지는 스앵님이 학습 기록으로 판단한다(대표님 2026-09-29). 노드 연결 = D.nodes(knowledge/lesson_nodes.json), 판정 = tutor_judge.js(TJ) */
+const NDS=D.nodes||{sec:{},q:{}}, CONF={}, secN=id=>(NDS.sec||{})[id]||[], qN=id=>(NDS.q||{})[id]||[];
+function ev(k,x){ try{ if(!window.TJ) return; const o=Object.assign({k:k,lid:D.id},x||{}); if(o.n&&o.n.length) TJ.rec(o); }catch(e){} }
+/* 객관식 보기는 빌드 때 섞인다(quizmix). 보기 k = 원문 순서 → 고른 보기를 k 로 저장(섞기 전 저장값 = 원문 순서라 그대로 맞는다) */
+const ck=(c,i)=>String(c&&c.k!=null?c.k:i);
+const EMB=window.parent!==window;
+let REDUCE=false; try{ REDUCE=!!(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches); }catch(e){}
+let S={mode:"intro",ci:0,si:0,qi:0,rev:false,again:0,resume:false,pre:"",preFace:""};   /* pre = 다음 화면 대사 앞에 붙일 안내 대사 */
+/* ---------- 저장 위치: 정수·범위 정리 + v2 는 고정 id·버전 (오타 v55 1 · 설계 2차 5) ----------
+   규칙: v2 — ver 불일치 → 그 챕터 처음(cid 없으면 목차) · sid 없음 → 챕터 처음 · v1 저장값(ci/si) 은 범위 안이면 그대로 · qi 는 항상 범위로 · fs 는 저장하지 않고 단계에서 다시 계산 */
+const toInt=v=>Number.isInteger(v)?v:((typeof v==="string"&&/^-?\d+$/.test(v))?parseInt(v,10):NaN);   /* "1junk" 같은 값은 숫자로 안 본다 */
+function posOf(){ const p=(L.pos&&typeof L.pos==="object")?L.pos:{}; const mode=(p.mode==="quiz"||p.mode==="step"||p.mode==="result")?p.mode:"step";
+  let qi=toInt(p.qi); if(!Number.isInteger(qi)||qi<0||qi>=QZ.length) qi=0;
+  let ci=-1, si=0, note="";
+  if(V2){ const v2save=("ver" in p)||("cid" in p)||("sid" in p);   /* v2 저장값(손상 포함)과 구버전(v1: ci/si 만) 저장값을 구분 */
+    if(v2save){ if(typeof p.cid==="string") ci=CH.findIndex(c=>c.id===p.cid);
+      if(ci<0) return {mode:mode==="quiz"?"quiz":"intro",ci:0,si:0,qi:qi,note:"챕터 못 찾음"};
+      if(String(p.ver||"")!==VER){ si=0; note="판서가 바뀌어 챕터 처음부터"; }
+      else if(typeof p.sid==="string"){ si=CH[ci].steps.findIndex(s=>s.id===p.sid); if(si<0){ si=0; note="단계 못 찾음"; } }
+      else { si=0; note="단계 못 찾음"; } }
+    else { const c2=toInt(p.ci); if(!Number.isInteger(c2)||c2<0||c2>=CH.length) return {mode:mode==="quiz"?"quiz":"intro",ci:0,si:0,qi:qi,note:"구버전 저장값"};
+      ci=c2; si=0; note="구버전 저장값이라 챕터 처음부터"; } }
+  else { ci=toInt(p.ci); if(!Number.isInteger(ci)||ci<0||ci>=CH.length) ci=0;
+    const n=(CH[ci]||{steps:[]}).steps.length; si=toInt(p.si); if(!Number.isInteger(si)||si<0) si=0; else if(si>=n) si=Math.max(0,n-1); }
+  return {mode:mode,ci:ci,si:si,qi:qi,note:note}; }
+/* 저장 위치로 화면을 옮긴다 — #resume 해시와 목차의 「이어서 하기」가 같은 함수를 쓴다(오타 R4). 문제 위치는 저장한 qi 그대로(범위는 posOf 가 정리), 전부 채점됐으면 결과 */
+function resumeTo(p){ cancelAll(); S=Object.assign(S,{mode:p.mode,ci:p.ci,si:p.si,qi:p.qi,rev:false,again:0,resume:true,pre:"",preFace:""});
+  if(S.mode==="quiz"){ if(!QZ.length) S.mode="result"; else if(QZ.every(q=>typeof ST.correct[q.id]==="boolean")) S.mode="result"; }
+  if(S.mode==="step"&&!CH.length) S.mode="intro";
+  if(S.mode==="intro"||S.mode==="result") S.resume=false;
+  render(); if(p.note) $("#dTip").textContent=p.note; }
+/* 안내 대사(챕터 완료·문제 시작)는 다음 화면 대사 앞에 붙인다 — render 뒤 say() 를 또 부르면 단계의 완료 콜백이 사라진다(오타 R2) */
+function preLine(line,face){ if(S.pre){ line=S.pre+" "+line; face=S.preFace||face; S.pre=""; S.preFace=""; } return [line,face]; }
+function savePos(){ if(S.mode!=="step"&&S.mode!=="quiz") return; const ch=CH[S.ci]||{}, st=(ch.steps||[])[S.si]||{};
+  L.pos= V2? {mode:S.mode,cid:ch.id||null,sid:st.id||null,qi:S.qi,ver:VER,ci:S.ci,si:S.si} : {mode:S.mode,ci:S.ci,si:S.si,qi:S.qi}; }
+/* ---------- 저장 ---------- */
+function save(){
+  T.lessons[D.id]=L; try{ localStorage.setItem(KEY,JSON.stringify(T)); ST.ts=Date.now(); localStorage.setItem(LKEY,JSON.stringify(ST)); }catch(e){}
+  try{ const dc=CH.filter(c=>L.ch[c.id]).length, qd=QZ.filter(q=>ST.done[q.id]).length;
+    const where= S.mode==="quiz"?"확인 문제 "+(S.qi+1)+"/"+QZ.length : S.mode==="result"?"결과" : S.mode==="step"?"CH "+(S.ci+1)+" · "+(CH[S.ci]||{}).title : "목차";
+    const li={deck:D.id,title:document.title,href:location.href.split("#")[0],idx:Math.max(0,dc-1),n:CH.length,sid:(CH[S.ci]||{}).id||"",part:null,partTitle:document.title.slice(0,60),where:String(where).slice(0,80),qDone:qd,qN:QZ.length,ts:Date.now()};
+    const j=JSON.stringify(li); localStorage.setItem("mc-slides-last",j); localStorage.setItem("mc-slides-last-"+D.id,j); }catch(e){}
+}
+/* ---------- HUD ---------- */
+const lvl=xp=>1+Math.floor(xp/150);
+function hud(){
+  $("#hCourse").textContent=D.course; $("#hSess").textContent=D.sess;
+  const dc=CH.filter(c=>L.ch[c.id]).length, qAll=QZ.length&&QZ.every(q=>ST.done[q.id]);
+  const cur= S.mode==="quiz"||S.mode==="result"? NCH : S.mode==="step"? S.ci+1 : Math.min(NCH,dc+1);
+  $("#hCh").textContent="CH "+cur+"/"+NCH;
+  $("#hSeg").innerHTML=CH.map((c,i)=>'<i class="'+(L.ch[c.id]?"on":(S.mode==="step"&&S.ci===i?"cur":""))+'"></i>').join("")+(QZ.length?'<i class="'+(qAll?"on":(S.mode==="quiz"?"cur":""))+'"></i>':"");
+  $("#hXp").textContent=T.xp; $("#hLv").textContent="Lv "+lvl(T.xp); $("#sXp").title="경험치 "+T.xp+" · 다음 레벨까지 "+(150-T.xp%150);
+  $("#hStreak").textContent=T.streak; $("#sSk").title="연속 학습 "+T.streak+"일";
+  $("#hHearts").innerHTML=[0,1,2].map(i=>'<svg viewBox="0 0 24 24" fill="'+(i<T.hearts?"#FF4B4B":"none")+'" stroke="'+(i<T.hearts?"#D42020":"#C9C9C9")+'" stroke-width="1.8" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-9.3-9.2C1.5 8.5 3.6 5 7 5c2 0 3.6 1.1 5 2.6C13.4 6.1 15 5 17 5c3.4 0 5.5 3.5 4.3 6.8C19.5 16.4 12 21 12 21z"/></svg>').join("");
+  $("#hHearts").title="하트 "+T.hearts+"/3 · 틀리면 하나씩, 매일 3개로";
+  $("#hAff").style.width=Math.max(0,Math.min(100,T.aff))+"%"; $("#sAf").title="호감도 "+T.aff+" · "+affName();
+  const ch=CH[S.ci]; if(S.mode==="step"&&ch){ $("#pV").textContent=(S.si+1)+" / "+ch.steps.length+" 단계"; $("#pBar").style.width=Math.round((S.si+1)/ch.steps.length*100)+"%"; } else { $("#pV").textContent= S.mode==="quiz"?"확인 문제 "+(S.qi+1)+"/"+QZ.length : "—"; $("#pBar").style.width= S.mode==="quiz"?Math.round((S.qi+1)/Math.max(1,QZ.length)*100)+"%":"0%"; }
+  $("#chpills").innerHTML='<span class="lb">챕터</span>'+CH.map((c,i)=>'<button type="button" class="pill'+(L.ch[c.id]?" done":"")+(S.mode==="step"&&S.ci===i?" cur":"")+'" data-pill="'+i+'">'+(i+1)+' · '+esc(shortT(c.title))+'</button>').join("")+(QZ.length?'<button type="button" class="pill'+(qAll?" done":"")+(S.mode==="quiz"||S.mode==="result"?" cur":"")+'" data-pill="q">확인 문제</button>':"");
+  $$("#chpills [data-pill]").forEach(b=>{ b.onclick=()=>{ cancelAll(); if(b.dataset.pill==="q"){ if(!QZ.length) return; if(T.hearts<=0&&QZ.some(q=>!ST.done[q.id])){ S.mode="nohearts"; return render(); } S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; } else { S=Object.assign(S,{mode:"step",ci:+b.dataset.pill,si:0,rev:false,again:0,resume:false}); } render(); }; });
+}
+const shortT=t=>{ t=String(t||""); const i=t.indexOf(" — "); t=i>0?t.slice(0,i):t; return t.length>13?t.slice(0,12)+"…":t; };
+function affName(){ return T.aff>=85?"전적으로 믿는":T.aff>=60?"인정":T.aff>=30?"지켜보는 중":"무관심"; }
+function pop(sel,txt,bad){ const el=$(sel); if(!el) return; const p=document.createElement("span"); p.className="pop"+(bad?" bad":""); p.textContent=txt; el.appendChild(p); setTimeout(()=>p.remove(),1200); }
+function gainXP(n){ T.xp+=n; L.xp=(L.xp||0)+n; pop("#sXp","+"+n+" XP"); }
+function gainAff(n){ T.aff=Math.max(0,Math.min(100,T.aff+n)); pop("#sAf",(n>0?"+":"")+n,n<0); }
+function touchStreak(){ dayReset(); const td=TODAY(); if(T.last===td) return; T.streak=(T.last===YDAY())?T.streak+1:1; T.last=td; pop("#sSk","+1"); }
+/* ---------- 대사 풀 (v1 회차 · 공통 안내) — 일타강사 구어체 존댓말 ---------- */
+/* 말투 = 일타강사 구어체 존댓말(대표님 2026-09-27 확정, 9/28 「말투 수정 안 됨」 → 전부 다시 씀): 「자, ~해 볼게요 / ~예요 / ~입니다」, 짧게 끊고 이유 한 줄과 다음 행동 하나. 명령·협박·비꼼 금지 */
+const LINES={
+  intro:["자, 앉으세요. 오늘은 {n}챕터, 대략 {min}분이면 됩니다. 눈으로만 훑으면 남는 게 없으니까 한 장씩 같이 넘겨 볼게요.","오늘 분량은 {n}챕터예요. 길지 않아요. 시작하면 끝까지 한 번에 가는 게 제일 편합니다.","오늘 {n}챕터, 순서대로만 따라오시면 됩니다. 막히면 「다시 설명」 누르세요. 그러라고 있는 버튼이에요."],
+  again_intro:["다시 오셨네요. 지난번 자리에서 이어갈게요. 앞이 흐릿하면 목차에서 한 챕터 앞으로 돌아가도 됩니다.","이어서 해요. 어제 한 건 어제 것이고, 오늘은 오늘 몫만 하면 됩니다."],
+  done_intro:["이 회차는 이미 끝내셨어요. 다시 보는 건 아주 좋은 습관이에요. 틀렸던 문제부터 보면 효율이 제일 좋습니다.","복습이네요. 두 번째는 빠르게 가고, 대신 외울 것 상자는 눈 감고 말할 수 있는지만 확인해 봅시다."],
+  chapter:["자, 챕터 {c}. {title}. 여기서부터 시험 문제가 나오기 시작해요.","{title}입니다. 이 챕터가 잡혀야 다음 챕터가 읽히니까, 여기서 천천히 갈게요.","챕터 {c}예요. 제목을 한 번 소리 내 읽고 시작해 보세요. 그게 목차를 머리에 심는 방법이에요."],
+  talk:["자, 읽어 볼게요. 굵은 글씨는 시험에 그대로 나오는 말이에요.","한 문장씩이요. 이해 안 되는 문장이 있으면 넘기지 말고 「다시 설명」을 눌러 주세요.","여기까지 읽고, 방금 읽은 걸 한 줄로 말해 보세요. 말로 나오면 아는 거예요.","천천히 가도 됩니다. 빨리 넘기는 것보다 한 번 제대로 읽는 게 훨씬 빨라요."],
+  fig:["글보다 그림이 먼저예요. 그림부터 보세요.","이 그림을 백지에 다시 그릴 수 있으면 이 챕터는 끝난 거예요.","화살표 방향이랑 글자 위치까지 눈에 넣어 두세요. 시험 그림이 바로 이 그림입니다."],
+  why:["왜 그런지 한 번만 붙잡고 가요. 「왜」를 알면 공식을 잊어도 다시 만들 수 있어요.","이유를 읽는 학생이 끝까지 남습니다. 여기가 그 부분이에요."],
+  analogy:["비유예요. 비유로 감을 잡고, 식은 비유 없이도 쓸 수 있어야 해요.","이해가 안 될 때 돌아올 자리예요. 지금은 가볍게 읽고 넘어가도 됩니다."],
+  formula:["이 식은 외우셔야 해요. 이해했다고 안 외우면 시험장에서 손이 안 움직입니다. 세 번만 써 보세요.","시험지에는 이 식이 안 적혀 있어요. 머릿속에서 나와야 합니다."],
+  pitfall:["여기서 반은 틀려요. 눈에 새겨 두세요.","채점할 때 제일 많이 깎이는 자리예요. 실수가 아니라 준비 부족이니까, 지금 준비해 두면 됩니다."],
+  memo:["정리예요. 이 상자는 시험 전날 한 번 더 봅니다.","여기 있는 것만 외워도 기본 점수는 나와요. 하나도 빼지 마세요."],
+  say:["교수님이 직접 하신 말이에요. 강조한 건 그대로 시험에 나옵니다.","교수님 말은 출제 의도예요. 문장 그대로 기억해 두세요."],
+  ex:["예제예요. 답부터 보지 말고 30초만 생각해 보세요. 그다음 풀이를 열어요.","풀이 보기 전에 첫 식부터 세워 볼까요. 안 세워지면 앞 챕터로 잠깐 돌아가도 됩니다."],
+  exopen:["풀이예요. 식이 왜 그렇게 세워졌는지만 보세요. 계산은 나중이에요.","한 줄 한 줄 「왜」를 붙여 보세요. 답만 맞는 건 의미가 없어요."],
+  again:["자, 다시 볼게요. 이번엔 굵은 글씨만 먼저 읽고, 그다음 문장을 읽어 보세요.","좋아요. 모른다고 말하는 게 실력이 느는 시작이에요. 한 번 더 갑니다.","한 번 더요. 이번엔 판서를 손가락으로 짚으면서 읽어 보세요."],
+  ask:["물어보세요. 애매하게 넘어가는 게 제일 손해예요.","질문은 구체적으로요. 어디서 막혔는지 말해 주시면 거기서부터 풀어 드릴게요."],
+  askoff:["질문은 앱 안에서 열었을 때 받을 수 있어요. 지금은 막힌 곳만 적어 두세요."],
+  chdone:["챕터 {c} 끝. 넘어갈게요.","됐어요. 다음이요.","좋아요. 이 속도로 가면 됩니다."],
+  chdone_warm:["잘 따라오고 있어요. 다음 챕터 갑니다.","좋아요. 오늘 집중이 괜찮네요."],
+  quiz:["자, 확인 문제 {n}개예요. 하트는 {h}개. 틀리면 하나씩 줄어드니까 찍지 말고 풀어 보세요.","이제 확인해 볼게요. 읽은 게 남았는지, 지나갔는지 여기서 갈립니다."],
+  q:["문제 {k}. 읽고 고르세요.","{k}번이에요. 보기를 다 읽고 나서 고르세요.","문제 {k}. 서두를 것 없어요."],
+  qin:["답을 쓰는 문제예요. 답만 간단히 쓰고 「답 보기」를 눌러 주세요."],
+  ok:["맞아요.","정답. 왜 맞았는지도 말할 수 있으면 완전히 아는 거예요.","좋아요. 계속 가요."],
+  ok_warm:["맞아요. 이런 학생이면 가르칠 맛이 나요.","정답. 오늘 눈빛이 다르네요."],
+  bad:["틀렸어요. 해설을 읽어 보세요. 같은 문제를 두 번 틀리지 않게만 하면 됩니다.","아니에요. 어디서 갈렸는지 해설에서 찾아보세요. 거기가 오늘 배운 자리예요."],
+  nohearts:["하트가 없네요. 챕터 하나를 다시 보고 오면 하트 하나 돌려드릴게요."],
+  heartback:["하트 하나 돌려드릴게요. 이번엔 읽은 대로 풀어 보세요."],
+  res_good:["오늘은 됐어요. 이 결과는 운이 아니라 순서대로 한 결과예요.","{ok}/{n}. 인정합니다. 내일도 같은 시간에 봐요."],
+  res_mid:["{ok}/{n}. 반은 넘겼지만 아직이에요. 틀린 문제를 지금 바로 다시 풀어 볼까요."],
+  res_bad:["{ok}/{n}. 읽은 게 아니라 본 거예요. 괜찮아요, 챕터부터 다시 가면 됩니다."],
+  chapter_face:{talk:"neutral",fig:"neutral",why:"sharp",analogy:"smile",formula:"sharp",pitfall:"angry",memo:"neutral",say:"neutral",ex:"sharp",exopen:"neutral",board:"neutral",v2:"neutral"}
+};
+function hash(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return (h>>>0); }
+function pick(pool,seed,vars){ const arr=LINES[pool]||[]; if(!arr.length) return ""; const t=arr[hash(D.id+"|"+pool+"|"+seed)%arr.length]; return t.replace(/\{(\w+)\}/g,(m,k)=>(vars&&k in vars)?vars[k]:m); }
+const warm=()=>T.aff>=60;
+/* ---------- 애니메이션 예약 관리: 타이머·RAF·전환 콜백을 한 곳에서 취소 (설계 2차 4) ---------- */
+const pend={t:[],raf:[],tr:[]}; let anim=null;   /* anim = {phase, finish} 진행 중 단계 */
+/* 실행된 예약은 목록에서 빼서 pending 이 실제 미실행 수가 되게 한다(오타 구현 검수 1차) */
+function later(fn,ms){ const id=setTimeout(()=>{ const k=pend.t.indexOf(id); if(k>=0) pend.t.splice(k,1); fn(); },ms); pend.t.push(id); return id; }
+function raf(fn){ const id=requestAnimationFrame(()=>{ const k=pend.raf.indexOf(id); if(k>=0) pend.raf.splice(k,1); fn(); }); pend.raf.push(id); return id; }
+/* fn(real): real=true 는 실제 transitionend, false 는 예비 타임아웃(탭이 숨겨져 RAF·전환이 멈춘 경우) */
+function onEnd(el,dur,fn){ let done=false; const ent={el:el,fn:null}; const go=real=>{ if(done) return; done=true; el.removeEventListener("transitionend",ent.fn); const k=pend.tr.indexOf(ent); if(k>=0) pend.tr.splice(k,1); fn(real); }; ent.fn=e=>{ if(e.target===el) go(true); }; el.addEventListener("transitionend",ent.fn); pend.tr.push(ent); later(()=>go(false),dur+80); }
+function cancelAll(){ pend.t.forEach(clearTimeout); pend.t=[]; pend.raf.forEach(id=>cancelAnimationFrame(id)); pend.raf=[]; pend.tr.forEach(x=>x.el.removeEventListener("transitionend",x.fn)); pend.tr=[]; if(typing){ clearInterval(typing); typing=null; } anim=null; geRest(); }
+function finishNow(){ const a=anim; if(typing){ clearInterval(typing); typing=null; $("#dText").textContent=fullText; typeDone=null; moreChk(); } cancelAll(); if(a&&a.finish) a.finish(); }
+/* ---------- 타자 ---------- */
+let typing=null, fullText="", typeDone=null, TYPE_MS=22;   /* TYPE_MS 는 검사기가 빠르게 돌릴 때 줄인다(__cr.speed) */
+let FIGONLY=false, SAY_INSTANT=false;   /* 「다시 보기」: 대사·판서는 즉시, 그림 애니메이션만 다시 */
+/* 김주영 스앵님 실사풍 일러스트: notes/classroom/assets/tutor/<face>.png (이 페이지 기준 ../assets/tutor/). neutral 이 열리면 그림으로, 아니면 SVG 치비 그대로. 끄기: ?tutor=svg 또는 localStorage mc-tutor-svg=1 */
+const TUTOR_IMG="../assets/tutor/", FACES=["neutral","sharp","smile","angry","wide","proud"]; let curFace="neutral", RASTER=false;
+/* v4 전자칠판: 칠판 옆 전신 — 목차·단계 = 지시봉(pose-point, 좌우 반전해 판서를 가리킴) · 문제 = 노트(pose-book) · 결과 = 팔짱(pose-cross). 표정은 자막 옆 얼굴(#faceImg). 포즈 파일이 없으면 흉상으로 */
+const POSE_OK={}; function poseFile(mode){ return mode==="result"?"pose-cross":(mode==="quiz"||mode==="nohearts")?"pose-book":"pose-point"; }
+function faceImg(face){ const im=$("#tutorImg"), box=$("#tutor"), av=$("#faceImg"); if(!im||!RASTER) return; const p=poseFile(S.mode); const usePose=!!(p&&POSE_OK[p]!==false);
+  const fsrc=TUTOR_IMG+(FACES.indexOf(face)>=0?face:"neutral")+".png";
+  if(av){ if(av.getAttribute("src")!==fsrc) av.setAttribute("src",fsrc); av.hidden=false; }   /* v4: 표정 = 자막 옆 얼굴 · 칠판 옆 = 전신 포즈 */
+  const gn=p?p.replace("pose-",""):"", useG=!!(usePose&&GE.has[gn]===true);   /* 동작 세트가 있으면 쉬는 자세도 세트 그림(같은 캔버스) */
+  const src=usePose?(useG?TUTOR_G+gn+".png":TUTOR_IMG+p+".png"):fsrc; box.classList.toggle("pose",usePose); box.classList.toggle("gset",useG);
+  if(im.getAttribute("src")!==src){ im.onerror=usePose?function(){ POSE_OK[p]=false; im.onerror=null; box.classList.remove("pose"); faceImg(face); }:null; im.setAttribute("src",src); } }
+(function(){ let off=false; try{ off=/[?&]tutor=svg\b/.test(location.search)||localStorage.getItem("mc-tutor-svg")==="1"; }catch(e){} if(off) return;
+  const probe=new Image(); probe.onload=function(){ RASTER=true; $("#tutor").classList.add("raster"); faceImg(curFace); gePreload(); }; probe.onerror=function(){ RASTER=false; }; probe.src=TUTOR_IMG+"neutral.png"; })();
+/* 스앵님 동작·표정 엔진 — 동작 그림 pose-<이름>.png: talk 설명 · stress 강조 · up 지시봉 위 · think 생각 · praise 엄지 · strict 허리에 손 (+ 쉬는 자세 point · book · cross).
+   말하는 동안 1.9초마다 두 겹(#tg1·#tg2)을 번갈아 교차 페이드, 타자가 끝나면 0.9초 뒤 쉬는 자세(#tutorImg). 없는 그림은 건너뛰고, 동작 줄이기·즉시 대사면 쉬는 자세 그대로 */
+const GEST={neutral:["talk","point","up"],sharp:["stress","point","talk"],smile:["talk","praise"],angry:["strict","stress"],proud:["praise","talk"],wide:["think","talk"]};
+/* 동작 세트 = notes/classroom/assets/tutor/g/<이름>.png (640×1000, 같은 키·발 줄·몸 중심 — docs/tools/tutor_gesture_cut.py). 쉬는 자세(point·book·cross)도 이 세트로 바꿔야 겹칠 때 안 튄다 */
+const TUTOR_G=TUTOR_IMG+"g/";
+const GE={has:{point:null,book:null,cross:null,talk:null,stress:null,up:null,think:null,praise:null,strict:null},t:null,h:null,cur:null,flip:0};
+function gePreload(){ let left=Object.keys(GE.has).length; const done=()=>{ if(--left===0) faceImg(curFace); };   /* 다 받으면 쉬는 자세도 세트로 */
+  Object.keys(GE.has).forEach(n=>{ const im=new Image(); im.onload=()=>{ GE.has[n]=true; done(); }; im.onerror=()=>{ GE.has[n]=false; done(); }; im.src=TUTOR_G+n+".png"; }); }
+function geShow(n){ const box=$("#tutor"), a=$("#tg1"), b=$("#tg2"); if(!box||!a||!b||!box.classList.contains("gset")) return;
+  const nx=GE.flip?a:b, pv=GE.flip?b:a, src=TUTOR_G+n+".png"; GE.cur=n;
+  const go=()=>{ nx.classList.add("on"); pv.classList.remove("on"); box.classList.add("gon"); GE.flip^=1; };
+  /* 못 받은 그림은 세트에서 빼고 쉬는 자세로, 늦게 온 onload 는 지금 그림(GE.cur)이 아니면 무시(오타 .91 설계 검수 ⑥) */
+  if(nx.getAttribute("src")===src&&nx.complete&&nx.naturalWidth) go(); else { nx.onload=()=>{ nx.onload=null; nx.onerror=null; if(GE.cur===n) go(); }; nx.onerror=()=>{ nx.onload=null; nx.onerror=null; GE.has[n]=false; if(GE.cur===n) geRest(); }; nx.setAttribute("src",src); } }
+function geRest(){ clearInterval(GE.t); GE.t=null; clearTimeout(GE.h); GE.h=null; GE.cur=null; const box=$("#tutor"); if(box) box.classList.remove("gon"); $$("#tutor .gimg").forEach(g=>g.classList.remove("on")); }
+function geStart(face){ geRest(); if(REDUCE||!RASTER) return;
+  const set=(S.mode==="quiz"||S.mode==="nohearts"?(face==="angry"?["strict","think"]:(face==="smile"||face==="proud")?["praise","book"]:["think","book"]):S.mode==="result"?(face==="angry"?["strict","cross"]:face==="proud"?["praise","cross"]:["talk","cross"]):(GEST[face]||GEST.neutral)).filter(n=>GE.has[n]===true);
+  if(!set.length) return; let i=hash(String(fullText))%set.length; geShow(set[i]); if(set.length>1) GE.t=setInterval(()=>{ i=(i+1)%set.length; geShow(set[i]); },1900); }
+function geEnd(){ clearInterval(GE.t); GE.t=null; clearTimeout(GE.h); GE.h=setTimeout(geRest,S.mode==="result"?4000:900); }
+function say(text,face,name,onDone){
+  const ch=$("#tutor .chibi"); if(ch) ch.setAttribute("data-face",face||"neutral"); curFace=face||"neutral"; faceImg(curFace);
+  const nm=$("#dNameTag"); nm.textContent=name||"김주영 스앵님"; nm.classList.toggle("prof",name==="교수님");
+  const el=$("#dText"); el.classList.remove("open"); { const b=$("#tMore"); if(b) b.hidden=true; } if(typing){ clearInterval(typing); typing=null; }
+  fullText=text; typeDone=onDone||null; el.innerHTML="";
+  if(REDUCE||S.resume||SAY_INSTANT){ geRest(); el.textContent=text; moreChk(); const f=typeDone; typeDone=null; if(f) f(); return; }
+  let i=0; const cur=document.createElement("i"); cur.className="cur"; geStart(curFace);
+  typing=setInterval(()=>{ i++; el.textContent=text.slice(0,i); if(i<text.length){ el.appendChild(cur); el.scrollTop=el.scrollHeight; } else { clearInterval(typing); typing=null; moreChk(); geEnd(); const f=typeDone; typeDone=null; if(f) f(); } },TYPE_MS);
+}
+function skipTyping(){ if(!typing) return false; clearInterval(typing); typing=null; $("#dText").textContent=fullText; moreChk(); geEnd(); const f=typeDone; typeDone=null; if(f) f(); return true; }
+$("#dText").onclick=()=>{ if(!skipTyping()) toggleText(); };   /* 타자 중이면 건너뛰기, 아니면 긴 대사 펼치기(오타 디자인 1차 R6) */
+$("#tMore").onclick=e=>{ e.stopPropagation(); if(!skipTyping()) toggleText(); };
+function toggleText(){ const el=$("#dText"); const o=el.classList.toggle("open"); el.scrollTop=o?0:el.scrollHeight; moreChk(); }
+/* 자막이 네 줄을 넘으면 이름 줄 오른쪽에 「전체 ▾」(타자가 끝난 뒤에만) — 잘린 줄 표시가 없었다(오타 디자인 1차 R6 · 2차 캡처). 펼쳐도 44vh 까지라 조작 줄은 그대로 */
+function moreChk(){ const el=$("#dText"), b=$("#tMore"); if(!el||!b) return; const open=el.classList.contains("open"); b.hidden=!!typing||!(open||el.scrollHeight>el.clientHeight+3); b.textContent=open?"접기 ▴":"전체 ▾"; b.setAttribute("aria-expanded",open?"true":"false"); }
+/* 넘치는 식은 줄여서 한 줄에 — 식을 두 줄로 나누지 않는다(대표님 2026-09-29 「수식 한 줄로」). 식 글자 14px(오타 기준) 아래로는 안 줄이고, 그래도 넘치면 식 상자 안에서 밀어 본다 */
+function fitMath(root){ if(!root) return; $$(".katex-display",root).forEach(k=>{ k.style.fontSize=""; const cw=k.clientWidth, sw=k.scrollWidth; if(!(cw>0&&sw>cw+1)) return;
+  const kx=k.querySelector(".katex"), fz=parseFloat(getComputedStyle(kx||k).fontSize)||20, lo=Math.min(1,Math.max(.6,14/fz));
+  let r=Math.max(lo,Math.floor(cw/sw*100)/100); k.style.fontSize=r+"em"; for(let i=0;i<20&&r>lo&&k.scrollWidth>k.clientWidth+1;i++){ r=Math.max(lo,Math.round((r-.02)*100)/100); k.style.fontSize=r+"em"; } }); }   /* 한글 \\text 폭은 배율과 딱 비례하지 않아 모자라면 2% 씩 더 */
+/* 인라인 식은 줄에서 끊지 않는다(CSS #bc .katex nowrap) — 줄보다 길면 글자를 줄여 한 줄에(14px 까지) */
+function fitInline(root){ if(!root) return; $$(".katex",root).forEach(k=>{ if(k.closest(".katex-display")) return; k.style.fontSize=""; const box=k.parentElement&&k.parentElement.closest(".bt,.qb,.ans,.cb,.tk,.bx,.ex,li,p,div"); if(!box) return;
+  const cw=box.clientWidth, w=k.getBoundingClientRect().width; if(!(cw>0&&w>cw-2)) return; const fs=parseFloat(getComputedStyle(k).fontSize)||16; k.style.fontSize=Math.max(14,Math.floor(fs*(cw-6)/w))+"px"; }); }
+window.addEventListener("resize",()=>{ fitMath($("#bc")); fitInline($("#bc")); moreChk(); reCur(); },{passive:true});
+try{ document.fonts.ready.then(()=>{ fitMath($("#bc")); fitInline($("#bc")); moreChk(); reCur(); }); document.fonts.addEventListener("loadingdone",()=>{ fitMath($("#bc")); fitInline($("#bc")); moreChk(); reCur(); }); }catch(e){}   /* KaTeX 글꼴이 늦게 붙으면 폭·높이가 바뀐다 */
+$("#bwrap").addEventListener("scroll",()=>upHint(),{passive:true}); UPH.onclick=()=>{ const w=$("#bwrap"); userScr=true; if(w) w.scrollTo({top:0,behavior:REDUCE?"auto":"smooth"}); };
+let figRet=null;   /* 확대창을 연 버튼(닫으면 포커스를 돌려준다) */
+function closeFig(){ const ov=$("#figov"); if(!ov||ov.hidden) return; ov.hidden=true; const r=figRet; figRet=null; try{ if(r&&document.contains(r)) r.focus(); }catch(e){} }
+$("#figovX").onclick=()=>closeFig(); document.addEventListener("keyup",e=>{ if(!$("#figov").hidden&&(e.key==="Enter"||e.key===" ")) e.preventDefault(); },true);
+function choices(list){ const box=$("#dCh"); box.innerHTML=""; $("#dTip").textContent=""; list.forEach(c=>{ if("tip" in c){ if(c.tip) $("#dTip").textContent=c.tip; return; }
+  const b=document.createElement("button"); b.type="button"; b.className="cbt "+(c.cls||"g"); b.innerHTML=esc(c.t); b.onclick=c.f; if(c.primary) b.dataset.primary="1"; box.appendChild(b); }); }
+/* ---------- 칠판 ---------- */
+function typeset(el){ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true}],throwOnError:false,strict:"ignore"}); }catch(e){} }
+function board(html,tag,v1){ const ck=$("#chk"); ck.innerHTML=tag||""; if(UPH) ck.insertBefore(UPH,ck.querySelector("small")); const bc=$("#bc"); bc.classList.toggle("v1",!!v1); bc.style.counterReset=""; bc.innerHTML=html; typeset(bc); fitMath(bc); fitInline(bc); $("#bwrap").scrollTop=0; upHint(); }
+const BOX={why:"왜 그런가",analogy:"비유",formula:"외울 것",pitfall:"함정",memo:"정리",say:"교수님 말"};
+const TGN={am:"암기",ih:"이해",ex:"시험",pr:"연습"};   /* 판서 줄 알약 — 암기·이해 구분(대표님 2026-09-29) */
+function stepHTML(st,rev){
+  const sub=st.sub?'<div class="sub">'+esc(st.sub)+'</div>':'';
+  switch(st.t){
+    case "talk": return sub+'<div class="tk">'+st.html+'</div>';
+    case "fig": return sub+'<figure class="paper">'+st.html+'</figure>';
+    case "board": return sub+'<figure class="paper photo"><img src="'+esc(st.src)+'" alt="판서 사진" onerror="this.closest(\'figure\').style.display=\'none\'">'+(st.cap?'<div class="cap">'+st.cap+'</div>':'')+'</figure>';
+    case "ex": return sub+'<div class="ex"><div class="exq"><i>예제</i>'+st.q+'</div>'+(rev?'<div class="exa"><i>풀이</i>'+st.a+'</div>':'')+'</div>';
+    default: return sub+'<div class="bx '+esc(st.t)+'"><i>'+(BOX[st.t]||"")+'</i>'+st.html+'</div>';
+  }
+}
+function tocHTML(){
+  let h='<ul class="toc">'+CH.map((c,i)=>{ const done=!!L.ch[c.id], cur=S.mode==="step"&&S.ci===i; return '<li class="'+(done?"done":"")+(cur?" cur":"")+'"><span class="st">'+(done?"✓":i+1)+'</span><span>'+esc(c.title)+'</span><small>'+c.steps.length+'단계</small></li>'; }).join("");
+  if(QZ.length){ const qd=QZ.filter(q=>ST.done[q.id]).length, qo=QZ.filter(q=>ST.correct[q.id]===true).length; h+='<li class="'+(qd>=QZ.length?"done":"")+(S.mode==="quiz"?" cur":"")+'"><span class="st">'+(qd>=QZ.length?"✓":"?")+'</span><span>확인 문제</span><small>'+(qd?qo+"/"+qd+" 정답":QZ.length+"문제")+'</small></li>'; }
+  return h+'</ul>';
+}
+/* ---------- 화면 ---------- */
+function render(){
+  hud(); savePos(); save();
+  try{
+    if(S.mode==="intro") renderIntro();
+    else if(S.mode==="step"){ if(V2) renderStepV2(); else renderStep(); }
+    else if(S.mode==="quiz") renderQuiz();
+    else if(S.mode==="nohearts") renderNoHearts();
+    else if(S.mode==="result") renderResult();
+  } finally { S.pre=""; S.preFace=""; }   /* 안내 대사는 바로 다음 화면 한 번만 — 하트 0·목차·pill 이동으로 다른 화면이 뜨면 버린다(오타 2차 R2) */
+}
+function renderIntro(){
+  const dc=CH.filter(c=>L.ch[c.id]).length, p0=(L.pos&&typeof L.pos==="object")?posOf():null;
+  const resume=!!(p0&&!L.done&&(dc>0||QZ.some(q=>ST.done[q.id])||p0.mode==="quiz"||(p0.mode==="step"&&(p0.ci>0||p0.si>0))));
+  board('<div class="ttl">'+esc(D.title)+'</div>'+(D.lead?'<div class="lead">'+D.lead+'</div>':'')+'<div class="sub">오늘의 목차</div>'+tocHTML(),'<span>오늘 수업</span><small>'+esc(D.course)+'</small>',true);
+  const line= L.done? pick("done_intro","i") : resume? pick("again_intro","i") : pick("intro","i",{n:CH.length,min:D.minutes||18});
+  say(line, L.done?"proud":"neutral");
+  const cs=[];
+  if(resume) cs.push({t:"이어서 하기",cls:"p",primary:1,key:"Enter",f:()=>resumeTo(posOf())});
+  cs.push({t:resume?"처음부터":"시작하기",cls:resume?"g":"p",primary:resume?0:1,key:resume?"":"Enter",f:()=>{ S=Object.assign(S,{mode:"step",ci:0,si:0,rev:false,again:0,resume:false}); render(); }});
+  cs.push({t:"교재 보기",cls:"g",f:()=>openBook((CH[0]||{}).id)}); cs.push({t:"암기노트",cls:"g",f:openMemo});
+  choices(cs);
+}
+/* ---- v1 단계 (구버전 판서) ---- */
+function renderStep(){
+  const ch=CH[S.ci]; if(!ch){ S.mode=QZ.length?"quiz":"result"; return render(); }
+  if(S.si<0||S.si>=ch.steps.length) S.si=Math.max(0,ch.steps.length-1);
+  const st=ch.steps[S.si]; if(!st){ S.mode="intro"; return render(); }
+  board(stepHTML(st,S.rev),'<span>CH '+(S.ci+1)+' · '+esc(ch.title)+'</span><small>'+(S.si+1)+' / '+ch.steps.length+'</small><span class="old">구버전 판서 · 판서 정리 전</span>',true);
+  const seed=S.ci+":"+S.si+":"+S.again; let line, face=LINES.chapter_face[st.t]||"neutral";
+  if(S.again>0){ line=pick("again",seed); face="sharp"; } else if(st.say){ line=st.say; } else if(S.si===0){ line=pick("chapter",seed,{c:S.ci+1,title:ch.title}); face="sharp"; } else if(st.t==="ex"&&S.rev){ line=pick("exopen",seed); } else line=pick(st.t in LINES?st.t:"talk",seed);
+  [line,face]=preLine(line,face); say(line,face); S.resume=false;
+  const cs=[];
+  if(st.t==="ex"&&!S.rev) cs.push({t:"풀이 보기",cls:"p",primary:1,key:"Enter",f:()=>{ S.rev=true; S.again=0; render(); }});
+  else cs.push({t:"이해했어요",cls:"p",primary:1,key:"Enter",f:()=>next()});
+  cs.push({t:"다시 설명",cls:"g",f:()=>{ again(); S.again++; render(); }});
+  cs.push({t:"질문할게요",cls:"t",f:ask});
+  choices(cs);
+}
+/* ---- v2 단계: 판서 누적 + 그림 단계 + 대사 (상태 기계: 대사 → 판서 줄 → 그림 → 대기) ---- */
+let figCur={ci:-1,name:null};
+const figNo=(ch,name)=>Math.max(1,[...new Set(ch.steps.map(s=>s.fig).filter(Boolean))].indexOf(name)+1);   /* 【그림 챕터-번호】: 챕터 안에서 그림이 처음 나온 순서 */
+/* 이번 단계가 보이게: 이 단계 첫 줄이 위로 밀려나지 않는 한에서 이 단계 끝(그림 포함)까지 보이게 스크롤 — 무조건 맨 아래로 내리면 앞 식이 머리글 밑에 반만 남았다(오타 디자인 1차 R4) */
+let userScr=false;   /* 사용자가 판서 창을 직접 밀었는가(휠·터치·포인터·위 판서 버튼) — 그러면 글꼴·크기 변화 때 다시 맞추지 않는다. scrollCur 가 새로 맞추면 풀린다 */
+function scrollCur(){ const w=$("#bwrap"); if(!w) return; userScr=false; const first=$("#bc .bl.cur"); if(!first){ w.scrollTop=w.scrollHeight; upHint(); return; }
+  const endEl=$("#bc .bd-fig")||$$("#bc .bl.cur").pop(), wr=w.getBoundingClientRect(), st0=w.scrollTop, ch=w.clientHeight;
+  const a=first.getBoundingClientRect().top-wr.top+st0, b=endEl.getBoundingClientRect().bottom-wr.top+st0;
+  /* 여유(위 10·아래 14)까지 들어가면 끝에 맞추고, 여유 없이만 들어가면 가운데, 안 들어가면 첫 줄을 위에(2차 실측: 창을 거의 채우는 단계에서 끝이 몇 px 잘렸다) */
+  w.scrollTop=Math.max(0,(b-a)+24<=ch?b+14-ch:(b-a)<=ch?a-(ch-(b-a))/2:a-10); upHint(); }
+/* 글꼴(KaTeX·한글 조각 글꼴)이 늦게 붙어 판서·자막 높이가 바뀌면 이번 단계 위치를 다시 맞춘다 — 360px 캡처에서 이번 단계 끝줄이 창 아래로 밀렸다(2차).
+   판서 창·판서 크기 변화(ResizeObserver)와 글꼴 로드 끝에서 부른다. 사용자가 직접 밀었으면 그대로 둔다 */
+function reCur(){ const w=$("#bwrap"); if(S.mode!=="step"||!V2||!w||userScr) return; scrollCur(); }
+["wheel","touchstart","pointerdown"].forEach(ev=>$("#bwrap").addEventListener(ev,()=>{ userScr=true; },{passive:true}));
+try{ let q=0; const ro=new ResizeObserver(()=>{ if(q) return; q=requestAnimationFrame(()=>{ q=0; reCur(); }); }); ro.observe($("#bwrap")); ro.observe($("#bc")); }catch(e){}
+function upHint(){ const w=$("#bwrap"); if(w&&UPH) UPH.hidden=!(w.scrollTop>12); }
+/* 폰에서 그림을 크게: 지금 보이는 그림 단계 그대로 복제해 겹창에(두 손가락 확대·옆으로 밀기) — 오타 디자인 1차 R2 */
+function zoomFig(){ const f=$("#bc .bd-fig figure"), ov=$("#figov"), box=$("#figov .fz"); if(!f||!ov||!box) return; box.innerHTML=""; const c=f.cloneNode(true); const sv=c.querySelector("svg"); if(sv) sv.removeAttribute("id");
+  $$(".pre,.draw,.fade",c).forEach(e=>{ e.classList.remove("pre","draw","fade"); e.style.strokeDasharray=""; e.style.strokeDashoffset=""; e.style.opacity=""; }); $$(".pulse",c).forEach(e=>e.classList.remove("pulse")); box.appendChild(c); figRet=document.activeElement; ov.hidden=false; try{ $("#figovX").focus(); }catch(e){}
+  /* 겹창에서는 가장 작은 글자(첨자 제외 font-size)가 14px 이 되게 키운다(오타 디자인 1차 R2 「설명 14px 이상」) — 넘치는 쪽은 겹창 안에서 밀어 본다 */
+  $$(":scope>svg",c).forEach(v=>{ const vb=v.viewBox&&v.viewBox.baseVal; if(!vb||!vb.width) return; let mu=99; v.querySelectorAll("text").forEach(t=>{ const z=parseFloat(getComputedStyle(t).fontSize); if(z>=6) mu=Math.min(mu,z); });   /* 6 미만은 자리 채움(점 등) */ if(mu>=99) mu=14; v.style.width=Math.round(vb.width*Math.max(1,14/mu))+"px"; v.style.maxWidth="none"; }); }
+/* 폰(≤760px): 가로로 늘어선 그림 칸(면·원통·구 비교처럼)을 세로로 쌓는다 — 통으로 줄이면 글자가 6px 까지 작아졌다(오타 디자인 1차 R2 「단순 축소 말고 세로 재배치」).
+   칸 = 가로 빈틈(24 또는 폭 3% 이상)으로 갈리는 요소 무리, 폭 12% 미만 무리는 가까운 이웃에 붙인다. 원본 요소를 칸별 svg 로 「옮기므로」(복제 아님) 그림 단계 숨김·그리기 애니메이션이 그대로 돈다.
+   칸이 하나면 그대로 두고 「크게 보기」. 칸 글자가 전부 14px 이상이면 .big → 「크게 보기」 숨김(오타 기준 14px). 모르는 요소가 있으면 손대지 않는다 */
+function stackFig(){
+  const fg=$("#bc .bd-fig figure"), sv=fg&&fg.querySelector(":scope>svg"); if(!sv) return;
+  let phone=false; try{ phone=window.matchMedia("(max-width:760px)").matches; }catch(e){} if(!phone) return;
+  const vb=sv.viewBox&&sv.viewBox.baseVal, sc=sv.getScreenCTM&&sv.getScreenCTM(); if(!vb||!vb.width||!vb.height||!sc) return;
+  const OKT=/^(g|a|line|path|circle|ellipse|polyline|polygon|rect|text|tspan|textPath|image|use|defs|style|title|desc|marker|clipPath|mask|pattern|symbol|linearGradient|radialGradient|stop|filter|fe[A-Za-z]+)$/;
+  if([...sv.querySelectorAll("*")].some(n=>!OKT.test(n.tagName))) return;
+  const W=vb.width, iv=sc.inverse(), NS="http://www.w3.org/2000/svg", items=[];
+  for(const e of $$("line,path,circle,ellipse,polyline,polygon,rect,text,image,use",sv)){
+    if(e.closest("defs,marker,clipPath,mask,pattern,symbol")||(e.parentNode&&e.parentNode.closest&&e.parentNode.closest("text"))) continue;
+    let b, m; try{ b=e.getBBox(); m=iv.multiply(e.getScreenCTM()); }catch(x){ return; }
+    const sw=(parseFloat(getComputedStyle(e).strokeWidth)||0)/2, xs=[], ys=[];
+    [[b.x,b.y],[b.x+b.width,b.y],[b.x,b.y+b.height],[b.x+b.width,b.y+b.height]].forEach(([x,y])=>{ xs.push(m.a*x+m.c*y+m.e); ys.push(m.b*x+m.d*y+m.f); });
+    items.push({e:e,x0:Math.min(...xs)-sw,x1:Math.max(...xs)+sw,y0:Math.min(...ys)-sw,y1:Math.max(...ys)+sw,bg:e.tagName==="rect"&&b.width>=W*.9}); }
+  const fgi=items.filter(t=>!t.bg); if(fgi.length<2) return;
+  const GAP=Math.max(24,W*.03), cl=[];
+  fgi.map(t=>[t.x0,t.x1]).sort((a,b)=>a[0]-b[0]).forEach(([a,b])=>{ const L=cl[cl.length-1]; if(L&&a<=L[1]+GAP) L[1]=Math.max(L[1],b); else cl.push([a,b]); });
+  for(let i=0;i<cl.length&&cl.length>1;){ if(cl[i][1]-cl[i][0]>=W*.12){ i++; continue; }
+    const gl=i>0?cl[i][0]-cl[i-1][1]:Infinity, gr=i<cl.length-1?cl[i+1][0]-cl[i][1]:Infinity, j=gl<=gr?i-1:i+1;
+    cl[j]=[Math.min(cl[j][0],cl[i][0]),Math.max(cl[j][1],cl[i][1])]; cl.splice(i,1); i=0; }
+  if(cl.length<2) return;
+  const which=t=>{ const cx=(t.x0+t.x1)/2; let k=0; cl.forEach((c,i)=>{ if(cx>=c[0]-.5) k=i; }); return k; };
+  const P=cl.map((c,i)=>{ const own=fgi.filter(t=>which(t)===i), pl=Math.min(10,i?(c[0]-cl[i-1][1])/2:c[0]-vb.x), pr=Math.min(10,i<cl.length-1?(cl[i+1][0]-c[1])/2:vb.x+W-c[1]);
+    const x0=c[0]-Math.max(0,pl), x1=c[1]+Math.max(0,pr), y0=Math.max(vb.y,Math.min(...own.map(t=>t.y0))-8), y1=Math.min(vb.y+vb.height,Math.max(...own.map(t=>t.y1))+8);
+    const p=document.createElementNS(NS,"svg"); [...sv.attributes].forEach(a=>{ if(!/^(id|viewBox|width|height|style)$/.test(a.name)) p.setAttribute(a.name,a.value); });
+    p.setAttribute("viewBox",x0.toFixed(1)+" "+y0.toFixed(1)+" "+(x1-x0).toFixed(1)+" "+(y1-y0).toFixed(1)); p.setAttribute("width",(x1-x0).toFixed(1)); p.setAttribute("height",(y1-y0).toFixed(1));
+    p.classList.add("fpan"); p.style.maxWidth=Math.round((x1-x0)*1.8)+"px"; return {p:p,map:new Map()}; });
+  const holder=(k,node)=>{ if(node===sv) return P[k].p; let c=P[k].map.get(node); if(c) return c;   /* 원본 묶음(g)의 칸 k 사본 — 속성(data-step·transform·글꼴·색) 그대로, id 는 처음 만든 칸에만 */
+    c=node.cloneNode(false); if(P.some((q,j)=>j!==k&&q.map.has(node))) c.removeAttribute("id"); holder(k,node.parentNode).appendChild(c); P[k].map.set(node,c); return c; };
+  [...sv.children].filter(n=>/^(defs|style|title|desc|marker|clipPath|mask|pattern|symbol|linearGradient|radialGradient|filter)$/.test(n.tagName)).forEach(n=>P[0].p.appendChild(n));
+  items.forEach(t=>{ if(t.bg) P.forEach((q,k)=>holder(k,t.e.parentNode).appendChild(k?t.e.cloneNode(true):t.e)); else holder(which(t),t.e.parentNode).appendChild(t.e); });   /* 문서 순서대로 = 칸마다 겹침 순서 유지 */
+  sv.replaceWith(...P.map(q=>q.p));
+  const box=fg.closest(".bd-fig"); box.classList.add("split"); box.dataset.pn=P.length;
+}
+/* 모든 폭: 그림에서 가장 작은 글자가 14px 미만이면 「크게 보기」·그림 누르기 확대(아이패드 1040 에서도 그림 글자 8.6~11px 가 있었다 — 2차 실측). 14px 이상이면 .big → 숨김 */
+function figZoomFlag(){ const bx=$("#bc .bd-fig"); if(!bx) return; let mn=99; $$("figure>svg text",bx).forEach(t=>{ const m=t.getScreenCTM&&t.getScreenCTM(), z=parseFloat(getComputedStyle(t).fontSize)||14; if(m&&z>=6) mn=Math.min(mn,z*Math.hypot(m.a,m.b)); }); bx.dataset.minfp=mn.toFixed(1); bx.classList.toggle("big",mn>=14); }
+function renderStepV2(){
+  cancelAll();
+  const ch=CH[S.ci]; if(!ch){ S.mode=QZ.length?"quiz":"result"; return render(); }
+  if(S.si<0||S.si>=ch.steps.length) S.si=Math.max(0,ch.steps.length-1);
+  const st=ch.steps[S.si]; if(!st){ S.mode="intro"; return render(); }
+  const instant=REDUCE||S.resume;
+  /* 판서: 이 단계까지의 줄 전부. 지난 단계 줄은 바로, 이 단계 줄은 (즉시가 아니면) 순서대로 써진다 */
+  /* v3: 판서 줄 = 핵심 카드(li 는 번호, h 소제목, f 식 카드, pit 함정, star 비유·시험, res 결론, memo 외울 것). 현재 단계 줄은 cur(초록), 지난 단계 줄은 dim. 「다시 보기」는 그림 애니메이션만 다시 */
+  let h='<div class="bd-title">핵심 정리 · '+(S.si+1)+' / '+ch.steps.length+'단계</div>', nLi=0;
+  ch.steps.slice(0,S.si+1).forEach((s,k)=>{ (s.b||[]).forEach((ln,j)=>{ const mine=k===S.si; if(ln.k==="li") nLi++; h+='<div class="bl k-'+esc(ln.k)+(mine?" cur":" dim")+((mine&&!instant&&!FIGONLY)?"":" now")+'" data-step="'+esc(s.id)+'" data-ln="'+j+'"'+(ln.k==="li"?' data-n="'+nLi+'"':'')+'><div class="bt">'+(ln.tg&&TGN[ln.tg]?'<span class="tg tg-'+esc(ln.tg)+'">'+TGN[ln.tg]+'</span>':'')+ln.h+'</div></div>'; }); });
+  const fig=st.fig?ch.figs[st.fig]:null;
+  if(fig) h+='<div class="bd-fig" data-fig="'+esc(st.fig)+'" style="counter-reset:fno '+figNo(ch,st.fig)+'"><div class="fh">그림 · 단계 '+st.fs+' / '+fig.max+'<span class="pl"><button type="button" class="zoom" data-zoom="1">크게 보기</button><button type="button" class="a" data-replay="1">▶ 다시 보기</button></span></div>'+fig.svg+'</div>';
+  board(h,'<span>CH '+(S.ci+1)+' · '+esc(ch.title)+'</span><small>'+(S.si+1)+' / '+ch.steps.length+'</small>',false);
+  $("#bc").style.counterReset="eq 0 chn "+(S.ci+1);   /* (식 챕터-번호) · 【그림 챕터-번호】 */
+  /* 작은 채움 원(전하·점)은 맥동 — 물리 그림에 생동감(대표님 9/28). 동작 줄이기면 CSS 가 끈다 */
+  $$("#bc .bd-fig circle").forEach(c=>{ if(c.closest("defs")) return; const r=+c.getAttribute("r")||0, f=c.getAttribute("fill"); if(r>0&&r<=20&&f&&f!=="none"&&!/^rgba\(.*,\s*0?\.[0-4]\d*\)$/.test(f)) c.classList.add("pulse"); });
+  stackFig(); figZoomFlag();   /* 폰: 가로 칸 그림을 세로로(오타 디자인 1차 R2) · 모든 폭: 작은 글자 그림은 크게 보기 — 그림 단계 숨김보다 먼저(숨긴 요소는 크기를 못 잰다) */
+  { const rb=$("#bc [data-replay]"); if(rb) rb.onclick=function(){ replayFig(); }; } { const zb=$("#bc [data-zoom]"); if(zb) zb.onclick=function(){ zoomFig(); }; }
+  { const fe=$("#bc .bd-fig figure"), bx=$("#bc .bd-fig"); if(fe&&bx&&!bx.classList.contains("big")) fe.addEventListener("click",()=>zoomFig()); }   /* 글자가 작은 그림은 그림을 눌러도 크게 */
+  /* 그림: 단계 ≤ fs 만 보이게. 이전 단계에서 이미 보였던 것은 바로, 이 단계에서 새로 보이는 것은 그려진다 */
+  const prevFs=FIGONLY?0:(()=>{ for(let k=S.si-1;k>=0;k--){ const p=ch.steps[k]; if(p.fig===st.fig) return p.fs||0; } return 0; })();   /* 다시 보기면 보이는 그림 전부를 처음부터 */
+  let newEls=[];
+  /* SVG 요소에는 hidden IDL 속성이 없다 — 속성으로 직접 (CSS .bd-fig [data-step][hidden]) */
+  /* 이 단계에서 새로 나올 그림 단계는 대사·판서가 끝나 그림 차례가 올 때까지 가린다(class pre, 오타 R3) */
+  if(fig){ const root=$("#bc .bd-fig"); $$("[data-step]",root).forEach(g=>{ const n=+g.getAttribute("data-step")||0; if(n>st.fs){ g.setAttribute("hidden",""); g.setAttribute("aria-hidden","true"); } else { g.removeAttribute("hidden"); g.removeAttribute("aria-hidden"); if(n>prevFs&&!instant){ g.classList.add("pre"); newEls.push(g); } } }); }
+  const wrap=$("#bwrap"); if(instant&&wrap) scrollCur();
+  const finishBoard=()=>{ $$("#bc .bl").forEach(l=>{ l.classList.add("now"); l.classList.remove("on"); }); };
+  const finishFig=()=>{ newEls.forEach(g=>{ g.classList.remove("pre"); $$(".draw,.fade",g).forEach(el=>{ el.classList.remove("draw","fade"); el.style.strokeDasharray=""; el.style.strokeDashoffset=""; el.style.opacity=""; el.style.transition=""; if(el.dataset.mk){ el.setAttribute("marker-end",el.dataset.mk); delete el.dataset.mk; } }); }); };
+  const seed=S.ci+":"+S.si+":"+S.again; let line=st.s, face= /반은 틀립|틀립니다|찍지/.test(st.s)?"angry": /정리|외우세요|외울 것/.test(st.s)?"sharp": /좋|맞습|됐/.test(st.s)?"smile":"neutral";
+  if(S.again>0){ line=pick("again",seed)+" "+st.s; face="sharp"; }
+  [line,face]=preLine(line,face);
+  if(!instant) anim={phase:"say",finish:()=>{ finishBoard(); finishFig(); }};
+  say(line,face,null,()=>{ if(instant){ finishBoard(); finishFig(); anim=null; return; }
+    /* 판서 줄 쓰기 */
+    anim={phase:"board",finish:()=>{ finishBoard(); finishFig(); }};
+    const lines=$$("#bc .bl:not(.now)"); lines.forEach((l,i)=>{ later(()=>{ l.classList.add("on"); if(wrap) scrollCur(); },i*220); });
+    later(()=>{ /* 그림 단계 */
+      if(!newEls.length){ finishBoard(); anim=null; return; }
+      anim={phase:"fig",finish:()=>{ finishBoard(); finishFig(); }};
+      let longest=null, longestDur=0;
+      newEls.forEach(g=>{ $$("line,path,circle,ellipse,polyline,polygon,text,tspan,rect",g).forEach(el=>{ if(el.closest("defs")) return;
+        const stroked=el.getAttribute("stroke")&&el.getAttribute("stroke")!=="none", filled=el.getAttribute("fill")&&el.getAttribute("fill")!=="none", dashed=!!el.getAttribute("stroke-dasharray"), isText=/^(text|tspan)$/i.test(el.tagName);
+        if(stroked&&!filled&&!dashed&&!isText&&typeof el.getTotalLength==="function"){ let len=0; try{ len=el.getTotalLength(); }catch(e){} if(len>0){ const dur=Math.min(1200,Math.max(400,len*4)); if(el.getAttribute("marker-end")){ el.dataset.mk=el.getAttribute("marker-end"); el.removeAttribute("marker-end"); }
+          el.style.strokeDasharray=len; el.style.strokeDashoffset=len; el.style.setProperty("--dur",dur+"ms"); el.classList.add("draw"); raf(()=>raf(()=>{ el.style.strokeDashoffset="0"; }));
+          /* 화살촉은 선이 실제로 다 그려진 사건(transitionend)에서만 — 예비 타임아웃(전환이 멈춘 탭)이면 그림 단계 완료(finishFig)에서 한꺼번에 */
+          onEnd(el,dur,real=>{ if(real&&el.dataset.mk){ el.setAttribute("marker-end",el.dataset.mk); delete el.dataset.mk; } }); if(dur>longestDur){ longestDur=dur; longest=el; } return; } }
+        el.classList.add("fade"); raf(()=>raf(()=>{ el.classList.add("on"); })); }); g.classList.remove("pre"); /* 자식이 전부 초기(안 보임) 상태가 된 뒤 가림을 푼다 */ });
+      if(wrap) scrollCur();
+      const settleFig=()=>{ finishBoard(); finishFig(); anim=null; };   /* 이름은 문제 채점 settle(q,ok) 와 겹치지 않게 */
+      if(longest) onEnd(longest,longestDur,settleFig); else later(settleFig,400);
+    },lines.length*220+120);
+  });
+  S.resume=false; S.again=0;
+  choices([{t:"이해했어요",cls:"p",primary:1,key:"Enter",f:()=>next()},{t:"다시 설명",cls:"g",f:()=>{ again(); S.again=1; render(); }},{t:"질문할게요",cls:"t",f:ask}]);
+}
+/* 「다시 보기」: 같은 단계를 대사·판서는 즉시 보인 채로 그림 애니메이션만 다시 돌린다(단계·보상·저장 위치 변화 없음) */
+function replayFig(){ if(S.mode!=="step"||!V2) return; cancelAll(); FIGONLY=true; SAY_INSTANT=true; try{ render(); } finally { FIGONLY=false; SAY_INSTANT=false; } }
+function next(){ if(anim){ finishNow(); } cancelAll(); S.again=0; S.rev=false; const ch=CH[S.ci]; if(!ch||S.si+1>=ch.steps.length) return finishChapter(); S.si++; S.resume=false; render(); }
+function enter(){ if(anim||typing){ finishNow(); if(typing) skipTyping(); return; } const b=$("#dCh [data-primary]"); if(b) b.click(); }
+function finishChapter(){
+  const ch=CH[S.ci]; if(!ch){ S.mode="intro"; return render(); } const was=!!L.ch[ch.id]; dayReset();
+  L.ch[ch.id]=true; ST.read[ch.id]=true; touchStreak(); ev("read",{sid:ch.id,n:secN(ch.id),clean:!CONF[ch.id]}); delete CONF[ch.id];
+  let extra="";
+  /* 보상은 회차 기록을 지워도 한 번만(L.rew 는 초기화에서 남긴다, 오타 R5). 하트 회복은 이미 끝낸 챕터를 다시 읽었을 때 */
+  if(!L.rew["ch:"+ch.id]){ L.rew["ch:"+ch.id]=true; gainXP(10); gainAff(2); } else if(was&&T.hearts<3){ T.hearts++; extra=" "+pick("heartback",S.ci); pop("#hHearts","+1"); }
+  save(); hud();
+  S.si=0; S.ci++; S.resume=false;
+  if(S.ci>=CH.length){ if(QZ.length){ S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; } else S.mode="result"; }
+  const line=(warm()?pick("chdone_warm",S.ci):pick("chdone",S.ci,{c:S.ci}))+extra;
+  /* 안내 대사는 다음 화면 대사 앞에 붙인다(render 뒤 say 를 또 부르면 새 단계의 완료 콜백이 사라진다, 오타 R2) */
+  if(S.mode==="quiz"&&S.ci===CH.length){ S.pre=pick("quiz","q",{n:QZ.length,h:T.hearts}); S.preFace="sharp"; } else { S.pre=line; S.preFace="proud"; }
+  render();
+}
+function renderQuiz(){
+  cancelAll();
+  const q=QZ[S.qi]; if(!q){ S.mode="result"; return render(); }
+  dayReset(); if(T.hearts<=0&&!ST.done[q.id]){ S.mode="nohearts"; return render(); }
+  const mc=Array.isArray(q.choices)&&q.choices.length, rev=!!ST.done[q.id], my=ST.answer[q.id], c=ST.correct[q.id];
+  let h='<div class="qz"><div class="qn">'+esc(q.qn||("문제 "+(S.qi+1)))+'</div><div class="qb">'+q.html+'</div>';
+  if(mc) h+='<ol class="ch">'+q.choices.map((x,i)=>'<li><button type="button" class="cb'+(rev?(x.ok?" ok":(my!=null&&String(my)===ck(x,i)?" bad":"")):"")+'" data-i="'+i+'"'+(rev?" disabled":"")+'><span class="n">'+(i+1)+'</span><span>'+x.html+'</span></button></li>').join("")+'</ol>';
+  else h+= rev? '<div class="my"><b>내 답</b> '+esc(my||"(빈칸)")+'</div>' : '<textarea id="myans" placeholder="답만 간단히">'+esc(my||"")+'</textarea><div class="row"><button type="button" class="cbt p" id="reveal" style="width:auto">답 보기</button></div>';
+  if(rev){ h+='<span class="vd '+(c===true?"ok":c===false?"bad":"wait")+'">'+(c===true?"정답":c===false?"오답":"채점 전")+'</span>';
+    if(!mc&&c==null) h+='<div class="row"><button type="button" class="cbt p" data-g="1" style="width:auto">맞았어요</button><button type="button" class="cbt r" data-g="0" style="width:auto">틀렸어요</button></div>';
+    h+='<div class="ans"><i>해설</i>'+(q.ans||"")+'</div>'; }
+  h+='</div>';
+  board(h,'<span>확인 문제</span><small>'+(S.qi+1)+' / '+QZ.length+'</small>',true);
+  $$("#bc .cb").forEach(b=>{ b.onclick=()=>answer(q,+b.dataset.i); });
+  const rv=$("#reveal"); if(rv) rv.onclick=()=>{ dayReset(); if(T.hearts<=0){ S.mode="nohearts"; return render(); } const ta=$("#myans"); ST.answer[q.id]=(ta&&ta.value.trim())||""; ST.done[q.id]=true; delete ST.correct[q.id]; save(); render(); say("자, 해설이랑 비교해 보세요. 채점은 본인이 하는 거예요. 봐주지만 마세요.","sharp"); };
+  $$("#bc [data-g]").forEach(b=>{ b.onclick=()=>grade(q,b.dataset.g==="1"); });
+  S.resume=false;
+  if(!rev){ const [ql,qf]=preLine(mc?pick("q",S.qi,{k:S.qi+1}):pick("qin",S.qi),"neutral"); say(ql,qf); choices([{t:"질문할게요",cls:"t",f:ask}]); }
+  else { const last=S.qi>=QZ.length-1; const [rl,rf]=preLine(c===true?"맞힌 문제예요. 다음으로 갈게요.":c===false?"틀렸던 문제예요. 해설을 한 번 더 읽고 가요.":"답은 봤고 채점이 남았어요. 봐주지 말고 본인이 채점해 주세요.", c===true?"neutral":"sharp"); say(rl,rf);
+    choices([{t:last?"결과 보기":"다음 문제",cls:"p",primary:1,key:"Enter",f:()=>{ if(last){ S.mode="result"; } else S.qi++; render(); }},{t:"다시 풀기",cls:"g",f:()=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; save(); render(); }},{t:"질문할게요",cls:"t",f:ask}]); }
+}
+function settle(q,ok){
+  ST.correct[q.id]=ok; touchStreak(); ev("quiz",{qid:q.id,ok:!!ok,n:qN(q.id)});
+  if(ok){ if(!L.rew[q.id]){ L.rew[q.id]=true; gainXP(15); gainAff(3); } }
+  else { T.hearts=Math.max(0,T.hearts-1); gainAff(-1); pop("#hHearts","-1",true); }
+  save(); render(); say(ok?(warm()?pick("ok_warm",S.qi):pick("ok",S.qi)):pick("bad",S.qi), ok?(warm()?"proud":"smile"):"angry");
+}
+function answer(q,i){ if(ST.done[q.id]) return; dayReset(); if(T.hearts<=0){ S.mode="nohearts"; return render(); } const c=q.choices[i]; ST.answer[q.id]=(c&&c.k!=null)?c.k:i; ST.done[q.id]=true; settle(q,!!(c&&c.ok)); }
+function grade(q,ok){ if(typeof ST.correct[q.id]==="boolean") return; dayReset(); if(T.hearts<=0){ S.mode="nohearts"; return render(); } settle(q,ok); }
+function renderNoHearts(){
+  cancelAll();
+  board('<div class="ttl">하트 0</div><div class="sub">목차</div>'+tocHTML(),'<span>잠깐</span>',true);
+  say(pick("nohearts","nh"),"angry");
+  choices([{t:"목차에서 챕터 고르기",cls:"p",primary:1,key:"Enter",f:openToc},{t:"교재 보기",cls:"g",f:()=>openBook((CH[0]||{}).id)}]);
+}
+function renderResult(){
+  cancelAll();
+  /* 완료 보상은 전부 채점된 뒤에만 — 입력형은 「답 보기」만 하고 자기 채점을 안 하면 채점 전(오타 구현 검수 1차) */
+  const n=QZ.length, ok=QZ.filter(q=>ST.correct[q.id]===true).length, wrong=QZ.filter(q=>ST.correct[q.id]===false), ung=QZ.filter(q=>typeof ST.correct[q.id]!=="boolean"), graded=n-ung.length;
+  const wasDone=!!L.done; if(graded>=n) L.done=true; const first=graded>=n&&!L.rew.done; if(first){ L.rew.done=true; gainXP(20); touchStreak(); }   /* 완료 보상도 회차당 한 번(L.rew, 오타 R5·R6) */
+  if(first||L.done!==wasDone) save();   /* 보상과 별개로 완료 상태 변화는 바로 저장 — render() 의 save 는 이보다 앞이라 재완료가 안 남았다(오타 2차 R6) */
+  const ratio=n?ok/n:1, good=ratio>=.8, mid=ratio>=.5;
+  /* 배지: 그림 세트가 있으면 스티커(전부 맞히면 트로피, 아니면 월계관), 없으면 SVG 배지 */
+  /* 스티커를 먼저 쓰고 못 열면 SVG 배지로 — RASTER 탐색(비동기)이 끝나기 전에 결과 화면이 뜰 수 있어 탐색 결과에 기대지 않는다 */
+  const badge='<img class="stk" alt="" src="../assets/stickers/'+(good?"trophy":"laurel")+'.png" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"><svg class="badge" style="display:none" viewBox="0 0 120 120" fill="none" stroke="#FFE27A" stroke-width="2.5" stroke-linejoin="round"><circle cx="60" cy="60" r="50" stroke-dasharray="4 3"/><circle cx="60" cy="60" r="40"/><path d="M60 30l8.8 18 19.8 2.9-14.3 13.9 3.4 19.7L60 75.2l-17.7 9.3 3.4-19.7L31.4 50.9l19.8-2.9z" fill="rgba(255,226,122,.18)"/></svg><div class="bl2">'+esc(D.course)+' · '+esc(D.sess)+' · 챕터 '+CH.length+'</div>';
+  board('<div class="res"><div class="big">'+(ung.length?"채점이 남았습니다":good?"수고했습니다":mid?"절반은 넘겼습니다":"다시 합니다")+'</div><div class="stats">'+(ung.length?'<div><b>'+graded+'/'+n+'</b><span>채점 완료</span></div><div><b>'+(graded?ok+'/'+graded:'—')+'</b><span>정답</span></div>':'<div><b>'+ok+'/'+n+'</b><span>정답</span></div>')+'<div><b>+'+(L.xp||0)+'</b><span>이 회차 XP</span></div><div><b>'+T.streak+'</b><span>연속일</span></div><div><b>'+T.aff+'</b><span>호감도 · '+affName()+'</span></div></div>'+(ung.length?'':badge)+(ung.length?'<div class="wrong">채점 전 '+ung.length+'개</div>':'')+(wrong.length?'<div class="wrong">틀린 문제 '+wrong.length+'개</div>':'')+'</div>','<span>오늘의 결과</span>',true);
+  { const [rl,rf]=preLine(ung.length?"채점을 안 한 문제가 있어요. 봐주지 말고 본인이 채점해 주세요. 그래야 오늘 공부가 끝난 거예요.":pick(good?"res_good":mid?"res_mid":"res_bad","r",{ok:ok,n:n}), ung.length?"sharp":good?"proud":mid?"sharp":"angry"); say(rl,rf); }
+  const cs=[];
+  if(ung.length) cs.push({t:"채점 안 한 문제 ("+ung.length+")",cls:"p",primary:1,key:"Enter",f:()=>{ S.mode="quiz"; S.qi=QZ.indexOf(ung[0]); render(); }});
+  if(wrong.length) cs.push({t:"틀린 문제 다시 ("+wrong.length+")",cls:ung.length?"g":"p",primary:ung.length?0:1,key:ung.length?"":"Enter",f:()=>{ wrong.forEach(q=>{ delete ST.done[q.id]; delete ST.correct[q.id]; delete ST.answer[q.id]; }); save(); S.mode="quiz"; S.qi=QZ.findIndex(q=>!ST.done[q.id]); render(); }});
+  cs.push({t:"교재 보기",cls:"g",f:()=>openBook(null)}); cs.push({t:"목차",cls:"g",f:openToc});
+  if(EMB) cs.push({t:"앱으로",cls:wrong.length?"g":"p",primary:wrong.length?0:1,f:()=>post({type:"mc-close",v:1})});
+  choices(cs);
+}
+/* ---------- 목차 · 교재 · 질문 ---------- */
+function openToc(){ const ov=$("#ov"); $("#ovMeta").textContent=D.course+" · "+D.sess;
+  $("#ovList").innerHTML=CH.map((c,i)=>'<li class="'+(L.ch[c.id]?"done":"")+(S.mode==="step"&&S.ci===i?" cur":"")+'"><button type="button" data-ci="'+i+'"><span class="st">'+(L.ch[c.id]?"✓":i+1)+'</span><span>'+esc(c.title)+'</span><small>'+c.steps.length+'단계</small></button></li>').join("")
+    +(QZ.length?'<li class="'+(QZ.every(q=>ST.done[q.id])?"done":"")+(S.mode==="quiz"?" cur":"")+'"><button type="button" data-q="1"><span class="st">?</span><span>확인 문제</span><small>'+QZ.filter(q=>ST.done[q.id]).length+'/'+QZ.length+'</small></button></li>':"");
+  $$("#ovList [data-ci]").forEach(b=>{ b.onclick=()=>{ ov.classList.remove("on"); cancelAll(); S=Object.assign(S,{mode:"step",ci:+b.dataset.ci,si:0,rev:false,again:0,resume:false}); render(); }; });
+  const qb=$("#ovList [data-q]"); if(qb) qb.onclick=()=>{ ov.classList.remove("on"); cancelAll(); if(T.hearts<=0&&QZ.some(q=>!ST.done[q.id])){ S.mode="nohearts"; return render(); } S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; render(); };
+  ov.classList.add("on"); }
+$("#hToc").onclick=openToc; $("#ovClose").onclick=()=>$("#ov").classList.remove("on"); $("#ov").onclick=e=>{ if(e.target.id==="ov") $("#ov").classList.remove("on"); };
+$("#ovBook").onclick=()=>openBook(S.mode==="step"?(CH[S.ci]||{}).id:null);
+/* 학습 기록(챕터·문제)과 보상 기록(L.rew·L.xp)을 분리 — 초기화해도 같은 챕터·문제로 XP 를 다시 받지 않는다(오타 R5) */
+$("#ovReset").onclick=()=>{ if(!confirm("이 회차의 챕터·문제 기록을 지울까요? (XP·연속일과 이미 받은 보상은 그대로 — 같은 챕터·문제로 XP 를 다시 받지는 않습니다)")) return; cancelAll(); L={pos:null,ch:{},done:false,xp:L.xp||0,rew:(L.rew&&typeof L.rew==="object")?L.rew:{}}; ST={read:{},done:{},correct:{},answer:{},ts:0}; S=Object.assign(S,{mode:"intro",ci:0,si:0,qi:0,rev:false,again:0,resume:false,pre:"",preFace:""}); $("#ov").classList.remove("on"); render(); };
+function post(m){ try{ window.parent.postMessage(m,location.origin); }catch(e){} }
+function openMemo(){ const h="#d"+D.date; if(EMB) post({type:"mc-open",v:1,file:"notes/memo/"+D.slug+".html"+h,title:D.course+" 암기노트"}); else location.href="../../memo/"+D.slug+".html"+h; }
+$("#ovMemo").onclick=()=>{ $("#ov").classList.remove("on"); openMemo(); };
+function openBook(sid){ const hash=sid?"#s="+sid:""; if(EMB){ post({type:"mc-open",v:1,file:LESSON_APP+hash,title:document.title}); } else location.href=LESSON_REL+hash; }
+function again(){ const c=CH[S.ci]; if(c){ CONF[c.id]=true; ev("again",{sid:c.id,n:secN(c.id)}); } }
+function ask(){ if(anim||typing) finishNow(); if(S.mode==="step"){ const c=CH[S.ci]; if(c){ CONF[c.id]=true; ev("ask",{sid:c.id,n:secN(c.id)}); } } else if(S.mode==="quiz"){ const q=QZ[S.qi]; if(q) ev("ask",{qid:q.id,n:qN(q.id)}); }   /* 질문 대사가 진행 중인 단계의 완료 콜백을 지우지 않게 먼저 즉시 완료(오타 R2) */
+  if(EMB){ post({type:"mc-ask",v:1}); say(pick("ask",S.ci+":"+S.si),"wide"); gainAff(1); save(); hud(); } else say(pick("askoff",S.ci),"sharp"); }
+/* ---------- 앱 질문 패널 문맥 (V45 규약) ---------- */
+let CTX_GEN=null;
+function ctx(){ if(!CTX_GEN||!EMB) return; let label="", q=null, sid="";
+  if(S.mode==="step"){ const ch=CH[S.ci]||{}, st=(ch.steps||[])[S.si]||{}; sid=ch.id||""; label="CH "+(S.ci+1)+" · "+(ch.title||""); const tmp=document.createElement("div"); tmp.innerHTML= st.t==="v2"? ((st.b||[]).map(l=>l.h).join(" ")+" "+(st.s||"")) : (st.t==="ex"?(st.q+" "+(S.rev?st.a:"")):(st.html||"")); q={qn:(ch.title||"").slice(0,80),kind:"개념",text:(tmp.textContent||"").replace(/\s+/g," ").trim().slice(0,600),choices:[],my:null,revealed:true,correct:null,answer:null}; }
+  else if(S.mode==="quiz"){ const qq=QZ[S.qi]; if(qq){ const tmp=document.createElement("div"); tmp.innerHTML=qq.html; label="확인 문제 "+(S.qi+1); const tc=x=>{ const d=document.createElement("div"); d.innerHTML=x; return (d.textContent||"").trim(); };
+    q={qn:qq.qn,kind:"문제",text:(tmp.textContent||"").replace(/\s+/g," ").trim().slice(0,600),choices:(qq.choices||[]).map(c=>tc(c.html)),my:(ST.answer[qq.id]==null?null:(Array.isArray(qq.choices)&&qq.choices.length?(()=>{ const j=qq.choices.findIndex((c,i)=>ck(c,i)===String(ST.answer[qq.id])); return j>=0?(j+1)+"번 "+tc(qq.choices[j].html):null; })():String(ST.answer[qq.id]))),revealed:!!ST.done[qq.id],correct:(typeof ST.correct[qq.id]==="boolean"?ST.correct[qq.id]:null),answer:null}; } }
+  else label=S.mode;
+  post({type:"mc-slide",v:1,gen:CTX_GEN,deck:D.id,title:document.title.slice(0,80),sid:sid,stype:S.mode==="quiz"?"quiz":"concept",part:null,partTitle:document.title.slice(0,60),label:("교실 · "+label).slice(0,80),q:q}); }
+window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; ctx(); } });
+const _render=render; render=function(){ _render(); ctx(); };
+/* ---------- 키보드 ---------- */
+document.addEventListener("keydown",e=>{ if(e.target&&/TEXTAREA|INPUT/.test(e.target.tagName)) return; if($("#ov").classList.contains("on")){ if(e.key==="Escape") $("#ov").classList.remove("on"); return; }
+  if(!$("#figov").hidden){ if(e.key==="Escape"){ e.preventDefault(); closeFig(); } else if(e.key==="Tab"){ e.preventDefault(); $("#figovX").focus(); } else if(e.key==="Enter"||e.key===" "){ e.preventDefault(); } return; }   /* 그림 확대창이 열려 있으면 뒤 교실 단축키(Enter·Space·숫자) 차단, 닫기는 Esc·닫기 버튼 — 오타 디자인 2차 */
+  if(e.key==="Enter"||e.key===" "){ e.preventDefault(); if(e.repeat) return; enter(); }
+  else if(/^[1-6]$/.test(e.key)&&S.mode==="quiz"){ const b=$$("#bc .cb")[+e.key-1]; if(b&&!b.disabled) b.click(); } });
+/* ---------- 시작 ---------- */
+/* 해시: #resume(저장 위치) · #ch=N(챕터 N) · #ch=N.M(챕터 N 의 M 단계) · #quiz · #result */
+function boot(){ const m=/^#(resume|ch=(\d+)(?:\.(\d+))?|quiz|result)$/.exec(location.hash||"");
+  if(m&&m[1]==="resume"&&L.pos&&!L.done){ return resumeTo(posOf()); }
+  else if(m&&m[2]){ const ci=Math.max(0,Math.min(CH.length-1,+m[2]-1)); const si=m[3]?Math.max(0,Math.min(CH[ci].steps.length-1,+m[3]-1)):0; S=Object.assign(S,{mode:"step",ci:ci,si:si,rev:(CH[ci].steps[si]||{}).t==="ex"&&/\.\d+r$/.test(location.hash),resume:!!m[3]}); }
+  else if(m&&m[1]==="quiz"&&QZ.length){ S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; }
+  else if(m&&m[1]==="result"){ S.mode="result"; }
+  render(); }
+window.__cr={get D(){return D;},get S(){return S;},set S(v){S=v;},get T(){return T;},get L(){return L;},set L(v){L=v;T.lessons[D.id]=L;},get ST(){return ST;},set ST(v){ST=v;},get fullText(){return fullText;},get anim(){return anim;},get pending(){return pend.t.length+pend.raf.length+pend.tr.length;},set reduce(v){REDUCE=!!v;},get reduce(){return REDUCE;},set speed(v){TYPE_MS=Math.max(1,+v||22);},get typing(){return !!typing;},
+  render:function(){ return render(); },next:function(){ return next(); },boot:function(){ return boot(); },enter:function(){ return enter(); },cancelAll:function(){ return cancelAll(); },posOf:function(){ return posOf(); },replay:function(){ return replayFig(); }};  /* 검사기(classroom_check.cjs)용 창구 */
+(function wait(){ if(window.renderMathInElement) boot(); else setTimeout(wait,40); })();
+</script>
+</body>
+</html>
