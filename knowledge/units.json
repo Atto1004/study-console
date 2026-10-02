@@ -20,7 +20,7 @@
  ]},
  "정역학": {"units": [
   {"n": 1, "title": "Ch.1 Introduction — 역학 · 단위 · 뉴턴 법칙", "dates": ["2026-09-02", "2026-09-07"], "num": "Ch\\.?\\s?1\\b", "kw": "Introduction|Orientation", "phase": "mid"},
-  {"n": 2, "title": "Ch.2 Vectors — 성분 · 위치벡터 · 방향여현 · 내적 · 외적", "dates": ["2026-09-09", "2026-09-14"], "num": "Ch\\.?\\s?2\\b", "kw": "Vectors|벡터", "phase": "mid"},
+  {"n": 2, "title": "Ch.2 Vectors — 성분 · 위치벡터 · 방향여현 · 내적 · 외적", "dates": ["2026-09-09", "2026-09-14"], "num": "Ch\\.?\\s?2\\b", "kw": "Vectors|벡터|삼중적|내적|정사영", "phase": "mid"},
   {"n": 3, "title": "Ch.3 Forces — 힘의 종류 · 자유물체도 · 입자의 평형", "dates": ["2026-09-16", "2026-09-21"], "num": "Ch\\.?\\s?3\\b", "kw": "Forces|자유물체|입자의 평형", "phase": "mid"},
   {"n": 4, "title": "Ch.4 Systems of Forces and Moments — 모멘트 · 힘계의 합력", "dates": ["2026-09-23", "2026-09-28"], "num": "Ch\\.?\\s?4\\b", "kw": "Moments|모멘트", "phase": "mid"},
   {"n": 5, "title": "Ch.5 Objects in Equilibrium — 강체의 평형", "dates": ["2026-09-30"], "num": "Ch\\.?\\s?5\\b", "kw": "Objects in Equilibrium|강체", "phase": "mid"},
