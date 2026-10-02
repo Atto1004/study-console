@@ -13,13 +13,16 @@ fig_why = canvas(560, 150,
     step(3, text(470, 56, "행렬 = 숫자의", 13, INK, "middle", True), text(470, 76, "직사각형 배열", 13, INK, "middle", True), text(470, 104, "연립방정식을 푸는 도구", 12, GRAY, "middle")),
     cap="행렬이 등장하는 이유. 미지수 4개 이상이면 중학교식 소거법은 복잡·느리다 → 계수만 배열로 다룬다.", name="why")
 
-fig_def = canvas(560, 170,
+fig_def = canvas(560, 176,
     step(1, mat(40, 26, [["a_11", "a_12", "…", "a_1n"], ["a_21", "a_22", "…", "a_2n"], ["⋮", "", "", "⋮"], ["a_m1", "a_m2", "…", "a_mn"]], 52, 28, hl=(1, 1)),
-        text(146, 158, "m × n 행렬 A = (a_ij)", 13, INK, "middle", True)),
-    step(2, arrow(300, 30, 300, 120, BLUE, "", 1.8), text(316, 80, "행 i (row, 가로) m 개", 12.5, BLUE)),
-    step(3, arrow(330, 140, 470, 140, GREEN, "", 1.8), text(400, 158, "열 j (column, 세로) n 개", 12.5, GREEN, "middle")),
-    step(4, text(430, 60, "a_ij = i 행 j 열 성분", 13, RED, "middle", True), text(430, 104, "행렬은 대문자 A, 성분은 소문자 a", 12, GRAY, "middle")),
-    cap="정의: 행 m 개 × 열 n 개. 첨자 순서는 「행 먼저, 열 나중」 — a₂₂ 처럼 강조된 칸은 2행 2열.", name="def")
+        text(146, 160, "m × n 행렬 A = (a_ij)", 13, INK, "middle", True)),
+    # 대표님 10/2: 세로 화살표 옆 「행(가로)」가 행이 세로인 것처럼 읽힘 → 행 = 가로 띠, 열 = 세로 띠로 직접 칠한다
+    step(2, band(44, 40, 246, 40, 24, BLUE, .2), text(268, 44, "1행 = 가로줄 (row)", 13, BLUE, "start", True),
+        text(268, 62, "위에서부터 1행 · 2행 … m행", 11.5, GRAY)),
+    step(3, band(66, 28, 66, 136, 44, GREEN, .2), text(268, 96, "1열 = 세로줄 (column)", 13, GREEN, "start", True),
+        text(268, 114, "왼쪽부터 1열 · 2열 … n열", 11.5, GRAY)),
+    step(4, text(452, 146, "a_ij = i 행 j 열 성분", 13, RED, "middle", True), text(452, 164, "행렬은 대문자 A, 성분은 소문자 a", 11, GRAY, "middle")),
+    cap="행(row) = 가로줄, 열(column) = 세로줄. m × n = 행 m 개 × 열 n 개. 첨자 순서는 「행 먼저, 열 나중」 — 강조된 칸 a₂₂ 는 2행 2열.", name="def")
 
 fig_kinds = canvas(560, 200,
     step(1, mat(20, 30, [[1, 0, 0], [0, 1, 0], [0, 0, 1]], 26, 24), text(59, 118, "단위행렬 I₃", 12, INK, "middle", True), text(59, 134, "대각 1, 나머지 0 = 숫자 1", 10.5, GRAY, "middle")),
