@@ -4,6 +4,9 @@
 
 ## 2026-10-01
 
+### .121 — 확인 탭 · 수업 영상 재생 · XP 숨김
+- 대표님 10/2. V64 LAYER(`docs/layers/v64-layer-src.js`). 질문 `_private/asks.json` · 답 `S.asks[id]`(atom kv study_state 로 올라감). 영상 목록 `docs/tools/build_media_index.py` → `_private/media.json`, 파일은 `_private/media` 정션(→ study-materials). atom `/study/` 영상 · 음성은 Range 로(server.py _study_media).
+
 ### .120 — 정역학 영상 미게시
 - 대표님 10/2 「정역학은 클로바노트가 아니라 영상 내용을 텍스트로 — 왜 28일꺼 없다고 떠?」. 9/28(W5-1)은 LMS 에 교수 필기(Statics_W5-1_260928)만 있고 영상 조각(W5-1-1…)이 없음(10/2 LMS 모듈 직접 조회). `_진도커버리지.py` lms_video_days → materials.json novideo → V58 「영상 미게시」.
 
