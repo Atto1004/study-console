@@ -22,7 +22,7 @@ else:
     how = "삽입"
 assert s.count(hdr) == 1
 
-B_OLD, B_NEW = 'var BUILD="2026-10-02.103";', 'var BUILD="2026-10-02.104";'
+B_OLD, B_NEW = 'var BUILD="2026-10-02.104";', 'var BUILD="2026-10-02.105";'
 if B_NEW not in s:
     assert s.count(B_OLD) == 1; s = s.replace(B_OLD, B_NEW)
 
@@ -31,7 +31,12 @@ ITEM = ('  {v:"2026-10-02.104",d:"10-02",items:[\n'
         '    "공업수학1 중간 범위 = 1장 ~ 3.3 (교수 10/2, 10/7 수업에서 범위 끝까지) — 시험 카드 범위 갱신",\n'
         '    "5주차 수업 노트 · 교실 8회차 추가 — 미적2 9/29 · 10/1, 공수1 9/30, 일물2 9/30, 정역학 9/21 · 9/23 · 9/28 · 9/30 (암기노트 · 개념 판정 연결 포함)"\n'
         '  ]},\n')
-if '{v:"2026-10-02.104"' not in s:
+if False:
     assert s.count(PN) == 1; s = s.replace(PN, PN + ITEM)
+ITEM2 = ('  {v:"2026-10-02.105",d:"10-02",items:[\n'
+         '    "공업수학1 중간 = 10/16(금) 가정 (후보 10/16 · 10/21, 10/7 진도 끝 · 10/14 정리 수업 — 대표님 10/2)"\n'
+         '  ]},\n')
+if '{v:"2026-10-02.105"' not in s:
+    assert s.count(PN) == 1; s = s.replace(PN, PN + ITEM2)
 io.open(IDX, "w", encoding="utf-8", newline="\n").write(s)
 print("V62", how)
