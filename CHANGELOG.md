@@ -4,6 +4,9 @@
 
 ## 2026-10-01
 
+### .128 — 반복 루틴 분리 · LMS 새 공지 처리
+- 대표님 10/2. V68 LAYER(할 일 탭 반복 루틴 카드). atom `lms_notice_watch.py`(kv lms_ann_seen 비교 → _private/asks.json 카드 + claude -p 처리) · `check_integrations.ps1` 매시간 lms_cdp_sync → notice_watch.
+
 ### .127 — 교실 질문창 · 넷플릭스 자막 · 강사 연출
 - 대표님 10/2. `_v4_splice.py` 18)~20)절 → 32회차 재빌드(check 0 · render 0 · design_audit 새 문제 0, 미적2 10/1 폰 식 넘침은 이전과 같음) · `classroom_check.cjs` 질문 시나리오를 하단 입력창으로. 앱 V67 LAYER: 교실 mc-ask-q → V45.send → mc-answer 중계.
 - 뒤돌아 칠판에 쓰는 장면은 뒷모습 그림이 없어 아직(그림 세트 필요).
