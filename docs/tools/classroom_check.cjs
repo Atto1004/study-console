@@ -142,7 +142,7 @@ async function check(file) {
       X.enter();   /* 1) 즉시 완료 */
       if (X.S.si !== tgt.si || X.S.ci !== tgt.ci) problems.push("Enter 즉시 완료가 단계를 옮김: " + X.S.ci + "/" + X.S.si);
       if (X.anim || X.pending) problems.push("즉시 완료 뒤 예약 작업 남음: " + X.pending);
-      if (norm(doc.querySelector("#dText").textContent) !== norm(X.fullText)) problems.push("즉시 완료 뒤 대사가 끝까지 안 나옴");
+      { const shown = norm(doc.querySelector("#dText").textContent), full = norm(X.fullText); if (X.typing || !shown || !full.endsWith(shown)) problems.push("즉시 완료 뒤 대사가 끝(마지막 문장)까지 안 나옴: " + shown.slice(0, 30)); }
       if (![...doc.querySelectorAll("#bc .bl")].every(l => l.classList.contains("now"))) problems.push("즉시 완료 뒤 판서 줄이 가려짐");
       if (doc.querySelector("#bc .bd-fig .draw, #bc .bd-fig .fade") ) problems.push("즉시 완료 뒤 그림 요소에 애니메이션 클래스 남음");
       if (tgt.s.fig) { const bad = [...doc.querySelectorAll("#bc .bd-fig [data-step]")].filter(g => +g.getAttribute("data-step") > tgt.s.fs && !g.hasAttribute("hidden")); if (bad.length) problems.push("즉시 완료 뒤 미래 그림 단계가 보임: " + bad.length); }
@@ -172,7 +172,7 @@ async function check(file) {
         if (X.S.ci !== 1 || X.S.si !== 0) problems.push("챕터 경계 뒤 위치가 CH2 1단계가 아님: " + X.S.ci + "/" + X.S.si);
         else { if (!X.typing) problems.push("챕터 경계 뒤 대사가 타자 중이 아님"); doc.querySelector("#dText").click();
           if (!X.anim || X.anim.phase !== "board" || !X.pending) problems.push("챕터 경계 뒤 대사를 끝냈는데 판서 단계로 안 넘어감: " + JSON.stringify({ anim: X.anim && X.anim.phase, pending: X.pending }));
-          if (!/^.+/.test(norm(doc.querySelector("#dText").textContent)) || !norm(doc.querySelector("#dText").textContent).includes(D.chapters[1].steps[0].s.slice(0, 12))) problems.push("챕터 경계 대사에 다음 단계 대사가 없음");
+          if (!/^.+/.test(norm(doc.querySelector("#dText").textContent)) || !norm(X.fullText).includes(norm(D.chapters[1].steps[0].s).slice(0, 12))) problems.push("챕터 경계 대사에 다음 단계 대사가 없음");
           X.enter(); if (![...doc.querySelectorAll("#bc .bl")].every(l => l.classList.contains("now"))) problems.push("챕터 경계 뒤 즉시 완료가 판서를 못 보임"); } }
       /* 오타 R2 → 대표님 10/2: 대사 중 하단 질문창으로 질문 — 진행 중 단계를 먼저 완료하고 질문으로(판서·그림이 사라지지 않음) */
       { X.S.mode = "step"; X.S.ci = tgt.ci; X.S.si = tgt.si; X.S.resume = false; X.render(); const ab = doc.querySelector("#askbar"), ai = doc.querySelector("#askIn"); if ([...doc.querySelectorAll("#dCh .cbt")].some(x => /질문할게요/.test(x.textContent))) problems.push("「질문할게요」 버튼이 남음(하단 질문창으로 바뀜, 대표님 10/2)"); if (!ab || !ai) problems.push("하단 질문 입력창 없음"); else { ai.value = "이 식은 왜 이렇게 되나요?"; ab.dispatchEvent(new (doc.defaultView.Event)("submit", { cancelable: true }));
@@ -222,7 +222,7 @@ async function check(file) {
       if (withFig.length) { X.reduce = false; const t3 = withFig[0]; X.S.mode = "step"; X.S.ci = t3.ci; X.S.si = t3.si; X.S.resume = false; X.render(); X.enter();
         const xpB = X.T.xp; X.replay();
         if (X.S.ci !== t3.ci || X.S.si !== t3.si || X.T.xp !== xpB) problems.push("다시 보기가 위치·XP 를 바꿈");
-        if (X.typing || norm(doc.querySelector("#dText").textContent) !== norm(X.fullText)) problems.push("다시 보기 중 대사가 다시 타자됨");
+        if (X.typing || !norm(X.fullText).includes(norm(doc.querySelector("#dText").textContent))) problems.push("다시 보기 중 대사가 다시 타자됨");
         if (![...doc.querySelectorAll("#bc .bl")].every(l => l.classList.contains("now"))) problems.push("다시 보기에서 판서 줄이 가려짐");
         if (!X.pending && !X.anim) problems.push("다시 보기가 그림 애니메이션을 예약하지 않음");
         X.enter(); if (X.pending || X.anim || doc.querySelector("#bc .bd-fig .pre")) problems.push("다시 보기 뒤 Enter 즉시 완료 실패"); }

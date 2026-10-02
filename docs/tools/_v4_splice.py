@@ -371,6 +371,70 @@ sub1('const _render=render; render=function(){ _render(); ctx(); };',
      '$("#bwrap")&&$("#bwrap").addEventListener("scroll",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,80); },{passive:true});\n'
      'window.addEventListener("resize",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,120); });\n'
      'setInterval(()=>{ const t=$("#tutor"); if(t) t.classList.toggle("talking",!!typing||ASKING); },300);', "강사 연출 JS")
+# 21) 자막 한 문장씩 · 넷플릭스 글씨 · 레이저는 지시봉 끝에서 (대표님 2026-10-02 피드백 — 19)·20)절 보정)
+#     자막: 대사를 문장(.?! …)으로 나눠 한 문장씩 통째로, 글자 수에 맞춘 읽는 시간(약 9.5자/초, 1.4~6.5초) 뒤 다음 문장. 긴 문장은 쉼표·— 에서 다시 나눔(52자).
+#           높이 제한·스크롤 없음(질문 답처럼 아주 긴 글만 38vh 에서 스크롤). 글씨 = Pretendard 600 + 부드러운 그림자(4방향 검은 테두리 제거).
+#     레이저: 지시봉이 있는 그림(g/point · g/up · pose-point)일 때만, 그림 속 지시봉 끝 좌표에서 지금 줄 글자 끝까지. 오가는 동안 매 프레임 따라감. 다른 동작이면 끔.
+sub1('</style>', """
+.text{font-family:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif!important;font-weight:600!important;font-size:22px!important;line-height:1.45!important;
+ max-height:38vh!important;overflow-y:auto!important;letter-spacing:-.005em!important;color:#fff!important;
+ text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 10px rgba(0,0,0,.55),0 0 22px rgba(0,0,0,.35)!important}
+.text .cur{display:none!important}#tMore{display:none!important}
+.text.sub-in{animation:subin .22s ease-out}@keyframes subin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+#laser{background:linear-gradient(90deg,rgba(255,70,70,.0),rgba(255,70,70,.85))!important}#laser::after{left:auto!important;right:-6px}
+@media (max-width:760px){.text{font-size:18px!important}}
+@media (prefers-reduced-motion: reduce){.text.sub-in{animation:none}}
+</style>""", "넷플릭스 자막 글씨·레이저 끝점")
+sub1('function toggleText(){', r"""/* 21) 자막 한 문장씩 */
+function sents(t){ t=String(t||"").replace(/\s+/g," ").trim(); if(!t) return [""];
+  let a=t.match(/[^.?!…。]+(?:[.?!…。]+[」』)"']*)?\s*/g)||[t]; a=a.map(x=>x.trim()).filter(Boolean); const out=[];
+  a.forEach(x=>{ if(x.length<=52){ out.push(x); return; } let buf=""; x.split(/(?<=[,，—])\s*/).forEach(p=>{ if(buf&&(buf+" "+p).length>52){ out.push(buf.trim()); buf=p; } else buf=(buf?buf+" ":"")+p; }); if(buf) out.push(buf.trim()); });
+  return out.length?out:[t]; }
+let SUB=null, SUBT=null;
+function subHold(k){ const n=(SUB&&SUB.L[k]||"").length; return Math.max(1400,Math.min(6500,n*105))*(TYPE_MS/22); }
+function subShow(k){ const el=$("#dText"); if(!el||!SUB) return; SUB.i=k; el.textContent=SUB.L[k]; el.classList.remove("sub-in"); void el.offsetWidth; el.classList.add("sub-in"); el.scrollTop=0; }
+say=function(text,face,name,onDone){
+  const ch=$("#tutor .chibi"); if(ch) ch.setAttribute("data-face",face||"neutral"); curFace=face||"neutral"; faceImg(curFace);
+  const nm=$("#dNameTag"); nm.textContent=name||"김주영 스앵님"; nm.classList.toggle("prof",name==="교수님");
+  const el=$("#dText"); el.classList.remove("open"); if(typing){ clearTimeout(typing); clearInterval(typing); typing=null; } clearTimeout(SUBT); SUBT=null;
+  fullText=text; typeDone=onDone||null; SUB={L:sents(text),i:0}; subShow(0);
+  const instant=REDUCE||S.resume||SAY_INSTANT, L0=SUB.L;
+  /* 자막은 뒤에서 한 문장씩 — 판서·그림은 말 시작과 함께(아래 typeDone) */
+  const run=k=>{ SUBT=setTimeout(()=>{ SUBT=null; if(!SUB||SUB.L!==L0) return; if(k<L0.length){ subShow(k); run(k+1); } else if(!instant) geEnd(); },subHold(k-1)); };
+  run(1);
+  if(instant){ geRest(); const f=typeDone; typeDone=null; if(f) f(); return; }
+  geStart(curFace);
+  typing=setTimeout(()=>{ typing=null; const f=typeDone; typeDone=null; if(f) f(); },700*(TYPE_MS/22)); };
+skipTyping=function(){ if(typing){ clearTimeout(typing); typing=null; const f=typeDone; typeDone=null; if(f) f(); return true; }
+  if(SUBT&&SUB&&SUB.i<SUB.L.length-1){ clearTimeout(SUBT); SUBT=null; const L0=SUB.L, k0=SUB.i+1; subShow(k0);
+    const run=k=>{ SUBT=setTimeout(()=>{ SUBT=null; if(!SUB||SUB.L!==L0) return; if(k<L0.length){ subShow(k); run(k+1); } else geEnd(); },subHold(k-1)); }; run(k0+1); return true; }
+  return false; };
+{ const _fn=finishNow; finishNow=function(){ const was=!!typing||!!SUBT; clearTimeout(SUBT); SUBT=null; _fn(); if(was&&SUB) subShow(SUB.L.length-1); }; }
+{ const _ca=cancelAll; cancelAll=function(){ clearTimeout(SUBT); SUBT=null; return _ca.apply(this,arguments); }; }
+function toggleText(){""", "자막 한 문장씩")
+sub1("$(\"#bwrap\")&&$(\"#bwrap\").addEventListener(\"scroll\",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,80); },{passive:true});",
+     r"""$("#bwrap")&&$("#bwrap").addEventListener("scroll",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,80); },{passive:true});
+/* 21) 레이저: 지시봉 끝(그림 안 좌표, 좌우 반전 반영)에서 지금 줄 글자 끝까지 — 지시봉 없는 동작이면 끔, 오가는 동안 매 프레임 */
+const TIPS={"g/point":[0.998,0.131,0.906,0.192],"g/up":[0.997,0.132,0.906,0.191],"pose-point":[0.985,0.201,0.871,0.255]};  /* [끝 x,y, 지시봉 위 손 쪽 점 x,y] — 그림 비율 좌표(2026-10-02 실측) */
+function tipPt(){ const box=$("#tutor"); if(!box) return null; let img=null, op=0; $$("#tutor img").forEach(x=>{ const c=getComputedStyle(x); const o=c.display==="none"||c.visibility==="hidden"?0:parseFloat(c.opacity)||0; if(o>op){ op=o; img=x; } });
+  if(!img||op<.85||!img.naturalWidth) return null;
+  const m=/(g\/[a-z]+|pose-[a-z]+)\.png/.exec(img.getAttribute("src")||""); if(!m||!TIPS[m[1]]) return null;
+  const tx=TIPS[m[1]][0], ty=TIPS[m[1]][1], r=img.getBoundingClientRect(), cs=getComputedStyle(img); let L=r.left,T=r.top,W=r.width,H=r.height;
+  if(cs.objectFit==="contain"){ const k=Math.min(W/img.naturalWidth,H/img.naturalHeight), dw=img.naturalWidth*k, dh=img.naturalHeight*k; L+=(W-dw)*.5; T+=(H-dh); W=dw; H=dh; }
+  let mir=false; try{ mir=new DOMMatrix(cs.transform==="none"?"":cs.transform).a<0; }catch(e){}
+  const P=(u,v)=>({x:mir?L+W*(1-u):L+W*u, y:T+H*v}); const tip=P(tx,ty), base=P(TIPS[m[1]][2],TIPS[m[1]][3]);
+  /* 스앵님 상자가 칠판 쪽에서 그림을 자르므로, 지시봉 선이 상자 경계를 넘으면 경계에서 보이는 끝으로 */
+  const card=$("#tutorCard"); if(card){ const c=card.getBoundingClientRect(); if(tip.x<c.left+2&&base.x>tip.x){ const t=(c.left+2-base.x)/(tip.x-base.x); if(t<1) return {x:c.left+2, y:base.y+(tip.y-base.y)*t}; }
+    if(tip.x>c.right-2&&base.x<tip.x){ const t=(c.right-2-base.x)/(tip.x-base.x); if(t<1) return {x:c.right-2, y:base.y+(tip.y-base.y)*t}; } }
+  return tip; }
+function drawLaser(){ const lz=$("#laser"), slide=$(".slide"), bc=$("#bc"); if(!lz||!slide||!bc) return false;
+  const cur=$$(".bl.cur",bc).pop(), tp=tipPt(); if(!cur||!tp||S.mode!=="step"){ lz.classList.remove("on"); return false; }
+  const sr=slide.getBoundingClientRect(), bt=cur.querySelector(".bt")||cur, cr=bt.getBoundingClientRect(); if(cr.bottom<sr.top||cr.top>sr.bottom){ lz.classList.remove("on"); return false; }
+  let x2=cr.right+6; const kids=bt.lastChild; try{ const rg=document.createRange(); rg.selectNodeContents(bt); const rr=rg.getBoundingClientRect(); if(rr.width) x2=rr.right+6; }catch(e){}
+  const y2=cr.top+Math.min(cr.height/2,18), x1=tp.x, y1=tp.y, dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy); if(len<20){ lz.classList.remove("on"); return false; }
+  lz.style.left=(x1-sr.left)+"px"; lz.style.top=(y1-sr.top)+"px"; lz.style.width=len+"px"; lz.style.transformOrigin="0 50%"; lz.style.transform="rotate("+(Math.atan2(dy,dx)*180/Math.PI)+"deg)"; lz.classList.add("on"); return true; }
+{ let raf=null; const loop=()=>{ raf=null; drawLaser(); if(S.mode==="step"&&!document.hidden) raf=requestAnimationFrame(loop); };
+  const _sf=stageFx; stageFx=function(){ _sf(); if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(loop); }; }""", "레이저 지시봉 끝")
 assert "wrap.scrollTop=wrap.scrollHeight" not in s.split("function renderStepV2")[1].split("function replayFig")[0], "renderStepV2 에 맨 아래 스크롤이 남음"
 assert s.index("stackFig();") < s.index('$$("[data-step]",root)'), "칸 쌓기가 단계 숨김보다 뒤"
 io.open(TPL, "w", encoding="utf-8", newline="\n").write(s)
