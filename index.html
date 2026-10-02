@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-02.118";
+var BUILD="2026-10-02.119";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,11 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-02.119",d:"10-02",items:[
+    "커리큘럼 · 시험 범위 vs 이해: 기말 과목은 중간고사 마지막 날까지 접어 두고 다음 날 자동으로 펼침",
+    "주차별 목록 가독성 — 주차마다 카드, 수업 흐름을 → 줄로 나눔(절 번호 굵게 · 날짜·메모 흐리게), 개념 칩은 점선 아래로, 어두운 학습 화면 글자 대비",
+    "LMS 연결: 토큰 없이 아톰 크롬 로그인 세션으로 과제 · 공지 · 미제출을 읽어 옴(atom, 매일 08 · 21시)"
+  ]},
   {v:"2026-10-02.118",d:"10-02",items:[
     "공부계획: 그날만 일정 줄이기(조기 퇴근 등)와 메모 · 학교 끝나고 집에 들렀다 떠나면 귀가 → 짐 → 출발 순서 · 「근로 중에」처럼 따로 시간을 잡지 않는 할 일은 배정 없이 오늘 죽어도에만"
   ]},
@@ -12414,9 +12419,41 @@ var V33={};
       ss.cancelled=true; if(!ss.memo) ss.memo=x[2]; S.v60p[k]=Date.now(); n++; });
     if(n){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
   };
+  /* ---------- 커리큘럼(V47) 카드 손보기 (대표님 10/2 「기말고사꺼는 숨기고 중간고사 끝나면 자동으로 펼쳐지게」 「주차별 맵 · 시험 범위 vs 이해 아래 부분 가독성」) ---------- */
+  V60.midEnd=function(){ var ds=exams().filter(function(e){ return /중간/.test(e.kind||""); }).map(function(e){ return e.date; }).sort(); return ds.length?ds[ds.length-1]:null; };
+  V60.midOver=function(){ var e=V60.midEnd(); return !e||today()>e; };
+  V60.fmtWeeks=function(root){
+    $$(".v47-wt",root).forEach(function(sp){
+      var t=(sp.textContent||"").trim(), wh=sp.closest(".v47-wh"); if(!wh) return;
+      var parts=t.split(/\s*→\s*/).filter(function(x){ return x; });
+      var ol=document.createElement("ol"); ol.className="v47-steps";
+      ol.innerHTML=parts.map(function(p){
+        var h=esc(p).replace(/^((?:\d+\.\d+|Ch\.\s?\d+|\d+장)(?:\s*·?\s*(?:\d+\.\d+))*)/,'<b>$1</b>').replace(/\(([^()]*)\)/g,'<small>($1)</small>').replace(/ · /g,'<i>·</i>');
+        return '<li>'+h+'</li>'; }).join("");
+      sp.remove(); wh.parentNode.insertBefore(ol,wh.nextSibling);
+    });
+  };
+  V60.hookV47=function(){
+    if(!window.V47||V47._v60) return; V47._v60=true;
+    var hidden=[];
+    var _ch=V47.courseHTML;
+    V47.courseHTML=function(c,single){
+      if(!single&&!V60.midOver()){ var sm=V47.summary(c); if(sm&&sm.scope&&sm.scope.ex&&sm.scope.ex.kind==="기말"){ hidden.push(c.name); return ""; } }
+      return _ch.apply(this,arguments);
+    };
+    var _rs=V47.renderStudy;
+    V47.renderStudy=function(){ hidden=[]; _rs.apply(this,arguments); var body=$("#v47Body"); if(!body) return;
+      if(hidden.length){ var me=V60.midEnd(), d=document.createElement("div"); d.className="v47-fold";
+        d.innerHTML='<span class="chip mut">기말</span> '+esc(hidden.join(" · "))+' <span class="v44-mut">· 중간고사 끝나면('+esc(V60.md(addDays(me,1)))+') 펼침</span>';
+        var lg=$(".v47-legend",body); body.insertBefore(d,lg||null); }
+      V60.fmtWeeks(body); };
+    var _rc=V47.renderCourse;
+    V47.renderCourse=function(){ _rc.apply(this,arguments); var k=$("#v47Course"); if(k) V60.fmtWeeks(k); var t=setTimeout(function(){ var k2=$("#v47Course"); if(k2) V60.fmtWeeks(k2); },600); };
+  };
+
   /* ---------- 연결 ---------- */
   var _render=render;
-  render=function(){ V60.patchCancel(); V60.hookExam(); V60.hookTodo(); V60.hookCal(); if(window.V59&&!V59._v60){ V59._v60=true; V59.renderPlan=V60.render; } _render.apply(this,arguments); };
+  render=function(){ V60.patchCancel(); V60.hookV47(); V60.hookExam(); V60.hookTodo(); V60.hookCal(); if(window.V59&&!V59._v60){ V59._v60=true; V59.renderPlan=V60.render; } _render.apply(this,arguments); };
 
   var css=document.createElement("style"); css.id="v60css";
   css.textContent=[
@@ -12478,6 +12515,14 @@ var V33={};
     ".v60-rmv{display:flex;align-items:center;gap:8px;padding-left:10px;font-size:11px;color:#C7261B;font-weight:700}.v60-rmv i{width:2px;height:16px;background:repeating-linear-gradient(#C7261B 0 4px,transparent 4px 7px)}",
     "@media (max-width:900px){.v60-tday{grid-template-columns:1fr}.v60-route{position:static}}",
     ".v60-note{font-size:12px;font-weight:700;color:#C7261B;background:color-mix(in srgb,#C7261B 8%,transparent);border-radius:6px;padding:1px 7px}",
+    ".v47-steps{margin:6px 0 4px;padding-left:20px;font-size:13.5px;line-height:1.6;color:var(--ink)}.v47-steps li{margin:2px 0;padding-left:2px}.v47-steps li::marker{content:'→ ';color:var(--ink-3)}.v47-steps li:first-child::marker{content:'• '}",
+    ".v47-steps b{font-weight:800}.v47-steps small{color:var(--ink-3);font-size:12px}.v47-steps i{font-style:normal;color:var(--ink-3);margin:0 3px}",
+    ".v47-wk{padding:10px 12px!important;margin:6px 0;border:1px solid var(--line)!important;border-radius:12px}.v47-wk.scope{border-left:4px solid var(--accent)!important}",
+    ".v47-wh{font-size:14px!important}.v47-wh b{font-size:15px}.v47-wh .v47-wmap{margin-left:auto}",
+    ".v47-nodes{margin-top:8px!important;padding-top:8px;border-top:1px dashed var(--line)}.v47-n{font-size:12.5px!important;padding:4px 10px!important}",
+    ".v47-fold{padding:10px 12px;font-size:13px;border-top:1px solid var(--line)}",
+    "#v-study .v47-n{color:#E6ECF5;background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2)}#v-study .v47-n.st-known{background:rgba(88,204,2,.2);border-color:#58CC02;color:#EAF8DD}",
+    "#v-study .v47-steps{color:#E6ECF5}#v-study .v47-wk{border-color:rgba(255,255,255,.14)!important}#v-study .v47-legend .v44-mut,#v-study .v47-fold .v44-mut{color:#AEB8CC}",
     ".v60-sh{font-weight:800;font-size:13px;margin:12px 0 6px}.v60-ok{border-color:var(--ok,#15803D)!important;color:var(--ok,#15803D)!important}",
     ".v60-callist{margin-top:12px;display:flex;flex-direction:column;gap:6px}",
     ".v60-cev{background:#1E5FA8!important;color:#fff!important}.v60-cev.hot{background:#C7261B!important}",

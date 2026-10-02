@@ -4,6 +4,10 @@
 
 ## 2026-10-01
 
+### .119 — 커리큘럼 기말 접기 · 주차 가독성 · LMS 연결
+- 대표님 10/2. V60.hookV47: 기말 범위 과목은 V60.midOver()(중간 시험일 마지막 다음 날) 전까지 학습 탭에서 접고 한 줄로 · V60.fmtWeeks: v47-wt 를 → 단계 목록으로.
+- LMS: atom `lms_cdp_sync.py`(lms.py sync 를 lms_api.mjs 로 돌림, kv lms_state via=cdp) + server.py lms_payload 가 via=cdp 를 연결됨으로 · lms_daily.ps1 에 추가.
+
 ### .118 — 조기 퇴근 · 집 들렀다 출발 · 근로 중 할 일
 - 대표님 10/2 「조금 일찍 퇴근해서 짐만 챙기고 자전거로」 「정역학은 근로하면서 끝내고 제출」. `_private/plan.json` cuts(그날 끝 시각 · 메모) · 할 일 noplan.
 
