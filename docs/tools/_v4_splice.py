@@ -272,6 +272,23 @@ sub1('const src=usePose?TUTOR_IMG+p+".png":fsrc; box.classList.toggle("pose",use
 sub1('if(typing){ clearInterval(typing); typing=null; } anim=null; }',
      'if(typing){ clearInterval(typing); typing=null; } anim=null; geRest(); }', "예약 취소 = 동작도 정지")
 sub1("b.innerHTML=esc(c.t)+(c.key?'<kbd>'+c.key+'</kbd>':'');", "b.innerHTML=esc(c.t);", "버튼 Enter 안내 제거")
+# 15) 이전 단계 (대표님 2026-10-02 「수업하다가 뒤로 가기가 안 됨」): 조작 줄 「이전」(다음 왼쪽) · ← 키 · 칠판을 오른쪽으로 밀기.
+#     챕터 앞 단계 → 이전 챕터 마지막 단계 → 회차 첫 단계면 없음. 돌아간 단계는 즉시 표시(S.resume), 보상(L.rew)은 그대로, 문제 화면의 이전 = 마지막 개념 단계(답은 남김), 저장 위치는 옮긴 단계로.
+sub1('document.addEventListener("keydown",e=>{ if(e.target&&/TEXTAREA|INPUT/.test(e.target.tagName)) return;',
+     'function canPrev(){ if(S.mode==="step") return S.si>0||S.ci>0; if(S.mode==="quiz") return CH.length>0; return false; }\n'
+     'function prevStep(){ if(!canPrev()) return; if(anim||typing){ finishNow(); if(typing) skipTyping(); } cancelAll(); S.again=0; S.rev=false; S.pre=""; S.preFace="";\n'
+     '  if(S.mode==="quiz"){ S.mode="step"; S.ci=CH.length-1; S.si=Math.max(0,CH[S.ci].steps.length-1); }\n'
+     '  else if(S.si>0) S.si--; else { S.ci--; S.si=Math.max(0,CH[S.ci].steps.length-1); }\n'
+     '  S.resume=true; render(); save(); }\n'
+     '{ const _ch0=choices; choices=function(list){ _ch0(list); if((S.mode==="step"||S.mode==="quiz")&&canPrev()){ const box=$("#dCh"); const b=document.createElement("button"); b.type="button"; b.className="cbt g prev"; b.textContent="이전"; b.onclick=prevStep; box.insertBefore(b,box.firstChild); } }; }\n'
+     '{ let sx=null, sy=null; const bw=$("#bwrap"); if(bw){ bw.addEventListener("touchstart",e=>{ const t=e.touches[0]; sx=t.clientX; sy=t.clientY; },{passive:true});\n'
+     '  bw.addEventListener("touchend",e=>{ if(sx==null) return; const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; sx=null; if(dx>80&&Math.abs(dy)<50&&$("#figov").hidden) prevStep(); },{passive:true}); } }\n'
+     'document.addEventListener("keydown",e=>{ if(e.target&&/TEXTAREA|INPUT/.test(e.target.tagName)) return; if(e.key==="ArrowLeft"&&$("#figov").hidden&&!$("#ov").classList.contains("on")){ e.preventDefault(); prevStep(); return; }', "이전 단계")
+# 16) XP · 하트 · 호감도 빼기 (대표님 2026-10-02 「Xp기능 불필요」 · 9/30 「호감도 하트 다음레벨 쓸데없다」): 머리 줄에서 숨기고, 틀려도 하트를 깎지 않으며 하트 0 으로 막히지 않게
+sub1('</style>', '#sXp,#hHearts,#sAf{display:none!important}\n</style>', "XP·하트·호감도 숨김")
+sub1('T.hearts=Math.max(0,T.hearts-1); gainAff(-1); pop("#hHearts","-1",true);', '/* 하트·호감도 차감 없음(대표님 10/2) */', "하트 차감 없음")
+sub1('function dayReset(){ const td=TODAY();', 'function dayReset(){ T.hearts=3; const td=TODAY();', "하트 늘 가득")
+sub1('window.__cr={get D(){return D;},', 'window.__cr={get prevStep(){return prevStep;},get D(){return D;},', "검사용 이전 단계")
 assert "wrap.scrollTop=wrap.scrollHeight" not in s.split("function renderStepV2")[1].split("function replayFig")[0], "renderStepV2 에 맨 아래 스크롤이 남음"
 assert s.index("stackFig();") < s.index('$$("[data-step]",root)'), "칸 쌓기가 단계 숨김보다 뒤"
 io.open(TPL, "w", encoding="utf-8", newline="\n").write(s)

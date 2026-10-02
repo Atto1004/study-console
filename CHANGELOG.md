@@ -4,6 +4,9 @@
 
 ## 2026-10-01
 
+### .122 — 교실 이전 단계 · XP 하트 호감도 제거
+- 대표님 10/2 「수업하다가 뒤로 가기가 안 됨」(os-a4 전달 스펙) · 「Xp기능 불필요」. `_v4_splice.py` 15)·16) 절 → `build_classroom.py --all` 32회차. 검사 `classroom_check.cjs` 에 이전 단계 시나리오 추가, 하트 검사는 「하트를 깎지 않음」으로 바꿈. 32회차 실패 0 · render_check 0 · design_audit 은 폰 식 넘침(em1 9/30 · statics 9/30) 이 기존과 같음.
+
 ### .121 — 확인 탭 · 수업 영상 재생 · XP 숨김
 - 대표님 10/2. V64 LAYER(`docs/layers/v64-layer-src.js`). 질문 `_private/asks.json` · 답 `S.asks[id]`(atom kv study_state 로 올라감). 영상 목록 `docs/tools/build_media_index.py` → `_private/media.json`, 파일은 `_private/media` 정션(→ study-materials). atom `/study/` 영상 · 음성은 Range 로(server.py _study_media).
 

@@ -264,6 +264,7 @@ main{max-width:1040px;margin:0 auto;padding:14px 20px 18px}
 #tutor.gon #tutorImg{opacity:0}
 #tutor .gimg.on{opacity:1}
 @media (prefers-reduced-motion: reduce){#tutor .gimg,#tutorImg{transition:none}#tutor .gimg{animation:none}}
+#sXp,#hHearts,#sAf{display:none!important}
 </style>
 </head>
 <body>
@@ -446,7 +447,7 @@ const KEY="mc-tutor", LKEY="mc-lesson-"+D.id;
 const load=(k,def)=>{ try{ const v=JSON.parse(localStorage.getItem(k)||"null"); return (v&&typeof v==="object")?Object.assign(def,v):def; }catch(e){ return def; } };
 let T=load(KEY,{v:1,xp:0,streak:0,last:"",hearts:3,hday:"",aff:20,lessons:{}});
 if(!T.lessons||typeof T.lessons!=="object") T.lessons={};
-function dayReset(){ const td=TODAY(); if(T.hday!==td){ T.hearts=3; T.hday=td; } if(T.last&&T.last!==td&&T.last!==YDAY()) T.streak=0; }
+function dayReset(){ T.hearts=3; const td=TODAY(); if(T.hday!==td){ T.hearts=3; T.hday=td; } if(T.last&&T.last!==td&&T.last!==YDAY()) T.streak=0; }
 dayReset();
 let L=T.lessons[D.id]||(T.lessons[D.id]={pos:null,ch:{},done:false,xp:0,rew:{}});
 if(!L.rew||typeof L.rew!=="object") L.rew={}; if(!L.ch||typeof L.ch!=="object") L.ch={};
@@ -845,7 +846,7 @@ function renderQuiz(){
 function settle(q,ok){
   ST.correct[q.id]=ok; touchStreak(); ev("quiz",{qid:q.id,ok:!!ok,n:qN(q.id)});
   if(ok){ if(!L.rew[q.id]){ L.rew[q.id]=true; gainXP(15); gainAff(3); } }
-  else { T.hearts=Math.max(0,T.hearts-1); gainAff(-1); pop("#hHearts","-1",true); }
+  else { /* 하트·호감도 차감 없음(대표님 10/2) */ }
   save(); render(); say(ok?(warm()?pick("ok_warm",S.qi):pick("ok",S.qi)):pick("bad",S.qi), ok?(warm()?"proud":"smile"):"angry");
 }
 function answer(q,i){ if(ST.done[q.id]) return; dayReset(); if(T.hearts<=0){ S.mode="nohearts"; return render(); } const c=q.choices[i]; ST.answer[q.id]=(c&&c.k!=null)?c.k:i; ST.done[q.id]=true; settle(q,!!(c&&c.ok)); }
@@ -904,7 +905,15 @@ function ctx(){ if(!CTX_GEN||!EMB) return; let label="", q=null, sid="";
 window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; ctx(); } });
 const _render=render; render=function(){ _render(); ctx(); };
 /* ---------- 키보드 ---------- */
-document.addEventListener("keydown",e=>{ if(e.target&&/TEXTAREA|INPUT/.test(e.target.tagName)) return; if($("#ov").classList.contains("on")){ if(e.key==="Escape") $("#ov").classList.remove("on"); return; }
+function canPrev(){ if(S.mode==="step") return S.si>0||S.ci>0; if(S.mode==="quiz") return CH.length>0; return false; }
+function prevStep(){ if(!canPrev()) return; if(anim||typing){ finishNow(); if(typing) skipTyping(); } cancelAll(); S.again=0; S.rev=false; S.pre=""; S.preFace="";
+  if(S.mode==="quiz"){ S.mode="step"; S.ci=CH.length-1; S.si=Math.max(0,CH[S.ci].steps.length-1); }
+  else if(S.si>0) S.si--; else { S.ci--; S.si=Math.max(0,CH[S.ci].steps.length-1); }
+  S.resume=true; render(); save(); }
+{ const _ch0=choices; choices=function(list){ _ch0(list); if((S.mode==="step"||S.mode==="quiz")&&canPrev()){ const box=$("#dCh"); const b=document.createElement("button"); b.type="button"; b.className="cbt g prev"; b.textContent="이전"; b.onclick=prevStep; box.insertBefore(b,box.firstChild); } }; }
+{ let sx=null, sy=null; const bw=$("#bwrap"); if(bw){ bw.addEventListener("touchstart",e=>{ const t=e.touches[0]; sx=t.clientX; sy=t.clientY; },{passive:true});
+  bw.addEventListener("touchend",e=>{ if(sx==null) return; const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; sx=null; if(dx>80&&Math.abs(dy)<50&&$("#figov").hidden) prevStep(); },{passive:true}); } }
+document.addEventListener("keydown",e=>{ if(e.target&&/TEXTAREA|INPUT/.test(e.target.tagName)) return; if(e.key==="ArrowLeft"&&$("#figov").hidden&&!$("#ov").classList.contains("on")){ e.preventDefault(); prevStep(); return; } if($("#ov").classList.contains("on")){ if(e.key==="Escape") $("#ov").classList.remove("on"); return; }
   if(!$("#figov").hidden){ if(e.key==="Escape"){ e.preventDefault(); closeFig(); } else if(e.key==="Tab"){ e.preventDefault(); $("#figovX").focus(); } else if(e.key==="Enter"||e.key===" "){ e.preventDefault(); } return; }   /* 그림 확대창이 열려 있으면 뒤 교실 단축키(Enter·Space·숫자) 차단, 닫기는 Esc·닫기 버튼 — 오타 디자인 2차 */
   if(e.key==="Enter"||e.key===" "){ e.preventDefault(); if(e.repeat) return; enter(); }
   else if(/^[1-6]$/.test(e.key)&&S.mode==="quiz"){ const b=$$("#bc .cb")[+e.key-1]; if(b&&!b.disabled) b.click(); } });
@@ -916,7 +925,7 @@ function boot(){ const m=/^#(resume|ch=(\d+)(?:\.(\d+))?|quiz|result)$/.exec(loc
   else if(m&&m[1]==="quiz"&&QZ.length){ S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; }
   else if(m&&m[1]==="result"){ S.mode="result"; }
   render(); }
-window.__cr={get D(){return D;},get S(){return S;},set S(v){S=v;},get T(){return T;},get L(){return L;},set L(v){L=v;T.lessons[D.id]=L;},get ST(){return ST;},set ST(v){ST=v;},get fullText(){return fullText;},get anim(){return anim;},get pending(){return pend.t.length+pend.raf.length+pend.tr.length;},set reduce(v){REDUCE=!!v;},get reduce(){return REDUCE;},set speed(v){TYPE_MS=Math.max(1,+v||22);},get typing(){return !!typing;},
+window.__cr={get prevStep(){return prevStep;},get D(){return D;},get S(){return S;},set S(v){S=v;},get T(){return T;},get L(){return L;},set L(v){L=v;T.lessons[D.id]=L;},get ST(){return ST;},set ST(v){ST=v;},get fullText(){return fullText;},get anim(){return anim;},get pending(){return pend.t.length+pend.raf.length+pend.tr.length;},set reduce(v){REDUCE=!!v;},get reduce(){return REDUCE;},set speed(v){TYPE_MS=Math.max(1,+v||22);},get typing(){return !!typing;},
   render:function(){ return render(); },next:function(){ return next(); },boot:function(){ return boot(); },enter:function(){ return enter(); },cancelAll:function(){ return cancelAll(); },posOf:function(){ return posOf(); },replay:function(){ return replayFig(); }};  /* 검사기(classroom_check.cjs)용 창구 */
 (function wait(){ if(window.renderMathInElement) boot(); else setTimeout(wait,40); })();
 </script>

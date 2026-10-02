@@ -69,7 +69,7 @@ async function check(file) {
         else { const ta = doc.querySelector("#myans"); if (!ta) { problems.push(`문제 ${qi + 1} 입력칸 없음`); return; } ta.value = "x"; doc.querySelector("#reveal").click(); const g = doc.querySelector("#bc [data-g='1']"); if (!g) { problems.push(`문제 ${qi + 1} 자기 채점 버튼 없음`); return; } g.click(); } });
       const ST = JSON.parse(w.localStorage.getItem("mc-lesson-" + D.id) || "{}"), T = JSON.parse(w.localStorage.getItem("mc-tutor") || "{}");
       const done = D.quiz.filter(q => ST.done && ST.done[q.id]).length; if (done !== D.quiz.length) problems.push(`mc-lesson 문제 저장 ${done}/${D.quiz.length}`);
-      if (!(T.xp > before.xp)) problems.push("정답 뒤 XP 안 오름"); if (D.quiz[1] && D.quiz[1].choices && !(T.hearts < before.hearts)) problems.push("오답 뒤 하트 안 줄음");
+      if (!(T.xp > before.xp)) problems.push("정답 뒤 XP 안 오름"); if (D.quiz[1] && D.quiz[1].choices && (T.hearts < before.hearts)) problems.push("오답에 하트를 깎음(하트 제거, 대표님 10/2)");
       if (!T.lessons || !T.lessons[D.id]) problems.push("mc-tutor 에 회차 기록 없음");
       /* 문제 위치 저장: 마지막 문제 화면의 저장값이 quiz + qi */
       const Lq = T.lessons && T.lessons[D.id]; if (!Lq || !Lq.pos || Lq.pos.mode !== "quiz" || Lq.pos.qi !== D.quiz.length - 1) problems.push("문제 위치 저장이 quiz/qi 가 아님: " + JSON.stringify(Lq && Lq.pos));
@@ -92,9 +92,16 @@ async function check(file) {
     // 오타 v54 A①: 정답 → 다시 풀기 → 정답 = XP 한 번
     if (D.quiz.length && D.quiz[0].choices) { const q = D.quiz[0], ST3 = X.ST; delete ST3.done[q.id]; delete ST3.correct[q.id]; delete ST3.answer[q.id]; X.T.hearts = 3; const xp2 = X.T.xp; X.S.mode = "quiz"; X.S.qi = 0; X.render();
       const okI = q.choices.findIndex(c => c.ok); doc.querySelectorAll("#bc .cb")[okI].click(); if (X.T.xp !== xp2) problems.push("다시 풀기 정답에 XP 를 또 줌: +" + (X.T.xp - xp2)); }
+    // 대표님 10/2 「뒤로 가기가 안 됨」: 이전 단계 — 챕터 안 · 챕터 경계 · 문제 화면 · 첫 단계
+    if (typeof X.prevStep === "function" && D.chapters.length) { const c0 = D.chapters[0];
+      if (c0.steps.length > 2) { X.S.mode = "step"; X.S.ci = 0; X.S.si = 2; X.S.resume = true; X.render(); X.prevStep(); if (!(X.S.ci === 0 && X.S.si === 1)) problems.push("이전: 챕터 안에서 한 단계 뒤로 안 감 " + X.S.ci + ":" + X.S.si); }
+      if (D.chapters.length > 1) { X.S.mode = "step"; X.S.ci = 1; X.S.si = 0; X.S.resume = true; X.render(); X.prevStep(); if (!(X.S.ci === 0 && X.S.si === c0.steps.length - 1)) problems.push("이전: 앞 챕터 마지막 단계로 안 감"); }
+      X.S.mode = "step"; X.S.ci = 0; X.S.si = 0; X.S.resume = true; X.render(); if (doc.querySelector("#dCh .prev")) problems.push("이전: 첫 단계에 이전 버튼이 있음");
+      if (D.quiz.length) { X.S.mode = "quiz"; X.S.qi = 0; X.render(); if (!doc.querySelector("#dCh .prev")) problems.push("이전: 문제 화면에 이전 버튼 없음"); X.prevStep(); if (X.S.mode !== "step" || X.S.ci !== D.chapters.length - 1) problems.push("이전: 문제에서 마지막 개념 단계로 안 감 " + X.S.mode); }
+    } else if (D.chapters.length) problems.push("이전 단계 함수 없음");
     // 오타 v54 A④: 하트 0이면 객관식·입력형 모두 문제를 못 연다(자기 채점 포함)
     if (D.quiz.length) { const q = D.quiz[0], ST4 = X.ST; delete ST4.done[q.id]; delete ST4.correct[q.id]; delete ST4.answer[q.id]; X.T.hearts = 0; X.S.mode = "quiz"; X.S.qi = 0; X.render();
-      if (X.S.mode !== "nohearts") problems.push("하트 0인데 문제 화면이 열림: " + X.S.mode); X.T.hearts = 3; }
+      if (X.S.mode === "nohearts") problems.push("하트 0 이 문제를 막음(하트 제거, 대표님 10/2)"); X.T.hearts = 3; }
     // 목차 오버레이
     doc.querySelector("#hToc").click(); if (doc.querySelectorAll("#ovList li").length !== D.chapters.length + (D.quiz.length ? 1 : 0)) problems.push("목차 항목 수 불일치"); doc.querySelector("#ovClose").click();
     // ④ v2 저장·이전·애니메이션
@@ -193,8 +200,8 @@ async function check(file) {
       /* 오타 2차 R2: 하트 0 → 마지막 챕터 완료 → nohearts → 다른 챕터 pill — 안내 대사가 새 챕터 대사에 붙지 않는다 */
       if (D.quiz.length) { X.reduce = true; const last = D.chapters.length - 1; X.T.hearts = 0; delete X.L.rew["ch:" + D.chapters[last].id]; delete X.L.ch[D.chapters[last].id]; X.ST.done = {}; X.ST.correct = {}; X.ST.answer = {};
         X.S.mode = "step"; X.S.ci = last; X.S.si = D.chapters[last].steps.length - 1; X.S.rev = true; X.S.resume = false; X.render(); X.next();
-        if (X.S.mode !== "nohearts") problems.push("하트 0 마지막 챕터 완료 뒤 nohearts 가 아님: " + X.S.mode);
-        else { doc.querySelector('#chpills [data-pill="0"]').click(); const t = norm(doc.querySelector("#dText").textContent); const own = norm(D.chapters[0].steps[0].s);
+        if (X.S.mode === "nohearts") problems.push("하트 0 이 마지막 챕터 뒤 문제를 막음(하트 제거, 대표님 10/2)");
+        else if (false) { doc.querySelector('#chpills [data-pill="0"]').click(); const t = norm(doc.querySelector("#dText").textContent); const own = norm(D.chapters[0].steps[0].s);
           if (t !== own) problems.push("nohearts 뒤 pill 이동한 챕터 대사에 안내 대사가 붙음: 「" + t.slice(0, 30) + "」"); if (X.S.pre) problems.push("S.pre 가 남아 있음"); }
         X.T.hearts = 3; }
       /* 오타 2차 R5: 구버전(.79 이전) 저장값(L.ch/L.done 만 있고 L.rew 에 챕터·완료 키 없음)으로 재진입해도 챕터 +10·완료 +20 을 다시 주지 않는다 — 새 창으로 다시 열어 이행을 본다 */
