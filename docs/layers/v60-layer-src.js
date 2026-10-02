@@ -19,6 +19,20 @@
   function cByName(n){ return courses().filter(function(c){ return c.name===n; })[0]; }
   V60.st=function(){ if(!S.v60) S.v60={est:{},done:{},cfg:{}}; S.v60.est=S.v60.est||{}; S.v60.done=S.v60.done||{}; S.v60.cfg=S.v60.cfg||{}; return S.v60; };
   V60.cfg=function(k,def){ var v=V60.st().cfg[k]; return (v==null||v==="")?def:v; };
+  V60.endOf=function(name,dow){ var e=(V60.st().cfg.ends||{})[name+"|"+dow]; return e||""; };
+  V60.slotRows=function(){
+    var DW=["일","월","화","수","목","금","토"], out=[];
+    courses().filter(isActive).forEach(function(c){ (c.slots||[]).forEach(function(sl){
+      var k=c.name+"|"+sl.d, cur=V60.endOf(c.name,sl.d)||(c.name==="CADD"?"16:00":"");
+      out.push('<label>'+esc(c.name)+' · '+DW[sl.d]+' '+esc(sl.s)+'–'+esc(sl.e)+'<input class="input" type="time" data-v60end="'+esc(k)+'" value="'+esc(cur||sl.e)+'"></label>'); }); });
+    return out.join("");
+  };
+  V60.sleepOf=function(d){ var st=V60.st(); st.sleep=st.sleep||{}; return st.sleep[d]||null; };
+  V60.loadSleep=function(){   /* 대표님이 말로 알려 준 수면 — atom 안에서만 보이는 _private/sleep.json, 앱 기록에 없는 날만 채운다 */
+    if(V60._sl||!ATOM_HOSTED) return Promise.resolve(); V60._sl=1;
+    return fetch("_private/sleep.json",{cache:"no-cache"}).then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; }).then(function(j){
+      if(!j) return; var st=V60.st(), n=0; st.sleep=st.sleep||{}; Object.keys(j).forEach(function(d){ if(!st.sleep[d]&&j[d]&&j[d].wake){ st.sleep[d]={bed:j[d].bed||"",wake:j[d].wake}; n++; } }); if(n) persist(); });
+  };
 
   /* ---------- ① 시험 모드 · 중간고사 ---------- */
   V60.hookExam=function(){
@@ -87,7 +101,8 @@
     if(!hol) classesOn(d).forEach(function(x){
       if(!isActive(x.c)) return; var ss=sessionOn(x.c.id,d); if(ss&&ss.cancelled) return;
       if(window.V32&&V32.meetings&&V32.meetings(x.c).indexOf(d)<0&&!ss) return;
-      var e=toMin(x.e); if(x.c.name==="CADD") e=Math.min(e,16*60);     /* 시간표 13~19시, 보통 15~16시 끝(대표님 9/10) */
+      var ov=V60.endOf(x.c.name,D(d).getDay()), e=ov?toMin(ov):toMin(x.e);
+      if(!ov&&x.c.name==="CADD") e=Math.min(e,16*60);     /* 시간표 13~19시, 보통 15~16시 끝(대표님 9/10) — 설정에서 바꿀 수 있음 */
       out.push({s:toMin(x.s),e:e,t:x.c.name,k:"cls",school:1});
     });
     ((R.grid||{})[V60.DOWK[D(d).getDay()]]||[]).forEach(function(t){
@@ -114,13 +129,23 @@
     var sch=fx.filter(function(b){ return b.school; });
     var wakeNat=(bedAbs-1440)+sleepH*60;                                   /* 전날 취침 + 수면 */
     var first=fx.length?fx[0].s:null, need=first!=null?first-(sch.length&&sch[0].s===first?mv.toSchool:0)-prep:null;
-    var wake=Math.max(5*60,need!=null?Math.min(wakeNat,need):wakeNat), short=need!=null&&need<wakeNat;
+    var wake=Math.max(5*60,need!=null?Math.min(wakeNat,need):wakeNat), short=need!=null&&need<wakeNat, slept=null;
+    var sl=V60.sleepOf(d);                                                 /* 실제 수면 기록이 있으면 그 기상 시각 */
+    if(sl&&sl.wake){ wake=toMin(sl.wake); if(sl.bed){ var bm=toMin(sl.bed); slept=wake>=bm?wake-bm:wake+1440-bm; short=slept<7*60; } }
     var blk=fx.slice();
     blk.push({s:wake,e:wake+prep,t:"기상·준비",k:"life"});
-    if(sch.length){ blk.push({s:sch[0].s-mv.toSchool,e:sch[0].s,t:"이동",k:"move"}); var ls=sch[sch.length-1]; blk.push({s:ls.e,e:ls.e+mv.toHome,t:"귀가",k:"move"}); }
+    var home=null;
+    if(sch.length){ var ss=sch.slice().sort(function(a,b){ return a.s-b.s; });
+      blk.push({s:ss[0].s-mv.toSchool,e:ss[0].s,t:"이동",k:"move"});
+      for(var q=0;q+1<ss.length;q++){ var gap=ss[q+1].s-ss[q].e; if(gap>0&&gap<=+V60.cfg("moveGap",30)) blk.push({s:ss[q].e,e:ss[q+1].s,t:"이동",k:"move"}); }   /* 붙어 있는 수업 사이 = 이동 */
+      var lastE=Math.max.apply(null,ss.map(function(b){ return b.e; })); blk.push({s:lastE,e:lastE+mv.toHome,t:"귀가",k:"move"}); home=lastE+mv.toHome; }
+    var dinLen=+V60.cfg("dinnerMin",60), rest=+V60.cfg("restMin",30), dinDone=false;
+    if(home!=null&&home>=16*60&&home<=20*60){                               /* 집에 오면 바로 저녁 → 쉬고 나서 공부 (대표님 10/2) */
+      var ds=Math.ceil(home/5)*5; if(!blk.some(function(b){ return b.s<ds+dinLen&&b.e>ds&&b.k!=="move"; })){ blk.push({s:ds,e:ds+dinLen,t:"저녁",k:"meal"}); if(rest>0) blk.push({s:ds+dinLen,e:ds+dinLen+rest,t:"휴식",k:"life"}); dinDone=true; } }
     [["lunch","12:00",60,"점심",11*60+30,14*60],["dinner","18:30",60,"저녁",17*60+30,20*60+30]].forEach(function(m){
+      if(m[0]==="dinner"&&dinDone) return;
       var len=+V60.cfg(m[0]+"Min",m[2]), at=toMin(V60.cfg(m[0],m[1])), lo=m[4], hi=m[5], done=false;
-      for(var s=at;s<=hi-len&&!done;s+=15){ if(!blk.some(function(b){ return b.s<s+len&&b.e>s; })){ blk.push({s:s,e:s+len,t:m[3],k:"meal"}); done=true; } }
+      for(var s=at;s<=hi-len&&!done;s+=15){ if(!blk.some(function(b){ return b.s<s+len&&b.e>s; })){ blk.push({s:s,e:s+len,t:m[3],k:"meal"}); if(m[0]==="dinner"&&rest>0) blk.push({s:s+len,e:s+len+rest,t:"휴식",k:"life"}); done=true; } }
       for(var s2=at-15;s2>=lo&&!done;s2-=15){ if(!blk.some(function(b){ return b.s<s2+len&&b.e>s2; })){ blk.push({s:s2,e:s2+len,t:m[3],k:"meal"}); done=true; } }
     });
     blk.sort(function(a,b){ return a.s-b.s; });
@@ -129,7 +154,7 @@
     var slots=start<end?free([start,end],blk.filter(function(b){ return b.k!=="life"||true; })):[];
     slots=slots.filter(function(r){ return r[1]-r[0]>=25; });
     var avail=slots.reduce(function(a,r){ return a+(r[1]-r[0]); },0);
-    return {d:d,blk:blk,wake:wake,bed:bedAbs,short:short,slots:slots,avail:avail};
+    return {d:d,blk:blk,wake:wake,bed:bedAbs,short:short,slept:slept,slots:slots,avail:avail};
   };
 
   /* ---------- 배정 ---------- */
@@ -140,6 +165,7 @@
     var lanes=V60.CORE.map(function(n){
       var it=items.filter(function(i){ return i.c.name===n; })[0], q=[];
       if(it){ (it.todayL||[]).concat(it.todo||[]).forEach(function(x){
+        if(V60.st().sdone&&V60.st().sdone[it.c.id+"|"+x.date]) return;
         var sec=(window.V59&&V59.secsFor)?V59.secsFor(it.c,x):null;
         q.push({kind:"study",c:it.c,x:x,min:per,today:x.date===td,label:V60.md(x.date)+" 회차"+(sec&&sec.s.length?" · "+sec.s.join(" · "):(x.title?" · "+x.title:""))}); }); }
       return {n:n,ex:ex[n]||"9999",q:q};
@@ -177,7 +203,7 @@
           var want=Math.min(x.min,cap-used); if(want<25) break;
           var got2=put(x,x.c.name+" · "+x.label,"st",want,{c:x.c,x:x.x,today:x.today}); used+=got2; if(!got2) break; if(x.min-got2>=25){ x.min-=got2; if(got2<want) break; continue; } sq.shift(); }
         /* 3) CADD 암기 — 하루 20분 */
-        if(cadd&&caddLeft>0) put({},"CADD · 암기카드 20장","memo",caddLeft,{memo:1});
+        if(cadd&&caddLeft>0&&!(V60.st().mdone&&V60.st().mdone[d])) put({},"CADD · 암기카드 20장","memo",caddLeft,{memo:1,d:d});
         info.items.sort(function(a,b){ return a.s-b.s; });
       }
       days.push(info);
@@ -194,6 +220,7 @@
     if(window.V58&&!V58.M&&V58.load) pend.push(V58.load());
     if(!V60.R) pend.push(V60.loadRoutine());
     if(V60.files==null) pend.push(V60.loadFiles());
+    if(ATOM_HOSTED&&!V60._sl) pend.push(V60.loadSleep());
     if(pend.length&&!V60._wait){ V60._wait=1; Promise.all(pend).then(function(){ V60._wait=0; if(ui.view==="plan") V60.render(); }); if(!V60.R){ body.innerHTML='<div class="v44-mut" style="padding:16px">…</div>'; return; } }
     var td=today(), mon=addDays(mondayOf(td),7*V60.ui.week);
     if(ATOM_HOSTED&&window.V25&&V25.atomCal&&!V60._cal){ V60._cal=1; V25.atomCal(mon,addDays(mon,6),function(fresh){ V60._cal=0; if(fresh&&ui.view==="plan") V60.render(); }); }
@@ -211,10 +238,13 @@
     var mustDo='<div class="v60-must"><div class="v60-h">오늘 무조건</div>'+(tItems.length?'<ol>'+tItems.map(function(b){
       return '<li class="m-'+b.k+'"><span class="v60-t">'+hm(b.s)+'–'+hm(b.e)+'</span> '+esc(b.t)+(b.meta&&b.meta.hw?V60.filesHTML(b.meta.hw):'')+
         (b.meta&&b.meta.x?' <button type="button" class="btn xs a" data-v60go="'+b.meta.c.id+'|'+b.meta.x.w+'|'+b.meta.x.date+'">열기</button>':'')+
-        (b.meta&&b.meta.memo?' <button type="button" class="btn xs a" data-v60memo="1">카드</button>':'')+'</li>'; }).join("")+'</ol>':'<div class="v60-none">'+(T&&T.avail<25?'남은 빈 시간이 없습니다':'배정할 것이 없습니다')+'</div>')+'</div>';
+        (b.meta&&b.meta.memo?' <button type="button" class="btn xs a" data-v60memo="1">카드</button>':'')+
+        (b.meta&&b.meta.hw?' <button type="button" class="btn xs v60-ok" data-v60done="'+esc(b.meta.hw.k)+'">완료</button>':'')+
+        (b.meta&&b.meta.x?' <button type="button" class="btn xs v60-ok" data-v60sdone="'+b.meta.c.id+'|'+b.meta.x.date+'">완료</button>':'')+
+        (b.meta&&b.meta.memo?' <button type="button" class="btn xs v60-ok" data-v60mdone="'+esc(b.meta.d)+'">완료</button>':'')+'</li>'; }).join("")+'</ol>':'<div class="v60-none">'+(T&&T.avail<25?'남은 빈 시간이 없습니다':'배정할 것이 없습니다')+'</div>')+'</div>';
     var hwMin=tItems.filter(function(b){ return b.k==="hw"; }).reduce(function(a,b){ return a+b.e-b.s; },0), stMin=tItems.filter(function(b){ return b.k!=="hw"; }).reduce(function(a,b){ return a+b.e-b.s; },0);
     var nums='<div class="v60-nums"><span><small>지금부터 빈 시간</small><b>'+dur(T?T.avail:0)+'</b></span><span><small>과제</small><b>'+dur(hwMin)+'</b></span><span><small>공부</small><b>'+dur(stMin)+'</b></span><span><small>오늘 실제 공부</small><b>'+dur(T?T.actual:0)+'</b></span>'+
-      (T&&T.short?'<span class="warn"><small>수면</small><b>부족</b></span>':'')+'</div>';
+      (T&&T.slept!=null?'<span class="'+(T.short?'warn':'')+'"><small>어젯밤 수면</small><b>'+dur(T.slept)+'</b></span>':(T&&T.short?'<span class="warn"><small>수면</small><b>부족</b></span>':''))+'</div>';
     /* 주간 격자 */
     var H0=7*60, H1=26*60, PX=0.62, nowM=nowMin();
     var cols=P.days.map(function(x){
@@ -246,17 +276,23 @@
         '<div class="s">'+(n==="CADD"?'암기 과목':'따라감 '+done+'/'+past+' 회차 · 밀림 '+todo)+' · 이번 주 공부 '+dur(mins)+'</div></div></div>'; }).join("");
     /* 설정 */
     var set='<details class="v60-set"><summary>수면 · 식사 · 공부 단위</summary><div class="v60-sf">'+
-      [["bed","취침","01:00","time"],["sleepH","수면(시간)",(S.profile&&S.profile.sleepH)||7,"number"],["lunch","점심","12:00","time"],["dinner","저녁","18:30","time"],["perSession","회차당 공부(분)",45,"number"],["caddMin","CADD 암기(분/일)",20,"number"],["maxStudy","하루 공부 최대(분)",300,"number"]].map(function(f){
-        return '<label>'+esc(f[1])+'<input class="input" type="'+f[3]+'" data-v60cfg="'+f[0]+'" value="'+esc(V60.cfg(f[0],f[2]))+'"></label>'; }).join("")+'</div></details>';
+      [["bed","취침","01:00","time"],["sleepH","수면(시간)",(S.profile&&S.profile.sleepH)||7,"number"],["lunch","점심","12:00","time"],["dinner","저녁","18:30","time"],["perSession","회차당 공부(분)",45,"number"],["caddMin","CADD 암기(분/일)",20,"number"],["maxStudy","하루 공부 최대(분)",300,"number"],["restMin","저녁 뒤 휴식(분)",30,"number"],["moveGap","수업 사이 이동으로 볼 틈(분)",30,"number"]].map(function(f){
+        return '<label>'+esc(f[1])+'<input class="input" type="'+f[3]+'" data-v60cfg="'+f[0]+'" value="'+esc(V60.cfg(f[0],f[2]))+'"></label>'; }).join("")+'</div>'+
+      '<div class="v60-sh">오늘 수면</div><div class="v60-sf">'+(function(){ var sl=V60.sleepOf(td)||{}; return '<label>취침<input class="input" type="time" data-v60sleep="bed" value="'+esc(sl.bed||"")+'"></label><label>기상<input class="input" type="time" data-v60sleep="wake" value="'+esc(sl.wake||"")+'"></label>'; })()+'</div>'+
+      '<div class="v60-sh">수업 끝나는 시각</div><div class="v60-sf">'+V60.slotRows()+'</div></details>';
     body.innerHTML='<div class="v60-top">'+die+mustDo+'</div>'+nums+grid+
       '<div class="card"><div class="card-h"><h3>과제</h3><span class="hs">'+P.asg.filter(function(a){ return a.due>=td&&!a.done; }).length+'</span></div><div class="card-b tight">'+(hwRows||'<div class="empty">남은 과제가 없습니다.</div>')+'</div></div>'+
       '<div class="card"><div class="card-h"><h3>진도</h3></div><div class="card-b tight">'+prog+'</div></div>'+set;
     /* 이벤트 */
-    $$("[data-v60done]",body).forEach(function(b){ b.onclick=function(){ var st=V60.st(), k=b.dataset.v60done; if(st.done[k]) delete st.done[k]; else st.done[k]=Date.now(); persist(); V60.render(); }; });
+    $$("[data-v60done]",body).forEach(function(b){ b.onclick=function(){ var st=V60.st(), k=b.dataset.v60done; if(st.done[k]) delete st.done[k]; else { st.done[k]=Date.now(); toast("과제 완료 — 남은 시간을 다시 배정합니다"); } persist(); V60.render(); }; });
     $$("[data-v60est]",body).forEach(function(inp){ inp.onchange=function(){ var v=+inp.value; if(v>0){ V60.st().est[inp.dataset.v60est]=v; persist(); V60.render(); } }; });
     $$("[data-v60cfg]",body).forEach(function(inp){ inp.onchange=function(){ V60.st().cfg[inp.dataset.v60cfg]=inp.type==="number"?+inp.value:inp.value; persist(); V60.render(); }; });
     $$("[data-v60go]",body).forEach(function(b){ b.onclick=function(){ var q=b.dataset.v60go.split("|"); openStudy(q[0],+q[1],q[2]); }; });
     $$("[data-v60memo]",body).forEach(function(b){ b.onclick=function(){ openNote(V60.CADD_MEMO+"#flip","CADD 암기카드"); }; });
+    $$("[data-v60sdone]",body).forEach(function(b){ b.onclick=function(){ var st=V60.st(); st.sdone=st.sdone||{}; st.sdone[b.dataset.v60sdone]=Date.now(); persist(); toast("완료 — 남은 시간을 다시 배정합니다"); V60.render(); }; });
+    $$("[data-v60mdone]",body).forEach(function(b){ b.onclick=function(){ var st=V60.st(); st.mdone=st.mdone||{}; st.mdone[b.dataset.v60mdone]=Date.now(); persist(); V60.render(); }; });
+    $$("[data-v60sleep]",body).forEach(function(inp){ inp.onchange=function(){ var st=V60.st(); st.sleep=st.sleep||{}; var o=st.sleep[td]||{}; o[inp.dataset.v60sleep]=inp.value; st.sleep[td]=o; persist(); V60.render(); }; });
+    $$("[data-v60end]",body).forEach(function(inp){ inp.onchange=function(){ var st=V60.st(); st.cfg.ends=st.cfg.ends||{}; if(inp.value) st.cfg.ends[inp.dataset.v60end]=inp.value; else delete st.cfg.ends[inp.dataset.v60end]; persist(); V60.render(); }; });
     $$("#v60Wk button",body).forEach(function(b){ b.onclick=function(){ V60.ui.week=+b.dataset.w; V60.render(); }; });
   };
 
@@ -328,6 +364,7 @@
     ".v60-hw .v60-est{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:var(--ink-2);margin:0 8px;white-space:nowrap}.v60-hw .v60-est input{width:62px;min-height:36px;border:1px solid var(--line);border-radius:8px;padding:0 6px;font:inherit}",
     ".v60-hw.done .t{text-decoration:line-through;color:var(--ink-3)}.v60-warn{color:#C7261B}",
     ".v60-set{margin:4px 0 20px}.v60-set summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}.v60-sf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.v60-sf label{display:flex;flex-direction:column;font-size:12.5px;gap:3px}",
+    ".v60-sh{font-weight:800;font-size:13px;margin:12px 0 6px}.v60-ok{border-color:var(--ok,#15803D)!important;color:var(--ok,#15803D)!important}",
     ".v60-callist{margin-top:12px;display:flex;flex-direction:column;gap:6px}",
     ".v60-cev{background:#1E5FA8!important;color:#fff!important}.v60-cev.hot{background:#C7261B!important}",
     "@media (max-width:900px){.v60-top{grid-template-columns:1fr}}",
