@@ -19,7 +19,7 @@
     {k:"note", n:"내 필기",  pc:["note"],             dev:["필기본"],             slot:"note"},
     {k:"sum",  n:"정리",     pc:["summary"],          dev:[],                     slot:""}
   ];
-  V58.LABEL={"정역학":{rec:"녹음·영상",board:"교수 필기"},"CADD":{rec:"영상 정리"}};
+  V58.LABEL={"정역학":{rec:"LMS 영상",board:"교수 필기"},"CADD":{rec:"영상 정리"}};
   V58.SHORT={pre:"자료",rec:"녹음",board:"판서",note:"필기",sum:"정리"};
   V58.SHORT_BY={"정역학":{rec:"영상",board:"교수"},"CADD":{rec:"영상"}};
   V58.ATT_SHORT={present:"출석",late:"지각",vlate:"큰지각",ghost:"출튀",excused:"인정",absent:"결석"};
@@ -61,6 +61,7 @@
     if(col.photo&&k.photo) return {cls:"maybe",t:"사진 "+k.photo,sm:"사진"};
     if(col.k!=="pre"&&col.k!=="sum"&&V58.ABS[st]) return {cls:"abs",t:"결석"};
     if(item.none&&need) return {cls:"abs",t:"안 옴"};
+    if(item.novideo&&col.k==="rec") return {cls:"abs",t:"영상 미게시",sm:"미게시",title:"LMS 에 그날 교수 필기만 있고 영상이 없음"};
     if(r.today) return {cls:"fut",t:need?"수업 뒤":""};
     return need?{cls:"no",t:"없음"}:{cls:"opt",t:"—"};
   };

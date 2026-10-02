@@ -4,6 +4,9 @@
 
 ## 2026-10-01
 
+### .120 — 정역학 영상 미게시
+- 대표님 10/2 「정역학은 클로바노트가 아니라 영상 내용을 텍스트로 — 왜 28일꺼 없다고 떠?」. 9/28(W5-1)은 LMS 에 교수 필기(Statics_W5-1_260928)만 있고 영상 조각(W5-1-1…)이 없음(10/2 LMS 모듈 직접 조회). `_진도커버리지.py` lms_video_days → materials.json novideo → V58 「영상 미게시」.
+
 ### .119 — 커리큘럼 기말 접기 · 주차 가독성 · LMS 연결
 - 대표님 10/2. V60.hookV47: 기말 범위 과목은 V60.midOver()(중간 시험일 마지막 다음 날) 전까지 학습 탭에서 접고 한 줄로 · V60.fmtWeeks: v47-wt 를 → 단계 목록으로.
 - LMS: atom `lms_cdp_sync.py`(lms.py sync 를 lms_api.mjs 로 돌림, kv lms_state via=cdp) + server.py lms_payload 가 via=cdp 를 연결됨으로 · lms_daily.ps1 에 추가.

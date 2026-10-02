@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-10-02T09:56:13",
+ "generatedAt": "2026-10-02T15:13:42",
  "asOf": "2026-10-02",
  "termEnd": "2026-12-21",
  "courses": {
@@ -386,7 +386,7 @@
       "photo": 1,
       "rec": 1,
       "summary": 1,
-      "board": 9,
+      "board": 11,
       "note": 1
      }
     }
@@ -479,7 +479,8 @@
       "summary": 1,
       "board": 1,
       "profnote": 1
-     }
+     },
+     "novideo": true
     },
     "2026-09-09": {
      "k": {
@@ -524,7 +525,8 @@
       "profnote": 2,
       "photo": 2,
       "summary": 1
-     }
+     },
+     "novideo": true
     },
     "2026-09-30": {
      "k": {

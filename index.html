@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-02.119";
+var BUILD="2026-10-02.120";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,9 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-02.120",d:"10-02",items:[
+    "수업 자료: 정역학은 녹음 대신 LMS 영상 — 열 이름 「LMS 영상」, LMS 에 그날 교수 필기만 있고 영상이 안 올라온 회차는 「영상 미게시」(9/28)"
+  ]},
   {v:"2026-10-02.119",d:"10-02",items:[
     "커리큘럼 · 시험 범위 vs 이해: 기말 과목은 중간고사 마지막 날까지 접어 두고 다음 날 자동으로 펼침",
     "주차별 목록 가독성 — 주차마다 카드, 수업 흐름을 → 줄로 나눔(절 번호 굵게 · 날짜·메모 흐리게), 개념 칩은 점선 아래로, 어두운 학습 화면 글자 대비",
@@ -11578,7 +11581,7 @@ var V33={};
     {k:"note", n:"내 필기",  pc:["note"],             dev:["필기본"],             slot:"note"},
     {k:"sum",  n:"정리",     pc:["summary"],          dev:[],                     slot:""}
   ];
-  V58.LABEL={"정역학":{rec:"녹음·영상",board:"교수 필기"},"CADD":{rec:"영상 정리"}};
+  V58.LABEL={"정역학":{rec:"LMS 영상",board:"교수 필기"},"CADD":{rec:"영상 정리"}};
   V58.SHORT={pre:"자료",rec:"녹음",board:"판서",note:"필기",sum:"정리"};
   V58.SHORT_BY={"정역학":{rec:"영상",board:"교수"},"CADD":{rec:"영상"}};
   V58.ATT_SHORT={present:"출석",late:"지각",vlate:"큰지각",ghost:"출튀",excused:"인정",absent:"결석"};
@@ -11620,6 +11623,7 @@ var V33={};
     if(col.photo&&k.photo) return {cls:"maybe",t:"사진 "+k.photo,sm:"사진"};
     if(col.k!=="pre"&&col.k!=="sum"&&V58.ABS[st]) return {cls:"abs",t:"결석"};
     if(item.none&&need) return {cls:"abs",t:"안 옴"};
+    if(item.novideo&&col.k==="rec") return {cls:"abs",t:"영상 미게시",sm:"미게시",title:"LMS 에 그날 교수 필기만 있고 영상이 없음"};
     if(r.today) return {cls:"fut",t:need?"수업 뒤":""};
     return need?{cls:"no",t:"없음"}:{cls:"opt",t:"—"};
   };
