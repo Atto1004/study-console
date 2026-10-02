@@ -119,7 +119,19 @@
       if(/기상|준비|이동|귀가/.test(t)) return;                          /* 준비·이동은 아래 규칙으로 */
       out.push({s:toMin(ev.start),e:toMin(ev.end)||1440,t:t,k:/알바|근무|근로/.test(t)?"work":"ev"}); });
     plansOn(d).filter(function(p){ return p.activity; }).forEach(function(p){ out.push({s:toMin(p.s),e:toMin(p.e),t:p.kind||"활동",k:"ev"}); });
-    return out.filter(function(b){ return b.e>b.s; }).sort(function(a,b){ return a.s-b.s; });
+    return V60.merge(out.filter(function(b){ return b.e>b.s; }));
+  };
+  /* 같은 일정은 하나로 (대표님 10/2 「근로장학같이 하나의 일정은 하나로 합쳐」) — 루틴 · 캘린더 · 쪼개진 블록(점심 전후 등)이 겹치거나 90분 안에 이어지면 한 블록 */
+  V60.norm=function(t){ return String(t||"").replace(/[^0-9A-Za-z가-힣]/g,"").replace(/(오전|오후|점심|근무|\d+)$/,""); };
+  V60.same=function(a,b){ var x=V60.norm(a), y=V60.norm(b); return !!x&&!!y&&(x===y||x.indexOf(y)===0||y.indexOf(x)===0); };
+  V60.merge=function(arr){
+    arr.sort(function(a,b){ return a.s-b.s; }); var out=[];
+    arr.forEach(function(b){
+      var m=null; for(var i=out.length-1;i>=0;i--){ var o=out[i]; if(V60.same(o.t,b.t)&&b.s<=o.e+90){ m=o; break; } }
+      if(m){ m.e=Math.max(m.e,b.e); m.s=Math.min(m.s,b.s); if(b.k==="work"||m.k==="work") m.k=m.k==="cls"?"cls":"work"; m.school=m.school||b.school; if(V60.norm(b.t).length<V60.norm(m.t).length) m.t=b.t; }
+      else out.push({s:b.s,e:b.e,t:b.t,k:b.k,school:b.school});
+    });
+    return out.sort(function(a,b){ return a.s-b.s; });
   };
   function free(iv,busy){   /* iv=[s,e] 에서 busy 빼기 */
     var res=[[iv[0],iv[1]]];
