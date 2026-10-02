@@ -12,10 +12,10 @@
 
   /* ---------- ① 시계 ---------- */
   V65.clock=function(){
-    var g=$(".topbar .topact"); if(!g) return; var old=$("#v65Clock"); if(old&&old.parentNode===g&&g.firstChild===old) return; if(old) old.remove();
+    var g=$(".topbar .topbar-in"); if(!g) return; var old=$("#v65Clock"); if(old&&old.parentNode===g&&g.firstChild===old) return; if(old) old.remove();   /* 대표님 10/2 「아예 완전 왼쪽으로, 좀 크게」 */
     var el=document.createElement("div"); el.id="v65Clock"; el.className="v65-clock";
     el.innerHTML='<span class="v65-t"><b id="v65H">--:--:--</b><small id="v65Ms">.000</small></span><span class="v65-d" id="v65D"></span>';
-    g.insertBefore(el,g.firstChild);   /* 중간고사 D-day · 저장 · 새로고침 줄의 맨 왼쪽 */
+    g.insertBefore(el,g.firstChild);
     var tick=function(){ var d=new Date();
       var h=$("#v65H"), m=$("#v65Ms"), dd=$("#v65D"); if(!h) return;
       h.textContent=p2(d.getHours())+":"+p2(d.getMinutes())+":"+p2(d.getSeconds()); m.textContent="."+p3(d.getMilliseconds());
@@ -79,11 +79,11 @@
 
   var css=document.createElement("style"); css.id="v65css";
   css.textContent=[
-    ".v65-clock{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;line-height:1.05;margin-right:4px;padding:4px 12px;border-radius:12px;background:var(--surface-2,rgba(31,42,68,.05));border:1px solid var(--line);font-variant-numeric:tabular-nums;white-space:nowrap}",
-    ".v65-t b{font-size:17px;font-weight:800;letter-spacing:.01em}.v65-t small{font-size:12px;font-weight:700;color:var(--ink-3);margin-left:1px;display:inline-block;width:30px}",
-    ".v65-d{font-size:11px;font-weight:700;color:var(--ink-2)}",
+    ".v65-clock{order:-1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;line-height:1.1;padding:6px 16px;border-right:1px solid var(--line);font-variant-numeric:tabular-nums;white-space:nowrap;flex:none}",
+    ".v65-t b{font-size:24px;font-weight:800;letter-spacing:.01em}.v65-t small{font-size:15px;font-weight:700;color:var(--ink-3);margin-left:1px;display:inline-block;width:38px}",
+    ".v65-d{font-size:13px;font-weight:700;color:var(--ink-2);margin-top:2px}",
     ".topbar-in{align-items:center}",
-    "@media (max-width:600px){.v65-clock{padding:2px 8px;margin-right:6px}.v65-t b{font-size:14px}.v65-t small{font-size:10px;width:24px}.v65-d{font-size:10px}}",
+    "@media (max-width:600px){.v65-clock{padding:4px 10px 4px 0;border-right:0}.v65-t b{font-size:18px}.v65-t small{font-size:12px;width:30px}.v65-d{font-size:11px}}",
     ".v65-clg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.v65-cld{border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:2px;font-size:13px}.v65-cld b{font-size:14px}.v65-cld small{color:var(--ink-3);font-size:11.5px}",
     ".v65-add{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.v65-add .input{min-height:42px}.v65-add select{flex:1;min-width:200px}.v65-bk{margin-top:8px}",
     "@media (max-width:600px){.v65-clg{grid-template-columns:repeat(3,minmax(0,1fr))}}",

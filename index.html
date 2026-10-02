@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-02.125";
+var BUILD="2026-10-02.126";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,10 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-02.126",d:"10-02",items:[
+    "공부계획 「오늘 무조건」 한 줄 = 시각 · 할 일 … 오른쪽 끝에 제출 파일 · 열기 · 체크 상자",
+    "시계를 맨 위 줄 맨 왼쪽으로, 크게 — 시:분:초.밀리초 / 아래 줄에 날짜 · 요일, 왼쪽 정렬"
+  ]},
   {v:"2026-10-02.125",d:"10-02",items:[
     "미분적분학2 과목 화면 「클리닉룸」 — 요일별 운영 시간 · 장소, 「예약하러 가기」(예약 사이트), 예약한 시간 넣기 → 공부계획 바쁜 시간 · 장소에 반영"
   ]},
@@ -12264,12 +12268,12 @@ var V33={};
       exT.map(function(e){ var c=course(e.courseId)||{}; return '<li><b>'+esc(c.name||"")+'</b> '+esc(e.kind||"시험")+' <span class="v60-due">'+(e.date===td?"오늘":"내일")+'</span></li>'; }).join("")+'</ul>':'<div class="v60-none">마감 임박 없음</div>')+'</div>';
     var tItems=T?T.items:[];
     var mustDo='<div class="v60-must"><div class="v60-h">오늘 무조건</div>'+(tItems.length?'<ol>'+tItems.map(function(b){
-      return '<li class="m-'+b.k+'"><span class="v60-t">'+hm(b.s)+'–'+hm(b.e)+'</span> '+esc(b.t)+(b.meta&&b.meta.hw?V60.filesHTML(b.meta.hw):'')+
+      return '<li class="m-'+b.k+'"><div class="v60-li"><span class="v60-lm"><span class="v60-t">'+hm(b.s)+'–'+hm(b.e)+'</span> '+esc(b.t)+'</span><span class="v60-la">'+(b.meta&&b.meta.hw?V60.filesHTML(b.meta.hw):'')+
         (b.meta&&b.meta.x?' <button type="button" class="btn xs a" data-v60go="'+b.meta.c.id+'|'+b.meta.x.w+'|'+b.meta.x.date+'">열기</button>':'')+
         (b.meta&&b.meta.memo?' <button type="button" class="btn xs a" data-v60memo="1">카드</button>':'')+
         (b.meta&&b.meta.hw?' <button type="button" class="v60-chk" data-v60done="'+esc(b.meta.hw.k)+'" aria-label="완료"></button>':'')+
         (b.meta&&b.meta.x?' <button type="button" class="v60-chk" data-v60sdone="'+b.meta.c.id+'|'+b.meta.x.date+'" aria-label="완료"></button>':'')+
-        (b.meta&&b.meta.memo?' <button type="button" class="v60-chk" data-v60mdone="'+esc(b.meta.d)+'" aria-label="완료"></button>':'')+'</li>'; }).join("")+'</ol>':'<div class="v60-none">'+(T&&T.avail<25?'남은 빈 시간이 없습니다':'배정할 것이 없습니다')+'</div>')+'</div>';
+        (b.meta&&b.meta.memo?' <button type="button" class="v60-chk" data-v60mdone="'+esc(b.meta.d)+'" aria-label="완료"></button>':'')+'</span></div></li>'; }).join("")+'</ol>':'<div class="v60-none">'+(T&&T.avail<25?'남은 빈 시간이 없습니다':'배정할 것이 없습니다')+'</div>')+'</div>';
     /* 오늘 끝낸 것 — 체크된 상자로 남긴다(대표님 10/2 「빈 박스 → 누르면 체크」) */
     var stx=V60.st(), dd0=function(t){ var x=new Date(t); return x.getFullYear()+"-"+(x.getMonth()<9?"0":"")+(x.getMonth()+1)+"-"+(x.getDate()<10?"0":"")+x.getDate(); };
     var doneT=[]; P.asg.forEach(function(a){ if(a.done&&stx.done[a.k]&&dd0(stx.done[a.k])===td) doneT.push({t:a.c+" · "+a.t,k:"done:"+a.k}); });
@@ -12565,6 +12569,9 @@ var V33={};
     ".v60-chk{display:inline-block;width:26px;height:26px;border:2px solid var(--ink-3,#8a93a8);border-radius:7px;background:var(--surface);vertical-align:middle;margin-left:6px;cursor:pointer;padding:0;position:relative}",
     ".v60-chk:hover{border-color:var(--ac,#4F9A35)}.v60-chk.on{background:var(--ac,#4F9A35);border-color:var(--ac,#4F9A35)}.v60-chk.on::after{content:'';position:absolute;left:7px;top:2px;width:7px;height:13px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg)}",
     ".v60-donel{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);display:flex;flex-direction:column;gap:4px}.v60-dn{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink-3)}.v60-dn .v60-chk{margin-left:0}",
+    ".v60-li{display:flex;align-items:center;gap:10px}.v60-lm{flex:1;min-width:0}.v60-la{flex:none;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;justify-content:flex-end}",
+    ".v60-la .v60-files{margin-left:0}.v60-la .v60-chk{margin-left:2px}",
+    "@media (max-width:600px){.v60-li{flex-wrap:wrap}.v60-la{margin-left:auto}}",
     ".v60-sh{font-weight:800;font-size:13px;margin:12px 0 6px}.v60-ok{border-color:var(--ok,#15803D)!important;color:var(--ok,#15803D)!important}",
     ".v60-callist{margin-top:12px;display:flex;flex-direction:column;gap:6px}",
     ".v60-cev{background:#1E5FA8!important;color:#fff!important}.v60-cev.hot{background:#C7261B!important}",
@@ -12829,10 +12836,10 @@ var V33={};
 
   /* ---------- ① 시계 ---------- */
   V65.clock=function(){
-    var g=$(".topbar .topact"); if(!g) return; var old=$("#v65Clock"); if(old&&old.parentNode===g&&g.firstChild===old) return; if(old) old.remove();
+    var g=$(".topbar .topbar-in"); if(!g) return; var old=$("#v65Clock"); if(old&&old.parentNode===g&&g.firstChild===old) return; if(old) old.remove();   /* 대표님 10/2 「아예 완전 왼쪽으로, 좀 크게」 */
     var el=document.createElement("div"); el.id="v65Clock"; el.className="v65-clock";
     el.innerHTML='<span class="v65-t"><b id="v65H">--:--:--</b><small id="v65Ms">.000</small></span><span class="v65-d" id="v65D"></span>';
-    g.insertBefore(el,g.firstChild);   /* 중간고사 D-day · 저장 · 새로고침 줄의 맨 왼쪽 */
+    g.insertBefore(el,g.firstChild);
     var tick=function(){ var d=new Date();
       var h=$("#v65H"), m=$("#v65Ms"), dd=$("#v65D"); if(!h) return;
       h.textContent=p2(d.getHours())+":"+p2(d.getMinutes())+":"+p2(d.getSeconds()); m.textContent="."+p3(d.getMilliseconds());
@@ -12896,11 +12903,11 @@ var V33={};
 
   var css=document.createElement("style"); css.id="v65css";
   css.textContent=[
-    ".v65-clock{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;line-height:1.05;margin-right:4px;padding:4px 12px;border-radius:12px;background:var(--surface-2,rgba(31,42,68,.05));border:1px solid var(--line);font-variant-numeric:tabular-nums;white-space:nowrap}",
-    ".v65-t b{font-size:17px;font-weight:800;letter-spacing:.01em}.v65-t small{font-size:12px;font-weight:700;color:var(--ink-3);margin-left:1px;display:inline-block;width:30px}",
-    ".v65-d{font-size:11px;font-weight:700;color:var(--ink-2)}",
+    ".v65-clock{order:-1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;line-height:1.1;padding:6px 16px;border-right:1px solid var(--line);font-variant-numeric:tabular-nums;white-space:nowrap;flex:none}",
+    ".v65-t b{font-size:24px;font-weight:800;letter-spacing:.01em}.v65-t small{font-size:15px;font-weight:700;color:var(--ink-3);margin-left:1px;display:inline-block;width:38px}",
+    ".v65-d{font-size:13px;font-weight:700;color:var(--ink-2);margin-top:2px}",
     ".topbar-in{align-items:center}",
-    "@media (max-width:600px){.v65-clock{padding:2px 8px;margin-right:6px}.v65-t b{font-size:14px}.v65-t small{font-size:10px;width:24px}.v65-d{font-size:10px}}",
+    "@media (max-width:600px){.v65-clock{padding:4px 10px 4px 0;border-right:0}.v65-t b{font-size:18px}.v65-t small{font-size:12px;width:30px}.v65-d{font-size:11px}}",
     ".v65-clg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.v65-cld{border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:2px;font-size:13px}.v65-cld b{font-size:14px}.v65-cld small{color:var(--ink-3);font-size:11.5px}",
     ".v65-add{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.v65-add .input{min-height:42px}.v65-add select{flex:1;min-width:200px}.v65-bk{margin-top:8px}",
     "@media (max-width:600px){.v65-clg{grid-template-columns:repeat(3,minmax(0,1fr))}}",

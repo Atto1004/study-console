@@ -261,12 +261,12 @@
       exT.map(function(e){ var c=course(e.courseId)||{}; return '<li><b>'+esc(c.name||"")+'</b> '+esc(e.kind||"시험")+' <span class="v60-due">'+(e.date===td?"오늘":"내일")+'</span></li>'; }).join("")+'</ul>':'<div class="v60-none">마감 임박 없음</div>')+'</div>';
     var tItems=T?T.items:[];
     var mustDo='<div class="v60-must"><div class="v60-h">오늘 무조건</div>'+(tItems.length?'<ol>'+tItems.map(function(b){
-      return '<li class="m-'+b.k+'"><span class="v60-t">'+hm(b.s)+'–'+hm(b.e)+'</span> '+esc(b.t)+(b.meta&&b.meta.hw?V60.filesHTML(b.meta.hw):'')+
+      return '<li class="m-'+b.k+'"><div class="v60-li"><span class="v60-lm"><span class="v60-t">'+hm(b.s)+'–'+hm(b.e)+'</span> '+esc(b.t)+'</span><span class="v60-la">'+(b.meta&&b.meta.hw?V60.filesHTML(b.meta.hw):'')+
         (b.meta&&b.meta.x?' <button type="button" class="btn xs a" data-v60go="'+b.meta.c.id+'|'+b.meta.x.w+'|'+b.meta.x.date+'">열기</button>':'')+
         (b.meta&&b.meta.memo?' <button type="button" class="btn xs a" data-v60memo="1">카드</button>':'')+
         (b.meta&&b.meta.hw?' <button type="button" class="v60-chk" data-v60done="'+esc(b.meta.hw.k)+'" aria-label="완료"></button>':'')+
         (b.meta&&b.meta.x?' <button type="button" class="v60-chk" data-v60sdone="'+b.meta.c.id+'|'+b.meta.x.date+'" aria-label="완료"></button>':'')+
-        (b.meta&&b.meta.memo?' <button type="button" class="v60-chk" data-v60mdone="'+esc(b.meta.d)+'" aria-label="완료"></button>':'')+'</li>'; }).join("")+'</ol>':'<div class="v60-none">'+(T&&T.avail<25?'남은 빈 시간이 없습니다':'배정할 것이 없습니다')+'</div>')+'</div>';
+        (b.meta&&b.meta.memo?' <button type="button" class="v60-chk" data-v60mdone="'+esc(b.meta.d)+'" aria-label="완료"></button>':'')+'</span></div></li>'; }).join("")+'</ol>':'<div class="v60-none">'+(T&&T.avail<25?'남은 빈 시간이 없습니다':'배정할 것이 없습니다')+'</div>')+'</div>';
     /* 오늘 끝낸 것 — 체크된 상자로 남긴다(대표님 10/2 「빈 박스 → 누르면 체크」) */
     var stx=V60.st(), dd0=function(t){ var x=new Date(t); return x.getFullYear()+"-"+(x.getMonth()<9?"0":"")+(x.getMonth()+1)+"-"+(x.getDate()<10?"0":"")+x.getDate(); };
     var doneT=[]; P.asg.forEach(function(a){ if(a.done&&stx.done[a.k]&&dd0(stx.done[a.k])===td) doneT.push({t:a.c+" · "+a.t,k:"done:"+a.k}); });
@@ -562,6 +562,9 @@
     ".v60-chk{display:inline-block;width:26px;height:26px;border:2px solid var(--ink-3,#8a93a8);border-radius:7px;background:var(--surface);vertical-align:middle;margin-left:6px;cursor:pointer;padding:0;position:relative}",
     ".v60-chk:hover{border-color:var(--ac,#4F9A35)}.v60-chk.on{background:var(--ac,#4F9A35);border-color:var(--ac,#4F9A35)}.v60-chk.on::after{content:'';position:absolute;left:7px;top:2px;width:7px;height:13px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg)}",
     ".v60-donel{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);display:flex;flex-direction:column;gap:4px}.v60-dn{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink-3)}.v60-dn .v60-chk{margin-left:0}",
+    ".v60-li{display:flex;align-items:center;gap:10px}.v60-lm{flex:1;min-width:0}.v60-la{flex:none;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;justify-content:flex-end}",
+    ".v60-la .v60-files{margin-left:0}.v60-la .v60-chk{margin-left:2px}",
+    "@media (max-width:600px){.v60-li{flex-wrap:wrap}.v60-la{margin-left:auto}}",
     ".v60-sh{font-weight:800;font-size:13px;margin:12px 0 6px}.v60-ok{border-color:var(--ok,#15803D)!important;color:var(--ok,#15803D)!important}",
     ".v60-callist{margin-top:12px;display:flex;flex-direction:column;gap:6px}",
     ".v60-cev{background:#1E5FA8!important;color:#fff!important}.v60-cev.hot{background:#C7261B!important}",
