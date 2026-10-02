@@ -49,8 +49,33 @@
     });
   };
 
+  /* ---------- ③ 미적분 클리닉룸 (대표님 10/2 「학습앱에서 클리닉룸 예약도」) — 운영표 · 예약 사이트 · 예약한 시간 기록(→ 공부계획 바쁜 시간) ----------
+     출처: 미적2 LMS 공지 「[필독] 미분적분학2 클리닉룸 운영 안내」(9/4). 예약 사이트는 미적1 아이디로 로그인 — 로그인은 대표님만. */
+  V65.CLINIC={url:"https://clinic-room-attendance.vercel.app/",
+    slots:[["월","16:00","17:00","융합교육관 503·504"],["월","17:00","18:00","융합교육관 503·504"],["화","16:00","17:00","융합교육관 206·207"],["화","17:00","18:00","융합교육관 206·207"],
+      ["수","13:00","14:00","융합교육관 503·504"],["수","14:00","15:00","융합교육관 503·504"],["목","16:00","17:00","융합교육관 206·207"],["목","17:00","18:00","융합교육관 206·207"],["금","16:00","17:00","융합교육관 503·504"],["금","17:00","18:00","융합교육관 503·504"]],
+    rule:"중간고사 전(2~8주차) 1회 · 기말고사 전(9~15주차) 1회 이상 퀴즈 합격 · 타임당 20명"};
+  V65.bookings=function(){ S.clinic=S.clinic||[]; return S.clinic; };
+  V65.clinicHTML=function(){
+    var td=today(), bk=V65.bookings().filter(function(b){ return b.date>=td; }).sort(function(a,b){ return (a.date+a.start)<(b.date+b.start)?-1:1; });
+    var opts=V65.CLINIC.slots.map(function(x,i){ return '<option value="'+i+'">'+x[0]+' '+x[1]+'–'+x[2]+' · '+x[3]+'</option>'; }).join("");
+    return '<div class="card v65-cl" id="v65Clinic"><div class="card-h"><h3>클리닉룸</h3><span class="hs">'+esc(V65.CLINIC.rule)+'</span><div class="ha"><a class="btn a" href="'+V65.CLINIC.url+'" target="_blank" rel="noopener">예약하러 가기</a></div></div><div class="card-b">'+
+      '<div class="v65-clg">'+["월","화","수","목","금"].map(function(d){ var xs=V65.CLINIC.slots.filter(function(x){ return x[0]===d; }); return '<div class="v65-cld"><b>'+d+'</b><span>'+esc(xs[0][1]+'–'+xs[xs.length-1][2])+'</span><small>'+esc(xs[0][3])+'</small></div>'; }).join("")+'</div>'+
+      (bk.length?'<div class="v65-bk">'+bk.map(function(b){ return '<div class="lrow"><div class="gr"><div class="t">'+esc(b.date)+' '+esc(b.start)+'–'+esc(b.end)+'</div><div class="s">'+esc(b.place||"")+'</div></div><button type="button" class="v65-x" data-v65cx="'+esc(b.id)+'" aria-label="예약 지우기">✕</button></div>'; }).join("")+'</div>':'')+
+      '<div class="v65-add"><input class="input" type="date" id="v65cD" value="'+td+'"><select class="input" id="v65cS">'+opts+'</select><button type="button" class="btn" id="v65cB">예약한 시간 넣기</button></div></div></div>';
+  };
+  V65.clinic=function(){
+    if(ui.view!=="course") return; var c=course(ui.course); var old=$("#v65Clinic"); if(old) old.remove(); if(!c||c.name!=="미분적분학2") return;
+    var host=$("#v58Card")||$("#v55Hero"); var v=$("#v-course"); if(!v) return;
+    var w=document.createElement("div"); w.innerHTML=V65.clinicHTML(); var card=w.firstChild;
+    if(host&&host.parentNode===v) v.insertBefore(card,host.nextSibling); else v.insertBefore(card,v.children[1]||null);
+    var b=$("#v65cB",card); if(b) b.onclick=function(){ var d=$("#v65cD",card).value, x=V65.CLINIC.slots[+$("#v65cS",card).value]; if(!d||!x) return;
+      V65.bookings().push({id:uid(),date:d,start:x[1],end:x[2],place:x[3]}); persist(); toast("클리닉룸 예약을 공부계획에 넣었어요"); V65.clinic(); };
+    $$("[data-v65cx]",card).forEach(function(x){ x.onclick=function(){ S.clinic=V65.bookings().filter(function(q){ return q.id!==x.dataset.v65cx; }); persist(); V65.clinic(); }; });
+  };
+
   var _render=render;
-  render=function(){ V65.hook(); _render.apply(this,arguments); V65.clock(); };
+  render=function(){ V65.hook(); _render.apply(this,arguments); V65.clock(); setTimeout(V65.clinic,50); };
 
   var css=document.createElement("style"); css.id="v65css";
   css.textContent=[
@@ -59,6 +84,9 @@
     ".v65-d{font-size:11px;font-weight:700;color:var(--ink-2)}",
     ".topbar-in{align-items:center}",
     "@media (max-width:600px){.v65-clock{padding:2px 8px;margin-right:6px}.v65-t b{font-size:14px}.v65-t small{font-size:10px;width:24px}.v65-d{font-size:10px}}",
+    ".v65-clg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.v65-cld{border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:2px;font-size:13px}.v65-cld b{font-size:14px}.v65-cld small{color:var(--ink-3);font-size:11.5px}",
+    ".v65-add{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.v65-add .input{min-height:42px}.v65-add select{flex:1;min-width:200px}.v65-bk{margin-top:8px}",
+    "@media (max-width:600px){.v65-clg{grid-template-columns:repeat(3,minmax(0,1fr))}}",
     ".v65-x{flex:none;width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink-3);font-size:14px;cursor:pointer;margin-left:6px}.v65-x:hover{color:#C7261B;border-color:#C7261B}"
   ].join("\n");
   document.head.appendChild(css);

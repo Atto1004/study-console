@@ -119,6 +119,7 @@
       if(/기상|준비|이동|귀가/.test(t)) return;                          /* 준비·이동은 아래 규칙으로 */
       out.push({s:toMin(ev.start),e:toMin(ev.end)||1440,t:t,k:/알바|근무|근로/.test(t)?"work":"ev",place:ev.location||ev.place||""}); });
     plansOn(d).filter(function(p){ return p.activity; }).forEach(function(p){ out.push({s:toMin(p.s),e:toMin(p.e),t:p.kind||"활동",k:"ev"}); });
+    (S.clinic||[]).filter(function(x){ return x.date===d; }).forEach(function(x){ out.push({s:toMin(x.start),e:toMin(x.end),t:"미적분 클리닉룸",k:"ev",school:1,place:x.place||""}); });   /* V65 예약 기록 */
     ((V60.pp&&V60.pp.events)||[]).filter(function(x){ return x.date===d; }).forEach(function(x){ out.push({s:toMin(x.start),e:toMin(x.end),t:x.title,k:x.k||"ev",place:x.place||"",trip:x.k==="trip"?1:0}); });
     var m=V60.merge(out.filter(function(b){ return b.e>b.s; }));
     ((V60.pp&&V60.pp.cuts)||[]).filter(function(x){ return x.date===d; }).forEach(function(x){ m.forEach(function(b){ if(V60.same(b.t,x.title)){ if(x.end) b.e=toMin(x.end); if(x.start) b.s=toMin(x.start); if(x.note) b.note=x.note; } }); });
