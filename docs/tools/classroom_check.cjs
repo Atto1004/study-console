@@ -174,8 +174,8 @@ async function check(file) {
           if (!X.anim || X.anim.phase !== "board" || !X.pending) problems.push("챕터 경계 뒤 대사를 끝냈는데 판서 단계로 안 넘어감: " + JSON.stringify({ anim: X.anim && X.anim.phase, pending: X.pending }));
           if (!/^.+/.test(norm(doc.querySelector("#dText").textContent)) || !norm(doc.querySelector("#dText").textContent).includes(D.chapters[1].steps[0].s.slice(0, 12))) problems.push("챕터 경계 대사에 다음 단계 대사가 없음");
           X.enter(); if (![...doc.querySelectorAll("#bc .bl")].every(l => l.classList.contains("now"))) problems.push("챕터 경계 뒤 즉시 완료가 판서를 못 보임"); } }
-      /* 오타 R2: 대사 중 「질문할게요」 — 진행 중 단계를 먼저 완료하고 질문 대사로(판서·그림이 사라지지 않음) */
-      { X.S.mode = "step"; X.S.ci = tgt.ci; X.S.si = tgt.si; X.S.resume = false; X.render(); const ab = [...doc.querySelectorAll("#dCh .cbt")].find(b => /질문할게요/.test(b.textContent)); if (!ab) problems.push("「질문할게요」 없음"); else { ab.click();
+      /* 오타 R2 → 대표님 10/2: 대사 중 하단 질문창으로 질문 — 진행 중 단계를 먼저 완료하고 질문으로(판서·그림이 사라지지 않음) */
+      { X.S.mode = "step"; X.S.ci = tgt.ci; X.S.si = tgt.si; X.S.resume = false; X.render(); const ab = doc.querySelector("#askbar"), ai = doc.querySelector("#askIn"); if ([...doc.querySelectorAll("#dCh .cbt")].some(x => /질문할게요/.test(x.textContent))) problems.push("「질문할게요」 버튼이 남음(하단 질문창으로 바뀜, 대표님 10/2)"); if (!ab || !ai) problems.push("하단 질문 입력창 없음"); else { ai.value = "이 식은 왜 이렇게 되나요?"; ab.dispatchEvent(new (doc.defaultView.Event)("submit", { cancelable: true }));
           if (X.anim || X.pending) problems.push("질문 뒤 예약 작업 남음"); if (![...doc.querySelectorAll("#bc .bl")].every(l => l.classList.contains("now"))) problems.push("질문 뒤 판서 줄이 가려짐"); if (doc.querySelector("#bc .bd-fig .pre")) problems.push("질문 뒤 그림 단계가 가려져 있음"); } }
       /* 자연 완료: 타자 1ms 로 놓고 기다리면 대사 → 판서 → 그림이 스스로 끝난다(예약 0 · 줄 전부 보임 · pre/draw/fade 없음 · 화살촉 복원) */
       { X.speed = 1; X.S.mode = "step"; X.S.ci = tgt.ci; X.S.si = tgt.si; X.S.resume = false; X.render();

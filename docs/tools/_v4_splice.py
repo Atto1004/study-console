@@ -310,6 +310,67 @@ sub1('</style>', """
 sub1("if(ln.k===\"li\") nLi++;", "if(ln.k===\"li\"||ln.k===\"def\"||ln.k===\"ex\") nLi++;", "정의·예시 줄 번호")
 sub1("(ln.k===\"li\"?' data-n=\"'+nLi+'\"':'')", "((ln.k===\"li\"||ln.k===\"def\"||ln.k===\"ex\")?' data-n=\"'+nLi+'\"':'')", "정의·예시 번호 표시")
 sub1("  return h+'</ul>';\n}", "  return h+'</ul><div class=\"clr-key\"><span><i style=\"background:#FFE45C\"></i>정의</span><span><i style=\"background:#C4A0FF\"></i>예시</span><span><i style=\"background:#96E878\"></i>비유</span><span><i style=\"background:#8FCDFF\"></i>교수님</span><span><i style=\"background:#FFB25C\"></i>외울 것</span><span><i style=\"background:#FF6B6B\"></i>시험·함정</span><span><i style=\"background:#C9F4E1\"></i>식</span></div>';\n}", "색 범례(목차)")
+# 18) 하단 질문 입력창 (대표님 2026-10-02 「질문할게요를 누르는 게 아니라 하단에 메인창처럼 채팅창, 스앵님이 답 — 우측 새 창 X」)
+sub1('    <div id="ctl"><div class="choices" id="dCh"></div><div class="tip" id="dTip"></div></div>\n',
+     '    <div id="ctl"><div class="choices" id="dCh"></div><div class="tip" id="dTip"></div></div>\n'
+     '    <form id="askbar" autocomplete="off"><input id="askIn" type="text" enterkeyhint="send" placeholder="스앵님에게 질문" aria-label="스앵님에게 질문"><button type="submit" id="askGo">보내기</button></form>\n', "질문 입력창 마크업")
+sub1('function canPrev(){',
+     '/* 질문: 앱(atom) 스앵님 대화로 보내고, 답을 자막으로 흘려 보여 준다. 앱 밖에서 열면 안내 대사 */\n'
+     'let ASKING=false;\n'
+     'function askSend(text){ text=String(text||"").trim(); if(!text) return; if(anim||typing) finishNow(); cancelAll();\n'
+     '  if(S.mode==="step"){ const c=CH[S.ci]; if(c){ CONF[c.id]=true; ev("ask",{sid:c.id,n:secN(c.id)}); } } else if(S.mode==="quiz"){ const q=QZ[S.qi]; if(q) ev("ask",{qid:q.id,n:qN(q.id)}); }\n'
+     '  if(!EMB){ say(pick("askoff",S.ci),"sharp"); return; }\n'
+     '  ASKING=true; $("#askIn").value=""; $("#askbar").classList.add("busy"); ctx(); post({type:"mc-ask-q",v:1,text:text.slice(0,600)});\n'
+     '  $("#dText").textContent="「"+text+"」 — 잠깐만요, 볼게요."; moreChk(); }\n'
+     'window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(!d||d.type!=="mc-answer"||d.v!==1) return;\n'
+     '  const el=$("#dText"); if(typeof d.text==="string"&&d.text){ el.textContent=d.text; moreChk(); const w=el; w.scrollTop=w.scrollHeight; }\n'
+     '  if(d.done||d.error){ ASKING=false; $("#askbar").classList.remove("busy"); if(d.error&&!d.text){ el.textContent=d.error; } geRest(); } });\n'
+     '$("#askbar").addEventListener("submit",e=>{ e.preventDefault(); if(ASKING) return; askSend($("#askIn").value); });\n'
+     '{ const _ch1=choices; choices=function(list){ _ch1((list||[]).filter(c=>c.t!=="질문할게요")); }; }\n'
+     'function canPrev(){', "질문 보내기 · 답 받기")
+sub1('</style>', '#askbar{display:flex;gap:8px;margin:10px 0 0;padding:6px;border-radius:14px;background:rgba(8,16,12,.55);border:1px solid rgba(255,255,255,.14)}'
+     '#askbar input{flex:1;min-width:0;min-height:46px;border:0;border-radius:10px;padding:0 14px;font:inherit;font-size:16px;background:rgba(255,255,255,.08);color:#F6FAF7;outline:none}'
+     '#askbar input::placeholder{color:rgba(246,250,247,.55)}#askbar input:focus{background:rgba(255,255,255,.14)}'
+     '#askbar button{flex:none;min-height:46px;min-width:88px;border:0;border-radius:10px;font:inherit;font-weight:800;background:var(--yel,#FFD84D);color:#1B2A20;cursor:pointer}'
+     '#askbar.busy button{opacity:.5;pointer-events:none}\n</style>', "질문 입력창 CSS")
+# 19) 넷플릭스식 자막 (대표님 2026-10-02 「얼굴 지우고 배경 지우고 넷플릭스 자막처럼」)
+sub1('</style>', '#faceImg{display:none!important}.box .name{display:none}'
+     '.box{background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:0!important;box-shadow:none!important;justify-content:center;padding:6px 18px 14px!important}'
+     '.box .sb{text-align:center;max-width:46em;margin:0 auto}'
+     '.text{font-family:var(--fh)!important;font-weight:700;font-size:21px!important;line-height:1.5!important;min-height:0!important;max-height:calc(1.5em * 3 + 2px)!important;color:#fff!important;'
+     'text-shadow:0 0 2px #000,0 0 4px #000,0 2px 6px rgba(0,0,0,.9),1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000;letter-spacing:.01em}'
+     '.slide::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(to top,rgba(0,0,0,.35),rgba(0,0,0,0));pointer-events:none;z-index:1}'
+     '#tMore{background:rgba(0,0,0,.62)!important;color:#fff!important;border-radius:7px;padding:2px 9px}'
+     '@media (max-width:760px){.text{font-size:17px!important}}\n</style>', "넷플릭스 자막")
+# 20) 강사 연출 (대표님 2026-10-02 「한자리에만 서 있음 — 왔다갔다, 지금 설명하는 부분을 짚고, 중요한 부분은 형광펜·밑줄·별표」)
+#     뒤돌아 칠판에 쓰는 장면은 뒷모습 그림이 없어 아직 못 넣음(그림 세트 g/write.png 가 생기면 판서 줄이 써지는 동안 그 그림으로).
+sub1('</style>', '@keyframes pace{0%,100%{transform:translateX(0)}25%{transform:translateX(-7%)}50%{transform:translateX(3%)}75%{transform:translateX(-11%)}}'
+     '#tutor.talking{animation:pace 9s ease-in-out infinite}'
+     '#laser{position:absolute;z-index:3;height:3px;transform-origin:0 50%;background:linear-gradient(90deg,rgba(255,80,80,0),rgba(255,80,80,.9));border-radius:3px;pointer-events:none;opacity:0;transition:opacity .25s}'
+     '#laser.on{opacity:1}#laser::after{content:"";position:absolute;left:-6px;top:-5px;width:13px;height:13px;border-radius:50%;background:radial-gradient(circle,#fff 0,#FF5050 45%,rgba(255,80,80,0) 70%)}'
+     '.bl.mk-hl>*:not(.fn):not(.tg){background-image:linear-gradient(transparent 58%,rgba(255,214,0,.42) 58%,rgba(255,214,0,.42) 92%,transparent 92%);background-repeat:no-repeat;background-size:0% 100%;animation:hl .9s .25s ease-out forwards}'
+     '@keyframes hl{to{background-size:100% 100%}}'
+     '.bl.mk-ul>*:not(.fn):not(.tg){text-decoration:underline;text-decoration-color:rgba(255,120,120,.95);text-decoration-thickness:3px;text-underline-offset:5px}'
+     '.bl.mk-star{position:relative}.bl.mk-star::before{content:"★";position:absolute;left:-22px;top:2px;color:#FFD84D;font-size:18px;animation:starpop .5s .2s both;text-shadow:0 0 6px rgba(255,216,77,.7)}'
+     '@keyframes starpop{0%{transform:scale(0) rotate(-40deg);opacity:0}70%{transform:scale(1.3) rotate(8deg);opacity:1}100%{transform:scale(1) rotate(0)}}'
+     '@media (prefers-reduced-motion: reduce){#tutor.talking{animation:none}.bl.mk-hl>*{animation:none;background-size:100% 100%}}\n</style>', "강사 연출 CSS")
+sub1('const _render=render; render=function(){ _render(); ctx(); };',
+     'const _render=render; render=function(){ _render(); ctx(); setTimeout(stageFx,60); };\n'
+     '/* 강사 연출: 중요한 줄 표시(형광펜 = 정의·외울 것 · 밑줄 = 결론·함정 · 별표 = 시험) · 지금 줄을 레이저로 짚기 · 말하는 동안 좌우로 오가기 */\n'
+     'function stageFx(){ try{ const bc=$("#bc"); if(!bc) return;\n'
+     '  $$(".bl",bc).forEach(el=>{ const c=el.className; if(/k-(def|memo)\\b/.test(c)) el.classList.add("mk-hl"); if(/k-(res|pit)\\b/.test(c)) el.classList.add("mk-ul"); if(/k-(exam|star)\\b/.test(c)) el.classList.add("mk-star"); });\n'
+     '  const slide=$(".slide"), tut=$("#tutor"), cur=$$(".bl.cur",bc).pop(); let lz=$("#laser"); if(!lz&&slide){ lz=document.createElement("i"); lz.id="laser"; slide.appendChild(lz); }\n'
+     '  if(!lz||!cur||!tut||!slide||getComputedStyle($("#tutorCard")).display==="none"){ if(lz) lz.classList.remove("on"); return; }\n'
+     '  const sr=slide.getBoundingClientRect(), cr=cur.getBoundingClientRect(), tr=$("#tutorCard").getBoundingClientRect();\n'
+     '  if(cr.bottom<sr.top||cr.top>sr.bottom){ lz.classList.remove("on"); return; }\n'
+     '  const x1=tr.left-sr.left+tr.width*0.18, y1=tr.top-sr.top+tr.height*0.36, x2=Math.min(cr.right,cr.left+cr.width*0.6)-sr.left, y2=cr.top-sr.top+cr.height/2;\n'
+     '  const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy), ang=Math.atan2(dy,dx)*180/Math.PI;\n'
+     '  lz.style.left=x1+"px"; lz.style.top=y1+"px"; lz.style.width=len+"px"; lz.style.transform="rotate("+ang+"deg) scaleX(-1)"; lz.style.transformOrigin="0 50%";\n'
+     '  lz.style.left=x2+"px"; lz.style.top=y2+"px"; lz.style.transform="rotate("+(ang+180)+"deg)"; lz.classList.add("on");\n'
+     '}catch(e){} }\n'
+     '$("#bwrap")&&$("#bwrap").addEventListener("scroll",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,80); },{passive:true});\n'
+     'window.addEventListener("resize",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,120); });\n'
+     'setInterval(()=>{ const t=$("#tutor"); if(t) t.classList.toggle("talking",!!typing||ASKING); },300);', "강사 연출 JS")
 assert "wrap.scrollTop=wrap.scrollHeight" not in s.split("function renderStepV2")[1].split("function replayFig")[0], "renderStepV2 에 맨 아래 스크롤이 남음"
 assert s.index("stackFig();") < s.index('$$("[data-step]",root)'), "칸 쌓기가 단계 숨김보다 뒤"
 io.open(TPL, "w", encoding="utf-8", newline="\n").write(s)
