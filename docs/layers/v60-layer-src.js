@@ -427,9 +427,19 @@
     };
   };
 
+  /* ---------- 휴강 공지 반영 (교수 공지 → 앱 회차 취소, 한 번만) ---------- */
+  V60.CANCEL=[["일반물리학2","2026-10-21","휴강 — 10/2 수업 공지(대표님 전달): 21일 수업 없음"]];
+  V60.patchCancel=function(){
+    if(typeof S==="undefined"||!S||!S.terms) return; S.v60p=S.v60p||{}; var n=0;
+    V60.CANCEL.forEach(function(x){ var k="cancel:"+x[0]+":"+x[1]; if(S.v60p[k]) return;
+      var c=courses().filter(function(q){ return q.name===x[0]; })[0]; if(!c) return;
+      var ss=sessionOn(c.id,x[1]); if(!ss&&window.V32&&V32.ensureSession) ss=V32.ensureSession(c.id,x[1]); if(!ss) return;
+      ss.cancelled=true; if(!ss.memo) ss.memo=x[2]; S.v60p[k]=Date.now(); n++; });
+    if(n){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+  };
   /* ---------- 연결 ---------- */
   var _render=render;
-  render=function(){ V60.hookExam(); V60.hookTodo(); V60.hookCal(); if(window.V59&&!V59._v60){ V59._v60=true; V59.renderPlan=V60.render; } _render.apply(this,arguments); };
+  render=function(){ V60.patchCancel(); V60.hookExam(); V60.hookTodo(); V60.hookCal(); if(window.V59&&!V59._v60){ V59._v60=true; V59.renderPlan=V60.render; } _render.apply(this,arguments); };
 
   var css=document.createElement("style"); css.id="v60css";
   css.textContent=[

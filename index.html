@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-02.115";
+var BUILD="2026-10-02.116";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,9 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-02.116",d:"10-02",items:[
+    "일반물리학2 10/21(수) 휴강 반영 — 10/2 수업 공지(대표님 전달). 회차 · 공부계획 빈 시간 계산에서 수업 없음으로"
+  ]},
   {v:"2026-10-02.115",d:"10-02",items:[
     "공부계획 「오늘만」: 이동 경로를 따로 두지 않고 일정 줄마다 오른쪽 「장소 · 이동」 칸에 — 머무는 곳(집 · 제1공학관 409 · 근무지)은 첫 줄에 이름, 같은 곳이 이어지면 세로선, 이동 줄은 「집 → 제1공학관 301」처럼 빨간 화살표"
   ]},
@@ -12384,9 +12387,19 @@ var V33={};
     };
   };
 
+  /* ---------- 휴강 공지 반영 (교수 공지 → 앱 회차 취소, 한 번만) ---------- */
+  V60.CANCEL=[["일반물리학2","2026-10-21","휴강 — 10/2 수업 공지(대표님 전달): 21일 수업 없음"]];
+  V60.patchCancel=function(){
+    if(typeof S==="undefined"||!S||!S.terms) return; S.v60p=S.v60p||{}; var n=0;
+    V60.CANCEL.forEach(function(x){ var k="cancel:"+x[0]+":"+x[1]; if(S.v60p[k]) return;
+      var c=courses().filter(function(q){ return q.name===x[0]; })[0]; if(!c) return;
+      var ss=sessionOn(c.id,x[1]); if(!ss&&window.V32&&V32.ensureSession) ss=V32.ensureSession(c.id,x[1]); if(!ss) return;
+      ss.cancelled=true; if(!ss.memo) ss.memo=x[2]; S.v60p[k]=Date.now(); n++; });
+    if(n){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+  };
   /* ---------- 연결 ---------- */
   var _render=render;
-  render=function(){ V60.hookExam(); V60.hookTodo(); V60.hookCal(); if(window.V59&&!V59._v60){ V59._v60=true; V59.renderPlan=V60.render; } _render.apply(this,arguments); };
+  render=function(){ V60.patchCancel(); V60.hookExam(); V60.hookTodo(); V60.hookCal(); if(window.V59&&!V59._v60){ V59._v60=true; V59.renderPlan=V60.render; } _render.apply(this,arguments); };
 
   var css=document.createElement("style"); css.id="v60css";
   css.textContent=[
