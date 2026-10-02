@@ -72,8 +72,28 @@ def board_line(line):
         if m:
             tg, cut = TAG[m.group(1)]
             if cut: body = body[m.end():]
+    # COLOR_RULE (대표님 2026-10-02): 분필 색 = 뜻. 정의(새 용어) 노랑 · 예시 보라 · 비유 초록 · 교수님 말씀 하늘 · 외울 것 주황 · 시험·함정 빨강 · 식 민트
+    term = None
+    if kind == "li":
+        if re.match(r"(예|예제|예시|보기|연습|Ex\.?|EX)\s*[\d(:：)]|(예|예제|예시|연습)\s", body):
+            kind = "ex"
+        elif re.match(r"(정의|용어|뜻)\s*[:：]", body):
+            kind = "def"; body = re.sub(r"^(정의|용어|뜻)\s*[:：]\s*", "", body)
+        else:
+            m2 = re.match(r"([가-힣][가-힣A-Za-z()]{0,11}(?: [A-Za-z][A-Za-z0-9ᵀ₀-₉]{0,2})?)\s*=\s*(\S.*)$", body)  # 용어 = 띄어쓰기 없는 짧은 말(+기호 한 글자) — 「같은 점 = …」 같은 문장은 제외
+            NOTDEF = {"결과", "단위", "방향", "전자는", "힘 F", "가속도 a", "중근 m", "해 y"}  # 정의가 아닌 「X = …」 문장 머리(용어 전체가 같을 때만)
+            if m2 and m2.group(1).startswith("연습"): kind = "ex"
+            elif m2 and re.search(r"[가-힣]", m2.group(1)) and not re.search(r"[\d\\_^]", m2.group(1)) and m2.group(1).strip() not in NOTDEF:
+                kind = "def"; term = m2.group(1).strip(); body = m2.group(2)
+    elif kind == "star":
+        if tg == "ih": kind = "ana"
+        elif tg == "ex": kind = "exam"
+        elif body.startswith("「") or "교수님" in body[:12]: kind = "quote"
+    elif kind == "h" and re.match(r"(예제|예시|Ex\.?\s*\d|예\))", body):
+        kind = "hex"
     if kind == "f": h = "\\[" + escape(body) + "\\]"   # 식도 이스케이프 — r<R 의 <R 이 태그로 읽혀 식이 통째로 사라졌다(2026-09-27 검사기 R1 이 잡음). KaTeX 는 textContent 를 읽으므로 &lt; 로 두어도 된다
     else: h = re.sub(r"__(.+?)__", r'<span class="ul">\1</span>', escape(body))
+    if term: h = '<b class="tm">' + escape(term) + '</b> = ' + h
     return {"k": kind, "h": h, "tg": tg} if tg else {"k": kind, "h": h}
 
 def build_v2(doc, chapters, v2, slug, date):

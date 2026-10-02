@@ -17,7 +17,9 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const until = async (fn, ms) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (fn()) return true; await sleep(40); } return fn(); };
 /* build_classroom.board_line() 과 같은 변환(xml.sax.saxutils.escape = & < > 만) — 페이지의 b[].k/h 가 이 결과와 같아야 한다 */
 const escH = t => String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-function boardLine(line) { const t = String(line).trim(); let kind = "li", body = t;
+const LCACHE = {};  /* loadBoard 가 build_classroom.board_line 결과를 채운다 — 판정 규칙의 원본은 파이썬 하나 */
+function boardLine(line) { if (Object.prototype.hasOwnProperty.call(LCACHE, String(line))) return LCACHE[String(line)];
+  const t = String(line).trim(); let kind = "li", body = t;
   for (const [pre, k] of [["#", "h"], ["=", "f"], ["!", "pit"], ["☆", "star"], ["→", "res"], ["■", "memo"], ["•", "li"]]) { if (t.startsWith(pre)) { kind = k; body = t.slice(pre.length).trim(); break; } }
   /* 암기·이해 알약(2026-09-29): ■·☆ 뒤 「외울 것 :」 등 → tg, 알약과 같은 말인 머리말은 뺀다(비유·할 일은 남김) — build_classroom.TAG 와 같다 */
   let tg = null; if (kind === "memo" || kind === "star") { const m = /^(외울 것|암기|이해|비유|시험|연습|할 일)\s*[:：]\s*/.exec(body);
@@ -27,8 +29,9 @@ const TGN = { am: "암기", ih: "이해", ex: "시험", pr: "연습" };
 let fail = 0, total = { steps: 0, quiz: 0, v2: 0 };
 function loadBoard(slug, date) {
   const p = path.join(__dirname, "lessons", "board", `${slug}_${date}.py`); if (!fs.existsSync(p)) return null;
-  const py = "import json,io,sys\nns={}\np=sys.argv[1]\nexec(compile(io.open(p,encoding='utf-8').read(),p,'exec'),ns)\nsys.stdout.buffer.write(json.dumps({'VERSION':str(ns.get('VERSION') or ''),'BOARD':ns['BOARD']},ensure_ascii=False).encode('utf-8'))";
-  return JSON.parse(cp.execFileSync("python", ["-c", py, p], { env: Object.assign({}, process.env, { PYTHONIOENCODING: "utf-8" }) }).toString("utf8"));
+  const py = "import json,io,sys,os\nns={}\np=sys.argv[1]\nexec(compile(io.open(p,encoding='utf-8').read(),p,'exec'),ns)\nsys.path.insert(0,os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(p)))))\nimport build_classroom as bc\nconv={str(l):bc.board_line(l) for v in ns['BOARD'].values() for st in v for l in st.get('b',[])}\nsys.stdout.buffer.write(json.dumps({'VERSION':str(ns.get('VERSION') or ''),'BOARD':ns['BOARD'],'CONV':conv},ensure_ascii=False).encode('utf-8'))";
+  const R = JSON.parse(cp.execFileSync("python", ["-c", py, p], { env: Object.assign({}, process.env, { PYTHONIOENCODING: "utf-8" }) }).toString("utf8"));
+  Object.assign(LCACHE, R.CONV || {}); return R;
 }
 async function check(file) {
   const html = fs.readFileSync(path.join(ROOT, file), "utf8");

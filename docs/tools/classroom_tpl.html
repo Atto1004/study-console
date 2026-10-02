@@ -265,6 +265,21 @@ main{max-width:1040px;margin:0 auto;padding:14px 20px 18px}
 #tutor .gimg.on{opacity:1}
 @media (prefers-reduced-motion: reduce){#tutor .gimg,#tutorImg{transition:none}#tutor .gimg{animation:none}}
 #sXp,#hHearts,#sAf{display:none!important}
+
+.bl.k-def>.bt{color:var(--chalk)}.bl.k-def .tm{color:#FFE45C;font-weight:800;border-bottom:2px solid rgba(255,228,92,.55)}
+.bl.k-def::before{border-color:#FFE45C;color:#FFE45C}.bl.k-def.cur::before{background:#FFE45C;border-color:#FFE45C;color:#2B2A12}
+.bl.k-ex{background:rgba(26,12,52,.42);border-color:rgba(196,160,255,.55)}.bl.k-ex>.bt{color:#EFE6FF}
+.bl.k-ex::before{border-color:#C4A0FF;color:#F1E9FF}.bl.k-ex.cur::before{background:#C4A0FF;border-color:#C4A0FF;color:#22163A}
+.bl.k-hex>.bt{font-family:var(--fh);font-weight:800;color:#F1E9FF}.bl.k-hex{padding:8px 0 9px;margin-top:6px;background:linear-gradient(#C4A0FF,#C4A0FF) 0 100%/64px 4px no-repeat}.bl.k-hex::before{display:none}
+.bl.k-ana>.bt{color:#B6F0A0}.bl.k-ana::before{content:"≈";border-color:rgba(150,232,120,.8);color:#96E878;font-size:13px}
+.bl.k-quote>.bt{color:#DAF0FF}.bl.k-quote::before{content:"“";border-color:rgba(143,205,255,.85);color:#8FCDFF;font-size:15px}
+.bl.k-exam{background:rgba(60,8,8,.42);border-color:rgba(255,107,107,.75)}.bl.k-exam>.bt{color:#FFE3E3;font-weight:700}.bl.k-exam::before{content:"★";border-color:#FF6B6B;background:#FF6B6B;color:#3A1010;font-size:11px}
+.bl.k-pit{background:rgba(60,12,8,.4)!important}.bl.k-pit>.bt{color:#FFE6E2}
+.bl.k-memo{background:rgba(58,32,4,.42);border-color:rgba(255,178,92,.75)}.bl.k-memo::before{border-color:#FFB25C;background:#FFB25C;color:#3A2208}.bl.k-memo>.bt{color:#FFF0DE}
+.bl.k-star>.bt{color:var(--chalk)}.bl.k-star::before{content:"☆";border-color:rgba(244,248,245,.6);color:var(--chalk)}
+.tg-am{background:#FFB25C;color:#3A2208}.tg-ih{background:#96E878;color:#173010}.tg-ex{background:#FF6B6B;color:#3A1010}
+.clr-key{display:flex;flex-wrap:wrap;gap:6px 12px;margin:12px 2px 0;font-family:var(--fb);font-size:12.5px;font-weight:700;color:var(--chalk-2)}
+.clr-key span{display:inline-flex;align-items:center;gap:5px}.clr-key i{width:10px;height:10px;border-radius:50%;display:inline-block}
 </style>
 </head>
 <body>
@@ -510,7 +525,7 @@ function stepHTML(st,rev){
 function tocHTML(){
   let h='<ul class="toc">'+CH.map((c,i)=>{ const done=!!L.ch[c.id], cur=S.mode==="step"&&S.ci===i; return '<li class="'+(done?"done":"")+(cur?" cur":"")+'"><span class="st">'+(done?"✓":i+1)+'</span><span>'+esc(c.title)+'</span><small>'+c.steps.length+'단계</small></li>'; }).join("");
   if(QZ.length){ const qd=QZ.filter(q=>ST.done[q.id]).length, qo=QZ.filter(q=>ST.correct[q.id]===true).length; h+='<li class="'+(qd>=QZ.length?"done":"")+(S.mode==="quiz"?" cur":"")+'"><span class="st">'+(qd>=QZ.length?"✓":"?")+'</span><span>확인 문제</span><small>'+(qd?qo+"/"+qd+" 정답":QZ.length+"문제")+'</small></li>'; }
-  return h+'</ul>';
+  return h+'</ul><div class="clr-key"><span><i style="background:#FFE45C"></i>정의</span><span><i style="background:#C4A0FF"></i>예시</span><span><i style="background:#96E878"></i>비유</span><span><i style="background:#8FCDFF"></i>교수님</span><span><i style="background:#FFB25C"></i>외울 것</span><span><i style="background:#FF6B6B"></i>시험·함정</span><span><i style="background:#C9F4E1"></i>식</span></div>';
 }
 /* ---------- 화면 ---------- */
 function render(){
@@ -619,7 +634,7 @@ function renderStepV2(){
   /* 판서: 이 단계까지의 줄 전부. 지난 단계 줄은 바로, 이 단계 줄은 (즉시가 아니면) 순서대로 써진다 */
   /* v3: 판서 줄 = 핵심 카드(li 는 번호, h 소제목, f 식 카드, pit 함정, star 비유·시험, res 결론, memo 외울 것). 현재 단계 줄은 cur(초록), 지난 단계 줄은 dim. 「다시 보기」는 그림 애니메이션만 다시 */
   let h='<div class="bd-title">핵심 정리 · '+(S.si+1)+' / '+ch.steps.length+'단계</div>', nLi=0;
-  ch.steps.slice(0,S.si+1).forEach((s,k)=>{ (s.b||[]).forEach((ln,j)=>{ const mine=k===S.si; if(ln.k==="li") nLi++; h+='<div class="bl k-'+esc(ln.k)+(mine?" cur":" dim")+((mine&&!instant&&!FIGONLY)?"":" now")+'" data-step="'+esc(s.id)+'" data-ln="'+j+'"'+(ln.k==="li"?' data-n="'+nLi+'"':'')+'><div class="bt">'+(ln.tg&&TGN[ln.tg]?'<span class="tg tg-'+esc(ln.tg)+'">'+TGN[ln.tg]+'</span>':'')+ln.h+'</div></div>'; }); });
+  ch.steps.slice(0,S.si+1).forEach((s,k)=>{ (s.b||[]).forEach((ln,j)=>{ const mine=k===S.si; if(ln.k==="li"||ln.k==="def"||ln.k==="ex") nLi++; h+='<div class="bl k-'+esc(ln.k)+(mine?" cur":" dim")+((mine&&!instant&&!FIGONLY)?"":" now")+'" data-step="'+esc(s.id)+'" data-ln="'+j+'"'+((ln.k==="li"||ln.k==="def"||ln.k==="ex")?' data-n="'+nLi+'"':'')+'><div class="bt">'+(ln.tg&&TGN[ln.tg]?'<span class="tg tg-'+esc(ln.tg)+'">'+TGN[ln.tg]+'</span>':'')+ln.h+'</div></div>'; }); });
   const fig=st.fig?ch.figs[st.fig]:null;
   if(fig) h+='<div class="bd-fig" data-fig="'+esc(st.fig)+'" style="counter-reset:fno '+figNo(ch,st.fig)+'"><div class="fh">그림 · 단계 '+st.fs+' / '+fig.max+'<span class="pl"><button type="button" class="zoom" data-zoom="1">크게 보기</button><button type="button" class="a" data-replay="1">▶ 다시 보기</button></span></div>'+fig.svg+'</div>';
   board(h,'<span>CH '+(S.ci+1)+' · '+esc(ch.title)+'</span><small>'+(S.si+1)+' / '+ch.steps.length+'</small>',false);

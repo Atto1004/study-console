@@ -289,6 +289,27 @@ sub1('</style>', '#sXp,#hHearts,#sAf{display:none!important}\n</style>', "XP·�
 sub1('T.hearts=Math.max(0,T.hearts-1); gainAff(-1); pop("#hHearts","-1",true);', '/* 하트·호감도 차감 없음(대표님 10/2) */', "하트 차감 없음")
 sub1('function dayReset(){ const td=TODAY();', 'function dayReset(){ T.hearts=3; const td=TODAY();', "하트 늘 가득")
 sub1('window.__cr={get D(){return D;},', 'window.__cr={get prevStep(){return prevStep;},get D(){return D;},', "검사용 이전 단계")
+# 17) 분필 색 규칙 (대표님 2026-10-02 「새로운 개념 용어 설명할 때는 특정 색 — 인강 강사 분필 색처럼, 예시는 보라 …」):
+#     정의(새 용어) 노랑 · 예시 보라 · 비유 초록 · 교수님 말씀 하늘 · 외울 것 주황 · 시험·함정 빨강 · 식 민트 · 기본 흰색. 줄 종류는 build_classroom.board_line 이 판정.
+sub1('</style>', """
+.bl.k-def>.bt{color:var(--chalk)}.bl.k-def .tm{color:#FFE45C;font-weight:800;border-bottom:2px solid rgba(255,228,92,.55)}
+.bl.k-def::before{border-color:#FFE45C;color:#FFE45C}.bl.k-def.cur::before{background:#FFE45C;border-color:#FFE45C;color:#2B2A12}
+.bl.k-ex{background:rgba(26,12,52,.42);border-color:rgba(196,160,255,.55)}.bl.k-ex>.bt{color:#EFE6FF}
+.bl.k-ex::before{border-color:#C4A0FF;color:#F1E9FF}.bl.k-ex.cur::before{background:#C4A0FF;border-color:#C4A0FF;color:#22163A}
+.bl.k-hex>.bt{font-family:var(--fh);font-weight:800;color:#F1E9FF}.bl.k-hex{padding:8px 0 9px;margin-top:6px;background:linear-gradient(#C4A0FF,#C4A0FF) 0 100%/64px 4px no-repeat}.bl.k-hex::before{display:none}
+.bl.k-ana>.bt{color:#B6F0A0}.bl.k-ana::before{content:"≈";border-color:rgba(150,232,120,.8);color:#96E878;font-size:13px}
+.bl.k-quote>.bt{color:#DAF0FF}.bl.k-quote::before{content:"“";border-color:rgba(143,205,255,.85);color:#8FCDFF;font-size:15px}
+.bl.k-exam{background:rgba(60,8,8,.42);border-color:rgba(255,107,107,.75)}.bl.k-exam>.bt{color:#FFE3E3;font-weight:700}.bl.k-exam::before{content:"★";border-color:#FF6B6B;background:#FF6B6B;color:#3A1010;font-size:11px}
+.bl.k-pit{background:rgba(60,12,8,.4)!important}.bl.k-pit>.bt{color:#FFE6E2}
+.bl.k-memo{background:rgba(58,32,4,.42);border-color:rgba(255,178,92,.75)}.bl.k-memo::before{border-color:#FFB25C;background:#FFB25C;color:#3A2208}.bl.k-memo>.bt{color:#FFF0DE}
+.bl.k-star>.bt{color:var(--chalk)}.bl.k-star::before{content:"☆";border-color:rgba(244,248,245,.6);color:var(--chalk)}
+.tg-am{background:#FFB25C;color:#3A2208}.tg-ih{background:#96E878;color:#173010}.tg-ex{background:#FF6B6B;color:#3A1010}
+.clr-key{display:flex;flex-wrap:wrap;gap:6px 12px;margin:12px 2px 0;font-family:var(--fb);font-size:12.5px;font-weight:700;color:var(--chalk-2)}
+.clr-key span{display:inline-flex;align-items:center;gap:5px}.clr-key i{width:10px;height:10px;border-radius:50%;display:inline-block}
+</style>""", "분필 색 CSS")
+sub1("if(ln.k===\"li\") nLi++;", "if(ln.k===\"li\"||ln.k===\"def\"||ln.k===\"ex\") nLi++;", "정의·예시 줄 번호")
+sub1("(ln.k===\"li\"?' data-n=\"'+nLi+'\"':'')", "((ln.k===\"li\"||ln.k===\"def\"||ln.k===\"ex\")?' data-n=\"'+nLi+'\"':'')", "정의·예시 번호 표시")
+sub1("  return h+'</ul>';\n}", "  return h+'</ul><div class=\"clr-key\"><span><i style=\"background:#FFE45C\"></i>정의</span><span><i style=\"background:#C4A0FF\"></i>예시</span><span><i style=\"background:#96E878\"></i>비유</span><span><i style=\"background:#8FCDFF\"></i>교수님</span><span><i style=\"background:#FFB25C\"></i>외울 것</span><span><i style=\"background:#FF6B6B\"></i>시험·함정</span><span><i style=\"background:#C9F4E1\"></i>식</span></div>';\n}", "색 범례(목차)")
 assert "wrap.scrollTop=wrap.scrollHeight" not in s.split("function renderStepV2")[1].split("function replayFig")[0], "renderStepV2 에 맨 아래 스크롤이 남음"
 assert s.index("stackFig();") < s.index('$$("[data-step]",root)'), "칸 쌓기가 단계 숨김보다 뒤"
 io.open(TPL, "w", encoding="utf-8", newline="\n").write(s)
