@@ -26,5 +26,14 @@
     if(c) (t.exams||[]).forEach(function(e){ if(e.courseId===c.id&&e.kind==="중간"){ e.date="2026-10-16"; e.time="10:30"; e.assumed=true; e.note="금요일 확정(대표님 10/2) — 날짜는 10/16 가정, 8주차면 10/23"; } });
     t.patchV62c=true; persist();
   };
-  var _boot=boot; boot=function(){ _boot(); try{ V62.patch(); V62.patchDate(); V62.patchPhys(); }catch(e){ if(window.console) console.warn("V62 패치", e); } };
+  /* 대표님 10/2 「응 옮겨」 — 한양 캘린더에 이미 있는 날짜에 맞춤: 일물2 「일반물리학2 중간고사」 10/23(금) · 미적2 「미분적분학2 중간고사」 10/20(화, 교수 9/29 발언 · 공식 공지 전) */
+  V62.patchCal=function(){
+    var t=term(); if(!t||t.patchV62d) return;
+    var set=function(name,date,time,note){ var c=(t.courses||[]).filter(function(x){ return x.name===name; })[0];
+      if(c) (t.exams||[]).forEach(function(e){ if(e.courseId===c.id&&e.kind==="중간"){ e.date=date; e.time=time; e.assumed=true; e.note=note; } }); };
+    set("일반물리학2","2026-10-23","10:30","금요일 확정(대표님 10/2) · 한양 캘린더 10/23(금)");
+    set("미분적분학2","2026-10-20","09:00","교수 9/29 「10월 20일 화요일」 — 공식 공지 전");
+    t.patchV62d=true; persist();
+  };
+  var _boot=boot; boot=function(){ _boot(); try{ V62.patch(); V62.patchDate(); V62.patchPhys(); V62.patchCal(); }catch(e){ if(window.console) console.warn("V62 패치", e); } };
 })();

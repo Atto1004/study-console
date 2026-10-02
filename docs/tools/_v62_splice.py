@@ -22,7 +22,7 @@ else:
     how = "삽입"
 assert s.count(hdr) == 1
 
-B_OLD, B_NEW = 'var BUILD="2026-10-02.108";', 'var BUILD="2026-10-02.109";'
+B_OLD, B_NEW = 'var BUILD="2026-10-02.109";', 'var BUILD="2026-10-02.110";'
 if B_NEW not in s:
     assert s.count(B_OLD) == 1; s = s.replace(B_OLD, B_NEW)
 
@@ -43,5 +43,10 @@ ITEM3 = ('  {v:"2026-10-02.109",d:"10-02",items:[\n'
          '  ]},\n')
 if '{v:"2026-10-02.109"' not in s:
     assert s.count(PN) == 1; s = s.replace(PN, PN + ITEM3)
+ITEM4 = ('  {v:"2026-10-02.110",d:"10-02",items:[\n'
+         '    "중간고사 날짜를 한양 캘린더에 맞춤 — 일반물리학2 10/23(금) 10:30 · 미분적분학2 10/20(화) 09:00 (공식 공지 전 가정)"\n'
+         '  ]},\n')
+if '{v:"2026-10-02.110"' not in s:
+    assert s.count(PN) == 1; s = s.replace(PN, PN + ITEM4)
 io.open(IDX, "w", encoding="utf-8", newline="\n").write(s)
 print("V62", how)
