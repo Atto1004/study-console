@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-10-02T15:13:42",
+ "generatedAt": "2026-10-02T16:23:51",
  "asOf": "2026-10-02",
  "termEnd": "2026-12-21",
  "courses": {
@@ -613,7 +613,9 @@
      "title": "Week2 과제 제출란",
      "given": "2026-09-08",
      "due": "",
-     "src": "LMS"
+     "src": "교수님 — 3주차 과제로 대신(대표님 10/2)",
+     "status": "제출 불필요",
+     "lms_state": "제출 불필요"
     }
    ]
   },

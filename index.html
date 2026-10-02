@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-02.122";
+var BUILD="2026-10-02.123";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,14 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-02.123",d:"10-02",items:[
+    "맨 위 줄 맨 왼쪽에 시계 — 시:분:초.밀리초 + 날짜 · 요일",
+    "공부계획 완료 = 빈 상자, 누르면 체크 — 오늘 끝낸 것은 체크된 채 줄을 그어 「오늘 무조건」 아래에 남김(다시 누르면 취소)",
+    "학습 큐는 미적2 · 일물2 · 공수1 · 정역학만",
+    "확인 탭: 메모 칸에서 Enter = 보내기, 「보내기」 버튼",
+    "LMS 공지: 지난 공지를 ✕ 로 지움(할 일 탭 · 과목 화면)",
+    "할 일 전체: 2주 넘게 남은 항목은 숨김 · CADD Week2 과제는 「제출 불필요」(3주차 과제로 대신, 교수님)"
+  ]},
   {v:"2026-10-02.122",d:"10-02",items:[
     "교실: 「이전」으로 한 단계 뒤로 — 조작 줄 「이전」(다음 왼쪽) · ← 키 · 칠판을 오른쪽으로 밀기. 챕터 첫 단계면 앞 챕터 마지막 단계, 문제 화면이면 마지막 개념 단계로, 돌아간 단계는 바로 보이고 이어서 하기 위치도 옮겨짐",
     "교실: XP · 하트 · 호감도 표시를 빼고 틀려도 하트가 줄지 않음(하트 0 으로 문제가 막히지 않음)"
@@ -11829,7 +11837,11 @@ var V33={};
   /* ---------- ① 학습 큐 5개 ---------- */
   V59.QN=5;
   V59.trimQueue=function(){
-    var box=$("#stq"); if(!box) return; var rows=$$(".st-row",box); if(rows.length<=V59.QN) return;
+    var box=$("#stq"); if(!box) return;
+    var CORE=["미분적분학2","일반물리학2","공업수학1","정역학"];   /* 대표님 10/2 「학습 큐에는 주요과목들만」 */
+    $$(".st-row",box).forEach(function(r){ var c=r.querySelector(".cchip"); if(c&&CORE.indexOf(c.textContent.trim())<0) r.remove(); });
+    var hs0=$("#stqHs"); if(hs0) hs0.textContent=$$(".st-row",box).length+"단원";
+    var rows=$$(".st-row",box); if(rows.length<=V59.QN) return;
     var all=!!ui.v59qAll;
     rows.forEach(function(r,i){ r.style.display=(all||i<V59.QN)?"":"none"; });
     var b=document.createElement("button"); b.type="button"; b.className="btn xs v59-more";
@@ -12248,9 +12260,15 @@ var V33={};
       return '<li class="m-'+b.k+'"><span class="v60-t">'+hm(b.s)+'–'+hm(b.e)+'</span> '+esc(b.t)+(b.meta&&b.meta.hw?V60.filesHTML(b.meta.hw):'')+
         (b.meta&&b.meta.x?' <button type="button" class="btn xs a" data-v60go="'+b.meta.c.id+'|'+b.meta.x.w+'|'+b.meta.x.date+'">열기</button>':'')+
         (b.meta&&b.meta.memo?' <button type="button" class="btn xs a" data-v60memo="1">카드</button>':'')+
-        (b.meta&&b.meta.hw?' <button type="button" class="btn xs v60-ok" data-v60done="'+esc(b.meta.hw.k)+'">완료</button>':'')+
-        (b.meta&&b.meta.x?' <button type="button" class="btn xs v60-ok" data-v60sdone="'+b.meta.c.id+'|'+b.meta.x.date+'">완료</button>':'')+
-        (b.meta&&b.meta.memo?' <button type="button" class="btn xs v60-ok" data-v60mdone="'+esc(b.meta.d)+'">완료</button>':'')+'</li>'; }).join("")+'</ol>':'<div class="v60-none">'+(T&&T.avail<25?'남은 빈 시간이 없습니다':'배정할 것이 없습니다')+'</div>')+'</div>';
+        (b.meta&&b.meta.hw?' <button type="button" class="v60-chk" data-v60done="'+esc(b.meta.hw.k)+'" aria-label="완료"></button>':'')+
+        (b.meta&&b.meta.x?' <button type="button" class="v60-chk" data-v60sdone="'+b.meta.c.id+'|'+b.meta.x.date+'" aria-label="완료"></button>':'')+
+        (b.meta&&b.meta.memo?' <button type="button" class="v60-chk" data-v60mdone="'+esc(b.meta.d)+'" aria-label="완료"></button>':'')+'</li>'; }).join("")+'</ol>':'<div class="v60-none">'+(T&&T.avail<25?'남은 빈 시간이 없습니다':'배정할 것이 없습니다')+'</div>')+'</div>';
+    /* 오늘 끝낸 것 — 체크된 상자로 남긴다(대표님 10/2 「빈 박스 → 누르면 체크」) */
+    var stx=V60.st(), dd0=function(t){ var x=new Date(t); return x.getFullYear()+"-"+(x.getMonth()<9?"0":"")+(x.getMonth()+1)+"-"+(x.getDate()<10?"0":"")+x.getDate(); };
+    var doneT=[]; P.asg.forEach(function(a){ if(a.done&&stx.done[a.k]&&dd0(stx.done[a.k])===td) doneT.push({t:a.c+" · "+a.t,k:"done:"+a.k}); });
+    Object.keys(stx.sdone||{}).forEach(function(k){ if(dd0(stx.sdone[k])===td){ var c=course(k.split("|")[0]); doneT.push({t:(c?c.name:"")+" · "+V60.md(k.split("|")[1])+" 회차",k:"sdone:"+k}); } });
+    if((stx.mdone||{})[td]) doneT.push({t:"CADD · 암기카드",k:"mdone:"+td});
+    if(doneT.length) mustDo=mustDo.replace(/<\/div>$/,'<div class="v60-donel">'+doneT.map(function(x){ return '<div class="v60-dn"><button type="button" class="v60-chk on" data-v60undo="'+esc(x.k)+'" aria-label="완료 취소"></button><s>'+esc(x.t)+'</s></div>'; }).join("")+'</div></div>');
     var hwMin=tItems.filter(function(b){ return b.k==="hw"; }).reduce(function(a,b){ return a+b.e-b.s; },0), stMin=tItems.filter(function(b){ return b.k!=="hw"; }).reduce(function(a,b){ return a+b.e-b.s; },0);
     var nums='<div class="v60-nums"><span><small>지금부터 빈 시간</small><b>'+dur(T?T.avail:0)+'</b></span><span><small>과제</small><b>'+dur(hwMin)+'</b></span><span><small>공부</small><b>'+dur(stMin)+'</b></span><span><small>오늘 실제 공부</small><b>'+dur(T?T.actual:0)+'</b></span>'+
       (T&&T.slept!=null?'<span class="'+(T.short?'warn':'')+'"><small>어젯밤 수면</small><b>'+dur(T.slept)+'</b></span>':(T&&T.short?'<span class="warn"><small>수면</small><b>부족</b></span>':''))+'</div>';
@@ -12303,6 +12321,7 @@ var V33={};
     $$("[data-v60memo]",body).forEach(function(b){ b.onclick=function(){ openNote(V60.CADD_MEMO+"#flip","CADD 암기카드"); }; });
     var ab=$("#v60aB",body); if(ab) ab.onclick=function(){ var t=($("#v60aT",body).value||"").trim(); if(!t){ toast("할 일을 적어 주세요"); return; } var st=V60.st(); st.extra=st.extra||[];
       st.extra.push({id:uid(),c:$("#v60aC",body).value,t:t,due:$("#v60aD",body).value||td,time:$("#v60aH",body).value||"23:59",est:+$("#v60aM",body).value||60}); persist(); V60.render(); };
+    $$("[data-v60undo]",body).forEach(function(b){ b.onclick=function(){ var st=V60.st(), k=b.dataset.v60undo, i=k.indexOf(":"), t=k.slice(0,i), r=k.slice(i+1); if(t==="done") delete st.done[r]; else if(t==="sdone"&&st.sdone) delete st.sdone[r]; else if(t==="mdone"&&st.mdone) delete st.mdone[r]; persist(); V60.render(); }; });
     $$("[data-v60sdone]",body).forEach(function(b){ b.onclick=function(){ var st=V60.st(); st.sdone=st.sdone||{}; st.sdone[b.dataset.v60sdone]=Date.now(); persist(); toast("완료 — 남은 시간을 다시 배정합니다"); V60.render(); }; });
     $$("[data-v60mdone]",body).forEach(function(b){ b.onclick=function(){ var st=V60.st(); st.mdone=st.mdone||{}; st.mdone[b.dataset.v60mdone]=Date.now(); persist(); V60.render(); }; });
     $$("[data-v60sleep]",body).forEach(function(inp){ inp.onchange=function(){ var st=V60.st(); st.sleep=st.sleep||{}; var o=st.sleep[td]||{}; o[inp.dataset.v60sleep]=inp.value; st.sleep[td]=o; persist(); V60.render(); }; });
@@ -12331,9 +12350,9 @@ var V33={};
       return '<div class="v60-tp '+(pl.home?'home':(pl.campus?'campus':'out'))+(same?' same':'')+'">'+(same?'<i></i>':'<span class="v60-tpn">'+esc(pl.name)+(pl.sub?' <small>'+esc(pl.sub)+'</small>':'')+(pl.ask?' <small class="v60-rask">자리 ❓</small>':'')+'</span>')+'</div>';
     };
     var list=rows.map(function(b,ri){ var past=b.e<=nowM, cur=b.s<=nowM&&nowM<b.e, act="";
-      if(b.meta&&b.meta.hw) act+=' <button type="button" class="btn xs v60-ok" data-v60done="'+esc(b.meta.hw.k)+'">완료</button>';
-      if(b.meta&&b.meta.x) act+=' <button type="button" class="btn xs a" data-v60go="'+b.meta.c.id+'|'+b.meta.x.w+'|'+b.meta.x.date+'">열기</button> <button type="button" class="btn xs v60-ok" data-v60sdone="'+b.meta.c.id+'|'+b.meta.x.date+'">완료</button>';
-      if(b.meta&&b.meta.memo) act+=' <button type="button" class="btn xs a" data-v60memo="1">카드</button> <button type="button" class="btn xs v60-ok" data-v60mdone="'+esc(b.meta.d)+'">완료</button>';
+      if(b.meta&&b.meta.hw) act+=' <button type="button" class="v60-chk" data-v60done="'+esc(b.meta.hw.k)+'" aria-label="완료"></button>';
+      if(b.meta&&b.meta.x) act+=' <button type="button" class="btn xs a" data-v60go="'+b.meta.c.id+'|'+b.meta.x.w+'|'+b.meta.x.date+'">열기</button> <button type="button" class="v60-chk" data-v60sdone="'+b.meta.c.id+'|'+b.meta.x.date+'" aria-label="완료"></button>';
+      if(b.meta&&b.meta.memo) act+=' <button type="button" class="btn xs a" data-v60memo="1">카드</button> <button type="button" class="v60-chk" data-v60mdone="'+esc(b.meta.d)+'" aria-label="완료"></button>';
       return '<div class="v60-tr'+(past?' past':'')+(cur?' cur':'')+'"><span class="v60-tt">'+hm2(b.s)+'<small>'+hm2(b.e)+'</small></span><i class="v60-tb k-'+b.k+'"></i><div class="v60-tx"><span class="v60-tk">'+esc(V60.KN[b.k]||"")+(cur?' · 지금':'')+'</span><b>'+esc(b.t)+'</b>'+(b.note?' <span class="v60-note">'+esc(b.note)+'</span>':'')+(b.meta&&b.meta.hw?V60.filesHTML(b.meta.hw):'')+act+'</div>'+placeCell(ri)+'</div>'; }).join("");
     if(T){ list+='<div class="v60-tr bed"><span class="v60-tt">'+hm2(T.bed)+'</span><i class="v60-tb k-sleep"></i><div class="v60-tx"><span class="v60-tk">수면</span><b>취침</b></div><div class="v60-tp home"><span class="v60-tpn">'+esc((V60.stayAt(T.d,T.bed)||{place:"집"}).place)+'</span></div></div>'; }
     return '<div class="card v60-today"><div class="card-h"><h3>오늘 '+esc(V60.md(today()))+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b"><div class="v60-thead"><span>시각</span><span></span><span>일정</span><span>장소 · 이동</span></div><div class="v60-tlist">'+(list||'<div class="empty">일정이 없습니다.</div>')+'</div></div></div>';
@@ -12394,7 +12413,7 @@ var V33={};
     wkItemHTML=function(it,mon,td){ if(it.done) return ""; if(it.due&&it.due<(td||today())) return ""; return _wk.apply(this,arguments); };
     var _ta=renderTaskAll;
     renderTaskAll=function(){ _ta.apply(this,arguments);
-      var td=today(); $$("#taskAllBox .row-t").forEach(function(r){ if(r.querySelector(".sub2.over")||r.querySelector(".tx.done")) r.remove(); });
+      var td=today(); $$("#taskAllBox .row-t").forEach(function(r){ var m=(r.textContent||"").match(/D-(\d+)/); if(r.querySelector(".sub2.over")||r.querySelector(".tx.done")||(m&&+m[1]>14)) r.remove(); });   /* 2주 넘게 남은 것은 숨김(대표님 10/2) */
       var hs=$("#taskAllHs"); if(hs) hs.textContent=$$("#taskAllBox .row-t").length+"건";
       var box=$("#taskAllBox .tka"); if(box&&!box.children.length) box.innerHTML='<div class="hint" style="padding:12px 14px">남은 할 일이 없습니다.</div>'; };
   };
@@ -12536,6 +12555,9 @@ var V33={};
     ".v47-fold{padding:10px 12px;font-size:13px;border-top:1px solid var(--line)}",
     "#v-study .v47-n{color:#E6ECF5;background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2)}#v-study .v47-n.st-known{background:rgba(88,204,2,.2);border-color:#58CC02;color:#EAF8DD}",
     "#v-study .v47-steps{color:#E6ECF5}#v-study .v47-wk{border-color:rgba(255,255,255,.14)!important}#v-study .v47-legend .v44-mut,#v-study .v47-fold .v44-mut{color:#AEB8CC}",
+    ".v60-chk{display:inline-block;width:26px;height:26px;border:2px solid var(--ink-3,#8a93a8);border-radius:7px;background:var(--surface);vertical-align:middle;margin-left:6px;cursor:pointer;padding:0;position:relative}",
+    ".v60-chk:hover{border-color:var(--ac,#4F9A35)}.v60-chk.on{background:var(--ac,#4F9A35);border-color:var(--ac,#4F9A35)}.v60-chk.on::after{content:'';position:absolute;left:7px;top:2px;width:7px;height:13px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg)}",
+    ".v60-donel{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);display:flex;flex-direction:column;gap:4px}.v60-dn{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink-3)}.v60-dn .v60-chk{margin-left:0}",
     ".v60-sh{font-weight:800;font-size:13px;margin:12px 0 6px}.v60-ok{border-color:var(--ok,#15803D)!important;color:var(--ok,#15803D)!important}",
     ".v60-callist{margin-top:12px;display:flex;flex-direction:column;gap:6px}",
     ".v60-cev{background:#1E5FA8!important;color:#fff!important}.v60-cev.hot{background:#C7261B!important}",
@@ -12719,12 +12741,13 @@ var V33={};
         (q.att||[]).map(V64.attHTML).join("")+
         (ans?'<div class="v64-ans"><b>'+esc(ans.a)+'</b>'+(ans.note?' — '+esc(ans.note):'')+' <button type="button" class="btn xs" data-v64undo="'+esc(q.id)+'">다시 답하기</button></div>'
           :'<div class="v64-opts">'+opts.map(function(o){ return '<button type="button" class="btn'+(o==="모르겠어요"?'':' a')+'" data-v64a="'+esc(o)+'">'+esc(o)+'</button>'; }).join("")+'</div>'+
-           '<textarea class="input v64-note" rows="2" placeholder="메모"></textarea>')+'</div></div>';
+           '<div class="v64-mrow"><textarea class="input v64-note" rows="2" placeholder="메모"></textarea><button type="button" class="btn a v64-send" data-v64a="메모">보내기</button></div>')+'</div></div>';
     };
     body.innerHTML=(open.length?open.map(function(q){ return card(q,null); }).join(""):'<div class="empty">지금 확인할 것이 없습니다.</div>')+
       (done.length?'<details class="v64-done"><summary>답한 것 '+done.length+'</summary>'+done.map(function(q){ return card(q,a[q.id]); }).join("")+'</details>':'');
     $$("[data-v64a]",body).forEach(function(b){ b.onclick=function(){ var c=b.closest("[data-q]"), id=c.dataset.q, note=(c.querySelector(".v64-note")||{}).value||"";
       V64.ans()[id]={a:b.dataset.v64a,note:note.trim(),at:Date.now()}; persist(); toast("답을 보냈어요"); V64.render(); V64.badge(); }; });
+    $$(".v64-note",body).forEach(function(t){ t.addEventListener("keydown",function(e){ if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){ e.preventDefault(); if(!t.value.trim()) return; var b=t.closest("[data-q]").querySelector(".v64-send"); if(b) b.click(); } }); });
     $$("[data-v64undo]",body).forEach(function(b){ b.onclick=function(){ delete V64.ans()[b.dataset.v64undo]; persist(); V64.render(); V64.badge(); }; });
   };
 
@@ -12773,7 +12796,7 @@ var V33={};
     ".v64-att figcaption{font-size:12.5px;color:var(--ink-3);margin-top:4px}.v64-att q{display:block;margin-top:4px;color:var(--ink);font-size:13.5px}",
     ".v64-quote{margin:10px 0 0;padding:8px 12px;border-left:3px solid var(--line);background:var(--surface-2);border-radius:8px;font-size:13.5px}.v64-quote cite{display:block;font-size:11.5px;color:var(--ink-3);font-style:normal;margin-top:4px}",
     ".v64-opts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.v64-opts .btn{min-height:46px;padding:0 18px}",
-    ".v64-note{margin-top:8px;width:100%;min-height:44px}",
+    ".v64-mrow{display:flex;gap:8px;margin-top:8px;align-items:stretch}.v64-note{flex:1;min-height:44px}.v64-send{min-width:84px}",
     ".v64-ans{margin-top:10px;font-size:14px}",
     ".v64-done{margin:12px 0 24px}.v64-done summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}",
     ".v64-play{margin-left:6px;min-height:30px;vertical-align:middle}",
@@ -12782,6 +12805,71 @@ var V33={};
     ".v64-plh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}",
     ".v64-plv video{width:100%;max-height:60vh;background:#000;border-radius:10px}.v64-plv audio{width:100%}.v64-plv .v60-file{margin-top:6px}",
     ".v64-pll{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.v64-pi{border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 12px;font:inherit;font-size:13px;min-height:40px;cursor:pointer}.v64-pi.on{border-color:var(--ac,#4F9A35);font-weight:800}.v64-pi small{margin-left:6px;color:var(--ink-3)}"
+  ].join("\n");
+  document.head.appendChild(css);
+})();
+/* ============================================================
+   V65 LAYER — 대표님 2026-10-02 (BUILD 2026-10-02.123)
+   ① 맨 위 줄(중간고사 · 저장 · 새로고침) 맨 왼쪽에 시계 — 시:분:초.밀리초 + 날짜 · 요일
+   ② LMS 공지 지우기 — 지난 공지(추석 클리닉룸 · 지난 휴강 등)를 ✕ 로 숨김(S.lmsHide), 할 일 탭 · 과목 화면 둘 다
+   ============================================================ */
+(function(){
+  if(window.V65) return;
+  var V65=window.V65={};
+  var DW=["일","월","화","수","목","금","토"];
+  function p2(n){ return (n<10?"0":"")+n; }
+  function p3(n){ return (n<10?"00":n<100?"0":"")+n; }
+
+  /* ---------- ① 시계 ---------- */
+  V65.clock=function(){
+    var g=$(".topbar .topact"); if(!g) return; var old=$("#v65Clock"); if(old&&old.parentNode===g&&g.firstChild===old) return; if(old) old.remove();
+    var el=document.createElement("div"); el.id="v65Clock"; el.className="v65-clock";
+    el.innerHTML='<span class="v65-t"><b id="v65H">--:--:--</b><small id="v65Ms">.000</small></span><span class="v65-d" id="v65D"></span>';
+    g.insertBefore(el,g.firstChild);   /* 중간고사 D-day · 저장 · 새로고침 줄의 맨 왼쪽 */
+    var tick=function(){ var d=new Date();
+      var h=$("#v65H"), m=$("#v65Ms"), dd=$("#v65D"); if(!h) return;
+      h.textContent=p2(d.getHours())+":"+p2(d.getMinutes())+":"+p2(d.getSeconds()); m.textContent="."+p3(d.getMilliseconds());
+      var s=(d.getMonth()+1)+"월 "+d.getDate()+"일 ("+DW[d.getDay()]+")"; if(dd.textContent!==s) dd.textContent=s;
+      requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  };
+
+  /* ---------- ② LMS 공지 지우기 ---------- */
+  V65.key=function(a){ return String(a.id||a.url||((a.title||"")+"|"+(a.posted||""))); };
+  V65.hidden=function(){ S.lmsHide=S.lmsHide||{}; return S.lmsHide; };
+  V65.hook=function(){
+    if(!window.V25||!V25.lms||V25._v65) return; V25._v65=true;
+    var _l=V25.lms;
+    V25.lms=function(cb){ _l(function(st){
+      if(st&&st.announcements){ var h=V65.hidden(); st=Object.assign({},st,{announcements:st.announcements.filter(function(a){ return !h[V65.key(a)]; })}); }
+      V65.last=st; cb(st); setTimeout(V65.decorate,0); }); };
+  };
+  V65.decorate=function(){
+    var st=V65.last; if(!st) return; var ann=st.announcements||[];
+    [["#lmsTodoBox",null,5],["#lmsCourseBox","course",4]].forEach(function(x){
+      var box=$(x[0]); if(!box) return; var list=ann;
+      if(x[1]==="course"){ var c=ui.course&&course(ui.course), lc=c&&V25.lmsCourse?V25.lmsCourse(c,st):null; if(!lc) return; list=ann.filter(function(a){ return a.course_id===lc.id; }); }
+      list=list.slice(0,x[2]);
+      var hint=[].filter.call(box.querySelectorAll(".hint"),function(h){ return /공지/.test(h.textContent); })[0]; if(!hint) return;
+      var rows=[], n=hint.nextElementSibling; while(n&&n.classList.contains("lrow")){ rows.push(n); n=n.nextElementSibling; }
+      rows.forEach(function(r,i){ var a=list[i]; if(!a||r.querySelector(".v65-x")) return;
+        var b=document.createElement("button"); b.type="button"; b.className="v65-x"; b.setAttribute("aria-label","공지 지우기"); b.textContent="✕";
+        b.onclick=function(){ V65.hidden()[V65.key(a)]=Date.now(); persist(); r.remove(); toast("공지를 지웠어요"); };
+        r.appendChild(b); });
+    });
+  };
+
+  var _render=render;
+  render=function(){ V65.hook(); _render.apply(this,arguments); V65.clock(); };
+
+  var css=document.createElement("style"); css.id="v65css";
+  css.textContent=[
+    ".v65-clock{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;line-height:1.05;margin-right:4px;padding:4px 12px;border-radius:12px;background:var(--surface-2,rgba(31,42,68,.05));border:1px solid var(--line);font-variant-numeric:tabular-nums;white-space:nowrap}",
+    ".v65-t b{font-size:17px;font-weight:800;letter-spacing:.01em}.v65-t small{font-size:12px;font-weight:700;color:var(--ink-3);margin-left:1px;display:inline-block;width:30px}",
+    ".v65-d{font-size:11px;font-weight:700;color:var(--ink-2)}",
+    ".topbar-in{align-items:center}",
+    "@media (max-width:600px){.v65-clock{padding:2px 8px;margin-right:6px}.v65-t b{font-size:14px}.v65-t small{font-size:10px;width:24px}.v65-d{font-size:10px}}",
+    ".v65-x{flex:none;width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink-3);font-size:14px;cursor:pointer;margin-left:6px}.v65-x:hover{color:#C7261B;border-color:#C7261B}"
   ].join("\n");
   document.head.appendChild(css);
 })();

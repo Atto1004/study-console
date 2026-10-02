@@ -72,12 +72,13 @@
         (q.att||[]).map(V64.attHTML).join("")+
         (ans?'<div class="v64-ans"><b>'+esc(ans.a)+'</b>'+(ans.note?' — '+esc(ans.note):'')+' <button type="button" class="btn xs" data-v64undo="'+esc(q.id)+'">다시 답하기</button></div>'
           :'<div class="v64-opts">'+opts.map(function(o){ return '<button type="button" class="btn'+(o==="모르겠어요"?'':' a')+'" data-v64a="'+esc(o)+'">'+esc(o)+'</button>'; }).join("")+'</div>'+
-           '<textarea class="input v64-note" rows="2" placeholder="메모"></textarea>')+'</div></div>';
+           '<div class="v64-mrow"><textarea class="input v64-note" rows="2" placeholder="메모"></textarea><button type="button" class="btn a v64-send" data-v64a="메모">보내기</button></div>')+'</div></div>';
     };
     body.innerHTML=(open.length?open.map(function(q){ return card(q,null); }).join(""):'<div class="empty">지금 확인할 것이 없습니다.</div>')+
       (done.length?'<details class="v64-done"><summary>답한 것 '+done.length+'</summary>'+done.map(function(q){ return card(q,a[q.id]); }).join("")+'</details>':'');
     $$("[data-v64a]",body).forEach(function(b){ b.onclick=function(){ var c=b.closest("[data-q]"), id=c.dataset.q, note=(c.querySelector(".v64-note")||{}).value||"";
       V64.ans()[id]={a:b.dataset.v64a,note:note.trim(),at:Date.now()}; persist(); toast("답을 보냈어요"); V64.render(); V64.badge(); }; });
+    $$(".v64-note",body).forEach(function(t){ t.addEventListener("keydown",function(e){ if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){ e.preventDefault(); if(!t.value.trim()) return; var b=t.closest("[data-q]").querySelector(".v64-send"); if(b) b.click(); } }); });
     $$("[data-v64undo]",body).forEach(function(b){ b.onclick=function(){ delete V64.ans()[b.dataset.v64undo]; persist(); V64.render(); V64.badge(); }; });
   };
 
@@ -126,7 +127,7 @@
     ".v64-att figcaption{font-size:12.5px;color:var(--ink-3);margin-top:4px}.v64-att q{display:block;margin-top:4px;color:var(--ink);font-size:13.5px}",
     ".v64-quote{margin:10px 0 0;padding:8px 12px;border-left:3px solid var(--line);background:var(--surface-2);border-radius:8px;font-size:13.5px}.v64-quote cite{display:block;font-size:11.5px;color:var(--ink-3);font-style:normal;margin-top:4px}",
     ".v64-opts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.v64-opts .btn{min-height:46px;padding:0 18px}",
-    ".v64-note{margin-top:8px;width:100%;min-height:44px}",
+    ".v64-mrow{display:flex;gap:8px;margin-top:8px;align-items:stretch}.v64-note{flex:1;min-height:44px}.v64-send{min-width:84px}",
     ".v64-ans{margin-top:10px;font-size:14px}",
     ".v64-done{margin:12px 0 24px}.v64-done summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}",
     ".v64-play{margin-left:6px;min-height:30px;vertical-align:middle}",

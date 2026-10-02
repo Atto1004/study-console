@@ -60,7 +60,11 @@
   /* ---------- ① 학습 큐 5개 ---------- */
   V59.QN=5;
   V59.trimQueue=function(){
-    var box=$("#stq"); if(!box) return; var rows=$$(".st-row",box); if(rows.length<=V59.QN) return;
+    var box=$("#stq"); if(!box) return;
+    var CORE=["미분적분학2","일반물리학2","공업수학1","정역학"];   /* 대표님 10/2 「학습 큐에는 주요과목들만」 */
+    $$(".st-row",box).forEach(function(r){ var c=r.querySelector(".cchip"); if(c&&CORE.indexOf(c.textContent.trim())<0) r.remove(); });
+    var hs0=$("#stqHs"); if(hs0) hs0.textContent=$$(".st-row",box).length+"단원";
+    var rows=$$(".st-row",box); if(rows.length<=V59.QN) return;
     var all=!!ui.v59qAll;
     rows.forEach(function(r,i){ r.style.display=(all||i<V59.QN)?"":"none"; });
     var b=document.createElement("button"); b.type="button"; b.className="btn xs v59-more";
