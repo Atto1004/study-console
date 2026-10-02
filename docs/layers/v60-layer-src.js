@@ -324,13 +324,28 @@
   V60.todayHTML=function(T,nowM,seg){
     var rows=T?T.blk.concat(T.items).filter(function(b){ return b.e>T.wake-1; }).sort(function(a,b){ return a.s-b.s||a.e-b.e; }):[];
     var hm2=function(m){ m=Math.round(m); return (m>=1440?"익일 ":"")+(Math.floor(m/60)%24<10?"0":"")+(Math.floor(m/60)%24)+":"+(m%60<10?"0":"")+(m%60); };
-    var list=rows.map(function(b){ var past=b.e<=nowM, cur=b.s<=nowM&&nowM<b.e, act="";
+    var sc=rows.filter(function(b){ return b.school; }), back=rows.filter(function(b){ return b.t==="귀가"; });
+    var sch=sc.length?{s:Math.min.apply(null,sc.map(function(b){ return b.s; })),e:back.length?back[back.length-1].s:Math.max.apply(null,sc.map(function(b){ return b.e; }))}:null;
+    var places=rows.map(function(b){ return b.k==="move"?null:V60.placeOf(b,sch); });
+    places.forEach(function(pl,i){ if(pl&&pl.soft){ for(var x=i-1;x>=0;x--){ if(places[x]){ if(places[x].campus) places[i]=places[x]; break; } } } });
+    var label=function(pl){ return pl?(pl.name+(pl.sub&&!pl.soft?" "+pl.sub:"")):""; };
+    var prevKey=null;
+    var placeCell=function(i){
+      var b=rows[i], pl=places[i];
+      if(b.k==="move"){ var from=null,to=null; for(var x=i-1;x>=0;x--){ if(places[x]){ from=places[x]; break; } } for(var y=i+1;y<rows.length;y++){ if(places[y]){ to=places[y]; break; } }
+        if(!from) from={name:"집",home:1}; if(!to) to={name:"집",home:1};
+        return '<div class="v60-tp mv"><span>'+esc(from.name)+'</span><b>→</b><span>'+esc(to.name+(to.sub&&!to.soft&&to.campus&&to.name!=="학교"?" "+to.sub:""))+'</span></div>'; }
+      if(!pl) return '<div class="v60-tp"></div>';
+      var same=prevKey!=null&&prevKey===label(pl); prevKey=label(pl);
+      return '<div class="v60-tp '+(pl.home?'home':(pl.campus?'campus':'out'))+(same?' same':'')+'">'+(same?'<i></i>':'<span class="v60-tpn">'+esc(pl.name)+(pl.sub?' <small>'+esc(pl.sub)+'</small>':'')+(pl.ask?' <small class="v60-rask">자리 ❓</small>':'')+'</span>')+'</div>';
+    };
+    var list=rows.map(function(b,ri){ var past=b.e<=nowM, cur=b.s<=nowM&&nowM<b.e, act="";
       if(b.meta&&b.meta.hw) act+=' <button type="button" class="btn xs v60-ok" data-v60done="'+esc(b.meta.hw.k)+'">완료</button>';
       if(b.meta&&b.meta.x) act+=' <button type="button" class="btn xs a" data-v60go="'+b.meta.c.id+'|'+b.meta.x.w+'|'+b.meta.x.date+'">열기</button> <button type="button" class="btn xs v60-ok" data-v60sdone="'+b.meta.c.id+'|'+b.meta.x.date+'">완료</button>';
       if(b.meta&&b.meta.memo) act+=' <button type="button" class="btn xs a" data-v60memo="1">카드</button> <button type="button" class="btn xs v60-ok" data-v60mdone="'+esc(b.meta.d)+'">완료</button>';
-      return '<div class="v60-tr'+(past?' past':'')+(cur?' cur':'')+'"><span class="v60-tt">'+hm2(b.s)+'<small>'+hm2(b.e)+'</small></span><i class="v60-tb k-'+b.k+'"></i><div class="v60-tx"><span class="v60-tk">'+esc(V60.KN[b.k]||"")+(cur?' · 지금':'')+'</span><b>'+esc(b.t)+'</b>'+(b.meta&&b.meta.hw?V60.filesHTML(b.meta.hw):'')+act+'</div></div>'; }).join("");
-    if(T){ list+='<div class="v60-tr bed"><span class="v60-tt">'+hm2(T.bed)+'</span><i class="v60-tb k-sleep"></i><div class="v60-tx"><span class="v60-tk">수면</span><b>취침</b></div></div>'; }
-    return '<div class="card v60-today"><div class="card-h"><h3>오늘 '+esc(V60.md(today()))+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b v60-tday"><div class="v60-tlist">'+(list||'<div class="empty">일정이 없습니다.</div>')+'</div>'+V60.routeHTML(T,nowM)+'</div></div>';
+      return '<div class="v60-tr'+(past?' past':'')+(cur?' cur':'')+'"><span class="v60-tt">'+hm2(b.s)+'<small>'+hm2(b.e)+'</small></span><i class="v60-tb k-'+b.k+'"></i><div class="v60-tx"><span class="v60-tk">'+esc(V60.KN[b.k]||"")+(cur?' · 지금':'')+'</span><b>'+esc(b.t)+'</b>'+(b.meta&&b.meta.hw?V60.filesHTML(b.meta.hw):'')+act+'</div>'+placeCell(ri)+'</div>'; }).join("");
+    if(T){ list+='<div class="v60-tr bed"><span class="v60-tt">'+hm2(T.bed)+'</span><i class="v60-tb k-sleep"></i><div class="v60-tx"><span class="v60-tk">수면</span><b>취침</b></div><div class="v60-tp home"><span class="v60-tpn">집</span></div></div>'; }
+    return '<div class="card v60-today"><div class="card-h"><h3>오늘 '+esc(V60.md(today()))+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b"><div class="v60-thead"><span>시각</span><span></span><span>일정</span><span>장소 · 이동</span></div><div class="v60-tlist">'+(list||'<div class="empty">일정이 없습니다.</div>')+'</div></div></div>';
   };
 
   /* ---------- 오늘의 이동 경로 (대표님 10/2 「오늘만 우측 여백에 일정에 따른 나의 위치 이동, 이동 경로」) ----------
@@ -447,7 +462,15 @@
     ".v60-set{margin:4px 0 20px}.v60-set summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}.v60-sf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.v60-sf label{display:flex;flex-direction:column;font-size:12.5px;gap:3px}",
     ".v60-add{display:grid;grid-template-columns:130px 1fr 140px 110px 80px auto;gap:6px;padding:10px 12px}.v60-add .input{min-height:42px}",
     "@media (max-width:760px){.v60-add{grid-template-columns:1fr 1fr}.v60-add #v60aT{grid-column:1/-1}}",
-    ".v60-tr{display:grid;grid-template-columns:64px 6px 1fr;gap:10px;align-items:stretch;padding:4px 0;min-height:44px}",
+    ".v60-tr{display:grid;grid-template-columns:64px 6px minmax(0,1fr) 210px;gap:10px;align-items:stretch;padding:4px 0;min-height:44px}",
+    ".v60-thead{display:grid;grid-template-columns:64px 6px minmax(0,1fr) 210px;gap:10px;font-size:11.5px;font-weight:800;color:var(--ink-3);padding:0 0 6px;border-bottom:1px solid var(--line);margin-bottom:4px}",
+    ".v60-tp{display:flex;align-items:center;gap:6px;padding:6px 10px;border-left:3px solid transparent;font-size:13px;min-width:0}",
+    ".v60-tp.home{border-left-color:#9CB78B}.v60-tp.campus{border-left-color:#1E5FA8}.v60-tp.out{border-left-color:#C26A12}",
+    ".v60-tpn{font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.v60-tpn small{font-weight:600;color:var(--ink-2);font-size:12px}",
+    ".v60-tp.same{padding-top:0;padding-bottom:0}.v60-tp.same i{display:block;width:2px;align-self:stretch;margin-left:6px;background:currentColor;opacity:.25}",
+    ".v60-tp.same.home i{color:#9CB78B;opacity:.6}.v60-tp.same.campus i{color:#1E5FA8;opacity:.5}.v60-tp.same.out i{color:#C26A12;opacity:.5}",
+    ".v60-tp.mv{color:#C7261B;font-weight:700;font-size:12.5px;border-left:3px dashed #C7261B;flex-wrap:wrap}.v60-tp.mv b{font-size:14px}",
+    "@media (max-width:700px){.v60-tr{grid-template-columns:52px 5px minmax(0,1fr)}.v60-thead{display:none}.v60-tp{grid-column:3;padding:0 0 4px 0;border-left:0;font-size:12px}.v60-tp.same{display:none}.v60-tt{font-size:13px}}",
     ".v60-tt{font-weight:800;font-variant-numeric:tabular-nums;font-size:14px;line-height:1.2;padding-top:6px}.v60-tt small{display:block;font-weight:600;font-size:11.5px;color:var(--ink-3)}",
     ".v60-tb{border-radius:4px}.v60-tb.k-cls{background:#5B6B8C}.v60-tb.k-work{background:#C26A12}.v60-tb.k-ev{background:#7A869A}.v60-tb.k-meal,.v60-tb.k-life{background:#9CB78B}.v60-tb.k-move{background:#C9D1DC}.v60-tb.k-hw{background:#C7261B}.v60-tb.k-st{background:#1E5FA8}.v60-tb.k-memo{background:#7C3AED}.v60-tb.k-sleep{background:repeating-linear-gradient(135deg,#8A93A8 0 4px,#C9CFDB 4px 8px)}",
     ".v60-tx{padding:6px 0;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:14.5px}.v60-tx b{font-weight:700}",
