@@ -34,12 +34,57 @@ SESS = [  # 날짜, 라벨, 범위 PDF 쪽(대표님 회차 표시 기준), 진�
 ]
 e = html.escape
 
+# 대표님 10/2 「시험에 나온다고 언급한 거는 형광펜, 빨간 펜, 별표, 교수님이 시험에 나온다고 하심 같은 것들로 표시」
+# (범위 PDF 쪽, 형광펜 칠할 슬라이드 글자, 등급, 빨간 펜 메모) — 근거 = 회차 정리.md ⑥ · 녹음 원문(인용은 「」 그대로)
+# 등급: exam = ★★ 교수님: 시험에 나온다 · memo = ★ 교수님: 꼭 외울 것 · emph = 교수님 강조 · note = 메모만(형광펜 없음)
+MARKS = [
+ (26, ["정리1)", "정리2)"], "memo", "9/16 「수학도 일정 부분은 외워야 돼요」 — 적분인자 정리 1·2"),
+ (31, ["비제차미분방정식의해법"], "memo", "9/11 해 공식 y = e^(−h)[∫e^h·r dx + c] — 두 번 반복, 외울 것"),
+ (32, [], "note", "9/11 「특수한 함수 적분은 시험에 나오면 공식을 알려줄 거예요」"),
+ (35, ["Bernoulli Equation"], "memo", "9/16 외울 것 — 베르누이 치환 u = y^(1−a)"),
+ (41, ["단, 이정리는비제차선형방정식또는비선형방정식에서는성립하지않는다."], "emph", "9/16 교재 빨간 글씨 — 제차 선형에만 성립(반례와 함께 강조)"),
+ (43, ["일차독립(Linearly Independent)"], "emph", "9/16 교수님 정정 — 비례하면 종속, 아니면 독립"),
+ (58, ["보조방정식:"], "memo", "9/23 「이거 한 바닥에 있는 거는 외워야 된다」 · 보조방정식 m² + (a−1)m + b 「이거 주의해야 된다」"),
+ (61, ["Ex. 1 오일러-코시방정식"], "exam", "9/23 「시험 볼 때는 오일러-코시 방정식이라고 주어지지 않아요」 — 꼴을 보고 알아볼 것"),
+ (62, ["예제) 다음오일러-코시방정식의해를구하시오."], "exam", "9/23 「중간고사 볼 때도 풀이 과정이 다 있어야 돼 … 없으면 점수를 안 줘요」"),
+ (64, ["정리2) 해의일차종속과일차독립"], "emph", "9/23 「정리 2는 상당히 중요한 정리」 — 증명은 안 함"),
+ (67, ["표2.1 미정계수방법"], "memo", "9/30 「표 2.1, 이거는 여러분들이 알아야 돼요. 꼭 알아야 돼요」"),
+ (68, ["변형규칙(Modification Rule)", "미정계수법에대한선택규칙"], "exam", "9/30 변형 규칙 「굉장히 시험이 잘 나와요」 · 선택 규칙 세 가지 「이것도 알아야 돼요」"),
+ (72, ["예제) 다음미분방정식의해를구하시오."], "exam", "9/30 「중간고사도 그냥 기본 규칙은 안 쓸 거예요」 → 변형 + 합 규칙 문제"),
+]
+MARK_HEAD = {"exam": "★★ 교수님: 시험에 나온다", "memo": "★ 교수님: 꼭 외울 것", "emph": "● 교수님 강조", "note": "✎ 교수님"}
+FONT = r"C:\Windows\Fonts\malgunbd.ttf"
+RED = (0.80, 0.08, 0.10)
+
+
+def mark_page(pg, words, lvl, memo):
+    """원본 슬라이드 위에 직접 그린다(주석 아님 — 어느 앱에서나 보이게)"""
+    pg.insert_font(fontname="mk", fontfile=FONT)
+    for w in words:
+        hits = pg.search_for(w)
+        if hits:
+            y0 = hits[0].y0
+            hits = [h for h in hits if abs(h.y0 - y0) < 40]  # 같은 문구(한두 줄)만 — 같은 글자가 다른 곳에 또 있으면 제외
+        for i, r in enumerate(hits):
+            box = pymupdf.Rect(r.x0 - 2, r.y0 - 1, r.x1 + 2, r.y1 + 1)
+            pg.draw_rect(box, color=None, fill=(1.0, 0.92, 0.25), fill_opacity=0.45, overlay=True)
+            if lvl == "exam":
+                pg.draw_line(pymupdf.Point(box.x0, box.y1 + 1.5), pymupdf.Point(box.x1, box.y1 + 1.5), color=RED, width=1.6)
+            if lvl in ("exam", "memo") and i == 0:
+                pg.insert_text(pymupdf.Point(max(4, box.x0 - 17), box.y1 - 1), "★", fontname="mk", fontsize=14, color=RED)
+    # 빨간 펜 메모 — 제목 위 여백(위 0~44pt)
+    head = MARK_HEAD[lvl]
+    rect = pymupdf.Rect(286, 3, 714, 37)
+    pg.draw_rect(rect, color=RED, width=1.2, fill=(1, 1, 1), fill_opacity=0.92, overlay=True, radius=0.12)
+    pg.insert_textbox(pymupdf.Rect(rect.x0 + 6, rect.y0 + 3, rect.x1 - 4, rect.y1), head + "  " + memo,
+                      fontname="mk", fontsize=8.6, color=RED, align=0)
+
 
 def slide_title(doc, p):
     t = doc[p - 1].get_text()
     for line in t.splitlines():
         line = line.strip()
-        if re.match(r"^\d\.\d{1,2}\s*\S", line):
+        if re.match(r"^\d\.\d{1,2}\s*(?:\d계)?[가-힣]", line):
             return line
     return ""
 
@@ -75,8 +120,8 @@ body{font-family:'Noto Serif KR','Batang',serif;color:#111;-webkit-print-color-a
 .ex{margin:0;padding:0;list-style:none}
 .ex li{position:relative;padding-left:16pt;margin:0 0 5pt;font-size:var(--fs,13pt);line-height:1.42}
 .ex li::before{content:"";position:absolute;left:1pt;top:.5em;width:7pt;height:7pt;border-radius:50%;background:#A5301E}
-.exam{border:1.2pt solid #C2185B;background:#FDF0F4;border-radius:4pt;padding:6pt 9pt}
-.exam b{display:block;font-family:'Noto Sans KR',sans-serif;font-size:9.5pt;color:#C2185B;margin-bottom:2pt}
+.exam{border:1.8pt solid #CC141A;background:linear-gradient(transparent 0,#FFF6B0 0);border-radius:4pt;padding:6pt 9pt;box-shadow:2pt 2pt 0 rgba(204,20,26,.18)}
+.exam b{display:block;font-family:'Noto Sans KR',sans-serif;font-size:10pt;color:#CC141A;margin-bottom:2pt}
 .exam div{font-size:calc(var(--fs,13pt) - 1pt);line-height:1.4}
 .note{font-family:'Noto Sans KR',sans-serif;font-size:10.5pt;color:#555;border-left:3pt solid #999;padding:2pt 8pt}
 .ph{flex:0 0 46%;display:flex;flex-direction:column;gap:6pt;min-height:0}
@@ -87,8 +132,8 @@ body{font-family:'Noto Serif KR','Batang',serif;color:#111;-webkit-print-color-a
 .grid figure{margin:0;display:flex;flex-direction:column;border:.8pt solid #ccc;border-radius:3pt;overflow:hidden;min-height:0}
 .grid img{flex:1;min-height:0;width:100%;object-fit:contain;background:#fff}
 .grid figcaption{font-family:'Noto Sans KR',sans-serif;font-size:8.5pt;padding:2pt 5pt;background:#fafafa;border-top:.6pt solid #ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-table.ss{border-collapse:collapse;width:100%;font-size:10.5pt}
-table.ss th,table.ss td{border-bottom:.8pt solid #bbb;padding:4pt 6pt;text-align:left;vertical-align:top}
+table.ss{border-collapse:collapse;width:100%;font-size:calc(var(--fs,13pt) - 2.5pt)}
+table.ss th,table.ss td{border-bottom:.8pt solid #bbb;padding:3pt 5pt;text-align:left;vertical-align:top}
 table.ss th{font-family:'Noto Sans KR',sans-serif;font-size:9.5pt;color:#555;border-bottom:1.4pt solid #111}
 table.ss td.d{white-space:nowrap;font-weight:600}
 .legend{font-family:'Noto Sans KR',sans-serif;font-size:9.5pt;color:#444;margin-top:10pt;line-height:1.6}
@@ -115,7 +160,7 @@ def page_block(title, tag, abs_, sub, explain, exam, note, photos):
     if explain:
         col += '<ul class="ex">' + "".join("<li>%s</li>" % e(x) for x in explain) + "</ul>"
     if exam:
-        col += '<div class="exam"><b>★ 시험 언급</b>' + "".join("<div>%s</div>" % e(x) for x in exam) + "</div>"
+        col += '<div class="exam"><b>★★ 교수님: 시험에 나온다고 하심</b>' + "".join("<div>%s</div>" % e(x) for x in exam) + "</div>"
     t += '<div class="body"><div class="col">%s</div>' % col
     if photos:
         t += '<div class="ph">' + "".join('<figure><img src="%s"><figcaption>%s</figcaption></figure>' % (p, e(c)) for p, c in photos) + "</div>"
@@ -197,6 +242,19 @@ def main():
     if "2026-10-02" not in recs:
         pages.append((75, page_block("2.9 모델화: 전기회로", "6주차 금 10/2 · 녹음 변환 대기", True, "10/2 수업 기록 — 클로바 녹음 변환 · 판서 사진 수신 대기",
                                      [], [], "녹음이 들어오면 이 쪽을 교수님 설명으로 바꿔 다시 뽑는다.", [])))
+    # 시험 표시 모아보기(표지 다음) — 최종 쪽 번호 계산: 앞쪽 2장 + 슬라이드 p 앞의 (슬라이드 + 끼움)
+    cnt = {}
+    for ap, _ in pages:
+        if ap: cnt[ap] = cnt.get(ap, 0) + 1
+    def final_page(p):
+        return 2 + sum(1 + cnt.get(q, 0) for q in range(1, p)) + 1
+    rows2 = "".join('<tr><td class="d">p.%d</td><td>%s</td><td style="color:#CC141A;font-weight:700;white-space:nowrap">%s</td><td>%s</td></tr>' % (
+        final_page(p), e(re.sub(r"\s+", " ", next((slide_title(doc, q) for q in range(p, 0, -1) if slide_title(doc, q)), ""))[:14]), e(MARK_HEAD[l]), e(m)) for p, w, l, m in MARKS)
+    summ = ('<div class="pg"><div class="ttl"><h1>★ 시험 표시 모아보기</h1><span class="tag">교수님 발언 기준</span></div>'
+            '<div class="body"><div class="col"><table class="ss"><tr><th>쪽</th><th>슬라이드</th><th>표시</th><th>교수님 말씀</th></tr>%s</table>'
+            '<div class="legend">슬라이드 위 노란 형광펜 = 해당 문구 · 빨간 ★ = 시험·암기 · 빨간 밑줄 = 「시험에 나온다」 직접 언급 · 맨 위 빨간 상자 = 교수님 말씀(날짜).</div>'
+            '</div></div><div class="orn"></div></div>') % rows2
+    pages.insert(1, (0, summ))
     # HTML → PDF
     htmlp = os.path.join(tmp, "ins.html")
     body = "".join(h for _, h in pages)
@@ -222,7 +280,22 @@ def main():
             toc.append([1, re.sub(r"\s+", " ", st)[:40], len(out)])
         for i in idx.get(p, []):
             out.insert_pdf(ins, from_page=i, to_page=i)
+    toc.insert(1, [1, "★ 시험 표시 모아보기", 2])
+    # 슬라이드 위 시험 표시
+    spage = {}
+    k = 0
+    for i in range(len(out)):
+        pass
+    pos = len(idx.get(0, []))
+    for p in range(1, 106):
+        spage[p] = pos; pos += 1 + len(idx.get(p, []))
+    for p, w, l, m in MARKS:
+        mark_page(out[spage[p]], w, l, m)
     out.set_toc(toc)
+    try:
+        out.subset_fonts()  # 빨간 펜 메모 글꼴은 쓴 글자만
+    except Exception as ex:
+        print("글꼴 줄이기 건너뜀:", ex)
     out.save(OUT, garbage=4, deflate=True, deflate_images=True, deflate_fonts=True, clean=True)
     print("완료", OUT, "· 쪽", len(out), "(슬라이드 105 + 끼움", len(pages), ") · 사진", nph, "· 셀카 제외", nbad)
     if "--icloud" in sys.argv:
