@@ -27,8 +27,8 @@ def answer_score(f):
     0 이하면 앱에서 뺀다(양식 · 서식 · 가이드 · 따라그리기 · 필사 · 이해용 · 문제지). iCloud 에는 전부 그대로 복사."""
     if re.search(r"양식|필기서식|가이드|따라그리기|필사|이해용|긴검증", f):
         return 0
-    m = re.search(r"제출본_v(\d+)", f)
-    if m: return 100 + int(m.group(1))
+    m = re.search(r"_v(\d+)\.(pdf|docx|hwp)$", f)   # _v2 · _v3 … = 최신 판 우선 (정역학 제출본 · 글쓰기 활동지 모두)
+    if m: return 100 + int(m.group(1)) + (1 if f.lower().endswith(".pdf") else 0)
     if "늦은제출" in f: return 50
     if re.search(r"풀이_", f): return 40
     if "제출용" in f: return 30
