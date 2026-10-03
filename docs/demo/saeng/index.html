@@ -6,13 +6,13 @@
 <title>스앵님 — 레이어드 2D 데모</title>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Gothic+A1:wght@800&display=swap" rel="stylesheet">
 <style>
-  html,body{margin:0;height:100%;background:#101410;font-family:"Gowun Dodum",sans-serif;color:#f3efe4}
-  .stage{position:relative;height:100%;overflow:hidden;background:#1d3a2f url(board.jpg) center/cover no-repeat}
+  html,body{margin:0;height:100%;background:#101410;font-family:"Gowun Dodum",sans-serif;color:#f3efe4;-webkit-tap-highlight-color:transparent}
+  .stage{position:relative;height:100%;overflow:hidden;background:#1d3a2f url(board.jpg) center/cover no-repeat;cursor:pointer}
   .stage.dark{background-image:url(board_dark.jpg)}
   .chalk{position:absolute;left:5%;top:9%;max-width:46%;font:800 clamp(22px,3.4vw,40px)/1.35 "Gothic A1",sans-serif;color:#f6f1e3;letter-spacing:-.01em;text-shadow:0 0 1px rgba(255,255,255,.4)}
   .chalk small{display:block;margin-top:.5em;font:400 clamp(14px,1.6vw,20px)/1.5 "Gowun Dodum",sans-serif;color:#dfe8d6}
   /* 캐릭터: 레이어 겹침. 상자 좌표는 manifest.json (0.5배 기준 440×584) */
-  .char{position:absolute;right:4%;bottom:-2%;width:min(44vh,34vw);aspect-ratio:440/584;transform-origin:50% 100%;will-change:transform}
+  .char{position:absolute;right:6%;bottom:16%;width:min(50vh,36vw);aspect-ratio:440/584;transform-origin:50% 100%;will-change:transform}
   .char img{position:absolute;left:0;top:0;width:100%;height:auto;pointer-events:none;user-select:none;-webkit-user-drag:none}
   .char .ly{opacity:0;transition:opacity 160ms ease}
   .char .ly.on{opacity:1}
@@ -20,30 +20,47 @@
   .breath .char{animation:breath 3.4s ease-in-out infinite}
   @keyframes breath{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.012)}}
   .char.tilt{transition:rotate 420ms cubic-bezier(.34,1.56,.64,1)}
-  .bubble{position:absolute;left:5%;bottom:7%;max-width:52%;padding:16px 20px;border-radius:14px;background:rgba(246,241,227,.94);color:#1b1f1b;font-size:clamp(15px,1.9vw,22px);line-height:1.55;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-  .bubble b{font-family:"Gothic A1",sans-serif;color:#2d5a3f;margin-right:8px}
+  /* 대사창 — 연애 시뮬레이션식(대표님 10/4): 이름표 · 타자 효과 · ▼ 탭해서 계속 · 선택지 */
+  .vn{position:absolute;left:3%;right:3%;bottom:3%;min-height:22%;padding:26px 26px 20px;border-radius:14px;background:rgba(14,18,16,.86);border:1px solid rgba(246,241,227,.14);box-shadow:0 14px 40px rgba(0,0,0,.35);backdrop-filter:blur(6px)}
+  .vn .name{position:absolute;left:18px;top:-18px;padding:6px 16px;border-radius:9px;background:#2fb344;color:#fff;font:800 15px "Gothic A1",sans-serif;letter-spacing:.02em}
+  .vn .text{font-size:clamp(16px,2.1vw,24px);line-height:1.6;min-height:2.4em;color:#f6f1e3;word-break:keep-all}
+  .vn .next{position:absolute;right:20px;bottom:12px;font-size:14px;color:rgba(246,241,227,.65);opacity:0;transition:opacity .2s}
+  .vn .next.on{opacity:1;animation:bob 1.1s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+  .vn .opts{display:none;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .vn .opts.on{display:flex}
+  .vn .opts button{height:44px;padding:0 18px;border:1px solid rgba(246,241,227,.35);border-radius:10px;background:rgba(246,241,227,.08);color:#f6f1e3;font:600 15px "Gowun Dodum",sans-serif}
+  .vn .opts button:hover{background:rgba(47,179,68,.25);border-color:#2fb344}
+  .vn .sys{position:absolute;right:18px;top:-18px;display:flex;gap:6px}
+  .vn .sys button{height:30px;padding:0 10px;border:0;border-radius:8px;background:rgba(246,241,227,.85);color:#1b1f1b;font:600 12px "Gowun Dodum",sans-serif}
+  .vn .sys button[aria-pressed=true]{background:#2fb344;color:#fff}
   .ctl{position:absolute;right:4%;top:3%;display:flex;flex-wrap:wrap;gap:6px;max-width:44%;justify-content:flex-end}
-  .ctl button{height:34px;padding:0 12px;border:0;border-radius:9px;background:rgba(246,241,227,.9);color:#1b1f1b;font:600 13px "Gowun Dodum",sans-serif}
+  .ctl button{height:30px;padding:0 10px;border:0;border-radius:8px;background:rgba(246,241,227,.75);color:#1b1f1b;font:600 12px "Gowun Dodum",sans-serif}
   .ctl button[aria-pressed=true]{background:#2fb344;color:#fff}
   .meta{position:absolute;left:5%;top:3%;font-size:12px;color:rgba(246,241,227,.6)}
-  @media (prefers-reduced-motion:reduce){.breath .char{animation:none}.char .ly{transition:none}.char.tilt{transition:none}}
+  @media (prefers-reduced-motion:reduce){.breath .char{animation:none}.char .ly{transition:none}.char.tilt{transition:none}.vn .next.on{animation:none}}
+  @media (max-width:700px){.char{right:50%;transform:translateX(50%);width:min(48vh,78vw);bottom:24%}.breath .char{animation:none}.chalk{max-width:90%}.ctl{display:none}.vn{min-height:26%}}
 </style>
 </head>
 <body class="breath">
 <div class="stage" id="stage">
   <div class="meta">스앵님 레이어드 2D 데모 · 바닐라 CSS/JS · 2026-10-04</div>
-  <div class="chalk" id="chalk">정역학 Ch.3<br>힘의 평형<small>ΣF = 0 · ΣM = 0 — 두 식이면 끝나요.</small></div>
+  <div class="chalk" id="chalk">정역학 Ch.3<br>힘의 평형<small>ΣF = 0 · ΣM = 0</small></div>
   <div class="char tilt" id="char" aria-label="김주영 스앵님"></div>
-  <div class="bubble" id="bubble"><b>스앵님</b><span id="say">자, 오늘은 평형부터 봐요. 식 두 개면 끝나요.</span></div>
+  <div class="vn" id="vn" role="dialog" aria-live="polite">
+    <div class="name" id="who">김주영</div>
+    <div class="sys"><button type="button" id="auto" aria-pressed="false">자동</button><button type="button" id="skip">건너뛰기</button><button type="button" id="board">칠판</button></div>
+    <div class="text" id="say"></div>
+    <div class="opts" id="opts"></div>
+    <div class="next" id="next">▼ 탭해서 계속</div>
+  </div>
   <div class="ctl" id="ctl">
     <button type="button" data-x="neutral" aria-pressed="true">기본</button>
     <button type="button" data-x="smile">미소</button>
     <button type="button" data-x="strict">엄격</button>
     <button type="button" data-x="surprise">놀람</button>
     <button type="button" data-x="praise">칭찬</button>
-    <button type="button" id="talk">말하기</button>
     <button type="button" id="blink">깜빡</button>
-    <button type="button" id="board">칠판 색</button>
   </div>
 </div>
 <script>
@@ -51,12 +68,12 @@
 const $ = s => document.querySelector(s);
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const char = $("#char");
-const LY = {};                                                  // 이름 → img
+const LY = {};
 const ORDER = ["base", "expr_neutral", "expr_smile", "expr_strict", "expr_surprise", "expr_praise",
                "eyes_open", "eyes_half", "eyes_closed", "eyes_side", "mouth_closed", "mouth_half", "mouth_open"];
-let M;                                                          // manifest
-const LDIR = new URLSearchParams(location.search).get("v") === "1" ? "layers/" : "layers2/";   // 기본 = v2 워터밤 룩(대표님 10/4), ?v=1 이면 터틀넥 v1
-fetch(LDIR + "manifest.json").then(r => r.json()).then(m => { M = m; build(); });
+let M;
+const LDIR = new URLSearchParams(location.search).get("v") === "1" ? "layers/" : "layers2/";   // 기본 = v2 워터밤 룩, ?v=1 이면 터틀넥 v1
+fetch(LDIR + "manifest.json").then(r => r.json()).then(m => { M = m; build(); play(0); });
 function build() {
   const W = M.size[0], H = M.size[1];
   for (const n of ORDER) {
@@ -74,8 +91,7 @@ function only(group, n, snap) { for (const k of Object.keys(LY)) if (k.startsWit
 const eyesRest = snap => only("eyes_", expr === "neutral" ? "eyes_open" : null, snap);
 const mouthRest = snap => only("mouth_", expr === "neutral" ? "mouth_closed" : null, snap);
 
-/* 깜빡임 — 반쯤 → 감음 → 반쯤 → 뜸. 표정 레이어가 눈을 덮고 있어도 눈 레이어가 위에 있어 그대로 깜빡인다 */
-let blinking = false, gazing = false;
+let blinking = false, gazing = false, talking = false, expr = "neutral";
 function blink(twice) {
   if (blinking || gazing) return; blinking = true;
   const seq = [["eyes_half", 40], ["eyes_closed", 70], ["eyes_half", 50], [null, 110]];
@@ -83,41 +99,70 @@ function blink(twice) {
   setTimeout(() => { blinking = false; if (twice) blink(false); }, t + 20);
 }
 function schedBlink() { setTimeout(() => { blink(Math.random() < .18); schedBlink(); }, 3000 + Math.random() * 3000); }
-/* 시선 — 가끔 옆을 봤다가 돌아온다 */
 function gaze() { if (blinking || talking || reduced) return; gazing = true; only("eyes_", "eyes_side"); setTimeout(() => { eyesRest(); gazing = false; }, 600 + Math.random() * 400); }
 function schedGaze() { setTimeout(() => { gaze(); schedGaze(); }, 8000 + Math.random() * 7000); }
-
-/* 표정 — 얼굴 패치 crossfade + 머리 기울임 스프링. 눈·입 레이어는 그 위에서 계속 산다 */
-let expr = "neutral";
 function setExpr(x) {
   expr = x;
-  setTimeout(() => {                                            // 반응 지연 120ms
+  setTimeout(() => {
     only("expr_", "expr_" + x);
-    if (!reduced) { char.style.rotate = (x === "strict" ? "-1.6deg" : x === "surprise" ? "1.2deg" : x === "praise" ? "-2deg" : x === "smile" ? "1deg" : "0deg"); }
+    if (!reduced) char.style.rotate = (x === "strict" ? "-1.6deg" : x === "surprise" ? "1.2deg" : x === "praise" ? "-2deg" : x === "smile" ? "1deg" : "0deg");
     if (!blinking && !gazing) eyesRest();
     if (!talking) setTimeout(mouthRest, 120);
   }, 120);
   for (const b of document.querySelectorAll("#ctl [data-x]")) b.setAttribute("aria-pressed", b.dataset.x === x ? "true" : "false");
 }
 
-/* 말하기 — 글자를 한 자씩 찍으면서 입을 닫음→반→열림으로 돌린다. 쉼표·마침표에선 입을 닫고 잠깐 쉰다 */
-const LINES = ["자, 오늘은 평형부터 봐요. 식 두 개면 끝나요.", "힘을 다 더해서 0, 모멘트도 더해서 0. 이게 전부예요.", "틀려도 돼요. 어디서 틀렸는지 보는 게 공부죠.", "좋아요, 그 풀이 맞아요. 다음 문제 가요."];
-let talking = false, li = 0;
-function talk() {
-  if (talking) return; talking = true;
-  const text = LINES[li++ % LINES.length], out = $("#say"); out.textContent = "";
-  let i = 0, mouth = 0; const shapes = ["mouth_closed", "mouth_half", "mouth_open", "mouth_half"];
-  setTimeout(function step() {                                  // 반응 지연 240ms 뒤 시작
-    if (i >= text.length) { talking = false; mouthRest(); if (expr === "neutral" && Math.random() < .5) setExpr("smile"); return; }
-    const ch = text[i++]; out.textContent += ch;
-    if (/[,.。!?]/.test(ch) || ch === " ") { mouthRest(true); setTimeout(step, ch === " " ? 90 : 260); return; }
-    mouth = (mouth + 1) % shapes.length; only("mouth_", shapes[mouth], true);
-    setTimeout(step, 60 + Math.random() * 30);
-  }, 240);
+/* ───── 대사 흐름 — 연애 시뮬레이션식 ─────
+   한 줄 = {who, text, expr, opts:[{t, go, expr}]}. 탭 = 글자 다 찍기 → 다음 줄. 선택지가 있으면 고를 때까지 멈춘다. */
+const SCRIPT = [
+  { who: "김주영", expr: "neutral", text: "자, 오늘은 평형부터 봐요. 식 두 개면 끝나요." },
+  { who: "김주영", expr: "neutral", text: "힘을 다 더해서 0, 모멘트도 더해서 0. 이게 전부예요." },
+  { who: "김주영", expr: "smile", text: "어때요, 여기까지는 따라왔어요?", opts: [
+    { t: "네, 이해했어요", go: 3, expr: "praise" }, { t: "다시 설명해 주세요", go: 1, expr: "strict" }, { t: "질문 있어요", go: 5, expr: "surprise" }] },
+  { who: "김주영", expr: "praise", text: "좋아요. 그럼 바로 문제로 가요. 틀려도 돼요, 어디서 틀렸는지 보는 게 공부죠." },
+  { who: "김주영", expr: "smile", text: "Ch.3 첫 문제. 보 위에 힘 세 개, 반력 두 개. 모멘트는 어디서 잡을래요?", opts: [
+    { t: "A점에서", go: 6, expr: "praise" }, { t: "B점에서", go: 6, expr: "smile" }, { t: "모르겠어요", go: 1, expr: "strict" }] },
+  { who: "김주영", expr: "surprise", text: "질문이요? 좋아요, 그게 제일 빠른 길이에요. 어느 부분이 걸려요?", opts: [{ t: "모멘트 방향이요", go: 1, expr: "neutral" }, { t: "아니에요, 계속할게요", go: 3, expr: "smile" }] },
+  { who: "김주영", expr: "praise", text: "그렇죠. 미지수가 제일 많이 사라지는 점. 그 감각이면 Ch.3는 다 풀려요." },
+  { who: "김주영", expr: "smile", text: "오늘은 여기까지. 내일은 트러스 가요. (처음으로)", opts: [{ t: "처음부터 다시", go: 0, expr: "neutral" }] },
+];
+let li = 0, typing = false, done = false, autoOn = false, skipReq = false, timer = 0;
+const say = $("#say"), opts = $("#opts"), nextEl = $("#next");
+function play(i) {
+  li = i; const L = SCRIPT[i]; if (!L) return;
+  clearTimeout(timer); done = false; skipReq = false; opts.classList.remove("on"); opts.replaceChildren(); nextEl.classList.remove("on");
+  $("#who").textContent = L.who; setExpr(L.expr || "neutral");
+  type(L.text, () => finishLine(L));
 }
-for (const b of document.querySelectorAll("#ctl [data-x]")) b.onclick = () => setExpr(b.dataset.x);
-$("#talk").onclick = talk; $("#blink").onclick = () => blink(false);
+function finishLine(L) {
+  done = true;
+  if (L.opts) { opts.replaceChildren(...L.opts.map(o => { const b = document.createElement("button"); b.type = "button"; b.textContent = o.t; b.onclick = e => { e.stopPropagation(); if (o.expr) setExpr(o.expr); setTimeout(() => play(o.go), 260); }; return b; })); opts.classList.add("on"); }
+  else { nextEl.classList.add("on"); if (autoOn) timer = setTimeout(() => play(li + 1), 1400 + L.text.length * 40); }
+}
+/* 타자 효과 + 입 모양 동기화. 쉼표·마침표에선 입을 닫고 잠깐 쉰다. 건너뛰기면 남은 글자를 한 번에 */
+function type(text, cb) {
+  talking = true; typing = true; say.textContent = "";
+  let i = 0, mouth = 0; const shapes = ["mouth_closed", "mouth_half", "mouth_open", "mouth_half"];
+  const step = () => {
+    if (skipReq) { say.textContent = text; i = text.length; }
+    if (i >= text.length) { typing = false; talking = false; mouthRest(); cb(); return; }
+    const ch = text[i++]; say.textContent += ch;
+    if (/[,.。!?]/.test(ch) || ch === " ") { mouthRest(true); timer = setTimeout(step, ch === " " ? 70 : 240); return; }
+    mouth = (mouth + 1) % shapes.length; only("mouth_", shapes[mouth], true);
+    timer = setTimeout(step, 55 + Math.random() * 30);
+  };
+  timer = setTimeout(step, 240);
+}
+$("#stage").addEventListener("click", e => {
+  if (e.target.closest("button")) return;
+  if (typing) { skipReq = true; return; }                       // 찍는 중이면 다 찍기
+  if (done && !SCRIPT[li].opts) play(li + 1);                    // 다 찍혔으면 다음 줄
+});
+$("#auto").onclick = e => { autoOn = !autoOn; e.currentTarget.setAttribute("aria-pressed", autoOn ? "true" : "false"); if (autoOn && done && !SCRIPT[li].opts) play(li + 1); };
+$("#skip").onclick = () => { if (typing) skipReq = true; else if (!SCRIPT[li].opts) play(li + 1); };
 $("#board").onclick = () => $("#stage").classList.toggle("dark");
+for (const b of document.querySelectorAll("#ctl [data-x]")) b.onclick = () => setExpr(b.dataset.x);
+$("#blink").onclick = () => blink(false);
 </script>
 </body>
 </html>
