@@ -268,9 +268,15 @@
     var tom=addDays(td,1);
     var must=P.asg.filter(function(a){ return !a.done&&a.due>=td&&a.due<=tom; });
     var exT=exams().filter(function(e){ return e.date===tom||e.date===td; });
-    var die='<div class="v60-die"><div class="v60-h">오늘 죽어도</div>'+((must.length||exT.length)?'<ul>'+
-      must.map(function(a){ return '<li><b>'+esc(a.c)+'</b> '+esc(a.t)+' <span class="v60-due">'+(a.due===td?"오늘":"내일")+' '+esc(a.time)+'</span> <span class="hint">'+(a.noplan?esc(a.noplan):'약 '+dur(a.est))+'</span>'+V60.filesHTML(a)+' <button type="button" class="btn xs" data-v60done="'+esc(a.k)+'">끝냄</button></li>'; }).join("")+
-      exT.map(function(e){ var c=course(e.courseId)||{}; return '<li><b>'+esc(c.name||"")+'</b> '+esc(e.kind||"시험")+' <span class="v60-due">'+(e.date===td?"오늘":"내일")+'</span></li>'; }).join("")+'</ul>':'<div class="v60-none">마감 임박 없음</div>')+'</div>';
+    /* 과목 이름은 묶음 머리에 한 번만, 그 아래 세부 항목 — 「사회봉사 · 사회봉사 · 사회봉사」 반복 금지(대표님 10/3) */
+    var dieG={}, dieO=[];
+    must.forEach(function(a){ if(!dieG[a.c]){ dieG[a.c]=[]; dieO.push(a.c); } dieG[a.c].push(a); });
+    exT.forEach(function(e){ var n=(course(e.courseId)||{}).name||"시험"; if(!dieG[n]){ dieG[n]=[]; dieO.push(n); } dieG[n].push({ex:e}); });
+    var die='<div class="v60-die"><div class="v60-h">오늘 죽어도</div>'+(dieO.length?dieO.map(function(n){ var xs=dieG[n], m=xs.reduce(function(s,a){ return s+(a.ex||a.noplan?0:a.est); },0);
+      return '<div class="v60-grp die"><div class="v60-grph"><b>'+esc(n)+'</b><span>'+xs.length+'개'+(m?' · 약 '+dur(m):'')+'</span></div>'+xs.map(function(a){
+        if(a.ex) return '<div class="v60-tk2"><div class="v60-tkm"><div class="v60-tkt">'+esc(a.ex.kind||"시험")+'</div><div class="v60-tks"><span class="v60-due hot">'+(a.ex.date===td?"오늘":"내일")+'</span></div></div></div>';
+        return '<div class="v60-tk2"><div class="v60-tkm"><div class="v60-tkt">'+esc(V60.tt(a))+'</div><div class="v60-tks"><span class="v60-due hot">'+(a.due===td?"오늘":"내일")+' '+esc(a.time)+'</span> · '+(a.noplan?esc(a.noplan):'약 '+dur(a.est))+V60.filesHTML(a)+'</div></div>'+
+          '<div class="v60-tka"><button type="button" class="v60-chk" data-v60done="'+esc(a.k)+'" aria-label="완료"></button></div></div>'; }).join("")+'</div>'; }).join(""):'<div class="v60-none">마감 임박 없음</div>')+'</div>';
     var tItems=T?T.items:[];
     var mustDo=V60.taskCard(P,T,td);
     /* 오늘 끝낸 것 — 체크된 상자로 남긴다(대표님 10/2 「빈 박스 → 누르면 체크」) */
@@ -353,6 +359,7 @@
   /* ---------- 오늘 할 과제 (대표님 10/3) ----------
      시각 표시 없이 남은 과제 전부. 과제(LMS)와 할 일(직접 · 말로 준 것)을 나누고, 각각 과목별로 묶어 마감 순 · 과목별 예상 합계.
      과제마다 「과제 시작 → 과제 종료」 — 실제 소요를 따로 남긴다. 공부는 그 아래 「과제 끝낸 뒤」로만. */
+  V60.tt=function(a){ var t=String(a.t||""), c=String(a.c||""); return (c&&t.indexOf(c)===0)?(t.slice(c.length).replace(/^[\s·:\-–—]+/,"")||t):t; };   /* 묶음 머리에 과목이 있으니 제목 앞 과목명은 뗀다 */
   V60.since=function(ts){ var x=new Date(ts); return hm(x.getHours()*60+x.getMinutes())+" 시작 · "+fmtMin(Math.max(0,Math.round((Date.now()-ts)/60000))); };
   V60.taskCard=function(P,T,td){
     var left=P.asg.filter(function(a){ return !a.done&&a.due>=td; });
@@ -362,7 +369,7 @@
     var row=function(a){
       var act=a.run?'<span class="v60-run" data-v60since="'+a.run+'">'+V60.since(a.run)+'</span><button type="button" class="btn xs a" data-v60stop="'+esc(a.k)+'">과제 종료</button><button type="button" class="v60-x" data-v60cancel="'+esc(a.k)+'" aria-label="시작 취소">×</button>'
         :'<button type="button" class="btn xs" data-v60start="'+esc(a.k)+'">과제 시작</button>';
-      return '<div class="v60-tk2'+(a.run?' run':'')+'"><div class="v60-tkm"><div class="v60-tkt">'+esc(a.t)+'</div><div class="v60-tks">'+due(a)+' · '+
+      return '<div class="v60-tk2'+(a.run?' run':'')+'"><div class="v60-tkm"><div class="v60-tkt">'+esc(V60.tt(a))+'</div><div class="v60-tks">'+due(a)+' · '+
         (a.noplan?esc(a.noplan):'<label class="v60-est">약 <input type="number" min="5" step="5" value="'+a.est+'" data-v60est="'+esc(a.k)+'">분</label> <small>'+esc(a.kind)+' · '+esc(a.estSrc)+'</small>')+V60.filesHTML(a)+'</div></div>'+
         '<div class="v60-tka">'+act+'<button type="button" class="v60-chk" data-v60done="'+esc(a.k)+'" aria-label="완료"></button></div></div>'; };
     var sec=function(title,xs){ if(!xs.length) return "";
@@ -588,7 +595,8 @@
     /* 오늘 할 과제 (10/3) */
     ".v60-hs{font-size:12.5px;font-weight:700;color:var(--ink-3);margin-left:6px}",
     ".v60-sec{margin-top:8px}.v60-sech{font-size:12px;font-weight:800;color:var(--ink-3);letter-spacing:.02em;margin:6px 0 2px}.v60-sech small{font-weight:600;margin-left:4px}",
-    ".v60-grp{border:1px solid var(--line);border-radius:12px;padding:4px 10px 6px;margin-top:6px;background:var(--surface)}",
+    ".v60-grp{border:1px solid var(--line);border-radius:12px;padding:6px 12px 8px;margin-top:10px;background:var(--surface)}",
+    ".v60-grp.die{border-color:color-mix(in srgb,#C7261B 35%,var(--line))}.v60-grp.die .v60-grph b{color:#A31F16}",
     ".v60-grph{display:flex;align-items:baseline;gap:8px;padding:4px 0;border-bottom:1px solid var(--line)}.v60-grph b{font-size:14.5px}.v60-grph span{font-size:12px;color:var(--ink-3)}",
     ".v60-tk2{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px dashed var(--line)}.v60-grph+.v60-tk2{border-top:0}",
     ".v60-tk2.run{background:color-mix(in srgb,#58CC02 9%,transparent);border-radius:8px;padding-left:6px;padding-right:4px}.v60-tk2.wait{opacity:.6}",
@@ -600,7 +608,7 @@
     ".v60-ck{display:flex!important;align-items:center;gap:8px;flex-direction:row!important}",
     ".v60-where{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin:0 0 10px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--line) 30%,transparent)}.v60-where small{color:var(--ink-3);margin-right:6px;font-size:11.5px}",
     ".v60-tks .v60-est{white-space:nowrap;display:inline-flex;align-items:center;gap:3px}",
-    "@media (max-width:600px){.v60-tk2{flex-wrap:wrap}.v60-tkm{flex-basis:100%}.v60-tka{margin-left:auto}}",
+    "@media (max-width:600px){.v60-tk2{flex-wrap:wrap}.v60-tkm{flex-basis:100%}.v60-tka{margin-left:auto}.v60-grp.die .v60-tk2{flex-wrap:nowrap}.v60-grp.die .v60-tkm{flex-basis:auto}}",
     ".v60-col.today .v60-cb{border-color:var(--ac,#4F9A35);box-shadow:0 0 0 1px var(--ac,#4F9A35)}",
     ".v60-sleep{position:absolute;left:0;right:0;background:repeating-linear-gradient(135deg,rgba(60,70,100,.10) 0 6px,rgba(60,70,100,.04) 6px 12px)}",
     ".v60-b{position:absolute;left:2px;right:2px;border-radius:6px;padding:1px 4px;overflow:hidden;font-size:10.5px;line-height:1.2;color:#fff;border:1px solid rgba(0,0,0,.06)}",
