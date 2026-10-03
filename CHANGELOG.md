@@ -4,6 +4,9 @@
 
 ## 2026-10-03
 
+### .134 — 정역학 「혼자 풀기」 버튼
+- os-a4 의 notes/lessons/_private/statics/hw(fe0c5fe)를 V69 카드에서 openNote 로 연다. 진행 = localStorage mc-hw-statics(문제별 clean ≥ 2 = 혼자 ✓), 문제 수 = 같은 폴더 chN.json.
+
 ### .133 — 과목 화면 「과제 파일」 카드
 - 대표님 10/2 「과목별로 과제 제출용 파일 모아둔 건 따로 없는 거야?」. V69 LAYER(_private/hwfiles.json → 과목 화면 카드, 주차·Ch. 묶음 · 용도 칩). `docs/tools/build_hw_files.py` = study-materials/<과목>/_과제 → hwfiles.json + iCloud 학교/2026-2/<과목>/과제 복사.
 
