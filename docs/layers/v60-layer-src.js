@@ -139,7 +139,7 @@
       out.push({s:toMin(ev.start),e:toMin(ev.end)||1440,t:t,k:/알바|근무|근로/.test(t)?"work":"ev",place:ev.location||ev.place||""}); });
     plansOn(d).filter(function(p){ return p.activity; }).forEach(function(p){ out.push({s:toMin(p.s),e:toMin(p.e),t:p.kind||"활동",k:"ev"}); });
     (S.clinic||[]).filter(function(x){ return x.date===d; }).forEach(function(x){ out.push({s:toMin(x.start),e:toMin(x.end),t:"미적분 클리닉룸",k:"ev",school:1,place:x.place||""}); });   /* V65 예약 기록 */
-    ((V60.pp&&V60.pp.events)||[]).filter(function(x){ return x.date===d; }).forEach(function(x){ out.push({s:toMin(x.start),e:toMin(x.end),t:x.title,k:x.k||"ev",place:x.place||"",trip:x.k==="trip"?1:0}); });
+    ((V60.pp&&V60.pp.events)||[]).filter(function(x){ return x.date===d; }).forEach(function(x){ out.push({s:toMin(x.start),e:toMin(x.end),t:x.title,k:x.k||"ev",place:x.place||"",trip:x.k==="trip"?1:0,said:1}); });   /* said = 대표님이 말로 준 일정 — 이름이 비슷해도 합치지 않는다(10/4 「과제」+「과제 · 저녁 · 휴식」이 한 칸이 된 버그) */
     var m=V60.merge(out.filter(function(b){ return b.e>b.s; }));
     ((V60.pp&&V60.pp.cuts)||[]).filter(function(x){ return x.date===d; }).forEach(function(x){ m.forEach(function(b){ if(V60.same(b.t,x.title)){ if(x.end) b.e=toMin(x.end); if(x.start) b.s=toMin(x.start); if(x.note) b.note=x.note; } }); });
     return m;
@@ -150,9 +150,9 @@
   V60.merge=function(arr){
     arr.sort(function(a,b){ return a.s-b.s; }); var out=[];
     arr.forEach(function(b){
-      var m=null; for(var i=out.length-1;i>=0;i--){ var o=out[i]; if(V60.same(o.t,b.t)&&b.s<=o.e+90){ m=o; break; } }
+      var m=null; for(var i=out.length-1;i>=0;i--){ var o=out[i]; if(!o.said&&!b.said&&V60.same(o.t,b.t)&&b.s<=o.e+90){ m=o; break; } }
       if(m){ if(!m.room&&b.room) m.room=b.room; if(!m.place&&b.place) m.place=b.place; m.e=Math.max(m.e,b.e); m.s=Math.min(m.s,b.s); if(b.k==="work"||m.k==="work") m.k=m.k==="cls"?"cls":"work"; m.school=m.school||b.school; if(V60.norm(b.t).length<V60.norm(m.t).length) m.t=b.t; }
-      else out.push({s:b.s,e:b.e,t:b.t,k:b.k,school:b.school,room:b.room||"",place:b.place||""});
+      else out.push({s:b.s,e:b.e,t:b.t,k:b.k,school:b.school,room:b.room||"",place:b.place||"",trip:b.trip||0,said:b.said||0});
     });
     return out.sort(function(a,b){ return a.s-b.s; });
   };
@@ -173,7 +173,9 @@
     var sl=V60.sleepOf(d);                                                 /* 실제 수면 기록이 있으면 그 기상 시각 */
     if(sl&&sl.wake){ wake=toMin(sl.wake); if(sl.bed){ var bm=toMin(sl.bed); slept=wake>=bm?wake-bm:wake+1440-bm; short=slept<7*60; } }
     var blk=fx.slice(), guess=!!+V60.cfg("autoMeal",1);   /* 짐작 칸(식사 · 휴식 · 준비)은 「제안」(sug, 점선)으로 — 확정 일정과 구분 (대표님 10/3 「오늘 스케줄 날아간 거 복구」, 설정에서 끌 수 있음) */
-    if(guess||(sl&&sl.wake)) blk.push({s:wake,e:wake+prep,t:"기상·준비",k:"life",sug:(sl&&sl.wake)?0:1});
+    /* 대표님이 말한 일정이 기상 시각 근처에 있으면(「기상 · 씻고 준비」 등) 앱이 만든 기상·준비 칸은 넣지 않는다 — 같은 일 두 번 · 칸 겹침 금지 (10/4) */
+    var wakeTaken=fx.some(function(b){ return b.s<wake+prep&&b.e>wake-30; });
+    if(!wakeTaken&&(guess||(sl&&sl.wake))) blk.push({s:wake,e:wake+prep,t:"기상·준비",k:"life",sug:(sl&&sl.wake)?0:1});
     var home=null;
     if(sch.length){ var ss=sch.slice().sort(function(a,b){ return a.s-b.s; });
       blk.push({s:ss[0].s-mv.toSchool,e:ss[0].s,t:"이동",k:"move"});
@@ -202,7 +204,7 @@
     /* 지난 시간에는 실제로 한 것 — 과제 재생 → 종료 기록(S.v60.act)을 그 시각에 */
     var A=V60.st().act||{}; Object.keys(A).forEach(function(k){ var x=A[k]; if(!x||!x.at||!x.min) return; var e=new Date(x.at);
       var ds=e.getFullYear()+"-"+pad2(e.getMonth()+1)+"-"+pad2(e.getDate()); if(ds!==d) return; var em=e.getHours()*60+e.getMinutes();
-      blk.push({s:Math.max(0,em-x.min),e:em,t:x.c+" · "+(x.t||"과제")+" (실제)",k:"hw",done:1}); });
+      blk.push({s:Math.max(0,em-x.min),e:em,t:x.c+" · "+(x.t||"과제"),k:"hw",done:1}); });
     blk.sort(function(a,b){ return a.s-b.s; });
     var start=wake, end=bedAbs;
     if(nowM!=null) start=Math.max(start,Math.ceil(nowM/5)*5);
@@ -474,7 +476,7 @@
   /* ---------- 오늘만 보기: 하루 시간표를 한 줄씩 ---------- */
   V60.KN={stay:"있던 곳",cls:"수업",work:"근무",ev:"일정",trip:"이동(차편)",meal:"식사",life:"생활",move:"이동",hw:"과제",st:"공부",memo:"암기"};
   V60.todayHTML=function(T,nowM,seg){
-    var rows=T?T.blk.concat(T.items.map(function(b){ return Object.assign({sug:1},b); })).filter(function(b){ return b.e>T.wake-1; }).concat(T.stays||[]).sort(function(a,b){ return a.s-b.s||a.e-b.e; }):[];   /* 정해진 일정만 — 빈 시간은 비워 둔다(대표님 10/3) */
+    var rows=T?T.blk.concat(T.items.map(function(b){ return Object.assign({sug:1},b); })).filter(function(b){ return b.e>T.wake-1; }).sort(function(a,b){ return a.s-b.s||a.e-b.e; }):[];   /* 정해진 일정만 — 빈 시간은 비워 둔다(대표님 10/3) */
     var hm2=function(m){ m=Math.round(m); return (m>=1440?"익일 ":"")+(Math.floor(m/60)%24<10?"0":"")+(Math.floor(m/60)%24)+":"+(m%60<10?"0":"")+(m%60); };
     var sc=rows.filter(function(b){ return b.school; }), back=rows.filter(function(b){ return b.t==="귀가"; });
     var sch=sc.length?{s:Math.min.apply(null,sc.map(function(b){ return b.s; })),e:back.length?back[back.length-1].s:Math.max.apply(null,sc.map(function(b){ return b.e; }))}:null;
@@ -495,12 +497,21 @@
     var PXH=V60.DPX, H=24*PXH, y=function(m){ return Math.max(0,Math.min(1440,m))/60*PXH; };
     var hrs=''; for(var h=0;h<24;h++) hrs+='<span style="top:'+(h*PXH)+'px">'+pad2(h)+':00</span>';
     var shade=T?(V60.sleepKnown(T.d,T.wake)?'<i class="v60-dsl" style="top:'+y(T.sleepFrom||0)+'px;height:'+Math.max(0,y(T.wake)-y(T.sleepFrom||0))+'px"></i>':'')+(T.bed<1440?'<i class="v60-dsl" style="top:'+y(T.bed)+'px;height:'+(H-y(T.bed))+'px"></i>':''):'';
-    var blks=rows.map(function(b,ri){ if(b.e<=0||b.s>=1440) return ""; var top=y(b.s), ht=Math.max(16,y(b.e)-top), past=b.e<=nowM, cur=b.s<=nowM&&nowM<b.e;
+    /* 글자 겹침 · 잘림 · 튀어나옴 금지 (대표님 10/4 「금기로 정했던 텍스트 합쳐짐 · 글자 잘림 · 밖으로 튀어나옴」):
+       칸 높이는 다음 칸 시작을 넘지 않게 자르고, 높이에 맞는 만큼만 글자를 넣는다 — 14px 미만 = 글자 없는 선 · 44 미만 = 한 줄 · 100 미만 = 제목 한 줄 + 시각 · 100 이상 = 종류 + 제목 두 줄 + 시각.
+       이동은 「이동」만 — 어디로 갔는지는 오른쪽 장소 줄이 보여 준다 (「용식이형네로 이동 말고 그냥 이동만」) */
+    var tops=rows.map(function(b){ return y(b.s); });
+    var blks=rows.map(function(b,ri){ if(b.e<=0||b.s>=1440) return ""; var top=y(b.s), real=y(b.e)-top, past=b.e<=nowM, cur=b.s<=nowM&&nowM<b.e;
+      var nextTop=H; for(var q=ri+1;q<rows.length;q++){ if(tops[q]>top+1){ nextTop=tops[q]; break; } }
+      var ht=Math.min(Math.max(real,16),nextTop-top-2); if(ht<3) ht=Math.max(2,real);
+      var isMove=b.k==="move"||(b.k==="trip"&&/이동/.test(b.t)), title=isMove?"이동":b.t;
+      var size=ht<14?" line":ht<44?" thin":ht<100?" mid":"";
+      if(ht<14) return '<div class="v60-db k-'+b.k+(b.sug?' sug':'')+(past?' past':'')+' line" style="top:'+top+'px;height:'+ht+'px" title="'+esc(hm2(b.s)+'–'+hm2(b.e)+' '+title)+'"></div>';
       var pc=V60.LANE?'':b.stay?'':placeCell(ri).replace(/^<div class="v60-tp/,'<div class="v60-tp v60-dp');
       /* 예전 목록 디자인 느낌(대표님 10/3 「1시간 칸 나누기 전 디자인이 이뻤다」) — 흰 칸 · 얇은 색 띠 · 작은 종류 이름 · 굵은 제목 · 파일/완료 상자 · 오른쪽 장소 줄 */
       var act=(ht>=60&&b.meta&&b.meta.hw?V60.filesHTML(b.meta.hw)+'<button type="button" class="v60-chk" data-v60done="'+esc(b.meta.hw.k)+'" aria-label="완료"></button>':'')+
         (ht>=60&&b.meta&&b.meta.x?'<button type="button" class="btn xs a" data-v60go="'+b.meta.c.id+'|'+b.meta.x.w+'|'+b.meta.x.date+'">열기</button><button type="button" class="v60-chk" data-v60sdone="'+b.meta.c.id+'|'+b.meta.x.date+'" aria-label="완료"></button>':'');
-      return '<div class="v60-db k-'+b.k+(b.sug?' sug':'')+(past?' past':'')+(cur?' cur':'')+(ht<34?' thin':'')+'" style="top:'+top+'px;height:'+ht+'px"><div class="v60-dbt">'+(ht>=44?'<span class="v60-dk">'+esc(V60.KN[b.k]||"")+(cur?' · 지금':'')+'</span>':'')+'<b>'+esc(b.t)+'</b><small>'+hm2(b.s)+'–'+hm2(b.e)+(b.note?' · '+esc(b.note):'')+'</small></div>'+(act?'<div class="v60-da">'+act+'</div>':'')+pc+'</div>'; }).join("");
+      return '<div class="v60-db k-'+b.k+(b.sug?' sug':'')+(past?' past':'')+(cur?' cur':'')+size+'" style="top:'+top+'px;height:'+ht+'px"><div class="v60-dbt">'+(ht>=100?'<span class="v60-dk">'+esc(V60.KN[b.k]||"")+(cur?' · 지금':'')+'</span>':'')+'<b>'+esc(title)+'</b><small>'+hm2(b.s)+'–'+hm2(b.e)+(ht>=100&&b.note?' · '+esc(b.note):'')+'</small></div>'+(act?'<div class="v60-da">'+act+'</div>':'')+pc+'</div>'; }).join("");
     var bed=T&&T.bed<1440?'<div class="v60-db k-sleep thin" style="top:'+y(T.bed)+'px;height:16px"><div class="v60-dbt"><b>취침</b><small>'+hm2(T.bed)+'</small></div></div>':'';
     var now=(T&&T.d===today())?'<i class="v60-dnow" style="top:'+y(nowM)+'px"><b>'+hm(nowM)+'</b></i>':'';
     var lane=V60.LANE&&T&&V60.laneOf?V60.laneOf(T,rows,places,y,H):null;
@@ -726,6 +737,14 @@
     ".v60-dk{display:block;font-size:11px;color:var(--ink-3);line-height:1.25;margin-bottom:1px}",
     ".v60-day .v60-dbt b{font-size:14px;font-weight:700;line-height:1.35;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}",
     ".v60-day .v60-db.thin .v60-dbt b{-webkit-line-clamp:1;font-size:12.5px}.v60-day .v60-dbt small{color:var(--ink-3);opacity:1;font-size:11.5px}",
+    /* 높이별 글자 양 (10/4) — 한 줄짜리는 줄바꿈 없이 말줄임, 선은 글자 없음 */
+    ".v60-day .v60-db.mid{padding-top:3px;padding-bottom:3px}",
+    ".v60-day .v60-db.thin{padding-top:0;padding-bottom:0;align-items:center}.v60-day .v60-db.thin .v60-dbt b{font-size:12px;line-height:1.2}.v60-day .v60-db.thin .v60-dbt small{line-height:1.2;font-size:11px}.v60-day .v60-db.thin .v60-dbt{line-height:1.2}",
+    ".v60-day .v60-db.thin .v60-dbt{display:flex;align-items:baseline;gap:8px;min-width:0;white-space:nowrap;overflow:hidden}",
+    ".v60-day .v60-db.thin .v60-dbt b,.v60-day .v60-db.mid .v60-dbt b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-line-clamp:unset;min-width:0}",
+    ".v60-day .v60-db.thin .v60-dbt small{flex:none}",
+    ".v60-day .v60-db.line{padding:0;border-radius:3px;border:0!important;box-shadow:none!important;background:color-mix(in srgb,var(--c) 55%,transparent)!important}",
+    ".v60-day .v60-dbt{overflow:hidden;min-width:0;flex:1}",
     ".v60-da{flex:none;display:flex;gap:6px;align-items:flex-start;flex-wrap:nowrap}.v60-da .v60-chk{margin-left:0}.v60-da .v60-files{flex-wrap:nowrap;margin:0}",
     ".v60-day .v60-db .v60-dp:empty,.v60-day .v60-db .v60-dp.same{display:none}",
     "@media (max-width:600px){.v60-da .v60-files{display:none}}",

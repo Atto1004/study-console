@@ -56,8 +56,8 @@
       last=g; mvStart=null; });
     var html='<div class="v73-lane" style="height:'+H+'px">'+segs.map(function(g){ if(!g.p) return "";
         var top=y(g.s), ht=Math.max(2,y(g.e)-top), fu=g.s>=nowM?' fu':'';
-        return '<div class="v73-ls'+(g.p.mv?' mv':g.p.c?' cp':'')+fu+'" style="top:'+top+'px;height:'+ht+'px">'+(!g.p.mv&&ht>=26?'<b>'+esc(g.p.n)+'</b>'+(g.p.s&&ht>=42?'<small>'+esc(g.p.s)+'</small>':''):'')+'</div>'; }).join("")+
-      trans.filter(function(t){ return !t.guess; }).map(function(t){ return '<div class="v73-tr'+(t.m>=nowM?' fu':'')+'" style="top:'+y(t.m)+'px"><time>'+hm(t.m)+'</time><span>'+esc(t.f.n)+' → '+esc(t.t.n)+'</span></div>'; }).join("")+'</div>';
+        /* 장소 이름은 띠 안에 · 이동 구간은 「이동」만 — 「시각 A → B」 알약은 글자를 덮어 뺐다 (대표님 10/4 「가독성 떨어지게 쓰지 말고 이동으로만」) */
+        return '<div class="v73-ls'+(g.p.mv?' mv':g.p.c?' cp':'')+fu+'" style="top:'+top+'px;height:'+ht+'px">'+(g.p.mv?(ht>=16?'<em>이동</em>':''):(ht>=26?'<b>'+esc(g.p.n)+'</b>'+(g.p.s&&ht>=42?'<small>'+esc(g.p.s)+'</small>':''):''))+'</div>'; }).join("")+'</div>';
     var first=null; segs.some(function(g){ if(g.p&&!g.p.mv){ first=g; return true; } return false; });
     var route=!first?'':'<div class="v73-route"><small>이동</small><b>'+esc(first.p.n)+'</b>'+
       (trans.length?trans.map(function(t){ return t.guess?'<i>→ 이후 예상</i><b class="fu">'+esc(t.t.n)+'</b>':'<i>→</i><time>'+hm(t.m)+'</time><b'+(t.m>=nowM?' class="fu"':'')+'>'+esc(t.t.n)+'</b>'; }).join(""):'<i>· 하루 종일</i>')+'</div>';
@@ -145,6 +145,7 @@
     ".v73-ls.cp{background:color-mix(in srgb,#5B6B8C 13%,var(--surface,#fff));border-color:color-mix(in srgb,#5B6B8C 40%,transparent)}",
     ".v73-ls.mv{background:repeating-linear-gradient(135deg,color-mix(in srgb,#8A94A6 35%,transparent) 0 4px,transparent 4px 8px);border:1px dashed color-mix(in srgb,#8A94A6 55%,transparent)}",
     ".v73-ls.fu{opacity:.5}",
+    ".v73-ls.mv{display:flex;align-items:center;padding:0 7px}.v73-ls.mv em{font-style:normal;font-size:11px;font-weight:700;color:var(--ink-2,#444);line-height:1;background:var(--surface,#fff);padding:1px 5px;border-radius:5px}",
     ".v73-ls b{display:block;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v73-ls small{display:block;color:var(--ink-3);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
     ".v73-tr{position:absolute;left:-4px;right:0;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;align-items:flex-start;padding:3px 8px;border-radius:10px;background:#1d1d1f;color:#fff;font-size:11px;line-height:1.25;box-shadow:0 2px 8px rgba(0,0,0,.2)}",
     ".v73-tr.fu{background:#5c6270}",
