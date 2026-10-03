@@ -34,12 +34,9 @@
   .vn .sys{position:absolute;right:18px;top:-18px;display:flex;gap:6px}
   .vn .sys button{height:30px;padding:0 10px;border:0;border-radius:8px;background:rgba(246,241,227,.85);color:#1b1f1b;font:600 12px "Gowun Dodum",sans-serif}
   .vn .sys button[aria-pressed=true]{background:#2fb344;color:#fff}
-  .ctl{position:absolute;right:4%;top:3%;display:flex;flex-wrap:wrap;gap:6px;max-width:44%;justify-content:flex-end}
-  .ctl button{height:30px;padding:0 10px;border:0;border-radius:8px;background:rgba(246,241,227,.75);color:#1b1f1b;font:600 12px "Gowun Dodum",sans-serif}
-  .ctl button[aria-pressed=true]{background:#2fb344;color:#fff}
   .meta{position:absolute;left:5%;top:3%;font-size:12px;color:rgba(246,241,227,.6)}
   @media (prefers-reduced-motion:reduce){.breath .char{animation:none}.char .ly{transition:none}.char.tilt{transition:none}.vn .next.on{animation:none}}
-  @media (max-width:700px){.char{right:50%;transform:translateX(50%);width:min(48vh,78vw);bottom:24%}.breath .char{animation:none}.chalk{max-width:90%}.ctl{display:none}.vn{min-height:26%}}
+  @media (max-width:700px){.char{right:50%;transform:translateX(50%);width:min(48vh,78vw);bottom:24%}.breath .char{animation:none}.chalk{max-width:90%}.vn{min-height:26%}}
 </style>
 </head>
 <body class="breath">
@@ -49,18 +46,10 @@
   <div class="char tilt" id="char" aria-label="김주영 스앵님"></div>
   <div class="vn" id="vn" role="dialog" aria-live="polite">
     <div class="name" id="who">김주영</div>
-    <div class="sys"><button type="button" id="auto" aria-pressed="false">자동</button><button type="button" id="skip">건너뛰기</button><button type="button" id="board">칠판</button></div>
+    <div class="sys"><button type="button" id="auto" aria-pressed="false">자동</button><button type="button" id="skip">건너뛰기</button></div>
     <div class="text" id="say"></div>
     <div class="opts" id="opts"></div>
     <div class="next" id="next">▼ 탭해서 계속</div>
-  </div>
-  <div class="ctl" id="ctl">
-    <button type="button" data-x="neutral" aria-pressed="true">기본</button>
-    <button type="button" data-x="smile">미소</button>
-    <button type="button" data-x="strict">엄격</button>
-    <button type="button" data-x="surprise">놀람</button>
-    <button type="button" data-x="praise">칭찬</button>
-    <button type="button" id="blink">깜빡</button>
   </div>
 </div>
 <script>
@@ -109,7 +98,6 @@ function setExpr(x) {
     if (!blinking && !gazing) eyesRest();
     if (!talking) setTimeout(mouthRest, 120);
   }, 120);
-  for (const b of document.querySelectorAll("#ctl [data-x]")) b.setAttribute("aria-pressed", b.dataset.x === x ? "true" : "false");
 }
 
 /* ───── 대사 흐름 — 연애 시뮬레이션식 ─────
@@ -160,9 +148,6 @@ $("#stage").addEventListener("click", e => {
 });
 $("#auto").onclick = e => { autoOn = !autoOn; e.currentTarget.setAttribute("aria-pressed", autoOn ? "true" : "false"); if (autoOn && done && !SCRIPT[li].opts) play(li + 1); };
 $("#skip").onclick = () => { if (typing) skipReq = true; else if (!SCRIPT[li].opts) play(li + 1); };
-$("#board").onclick = () => $("#stage").classList.toggle("dark");
-for (const b of document.querySelectorAll("#ctl [data-x]")) b.onclick = () => setExpr(b.dataset.x);
-$("#blink").onclick = () => blink(false);
 </script>
 </body>
 </html>
