@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-03.130";
+var BUILD="2026-10-03.131";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -12855,14 +12855,24 @@ var V33={};
   V65.clock=function(){
     var g=$(".topbar .topbar-in"); if(!g) return; var old=$("#v65Clock"); if(old&&old.parentNode===g&&g.firstChild===old) return; if(old) old.remove();   /* 대표님 10/2 「아예 완전 왼쪽으로, 좀 크게」 */
     var el=document.createElement("div"); el.id="v65Clock"; el.className="v65-clock";
-    el.innerHTML='<span class="v65-t"><b id="v65H">--:--:--</b><small id="v65Ms">.000</small></span><span class="v65-d" id="v65D"></span>';
+    var roll=function(sec){ var s='<span class="v65-w"><span class="v65-r" style="animation-duration:'+sec+'s">'; for(var i=0;i<10;i++) s+='<i>'+i+'</i>'; return s+'</span></span>'; };
+    el.innerHTML='<span class="v65-t"><b id="v65H">--:--:--</b><small id="v65Ms">.'+roll(1)+roll(0.1)+roll(0.01)+'</small></span><span class="v65-d" id="v65D"></span>';
     g.insertBefore(el,g.firstChild);
-    var tick=function(){ var d=new Date();
-      var h=$("#v65H"), m=$("#v65Ms"), dd=$("#v65D"); if(!h) return;
-      h.textContent=p2(d.getHours())+":"+p2(d.getMinutes())+":"+p2(d.getSeconds()); m.textContent="."+p3(d.getMilliseconds());
-      var s=(d.getMonth()+1)+"월 "+d.getDate()+"일 ("+DW[d.getDay()]+")"; if(dd.textContent!==s) dd.textContent=s;
-      requestAnimationFrame(tick); };
-    requestAnimationFrame(tick);
+    /* 10/3 가볍게(BUILD .131, 대표님 「최적화 한번 해줘」): 예전엔 JS 가 1초에 60번 밀리초 글자를 바꿔 가만히 둬도 메인스레드 6%(시계 빼면 0.1%).
+       이제 밀리초 = 숫자 띠를 CSS 애니메이션으로 굴린다(GPU) — 보이는 건 같고 JS 는 1초에 한 번 시:분:초·날짜만.
+       시작 지연 -(지금 ms)로 벽시계와 맞추고, 탭에 돌아오면 다시 맞춘다. 시계가 화면에서 빠지면 타이머도 멈춘다(예전엔 id 로 찾아 루프가 겹칠 수 있었다) */
+    var H=el.querySelector("#v65H"), D=el.querySelector("#v65D"), R=el.querySelectorAll(".v65-r"), lastD="";
+    var sync=function(){   /* 애니메이션 위치를 직접 맞춘다(지연만 주면 그려지기 시작한 때부터라 0.3초쯤 늦었다). 애니메이션 시계는 이번 프레임 시작 시각이라 그 차이만큼 앞당긴다 */
+      var lag=(document.timeline&&document.timeline.currentTime!=null&&window.performance)?Math.max(0,performance.now()-document.timeline.currentTime):0, ms=(Date.now()+lag)%1000;
+      for(var i=0;i<R.length;i++){ var a=R[i].getAnimations?R[i].getAnimations()[0]:null; if(a) a.currentTime=ms; else R[i].style.animationDelay=(-ms)+"ms"; } };
+    var tick=function(){ if(!el.isConnected){ document.removeEventListener("visibilitychange",onVis); return; } var d=new Date();
+      H.textContent=p2(d.getHours())+":"+p2(d.getMinutes())+":"+p2(d.getSeconds());
+      var s=(d.getMonth()+1)+"월 "+d.getDate()+"일 ("+DW[d.getDay()]+")"; if(s!==lastD){ lastD=s; D.textContent=s; }
+      if(d.getSeconds()===0) sync();   /* 1분에 한 번 다시 맞춤 */
+      setTimeout(tick, 1000-Date.now()%1000+5); };
+    var onVis=function(){ if(!document.hidden) sync(); };
+    document.addEventListener("visibilitychange",onVis);
+    sync(); tick();
   };
 
   /* ---------- ② LMS 공지 지우기 ---------- */
@@ -12921,10 +12931,10 @@ var V33={};
   var css=document.createElement("style"); css.id="v65css";
   css.textContent=[
     ".v65-clock{order:-1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;line-height:1.1;padding:6px 16px;border-right:1px solid var(--line);font-variant-numeric:tabular-nums;white-space:nowrap;flex:none}",
-    ".v65-t b{font-size:24px;font-weight:800;letter-spacing:.01em}.v65-t small{font-size:15px;font-weight:700;color:var(--ink-3);margin-left:1px;display:inline-block;width:38px}",
+    ".v65-t b{font-size:24px;font-weight:800;letter-spacing:.01em}.v65-t small{font-size:15px;font-weight:700;color:var(--ink-3);margin-left:1px;display:inline-block;width:38px;height:17px;line-height:17px;overflow:hidden;vertical-align:-3px}.v65-w{display:inline-block;height:17px;overflow:hidden;vertical-align:top}.v65-r{display:block;will-change:transform;animation:v65roll 1s steps(10) infinite}.v65-r i{display:block;font-style:normal;height:17px;line-height:17px}@keyframes v65roll{to{transform:translateY(-100%)}}",
     ".v65-d{font-size:13px;font-weight:700;color:var(--ink-2);margin-top:2px}",
     ".topbar-in{align-items:center}",
-    "@media (max-width:600px){.v65-clock{padding:4px 10px 4px 0;border-right:0}.v65-t b{font-size:18px}.v65-t small{font-size:12px;width:30px}.v65-d{font-size:11px}}",
+    "@media (max-width:600px){.v65-clock{padding:4px 10px 4px 0;border-right:0}.v65-t b{font-size:18px}.v65-t small{font-size:12px;width:30px;height:14px;line-height:14px;vertical-align:-2px}.v65-w,.v65-r i{height:14px;line-height:14px}.v65-d{font-size:11px}}",
     ".v65-clg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.v65-cld{border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:2px;font-size:13px}.v65-cld b{font-size:14px}.v65-cld small{color:var(--ink-3);font-size:11.5px}",
     ".v65-add{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.v65-add .input{min-height:42px}.v65-add select{flex:1;min-width:200px}.v65-bk{margin-top:8px}",
     "@media (max-width:600px){.v65-clg{grid-template-columns:repeat(3,minmax(0,1fr))}}",
