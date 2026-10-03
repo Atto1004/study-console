@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-04.156";
+var BUILD="2026-10-04.157";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -13587,7 +13587,7 @@ var V33={};
   setTimeout(V72.ping,3000);
 })();
 /* ============================================================
-   V73 LAYER — 공부계획 하루 보기 개편 (대표님 2026-10-04) (BUILD 2026-10-04.156)
+   V73 LAYER — 공부계획 하루 보기 개편 (대표님 2026-10-04) (BUILD 2026-10-04.157)
    ① 보기 전환 = 구글 캘린더식 아이콘(하루 · 한 주) + ‹ 오늘 › 이동 — 「오늘만 · 이번 주 · 다음 주 버튼 말고 1day · 1week 아이콘」
    ② 하루 보기에서 어제 · 내일로 넘기기(V60.ui.off) — 「오늘만에서 어제랑 내일로 이동」
    ③ 시간표 오른쪽 장소 줄(폰에서도) + 경계마다 「14:30 집 → 카페」, 위에 하루 경로 한 줄 — 「위치는 항상 우측 · 어디서 어디로 한눈에」
@@ -13639,15 +13639,16 @@ var V33={};
       else segs.push({k:k,s:m,e:m+STEP,p:p?Object.assign({},p):null}); }
     var trans=[], last=null, mvStart=null;
     segs.forEach(function(g){ if(!g.p) return; if(g.p.mv){ if(mvStart==null) mvStart=g.s; return; }
-      if(last&&last.p.n!==g.p.n) trans.push({m:mvStart!=null?mvStart:g.s,f:last.p,t:g.p});
+      var tm=mvStart!=null?mvStart:g.s;
+      if(last&&last.p.n!==g.p.n) trans.push({m:tm,f:last.p,t:g.p,guess:tm>nowM&&tm<=nowM+STEP?1:0});   /* guess = 「지금까지」로 끝난 위치 다음 칸(실제 이동 시각 아님) — 줄에 시각 표시 없이 경로에만 「이후 예상」 */   /* 「지금까지」로 끝난 위치 다음 칸은 실제 이동이 아니다 — 지금 바로 뒤 경계는 빼기 */
       last=g; mvStart=null; });
     var html='<div class="v73-lane" style="height:'+H+'px">'+segs.map(function(g){ if(!g.p) return "";
         var top=y(g.s), ht=Math.max(2,y(g.e)-top), fu=g.s>=nowM?' fu':'';
         return '<div class="v73-ls'+(g.p.mv?' mv':g.p.c?' cp':'')+fu+'" style="top:'+top+'px;height:'+ht+'px">'+(!g.p.mv&&ht>=26?'<b>'+esc(g.p.n)+'</b>'+(g.p.s&&ht>=42?'<small>'+esc(g.p.s)+'</small>':''):'')+'</div>'; }).join("")+
-      trans.map(function(t){ return '<div class="v73-tr'+(t.m>=nowM?' fu':'')+'" style="top:'+y(t.m)+'px"><time>'+hm(t.m)+'</time><span>'+esc(t.f.n)+' → '+esc(t.t.n)+'</span></div>'; }).join("")+'</div>';
+      trans.filter(function(t){ return !t.guess; }).map(function(t){ return '<div class="v73-tr'+(t.m>=nowM?' fu':'')+'" style="top:'+y(t.m)+'px"><time>'+hm(t.m)+'</time><span>'+esc(t.f.n)+' → '+esc(t.t.n)+'</span></div>'; }).join("")+'</div>';
     var first=null; segs.some(function(g){ if(g.p&&!g.p.mv){ first=g; return true; } return false; });
     var route=!first?'':'<div class="v73-route"><small>이동</small><b>'+esc(first.p.n)+'</b>'+
-      (trans.length?trans.map(function(t){ return '<i>→</i><time>'+hm(t.m)+'</time><b'+(t.m>=nowM?' class="fu"':'')+'>'+esc(t.t.n)+'</b>'; }).join(""):'<i>· 하루 종일</i>')+'</div>';
+      (trans.length?trans.map(function(t){ return t.guess?'<i>→ 이후 예상</i><b class="fu">'+esc(t.t.n)+'</b>':'<i>→</i><time>'+hm(t.m)+'</time><b'+(t.m>=nowM?' class="fu"':'')+'>'+esc(t.t.n)+'</b>'; }).join(""):'<i>· 하루 종일</i>')+'</div>';
     return {html:html,route:route};
   };
   /* ④ 과목 화면 혼자 풀기 — 제출 파일 목록(_private/submit.json) 중 .html(혼자 풀기)만. 정역학 Ch 버튼(V69)은 그대로 */
