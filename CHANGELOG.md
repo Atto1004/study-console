@@ -4,6 +4,9 @@
 
 ## 2026-10-03
 
+### .145 — 공부계획 html 링크 = 앱 안 보기 창
+- os-a4 가 _private/submit.json 에 넣은 「혼자 풀기 (스앵님 코칭)」 html(?ch=) 링크 — V60.filesHTML 이 .html 이면 data-v60note 로 openNote(#ntvFrame) 열기. V67 → V45 스앵님 코칭은 #ntvFrame 에서만 이어짐.
+
 ### .144 — 클로바노트 반영 상태 줄
 - 대표님 10/3 「상단에 연결끊김 한양포털 대신 클로바노트 녹음본 변환 몇 개 대기 중이고, 최근 어떤 과목 녹음본까지 적용했는지」. V70 LAYER(V48 배너 감싸기, portal·hylue 제외) + docs/tools/clova_status.py → knowledge/clova-status.json(.gitignore), check_integrations.ps1 매시간.
 

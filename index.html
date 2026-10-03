@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-03.144";
+var BUILD="2026-10-03.145";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,9 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-03.145",d:"10-03",items:[
+    "공부계획 과제 옆 「혼자 풀기 (스앵님 코칭)」 — 새 탭 대신 앱 안 창으로 열려 스앵님 코칭이 이어짐"
+  ]},
   {v:"2026-10-03.144",d:"10-03",items:[
     "오늘 탭 맨 위 — 한양 포털 끊김 알림 대신 클로바노트 상태: 녹음본 변환 대기 몇 개 · 최근 어떤 과목 녹음본까지 앱에 반영했는지 · 대기 중인 과목 날짜"
   ]},
@@ -12143,8 +12146,10 @@ var V33={};
   V60.filesFor=function(a){ return (V60.files||[]).filter(function(f){ return f.course===a.c&&new RegExp(f.match).test(a.t); }); };
   V60.filesHTML=function(a){
     var fs=V60.filesFor(a); if(!fs.length) return "";
-    return '<span class="v60-files">'+fs.map(function(f){ return '<a class="v60-file" href="'+esc(f.file)+'" target="_blank" rel="noopener">'+esc(f.label)+'</a>'; }).join("")+'</span>';
+    return '<span class="v60-files">'+fs.map(function(f){ var pg=/\.html(\?|#|$)/.test(f.file);   /* html(혼자 풀기 등)은 앱 안 보기 창으로 — 스앵님 코칭이 이어지게(10/3) */
+      return '<a class="v60-file'+(pg?' pg':'')+'" href="'+esc(f.file)+'"'+(pg?' data-v60note="'+esc(a.c+" · "+f.label)+'"':' target="_blank" rel="noopener"')+'>'+esc(f.label)+'</a>'; }).join("")+'</span>';
   };
+  document.addEventListener("click",function(e){ var t=e.target&&e.target.closest&&e.target.closest("a[data-v60note]"); if(!t||typeof openNote!=="function") return; e.preventDefault(); openNote(t.getAttribute("href"),t.getAttribute("data-v60note")); });
   V60.EST={"공업수학1":60,"정역학":90,"아카데믹글쓰기":60,"CADD":120,"일반물리학2":90,"미분적분학2":90};
   V60.key=function(a){ return a.c+"|"+a.t; };
   /* 과제 종류 — 같은 과목 · 같은 종류의 실제 소요 기록으로 예상 시간을 잡는다 (대표님 10/3) */

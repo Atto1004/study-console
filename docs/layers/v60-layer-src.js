@@ -69,8 +69,10 @@
   V60.filesFor=function(a){ return (V60.files||[]).filter(function(f){ return f.course===a.c&&new RegExp(f.match).test(a.t); }); };
   V60.filesHTML=function(a){
     var fs=V60.filesFor(a); if(!fs.length) return "";
-    return '<span class="v60-files">'+fs.map(function(f){ return '<a class="v60-file" href="'+esc(f.file)+'" target="_blank" rel="noopener">'+esc(f.label)+'</a>'; }).join("")+'</span>';
+    return '<span class="v60-files">'+fs.map(function(f){ var pg=/\.html(\?|#|$)/.test(f.file);   /* html(혼자 풀기 등)은 앱 안 보기 창으로 — 스앵님 코칭이 이어지게(10/3) */
+      return '<a class="v60-file'+(pg?' pg':'')+'" href="'+esc(f.file)+'"'+(pg?' data-v60note="'+esc(a.c+" · "+f.label)+'"':' target="_blank" rel="noopener"')+'>'+esc(f.label)+'</a>'; }).join("")+'</span>';
   };
+  document.addEventListener("click",function(e){ var t=e.target&&e.target.closest&&e.target.closest("a[data-v60note]"); if(!t||typeof openNote!=="function") return; e.preventDefault(); openNote(t.getAttribute("href"),t.getAttribute("data-v60note")); });
   V60.EST={"공업수학1":60,"정역학":90,"아카데믹글쓰기":60,"CADD":120,"일반물리학2":90,"미분적분학2":90};
   V60.key=function(a){ return a.c+"|"+a.t; };
   /* 과제 종류 — 같은 과목 · 같은 종류의 실제 소요 기록으로 예상 시간을 잡는다 (대표님 10/3) */
