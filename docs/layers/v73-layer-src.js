@@ -118,6 +118,8 @@
   V73.now=function(){
     var pts=V73.pts(), last=pts.length?pts[pts.length-1]:null, lt=last?(last.t2||last.t):0;
     if(last&&Date.now()-lt<30*60000&&window.V72){ var cl=V72.clusters(), c=cl[cl.length-1], nm=c?V72.nameOf(c):null;
+      /* 이름 모르는 위치인데 대표님이 말한 체류(숙소 등)가 지금을 덮고 있으면 그 이름 — 「새 장소」로 덮지 않는다 (10/4) */
+      if(!nm){ var sa=V60.stayAt(today(),nowMin()); if(sa&&sa.src!=="geo") return {place:sa.place,sub:sa.sub||"",when:agoS(lt)+" 위치 기준"}; }
       return {place:nm||"새 장소",sub:nm?"":"처음 온 곳 — 이름을 말해 주시면 기억해요",when:agoS(lt)+" 위치 기준"}; }
     var st=V60.stayAt(today(),nowMin());
     return {place:st?st.place:"모름",sub:st?(st.sub||""):"",when:last?"마지막 위치 "+agoS(lt)+" · 그 뒤는 짐작":"위치 기록 없음"};

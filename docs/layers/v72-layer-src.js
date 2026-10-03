@@ -46,9 +46,21 @@
         if(ov>=dur*0.5){ P[s.place]={la:+c.la.toFixed(5),lo:+c.lo.toFixed(5),r:150}; ch=true; } }); });
     if(ch) persist();
   };
+  /* 숙소처럼 긴 체류(12시간 넘게, 끝 시각 있음)는 「밤에 잡힌 위치」로 이름을 배운다 — 낮에는 카페 등으로 나가니 아무 위치나 배우면 안 됨.
+     위치 묶음이 새벽 1~6시에 걸쳐 있고 그 시각이 긴 체류 안이면 그 체류 이름 (10/4) */
+  V72.learnNight=function(){
+    var g=V72.st(), P=g.places, ch=false;
+    var long=((window.V60&&V60.pp&&V60.pp.stays)||[]).filter(function(s){ return s.to&&s.place&&!P[s.place]&&(!s.src||/^said/.test(s.src)); }).filter(function(s){ return (new Date(s.to.replace(" ","T"))-new Date(s.from.replace(" ","T")))/3600000>12; });
+    if(!long.length) return;
+    V72.clusters().forEach(function(c){
+      for(var t=c.t;t<=c.t2;t+=30*60000){ var d=new Date(t), h=d.getHours(); if(h<1||h>=6) continue; var st=V72.stamp(t);
+        var s=long.filter(function(x){ return st>=x.from&&st<x.to&&!P[x.place]; })[0];
+        if(s){ P[s.place]={la:+c.la.toFixed(5),lo:+c.lo.toFixed(5),r:150}; ch=true; break; } } });
+    if(ch) persist();
+  };
   V72.stays=function(){
     var said=((window.V60&&V60.pp&&V60.pp.stays)||[]).filter(function(s){ return !s.src||/^said/.test(s.src); }).filter(function(s){ var h=(new Date((s.to||V72.stamp(Date.now())).replace(" ","T"))-new Date(s.from.replace(" ","T")))/3600000; return h<=12; });
-    try{ V72.learn(said); }catch(e){}
+    try{ V72.learn(said); V72.learnNight(); }catch(e){}
     return V72.clusters().map(function(c){ var nm=V72.nameOf(c);
       var open=Date.now()-c.t2<15*60000;   /* 마지막 확인이 15분 안이면 아직 거기 있는 것으로(끝 = 지금) */
       return {from:V72.stamp(c.t),to:open?null:V72.stamp(c.t2+60000),place:nm||"새 장소",sub:nm?"앱 위치":(c.la.toFixed(4)+", "+c.lo.toFixed(4)),src:"geo"}; });
