@@ -648,10 +648,11 @@
     ".v60-run{min-width:44px;text-align:right}",
     ".v60-ck{display:flex!important;align-items:center;gap:8px;flex-direction:row!important}",
     ".v60-db.k-hw{background:#C7261B}.v60-db.k-st{background:#1E5FA8}.v60-db.k-memo{background:#7C3AED}",
-    /* 제안 칸(짐작 · 자동 배정) = 점선 · 옅게 — 확정 일정과 구분 (10/3) */
-    ".v60-db.sug,.v60-b.sug{background:transparent!important;border:2px dashed currentColor;box-shadow:none}",
-    ".v60-db.sug.k-hw,.v60-b.sug.k-hw{color:#C7261B}.v60-db.sug.k-st,.v60-b.sug.k-st{color:#1E5FA8}.v60-db.sug.k-memo,.v60-b.sug.k-memo{color:#7C3AED}.v60-db.sug.k-meal,.v60-db.sug.k-life,.v60-b.sug.k-meal,.v60-b.sug.k-life{color:#5E7F4A}",
-    ".v60-db.sug .v60-dbt small,.v60-b.sug small{opacity:.8}.v60-db.sug .v60-dp{background:transparent!important}",
+    /* 제안 칸(짐작 · 자동 배정) = 옅은 색 채움 + 왼쪽 색 띠 — 확정 일정(진한 색)과 진하기로만 구분 (10/3, 점선은 지저분하다는 대표님 지적으로 교체) */
+    ".v60-db.sug,.v60-b.sug{--c:#7A869A;background:color-mix(in srgb,var(--c) 13%,var(--surface,#fff))!important;color:color-mix(in srgb,var(--c) 85%,#000)!important;box-shadow:inset 3px 0 0 var(--c)!important;border:0!important}",
+    ".v60-db.sug.k-hw,.v60-b.sug.k-hw{--c:#C7261B}.v60-db.sug.k-st,.v60-b.sug.k-st{--c:#1E5FA8}.v60-db.sug.k-memo,.v60-b.sug.k-memo{--c:#7C3AED}.v60-db.sug.k-meal,.v60-db.sug.k-life,.v60-b.sug.k-meal,.v60-b.sug.k-life{--c:#6E9A57}",
+    ".v60-db.sug .v60-dbt small,.v60-b.sug small{opacity:.75}.v60-db.sug .v60-dp{background:color-mix(in srgb,var(--c) 12%,transparent)!important}",
+    ".v60-b.sug{left:2px;right:2px}",
     ".v60-tln{display:inline-flex;align-items:center;color:#B45309}.v60-tln b{font-weight:800}",
     ".v60-where{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin:0 0 10px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--line) 30%,transparent)}.v60-where small{color:var(--ink-3);margin-right:6px;font-size:11.5px}",
     ".v60-tks .v60-est{white-space:nowrap;display:inline-flex;align-items:center;gap:3px}",
