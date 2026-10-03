@@ -55,12 +55,13 @@ const LY = {};                                                  // 이름 → im
 const ORDER = ["base", "expr_neutral", "expr_smile", "expr_strict", "expr_surprise", "expr_praise",
                "eyes_open", "eyes_half", "eyes_closed", "eyes_side", "mouth_closed", "mouth_half", "mouth_open"];
 let M;                                                          // manifest
-fetch("layers/manifest.json").then(r => r.json()).then(m => { M = m; build(); });
+const LDIR = new URLSearchParams(location.search).get("v") === "1" ? "layers/" : "layers2/";   // 기본 = v2 워터밤 룩(대표님 10/4), ?v=1 이면 터틀넥 v1
+fetch(LDIR + "manifest.json").then(r => r.json()).then(m => { M = m; build(); });
 function build() {
   const W = M.size[0], H = M.size[1];
   for (const n of ORDER) {
     const img = document.createElement("img"); img.alt = ""; img.decoding = "async";
-    img.src = "layers/" + n + ".png"; img.className = n === "base" ? "base" : "ly";
+    img.src = LDIR + n + ".png"; img.className = n === "base" ? "base" : "ly";
     if (n !== "base") { const b = M.boxes[M.layers[n].box]; img.style.left = (b[0] / W * 100) + "%"; img.style.top = (b[1] / H * 100) + "%"; img.style.width = ((b[2] - b[0]) / W * 100) + "%"; }
     char.append(img); LY[n] = img;
   }

@@ -1,0 +1,4 @@
+{"src": "C:/Users/user/Desktop/학습시스템/디자인/2026-10-04_스앵님_웹툰/v2_워터밤룩", "base": "base2_A.png", "out": "demo/saeng/layers2",
+ "box": {"eyes": [140, 225, 640, 360], "mouth": [280, 380, 440, 465], "face": [130, 215, 650, 520]}, "stable": [280, 470, 560, 640],
+ "parts": {"51_눈감음": ["eyes_closed", "eyes"], "52_눈반": ["eyes_half", "eyes"], "53_시선": ["eyes_side", "eyes"], "54_입반": ["mouth_half", "mouth"], "55_입아": ["mouth_open", "mouth"],
+           "56_미소": ["expr_smile", "face"], "57_엄격": ["expr_strict", "face"], "58_놀람": ["expr_surprise", "face"], "59_칭찬": ["expr_praise", "face"]}}

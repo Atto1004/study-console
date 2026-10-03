@@ -1,0 +1,112 @@
+{
+ "scale": 0.5,
+ "size": [
+  440,
+  584
+ ],
+ "boxes": {
+  "eyes": [
+   70,
+   112,
+   320,
+   180
+  ],
+  "mouth": [
+   140,
+   190,
+   220,
+   232
+  ],
+  "face": [
+   65,
+   107,
+   325,
+   260
+  ]
+ },
+ "layers": {
+  "eyes_open": {
+   "box": "eyes"
+  },
+  "mouth_closed": {
+   "box": "mouth"
+  },
+  "expr_neutral": {
+   "box": "face"
+  },
+  "eyes_closed": {
+   "box": "eyes"
+  },
+  "eyes_half": {
+   "box": "eyes"
+  },
+  "eyes_side": {
+   "box": "eyes"
+  },
+  "mouth_half": {
+   "box": "mouth"
+  },
+  "mouth_open": {
+   "box": "mouth"
+  },
+  "expr_smile": {
+   "box": "face"
+  },
+  "expr_strict": {
+   "box": "face"
+  },
+  "expr_surprise": {
+   "box": "face"
+  },
+  "expr_praise": {
+   "box": "face"
+  }
+ },
+ "shift": {
+  "eyes_closed": [
+   -1,
+   0,
+   81.3
+  ],
+  "eyes_half": [
+   -3,
+   -1,
+   172.4
+  ],
+  "eyes_side": [
+   -9,
+   -3,
+   377.5
+  ],
+  "mouth_half": [
+   -1,
+   0,
+   66.7
+  ],
+  "mouth_open": [
+   -1,
+   1,
+   334.5
+  ],
+  "expr_smile": [
+   -1,
+   -2,
+   421.9
+  ],
+  "expr_strict": [
+   -3,
+   -2,
+   540.0
+  ],
+  "expr_surprise": [
+   -2,
+   -1,
+   325.9
+  ],
+  "expr_praise": [
+   -4,
+   -4,
+   450.0
+  ]
+ }
+}
