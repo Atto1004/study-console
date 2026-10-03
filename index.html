@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-04.161";
+var BUILD="2026-10-04.162";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,9 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-04.162",d:"10-04",items:[
+    "공부계획 하루 보기 — 수면을 빗금 대신 「취침」 칸으로 기록(예: 10/3 취침 02:00–12:00). 지난 날 밤은 다음 날 수면 기록이 있을 때만"
+  ]},
   {v:"2026-10-04.161",d:"10-04",items:[
     "공부계획 하루 보기 — 칸끼리 겹치거나 글자가 잘리고 튀어나오던 것 정리. 칸 높이에 맞는 만큼만 글자(아주 짧은 칸은 선만)",
     "같은 일을 두 번 그리지 않음 — 말씀하신 「기상 · 씻고 준비」가 있으면 앱이 만든 기상 칸은 빼고, 있던 곳은 오른쪽 장소 줄에만",
@@ -12592,9 +12595,15 @@ var V33={};
   };
 
   /* ---------- 오늘만 보기: 하루 시간표를 한 줄씩 ---------- */
-  V60.KN={stay:"있던 곳",cls:"수업",work:"근무",ev:"일정",trip:"이동(차편)",meal:"식사",life:"생활",move:"이동",hw:"과제",st:"공부",memo:"암기"};
+  V60.KN={sleep:"수면",stay:"있던 곳",cls:"수업",work:"근무",ev:"일정",trip:"이동(차편)",meal:"식사",life:"생활",move:"이동",hw:"과제",st:"공부",memo:"암기"};
   V60.todayHTML=function(T,nowM,seg){
     var rows=T?T.blk.concat(T.items.map(function(b){ return Object.assign({sug:1},b); })).filter(function(b){ return b.e>T.wake-1; }).sort(function(a,b){ return a.s-b.s||a.e-b.e; }):[];   /* 정해진 일정만 — 빈 시간은 비워 둔다(대표님 10/3) */
+    /* 수면은 빗금이 아니라 「취침」 칸으로 기록 (대표님 10/4 「취침은 취침으로 기록해야지」) — 아침 = 수면 기록(또는 앞으로의 계획), 밤 = 다음 날 기록의 취침 시각.
+       지난 날 밤인데 다음 날 기록이 없으면 짐작이라 그리지 않는다(.152 원칙) */
+    if(T){ var tdS=today(), nx=V60.sleepOf(addDays(T.d,1));
+      if(V60.sleepKnown(T.d,T.wake)&&T.wake>(T.sleepFrom||0)){ var bc=toMin(V60.cfg("bed","01:00")), sf=T.sleepFrom||(!V60.sleepOf(T.d)&&T.d>tdS&&bc<6*60?bc:0); rows.push({s:sf,e:T.wake,t:"취침",k:"sleep",sug:V60.sleepOf(T.d)?0:1}); }
+      if(T.bed<1440&&(T.d>=tdS||nx)) rows.push({s:T.bed,e:1440,t:"취침",k:"sleep",sug:nx?0:1});
+      rows.sort(function(a,b){ return a.s-b.s||a.e-b.e; }); }
     var hm2=function(m){ m=Math.round(m); return (m>=1440?"익일 ":"")+(Math.floor(m/60)%24<10?"0":"")+(Math.floor(m/60)%24)+":"+(m%60<10?"0":"")+(m%60); };
     var sc=rows.filter(function(b){ return b.school; }), back=rows.filter(function(b){ return b.t==="귀가"; });
     var sch=sc.length?{s:Math.min.apply(null,sc.map(function(b){ return b.s; })),e:back.length?back[back.length-1].s:Math.max.apply(null,sc.map(function(b){ return b.e; }))}:null;
@@ -12614,7 +12623,7 @@ var V33={};
     /* 24시간 · 1시간 칸 시간표 (대표님 10/3 「오늘 24시간으로 되어 있는 거 왜 한 칸밖에 없는 거지」) — 칸은 늘 24개, 정해진 일정만 그 시각에 놓고 나머지는 빈 칸 */
     var PXH=V60.DPX, H=24*PXH, y=function(m){ return Math.max(0,Math.min(1440,m))/60*PXH; };
     var hrs=''; for(var h=0;h<24;h++) hrs+='<span style="top:'+(h*PXH)+'px">'+pad2(h)+':00</span>';
-    var shade=T?(V60.sleepKnown(T.d,T.wake)?'<i class="v60-dsl" style="top:'+y(T.sleepFrom||0)+'px;height:'+Math.max(0,y(T.wake)-y(T.sleepFrom||0))+'px"></i>':'')+(T.bed<1440?'<i class="v60-dsl" style="top:'+y(T.bed)+'px;height:'+(H-y(T.bed))+'px"></i>':''):'';
+    var shade='';   /* 수면 빗금 → 「취침」 칸으로 바뀜 (10/4) */
     /* 글자 겹침 · 잘림 · 튀어나옴 금지 (대표님 10/4 「금기로 정했던 텍스트 합쳐짐 · 글자 잘림 · 밖으로 튀어나옴」):
        칸 높이는 다음 칸 시작을 넘지 않게 자르고, 높이에 맞는 만큼만 글자를 넣는다 — 14px 미만 = 글자 없는 선 · 44 미만 = 한 줄 · 100 미만 = 제목 한 줄 + 시각 · 100 이상 = 종류 + 제목 두 줄 + 시각.
        이동은 「이동」만 — 어디로 갔는지는 오른쪽 장소 줄이 보여 준다 (「용식이형네로 이동 말고 그냥 이동만」) */
@@ -12630,7 +12639,7 @@ var V33={};
       var act=(ht>=60&&b.meta&&b.meta.hw?V60.filesHTML(b.meta.hw)+'<button type="button" class="v60-chk" data-v60done="'+esc(b.meta.hw.k)+'" aria-label="완료"></button>':'')+
         (ht>=60&&b.meta&&b.meta.x?'<button type="button" class="btn xs a" data-v60go="'+b.meta.c.id+'|'+b.meta.x.w+'|'+b.meta.x.date+'">열기</button><button type="button" class="v60-chk" data-v60sdone="'+b.meta.c.id+'|'+b.meta.x.date+'" aria-label="완료"></button>':'');
       return '<div class="v60-db k-'+b.k+(b.sug?' sug':'')+(past?' past':'')+(cur?' cur':'')+size+'" style="top:'+top+'px;height:'+ht+'px"><div class="v60-dbt">'+(ht>=100?'<span class="v60-dk">'+esc(V60.KN[b.k]||"")+(cur?' · 지금':'')+'</span>':'')+'<b>'+esc(title)+'</b><small>'+hm2(b.s)+'–'+hm2(b.e)+(ht>=100&&b.note?' · '+esc(b.note):'')+'</small></div>'+(act?'<div class="v60-da">'+act+'</div>':'')+pc+'</div>'; }).join("");
-    var bed=T&&T.bed<1440?'<div class="v60-db k-sleep thin" style="top:'+y(T.bed)+'px;height:16px"><div class="v60-dbt"><b>취침</b><small>'+hm2(T.bed)+'</small></div></div>':'';
+    var bed='';
     var now=(T&&T.d===today())?'<i class="v60-dnow" style="top:'+y(nowM)+'px"><b>'+hm(nowM)+'</b></i>':'';
     var lane=V60.LANE&&T&&V60.laneOf?V60.laneOf(T,rows,places,y,H):null;
     return '<div class="card v60-today"><div class="card-h"><h3>'+esc(V60.dayName?V60.dayName(T?T.d:today()):'오늘')+' '+esc(V60.md(T?T.d:today()))+V60.I("24시간 · 1시간 칸 시간표입니다.\n꽉 찬 칸 = 정해진 일정(수업 · 근무 · 캘린더 · 차편).\n점선 칸 = 제안 — 빈 시간에 앱이 짐작으로 배치한 과제 · 공부 · 식사 · 휴식(확정 아님).\n빈 칸 = 아무것도 없는 시간 · 빗금 = 수면 · 빨간 줄 = 지금.")+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b">'+V60.whereHTML(T)+(lane?lane.route:'')+
@@ -12857,6 +12866,7 @@ var V33={};
     ".v60-day .v60-db.thin .v60-dbt b{-webkit-line-clamp:1;font-size:12.5px}.v60-day .v60-dbt small{color:var(--ink-3);opacity:1;font-size:11.5px}",
     /* 높이별 글자 양 (10/4) — 한 줄짜리는 줄바꿈 없이 말줄임, 선은 글자 없음 */
     ".v60-day .v60-db.mid{padding-top:3px;padding-bottom:3px}",
+    ".v60-day .v60-db.k-sleep{background:repeating-linear-gradient(135deg,color-mix(in srgb,#7C86A0 10%,var(--surface,#fff)) 0 6px,var(--surface,#fff) 6px 12px)!important}",
     ".v60-day .v60-db.thin{padding-top:0;padding-bottom:0;align-items:center}.v60-day .v60-db.thin .v60-dbt b{font-size:12px;line-height:1.2}.v60-day .v60-db.thin .v60-dbt small{line-height:1.2;font-size:11px}.v60-day .v60-db.thin .v60-dbt{line-height:1.2}",
     ".v60-day .v60-db.thin .v60-dbt{display:flex;align-items:baseline;gap:8px;min-width:0;white-space:nowrap;overflow:hidden}",
     ".v60-day .v60-db.thin .v60-dbt b,.v60-day .v60-db.mid .v60-dbt b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-line-clamp:unset;min-width:0}",
