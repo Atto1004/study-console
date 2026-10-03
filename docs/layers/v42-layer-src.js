@@ -10,7 +10,7 @@
     var t=term(); if(t.patchV42a) return;
     var c=t.courses.filter(function(x){return x.name==="공업수학1";})[0]; if(!c) return;
     if(Array.isArray(window.NOTES)&&!NOTES.some(function(x){return x.file===V42.FILE;}))
-      NOTES.push({course:"공업수학1",type:"과제",title:"3주차 과제 해답지 — 제출용 (수식 전개만) · 1.5 #23·28 · 2.1 #6·9 · 2.2 #4·8·14 · 2.3 #8",file:V42.FILE,week:3,date:"2026-09-18",sub:"제출 9/23(수) 09:00 교탁 ❓ · 오타 GREEN(2차) · PDF 4장 · 손으로 옮겨 적을 것"});
+      NOTES.push({course:"공업수학1",type:"과제",title:"3주차 과제 해답지 — 제출용 (수식 전개만) · 1.5 #23·28 · 2.1 #6·9 · 2.2 #4·8·14 · 2.3 #8",file:V42.FILE,week:3,date:"2026-09-18",sub:"제출 9/23(수) 09:00 교탁(확인 필요) · 오타 GREEN(2차) · PDF 4장 · 손으로 옮겨 적을 것"});
     var n=weekNote(c,3,true);
     if(n){
       if(!n.links.some(function(l){return (l.url||"")===V42.FILE;})) n.links.unshift({label:"3주차 과제 해답지 — 제출용 (PDF 4장, 오타 GREEN)",url:V42.FILE});

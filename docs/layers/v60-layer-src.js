@@ -476,7 +476,7 @@
     var exH=exams().filter(function(e){ return e.date===td||e.date===addDays(td,1); }).map(function(e){ var n=(course(e.courseId)||{}).name||"";
       return '<div class="v60-tk2 urgent"><div class="v60-tkm"><div class="v60-tkt"><b>'+esc(n)+'</b> · '+esc(e.kind||"시험")+'</div><div class="v60-tks"><span class="v60-due hot">'+(e.date===td?"오늘":"내일")+(e.time?" "+esc(e.time):"")+'</span></div></div></div>'; }).join("");
     var nHot=left.filter(isHot).length;
-    return '<div class="v60-must"><div class="v60-h">오늘 할 과제 '+(nHot?'<span class="v60-hotn">마감 임박 '+nHot+'</span> ':'')+'<span class="v60-hs">'+left.length+'개'+(sum(left)?' · 예상 합계 '+fmtMin(sum(left)):'')+'</span>'+V60.I("시각 없이 남은 과제 전부 — 과목별 · 마감 순.\n「과제」 = LMS 과제 · 「할 일」 = 직접 넣거나 말로 준 것.\n▶ 재생 · ⏸ 일시정지 · ■ 종료(= 완료 + 실제 걸린 시간 기록). 그 기록이 같은 과목 · 같은 종류 과제의 예상 시간이 됩니다.")+'</div>'+
+    return '<div class="v60-must"><div class="v60-h">오늘 할 과제 '+(nHot?'<span class="v60-hotn">마감 임박 '+nHot+'</span> ':'')+'<span class="v60-hs">'+left.length+'개'+(sum(left)?' · 예상 합계 '+fmtMin(sum(left)):'')+'</span>'+V60.I("시각 없이 남은 과제 전부 — 과목별 · 마감 순.\n「과제」 = LMS 과제 · 「할 일」 = 직접 넣거나 말로 준 것.\n▶ 재생 · ⏸︎ 일시정지 · ■ 종료(= 완료 + 실제 걸린 시간 기록). 그 기록이 같은 과목 · 같은 종류 과제의 예상 시간이 됩니다.")+'</div>'+
       exH+sec("과제",left.filter(function(a){ return !a.own; }))+sec("할 일",left.filter(function(a){ return a.own; }))+stHTML+'</div>';
   };
 
@@ -541,7 +541,7 @@
         return '<div class="v60-tp mv"><span>'+esc(from.name)+'</span><b>→</b><span>'+esc(to.name+(to.sub&&!to.soft&&to.campus&&to.name!=="학교"?" "+to.sub:""))+'</span></div>'; }
       if(!pl) return '<div class="v60-tp"></div>';
       var same=prevKey!=null&&prevKey===label(pl); prevKey=label(pl);
-      return '<div class="v60-tp '+(pl.home?'home':(pl.campus?'campus':'out'))+(same?' same':'')+'">'+(same?'<i></i>':'<span class="v60-tpn">'+esc(pl.name)+(pl.sub?' <small>'+esc(pl.sub)+'</small>':'')+(pl.ask?' <small class="v60-rask">자리 ❓</small>':'')+'</span>')+'</div>';
+      return '<div class="v60-tp '+(pl.home?'home':(pl.campus?'campus':'out'))+(same?' same':'')+'">'+(same?'<i></i>':'<span class="v60-tpn">'+esc(pl.name)+(pl.sub?' <small>'+esc(pl.sub)+'</small>':'')+(pl.ask?' <small class="v60-rask">자리 확인 필요</small>':'')+'</span>')+'</div>';
     };
     /* 24시간 · 1시간 칸 시간표 (대표님 10/3 「오늘 24시간으로 되어 있는 거 왜 한 칸밖에 없는 거지」) — 칸은 늘 24개, 정해진 일정만 그 시각에 놓고 나머지는 빈 칸 */
     var PXH=V60.DPX, H=24*PXH, y=function(m){ return Math.max(0,Math.min(1440,m))/60*PXH; };
@@ -646,7 +646,7 @@
     var html=stops.map(function(x,i){ var nx=stops[i+1], mv="";
       if(nx){ var gap=nx.s-x.e, lab=(x.p.campus&&nx.p.campus)?(x.p.name===nx.p.name?"강의실 이동":"건물 이동"):(nx.p.home?"귀가":(x.p.home?"등교 · 외출":"이동"));
         mv='<div class="v60-rmv"><i></i><span>'+esc(lab)+(gap>0?' · '+gap+'분':'')+'</span></div>'; }
-      return '<div class="v60-rst'+(i===now?' now':'')+(x.p.home?' home':(x.p.campus?' campus':' out'))+'"><span class="v60-rdot">'+(i+1)+'</span><div><div class="v60-rpl"><b>'+esc(x.p.name)+'</b>'+(x.p.sub?' <span>'+esc(x.p.sub)+'</span>':'')+(i===now?' <em>지금</em>':'')+(x.p.ask?' <span class="v60-rask">자리 ❓</span>':'')+'</div>'+
+      return '<div class="v60-rst'+(i===now?' now':'')+(x.p.home?' home':(x.p.campus?' campus':' out'))+'"><span class="v60-rdot">'+(i+1)+'</span><div><div class="v60-rpl"><b>'+esc(x.p.name)+'</b>'+(x.p.sub?' <span>'+esc(x.p.sub)+'</span>':'')+(i===now?' <em>지금</em>':'')+(x.p.ask?' <span class="v60-rask">자리 확인 필요</span>':'')+'</div>'+
         '<div class="v60-rt">'+hm2(x.s)+(x.e>x.s?'–'+hm2(x.e):'')+'</div><div class="v60-rw">'+x.what.slice(0,6).map(esc).join(' · ')+(x.what.length>6?' 외 '+(x.what.length-6):'')+'</div></div></div>'+mv; }).join("");
     var keys=[]; stops.forEach(function(x){ if(keys.indexOf(x.p.name)<0) keys.push(x.p.name); });
     var W=260, H=Math.max(120,keys.length*46+24), pos={};
