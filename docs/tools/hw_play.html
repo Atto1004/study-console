@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>정역학 과제 혼자 풀기</title>
+<!-- 대표님 2026-10-02 「정역학은 시험문제 과제 문제 중에 그대로 나온다고 했으니까 과제 문제 내가 혼자서 풀 수 있게」.
+     원본 = docs/tools/hw_play.html → build_hw_play.py 가 notes/lessons/_private/statics/hw/index.html 로 복사(교재 스캔 그림이 있어 atom /study/ 안에서만).
+     데이터 = 같은 폴더 ch3.json · ch4.json. 기록 = localStorage mc-hw-statics(문제별 시도·힌트·혼자 풀기 연속). -->
+<style>
+:root{--bg:#F4F6F4;--card:#fff;--ink:#141a16;--sub:#5f6a63;--line:#dde3de;--acc:#2E7D32;--acc-soft:#E6F2E6;--ok:#1B7A2E;--bad:#C7261B;--warn:#9A5B00;--hint:#1E5FA8}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:16px;-webkit-text-size-adjust:100%}
+button,input{font:inherit}
+.top{position:sticky;top:0;z-index:5;background:rgba(244,246,244,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .in{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.top h1{font-size:18px;margin:0;font-weight:800}.top .dd{font-size:13px;font-weight:800;color:var(--bad);border:1.5px solid currentColor;border-radius:99px;padding:2px 10px}
+.tabs{display:flex;gap:6px;margin-left:auto}.tabs button,.seg button{min-height:40px;padding:0 14px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);font-weight:700;cursor:pointer}
+.tabs button.on,.seg button.on{border-color:var(--acc);background:var(--acc-soft);color:var(--acc)}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+.sum{display:flex;gap:14px;flex-wrap:wrap;font-size:14px;color:var(--sub);margin:0 0 12px}.sum b{color:var(--ink);font-size:18px;margin-left:4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.pc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:8px;min-height:120px}
+.pc:hover{border-color:var(--acc)}.pc .h{display:flex;align-items:center;gap:8px}.pc .no{font-size:20px;font-weight:800}.pc .t{font-size:14px;color:var(--sub)}
+.st{margin-left:auto;font-size:12px;font-weight:800;border-radius:99px;padding:3px 10px;border:1.5px solid currentColor;white-space:nowrap}
+.st.new{color:var(--sub)}.st.ing{color:var(--warn)}.st.ok{color:var(--ok);background:#E9F6EC}
+.pc .meta{font-size:12.5px;color:var(--sub);margin-top:auto}
+.play{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:14px;align-items:start}
+.pane{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.pane h2{font-size:20px;margin:0 0 6px}.pane .ask{font-weight:700;margin:8px 0 4px}
+.figbox{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;cursor:zoom-in}.figbox img{display:block;width:100%;height:auto}
+ul.given{margin:8px 0 0;padding-left:20px}ul.given li{margin:2px 0}
+.dots{display:flex;gap:5px;margin:0 0 10px}.dots i{flex:1;height:6px;border-radius:3px;background:var(--line)}.dots i.done{background:var(--acc)}.dots i.cur{background:#8BC48F}
+.step .k{font-size:13px;color:var(--sub);font-weight:700}.step .q{font-size:18px;font-weight:700;margin:6px 0 12px;line-height:1.45}
+.ch{display:flex;flex-direction:column;gap:8px}.ch label{display:flex;gap:10px;align-items:center;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;min-height:46px}
+.ch label.sel{border-color:var(--acc);background:var(--acc-soft)}.ch input{width:20px;height:20px;accent-color:var(--acc)}
+.ch label.right{border-color:var(--ok);background:#E9F6EC}.ch label.wrong{border-color:var(--bad);background:#FDECEA}
+.num{display:flex;gap:8px;align-items:center}.num input{flex:1;min-width:0;min-height:50px;border:1.5px solid var(--line);border-radius:10px;padding:0 14px;font-size:20px;font-variant-numeric:tabular-nums}
+.num input:focus{outline:none;border-color:var(--acc)}.num .u{font-size:15px;color:var(--sub);font-weight:700;white-space:nowrap}
+.model{border:1.5px dashed var(--acc);border-radius:10px;padding:10px 12px;background:var(--acc-soft);margin:8px 0}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.btn{min-height:46px;padding:0 18px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-weight:800;cursor:pointer}
+.btn.p{background:var(--acc);border-color:var(--acc);color:#fff}.btn.h{color:var(--hint);border-color:#9DB9DD}.btn:disabled{opacity:.45;cursor:default}
+.fb{margin-top:12px;border-radius:10px;padding:10px 12px;font-weight:600;line-height:1.5}.fb.ok{background:#E9F6EC;color:var(--ok)}.fb.bad{background:#FDECEA;color:var(--bad)}.fb.show{background:#FFF6E0;color:#6B4A00}
+.hints{margin-top:10px;display:flex;flex-direction:column;gap:6px}.hints div{border-left:4px solid var(--hint);background:#EEF4FB;padding:7px 10px;border-radius:0 8px 8px 0;font-size:15px}
+.done{text-align:center;padding:10px 0}.done .big{font-size:22px;font-weight:800;margin:6px 0}.done .rec{color:var(--sub);font-size:14px}
+.exam{margin-top:8px;font-size:14px;color:#B00020;font-weight:700}
+.zoom{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;z-index:20;cursor:zoom-out}.zoom.on{display:flex}.zoom img{max-width:96vw;max-height:94vh;background:#fff;border-radius:6px}
+.back{border:0;background:none;color:var(--acc);font-weight:800;cursor:pointer;padding:6px 0;min-height:40px}
+@media (max-width:820px){.play{grid-template-columns:1fr}.top h1{font-size:16px}}
+</style></head><body>
+<div class="top"><div class="in"><h1>정역학 과제 혼자 풀기</h1><span class="dd" id="dd"></span>
+ <div class="tabs" id="tabs"><button data-ch="3">Ch.3</button><button data-ch="4">Ch.4</button></div></div></div>
+<div class="wrap" id="app"></div>
+<div class="zoom" id="zoom"><img alt=""></div>
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const KEY="mc-hw-statics", EXAM="2026-10-19";
+const DATA={}; let CH=new URLSearchParams(location.search).get("ch")||localStorage.getItem(KEY+"-ch")||"3";
+let REC={}; try{ REC=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ REC={}; }
+const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(REC)); }catch(e){} };
+const rec=id=>REC[id]||(REC[id]={runs:[],clean:0});
+/* 혼자 풀기 = 힌트·해설 없이, 틀림 없이 끝까지 2번 연속 */
+const status=id=>{ const r=REC[id]; if(!r||!r.runs.length) return "new"; return r.clean>=2?"ok":"ing"; };
+const ST={new:["아직","new"],ing:["연습 중","ing"],ok:["혼자 ✓","ok"]};
+function dday(){ const d=Math.ceil((new Date(EXAM+"T00:00:00+09:00")-new Date())/864e5); $("#dd").textContent=d>0?"중간 D-"+d:d===0?"중간 오늘":"중간 지남"; }
+function load(ch){ if(DATA[ch]) return Promise.resolve(DATA[ch]); return fetch("ch"+ch+".json",{cache:"no-cache"}).then(r=>r.ok?r.json():null).catch(()=>null).then(d=>{ DATA[ch]=d; return d; }); }
+function tabs(){ $$("#tabs button").forEach(b=>{ b.classList.toggle("on",b.dataset.ch===CH); b.onclick=()=>{ CH=b.dataset.ch; localStorage.setItem(KEY+"-ch",CH); list(); }; }); }
+/* ---------- 목록 ---------- */
+function list(){ tabs(); load(CH).then(d=>{ const app=$("#app"); if(!d){ app.innerHTML='<div class="pane">없음</div>'; return; }
+  const P=d.problems, n=P.length, ok=P.filter(p=>status(p.id)==="ok").length, ing=P.filter(p=>status(p.id)==="ing").length;
+  app.innerHTML='<div class="exam" style="margin:0 0 10px">★ 교수님(OT 9/7) — 과제 문제 1~2개가 중간에 그대로 · 부분점수 없음</div><div class="sum"><span>'+esc(d.title)+'</span><span>혼자 ✓<b>'+ok+' / '+n+'</b></span><span>연습 중<b>'+ing+'</b></span></div><div class="grid">'+
+   P.map(p=>{ const s=ST[status(p.id)], r=REC[p.id]; const last=r&&r.runs.length?r.runs[r.runs.length-1]:null;
+     return '<div class="pc" data-id="'+esc(p.id)+'"><div class="h"><span class="no">'+esc(p.id)+'</span><span class="st '+s[1]+'">'+s[0]+(s[1]==="ing"?" "+(r.clean||0)+"/2":"")+'</span></div><div class="t">'+esc(p.title)+'</div>'+
+       '<div class="meta">'+(last?("마지막 "+new Date(last.ts).toLocaleDateString("ko-KR",{month:"numeric",day:"numeric"})+" · 힌트 "+last.hints+" · 틀림 "+last.wrong+(last.mode==="exam"?" · 실전":"")):"")+'</div></div>'; }).join("")+'</div>';
+  $$(".pc",app).forEach(c=>c.onclick=()=>open(c.dataset.id,"step")); window.scrollTo(0,0); }); }
+/* ---------- 풀기 ---------- */
+let RUN=null;
+function open(id,mode){ let p=(DATA[CH]&&DATA[CH].problems.find(x=>x.id===id))||null;
+  if(!p) for(const c in DATA){ const q=DATA[c]&&DATA[c].problems.find(x=>x.id===id); if(q){ p=q; CH=c; tabs(); break; } } if(!p) return;
+  RUN={p,mode,k:0,hints:0,wrong:0,shown:0,used:new Set(),tries:0,hk:0,fin:false};
+  const app=$("#app");
+  app.innerHTML='<button class="back" id="bk">‹ 목록</button><div class="play"><div class="pane"><h2>'+esc(p.id)+' · '+esc(p.title)+'</h2>'+
+    '<div class="figbox" id="fig"><img src="'+esc(p.img)+'" alt="'+esc(p.id)+' 문제 그림"></div>'+
+    (p.given&&p.given.length?'<ul class="given">'+p.given.map(g=>'<li>'+esc(g)+'</li>').join("")+'</ul>':'')+
+    '<div class="ask">구할 것 · '+esc(p.ask||"")+'</div>'+(p.exam?'<div class="exam">★ '+esc(p.exam)+'</div>':'')+'</div>'+
+    '<div class="pane"><div class="seg" style="display:flex;gap:6px;margin:0 0 10px"><button data-m="step"'+(mode==="step"?' class="on"':'')+'>단계</button><button data-m="exam"'+(mode==="exam"?' class="on"':'')+'>실전</button></div><div id="stage"></div></div></div>';
+  $("#bk").onclick=list; $$(".seg button",app).forEach(b=>b.onclick=()=>open(id,b.dataset.m));
+  $("#fig").onclick=()=>{ const z=$("#zoom"); $("img",z).src=p.img; z.classList.add("on"); };
+  window.scrollTo(0,0); mode==="exam"?examView():stepView(); }
+$("#zoom").onclick=()=>$("#zoom").classList.remove("on");
+function dots(){ const N=RUN.p.steps.length; return '<div class="dots">'+RUN.p.steps.map((s,i)=>'<i class="'+(i<RUN.k?"done":i===RUN.k?"cur":"")+'"></i>').join("")+'</div>'; }
+function inputHTML(s){
+  if(s.kind==="multi"||s.kind==="choice"){ const t=s.kind==="multi"?"checkbox":"radio"; return '<div class="ch">'+s.choices.map((c,i)=>'<label><input type="'+t+'" name="c" value="'+i+'"><span>'+esc(c)+'</span></label>').join("")+'</div>'; }
+  if(s.kind==="num") return '<div class="num"><input id="nv" inputmode="decimal" autocomplete="off" placeholder="숫자"><span class="u">'+esc(s.answer.unit||"")+'</span></div>';
+  return '<div class="model" id="mdl" hidden>'+esc(s.model||"")+'</div>'; }
+function stepView(){ const p=RUN.p, s=p.steps[RUN.k], st=$("#stage"); RUN.tries=0; RUN.hk=0;
+  if(!s){ return finish(); }
+  st.innerHTML=dots()+'<div class="step"><div class="k">단계 '+(RUN.k+1)+' / '+p.steps.length+'</div><div class="q">'+esc(s.q)+'</div>'+inputHTML(s)+
+    '<div class="hints" id="hs"></div><div id="fb"></div><div class="btns">'+
+    (s.kind==="self"?'<button class="btn p" id="go">다 썼어요</button>':'<button class="btn p" id="go">확인</button>')+
+    '<button class="btn h" id="hint">힌트 1/3</button><button class="btn" id="give">해설</button></div></div>';
+  $$(".ch label",st).forEach(l=>{ const i=$("input",l); i.onchange=()=>$$(".ch label",st).forEach(x=>x.classList.toggle("sel",$("input",x).checked)); });
+  const nv=$("#nv"); if(nv){ nv.focus(); nv.onkeydown=e=>{ if(e.key==="Enter") $("#go").click(); }; }
+  $("#hint").onclick=()=>{ if(RUN.hk>=3) return; const h=(s.hints||[])[RUN.hk]; if(h==null) return; RUN.hk++; RUN.hints++; RUN.used.add(RUN.k);
+    $("#hs").insertAdjacentHTML("beforeend",'<div>'+esc(h)+'</div>'); $("#hint").textContent=RUN.hk>=3?"힌트 끝":"힌트 "+(RUN.hk+1)+"/3"; if(RUN.hk>=3) $("#hint").disabled=true; };
+  $("#give").onclick=()=>reveal(s,true);
+  $("#go").onclick=()=>{ if(s.kind==="self") return selfCheck(s); const ok=judge(s); if(ok===null) return;
+    if(ok){ $("#fb").innerHTML='<div class="fb ok">맞아요. '+esc(s.explain||"")+'</div>'; mark(s,true); nextBtn(); }
+    else { RUN.wrong++; RUN.tries++; mark(s,false); if(RUN.tries>=3) return reveal(s,false); $("#fb").innerHTML='<div class="fb bad">다시 · '+RUN.tries+'/3</div>'; } }; }
+function judge(s){ const st=$("#stage");
+  if(s.kind==="num"){ const raw=($("#nv").value||"").replace(/,/g,"").replace(/×\s*10\^?/,"e").replace(/\s/g,""); if(raw==="") return null; const x=Number(raw); if(!isFinite(x)) return false;
+    const v=Number(s.answer.v), tol=s.answer.tol!=null?Number(s.answer.tol):.01; return Math.abs(v)<1e-9?Math.abs(x)<=.01:Math.abs(x-v)<=Math.abs(v)*tol+1e-9; }
+  const sel=$$(".ch input",st).filter(i=>i.checked).map(i=>+i.value); if(!sel.length) return null;
+  if(s.kind==="choice") return sel[0]===s.answer;
+  const a=[...s.answer].sort().join(","); return sel.sort().join(",")===a; }
+function mark(s,ok){ if(s.kind!=="multi"&&s.kind!=="choice") return; const ans=s.kind==="choice"?[s.answer]:s.answer;
+  $$(".ch label",$("#stage")).forEach((l,i)=>{ l.classList.remove("right","wrong"); const c=$("input",l).checked; if(ok&&ans.includes(i)) l.classList.add("right"); else if(!ok&&c&&!ans.includes(i)) l.classList.add("wrong"); }); }
+function answerText(s){ if(s.kind==="num") return (Math.round(s.answer.v*1000)/1000)+" "+(s.answer.unit||""); if(s.kind==="choice") return s.choices[s.answer]; if(s.kind==="multi") return s.answer.map(i=>s.choices[i]).join(" · "); return s.model||""; }
+function reveal(s,asked){ RUN.shown++; RUN.used.add(RUN.k); mark(s,true);
+  $("#fb").innerHTML='<div class="fb show">정답 · '+esc(answerText(s))+'<br>'+esc(s.explain||"")+'</div>'; nextBtn(); }
+function selfCheck(s){ $("#mdl").hidden=false; $("#go").remove(); $("#hint").remove(); $("#give").remove();
+  $("#fb").innerHTML='<div class="btns"><button class="btn p" id="same">같게 그렸어요</button><button class="btn" id="diff">다르게 그렸어요</button></div>';
+  $("#same").onclick=()=>{ $("#fb").innerHTML='<div class="fb ok">'+esc(s.explain||"")+'</div>'; nextBtn(); };
+  $("#diff").onclick=()=>{ RUN.wrong++; RUN.used.add(RUN.k); $("#fb").innerHTML='<div class="fb show">'+esc(s.explain||"")+'</div>'; nextBtn(); }; }
+function nextBtn(){ const b=$(".btns",$("#stage")); if(!b) return; $$("button",b).forEach(x=>{ if(x.id!=="nx") x.disabled=true; });
+  b.insertAdjacentHTML("beforeend",'<button class="btn p" id="nx">'+(RUN.k+1<RUN.p.steps.length?"다음 단계":"끝")+'</button>'); $("#nx").disabled=false; $("#nx").focus();
+  $("#nx").onclick=()=>{ RUN.k++; stepView(); }; }
+/* 실전: 단계·힌트 없이 종이에 다 풀고, 숫자 답만 한꺼번에 */
+function examView(){ const p=RUN.p, st=$("#stage"), nums=p.steps.map((s,i)=>[s,i]).filter(([s])=>s.kind==="num");
+  st.innerHTML='<div class="step"><div class="q">종이에 처음부터 끝까지 푼 뒤 답만</div>'+nums.map(([s,i])=>'<div class="k" style="margin-top:10px">'+esc(s.q)+'</div><div class="num"><input data-i="'+i+'" inputmode="decimal" autocomplete="off"><span class="u">'+esc(s.answer.unit||"")+'</span></div>').join("")+
+    '<div id="fb"></div><div class="btns"><button class="btn p" id="go">채점</button></div></div>';
+  $("#go").onclick=()=>{ let bad=0; $$("input[data-i]",st).forEach(inp=>{ const s=p.steps[+inp.dataset.i]; const raw=(inp.value||"").replace(/,/g,"").trim(); const x=Number(raw), v=Number(s.answer.v), tol=s.answer.tol!=null?s.answer.tol:.01;
+      const ok=raw!==""&&isFinite(x)&&(Math.abs(v)<1e-9?Math.abs(x)<=.01:Math.abs(x-v)<=Math.abs(v)*tol+1e-9); if(!ok) bad++;
+      inp.style.borderColor=ok?"var(--ok)":"var(--bad)"; if(!ok) inp.insertAdjacentHTML("afterend",'<span class="u" style="color:var(--bad)">→ '+esc(answerText(s))+'</span>'); });
+    RUN.wrong=bad; RUN.k=p.steps.length; $("#go").disabled=true;
+    $("#fb").innerHTML=bad?'<div class="fb bad">틀림 '+bad+'개 — 단계 모드로 다시</div>':'<div class="fb ok">전부 맞음 · '+esc(p.final||"")+'</div>';
+    record(); $(".btns",st).insertAdjacentHTML("beforeend",'<button class="btn" id="again">다시 백지로</button><button class="btn" id="lst">목록</button>'); $("#again").onclick=()=>open(p.id,"exam"); $("#lst").onclick=list; }; }
+function record(){ if(RUN.fin) return; RUN.fin=true; const r=rec(RUN.p.id), clean=RUN.hints===0&&RUN.wrong===0&&RUN.shown===0;
+  r.runs.push({ts:Date.now(),mode:RUN.mode,hints:RUN.hints,wrong:RUN.wrong,shown:RUN.shown,clean}); if(r.runs.length>30) r.runs=r.runs.slice(-30);
+  r.clean=clean?(r.clean||0)+1:0; save(); return clean; }
+function finish(){ const clean=record(), r=REC[RUN.p.id], st=$("#stage");
+  st.innerHTML=dots()+'<div class="done"><div class="big">'+(clean?(r.clean>=2?"혼자 ✓":"힌트 없이 성공 "+r.clean+"/2"):"끝")+'</div>'+
+    '<div class="rec">힌트 '+RUN.hints+' · 틀림 '+RUN.wrong+' · 해설 '+RUN.shown+'</div><div style="margin-top:8px;font-weight:700">'+esc(RUN.p.final||"")+'</div>'+
+    '<div class="btns" style="justify-content:center"><button class="btn p" id="again">다시 백지로</button><button class="btn" id="ex">실전</button><button class="btn" id="nxp">다음 문제</button></div></div>';
+  $("#again").onclick=()=>open(RUN.p.id,"step"); $("#ex").onclick=()=>open(RUN.p.id,"exam");
+  $("#nxp").onclick=()=>{ const P=DATA[CH].problems, i=P.findIndex(x=>x.id===RUN.p.id); i+1<P.length?open(P[i+1].id,"step"):list(); }; }
+window.__hw={get REC(){return REC;},get RUN(){return RUN;},open,list,load};
+dday(); list();
+</script></body></html>
