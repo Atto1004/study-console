@@ -19,6 +19,8 @@
   function pad2(n){ return (n<10?"0":"")+n; }
   function hm(m){ m=Math.round(m); var h=Math.floor(m/60), r=m%60; return pad2(h%24)+":"+pad2(r); }
   function dur(m){ return fmtMin(m); }
+  /* 아침 수면 빗금 = 수면 기록이 있거나, 아직 오지 않은 시간(앞으로의 계획)일 때만 — 지난 시간에 짐작한 기상 시각은 그리지 않는다 (10/3) */
+  V60.sleepKnown=function(d,wake){ var sl=V60.sleepOf(d); if(sl&&sl.wake) return true; var t=today(); return d>t||(d===t&&wake>nowMin()); };
   V60.I=function(t){ return window.V71?V71.info(t):""; };   /* 설명 문구는 (i) 안으로 — 지침 학습시스템 §30 */
   function cByName(n){ return courses().filter(function(c){ return c.name===n; })[0]; }
   V60.st=function(){ if(!S.v60) S.v60={est:{},done:{},cfg:{}}; S.v60.est=S.v60.est||{}; S.v60.done=S.v60.done||{}; S.v60.cfg=S.v60.cfg||{}; return S.v60; };
@@ -184,6 +186,13 @@
       for(var s=at;s<=hi-len&&!done;s+=15){ if(!blk.some(function(b){ return b.s<s+len&&b.e>s; })){ blk.push({s:s,e:s+len,t:m[3],k:"meal",sug:1}); if(m[0]==="dinner"&&rest>0) blk.push({s:s+len,e:s+len+rest,t:"휴식",k:"life",sug:1}); done=true; } }
       for(var s2=at-15;s2>=lo&&!done;s2-=15){ if(!blk.some(function(b){ return b.s<s2+len&&b.e>s2; })){ blk.push({s:s2,e:s2+len,t:m[3],k:"meal",sug:1}); done=true; } }
     });
+    /* 제안(짐작)은 앞으로의 계획에만 — 지난 날 · 지금 이전에 끝난 짐작 칸은 지운다 (대표님 10/3 「미확정된 건 미래의 계획에만 해당」) */
+    var tdy=today(), nm=nowMin();
+    blk=blk.filter(function(b){ return !b.sug||(d>tdy)||(d===tdy&&b.e>nm); });
+    /* 지난 시간에는 실제로 한 것 — 과제 재생 → 종료 기록(S.v60.act)을 그 시각에 */
+    var A=V60.st().act||{}; Object.keys(A).forEach(function(k){ var x=A[k]; if(!x||!x.at||!x.min) return; var e=new Date(x.at);
+      var ds=e.getFullYear()+"-"+pad2(e.getMonth()+1)+"-"+pad2(e.getDate()); if(ds!==d) return; var em=e.getHours()*60+e.getMinutes();
+      blk.push({s:Math.max(0,em-x.min),e:em,t:x.c+" · "+(x.t||"과제")+" (실제)",k:"hw",done:1}); });
     blk.sort(function(a,b){ return a.s-b.s; });
     var start=wake, end=bedAbs;
     if(nowM!=null) start=Math.max(start,Math.ceil(nowM/5)*5);
@@ -300,7 +309,7 @@
       var bl=x.blk.map(function(b){ return {s:b.s,e:b.e,t:b.t,k:b.k,sug:b.sug}; }).concat(x.items.map(function(b){ return {s:b.s,e:b.e,t:b.t,k:b.k,sug:1}; }));   /* 과제 · 공부 배정 = 제안 칸 */
       var isT=x.d===td;
       return '<div class="v60-col'+(isT?' today':'')+(x.past?' past':'')+'" data-d="'+x.d+'"><div class="v60-ch"><b>'+V60.md(x.d)+'</b><small>빈 '+dur(x.avail)+(x.actual?' · 공부 '+dur(x.actual):'')+'</small></div><div class="v60-cb" style="height:'+((H1-H0)*PX)+'px">'+
-        '<i class="v60-sleep" style="top:0;height:'+Math.max(0,(x.wake-H0)*PX)+'px"></i><i class="v60-sleep" style="top:'+((x.bed-H0)*PX)+'px;height:'+Math.max(0,(H1-x.bed)*PX)+'px"></i>'+
+        (V60.sleepKnown(x.d,x.wake)?'<i class="v60-sleep" style="top:0;height:'+Math.max(0,(x.wake-H0)*PX)+'px"></i>':'')+(x.d>=td?'<i class="v60-sleep" style="top:'+((x.bed-H0)*PX)+'px;height:'+Math.max(0,(H1-x.bed)*PX)+'px"></i>':'')+
         bl.filter(function(b){ return b.e>H0&&b.s<H1; }).map(function(b){ var s=Math.max(b.s,H0), e=Math.min(b.e,H1), h=(e-s)*PX;
           return '<div class="v60-b k-'+b.k+(b.sug?' sug':'')+'" style="top:'+((s-H0)*PX)+'px;height:'+h+'px" title="'+esc(hm(b.s)+'–'+hm(b.e)+' '+b.t)+'">'+(h>=15?'<span>'+esc(b.t)+'</span>':'')+(h>=30?'<small>'+hm(b.s)+'</small>':'')+'</div>'; }).join("")+
         (isT&&nowM>H0&&nowM<H1?'<i class="v60-now" style="top:'+((nowM-H0)*PX)+'px"><b>'+hm(nowM)+'</b></i>':'')+'</div></div>';
@@ -433,7 +442,7 @@
     /* 24시간 · 1시간 칸 시간표 (대표님 10/3 「오늘 24시간으로 되어 있는 거 왜 한 칸밖에 없는 거지」) — 칸은 늘 24개, 정해진 일정만 그 시각에 놓고 나머지는 빈 칸 */
     var PXH=V60.DPX, H=24*PXH, y=function(m){ return Math.max(0,Math.min(1440,m))/60*PXH; };
     var hrs=''; for(var h=0;h<24;h++) hrs+='<span style="top:'+(h*PXH)+'px">'+pad2(h)+':00</span>';
-    var shade=T?'<i class="v60-dsl" style="top:0;height:'+y(T.wake)+'px"></i>'+(T.bed<1440?'<i class="v60-dsl" style="top:'+y(T.bed)+'px;height:'+(H-y(T.bed))+'px"></i>':''):'';
+    var shade=T?(V60.sleepKnown(T.d,T.wake)?'<i class="v60-dsl" style="top:0;height:'+y(T.wake)+'px"></i>':'')+(T.bed<1440?'<i class="v60-dsl" style="top:'+y(T.bed)+'px;height:'+(H-y(T.bed))+'px"></i>':''):'';
     var blks=rows.map(function(b,ri){ if(b.e<=0||b.s>=1440) return ""; var top=y(b.s), ht=Math.max(16,y(b.e)-top), past=b.e<=nowM, cur=b.s<=nowM&&nowM<b.e;
       var pc=placeCell(ri).replace(/^<div class="v60-tp/,'<div class="v60-tp v60-dp');
       return '<div class="v60-db k-'+b.k+(b.sug?' sug':'')+(past?' past':'')+(cur?' cur':'')+(ht<34?' thin':'')+'" style="top:'+top+'px;height:'+ht+'px"><div class="v60-dbt"><b>'+esc(b.t)+'</b><small>'+hm2(b.s)+'–'+hm2(b.e)+(b.note?' · '+esc(b.note):'')+'</small></div>'+pc+'</div>'; }).join("");
