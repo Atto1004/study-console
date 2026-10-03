@@ -18,7 +18,10 @@
       V64.A=(x[0]&&x[0].asks)||[]; V64.M=(x[1]&&x[1].items)||[]; return true; });
     return V64._p;
   };
-  V64.ans=function(){ S.asks=S.asks||{}; return S.asks; };
+  /* S(상태)는 atom 안에서 boot() 가 atom 상태를 받을 때까지 null — 그 사이 asks.json 이 먼저 도착해 badge 가 돌면 S.asks 에서 예외가 나고,
+     그 예외가 render 래퍼를 타고 올라가 뒤 레이어들의 후처리까지 끊었다(10/4 오류 점검). S 없으면 읽기는 빈 객체, 그리기·저장은 하지 않는다. boot() 뒤 첫 render 가 다시 그린다. */
+  V64.ready=function(){ return !!S; };
+  V64.ans=function(){ if(!S) return {}; S.asks=S.asks||{}; return S.asks; };
   V64.open=function(){ var a=V64.ans(); return (V64.A||[]).filter(function(q){ return !a[q.id]; }); };
 
   /* ---------- ① XP ---------- */
@@ -40,6 +43,7 @@
     ref.parentNode.insertBefore(v,ref.nextSibling);
   };
   V64.badge=function(){
+    if(!V64.ready()) return;
     var n=V64.open().length;
     $$('#rail .navb[data-k="ask"],#tabbar .tabb[data-k="ask"]').forEach(function(b){ var d=b.querySelector(".v64-dot"); if(n){ if(!d){ d=document.createElement("i"); d.className="v64-dot"; b.appendChild(d); } d.textContent=n; } else if(d) d.remove(); });
   };
@@ -61,6 +65,7 @@
   /* ---------- ② 확인 화면 ---------- */
   V64.render=function(){
     V64.ensureView(); var body=$("#v64Body"); if(!body) return;
+    if(!V64.ready()){ body.innerHTML='<div class="v44-mut" style="padding:16px">…</div>'; return; }
     if(V64.A==null){ body.innerHTML='<div class="v44-mut" style="padding:16px">…</div>'; V64.load().then(function(){ if(ui.view==="ask") V64.render(); V64.badge(); }); return; }
     var a=V64.ans(), open=V64.open(), done=(V64.A||[]).filter(function(q){ return a[q.id]; });
     $("#v64Sub").textContent=open.length?"답 기다리는 것 "+open.length:"모두 답함";
@@ -76,10 +81,10 @@
     };
     body.innerHTML=(open.length?open.map(function(q){ return card(q,null); }).join(""):'<div class="empty">지금 확인할 것이 없습니다.</div>')+
       (done.length?'<details class="v64-done"><summary>답한 것 '+done.length+'</summary>'+done.map(function(q){ return card(q,a[q.id]); }).join("")+'</details>':'');
-    $$("[data-v64a]",body).forEach(function(b){ b.onclick=function(){ var c=b.closest("[data-q]"), id=c.dataset.q, note=(c.querySelector(".v64-note")||{}).value||"";
+    $$("[data-v64a]",body).forEach(function(b){ b.onclick=function(){ if(!V64.ready()) return; var c=b.closest("[data-q]"), id=c.dataset.q, note=(c.querySelector(".v64-note")||{}).value||"";
       V64.ans()[id]={a:b.dataset.v64a,note:note.trim(),at:Date.now()}; persist(); toast("답을 보냈어요"); V64.render(); V64.badge(); }; });
     $$(".v64-note",body).forEach(function(t){ t.addEventListener("keydown",function(e){ if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){ e.preventDefault(); if(!t.value.trim()) return; var b=t.closest("[data-q]").querySelector(".v64-send"); if(b) b.click(); } }); });
-    $$("[data-v64undo]",body).forEach(function(b){ b.onclick=function(){ delete V64.ans()[b.dataset.v64undo]; persist(); V64.render(); V64.badge(); }; });
+    $$("[data-v64undo]",body).forEach(function(b){ b.onclick=function(){ if(!V64.ready()) return; delete V64.ans()[b.dataset.v64undo]; persist(); V64.render(); V64.badge(); }; });
   };
 
   /* ---------- ③ 수업 자료 표에서 그날 영상 · 녹음 ---------- */

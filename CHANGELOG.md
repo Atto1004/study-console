@@ -4,6 +4,9 @@
 
 ## 2026-10-04
 
+### .170 — 확인 탭 배지: 상태 준비 전 예외 제거
+- A++O 세션 오류 점검(console_probe.mjs)에서 발견: 새 프로필로 /study/ 를 열면 `V64.ans` 가 `S==null` 인 채 `S.asks` 를 읽어 TypeError. atom 안에서는 boot() 가 atom 상태 수신까지 기다리는 동안 S 가 null 이라, 그 사이 render → V64.badge 가 던진 예외가 그 뒤 레이어들의 render 후처리까지 끊었다. `V64.ans` 에 `if(!S) return {}` 가드(index.html · docs/layers/v64-layer-src.js). 오타 회의 후 반영.
+
 ### .169 — 화면 이모지 정리 (지침 점검)
 - A++O 세션 전체 점검(대표님 「전체적으로 싹 점검, 지침 어긴 거 없게」): UI 이모지 「❓」 2곳(V60 「자리 ❓」, V42 공수1 과제 「교탁 ❓」) → 「확인 필요」. U+26A0 ⚠ · U+2699 ⚙ · U+2691 ⚑ · U+23F8 ⏸ 뒤에 U+FE0E(글자 표시)를 붙여 iOS 컬러 이모지 방지(index.html · v35 · v36 · v60). 그림 이모지(🎙 📚 등)는 기존 V34.deEmoji/scrub 가 렌더 때 글자로 바꿈.
 
