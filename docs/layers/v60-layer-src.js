@@ -90,6 +90,7 @@
     }); });
     /* 직접 넣은 할 일(공부계획 「+ 추가」) · 대표님이 말로 준 할 일(_private/tasks.json, atom 안에서만) */
     (st.extra||[]).concat(V60.priv||[]).forEach(function(x){ if(!x||!x.t||!x.due) return;
+      if(x.kind==="study"||x.kind==="prep") return;   /* 공부 · 수업 준비는 과제가 아니다(대표님 10/3) — 「공부」 칸으로(V60.studyTodo) */
       var o=V60.fill({c:x.c||"기타",t:x.t,due:x.due,time:x.time||"23:59",st:"",own:1,id:x.id||""},x.est||60);
       if(x.noplan) o.est=0; o.noplan=x.noplan||""; out.push(o); });
     return out.sort(function(a,b){ return (a.due+a.time)<(b.due+b.time)?-1:1; });
@@ -377,7 +378,10 @@
         return '<div class="v60-grp"><div class="v60-grph"><b>'+esc(g.c)+'</b><span>'+g.xs.length+'개'+(m?' · 약 '+fmtMin(m):'')+'</span></div>'+g.xs.map(row).join("")+'</div>'; }).join("")+'</div>'; };
     /* 공부 — 과제 끝낸 뒤 */
     var st=[], seen={}; (T?T.items:[]).filter(function(b){ return b.k==="st"||b.k==="memo"; }).forEach(function(b){ if(seen[b.t]){ seen[b.t].min+=b.e-b.s; return; } seen[b.t]={b:b,min:b.e-b.s}; st.push(seen[b.t]); });
-    var stHTML='<div class="v60-sec st"><div class="v60-sech">공부 <small>과제를 끝낸 뒤</small></div>'+(T&&T.hwLeft?'<div class="v60-none">남은 과제를 끝내면 공부가 열립니다.</div>':st.length?st.map(function(x){ var b=x.b, m=b.meta||{};
+    var sd=V60.st().done, own=(V60.priv||[]).concat(V60.st().extra||[]).filter(function(x){ return x&&(x.kind==="study"||x.kind==="prep")&&x.due>=td; }).map(function(x){ var o={c:x.c||"기타",t:x.t,due:x.due,time:x.time||"23:59",kind:x.kind}; o.k=V60.key(o); o.done=!!sd[o.k]; return o; }).filter(function(o){ return !o.done; }).sort(function(a,b){ return (a.due+a.time)<(b.due+b.time)?-1:1; });
+    var ownHTML=own.map(function(o){ var dd=diffDays(td,o.due);
+      return '<div class="v60-tk2'+(left.length&&o.kind==="study"?' wait':'')+'"><div class="v60-tkm"><div class="v60-tkt"><b>'+esc(o.c)+'</b> · '+esc(V60.tt(o))+'</div><div class="v60-tks">'+(o.kind==="prep"?'수업 준비 · ':'')+(dd===0?'오늘':dd===1?'내일':V60.md(o.due)+' · D-'+dd)+'</div></div><div class="v60-tka"><button type="button" class="v60-chk" data-v60done="'+esc(o.k)+'" aria-label="완료"></button></div></div>'; }).join("");
+    var stHTML='<div class="v60-sec st"><div class="v60-sech">공부 <small>과제를 끝낸 뒤</small></div>'+ownHTML+(T&&T.hwLeft?'<div class="v60-none">남은 과제를 끝내면 공부가 열립니다.</div>':st.length?st.map(function(x){ var b=x.b, m=b.meta||{};
       return '<div class="v60-tk2'+(left.length?' wait':'')+'"><div class="v60-tkm"><div class="v60-tkt">'+esc(b.t)+'</div><div class="v60-tks">약 '+fmtMin(x.min)+'</div></div><div class="v60-tka">'+
         (m.x?'<button type="button" class="btn xs a" data-v60go="'+m.c.id+'|'+m.x.w+'|'+m.x.date+'">열기</button><button type="button" class="v60-chk" data-v60sdone="'+m.c.id+'|'+m.x.date+'" aria-label="완료"></button>':'')+
         (m.memo?'<button type="button" class="btn xs a" data-v60memo="1">카드</button><button type="button" class="v60-chk" data-v60mdone="'+esc(m.d)+'" aria-label="완료"></button>':'')+'</div></div>'; }).join(""):'<div class="v60-none">오늘 배정할 공부가 없습니다</div>')+'</div>';
