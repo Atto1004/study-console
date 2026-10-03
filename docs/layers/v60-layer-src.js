@@ -445,13 +445,16 @@
     var shade=T?(V60.sleepKnown(T.d,T.wake)?'<i class="v60-dsl" style="top:0;height:'+y(T.wake)+'px"></i>':'')+(T.bed<1440?'<i class="v60-dsl" style="top:'+y(T.bed)+'px;height:'+(H-y(T.bed))+'px"></i>':''):'';
     var blks=rows.map(function(b,ri){ if(b.e<=0||b.s>=1440) return ""; var top=y(b.s), ht=Math.max(16,y(b.e)-top), past=b.e<=nowM, cur=b.s<=nowM&&nowM<b.e;
       var pc=placeCell(ri).replace(/^<div class="v60-tp/,'<div class="v60-tp v60-dp');
-      return '<div class="v60-db k-'+b.k+(b.sug?' sug':'')+(past?' past':'')+(cur?' cur':'')+(ht<34?' thin':'')+'" style="top:'+top+'px;height:'+ht+'px"><div class="v60-dbt"><b>'+esc(b.t)+'</b><small>'+hm2(b.s)+'–'+hm2(b.e)+(b.note?' · '+esc(b.note):'')+'</small></div>'+pc+'</div>'; }).join("");
+      /* 예전 목록 디자인 느낌(대표님 10/3 「1시간 칸 나누기 전 디자인이 이뻤다」) — 흰 칸 · 얇은 색 띠 · 작은 종류 이름 · 굵은 제목 · 파일/완료 상자 · 오른쪽 장소 줄 */
+      var act=(ht>=60&&b.meta&&b.meta.hw?V60.filesHTML(b.meta.hw)+'<button type="button" class="v60-chk" data-v60done="'+esc(b.meta.hw.k)+'" aria-label="완료"></button>':'')+
+        (ht>=60&&b.meta&&b.meta.x?'<button type="button" class="btn xs a" data-v60go="'+b.meta.c.id+'|'+b.meta.x.w+'|'+b.meta.x.date+'">열기</button><button type="button" class="v60-chk" data-v60sdone="'+b.meta.c.id+'|'+b.meta.x.date+'" aria-label="완료"></button>':'');
+      return '<div class="v60-db k-'+b.k+(b.sug?' sug':'')+(past?' past':'')+(cur?' cur':'')+(ht<34?' thin':'')+'" style="top:'+top+'px;height:'+ht+'px"><div class="v60-dbt">'+(ht>=44?'<span class="v60-dk">'+esc(V60.KN[b.k]||"")+(cur?' · 지금':'')+'</span>':'')+'<b>'+esc(b.t)+'</b><small>'+hm2(b.s)+'–'+hm2(b.e)+(b.note?' · '+esc(b.note):'')+'</small></div>'+(act?'<div class="v60-da">'+act+'</div>':'')+pc+'</div>'; }).join("");
     var bed=T&&T.bed<1440?'<div class="v60-db k-sleep thin" style="top:'+y(T.bed)+'px;height:16px"><div class="v60-dbt"><b>취침</b><small>'+hm2(T.bed)+'</small></div></div>':'';
     var now=(T&&T.d===today())?'<i class="v60-dnow" style="top:'+y(nowM)+'px"><b>'+hm(nowM)+'</b></i>':'';
     return '<div class="card v60-today"><div class="card-h"><h3>오늘 '+esc(V60.md(today()))+V60.I("24시간 · 1시간 칸 시간표입니다.\n꽉 찬 칸 = 정해진 일정(수업 · 근무 · 캘린더 · 차편).\n점선 칸 = 제안 — 빈 시간에 앱이 짐작으로 배치한 과제 · 공부 · 식사 · 휴식(확정 아님).\n빈 칸 = 아무것도 없는 시간 · 빗금 = 수면 · 빨간 줄 = 지금.")+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b">'+V60.whereHTML(T)+
       '<div class="v60-day"><div class="v60-dhs" style="height:'+H+'px">'+hrs+'</div><div class="v60-dcol" style="height:'+H+'px;background-size:100% '+PXH+'px">'+shade+blks+bed+now+'</div></div></div></div>';
   };
-  V60.DPX=44;
+  V60.DPX=56;
 
   /* 지금 줄 옮기기 (대표님 10/3 「현재시간 표시」) — 30초마다 위치·시각만. 전체 다시 그리기·캘린더 재조회는 하지 않는다 */
   V60.nowTick=function(){
@@ -662,13 +665,28 @@
     ".v60-db.sug.k-hw,.v60-b.sug.k-hw{--c:#C7261B}.v60-db.sug.k-st,.v60-b.sug.k-st{--c:#1E5FA8}.v60-db.sug.k-memo,.v60-b.sug.k-memo{--c:#7C3AED}.v60-db.sug.k-meal,.v60-db.sug.k-life,.v60-b.sug.k-meal,.v60-b.sug.k-life{--c:#6E9A57}",
     ".v60-db.sug .v60-dbt small,.v60-b.sug small{opacity:.75}.v60-db.sug .v60-dp{background:color-mix(in srgb,var(--c) 12%,transparent)!important}",
     ".v60-b.sug{left:2px;right:2px}",
+    /* 오늘 시간표 = 예전 목록 디자인 느낌 (10/3) — 흰 칸 · 얇은 색 띠 · 작은 종류 이름 · 오른쪽 초록 장소 줄 · 검은 지금 줄 */
+    ".v60-day .v60-db{--c:#7A869A;background:var(--surface,#fff)!important;color:var(--ink,#1d1d1f)!important;box-shadow:inset 4px 0 0 var(--c)!important;border:1px solid color-mix(in srgb,var(--line) 75%,transparent)!important;border-radius:8px;padding:5px 12px 5px 16px;left:4px;right:4px}",
+    ".v60-day .v60-db.k-cls{--c:#5B6B8C}.v60-day .v60-db.k-work{--c:#C26A12}.v60-day .v60-db.k-ev{--c:#7A869A}.v60-day .v60-db.k-trip{--c:#8A5A2B}.v60-day .v60-db.k-meal,.v60-day .v60-db.k-life{--c:#9CB78B}.v60-day .v60-db.k-move{--c:#B8C2CF}.v60-day .v60-db.k-hw{--c:#C7261B}.v60-day .v60-db.k-st{--c:#1E5FA8}.v60-day .v60-db.k-memo{--c:#7C3AED}.v60-day .v60-db.k-sleep{--c:#7C86A0}",
+    ".v60-day .v60-db.sug{background:color-mix(in srgb,var(--c) 5%,var(--surface,#fff))!important;box-shadow:inset 4px 0 0 color-mix(in srgb,var(--c) 55%,transparent)!important}.v60-day .v60-db.sug .v60-dbt b{color:var(--ink-2,#444)}",
+    ".v60-day .v60-db.past{opacity:.5}.v60-day .v60-db.cur{outline:2px solid #1d1d1f;outline-offset:0}",
+    ".v60-dk{display:block;font-size:11px;color:var(--ink-3);line-height:1.25;margin-bottom:1px}",
+    ".v60-day .v60-dbt b{font-size:14px;font-weight:700;line-height:1.35;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}",
+    ".v60-day .v60-db.thin .v60-dbt b{-webkit-line-clamp:1;font-size:12.5px}.v60-day .v60-dbt small{color:var(--ink-3);opacity:1;font-size:11.5px}",
+    ".v60-da{flex:none;display:flex;gap:6px;align-items:flex-start;flex-wrap:nowrap}.v60-da .v60-chk{margin-left:0}.v60-da .v60-files{flex-wrap:nowrap;margin:0}",
+    ".v60-day .v60-db .v60-dp:empty,.v60-day .v60-db .v60-dp.same{display:none}",
+    "@media (max-width:600px){.v60-da .v60-files{display:none}}",
+    ".v60-day .v60-db .v60-dp{background:none!important;border:0!important;border-left:2px solid #9CB78B!important;border-radius:0;color:var(--ink-2,#444)!important;padding:0 0 0 10px;align-self:stretch;max-width:36%;font-size:12.5px;display:flex;align-items:flex-start}",
+    "@media (max-width:600px){.v60-day .v60-db .v60-dp{display:none}}",
+    ".v60-day .v60-dp *{color:var(--ink-2,#444)!important}.v60-day .v60-dp small{color:var(--ink-3)!important}",
+    ".v60-day .v60-dnow{background:#1d1d1f;height:2px}.v60-day .v60-dnow b{background:#1d1d1f;color:#fff;border-radius:99px;padding:1px 8px;top:-9px;left:4px;font-size:11px}",
     ".v60-tln{display:inline-flex;align-items:center;color:#B45309}.v60-tln b{font-weight:800}",
     ".v60-where{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin:0 0 10px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--line) 30%,transparent)}.v60-where small{color:var(--ink-3);margin-right:6px;font-size:11.5px}",
     ".v60-tks .v60-est{white-space:nowrap;display:inline-flex;align-items:center;gap:3px}",
-    /* 오늘 24시간 시간표 (10/3) — 1시간 = 44px, 30분은 칸 가운데 옅은 선 */
+    /* 오늘 24시간 시간표 (10/3) — 1시간 = 56px(V60.DPX), 30분은 칸 가운데 옅은 선 */
     ".v60-day{display:grid;grid-template-columns:52px 1fr;gap:6px;margin-top:4px}",
     ".v60-dhs{position:relative}.v60-dhs span{position:absolute;right:4px;transform:translateY(-50%);font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}.v60-dhs span:first-child{transform:none}",
-    ".v60-dcol{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background-image:linear-gradient(to bottom,transparent 0,transparent 21.6px,color-mix(in srgb,var(--line) 45%,transparent) 21.6px,color-mix(in srgb,var(--line) 45%,transparent) 22px,transparent 22px,transparent 43.2px,var(--line) 43.2px,var(--line) 44px);background-repeat:repeat-y}",
+    ".v60-dcol{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background-image:linear-gradient(to bottom,transparent 0,transparent 27.6px,color-mix(in srgb,var(--line) 45%,transparent) 27.6px,color-mix(in srgb,var(--line) 45%,transparent) 28px,transparent 28px,transparent 55.2px,var(--line) 55.2px,var(--line) 56px);background-repeat:repeat-y}",
     ".v60-dsl{position:absolute;left:0;right:0;background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--line) 35%,transparent) 0 6px,transparent 6px 12px)}",
     ".v60-db{position:absolute;left:6px;right:6px;border-radius:8px;padding:4px 10px;display:flex;justify-content:space-between;gap:10px;overflow:hidden;color:#fff;box-shadow:0 1px 0 rgba(0,0,0,.08)}",
     ".v60-db.past{opacity:.55}.v60-db.cur{outline:2.5px solid #1d1d1f;outline-offset:1px}",
