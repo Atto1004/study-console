@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>스앵님 — 레이어드 2D 데모</title>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Gothic+A1:wght@800&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;height:100%;background:#101410;font-family:"Gowun Dodum",sans-serif;color:#f3efe4}
+  .stage{position:relative;height:100%;overflow:hidden;background:#1d3a2f url(board.jpg) center/cover no-repeat}
+  .stage.dark{background-image:url(board_dark.jpg)}
+  .chalk{position:absolute;left:5%;top:9%;max-width:46%;font:800 clamp(22px,3.4vw,40px)/1.35 "Gothic A1",sans-serif;color:#f6f1e3;letter-spacing:-.01em;text-shadow:0 0 1px rgba(255,255,255,.4)}
+  .chalk small{display:block;margin-top:.5em;font:400 clamp(14px,1.6vw,20px)/1.5 "Gowun Dodum",sans-serif;color:#dfe8d6}
+  /* 캐릭터: 레이어 겹침. 상자 좌표는 manifest.json (0.5배 기준 440×584) */
+  .char{position:absolute;right:4%;bottom:-2%;width:min(44vh,34vw);aspect-ratio:440/584;transform-origin:50% 100%;will-change:transform}
+  .char img{position:absolute;left:0;top:0;width:100%;height:auto;pointer-events:none;user-select:none;-webkit-user-drag:none}
+  .char .ly{opacity:0;transition:opacity 160ms ease}
+  .char .ly.on{opacity:1}
+  .char .ly.snap{transition:none}
+  .breath .char{animation:breath 3.4s ease-in-out infinite}
+  @keyframes breath{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-2px) scale(1.012)}}
+  .char.tilt{transition:rotate 420ms cubic-bezier(.34,1.56,.64,1)}
+  .bubble{position:absolute;left:5%;bottom:7%;max-width:52%;padding:16px 20px;border-radius:14px;background:rgba(246,241,227,.94);color:#1b1f1b;font-size:clamp(15px,1.9vw,22px);line-height:1.55;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .bubble b{font-family:"Gothic A1",sans-serif;color:#2d5a3f;margin-right:8px}
+  .ctl{position:absolute;right:4%;top:3%;display:flex;flex-wrap:wrap;gap:6px;max-width:44%;justify-content:flex-end}
+  .ctl button{height:34px;padding:0 12px;border:0;border-radius:9px;background:rgba(246,241,227,.9);color:#1b1f1b;font:600 13px "Gowun Dodum",sans-serif}
+  .ctl button[aria-pressed=true]{background:#2fb344;color:#fff}
+  .meta{position:absolute;left:5%;top:3%;font-size:12px;color:rgba(246,241,227,.6)}
+  @media (prefers-reduced-motion:reduce){.breath .char{animation:none}.char .ly{transition:none}.char.tilt{transition:none}}
+</style>
+</head>
+<body class="breath">
+<div class="stage" id="stage">
+  <div class="meta">스앵님 레이어드 2D 데모 · 바닐라 CSS/JS · 2026-10-04</div>
+  <div class="chalk" id="chalk">정역학 Ch.3<br>힘의 평형<small>ΣF = 0 · ΣM = 0 — 두 식이면 끝나요.</small></div>
+  <div class="char tilt" id="char" aria-label="김주영 스앵님"></div>
+  <div class="bubble" id="bubble"><b>스앵님</b><span id="say">자, 오늘은 평형부터 봐요. 식 두 개면 끝나요.</span></div>
+  <div class="ctl" id="ctl">
+    <button type="button" data-x="neutral" aria-pressed="true">기본</button>
+    <button type="button" data-x="smile">미소</button>
+    <button type="button" data-x="strict">엄격</button>
+    <button type="button" data-x="surprise">놀람</button>
+    <button type="button" data-x="praise">칭찬</button>
+    <button type="button" id="talk">말하기</button>
+    <button type="button" id="blink">깜빡</button>
+    <button type="button" id="board">칠판 색</button>
+  </div>
+</div>
+<script>
+/* 규칙(방향 v2 §4-1): 숨 3.4s · 깜빡임 3~6s 무작위(감 70ms·뜸 110ms, 가끔 두 번) · 시선 8~15s · 입은 글자 흐름에 맞춰 60~90ms · 표정 crossfade 160ms + 머리 2° 스프링 · 반응 지연 120/240ms */
+const $ = s => document.querySelector(s);
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const char = $("#char");
+const LY = {};                                                  // 이름 → img
+const ORDER = ["base", "expr_neutral", "expr_smile", "expr_strict", "expr_surprise", "expr_praise",
+               "eyes_open", "eyes_half", "eyes_closed", "eyes_side", "mouth_closed", "mouth_half", "mouth_open"];
+let M;                                                          // manifest
+fetch("layers/manifest.json").then(r => r.json()).then(m => { M = m; build(); });
+function build() {
+  const W = M.size[0], H = M.size[1];
+  for (const n of ORDER) {
+    const img = document.createElement("img"); img.alt = ""; img.decoding = "async";
+    img.src = "layers/" + n + ".png"; img.className = n === "base" ? "base" : "ly";
+    if (n !== "base") { const b = M.boxes[M.layers[n].box]; img.style.left = (b[0] / W * 100) + "%"; img.style.top = (b[1] / H * 100) + "%"; img.style.width = ((b[2] - b[0]) / W * 100) + "%"; }
+    char.append(img); LY[n] = img;
+  }
+  set("eyes_open", true); set("mouth_closed", true);
+  schedBlink(); schedGaze();
+}
+function set(n, on, snap) { const el = LY[n]; if (!el) return; el.classList.toggle("snap", !!snap); el.classList.toggle("on", !!on); }
+function only(group, n, snap) { for (const k of Object.keys(LY)) if (k.startsWith(group)) set(k, k === n, snap); }
+/* 표정 패치(expr_*)에는 그 표정의 눈·입이 이미 들어 있다 — 기본 표정일 때만 기본 눈·입 레이어를 위에 올리고, 다른 표정에선 깜빡임·말할 때만 잠깐 덮는다 */
+const eyesRest = snap => only("eyes_", expr === "neutral" ? "eyes_open" : null, snap);
+const mouthRest = snap => only("mouth_", expr === "neutral" ? "mouth_closed" : null, snap);
+
+/* 깜빡임 — 반쯤 → 감음 → 반쯤 → 뜸. 표정 레이어가 눈을 덮고 있어도 눈 레이어가 위에 있어 그대로 깜빡인다 */
+let blinking = false, gazing = false;
+function blink(twice) {
+  if (blinking || gazing) return; blinking = true;
+  const seq = [["eyes_half", 40], ["eyes_closed", 70], ["eyes_half", 50], [null, 110]];
+  let t = 0; for (const [n, d] of seq) { setTimeout(() => n ? only("eyes_", n, true) : eyesRest(true), t); t += d; }
+  setTimeout(() => { blinking = false; if (twice) blink(false); }, t + 20);
+}
+function schedBlink() { setTimeout(() => { blink(Math.random() < .18); schedBlink(); }, 3000 + Math.random() * 3000); }
+/* 시선 — 가끔 옆을 봤다가 돌아온다 */
+function gaze() { if (blinking || talking || reduced) return; gazing = true; only("eyes_", "eyes_side"); setTimeout(() => { eyesRest(); gazing = false; }, 600 + Math.random() * 400); }
+function schedGaze() { setTimeout(() => { gaze(); schedGaze(); }, 8000 + Math.random() * 7000); }
+
+/* 표정 — 얼굴 패치 crossfade + 머리 기울임 스프링. 눈·입 레이어는 그 위에서 계속 산다 */
+let expr = "neutral";
+function setExpr(x) {
+  expr = x;
+  setTimeout(() => {                                            // 반응 지연 120ms
+    only("expr_", "expr_" + x);
+    if (!reduced) { char.style.rotate = (x === "strict" ? "-1.6deg" : x === "surprise" ? "1.2deg" : x === "praise" ? "-2deg" : x === "smile" ? "1deg" : "0deg"); }
+    if (!blinking && !gazing) eyesRest();
+    if (!talking) setTimeout(mouthRest, 120);
+  }, 120);
+  for (const b of document.querySelectorAll("#ctl [data-x]")) b.setAttribute("aria-pressed", b.dataset.x === x ? "true" : "false");
+}
+
+/* 말하기 — 글자를 한 자씩 찍으면서 입을 닫음→반→열림으로 돌린다. 쉼표·마침표에선 입을 닫고 잠깐 쉰다 */
+const LINES = ["자, 오늘은 평형부터 봐요. 식 두 개면 끝나요.", "힘을 다 더해서 0, 모멘트도 더해서 0. 이게 전부예요.", "틀려도 돼요. 어디서 틀렸는지 보는 게 공부죠.", "좋아요, 그 풀이 맞아요. 다음 문제 가요."];
+let talking = false, li = 0;
+function talk() {
+  if (talking) return; talking = true;
+  const text = LINES[li++ % LINES.length], out = $("#say"); out.textContent = "";
+  let i = 0, mouth = 0; const shapes = ["mouth_closed", "mouth_half", "mouth_open", "mouth_half"];
+  setTimeout(function step() {                                  // 반응 지연 240ms 뒤 시작
+    if (i >= text.length) { talking = false; mouthRest(); if (expr === "neutral" && Math.random() < .5) setExpr("smile"); return; }
+    const ch = text[i++]; out.textContent += ch;
+    if (/[,.。!?]/.test(ch) || ch === " ") { mouthRest(true); setTimeout(step, ch === " " ? 90 : 260); return; }
+    mouth = (mouth + 1) % shapes.length; only("mouth_", shapes[mouth], true);
+    setTimeout(step, 60 + Math.random() * 30);
+  }, 240);
+}
+for (const b of document.querySelectorAll("#ctl [data-x]")) b.onclick = () => setExpr(b.dataset.x);
+$("#talk").onclick = talk; $("#blink").onclick = () => blink(false);
+$("#board").onclick = () => $("#stage").classList.toggle("dark");
+</script>
+</body>
+</html>
