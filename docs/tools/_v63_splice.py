@@ -22,7 +22,7 @@ else:
     how = "삽입"
 assert s.count(hdr) == 1
 
-B_OLD, B_NEW = 'var BUILD="2026-10-02.112";', 'var BUILD="2026-10-02.113";'
+B_OLD, B_NEW = 'var BUILD="2026-10-03.139";', 'var BUILD="2026-10-03.140";'
 if B_NEW not in s:
     assert s.count(B_OLD) == 1; s = s.replace(B_OLD, B_NEW)
 PN = 'var PATCHNOTES=[\n'
@@ -36,5 +36,10 @@ ITEM2 = ('  {v:"2026-10-02.113",d:"10-02",items:[' + chr(10) +
          '  ]},' + chr(10))
 if '{v:"2026-10-02.113"' not in s:
     assert s.count(PN) == 1; s = s.replace(PN, PN + ITEM2)
+ITEM3 = ('  {v:"2026-10-03.140",d:"10-03",items:[\n'
+         '    "정역학 「세부단원」 — Ch.1~5 단원별로 절(3.1 ~ 5.4) 나눔. 절마다 교수님 필기 해당 쪽 · 교실 · 수업 노트 · 덱 파트 · 과제 혼자 풀기 · 암기노트"\n'
+         '  ]},\n')
+if '{v:"2026-10-03.140"' not in s:
+    assert s.count(PN) == 1; s = s.replace(PN, PN + ITEM3)
 io.open(IDX, "w", encoding="utf-8", newline="\n").write(s)
 print("V63", how)

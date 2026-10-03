@@ -1,5 +1,5 @@
 /* ============================================================
-   V63 LAYER — 과목 화면 「세부단원」: 절(1.1 ~ 3.3)마다 학습 경로 (BUILD 2026-10-02.111)
+   V63 LAYER — 과목 화면 「세부단원」: 절(1.1 ~ 3.3)마다 학습 경로 (BUILD 2026-10-02.111 · 정역학 2026-10-03.140)
    대표님 2026-10-02 「공업수학 먼저 각 세부단원별로 나눠서 학습 경로로 구체화해주고 교수님 학습자료도 세부단원별로 나눠서 첨부해주고
    거기에 그날 수업에 찍은 사진 따로 첨부하는 항목도 생성해줘 없으면 빈칸으로 두고」
    데이터: knowledge/sections.json(docs/tools/build_sections.py) — 절 · 수업일 · 교수님 슬라이드 조각 · 수업 노트/교실 · 덱 파트
@@ -34,11 +34,12 @@
     var st=V63.state(c,s), lab=V63.ST[st];
     var step=function(n,inner){ return '<div class="v63-step"><span class="v63-sn">'+n+'</span><div class="v63-sc">'+inner+'</div></div>'; };
     var btn=function(href,txt,title,cls){ return '<button class="v63-btn'+(cls?' '+cls:'')+'" data-href="'+esc(href)+'" data-title="'+esc(title||txt)+'">'+txt+'</button>'; };
-    var sl=s.slides.map(function(x){ return btn(x.href,"교수님 자료 "+esc(x.label),"공업수학1 "+s.no+" 교수님 자료 "+x.label,"prof"); }).join("");
+    var sl=s.slides.map(function(x){ return btn(x.href,"교수님 자료 "+esc(x.label),c.name+" "+s.no+" 교수님 자료 "+x.label,"prof"); }).join("");
     var cls=s.lessons.filter(function(l){ return l.cls; }).map(function(l){ return btn(l.cls,"교실 "+md(l.date),s.no+" 교실 "+md(l.date)); }).join("");
     var nt=s.lessons.map(function(l){ var r=V63.read(c,l); return btn(l.note,(r?"✓ ":"")+"수업 노트 "+md(l.date),s.no+" 수업 노트 "+md(l.date),r?"rd":""); }).join("");
     var dk=s.decks.map(function(x){ return btn(x.href,"문제 "+esc(x.label),x.deck+" "+x.label)+btn(x.quiz,"문제만",x.deck+" 문제만","q"); }).join("");
-    var mm=D.memo?btn(D.memo,"암기노트","공업수학1 암기노트"):"";
+    var mm=D.memo?btn(D.memo,"암기노트",c.name+" 암기노트"):"";
+    var hw=(s.hw||[]).map(function(h){ return btn(h.href,"과제 "+esc(h.id)+" 혼자 풀기",c.name+" 과제 "+h.id+" 혼자 풀기","hw"); }).join("");
     var pics=s.dates.map(function(d){ var L=(ph&&ph[d])||[];
       return '<div class="v63-pd"><span class="v63-pdd">'+md(d)+'</span>'+(L.length?L.map(function(p,i){
         return '<button class="v63-th" data-href="'+esc(p.f)+'" data-title="'+esc(md(d)+" "+p.kind+(p.label?" · "+p.label:""))+'"><img loading="lazy" src="'+esc(p.f)+'" alt="'+esc(p.kind+" "+p.label)+'"><span>'+esc(p.kind)+(p.t?" "+esc(p.t):"")+'</span></button>'; }).join(""):'<span class="v63-empty"></span>')+'</div>'; }).join("");
@@ -49,14 +50,14 @@
         step(1,sl||'<span class="v63-empty"></span>')+
         step(2,cls||'<span class="v63-empty"></span>')+
         step(3,nt||'<span class="v63-empty"></span>')+
-        step(4,dk||'<span class="v63-empty"></span>')+
+        step(4,(dk+hw)||'<span class="v63-empty"></span>')+
         step(5,mm||'<span class="v63-empty"></span>')+
         '<div class="v63-ph"><span class="v63-phh">그날 수업 사진</span>'+(pics||'<span class="v63-empty"></span>')+'</div>'+
       '</div></div>';
   };
   V63.html=function(c,D,ph){
     var by={}; D.sections.forEach(function(s){ (by[s.ch]=by[s.ch]||[]).push(s); });
-    return Object.keys(by).sort().map(function(ch){
+    return (D.basis?'<div class="v63-basis">'+esc(D.basis)+'</div>':'')+Object.keys(by).sort().map(function(ch){
       var L=by[ch], n=L.filter(function(s){ return V63.state(c,s)==="done"; }).length;
       return '<div class="v63-ch"><div class="v63-chh"><b>'+esc(D.chapters[ch]||ch+"장")+'</b><span>'+n+' / '+L.length+'</span></div>'+L.map(function(s){ return V63.row(c,D,s,ph); }).join("")+'</div>';
     }).join("");
@@ -100,7 +101,7 @@
     ".v63-sn{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:800;background:color-mix(in srgb,var(--line) 60%,transparent);color:var(--ink-2,#444);margin-top:6px}",
     ".v63-sc{display:flex;flex-wrap:wrap;gap:6px;min-height:34px;align-items:center}",
     ".v63-btn{min-height:34px;padding:5px 12px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink,#111);font-size:12.5px;font-weight:700;cursor:pointer}",
-    ".v63-btn.prof{border-color:#1E5FA8;color:#1E5FA8}.v63-btn.rd{border-color:#1B7A2E;color:#1B7A2E}.v63-btn.q{font-weight:600;color:var(--ink-2,#444)}",
+    ".v63-basis{font-size:12px;color:var(--ink-3);margin:4px 2px 0}.v63-btn.hw{border-color:#B85C00;color:#B85C00}.v63-btn.prof{border-color:#1E5FA8;color:#1E5FA8}.v63-btn.rd{border-color:#1B7A2E;color:#1B7A2E}.v63-btn.q{font-weight:600;color:var(--ink-2,#444)}",
     ".v63-empty{display:inline-block;min-width:120px;height:30px;border:1.5px dashed var(--line);border-radius:8px}",
     ".v63-ph{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}.v63-phh{display:block;font-size:12px;font-weight:800;color:var(--ink-3);margin-bottom:6px}",
     ".v63-pd{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}.v63-pdd{font-family:var(--font-num,inherit);font-size:12px;font-weight:700;min-width:48px;color:var(--ink-2,#444)}",

@@ -143,5 +143,5 @@ function finish(){ const clean=record(), r=REC[RUN.p.id], st=$("#stage");
   $("#again").onclick=()=>open(RUN.p.id,"step"); $("#ex").onclick=()=>open(RUN.p.id,"exam");
   $("#nxp").onclick=()=>{ const P=DATA[CH].problems, i=P.findIndex(x=>x.id===RUN.p.id); i+1<P.length?open(P[i+1].id,"step"):list(); }; }
 window.__hw={get REC(){return REC;},get RUN(){return RUN;},open,list,load};
-dday(); list();
+dday(); { const m=/[#&]p=([\d.]+)/.exec(location.hash||""); if(m){ load(CH).then(()=>open(m[1],"step")); } else list(); }
 </script></body></html>

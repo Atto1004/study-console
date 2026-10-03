@@ -47,7 +47,44 @@ COURSES = {
    ("3.3", "고계 비제차 선형 상미분방정식", [(EM1_RANGE, 100, 105)], ["2026-10-07"], "비제차|들보", "10/7 예정 · 중간 범위 끝"),
   ],
  },
+
+ "정역학": {
+  "slug": "statics", "folder": "정역학", "decks": ["statics-w1-3", "statics-mid", "statics-mid2", "statics-mid3"], "memo": "notes/memo/statics.html",
+  "basis": "절 = Bedford & Fowler 5판 목차(수업 영상정리의 교재 절 표기 기준) · 교재 원본 대조 전",
+  "chapters": {"1": "Ch.1 Introduction", "2": "Ch.2 Vectors (도구 · 범위 밖)", "3": "Ch.3 Forces", "4": "Ch.4 Systems of Forces and Moments", "5": "Ch.5 Objects in Equilibrium"},
+  "hw_href": "notes/lessons/_private/statics/hw/index.html?ch=%s#p=%s",
+  "hw": {"3.3": ["3.11", "3.26", "3.47", "3.51"], "3.4": ["3.63", "3.69"], "4.1": ["4.5", "4.16"], "4.2": ["4.53"], "4.3": ["4.87"], "4.4": ["4.108", "4.123"]},
+  "deck_ovr": [("1.1", "statics-w1-3", 1), ("2.1", "statics-w1-3", 1), ("2.2", "statics-w1-3", 2), ("2.3", "statics-w1-3", 2), ("2.4", "statics-w1-3", 3), ("2.5", "statics-w1-3", 3),
+               ("2.2", "statics-mid", 1), ("2.3", "statics-mid", 1), ("2.4", "statics-mid", 2), ("2.5", "statics-mid", 3), ("2.6", "statics-mid", 3),
+               ("3.1", "statics-mid", 4), ("3.2", "statics-mid", 5), ("3.3", "statics-mid3", 1), ("3.3", "statics-mid3", 2), ("3.3", "statics-mid3", 3), ("3.4", "statics-mid3", 4),
+               ("4.1", "statics-mid2", 1), ("4.2", "statics-mid2", 1), ("4.2", "statics-mid2", 2), ("4.3", "statics-mid2", 2), ("4.4", "statics-mid2", 3), ("4.5", "statics-mid2", 3), ("4.6", "statics-mid2", 3),
+               ("5.1", "statics-mid2", 4), ("5.2", "statics-mid2", 5), ("5.4", "statics-mid2", 5), ("5.3", "statics-mid2", 6)],
+  "sections": [
+   ("1.1", "Introduction — 역학 · 단위 · 뉴턴 법칙 · 만유인력", [("교수필기_2주차_Statics_W2-1_260907.pdf", 1, 13)], ["2026-09-02", "2026-09-07"], "역학|단위|뉴턴|Introduction|만유", ""),
+   ("2.1", "Scalars and Vectors — 스칼라 · 벡터 · 단위벡터", [("교수필기_2주차_Statics_W2-1_260907.pdf", 1, 13)], ["2026-09-07"], "벡터|스칼라|단위벡터", ""),
+   ("2.2", "Components in Two Dimensions — 2D 성분 · 위치벡터", [("교수필기_2주차_Statics_W2-2_260909.pdf", 2, 4)], ["2026-09-09"], "성분|위치벡터|2D|2차원", ""),
+   ("2.3", "Components in Three Dimensions — 3D 성분 · 방향여현", [("교수필기_2주차_Statics_W2-2_260909.pdf", 5, 9)], ["2026-09-09"], "3D|3차원|방향여현|방향 ?코사인", ""),
+   ("2.4", "Dot Products — 내적 · 사이각 · 정사영", [("교수필기_2주차_Statics_W2-2_260909.pdf", 10, 11), ("교수필기_3주차_Statics_W3-1_260914.pdf", 2, 6)], ["2026-09-09", "2026-09-14"], "내적|사이각|정사영|평행·수직", ""),
+   ("2.5", "Cross Products — 외적 · 행렬식", [("교수필기_3주차_Statics_W3-1_260914.pdf", 7, 12)], ["2026-09-14"], "외적|행렬식|오른손", ""),
+   ("2.6", "Mixed Triple Products — 혼합삼중적", [("교수필기_3주차_Statics_W3-2_260916.pdf", 2, 4)], ["2026-09-16"], "삼중적|혼합", ""),
+   ("3.1", "Types of Forces — 체적력 · 접촉력 · 장력 · 도르래 · 스프링", [("교수필기_3주차_Statics_W3-2_260916.pdf", 5, 13)], ["2026-09-16"], "힘의 종류|접촉|장력|도르래|스프링|무게|Forces", ""),
+   ("3.2", "Equilibrium and Free-Body Diagrams — 평형 · 자유물체도", [("교수필기_4주차_Statics_W4-1_260921.pdf", 2, 3)], ["2026-09-16", "2026-09-21"], "자유물체|FBD|평형|두 블록|외력", ""),
+   ("3.3", "Two-Dimensional Force Systems — 2D 입자 평형", [("교수필기_4주차_Statics_W4-1_260921.pdf", 4, 4)], ["2026-09-21"], "2D|2차원|평형식|성분식", ""),
+   ("3.4", "Three-Dimensional Force Systems — 3D 입자 평형", [("교수필기_4주차_Statics_W4-1_260921.pdf", 4, 4)], ["2026-09-21"], "3D|3차원", ""),
+   ("4.1", "Two-Dimensional Description of the Moment — M = DF · 부호", [("교수필기_4주차_Statics_W4-1_260921.pdf", 5, 7)], ["2026-09-21"], "점에 대한|M ?= ?DF|부호|2차원 모멘트|모멘트의 합", ""),
+   ("4.2", "The Moment Vector — M = r × F · 바리뇽", [("교수필기_4주차_Statics_W4-1_260921.pdf", 8, 11), ("교수필기_4주차_Statics_W4-2_260923.pdf", 2, 3)], ["2026-09-21", "2026-09-23"], "모멘트 벡터|r ?× ?F|바리뇽|Varignon", ""),
+   ("4.3", "Moment of a Force About a Line — M_L = e·(r × F)", [("교수필기_4주차_Statics_W4-2_260923.pdf", 4, 9)], ["2026-09-23"], "직선|축|M_L|line", ""),
+   ("4.4", "Couples — 우력", [("교수필기_5주차_Statics_W5-1_260928.pdf", 2, 4)], ["2026-09-28"], "우력|Couple|4\\.18", ""),
+   ("4.5", "Equivalent Systems — 등가계", [("교수필기_5주차_Statics_W5-1_260928.pdf", 5, 8)], ["2026-09-28"], "등가|Equivalent|옮기", ""),
+   ("4.6", "Representing Systems by Equivalent Systems — 힘 + 우력 · 렌치", [("교수필기_5주차_Statics_W5-1_260928.pdf", 9, 14), ("교수필기_5주차_Statics_W5-2_260930.pdf", 2, 3)], ["2026-09-28", "2026-09-30"], "렌치|wrench|요약|힘 \\+ 우력", ""),
+   ("5.1", "Two-Dimensional Applications — 지지와 반력 · 평형식 3개", [("교수필기_5주차_Statics_W5-2_260930.pdf", 4, 14)], ["2026-09-30"], "평형|지지|반력|FBD 4|핀|롤러|고정", ""),
+   ("5.2", "Statically Indeterminate Objects — 부정정 · 부적절한 지지", [], [], "부정정", "10/7 · 10/12 · 10/14 예정"),
+   ("5.3", "Three-Dimensional Applications — 3D 강체 평형", [], [], "3D", "10/7 · 10/12 · 10/14 예정"),
+   ("5.4", "Two-Force and Three-Force Members — 2력 · 3력 부재", [], [], "2력|3력", "10/7 · 10/12 · 10/14 예정"),
+  ],
+ },
 }
+DECK_SHORT = {"em1-mid": "대비1", "em1-mid2": "대비2", "statics-w1-3": "1~3주", "statics-mid": "대비1", "statics-mid2": "대비2", "statics-mid3": "대비3 문제"}
 IMG = re.compile(r"\.(jpe?g|png|heic)$", re.I)
 KIND = [("판서_", "판서"), ("자료_", "자료"), ("강의자료_", "자료"), ("과제_", "과제"), ("필기_", "필기"), ("미분류사진_", "사진"), ("교재_", "교재")]
 
@@ -110,11 +147,11 @@ def main():
             for p in d.get("partList", []):
                 for n in expand(p.get("title", ""), allno):
                     deckmap.setdefault(n, []).append({"href": d["file"] + "#at=p%d-cover" % p["n"], "quiz": d["file"] + "#quiz",
-                                                      "label": "파트 %d" % p["n"], "deck": d.get("title", d["id"])})
+                                                      "label": DECK_SHORT.get(d["id"], "") + " · 파트 %d" % p["n"], "deck": d.get("title", d["id"])})
         for n, did, pn in C.get("deck_ovr", []):
             for d in decks:
                 if d.get("id") == did:
-                    deckmap.setdefault(n, []).append({"href": d["file"] + "#at=p%d-cover" % pn, "quiz": d["file"] + "#quiz", "label": "파트 %d" % pn, "deck": d.get("title", did)})
+                    deckmap.setdefault(n, []).append({"href": d["file"] + "#at=p%d-cover" % pn, "quiz": d["file"] + "#quiz", "label": DECK_SHORT.get(did, "") + " · 파트 %d" % pn, "deck": d.get("title", did)})
         reg = lessons.get("courses", {}).get(cname, {})
         reg = reg.get("dates", reg) if isinstance(reg, dict) else {}
         # 사진 — 절에 걸린 수업일 전부
@@ -183,12 +220,15 @@ def main():
         secs = []
         for no, title, sl, sdates, kw, note in C["sections"]:
             slides = []
-            for pdf, a, b in sl:
+            for k, (pdf, a, b) in enumerate(sl):
                 srcp = os.path.join(MAT, C["folder"], "_강의자료", pdf)
-                dst = os.path.join(priv, "slides", "%s.pdf" % no)
+                name = "%s.pdf" % no if len(sl) == 1 else "%s-%d.pdf" % (no, k + 1)
+                dst = os.path.join(priv, "slides", name)
                 doc = pymupdf.open(srcp)
                 nd = pymupdf.open(); nd.insert_pdf(doc, from_page=a - 1, to_page=b - 1); nd.save(dst); nd.close()
-                slides.append({"href": "notes/lessons/_private/%s/slides/%s.pdf" % (slug, no), "label": "p.%d~%d" % (a, b), "pages": b - a + 1})
+                m6 = re.search(r"_(\d{2})(\d{2})(\d{2})\.pdf$", pdf)   # 교수필기_…_260921.pdf → 9/21
+                pre = ("%d/%d 필기 " % (int(m6.group(2)), int(m6.group(3)))) if m6 else ""
+                slides.append({"href": "notes/lessons/_private/%s/slides/%s" % (slug, name), "label": pre + ("p.%d~%d" % (a, b) if a != b else "p.%d" % a), "pages": b - a + 1})
             les = []
             for d in sdates:
                 ent = reg.get(d)
@@ -202,9 +242,10 @@ def main():
                 les.append({"date": d, "note": f + ("#s=" + sid if sid else ""),
                             "cls": (ent.get("classroom") + ("#ch=" + sid[1:] if sid else "")) if ent.get("classroom") else None,
                             "title": ent.get("title", "")})
+            hw = [{"id": h, "href": C["hw_href"] % (h.split(".")[0], h)} for h in C.get("hw", {}).get(no, [])]
             secs.append({"no": no, "ch": no.split(".")[0], "title": title, "dates": sdates, "note": note,
-                         "slides": slides, "lessons": les, "decks": deckmap.get(no, [])})
-        out["courses"][cname] = {"slug": slug, "chapters": C["chapters"], "memo": C["memo"], "sections": secs}
+                         "slides": slides, "lessons": les, "decks": deckmap.get(no, []), "hw": hw})
+        out["courses"][cname] = {"slug": slug, "chapters": C["chapters"], "memo": C["memo"], "sections": secs, "basis": C.get("basis", "")}
         print(cname, "절", len(secs), "· 슬라이드", sum(len(s["slides"]) for s in secs), "· 사진 날짜", len(photos),
               "장", sum(len(v) for v in photos.values()), "· 수업 노트 연결", sum(len(s["lessons"]) for s in secs),
               "· 덱 연결", sum(len(s["decks"]) for s in secs))
