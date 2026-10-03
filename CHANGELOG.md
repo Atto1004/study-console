@@ -4,6 +4,9 @@
 
 ## 2026-10-04
 
+### .171 — 「불러오는 중」 안내
+- A++O 세션 보고(대표님 「아이패드 A++O 안 학습앱이 안 보이는 경우가 많음」): atom 이 1.2MB 를 압축 없이 보내 느린 회선에서 8초 넘게 흰 화면. 스크립트 앞 정적 #sc-loading(인라인 style) → start() 의 boot() 뒤 finally 에서 제거(boot 실패 시에도 걷어 오류 화면이 보임). 서버 gzip 은 A++O 쪽.
+
 ### .170 — 확인 탭 배지: 상태 준비 전 예외 제거
 - A++O 세션 오류 점검(console_probe.mjs)에서 발견: 새 프로필로 /study/ 를 열면 `V64.ans` 가 `S==null` 인 채 `S.asks` 를 읽어 TypeError. atom 안에서는 boot() 가 atom 상태 수신까지 기다리는 동안 S 가 null 이라, 그 사이 render → V64.badge 가 던진 예외가 그 뒤 레이어들의 render 후처리까지 끊었다. `V64.ans` 에 `if(!S) return {}` 가드(index.html · docs/layers/v64-layer-src.js). 오타 회의 후 반영.
 

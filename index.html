@@ -1760,6 +1760,9 @@ th{font-weight:600;font-size:12px;letter-spacing:0}
 
 <script type="application/json" id="state">null</script>
 
+<!-- 느린 회선에서 1.2MB 를 받는 동안 흰 화면이 고장처럼 보이는 것 방지(10/4, A++O 세션 보고) — 스크립트 전에 그려지고 boot() 끝에서 사라진다 -->
+<div id="sc-loading" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;font:600 15px/1.4 -apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#6b7280;background:#f6f7f9;z-index:99999">학습앱 불러오는 중…</div>
+
 <div class="shell">
   <header class="topbar">
     <div class="topbar-in">
@@ -2259,7 +2262,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-04.170";
+var BUILD="2026-10-04.171";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4841,9 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-04.171",d:"10-04",items:[
+    "앱을 여는 동안 「학습앱 불러오는 중…」 — 느린 회선에서 흰 화면이 길어질 때 고장이 아니라 받는 중인 것을 알 수 있게"
+  ]},
   {v:"2026-10-04.170",d:"10-04",items:[
     "앱을 처음 열 때(저장된 상태가 아직 없을 때) 「확인」 탭 배지 계산이 오류를 내며 그 화면 그리기를 끊던 문제 — 상태가 준비되기 전엔 0건으로 두고 넘어가게"
   ]},
@@ -7929,9 +7935,10 @@ function boot(){
   },1000);
   ui.dirty=false; markSave();
 }
+var scLoaded=function(){ var l=document.getElementById("sc-loading"); if(l) l.remove(); };   /* 「불러오는 중」 걷기 — boot 가 실패해도 걷어서 오류 화면이 보이게 */
 function start(){
-  if(!ATOM_HOSTED){ boot(); return; }
-  var done=false, go=function(){ if(done) return; done=true; boot(); if(!atomState||(S.updatedAt||0)>(atomState.updatedAt||0)) atomPush(); };
+  if(!ATOM_HOSTED){ try{ boot(); }finally{ scLoaded(); } return; }
+  var done=false, go=function(){ if(done) return; done=true; try{ boot(); }finally{ scLoaded(); } if(!atomState||(S.updatedAt||0)>(atomState.updatedAt||0)) atomPush(); };
   fetch("/api/study/state").then(function(r){ return r.json(); }).then(function(j){ atomState=(j&&j.state)||null; go(); })["catch"](go);
   setTimeout(go,4000);
 }
