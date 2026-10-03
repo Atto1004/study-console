@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-04.163";
+var BUILD="2026-10-04.164";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,10 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-04.164",d:"10-04",items:[
+    "공부계획 하루 보기: 어제 · 그저께로 넘기면 그날 끝낸 과제가 「10/3(토) 끝낸 것」으로 체크 · 취소선과 함께 보임",
+    "하루 단위 지역 표시(시 · 도) — 하루 종일 있던 곳은 「광주」, 크게 옮긴 날은 「안산 → 광주」. 2시간 넘게 머문 지역만, 지나간 곳은 안 씀. 하루 보기는 제목 옆, 한 주 보기는 그날 칸 맨 위"
+  ]},
   {v:"2026-10-04.163",d:"10-04",items:[
     "공부계획 일정 칸 = 종류(작업 · 과제) + 그 아래 확정된 세부만 — 예: 10/3 「작업 · 학습앱 업데이트」",
     "계획할 때 과제 · 공부는 이어진 시간을 한 칸으로 묶고 과목과 개수만(「아카데믹글쓰기 · 사회봉사 ×3」). 실제로 재생 → 종료한 과제는 「과제」 칸에 그 항목으로",
@@ -12434,10 +12438,12 @@ var V33={};
     var mustDo=V60.taskCard(P,T,td);
     /* 오늘 끝낸 것 — 체크된 상자로 남긴다(대표님 10/2 「빈 박스 → 누르면 체크」) */
     var stx=V60.st(), dd0=function(t){ var x=new Date(t); return x.getFullYear()+"-"+(x.getMonth()<9?"0":"")+(x.getMonth()+1)+"-"+(x.getDate()<10?"0":"")+x.getDate(); };
-    var doneT=[]; P.asg.forEach(function(a){ if(a.done&&stx.done[a.k]&&dd0(stx.done[a.k])===td) doneT.push({t:a.c+" · "+a.t+(a.act?" — 실제 "+dur(a.act.min)+" (예상 "+dur(a.est)+")":""),k:"done:"+a.k}); });
-    Object.keys(stx.sdone||{}).forEach(function(k){ if(dd0(stx.sdone[k])===td){ var c=course(k.split("|")[0]); doneT.push({t:(c?c.name:"")+" · "+V60.md(k.split("|")[1])+" 회차",k:"sdone:"+k}); } });
-    if((stx.mdone||{})[td]) doneT.push({t:"CADD · 암기카드",k:"mdone:"+td});
-    if(doneT.length) mustDo=mustDo.replace(/<\/div>$/,'<div class="v60-donel">'+doneT.map(function(x){ return '<div class="v60-dn"><button type="button" class="v60-chk on" data-v60undo="'+esc(x.k)+'" aria-label="완료 취소"></button><s>'+esc(x.t)+'</s></div>'; }).join("")+'</div></div>');
+    /* 대표님 10/4 「어제 것 기준으로 보는데 이미 한 것은 작대기 그어서 완료 표시」 — 하루 보기에서 고른 날짜에 끝낸 것 */
+    var dD=V60.ui.today?addDays(td,V60.ui.off||0):td;
+    var doneT=[]; P.asg.forEach(function(a){ if(a.done&&stx.done[a.k]&&dd0(stx.done[a.k])===dD) doneT.push({t:a.c+" · "+a.t+(a.act?" — 실제 "+dur(a.act.min)+" (예상 "+dur(a.est)+")":""),k:"done:"+a.k}); });
+    Object.keys(stx.sdone||{}).forEach(function(k){ if(dd0(stx.sdone[k])===dD){ var c=course(k.split("|")[0]); doneT.push({t:(c?c.name:"")+" · "+V60.md(k.split("|")[1])+" 회차",k:"sdone:"+k}); } });
+    if((stx.mdone||{})[dD]) doneT.push({t:"CADD · 암기카드",k:"mdone:"+dD});
+    if(doneT.length) mustDo=mustDo.replace(/<\/div>$/,'<div class="v60-donel">'+(dD!==td?'<div class="v60-donh">'+esc(V60.md(dD))+' 끝낸 것</div>':'')+doneT.map(function(x){ return '<div class="v60-dn"><button type="button" class="v60-chk on" data-v60undo="'+esc(x.k)+'" aria-label="완료 취소"></button><s>'+esc(x.t)+'</s></div>'; }).join("")+'</div></div>');
     var hwMin=P.asg.filter(function(a){ return !a.done&&a.due>=td; }).reduce(function(s,a){ return s+(a.noplan?0:a.est); },0), stMin=tItems.filter(function(b){ return b.k!=="hw"; }).reduce(function(a,b){ return a+b.e-b.s; },0);
     var hwAct=Object.keys(stx.act||{}).reduce(function(s,k){ var x=stx.act[k]; return s+(x&&dd0(x.at)===td?x.min:0); },0);
     var nums='<div class="v60-nums"><span><small>지금부터 빈 시간</small><b>'+dur(T?T.avail:0)+'</b></span><span><small>남은 과제 예상</small><b>'+dur(hwMin)+'</b></span><span><small>오늘 과제 실제</small><b>'+dur(hwAct)+'</b></span><span><small>공부(과제 뒤)</small><b>'+dur(stMin)+'</b></span><span><small>오늘 실제 공부</small><b>'+dur(T?T.actual:0)+'</b></span>'+
@@ -12448,7 +12454,7 @@ var V33={};
     var cols=P.days.map(function(x){
       var bl=x.blk.map(function(b){ return {s:b.s,e:b.e,t:b.t,k:b.k,sug:b.sug}; }).concat(x.items.map(function(b){ return {s:b.s,e:b.e,t:b.t,k:b.k,sug:1}; }));   /* 과제 · 공부 배정 = 제안 칸 */
       var isT=x.d===td;
-      return '<div class="v60-col'+(isT?' today':'')+(x.past?' past':'')+'" data-d="'+x.d+'"><div class="v60-ch"><b>'+V60.md(x.d)+'</b><small>빈 '+dur(x.avail)+(x.actual?' · 공부 '+dur(x.actual):'')+'</small></div><div class="v60-cb" style="height:'+((H1-H0)*PX)+'px">'+
+      return '<div class="v60-col'+(isT?' today':'')+(x.past?' past':'')+'" data-d="'+x.d+'"><div class="v60-ch"><b>'+V60.md(x.d)+'</b><small>빈 '+dur(x.avail)+(x.actual?' · 공부 '+dur(x.actual):'')+'</small></div><div class="v60-cb" style="height:'+((H1-H0)*PX)+'px">'+(V60.regionOf(x.d).length?'<i class="v60-cbrg">'+esc(V60.regionOf(x.d).join(" → "))+'</i>':'')+
         (V60.sleepKnown(x.d,x.wake)?'<i class="v60-sleep" style="top:'+Math.max(0,((x.sleepFrom||0)-H0)*PX)+'px;height:'+Math.max(0,(x.wake-Math.max(H0,x.sleepFrom||0))*PX)+'px"></i>':'')+(x.d>=td?'<i class="v60-sleep" style="top:'+((x.bed-H0)*PX)+'px;height:'+Math.max(0,(H1-x.bed)*PX)+'px"></i>':'')+
         bl.filter(function(b){ return b.e>H0&&b.s<H1; }).map(function(b){ var s=Math.max(b.s,H0), e=Math.min(b.e,H1), h=(e-s)*PX;
           return '<div class="v60-b k-'+b.k+(b.sug?' sug':'')+'" style="top:'+((s-H0)*PX)+'px;height:'+h+'px" title="'+esc(hm(b.s)+'–'+hm(b.e)+' '+b.t)+'">'+(h>=15?'<span>'+esc(b.t)+'</span>':'')+(h>=30?'<small>'+hm(b.s)+'</small>':'')+'</div>'; }).join("")+
@@ -12620,6 +12626,24 @@ var V33={};
     out.forEach(function(g){ var cnt={}, ord=[]; g.items.forEach(function(x){ var c=String(x).split(" · ")[0]; if(!cnt[c]){ cnt[c]=0; ord.push(c); } cnt[c]++; });
       g.full=g.items; g.items=[ord.map(function(c){ return c+(cnt[c]>1?" ×"+cnt[c]:""); }).join(" · ")]; });
     return out; };
+  /* 하루 단위 지역(시·도) — 대표님 10/4 「하루 종일 광주에 있었으니 광주 표시 · 크게 이동한 날은 이동 과정 · 경유지 나열은 의미 없음, 주로 하루를 보낸 지역 기준」.
+     머문 곳(stays.sub 「광주 · …」)과 차편(events trip 「(안산 → 광주)」)으로 06~24시 머문 시간을 지역별로 세고, 2시간 넘게 머문 지역만 시간 순으로. 기록 없으면 표시 안 함(짐작 X) */
+  V60.regionOf=function(d){
+    var D0=new Date(d+"T06:00:00").getTime(), D1=new Date(addDays(d,1)+"T00:00:00").getTime(), acc={}, first={};
+    var add=function(rg,a,b){ if(!rg) return; a=Math.max(a,D0); b=Math.min(b,D1); if(b<=a) return; acc[rg]=(acc[rg]||0)+(b-a); if(first[rg]==null||a<first[rg]) first[rg]=a; };
+    var ts=function(x){ return x?new Date(String(x).replace(" ","T")+":00").getTime():null; };
+    var covered=[];
+    var SS=V60.allStays?V60.allStays():[], rgOf=function(x){ var r=String(x.sub||"").split("·")[0].trim(); return (!r||/앱 위치|^[\d.,\s-]+$/.test(r))?"":r; };
+    SS.forEach(function(x){ var rg=rgOf(x); if(!rg) SS.forEach(function(y){ if(!rg&&y.place===x.place&&rgOf(y)) rg=rgOf(y); });   /* 앱 위치(V72)는 지역이 없어 같은 이름 장소의 지역을 빌림, 없으면 안 셈 */
+      var a=ts(x.from), b=ts(x.to)||D1; if(!rg||a==null) return; add(rg,a,b); covered.push([a,b]); });
+    ((V60.pp&&V60.pp.events)||[]).filter(function(e){ return e.date===d&&e.k==="trip"; }).forEach(function(e){
+      var m=/\(\s*([^()→\s]+)\s*→\s*([^()\s]+)\s*\)/.exec(e.place||e.title||""); if(!m) return;
+      var a=new Date(d+"T"+e.start+":00").getTime(), b=new Date(d+"T"+e.end+":00").getTime();
+      var free=function(x,y){ covered.forEach(function(c){ if(c[0]<=x&&c[1]>x) x=Math.min(y,c[1]); if(c[0]<y&&c[1]>=y) y=Math.max(x,c[0]); }); return [x,y]; };
+      var p=free(D0,a); add(m[1],p[0],p[1]); var q=free(b,D1); add(m[2],q[0],q[1]); });
+    return Object.keys(acc).filter(function(k){ return acc[k]>=120*60000; }).sort(function(a,b){ return first[a]-first[b]; });
+  };
+  V60.regionHTML=function(d){ var r=V60.regionOf(d); return r.length?'<span class="v60-rg">'+esc(r.join(" → "))+'</span>':''; };
   V60.todayHTML=function(T,nowM,seg){
     var rows=T?T.blk.concat(V60.groupItems(T.items)).filter(function(b){ return b.e>T.wake-1; }).sort(function(a,b){ return a.s-b.s||a.e-b.e; }):[];   /* 정해진 일정만 — 빈 시간은 비워 둔다(대표님 10/3) */
     /* 수면은 빗금이 아니라 「취침」 칸으로 기록 (대표님 10/4 「취침은 취침으로 기록해야지」) — 아침 = 수면 기록(또는 앞으로의 계획), 밤 = 다음 날 기록의 취침 시각.
@@ -12669,7 +12693,7 @@ var V33={};
     var bed='';
     var now=(T&&T.d===today())?'<i class="v60-dnow" style="top:'+y(nowM)+'px"><b>'+hm(nowM)+'</b></i>':'';
     var lane=V60.LANE&&T&&V60.laneOf?V60.laneOf(T,rows,places,y,H):null;
-    return '<div class="card v60-today"><div class="card-h"><h3>'+esc(V60.dayName?V60.dayName(T?T.d:today()):'오늘')+' '+esc(V60.md(T?T.d:today()))+V60.I("24시간 · 1시간 칸 시간표입니다.\n꽉 찬 칸 = 정해진 일정(수업 · 근무 · 캘린더 · 차편).\n점선 칸 = 제안 — 빈 시간에 앱이 짐작으로 배치한 과제 · 공부 · 식사 · 휴식(확정 아님).\n빈 칸 = 아무것도 없는 시간 · 빗금 = 수면 · 빨간 줄 = 지금.")+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b">'+V60.whereHTML(T)+(lane?lane.route:'')+
+    return '<div class="card v60-today"><div class="card-h"><h3>'+esc(V60.dayName?V60.dayName(T?T.d:today()):'오늘')+' '+esc(V60.md(T?T.d:today()))+V60.I("24시간 · 1시간 칸 시간표입니다.\n꽉 찬 칸 = 정해진 일정(수업 · 근무 · 캘린더 · 차편).\n점선 칸 = 제안 — 빈 시간에 앱이 짐작으로 배치한 과제 · 공부 · 식사 · 휴식(확정 아님).\n빈 칸 = 아무것도 없는 시간 · 빗금 = 수면 · 빨간 줄 = 지금.")+'</h3><span class="hs">'+V60.regionHTML(T?T.d:today())+' 빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b">'+V60.whereHTML(T)+(lane?lane.route:'')+
       '<div class="v60-day'+(lane?' lane':'')+'"><div class="v60-dhs" style="height:'+H+'px">'+hrs+'</div><div class="v60-dcol" style="height:'+H+'px;background-size:100% '+PXH+'px">'+shade+blks+bed+now+'</div>'+(lane?lane.html:'')+'</div></div></div>';
   };
   V60.DPX=56;
@@ -12984,6 +13008,9 @@ var V33={};
     ".v60-cev{background:#1E5FA8!important;color:#fff!important}.v60-cev.hot{background:#C7261B!important}",
     "@media (max-width:900px){.v60-top{grid-template-columns:1fr}}",
     ".v60-top.one{grid-template-columns:1fr}",
+    ".v60-rg{display:inline-block;font-size:12px;font-weight:800;color:#1E5FA8;border:1.5px solid currentColor;border-radius:99px;padding:1px 8px;margin-left:8px;vertical-align:middle;white-space:nowrap}.v60-cbrg{position:absolute;top:3px;left:3px;right:3px;z-index:3;font-style:normal;font-size:10.5px;font-weight:800;color:#1E5FA8;background:color-mix(in srgb,#1E5FA8 10%,var(--surface,#fff));border:1px solid color-mix(in srgb,#1E5FA8 45%,transparent);border-radius:6px;padding:1px 4px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
+    ".v60-today>.card-h h3{flex-shrink:0;white-space:nowrap}.v60-today>.card-h .hs{min-width:0;display:inline-flex;flex-wrap:wrap;align-items:center;gap:2px 6px}.v60-today>.card-h .hs .v60-rg{margin-left:0}",
+    ".v60-donh{font-size:12.5px;font-weight:800;color:var(--ink-3);margin:8px 0 2px}",
     ".v60-tk2.urgent{background:color-mix(in srgb,#C7261B 9%,transparent);border-left:4px solid #C7261B;border-radius:8px;padding-left:8px;padding-right:4px}.v60-tk2.urgent .v60-tkt{color:#B3170E;font-weight:800}",
     ".v60-grp.hot>.v60-grph b{color:#C7261B}.v60-hotn{font-size:12px;font-weight:800;color:#fff;background:#C7261B;border-radius:99px;padding:2px 9px;margin-left:4px;vertical-align:middle}",
     "@media (max-width:600px){.v60-grid{grid-template-columns:28px repeat(7,minmax(46px,1fr))}.v60-b span{font-size:9.5px}.v60-b small{display:none}.v60-sf{grid-template-columns:1fr 1fr}.v60-hw{flex-wrap:wrap}}"
