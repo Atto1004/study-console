@@ -1,5 +1,5 @@
 /* ============================================================
-   V62 LAYER — 대표님 2026-10-02 「공업수학 3.3까지가 시험범위, 다음주 수요일에 시험범위 다 나간다」 (BUILD 2026-10-02.104 · .105 공수1 시험일 · .109 일물2 금요일)
+   V62 LAYER — 대표님 2026-10-02 「공업수학 3.3까지가 시험범위, 다음주 수요일에 시험범위 다 나간다」 (BUILD 2026-10-02.104 · .105 공수1 시험일 · .109 일물2 금요일 · .110 캘린더 날짜 · 2026-10-03.129 창업 10/19 · CADD 11/3 · 미적2·일물2 확정)
    boot 패치 1회: 공업수학1 중간 범위 = 1장 ~ 3.3 (10/7 수업에서 범위 끝까지). 시험 카드·시험 모드 범위 주차가 이 문자열을 읽는다.
    ============================================================ */
 (function(){
@@ -35,5 +35,18 @@
     set("미분적분학2","2026-10-20","09:00","교수 9/29 「10월 20일 화요일」 — 공식 공지 전");
     t.patchV62d=true; persist();
   };
-  var _boot=boot; boot=function(){ _boot(); try{ V62.patch(); V62.patchDate(); V62.patchPhys(); V62.patchCal(); }catch(e){ if(window.console) console.warn("V62 패치", e); } };
+  /* 10/3 주간 리뷰 결재(BUILD .129): 창업 = 대표님 선택 「10/19(월)로 옮김」 — OT 슬라이드 「8주 = 중간고사·중간발표」, 형식 미확인이라 가정 유지
+     CADD = 대표님 선택 「11/3(화)로 옮김」 — 강의계획(OT 자료) Week 10 = Mid-term exam, 공지 전이라 가정 유지
+     미적2 = LMS 공지 10/1 「중간고사 시험 시행 안내문」으로 확정 · 일물2 = 교수 10/2 녹음 「우리 23일」로 확정 → 가정 해제 */
+  V62.patchMid3=function(){
+    var t=term(); if(!t||t.patchV62e) return;
+    var set=function(name,date,time,assumed,note){ var c=(t.courses||[]).filter(function(x){ return x.name===name; })[0];
+      if(c) (t.exams||[]).forEach(function(e){ if(e.courseId===c.id&&e.kind==="중간"){ e.date=date; e.time=time; e.assumed=assumed; e.note=note; } }); };
+    set("창업아이디어탐색","2026-10-19","11:00",true,"OT 슬라이드 「8주 = 중간고사·중간발표」 → 학교 8주차 월요일(대표님 10/3) · 형식 미확인");
+    set("CADD","2026-11-03","13:00",true,"강의계획(OT) Week 10 = Mid-term exam → 11/3(화) (대표님 10/3) · 공지 전");
+    set("미분적분학2","2026-10-20","09:00",false,"LMS 공지 10/1 — 09:00~10:00 · 제2과학기술관 511호 예정 · 계산기 금지");
+    set("일반물리학2","2026-10-23","10:30",false,"교수 10/2 녹음 「우리 23일」 · 한양 캘린더 10/23(금)");
+    t.patchV62e=true; persist();
+  };
+  var _boot=boot; boot=function(){ _boot(); try{ V62.patch(); V62.patchDate(); V62.patchPhys(); V62.patchCal(); V62.patchMid3(); }catch(e){ if(window.console) console.warn("V62 패치", e); } };
 })();
