@@ -22,7 +22,7 @@ else:
     how = "삽입"
 assert s.count(hdr) == 1
 
-B_OLD, B_NEW = 'var BUILD="2026-10-03.129";', 'var BUILD="2026-10-03.130";'
+B_OLD, B_NEW = 'var BUILD="2026-10-03.136";', 'var BUILD="2026-10-03.137";'
 if B_NEW not in s:
     assert s.count(B_OLD) == 1; s = s.replace(B_OLD, B_NEW)
 
@@ -60,5 +60,10 @@ ITEM6 = ('  {v:"2026-10-03.130",d:"10-03",items:[\n'
          '  ]},\n')
 if '{v:"2026-10-03.130"' not in s:
     assert s.count(PN) == 1; s = s.replace(PN, PN + ITEM6)
+ITEM7 = ('  {v:"2026-10-03.137",d:"10-03",items:[\n'
+         '    "과목 화면 맨 위 「중간고사 범위 · 확정」 — 정역학 Ch.3~5(OT) · 공업수학1 1장~3.3(교수 10/2) · 일반물리학2 21~27장(교수 9/18). 범위 미공지 과목은 표시 안 함"\n'
+         '  ]},\n')
+if '{v:"2026-10-03.137"' not in s:
+    assert s.count(PN) == 1; s = s.replace(PN, PN + ITEM7)
 io.open(IDX, "w", encoding="utf-8", newline="\n").write(s)
 print("V62", how)

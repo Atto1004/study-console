@@ -56,5 +56,41 @@
     if(c) (t.exams||[]).forEach(function(e){ if(e.courseId===c.id&&e.kind==="중간"){ e.date="2026-10-21"; e.time="09:00"; e.assumed=true; e.note="10/2 녹음 「8주차에 시험」 → 10/21(수) (대표님 10/3) · 공지 전"; } });
     t.patchV62f=true; persist();
   };
-  var _boot=boot; boot=function(){ _boot(); try{ V62.patch(); V62.patchDate(); V62.patchPhys(); V62.patchCal(); V62.patchMid3(); V62.patchEm1b(); }catch(e){ if(window.console) console.warn("V62 패치", e); } };
+  /* 10/3 대표님 「과목 들어가서 맨 상단에 이번 시험범위 확정된 거 있으면 표시」(BUILD .137) — 범위가 교수 근거로 확정된 과목만 scopeOk.
+     정역학 = OT p.8 · 공수1 = 교수 10/2 · 일물2 = 교수 9/18 녹음. 미적2 = 10/1 안내문에 날짜·장소만(범위 없음) → 표시 안 함 */
+  V62.SCOPE_OK={
+    "정역학":["Ch.3 Forces · Ch.4 Systems of Forces and Moments · Ch.5 Objects in Equilibrium","과제 1~2문제 그대로 출제 · 틀리면 부분점수 없음","OT 슬라이드 p.8"],
+    "공업수학1":["1장(1.1 · 1.3 ~ 1.5) · 2장(2.1 ~ 2.10) · 3장(3.1 ~ 3.3)","10/7(수) 수업에서 범위 끝까지 · 10/14 정리","교수님 10/2"],
+    "일반물리학2":["21장 ~ 27장 (27장 RC 회로까지 · 28장 제외)","","교수님 9/18 녹음"]
+  };
+  V62.patchScope=function(){
+    var t=term(); if(!t||t.patchV62g) return;
+    (t.courses||[]).forEach(function(c){ var o=V62.SCOPE_OK[c.name]; if(!o) return;
+      (t.exams||[]).forEach(function(e){ if(e.courseId===c.id&&e.kind==="중간"){ e.scopeOk=true; e.scopeSrc=o[2]; } }); });
+    t.patchV62g=true; persist();
+  };
+  V62.scopeHTML=function(c){
+    var o=V62.SCOPE_OK[c.name]; if(!o) return "";
+    var e=(term().exams||[]).filter(function(x){ return x.courseId===c.id&&x.kind==="중간"; })[0]; if(!e) return "";
+    var dd=Math.round((new Date(e.date+"T00:00:00")-new Date(today()+"T00:00:00"))/864e5); if(dd<0) return "";
+    return '<div class="v62s-h"><b>중간고사 범위</b><span class="v62s-ok">확정</span><span class="v62s-d">'+fmtDate(e.date)+(e.time?" "+esc(e.time):"")+(e.assumed?' <i>날짜 가정</i>':'')+' · D-'+dd+'</span></div>'+
+      '<div class="v62s-r">'+esc(o[0])+'</div>'+(o[1]?'<div class="v62s-n">'+esc(o[1])+'</div>':'')+'<div class="v62s-src">'+esc(o[2])+'</div>';
+  };
+  V62.renderScope=function(){
+    var v=$("#v-course"), c=ui.course&&course(ui.course); if(!v||!c) return;
+    var old=$("#v62Scope",v), h=V62.scopeHTML(c);
+    if(!h){ if(old) old.remove(); return; }
+    var hero=$("#v55Hero",v); if(!hero) return;
+    if(!old){ old=document.createElement("div"); old.id="v62Scope"; old.className="v62s"; }
+    old.innerHTML=h; if(old.nextElementSibling!==hero) hero.insertAdjacentElement("beforebegin",old);
+  };
+  if(window.V55&&V55.render&&!V55._v62){ var _r=V55.render; V55.render=function(){ var x=_r.apply(this,arguments); try{ V62.renderScope(); }catch(e){ if(window.console) console.warn("V62 범위",e); } return x; }; V55._v62=1; }
+  var css=document.createElement("style"); css.id="v62css";
+  css.textContent=".v62s{margin:0 0 12px;padding:12px 16px;border-radius:14px;background:var(--surface,#fff);border:1px solid var(--line,#dde3de);border-left:5px solid #C7261B}"+
+    ".v62s-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.v62s-h b{font-size:15px}.v62s-ok{font-size:11.5px;font-weight:800;color:#fff;background:#C7261B;border-radius:99px;padding:2px 9px}"+
+    ".v62s-d{margin-left:auto;font-size:13px;font-weight:700;color:var(--ink-2,#444);font-variant-numeric:tabular-nums}.v62s-d i{font-style:normal;font-size:11.5px;color:#9A5B00;border:1.5px solid currentColor;border-radius:99px;padding:0 7px;margin-left:4px}"+
+    ".v62s-r{font-size:16px;font-weight:800;margin-top:6px;line-height:1.45}.v62s-n{font-size:13.5px;color:#C7261B;font-weight:700;margin-top:3px}.v62s-src{font-size:12px;color:var(--ink-3,#777);margin-top:3px}"+
+    "@media (max-width:600px){.v62s-d{margin-left:0;width:100%}.v62s-r{font-size:15px}}";
+  document.head.appendChild(css);
+  var _boot=boot; boot=function(){ _boot(); try{ V62.patch(); V62.patchDate(); V62.patchPhys(); V62.patchCal(); V62.patchMid3(); V62.patchEm1b(); V62.patchScope(); }catch(e){ if(window.console) console.warn("V62 패치", e); } };
 })();
