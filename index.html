@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-03.146";
+var BUILD="2026-10-03.147";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,9 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-03.147",d:"10-03",items:[
+    "화면 설명 문구(빈 칸 뜻 · 버튼 쓰는 법 · 파일 위치 등)는 본문에서 빼고 제목 옆 원형 (i) 아이콘 안으로 — 누르면 뜨고 바깥을 누르면 닫힘"
+  ]},
   {v:"2026-10-03.146",d:"10-03",items:[
     "공부계획 「오늘만」 보기를 24시간 시간표로 — 0~24시 1시간 칸(30분 옅은 선), 정해진 일정만 그 시각에 놓고 나머지는 빈 칸, 지금 시각 빨간 줄"
   ]},
@@ -12099,6 +12102,7 @@ var V33={};
   function pad2(n){ return (n<10?"0":"")+n; }
   function hm(m){ m=Math.round(m); var h=Math.floor(m/60), r=m%60; return pad2(h%24)+":"+pad2(r); }
   function dur(m){ return fmtMin(m); }
+  V60.I=function(t){ return window.V71?V71.info(t):""; };   /* 설명 문구는 (i) 안으로 — 지침 학습시스템 §30 */
   function cByName(n){ return courses().filter(function(c){ return c.name===n; })[0]; }
   V60.st=function(){ if(!S.v60) S.v60={est:{},done:{},cfg:{}}; S.v60.est=S.v60.est||{}; S.v60.done=S.v60.done||{}; S.v60.cfg=S.v60.cfg||{}; return S.v60; };
   V60.cfg=function(k,def){ var v=V60.st().cfg[k]; return (v==null||v==="")?def:v; };
@@ -12386,8 +12390,8 @@ var V33={};
     }).join("");
     var hours=''; for(var h=0;h<=24;h+=1) hours+='<span style="top:'+((h*60-H0)*PX)+'px">'+pad2(h%24)+'</span>';
     var seg='<div class="seg" id="v60Wk"><button data-w="t"'+(V60.ui.today?' aria-pressed="true"':'')+'>오늘만</button><button data-w="0"'+(!V60.ui.today&&V60.ui.week===0?' aria-pressed="true"':'')+'>이번 주</button><button data-w="1"'+(!V60.ui.today&&V60.ui.week===1?' aria-pressed="true"':'')+'>다음 주</button></div>';
-    var grid=V60.ui.today?V60.todayHTML(T,nowM,seg):'<div class="card v60-gridcard"><div class="card-h"><h3>'+(V60.ui.week?'다음 주':'이번 주')+'</h3><span class="hs"></span><div class="ha">'+seg+'</div></div>'+
-      '<div class="card-b"><div class="v60-leg"><i class="k-cls"></i>수업<i class="k-work"></i>근무·알바<i class="k-ev"></i>일정<i class="k-meal"></i>식사·준비<i class="k-move"></i>이동<span class="v60-legn">빈 칸 = 정해지지 않은 시간</span></div>'+
+    var grid=V60.ui.today?V60.todayHTML(T,nowM,seg):'<div class="card v60-gridcard"><div class="card-h"><h3>'+(V60.ui.week?'다음 주':'이번 주')+V60.I("정해진 일정만 그 시각에 놓습니다.\n빈 칸 = 정해지지 않은 시간 · 빗금 = 수면.\n과제 · 공부는 칸에 채우지 않고 「오늘 할 과제」 목록으로.")+'</h3><span class="hs"></span><div class="ha">'+seg+'</div></div>'+
+      '<div class="card-b"><div class="v60-leg"><i class="k-cls"></i>수업<i class="k-work"></i>근무·알바<i class="k-ev"></i>일정<i class="k-meal"></i>식사·준비<i class="k-move"></i>이동</div>'+
       '<div class="v60-grid"><div class="v60-hrs" style="height:'+((H1-H0)*PX)+'px">'+hours+'</div>'+cols+'</div></div></div>';
     /* 과제 */
     /* 끝낸 과제 기록 — 실제 소요(과제 시작 → 과제 종료). 같은 과목 · 같은 종류의 다음 과제 예상 시간이 이 평균으로 잡힌다 */
@@ -12412,7 +12416,7 @@ var V33={};
       '<div class="v60-sh">장소</div><div class="v60-sf"><label>근로장학 장소<input class="input" data-v60cfg="place:근로장학" placeholder="예: 제1공학관 2층 학과 사무실" value="'+esc(V60.cfg("place:근로장학",""))+'"></label></div>'+
       '<div class="v60-sh">수업 끝나는 시각</div><div class="v60-sf">'+V60.slotRows()+'</div></details>';
     body.innerHTML='<div class="v60-top">'+die+mustDo+'</div>'+nums+grid+
-      '<div class="card"><div class="card-h"><h3>끝낸 과제 · 실제 소요</h3><span class="hs">'+actL.length+'</span></div><div class="card-b tight">'+(hwRows||'<div class="empty">「과제 시작 → 과제 종료」로 끝낸 기록이 여기 쌓이고, 같은 과목 · 같은 종류 과제의 예상 시간이 됩니다.</div>')+
+      '<div class="card"><div class="card-h"><h3>끝낸 과제 · 실제 소요'+V60.I("▶ 재생 → ■ 종료로 끝낸 과제가 실제 걸린 시간과 함께 여기 쌓이고, 같은 과목 · 같은 종류 과제의 예상 시간이 됩니다.")+'</h3><span class="hs">'+actL.length+'</span></div><div class="card-b tight">'+hwRows+
         '<div class="v60-add"><select class="input" id="v60aC">'+V60.MID.concat(["아카데믹글쓰기","창업아이디어탐색","사회봉사","기타"]).map(function(n){ return '<option>'+esc(n)+'</option>'; }).join("")+'</select><input class="input" id="v60aT" placeholder="할 일"><input class="input" type="date" id="v60aD" value="'+td+'"><input class="input" type="time" id="v60aH" value="23:59"><input class="input" type="number" id="v60aM" value="60" min="10" step="10"><button type="button" class="btn a" id="v60aB">추가</button></div></div></div>'+
       '<div class="card"><div class="card-h"><h3>진도</h3></div><div class="card-b tight">'+prog+'</div></div>'+set;
     /* 이벤트 */
@@ -12472,12 +12476,13 @@ var V33={};
     var sd=V60.st().done, own=(V60.priv||[]).concat(V60.st().extra||[]).filter(function(x){ return x&&(x.kind==="study"||x.kind==="prep")&&x.due>=td; }).map(function(x){ var o={c:x.c||"기타",t:x.t,due:x.due,time:x.time||"23:59",kind:x.kind}; o.k=V60.key(o); o.done=!!sd[o.k]; return o; }).filter(function(o){ return !o.done; }).sort(function(a,b){ return (a.due+a.time)<(b.due+b.time)?-1:1; });
     var ownHTML=own.map(function(o){ var dd=diffDays(td,o.due);
       return '<div class="v60-tk2'+(left.length&&o.kind==="study"?' wait':'')+'"><div class="v60-tkm"><div class="v60-tkt"><b>'+esc(o.c)+'</b> · '+esc(V60.tt(o))+'</div><div class="v60-tks">'+(o.kind==="prep"?'수업 준비 · ':'')+(dd===0?'오늘':dd===1?'내일':V60.md(o.due)+' · D-'+dd)+'</div></div><div class="v60-tka"><button type="button" class="v60-chk" data-v60done="'+esc(o.k)+'" aria-label="완료"></button></div></div>'; }).join("");
-    var stHTML='<div class="v60-sec st"><div class="v60-sech">공부 <small>과제를 끝낸 뒤</small></div>'+ownHTML+(T&&T.hwLeft?'<div class="v60-none">남은 과제를 끝내면 공부가 열립니다.</div>':st.length?st.map(function(x){ var b=x.b, m=b.meta||{};
+    var stBody=ownHTML+(T&&T.hwLeft?'':st.map(function(x){ var b=x.b, m=b.meta||{};
       return '<div class="v60-tk2'+(left.length?' wait':'')+'"><div class="v60-tkm"><div class="v60-tkt">'+esc(b.t)+'</div><div class="v60-tks">약 '+fmtMin(x.min)+'</div></div><div class="v60-tka">'+
         (m.x?'<button type="button" class="btn xs a" data-v60go="'+m.c.id+'|'+m.x.w+'|'+m.x.date+'">열기</button><button type="button" class="v60-chk" data-v60sdone="'+m.c.id+'|'+m.x.date+'" aria-label="완료"></button>':'')+
-        (m.memo?'<button type="button" class="btn xs a" data-v60memo="1">카드</button><button type="button" class="v60-chk" data-v60mdone="'+esc(m.d)+'" aria-label="완료"></button>':'')+'</div></div>'; }).join(""):'<div class="v60-none">오늘 배정할 공부가 없습니다</div>')+'</div>';
-    return '<div class="v60-must"><div class="v60-h">오늘 할 과제 <span class="v60-hs">'+left.length+'개'+(sum(left)?' · 예상 합계 '+fmtMin(sum(left)):'')+'</span></div>'+
-      (left.length?sec("과제",left.filter(function(a){ return !a.own; }))+sec("할 일",left.filter(function(a){ return a.own; })):'<div class="v60-none">남은 과제가 없습니다</div>')+stHTML+'</div>';
+        (m.memo?'<button type="button" class="btn xs a" data-v60memo="1">카드</button><button type="button" class="v60-chk" data-v60mdone="'+esc(m.d)+'" aria-label="완료"></button>':'')+'</div></div>'; }).join(""));
+    var stHTML=stBody?'<div class="v60-sec st"><div class="v60-sech">공부'+V60.I("과제를 끝낸 뒤에 합니다 — 과제를 해야 공부를 할 수 있다.\n남은 과제가 오늘 안에 다 안 들어가면 복습 · 밀린 회차 · 암기는 배정하지 않습니다.\n흐린 줄 = 과제가 남아 아직 차례가 아닌 공부.")+'</div>'+stBody+'</div>':'';
+    return '<div class="v60-must"><div class="v60-h">오늘 할 과제 <span class="v60-hs">'+left.length+'개'+(sum(left)?' · 예상 합계 '+fmtMin(sum(left)):'')+'</span>'+V60.I("시각 없이 남은 과제 전부 — 과목별 · 마감 순.\n「과제」 = LMS 과제 · 「할 일」 = 직접 넣거나 말로 준 것.\n▶ 재생 · ⏸ 일시정지 · ■ 종료(= 완료 + 실제 걸린 시간 기록). 그 기록이 같은 과목 · 같은 종류 과제의 예상 시간이 됩니다.")+'</div>'+
+      sec("과제",left.filter(function(a){ return !a.own; }))+sec("할 일",left.filter(function(a){ return a.own; }))+stHTML+'</div>';
   };
 
   /* ---------- 오늘만 보기: 하루 시간표를 한 줄씩 ---------- */
@@ -12509,9 +12514,8 @@ var V33={};
       return '<div class="v60-db k-'+b.k+(past?' past':'')+(cur?' cur':'')+(ht<34?' thin':'')+'" style="top:'+top+'px;height:'+ht+'px"><div class="v60-dbt"><b>'+esc(b.t)+'</b><small>'+hm2(b.s)+'–'+hm2(b.e)+(b.note?' · '+esc(b.note):'')+'</small></div>'+pc+'</div>'; }).join("");
     var bed=T&&T.bed<1440?'<div class="v60-db k-sleep thin" style="top:'+y(T.bed)+'px;height:16px"><div class="v60-dbt"><b>취침</b><small>'+hm2(T.bed)+'</small></div></div>':'';
     var now=(T&&T.d===today())?'<i class="v60-dnow" style="top:'+y(nowM)+'px"><b>'+hm(nowM)+'</b></i>':'';
-    return '<div class="card v60-today"><div class="card-h"><h3>오늘 '+esc(V60.md(today()))+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b">'+V60.whereHTML(T)+
-      '<div class="v60-day"><div class="v60-dhs" style="height:'+H+'px">'+hrs+'</div><div class="v60-dcol" style="height:'+H+'px;background-size:100% '+PXH+'px">'+shade+blks+bed+now+'</div></div>'+
-      (rows.length?'':'<div class="hint" style="padding:6px 2px">오늘 정해진 일정이 없습니다 — 빈 칸 = 정해지지 않은 시간</div>')+'</div></div>';
+    return '<div class="card v60-today"><div class="card-h"><h3>오늘 '+esc(V60.md(today()))+V60.I("24시간 · 1시간 칸 시간표입니다.\n정해진 일정(수업 · 근무 · 캘린더 · 차편)만 그 시각에 놓습니다.\n빈 칸 = 정해지지 않은 시간 · 빗금 = 수면 · 빨간 줄 = 지금.\n과제 · 공부는 위 「오늘 할 과제」 목록에 있습니다.")+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b">'+V60.whereHTML(T)+
+      '<div class="v60-day"><div class="v60-dhs" style="height:'+H+'px">'+hrs+'</div><div class="v60-dcol" style="height:'+H+'px;background-size:100% '+PXH+'px">'+shade+blks+bed+now+'</div></div></div></div>';
   };
   V60.DPX=44;
 
@@ -13317,8 +13321,7 @@ var V33={};
       var anchor=$("#v58Card",v)||$("#v55Hero",v); if(!anchor) return;
       if(!card){ card=document.createElement("div"); card.id="v69Card"; card.className="card v69"; }
       if(card.previousElementSibling!==anchor) anchor.insertAdjacentElement("afterend",card);
-      card.innerHTML='<div class="card-h"><h3>과제 제출본</h3><span class="hs">'+items.length+'개</span></div><div class="v69-b">'+(V69.PLAY[c.name]?'<div class="v69-play" id="v69Play">'+V69.PLAY[c.name].chs.map(function(ch){ return '<button type="button" class="v69-pb" data-ch="'+ch+'"><b>혼자 풀기 · Ch.'+ch+'</b><small></small></button>'; }).join("")+'</div>':'')+V69.html(items)+
-        '<div class="v69-h">아이패드: iCloud Drive › 학교 › 2026-2 › '+esc(c.name)+' › 과제 (양식 · 서식도 거기에)</div></div>';
+      card.innerHTML='<div class="card-h"><h3>과제 제출본'+(window.V71?V71.info("주차(Ch.)마다 답이 적힌 제출본 하나만 둡니다. 보고 손으로 옮겨 적어 내는 용.\n양식 · 필기 서식 · 가이드는 아이패드 iCloud Drive › 학교 › 2026-2 › "+c.name+" › 과제 에 있습니다."):"")+'</h3><span class="hs">'+items.length+'개</span></div><div class="v69-b">'+(V69.PLAY[c.name]?'<div class="v69-play" id="v69Play">'+V69.PLAY[c.name].chs.map(function(ch){ return '<button type="button" class="v69-pb" data-ch="'+ch+'"><b>혼자 풀기 · Ch.'+ch+'</b><small></small></button>'; }).join("")+'</div>':'')+V69.html(items)+'</div>';
       var pl=V69.PLAY[c.name], box=$("#v69Play",card);
       if(pl&&box){ V69.playFill(box,pl); $$(".v69-pb",box).forEach(function(b){ b.onclick=function(){ var ch=b.getAttribute("data-ch"); openNote(pl.path+"index.html?ch="+ch,c.name+" 혼자 풀기 · Ch."+ch); }; }); }
     };
@@ -13380,6 +13383,37 @@ var V33={};
     ".v70-n b{font-size:15px;font-variant-numeric:tabular-nums}.v70-n.wait b{color:#B45309}",
     ".v70-u{color:var(--ink-3);font-size:12.5px}",
     ".v70-p{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.v70-p span{font-size:12px;padding:2px 9px;border-radius:99px;background:color-mix(in srgb,#B45309 10%,var(--surface));color:#8A4106}"
+  ].join("\n");
+  document.head.appendChild(css);
+})();
+/* ============================================================
+   V71 LAYER — 설명 문구는 원형 (i) 아이콘 안으로 (대표님 2026-10-03 「이런 말은 굳이 UI 상에 표시해 둘 이유가 없으니까 i 에 원으로 둘러싸인 아이콘,
+   그거 누르면 뜨는 식으로. 이건 지침이야」 — 지침 학습시스템 §30) (BUILD 2026-10-03.147)
+   V71.info(글) → (i) 버튼 HTML. 누르면 말풍선, 다시 누르거나 바깥을 누르면 닫힘. 다른 레이어는 render 때 window.V71 이 있으면 쓴다.
+   ============================================================ */
+(function(){
+  if(window.V71) return;
+  var V71=window.V71={pop:null,btn:null};
+  V71.info=function(t){ return '<button type="button" class="v71-i" aria-label="설명 보기" data-v71tip="'+esc(t)+'">i</button>'; };
+  V71.close=function(){ if(V71.pop){ V71.pop.remove(); V71.pop=null; } if(V71.btn){ V71.btn.classList.remove("on"); V71.btn=null; } };
+  V71.open=function(b){
+    V71.close(); var p=document.createElement("div"); p.className="v71-pop"; p.setAttribute("role","tooltip"); p.textContent=b.getAttribute("data-v71tip")||"";
+    document.body.appendChild(p); var r=b.getBoundingClientRect(), w=Math.min(300,window.innerWidth-24);
+    p.style.maxWidth=w+"px"; var left=Math.max(12,Math.min(r.left+r.width/2-p.offsetWidth/2,window.innerWidth-p.offsetWidth-12));
+    var top=r.bottom+8; if(top+p.offsetHeight>window.innerHeight-12) top=r.top-p.offsetHeight-8;
+    p.style.left=left+"px"; p.style.top=top+"px"; b.classList.add("on"); V71.pop=p; V71.btn=b;
+  };
+  document.addEventListener("click",function(e){ var b=e.target&&e.target.closest&&e.target.closest(".v71-i");
+    if(b){ e.preventDefault(); e.stopPropagation(); if(V71.btn===b) V71.close(); else V71.open(b); return; }
+    if(V71.pop&&!(e.target.closest&&e.target.closest(".v71-pop"))) V71.close(); },true);
+  window.addEventListener("scroll",function(){ V71.close(); },true);
+  window.addEventListener("keydown",function(e){ if(e.key==="Escape") V71.close(); });
+  var css=document.createElement("style"); css.id="v71css";
+  css.textContent=[
+    ".v71-i{position:relative;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;padding:0;margin:0 0 0 6px;border-radius:50%;border:1.5px solid var(--ink-3,#8a93a8);background:transparent;color:var(--ink-3,#8a93a8);font:italic 700 12px/1 Georgia,'Times New Roman',serif;cursor:pointer;vertical-align:middle;flex:none}",
+    ".v71-i::after{content:'';position:absolute;inset:-10px}",
+    ".v71-i:hover,.v71-i.on{border-color:var(--ink-2,#444);color:var(--ink-2,#444)}",
+    ".v71-pop{position:fixed;z-index:10000;background:#1d1d1f;color:#fff;font-size:13px;line-height:1.55;padding:10px 12px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.22);white-space:pre-line}"
   ].join("\n");
   document.head.appendChild(css);
 })();

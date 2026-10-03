@@ -42,8 +42,7 @@
       var anchor=$("#v58Card",v)||$("#v55Hero",v); if(!anchor) return;
       if(!card){ card=document.createElement("div"); card.id="v69Card"; card.className="card v69"; }
       if(card.previousElementSibling!==anchor) anchor.insertAdjacentElement("afterend",card);
-      card.innerHTML='<div class="card-h"><h3>과제 제출본</h3><span class="hs">'+items.length+'개</span></div><div class="v69-b">'+(V69.PLAY[c.name]?'<div class="v69-play" id="v69Play">'+V69.PLAY[c.name].chs.map(function(ch){ return '<button type="button" class="v69-pb" data-ch="'+ch+'"><b>혼자 풀기 · Ch.'+ch+'</b><small></small></button>'; }).join("")+'</div>':'')+V69.html(items)+
-        '<div class="v69-h">아이패드: iCloud Drive › 학교 › 2026-2 › '+esc(c.name)+' › 과제 (양식 · 서식도 거기에)</div></div>';
+      card.innerHTML='<div class="card-h"><h3>과제 제출본'+(window.V71?V71.info("주차(Ch.)마다 답이 적힌 제출본 하나만 둡니다. 보고 손으로 옮겨 적어 내는 용.\n양식 · 필기 서식 · 가이드는 아이패드 iCloud Drive › 학교 › 2026-2 › "+c.name+" › 과제 에 있습니다."):"")+'</h3><span class="hs">'+items.length+'개</span></div><div class="v69-b">'+(V69.PLAY[c.name]?'<div class="v69-play" id="v69Play">'+V69.PLAY[c.name].chs.map(function(ch){ return '<button type="button" class="v69-pb" data-ch="'+ch+'"><b>혼자 풀기 · Ch.'+ch+'</b><small></small></button>'; }).join("")+'</div>':'')+V69.html(items)+'</div>';
       var pl=V69.PLAY[c.name], box=$("#v69Play",card);
       if(pl&&box){ V69.playFill(box,pl); $$(".v69-pb",box).forEach(function(b){ b.onclick=function(){ var ch=b.getAttribute("data-ch"); openNote(pl.path+"index.html?ch="+ch,c.name+" 혼자 풀기 · Ch."+ch); }; }); }
     };

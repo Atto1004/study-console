@@ -19,6 +19,7 @@
   function pad2(n){ return (n<10?"0":"")+n; }
   function hm(m){ m=Math.round(m); var h=Math.floor(m/60), r=m%60; return pad2(h%24)+":"+pad2(r); }
   function dur(m){ return fmtMin(m); }
+  V60.I=function(t){ return window.V71?V71.info(t):""; };   /* 설명 문구는 (i) 안으로 — 지침 학습시스템 §30 */
   function cByName(n){ return courses().filter(function(c){ return c.name===n; })[0]; }
   V60.st=function(){ if(!S.v60) S.v60={est:{},done:{},cfg:{}}; S.v60.est=S.v60.est||{}; S.v60.done=S.v60.done||{}; S.v60.cfg=S.v60.cfg||{}; return S.v60; };
   V60.cfg=function(k,def){ var v=V60.st().cfg[k]; return (v==null||v==="")?def:v; };
@@ -306,8 +307,8 @@
     }).join("");
     var hours=''; for(var h=0;h<=24;h+=1) hours+='<span style="top:'+((h*60-H0)*PX)+'px">'+pad2(h%24)+'</span>';
     var seg='<div class="seg" id="v60Wk"><button data-w="t"'+(V60.ui.today?' aria-pressed="true"':'')+'>오늘만</button><button data-w="0"'+(!V60.ui.today&&V60.ui.week===0?' aria-pressed="true"':'')+'>이번 주</button><button data-w="1"'+(!V60.ui.today&&V60.ui.week===1?' aria-pressed="true"':'')+'>다음 주</button></div>';
-    var grid=V60.ui.today?V60.todayHTML(T,nowM,seg):'<div class="card v60-gridcard"><div class="card-h"><h3>'+(V60.ui.week?'다음 주':'이번 주')+'</h3><span class="hs"></span><div class="ha">'+seg+'</div></div>'+
-      '<div class="card-b"><div class="v60-leg"><i class="k-cls"></i>수업<i class="k-work"></i>근무·알바<i class="k-ev"></i>일정<i class="k-meal"></i>식사·준비<i class="k-move"></i>이동<span class="v60-legn">빈 칸 = 정해지지 않은 시간</span></div>'+
+    var grid=V60.ui.today?V60.todayHTML(T,nowM,seg):'<div class="card v60-gridcard"><div class="card-h"><h3>'+(V60.ui.week?'다음 주':'이번 주')+V60.I("정해진 일정만 그 시각에 놓습니다.\n빈 칸 = 정해지지 않은 시간 · 빗금 = 수면.\n과제 · 공부는 칸에 채우지 않고 「오늘 할 과제」 목록으로.")+'</h3><span class="hs"></span><div class="ha">'+seg+'</div></div>'+
+      '<div class="card-b"><div class="v60-leg"><i class="k-cls"></i>수업<i class="k-work"></i>근무·알바<i class="k-ev"></i>일정<i class="k-meal"></i>식사·준비<i class="k-move"></i>이동</div>'+
       '<div class="v60-grid"><div class="v60-hrs" style="height:'+((H1-H0)*PX)+'px">'+hours+'</div>'+cols+'</div></div></div>';
     /* 과제 */
     /* 끝낸 과제 기록 — 실제 소요(과제 시작 → 과제 종료). 같은 과목 · 같은 종류의 다음 과제 예상 시간이 이 평균으로 잡힌다 */
@@ -332,7 +333,7 @@
       '<div class="v60-sh">장소</div><div class="v60-sf"><label>근로장학 장소<input class="input" data-v60cfg="place:근로장학" placeholder="예: 제1공학관 2층 학과 사무실" value="'+esc(V60.cfg("place:근로장학",""))+'"></label></div>'+
       '<div class="v60-sh">수업 끝나는 시각</div><div class="v60-sf">'+V60.slotRows()+'</div></details>';
     body.innerHTML='<div class="v60-top">'+die+mustDo+'</div>'+nums+grid+
-      '<div class="card"><div class="card-h"><h3>끝낸 과제 · 실제 소요</h3><span class="hs">'+actL.length+'</span></div><div class="card-b tight">'+(hwRows||'<div class="empty">「과제 시작 → 과제 종료」로 끝낸 기록이 여기 쌓이고, 같은 과목 · 같은 종류 과제의 예상 시간이 됩니다.</div>')+
+      '<div class="card"><div class="card-h"><h3>끝낸 과제 · 실제 소요'+V60.I("▶ 재생 → ■ 종료로 끝낸 과제가 실제 걸린 시간과 함께 여기 쌓이고, 같은 과목 · 같은 종류 과제의 예상 시간이 됩니다.")+'</h3><span class="hs">'+actL.length+'</span></div><div class="card-b tight">'+hwRows+
         '<div class="v60-add"><select class="input" id="v60aC">'+V60.MID.concat(["아카데믹글쓰기","창업아이디어탐색","사회봉사","기타"]).map(function(n){ return '<option>'+esc(n)+'</option>'; }).join("")+'</select><input class="input" id="v60aT" placeholder="할 일"><input class="input" type="date" id="v60aD" value="'+td+'"><input class="input" type="time" id="v60aH" value="23:59"><input class="input" type="number" id="v60aM" value="60" min="10" step="10"><button type="button" class="btn a" id="v60aB">추가</button></div></div></div>'+
       '<div class="card"><div class="card-h"><h3>진도</h3></div><div class="card-b tight">'+prog+'</div></div>'+set;
     /* 이벤트 */
@@ -392,12 +393,13 @@
     var sd=V60.st().done, own=(V60.priv||[]).concat(V60.st().extra||[]).filter(function(x){ return x&&(x.kind==="study"||x.kind==="prep")&&x.due>=td; }).map(function(x){ var o={c:x.c||"기타",t:x.t,due:x.due,time:x.time||"23:59",kind:x.kind}; o.k=V60.key(o); o.done=!!sd[o.k]; return o; }).filter(function(o){ return !o.done; }).sort(function(a,b){ return (a.due+a.time)<(b.due+b.time)?-1:1; });
     var ownHTML=own.map(function(o){ var dd=diffDays(td,o.due);
       return '<div class="v60-tk2'+(left.length&&o.kind==="study"?' wait':'')+'"><div class="v60-tkm"><div class="v60-tkt"><b>'+esc(o.c)+'</b> · '+esc(V60.tt(o))+'</div><div class="v60-tks">'+(o.kind==="prep"?'수업 준비 · ':'')+(dd===0?'오늘':dd===1?'내일':V60.md(o.due)+' · D-'+dd)+'</div></div><div class="v60-tka"><button type="button" class="v60-chk" data-v60done="'+esc(o.k)+'" aria-label="완료"></button></div></div>'; }).join("");
-    var stHTML='<div class="v60-sec st"><div class="v60-sech">공부 <small>과제를 끝낸 뒤</small></div>'+ownHTML+(T&&T.hwLeft?'<div class="v60-none">남은 과제를 끝내면 공부가 열립니다.</div>':st.length?st.map(function(x){ var b=x.b, m=b.meta||{};
+    var stBody=ownHTML+(T&&T.hwLeft?'':st.map(function(x){ var b=x.b, m=b.meta||{};
       return '<div class="v60-tk2'+(left.length?' wait':'')+'"><div class="v60-tkm"><div class="v60-tkt">'+esc(b.t)+'</div><div class="v60-tks">약 '+fmtMin(x.min)+'</div></div><div class="v60-tka">'+
         (m.x?'<button type="button" class="btn xs a" data-v60go="'+m.c.id+'|'+m.x.w+'|'+m.x.date+'">열기</button><button type="button" class="v60-chk" data-v60sdone="'+m.c.id+'|'+m.x.date+'" aria-label="완료"></button>':'')+
-        (m.memo?'<button type="button" class="btn xs a" data-v60memo="1">카드</button><button type="button" class="v60-chk" data-v60mdone="'+esc(m.d)+'" aria-label="완료"></button>':'')+'</div></div>'; }).join(""):'<div class="v60-none">오늘 배정할 공부가 없습니다</div>')+'</div>';
-    return '<div class="v60-must"><div class="v60-h">오늘 할 과제 <span class="v60-hs">'+left.length+'개'+(sum(left)?' · 예상 합계 '+fmtMin(sum(left)):'')+'</span></div>'+
-      (left.length?sec("과제",left.filter(function(a){ return !a.own; }))+sec("할 일",left.filter(function(a){ return a.own; })):'<div class="v60-none">남은 과제가 없습니다</div>')+stHTML+'</div>';
+        (m.memo?'<button type="button" class="btn xs a" data-v60memo="1">카드</button><button type="button" class="v60-chk" data-v60mdone="'+esc(m.d)+'" aria-label="완료"></button>':'')+'</div></div>'; }).join(""));
+    var stHTML=stBody?'<div class="v60-sec st"><div class="v60-sech">공부'+V60.I("과제를 끝낸 뒤에 합니다 — 과제를 해야 공부를 할 수 있다.\n남은 과제가 오늘 안에 다 안 들어가면 복습 · 밀린 회차 · 암기는 배정하지 않습니다.\n흐린 줄 = 과제가 남아 아직 차례가 아닌 공부.")+'</div>'+stBody+'</div>':'';
+    return '<div class="v60-must"><div class="v60-h">오늘 할 과제 <span class="v60-hs">'+left.length+'개'+(sum(left)?' · 예상 합계 '+fmtMin(sum(left)):'')+'</span>'+V60.I("시각 없이 남은 과제 전부 — 과목별 · 마감 순.\n「과제」 = LMS 과제 · 「할 일」 = 직접 넣거나 말로 준 것.\n▶ 재생 · ⏸ 일시정지 · ■ 종료(= 완료 + 실제 걸린 시간 기록). 그 기록이 같은 과목 · 같은 종류 과제의 예상 시간이 됩니다.")+'</div>'+
+      sec("과제",left.filter(function(a){ return !a.own; }))+sec("할 일",left.filter(function(a){ return a.own; }))+stHTML+'</div>';
   };
 
   /* ---------- 오늘만 보기: 하루 시간표를 한 줄씩 ---------- */
@@ -429,9 +431,8 @@
       return '<div class="v60-db k-'+b.k+(past?' past':'')+(cur?' cur':'')+(ht<34?' thin':'')+'" style="top:'+top+'px;height:'+ht+'px"><div class="v60-dbt"><b>'+esc(b.t)+'</b><small>'+hm2(b.s)+'–'+hm2(b.e)+(b.note?' · '+esc(b.note):'')+'</small></div>'+pc+'</div>'; }).join("");
     var bed=T&&T.bed<1440?'<div class="v60-db k-sleep thin" style="top:'+y(T.bed)+'px;height:16px"><div class="v60-dbt"><b>취침</b><small>'+hm2(T.bed)+'</small></div></div>':'';
     var now=(T&&T.d===today())?'<i class="v60-dnow" style="top:'+y(nowM)+'px"><b>'+hm(nowM)+'</b></i>':'';
-    return '<div class="card v60-today"><div class="card-h"><h3>오늘 '+esc(V60.md(today()))+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b">'+V60.whereHTML(T)+
-      '<div class="v60-day"><div class="v60-dhs" style="height:'+H+'px">'+hrs+'</div><div class="v60-dcol" style="height:'+H+'px;background-size:100% '+PXH+'px">'+shade+blks+bed+now+'</div></div>'+
-      (rows.length?'':'<div class="hint" style="padding:6px 2px">오늘 정해진 일정이 없습니다 — 빈 칸 = 정해지지 않은 시간</div>')+'</div></div>';
+    return '<div class="card v60-today"><div class="card-h"><h3>오늘 '+esc(V60.md(today()))+V60.I("24시간 · 1시간 칸 시간표입니다.\n정해진 일정(수업 · 근무 · 캘린더 · 차편)만 그 시각에 놓습니다.\n빈 칸 = 정해지지 않은 시간 · 빗금 = 수면 · 빨간 줄 = 지금.\n과제 · 공부는 위 「오늘 할 과제」 목록에 있습니다.")+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b">'+V60.whereHTML(T)+
+      '<div class="v60-day"><div class="v60-dhs" style="height:'+H+'px">'+hrs+'</div><div class="v60-dcol" style="height:'+H+'px;background-size:100% '+PXH+'px">'+shade+blks+bed+now+'</div></div></div></div>';
   };
   V60.DPX=44;
 
