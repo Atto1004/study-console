@@ -4,6 +4,9 @@
 
 ## 2026-10-03
 
+### .136 — 공부계획 개편: 오늘 할 과제 · 과제 시작/종료 · 과제 먼저 · 빈 칸 비우기 · 24시간 격자
+- 대표님 10/3(os-a4 전달). V60: taskCard(과제/할 일 · 과목 묶음 · 합계), S.v60.run/act(실제 소요) · kindOf/learned(같은 과목·종류 평균), plan() hwLeft 이면 공부 cap 0, day() autoMeal 기본 끔, 격자 H0=0 H1=24h PX .6, stayAt 끝 없는 체류 = 지금까지, whereHTML(_private/plan.json stays · visits).
+
 ### .135 — 아이패드 홈 화면 앱에서 브라우저 막대 없이
 - 대표님 「학습앱 열 때 상단에 웹처럼 뜨는 거 안 뜨게」. A++O 홈 화면 앱은 /kingdom/ 아래만 자기 범위라 /study/ 로 넘어가면 아이패드가 바깥 웹으로 보고 브라우저 막대를 띄웠다. atom 이 학습앱을 /kingdom/study/ 로도 내보내게 하고(서버), 여기서는 `ATOM_HOSTED` 판정이 그 주소도 atom 으로 알아보게 했다(비공개 일정·제출 파일·캘린더 연동 유지).
 
