@@ -460,16 +460,24 @@
   V60.BLD={"1공":"제1공학관","2공":"제2공학관","3공":"제3공학관","4공":"제4공학관","5공":"제5공학관"};
   V60.stamp=function(d,m){ var t=d+" "+(Math.floor(m/60)%24<10?"0":"")+(Math.floor(m/60)%24)+":"+(m%60<10?"0":"")+(m%60); if(m>=1440) t=addDays(d,1)+t.slice(10); return t; };
   /* 끝 시각을 모르는 체류(to 없음)는 지금까지만 — 앞으로는 짐작하지 않는다(대표님 10/3) */
+  /* 체류 = 대표님 말(plan.json) + 앱 위치(V72) — 우선순위: 말한 짧은 체류(12시간 이하) > 앱 위치 > 긴 숙소 체류 (대표님 10/3) */
+  V60.allStays=function(){ var s=((V60.pp&&V60.pp.stays)||[]).slice(); try{ if(window.V72) s=s.concat(V72.stays()); }catch(e){} return s; };
+  V60.stayRank=function(x){ if(x.src==="geo") return 1; var h=(new Date((x.to||V60.stamp(today(),nowMin())).replace(" ","T"))-new Date(x.from.replace(" ","T")))/3600000; return h<=12?2:0; };
   V60.stayAt=function(d,m){ var t=V60.stamp(d,m), now=V60.stamp(today(),nowMin());
-    return ((V60.pp&&V60.pp.stays)||[]).filter(function(x){ return t>=x.from&&(x.to?t<x.to:t<=now); }).sort(function(a,b){ return a.from<b.from?1:-1; })[0]||null; };   /* 겹치면 나중에 시작한 곳(카페 > 숙소) */
+    return V60.allStays().filter(function(x){ return t>=x.from&&(x.to?t<x.to:t<=now); }).sort(function(a,b){ return V60.stayRank(b)-V60.stayRank(a)||(a.from<b.from?1:-1); })[0]||null; };
   V60.whereHTML=function(T){ if(!T) return ""; var d=T.d, a=d+" 00:00", z=addDays(d,1)+" 00:00", now=V60.stamp(today(),nowMin());
-    var ss=((V60.pp&&V60.pp.stays)||[]).filter(function(x){ return x.from<z&&(x.to||now)>a; });
-    var vs=((V60.pp&&V60.pp.visits)||[]).filter(function(x){ return x.date===d; });
-    if(!ss.length&&!vs.length) return "";
+    var ss=V60.allStays().filter(function(x){ return x.from<z&&(x.to||now)>a; });
     var cur=d===today()?V60.stayAt(d,nowMin()):null;
+    var long=ss.filter(function(x){ return V60.stayRank(x)===0&&x!==cur; });
+    var went=[], seen={}; ((V60.pp&&V60.pp.visits)||[]).filter(function(x){ return x.date===d; }).forEach(function(x){ if(!seen[x.place]){ seen[x.place]=1; went.push(esc(x.t)+' <b>'+esc(x.place)+'</b>'); } });
+    ss.filter(function(x){ return V60.stayRank(x)>0&&x.place!=="새 장소"; }).sort(function(p,q){ return p.from<q.from?-1:1; }).forEach(function(x){ if(!seen[x.place]){ seen[x.place]=1; went.push('<b>'+esc(x.place)+'</b>'); } });
+    /* 자기 전 타임라인 내보내기 안내 (대표님 10/3) — 22:30 이후 오늘 것을 아직 안 가져왔으면 */
+    var tl=(V60.pp&&V60.pp.timeline)||{}, late=d===today()&&nowMin()>=22*60+30&&String(tl.at||"").slice(0,10)!==d;
+    var nag=late?'<span class="v60-tln"><b>오늘 타임라인 내보내기</b>'+V60.I("휴대폰 구글 지도 › 프로필 › 내 타임라인 › ⋮ › 설정 › 타임라인 데이터 내보내기 → iCloud Drive › 위치 폴더에 저장.\nPC 가 매시간 확인해서 앱 위치 기록의 시각 오차를 고칩니다(장소 이름은 대표님 말이 우선).")+'</span>':'';
+    if(!cur&&!long.length&&!went.length&&!nag) return "";
     return '<div class="v60-where">'+(cur?'<span><small>지금</small><b>'+esc(cur.place)+'</b>'+(cur.sub?' '+esc(cur.sub):'')+'</span>':'')+
-      ss.filter(function(x){ return x!==cur; }).map(function(x){ return '<span><small>머무는 곳</small><b>'+esc(x.place)+'</b>'+(x.sub?' '+esc(x.sub):'')+'</span>'; }).join("")+
-      (vs.length?'<span><small>오늘 간 곳</small>'+vs.map(function(x){ return esc(x.t)+' <b>'+esc(x.place)+'</b>'; }).join(" · ")+'</span>':'')+'</div>'; };
+      long.map(function(x){ return '<span><small>머무는 곳</small><b>'+esc(x.place)+'</b>'+(x.sub?' '+esc(x.sub):'')+'</span>'; }).join("")+
+      (went.length?'<span><small>오늘 간 곳</small>'+went.join(" · ")+'</span>':'')+nag+'</div>'; };
   V60.placeOf=function(b,sch,d){ d=d||today();
     var room=(b.room||"").trim();
     if(b.k==="cls"&&room){ var m=room.match(/^(\d공)\s*(.*)$/); if(m) return {key:m[1],name:V60.BLD[m[1]]||m[1],sub:m[2],campus:1}; return {key:room,name:room,sub:"",campus:1}; }
@@ -631,6 +639,7 @@
     ".v60-tk2.paused .v60-run{color:var(--ink-3)}.v60-tk2.paused{background:color-mix(in srgb,var(--line) 25%,transparent);border-radius:8px;padding-left:6px;padding-right:4px}",
     ".v60-run{min-width:44px;text-align:right}",
     ".v60-ck{display:flex!important;align-items:center;gap:8px;flex-direction:row!important}",
+    ".v60-tln{display:inline-flex;align-items:center;color:#B45309}.v60-tln b{font-weight:800}",
     ".v60-where{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin:0 0 10px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--line) 30%,transparent)}.v60-where small{color:var(--ink-3);margin-right:6px;font-size:11.5px}",
     ".v60-tks .v60-est{white-space:nowrap;display:inline-flex;align-items:center;gap:3px}",
     /* 오늘 24시간 시간표 (10/3) — 1시간 = 44px, 30분은 칸 가운데 옅은 선 */
