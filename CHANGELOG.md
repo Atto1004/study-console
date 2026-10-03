@@ -4,6 +4,9 @@
 
 ## 2026-10-03
 
+### .135 — 아이패드 홈 화면 앱에서 브라우저 막대 없이
+- 대표님 「학습앱 열 때 상단에 웹처럼 뜨는 거 안 뜨게」. A++O 홈 화면 앱은 /kingdom/ 아래만 자기 범위라 /study/ 로 넘어가면 아이패드가 바깥 웹으로 보고 브라우저 막대를 띄웠다. atom 이 학습앱을 /kingdom/study/ 로도 내보내게 하고(서버), 여기서는 `ATOM_HOSTED` 판정이 그 주소도 atom 으로 알아보게 했다(비공개 일정·제출 파일·캘린더 연동 유지).
+
 ### .134 — 정역학 「혼자 풀기」 버튼
 - os-a4 의 notes/lessons/_private/statics/hw(fe0c5fe)를 V69 카드에서 openNote 로 연다. 진행 = localStorage mc-hw-statics(문제별 clean ≥ 2 = 혼자 ✓), 문제 수 = 같은 폴더 chN.json.
 

@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-03.134";
+var BUILD="2026-10-03.135";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -2981,7 +2981,7 @@ function migrate(o){
   return s;
 }
 /* ---------- atom 비서앱 안에서 열렸을 때 (같은 주소 /study/ 로 서빙) — 상태를 atom 서버(kv)에 두어 폰·PC가 같은 데이터를 본다 ---------- */
-var ATOM_HOSTED=(location.pathname.indexOf("/study/")===0);
+var ATOM_HOSTED=/^\/(kingdom\/)?study\//.test(location.pathname);   /* atom 이 /study/ 또는 /kingdom/study/ 로 내보낼 때(아이패드 홈 화면 앱 범위 안, 2026-10-03 .135) */
 if(ATOM_HOSTED) document.documentElement.classList.add("atom-hosted");
 /* atom 안에서는 테마를 atom 이 정한다 — 처음엔 ?theme=, 바뀌면 postMessage {atomTheme} (아토 2026-09-08 통일) */
 (function(){
