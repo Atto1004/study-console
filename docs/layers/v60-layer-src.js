@@ -386,6 +386,38 @@
   V60.ICON={play:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>',
     pause:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="6.5" y="5.5" width="4" height="13" rx="1" fill="currentColor"/><rect x="13.5" y="5.5" width="4" height="13" rx="1" fill="currentColor"/></svg>',
     stop:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="6.5" y="6.5" width="11" height="11" rx="2" fill="currentColor"/></svg>'};
+  /* ---------- 혼자 풀기 문제 큐 (atom 안에서만 — 문제 은행은 _private) ---------- */
+  V60.HWS=[["statics",20],["calc2",10],["em1",15]];
+  V60.loadHW=function(){
+    if(V60.HW||V60._hwL||!window.ATOM_HOSTED) return; V60._hwL=1;
+    var base="notes/lessons/_private/", get=function(u){ return fetch(u,{cache:"no-cache"}).then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; }); };
+    Promise.all(V60.HWS.map(function(x){ var sl=x[0];
+      return get(base+sl+"/hw/meta.json").then(function(m){ if(!m) return null;
+        return Promise.all((m.tabs||[]).map(function(t){ return get(base+sl+"/hw/ch"+t[0]+".json"); })).then(function(chs){ var ps=[];
+          chs.forEach(function(c){ ((c&&c.problems)||[]).forEach(function(p){ ps.push({id:p.id,title:p.title||"",n:(p.steps||[]).length}); }); });
+          return {slug:sl,min:x[1],meta:m,ps:ps}; }); }); }))
+    .then(function(bs){ V60.HW=bs.filter(function(b){ return b&&b.ps.length; }); V60._hwL=0; if(ui.view==="plan") V60.render(); });
+  };
+  V60.hwQueueHTML=function(td,waitN){
+    if(!window.ATOM_HOSTED) return '<div class="v60-tk2"><div class="v60-tkm"><div class="v60-tks">과제 혼자 풀기 문제는 atom 안에서 열립니다</div></div></div>';
+    if(!V60.HW){ V60.loadHW(); return ''; }
+    var ex=function(name){ var e=(exams()||[]).filter(function(x){ var c=course(x.courseId); return c&&c.name===name&&x.kind==="중간"&&x.date>=td; })[0]; return e?e.date:"9999"; };
+    var bs=V60.HW.map(function(b){ var rec={}; try{ rec=JSON.parse(localStorage.getItem(b.meta.key)||"{}")||{}; }catch(e){}
+      var st=function(id){ var r=rec[id]; return !r||!r.runs||!r.runs.length?"new":(r.clean>=2?"ok":"ing"); };
+      var ps=b.ps.map(function(p){ return {p:p,s:st(p.id),r:rec[p.id]}; });
+      return {b:b,date:ex(b.meta.course),ps:ps,ok:ps.filter(function(x){ return x.s==="ok"; }).length}; })
+      .filter(function(x){ return x.date!=="9999"; }).sort(function(a,b){ return a.date<b.date?-1:1; });
+    var out="";
+    bs.forEach(function(x,i){ var lim=i===0?4:i===1?2:1;
+      var todo=x.ps.filter(function(q){ return q.s==="ing"; }).concat(x.ps.filter(function(q){ return q.s==="new"; })).slice(0,lim);
+      if(!todo.length) return;
+      var dd=diffDays(td,x.date), base="notes/lessons/_private/"+x.b.slug+"/hw/index.html";
+      out+='<div class="v60-grp hwq"><div class="v60-grph"><b>'+esc(x.b.meta.course)+'</b><span>혼자 ✓ '+x.ok+' / '+x.ps.length+' · 시험 D-'+dd+'</span></div>'+todo.map(function(q){ var p=q.p;
+        var tag=q.s==="ing"?'연습 중 '+((q.r&&q.r.clean)||0)+'/2':'처음';
+        return '<div class="v60-tk2'+(waitN?' wait':'')+'"><div class="v60-tkm"><div class="v60-tkt">'+esc(/^\d/.test(p.title||"")?p.title:p.id+" · "+(p.title||""))+'</div><div class="v60-tks">혼자 풀기 · '+tag+' · '+p.n+'단계 · 약 '+fmtMin(x.b.min)+'</div></div>'+
+          '<div class="v60-tka"><a class="btn xs a" href="'+esc(base+"#p="+p.id)+'" data-v60note="'+esc(x.b.meta.course+" · 혼자 풀기 "+p.id)+'">풀기</a></div></div>'; }).join("")+'</div>'; });
+    return out;
+  };
   V60.taskCard=function(P,T,td){
     var left=P.asg.filter(function(a){ return !a.done&&a.due>=td; });
     var sum=function(xs){ return xs.reduce(function(s,a){ return s+(a.noplan?0:a.est); },0); };
@@ -408,15 +440,16 @@
       return '<div class="v60-sec"><div class="v60-sech">'+title+'</div>'+groups(xs).map(function(g){ var m=sum(g.xs);
         return '<div class="v60-grp'+(g.hot?' hot':'')+'"><div class="v60-grph"><b>'+esc(g.c)+'</b><span>'+g.xs.length+'개'+(m?' · 약 '+fmtMin(m):'')+'</span></div>'+g.xs.map(row).join("")+'</div>'; }).join("")+'</div>'; };
     /* 공부 — 과제 끝낸 뒤 */
-    var st=[], seen={}; (T?T.items:[]).filter(function(b){ return b.k==="st"||b.k==="memo"; }).forEach(function(b){ if(seen[b.t]){ seen[b.t].min+=b.e-b.s; return; } seen[b.t]={b:b,min:b.e-b.s}; st.push(seen[b.t]); });
+    /* 대표님 10/4 「공부 영역에 그걸 왜 쓰는 거야」 → 회차 복습(st)은 빼고 시험 순서 혼자 풀기 문제(V60.hwQueueHTML)로. 암기(memo)만 남김 */
+    var st=[], seen={}; (T?T.items:[]).filter(function(b){ return b.k==="memo"; }).forEach(function(b){ if(seen[b.t]){ seen[b.t].min+=b.e-b.s; return; } seen[b.t]={b:b,min:b.e-b.s}; st.push(seen[b.t]); });
     var sd=V60.st().done, own=(V60.priv||[]).concat(V60.st().extra||[]).filter(function(x){ return x&&(x.kind==="study"||x.kind==="prep")&&x.due>=td; }).map(function(x){ var o={c:x.c||"기타",t:x.t,due:x.due,time:x.time||"23:59",kind:x.kind}; o.k=V60.key(o); o.done=!!sd[o.k]; return o; }).filter(function(o){ return !o.done; }).sort(function(a,b){ return (a.due+a.time)<(b.due+b.time)?-1:1; });
     var ownHTML=own.map(function(o){ var dd=diffDays(td,o.due);
       return '<div class="v60-tk2'+(left.length&&o.kind==="study"?' wait':'')+'"><div class="v60-tkm"><div class="v60-tkt"><b>'+esc(o.c)+'</b> · '+esc(V60.tt(o))+'</div><div class="v60-tks">'+(o.kind==="prep"?'수업 준비 · ':'')+(dd===0?'오늘':dd===1?'내일':V60.md(o.due)+' · D-'+dd)+'</div></div><div class="v60-tka"><button type="button" class="v60-chk" data-v60done="'+esc(o.k)+'" aria-label="완료"></button></div></div>'; }).join("");
-    var stBody=ownHTML+(T&&T.hwLeft?'':st.map(function(x){ var b=x.b, m=b.meta||{};
+    var stBody=ownHTML+V60.hwQueueHTML(td,left.length)+(T&&T.hwLeft?'':st.map(function(x){ var b=x.b, m=b.meta||{};
       return '<div class="v60-tk2'+(left.length?' wait':'')+'"><div class="v60-tkm"><div class="v60-tkt">'+esc(b.t)+'</div><div class="v60-tks">약 '+fmtMin(x.min)+'</div></div><div class="v60-tka">'+
         (m.x?'<button type="button" class="btn xs a" data-v60go="'+m.c.id+'|'+m.x.w+'|'+m.x.date+'">열기</button><button type="button" class="v60-chk" data-v60sdone="'+m.c.id+'|'+m.x.date+'" aria-label="완료"></button>':'')+
         (m.memo?'<button type="button" class="btn xs a" data-v60memo="1">카드</button><button type="button" class="v60-chk" data-v60mdone="'+esc(m.d)+'" aria-label="완료"></button>':'')+'</div></div>'; }).join(""));
-    var stHTML=stBody?'<div class="v60-sec st"><div class="v60-sech">공부'+V60.I("과제를 끝낸 뒤에 합니다 — 과제를 해야 공부를 할 수 있다.\n남은 과제가 오늘 안에 다 안 들어가면 복습 · 밀린 회차 · 암기는 배정하지 않습니다.\n흐린 줄 = 과제가 남아 아직 차례가 아닌 공부.")+'</div>'+stBody+'</div>':'';
+    var stHTML=stBody?'<div class="v60-sec st"><div class="v60-sech">공부'+V60.I("시험이 가까운 과목부터 과제 문제를 혼자 풀기(스앵님 코칭)로 — 막히면 「모르겠어요」.\n회차 복습은 막혔을 때 과목 화면에서 엽니다.\n과제를 끝낸 뒤에 합니다 — 과제를 해야 공부를 할 수 있다.\n남은 과제가 오늘 안에 다 안 들어가면 복습 · 밀린 회차 · 암기는 배정하지 않습니다.\n흐린 줄 = 과제가 남아 아직 차례가 아닌 공부.")+'</div>'+stBody+'</div>':'';
     var exH=exams().filter(function(e){ return e.date===td||e.date===addDays(td,1); }).map(function(e){ var n=(course(e.courseId)||{}).name||"";
       return '<div class="v60-tk2 urgent"><div class="v60-tkm"><div class="v60-tkt"><b>'+esc(n)+'</b> · '+esc(e.kind||"시험")+'</div><div class="v60-tks"><span class="v60-due hot">'+(e.date===td?"오늘":"내일")+(e.time?" "+esc(e.time):"")+'</span></div></div></div>'; }).join("");
     var nHot=left.filter(isHot).length;

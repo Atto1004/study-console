@@ -4,6 +4,9 @@
 
 ## 2026-10-04
 
+### .156 — 공부 칸 = 혼자 풀기 문제
+- 대표님 10/4 「공부 영역에 그걸 왜 쓰는 거야」→「ㄱㄱ」. V60.loadHW(_private/{statics,calc2,em1}/hw meta·ch) · V60.hwQueueHTML(시험일 순, 4·2·1, 연습 중→처음, a[data-v60note] → openNote) · taskCard 공부 칸의 회차 복습(st) 빼고 memo 만, study/prep 할 일 그대로.
+
 ### .155 — 시계는 초까지만
 - 대표님 「시계에 밀리초까지는 필요 없을 듯, 그냥 초로만」. V65 `clock`에서 밀리초 숫자 띠(.131 CSS 애니메이션)와 위치 맞춤을 걷어냈다. JS 는 1초에 한 번 시:분:초·날짜만. 패치 `docs/tools/_v65_clock_sec.py`.
 - 같은 날 atom 상단바(kingdom/study-hud.js): 연동 끊김 자리에 클로바노트 변환 대기 N개 / 마지막 반영 과목(날짜) — 원본 knowledge/clova-status.json.

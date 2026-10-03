@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-04.155";
+var BUILD="2026-10-04.156";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,9 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-04.156",d:"10-04",items:[
+    "공부계획 「공부」 칸 = 시험 순서 혼자 풀기 문제(정역학 → 미적2 → 공수1, 스앵님 코칭) — 가장 가까운 시험 과목 4문제 · 다음 2 · 그다음 1, 연습 중인 문제 먼저. 9월 회차 복습 줄은 뺌(막혔을 때 과목 화면에서). 암기카드 · 직접 넣은 공부 할 일은 그대로"
+  ]},
   {v:"2026-10-03.154",d:"10-03",items:[
     "공부계획 「오늘만」 시간표에 실제로 있던 곳(대표님이 말한 카페 등 · 앱 위치)을 「있던 곳」 칸으로 — 예: 에센자커피 15:40~18:59 · 스타벅스 18:59~지금"
   ]},
@@ -12177,7 +12180,7 @@ var V33={};
   };
   V60.filesFor=function(a){ return (V60.files||[]).filter(function(f){ return f.course===a.c&&new RegExp(f.match).test(a.t); }); };
   V60.filesHTML=function(a){
-    var fs=V60.filesFor(a); if(!fs.length) return "";
+    var fs=V60.filesFor(a).filter(function(f){ return !/\.html(\?|#|$)/.test(f.file)&&!/혼자\s*풀기/.test(f.label||""); }); if(!fs.length) return "";   /* 혼자 풀기는 그 과목 화면에만(대표님 10/4) — V73 */
     return '<span class="v60-files">'+fs.map(function(f){ var pg=/\.html(\?|#|$)/.test(f.file);   /* html(혼자 풀기 등)은 앱 안 보기 창으로 — 스앵님 코칭이 이어지게(10/3) */
       return '<a class="v60-file'+(pg?' pg':'')+'" href="'+esc(f.file)+'"'+(pg?' data-v60note="'+esc(a.c+" · "+f.label)+'"':' target="_blank" rel="noopener"')+'>'+esc(f.label)+'</a>'; }).join("")+'</span>';
   };
@@ -12371,7 +12374,7 @@ var V33={};
   };
 
   /* ---------- 공부계획 화면 ---------- */
-  V60.ui={week:0,day:null,today:(function(){ try{ return localStorage.getItem("mc-plan-today")==="1"; }catch(e){ return false; } })()};
+  V60.ui={week:0,off:0,day:null,today:(function(){ try{ return localStorage.getItem("mc-plan-today")==="1"; }catch(e){ return false; } })()};
   V60.render=function(){
     if(window.V59) V59.ensureView(); var body=$("#v59Body"); if(!body) return;
     var pend=[];
@@ -12426,8 +12429,14 @@ var V33={};
         (isT&&nowM>H0&&nowM<H1?'<i class="v60-now" style="top:'+((nowM-H0)*PX)+'px"><b>'+hm(nowM)+'</b></i>':'')+'</div></div>';
     }).join("");
     var hours=''; for(var h=0;h<=24;h+=1) hours+='<span style="top:'+((h*60-H0)*PX)+'px">'+pad2(h%24)+'</span>';
-    var seg='<div class="seg" id="v60Wk"><button data-w="t"'+(V60.ui.today?' aria-pressed="true"':'')+'>오늘만</button><button data-w="0"'+(!V60.ui.today&&V60.ui.week===0?' aria-pressed="true"':'')+'>이번 주</button><button data-w="1"'+(!V60.ui.today&&V60.ui.week===1?' aria-pressed="true"':'')+'>다음 주</button></div>';
-    var grid=V60.ui.today?V60.todayHTML(T,nowM,seg):'<div class="card v60-gridcard"><div class="card-h"><h3>'+(V60.ui.week?'다음 주':'이번 주')+V60.I("꽉 찬 칸 = 정해진 일정 · 점선 칸 = 제안(앱이 짐작으로 배치한 과제 · 공부 · 식사 · 휴식).\n빗금 = 수면.")+'</h3><span class="hs"></span><div class="ha">'+seg+'</div></div>'+
+    var seg=(V60.viewBar?V60.viewBar():'')+'<div hidden>';   /* 10/4 아이콘 보기 전환(V60.viewBar) — 아래 예전 버튼 줄은 숨김 자리만 */
+    seg+='<div class="seg" id="v60WkOld"><button data-w="t"'+(V60.ui.today?' aria-pressed="true"':'')+'>오늘만</button><button data-w="0"'+(!V60.ui.today&&V60.ui.week===0?' aria-pressed="true"':'')+'>이번 주</button><button data-w="1"'+(!V60.ui.today&&V60.ui.week===1?' aria-pressed="true"':'')+'>다음 주</button></div>';
+    var selD=addDays(td,V60.ui.off||0), TS=T;
+    if(V60.ui.today&&selD!==td){ TS=P.days.filter(function(x){ return x.d===selD; })[0];
+      if(!TS){ var mon2=mondayOf(selD); TS=V60.plan(mon2).days.filter(function(x){ return x.d===selD; })[0];
+        if(ATOM_HOSTED&&window.V25&&V25.atomCal&&V60._calW!==mon2){ V60._calW=mon2; V25.atomCal(mon2,addDays(mon2,6),function(fresh){ if(fresh&&ui.view==="plan") V60.render(); }); } } }
+    seg+='</div>';
+    var grid=V60.ui.today?V60.todayHTML(TS,selD<td?1441:selD>td?-1:nowM,seg):'<div class="card v60-gridcard"><div class="card-h"><h3>'+(V60.weekName?V60.weekName(V60.ui.week):(V60.ui.week?'다음 주':'이번 주'))+V60.I("꽉 찬 칸 = 정해진 일정 · 점선 칸 = 제안(앱이 짐작으로 배치한 과제 · 공부 · 식사 · 휴식).\n빗금 = 수면.")+'</h3><span class="hs"></span><div class="ha">'+seg+'</div></div>'+
       '<div class="card-b"><div class="v60-leg"><i class="k-cls"></i>수업<i class="k-work"></i>근무·알바<i class="k-ev"></i>일정<i class="k-meal"></i>식사·준비<i class="k-move"></i>이동</div>'+
       '<div class="v60-grid"><div class="v60-hrs" style="height:'+((H1-H0)*PX)+'px">'+hours+'</div>'+cols+'</div></div></div>';
     /* 과제 */
@@ -12479,7 +12488,8 @@ var V33={};
     $$("[data-v60mdone]",body).forEach(function(b){ b.onclick=function(){ var st=V60.st(); st.mdone=st.mdone||{}; st.mdone[b.dataset.v60mdone]=Date.now(); persist(); V60.render(); }; });
     $$("[data-v60sleep]",body).forEach(function(inp){ inp.onchange=function(){ var st=V60.st(); st.sleep=st.sleep||{}; var o=st.sleep[td]||{}; o[inp.dataset.v60sleep]=inp.value; st.sleep[td]=o; persist(); V60.render(); }; });
     $$("[data-v60end]",body).forEach(function(inp){ inp.onchange=function(){ var st=V60.st(); st.cfg.ends=st.cfg.ends||{}; if(inp.value) st.cfg.ends[inp.dataset.v60end]=inp.value; else delete st.cfg.ends[inp.dataset.v60end]; persist(); V60.render(); }; });
-    $$("#v60Wk button",body).forEach(function(b){ b.onclick=function(){ var w=b.dataset.w; V60.ui.today=w==="t"; if(w!=="t") V60.ui.week=+w; try{ localStorage.setItem("mc-plan-today",V60.ui.today?"1":"0"); }catch(e){} V60.render(); }; });
+    if(V60.viewBind) V60.viewBind(body);
+    $$("#v60WkOld button",body).forEach(function(b){ b.onclick=function(){ var w=b.dataset.w; V60.ui.today=w==="t"; if(w!=="t") V60.ui.week=+w; try{ localStorage.setItem("mc-plan-today",V60.ui.today?"1":"0"); }catch(e){} V60.render(); }; });
   };
 
   /* ---------- 오늘 할 과제 (대표님 10/3) ----------
@@ -12492,6 +12502,38 @@ var V33={};
   V60.ICON={play:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>',
     pause:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="6.5" y="5.5" width="4" height="13" rx="1" fill="currentColor"/><rect x="13.5" y="5.5" width="4" height="13" rx="1" fill="currentColor"/></svg>',
     stop:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="6.5" y="6.5" width="11" height="11" rx="2" fill="currentColor"/></svg>'};
+  /* ---------- 혼자 풀기 문제 큐 (atom 안에서만 — 문제 은행은 _private) ---------- */
+  V60.HWS=[["statics",20],["calc2",10],["em1",15]];
+  V60.loadHW=function(){
+    if(V60.HW||V60._hwL||!window.ATOM_HOSTED) return; V60._hwL=1;
+    var base="notes/lessons/_private/", get=function(u){ return fetch(u,{cache:"no-cache"}).then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; }); };
+    Promise.all(V60.HWS.map(function(x){ var sl=x[0];
+      return get(base+sl+"/hw/meta.json").then(function(m){ if(!m) return null;
+        return Promise.all((m.tabs||[]).map(function(t){ return get(base+sl+"/hw/ch"+t[0]+".json"); })).then(function(chs){ var ps=[];
+          chs.forEach(function(c){ ((c&&c.problems)||[]).forEach(function(p){ ps.push({id:p.id,title:p.title||"",n:(p.steps||[]).length}); }); });
+          return {slug:sl,min:x[1],meta:m,ps:ps}; }); }); }))
+    .then(function(bs){ V60.HW=bs.filter(function(b){ return b&&b.ps.length; }); V60._hwL=0; if(ui.view==="plan") V60.render(); });
+  };
+  V60.hwQueueHTML=function(td,waitN){
+    if(!window.ATOM_HOSTED) return '<div class="v60-tk2"><div class="v60-tkm"><div class="v60-tks">과제 혼자 풀기 문제는 atom 안에서 열립니다</div></div></div>';
+    if(!V60.HW){ V60.loadHW(); return ''; }
+    var ex=function(name){ var e=(exams()||[]).filter(function(x){ var c=course(x.courseId); return c&&c.name===name&&x.kind==="중간"&&x.date>=td; })[0]; return e?e.date:"9999"; };
+    var bs=V60.HW.map(function(b){ var rec={}; try{ rec=JSON.parse(localStorage.getItem(b.meta.key)||"{}")||{}; }catch(e){}
+      var st=function(id){ var r=rec[id]; return !r||!r.runs||!r.runs.length?"new":(r.clean>=2?"ok":"ing"); };
+      var ps=b.ps.map(function(p){ return {p:p,s:st(p.id),r:rec[p.id]}; });
+      return {b:b,date:ex(b.meta.course),ps:ps,ok:ps.filter(function(x){ return x.s==="ok"; }).length}; })
+      .filter(function(x){ return x.date!=="9999"; }).sort(function(a,b){ return a.date<b.date?-1:1; });
+    var out="";
+    bs.forEach(function(x,i){ var lim=i===0?4:i===1?2:1;
+      var todo=x.ps.filter(function(q){ return q.s==="ing"; }).concat(x.ps.filter(function(q){ return q.s==="new"; })).slice(0,lim);
+      if(!todo.length) return;
+      var dd=diffDays(td,x.date), base="notes/lessons/_private/"+x.b.slug+"/hw/index.html";
+      out+='<div class="v60-grp hwq"><div class="v60-grph"><b>'+esc(x.b.meta.course)+'</b><span>혼자 ✓ '+x.ok+' / '+x.ps.length+' · 시험 D-'+dd+'</span></div>'+todo.map(function(q){ var p=q.p;
+        var tag=q.s==="ing"?'연습 중 '+((q.r&&q.r.clean)||0)+'/2':'처음';
+        return '<div class="v60-tk2'+(waitN?' wait':'')+'"><div class="v60-tkm"><div class="v60-tkt">'+esc(/^\d/.test(p.title||"")?p.title:p.id+" · "+(p.title||""))+'</div><div class="v60-tks">혼자 풀기 · '+tag+' · '+p.n+'단계 · 약 '+fmtMin(x.b.min)+'</div></div>'+
+          '<div class="v60-tka"><a class="btn xs a" href="'+esc(base+"#p="+p.id)+'" data-v60note="'+esc(x.b.meta.course+" · 혼자 풀기 "+p.id)+'">풀기</a></div></div>'; }).join("")+'</div>'; });
+    return out;
+  };
   V60.taskCard=function(P,T,td){
     var left=P.asg.filter(function(a){ return !a.done&&a.due>=td; });
     var sum=function(xs){ return xs.reduce(function(s,a){ return s+(a.noplan?0:a.est); },0); };
@@ -12514,15 +12556,16 @@ var V33={};
       return '<div class="v60-sec"><div class="v60-sech">'+title+'</div>'+groups(xs).map(function(g){ var m=sum(g.xs);
         return '<div class="v60-grp'+(g.hot?' hot':'')+'"><div class="v60-grph"><b>'+esc(g.c)+'</b><span>'+g.xs.length+'개'+(m?' · 약 '+fmtMin(m):'')+'</span></div>'+g.xs.map(row).join("")+'</div>'; }).join("")+'</div>'; };
     /* 공부 — 과제 끝낸 뒤 */
-    var st=[], seen={}; (T?T.items:[]).filter(function(b){ return b.k==="st"||b.k==="memo"; }).forEach(function(b){ if(seen[b.t]){ seen[b.t].min+=b.e-b.s; return; } seen[b.t]={b:b,min:b.e-b.s}; st.push(seen[b.t]); });
+    /* 대표님 10/4 「공부 영역에 그걸 왜 쓰는 거야」 → 회차 복습(st)은 빼고 시험 순서 혼자 풀기 문제(V60.hwQueueHTML)로. 암기(memo)만 남김 */
+    var st=[], seen={}; (T?T.items:[]).filter(function(b){ return b.k==="memo"; }).forEach(function(b){ if(seen[b.t]){ seen[b.t].min+=b.e-b.s; return; } seen[b.t]={b:b,min:b.e-b.s}; st.push(seen[b.t]); });
     var sd=V60.st().done, own=(V60.priv||[]).concat(V60.st().extra||[]).filter(function(x){ return x&&(x.kind==="study"||x.kind==="prep")&&x.due>=td; }).map(function(x){ var o={c:x.c||"기타",t:x.t,due:x.due,time:x.time||"23:59",kind:x.kind}; o.k=V60.key(o); o.done=!!sd[o.k]; return o; }).filter(function(o){ return !o.done; }).sort(function(a,b){ return (a.due+a.time)<(b.due+b.time)?-1:1; });
     var ownHTML=own.map(function(o){ var dd=diffDays(td,o.due);
       return '<div class="v60-tk2'+(left.length&&o.kind==="study"?' wait':'')+'"><div class="v60-tkm"><div class="v60-tkt"><b>'+esc(o.c)+'</b> · '+esc(V60.tt(o))+'</div><div class="v60-tks">'+(o.kind==="prep"?'수업 준비 · ':'')+(dd===0?'오늘':dd===1?'내일':V60.md(o.due)+' · D-'+dd)+'</div></div><div class="v60-tka"><button type="button" class="v60-chk" data-v60done="'+esc(o.k)+'" aria-label="완료"></button></div></div>'; }).join("");
-    var stBody=ownHTML+(T&&T.hwLeft?'':st.map(function(x){ var b=x.b, m=b.meta||{};
+    var stBody=ownHTML+V60.hwQueueHTML(td,left.length)+(T&&T.hwLeft?'':st.map(function(x){ var b=x.b, m=b.meta||{};
       return '<div class="v60-tk2'+(left.length?' wait':'')+'"><div class="v60-tkm"><div class="v60-tkt">'+esc(b.t)+'</div><div class="v60-tks">약 '+fmtMin(x.min)+'</div></div><div class="v60-tka">'+
         (m.x?'<button type="button" class="btn xs a" data-v60go="'+m.c.id+'|'+m.x.w+'|'+m.x.date+'">열기</button><button type="button" class="v60-chk" data-v60sdone="'+m.c.id+'|'+m.x.date+'" aria-label="완료"></button>':'')+
         (m.memo?'<button type="button" class="btn xs a" data-v60memo="1">카드</button><button type="button" class="v60-chk" data-v60mdone="'+esc(m.d)+'" aria-label="완료"></button>':'')+'</div></div>'; }).join(""));
-    var stHTML=stBody?'<div class="v60-sec st"><div class="v60-sech">공부'+V60.I("과제를 끝낸 뒤에 합니다 — 과제를 해야 공부를 할 수 있다.\n남은 과제가 오늘 안에 다 안 들어가면 복습 · 밀린 회차 · 암기는 배정하지 않습니다.\n흐린 줄 = 과제가 남아 아직 차례가 아닌 공부.")+'</div>'+stBody+'</div>':'';
+    var stHTML=stBody?'<div class="v60-sec st"><div class="v60-sech">공부'+V60.I("시험이 가까운 과목부터 과제 문제를 혼자 풀기(스앵님 코칭)로 — 막히면 「모르겠어요」.\n회차 복습은 막혔을 때 과목 화면에서 엽니다.\n과제를 끝낸 뒤에 합니다 — 과제를 해야 공부를 할 수 있다.\n남은 과제가 오늘 안에 다 안 들어가면 복습 · 밀린 회차 · 암기는 배정하지 않습니다.\n흐린 줄 = 과제가 남아 아직 차례가 아닌 공부.")+'</div>'+stBody+'</div>':'';
     var exH=exams().filter(function(e){ return e.date===td||e.date===addDays(td,1); }).map(function(e){ var n=(course(e.courseId)||{}).name||"";
       return '<div class="v60-tk2 urgent"><div class="v60-tkm"><div class="v60-tkt"><b>'+esc(n)+'</b> · '+esc(e.kind||"시험")+'</div><div class="v60-tks"><span class="v60-due hot">'+(e.date===td?"오늘":"내일")+(e.time?" "+esc(e.time):"")+'</span></div></div></div>'; }).join("");
     var nHot=left.filter(isHot).length;
@@ -12555,15 +12598,16 @@ var V33={};
     var hrs=''; for(var h=0;h<24;h++) hrs+='<span style="top:'+(h*PXH)+'px">'+pad2(h)+':00</span>';
     var shade=T?(V60.sleepKnown(T.d,T.wake)?'<i class="v60-dsl" style="top:0;height:'+y(T.wake)+'px"></i>':'')+(T.bed<1440?'<i class="v60-dsl" style="top:'+y(T.bed)+'px;height:'+(H-y(T.bed))+'px"></i>':''):'';
     var blks=rows.map(function(b,ri){ if(b.e<=0||b.s>=1440) return ""; var top=y(b.s), ht=Math.max(16,y(b.e)-top), past=b.e<=nowM, cur=b.s<=nowM&&nowM<b.e;
-      var pc=b.stay?'':placeCell(ri).replace(/^<div class="v60-tp/,'<div class="v60-tp v60-dp');
+      var pc=V60.LANE?'':b.stay?'':placeCell(ri).replace(/^<div class="v60-tp/,'<div class="v60-tp v60-dp');
       /* 예전 목록 디자인 느낌(대표님 10/3 「1시간 칸 나누기 전 디자인이 이뻤다」) — 흰 칸 · 얇은 색 띠 · 작은 종류 이름 · 굵은 제목 · 파일/완료 상자 · 오른쪽 장소 줄 */
       var act=(ht>=60&&b.meta&&b.meta.hw?V60.filesHTML(b.meta.hw)+'<button type="button" class="v60-chk" data-v60done="'+esc(b.meta.hw.k)+'" aria-label="완료"></button>':'')+
         (ht>=60&&b.meta&&b.meta.x?'<button type="button" class="btn xs a" data-v60go="'+b.meta.c.id+'|'+b.meta.x.w+'|'+b.meta.x.date+'">열기</button><button type="button" class="v60-chk" data-v60sdone="'+b.meta.c.id+'|'+b.meta.x.date+'" aria-label="완료"></button>':'');
       return '<div class="v60-db k-'+b.k+(b.sug?' sug':'')+(past?' past':'')+(cur?' cur':'')+(ht<34?' thin':'')+'" style="top:'+top+'px;height:'+ht+'px"><div class="v60-dbt">'+(ht>=44?'<span class="v60-dk">'+esc(V60.KN[b.k]||"")+(cur?' · 지금':'')+'</span>':'')+'<b>'+esc(b.t)+'</b><small>'+hm2(b.s)+'–'+hm2(b.e)+(b.note?' · '+esc(b.note):'')+'</small></div>'+(act?'<div class="v60-da">'+act+'</div>':'')+pc+'</div>'; }).join("");
     var bed=T&&T.bed<1440?'<div class="v60-db k-sleep thin" style="top:'+y(T.bed)+'px;height:16px"><div class="v60-dbt"><b>취침</b><small>'+hm2(T.bed)+'</small></div></div>':'';
     var now=(T&&T.d===today())?'<i class="v60-dnow" style="top:'+y(nowM)+'px"><b>'+hm(nowM)+'</b></i>':'';
-    return '<div class="card v60-today"><div class="card-h"><h3>오늘 '+esc(V60.md(today()))+V60.I("24시간 · 1시간 칸 시간표입니다.\n꽉 찬 칸 = 정해진 일정(수업 · 근무 · 캘린더 · 차편).\n점선 칸 = 제안 — 빈 시간에 앱이 짐작으로 배치한 과제 · 공부 · 식사 · 휴식(확정 아님).\n빈 칸 = 아무것도 없는 시간 · 빗금 = 수면 · 빨간 줄 = 지금.")+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b">'+V60.whereHTML(T)+
-      '<div class="v60-day"><div class="v60-dhs" style="height:'+H+'px">'+hrs+'</div><div class="v60-dcol" style="height:'+H+'px;background-size:100% '+PXH+'px">'+shade+blks+bed+now+'</div></div></div></div>';
+    var lane=V60.LANE&&T&&V60.laneOf?V60.laneOf(T,rows,places,y,H):null;
+    return '<div class="card v60-today"><div class="card-h"><h3>'+esc(V60.dayName?V60.dayName(T?T.d:today()):'오늘')+' '+esc(V60.md(T?T.d:today()))+V60.I("24시간 · 1시간 칸 시간표입니다.\n꽉 찬 칸 = 정해진 일정(수업 · 근무 · 캘린더 · 차편).\n점선 칸 = 제안 — 빈 시간에 앱이 짐작으로 배치한 과제 · 공부 · 식사 · 휴식(확정 아님).\n빈 칸 = 아무것도 없는 시간 · 빗금 = 수면 · 빨간 줄 = 지금.")+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b">'+V60.whereHTML(T)+(lane?lane.route:'')+
+      '<div class="v60-day'+(lane?' lane':'')+'"><div class="v60-dhs" style="height:'+H+'px">'+hrs+'</div><div class="v60-dcol" style="height:'+H+'px;background-size:100% '+PXH+'px">'+shade+blks+bed+now+'</div>'+(lane?lane.html:'')+'</div></div></div>';
   };
   V60.DPX=56;
 
@@ -13541,6 +13585,110 @@ var V33={};
   document.addEventListener("visibilitychange",function(){ if(!document.hidden) V72.ping(); });
   setInterval(V72.ping,5*60000);
   setTimeout(V72.ping,3000);
+})();
+/* ============================================================
+   V73 LAYER — 공부계획 하루 보기 개편 (대표님 2026-10-04) (BUILD 2026-10-04.156)
+   ① 보기 전환 = 구글 캘린더식 아이콘(하루 · 한 주) + ‹ 오늘 › 이동 — 「오늘만 · 이번 주 · 다음 주 버튼 말고 1day · 1week 아이콘」
+   ② 하루 보기에서 어제 · 내일로 넘기기(V60.ui.off) — 「오늘만에서 어제랑 내일로 이동」
+   ③ 시간표 오른쪽 장소 줄(폰에서도) + 경계마다 「14:30 집 → 카페」, 위에 하루 경로 한 줄 — 「위치는 항상 우측 · 어디서 어디로 한눈에」
+   ④ 과목 화면 「혼자 풀기」 칸 — 공부계획 · 달력 목록에서는 뺐다(V60.filesHTML) — 「혼자 풀기는 그 과목에만」
+   ============================================================ */
+(function(){
+  if(window.V73||!window.V60) return;
+  var V73=window.V73={};
+  var p2=function(n){ return (n<10?"0":"")+n; }, hm=function(m){ m=Math.max(0,Math.round(m)); return p2(Math.floor(m/60)%24)+":"+p2(m%60); };
+  var IC=function(p){ return '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>'; };
+  var CAL='<rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17M8 2.8v3.4M16 2.8v3.4"/>';
+  V60.LANE=true;
+  /* ① ② 보기 바 */
+  V60.viewBar=function(){
+    var d=V60.ui.today, isNow=d?!(V60.ui.off||0):!(V60.ui.week||0);
+    return '<div class="v73-bar" id="v60Wk"><div class="v73-nav">'+
+      '<button type="button" data-v73n="-1" aria-label="'+(d?'전날':'지난 주')+'" title="'+(d?'전날':'지난 주')+'">'+IC('<path d="M14.5 6l-6 6 6 6"/>')+'</button>'+
+      '<button type="button" class="v73-tdy" data-v73n="0"'+(isNow?' aria-current="true"':'')+'>오늘</button>'+
+      '<button type="button" data-v73n="1" aria-label="'+(d?'다음 날':'다음 주')+'" title="'+(d?'다음 날':'다음 주')+'">'+IC('<path d="M9.5 6l6 6-6 6"/>')+'</button></div>'+
+      '<div class="v73-vw" role="group" aria-label="보기">'+
+      '<button type="button" data-v73w="d" aria-label="하루" title="하루"'+(d?' aria-pressed="true"':'')+'>'+IC(CAL+'<path d="M10.6 13.4l1.8-1.3v6"/>')+'</button>'+
+      '<button type="button" data-v73w="w" aria-label="한 주" title="한 주"'+(!d?' aria-pressed="true"':'')+'>'+IC(CAL+'<path d="M7 12.5v5M10.3 12.5v5M13.7 12.5v5M17 12.5v5"/>')+'</button></div></div>';
+  };
+  V60.viewBind=function(body){
+    $$("[data-v73w]",body).forEach(function(b){ b.onclick=function(){ var td=today(), toDay=b.getAttribute("data-v73w")==="d"; if(toDay===!!V60.ui.today) return;
+      if(toDay) V60.ui.off=(V60.ui.week||0)?diffDays(td,addDays(mondayOf(td),7*V60.ui.week)):0;   /* 다른 주를 보다가 하루로 → 그 주 월요일 */
+      else V60.ui.week=Math.round(diffDays(mondayOf(td),mondayOf(addDays(td,V60.ui.off||0)))/7);   /* 하루 보다가 주로 → 그날이 든 주 */
+      V60.ui.today=toDay; try{ localStorage.setItem("mc-plan-today",toDay?"1":"0"); }catch(e){} V60.render(); }; });
+    $$("[data-v73n]",body).forEach(function(b){ b.onclick=function(){ var n=+b.getAttribute("data-v73n");
+      if(V60.ui.today) V60.ui.off=n?(V60.ui.off||0)+n:0; else V60.ui.week=n?(V60.ui.week||0)+n:0; V60.render(); }; });
+  };
+  V60.dayName=function(d){ var n=diffDays(today(),d); if(n===0) return "오늘"; if(n===-1) return "어제"; if(n===1) return "내일";
+    return ["일","월","화","수","목","금","토"][new Date(d+"T00:00:00").getDay()]+"요일"; };
+  V60.weekName=function(w){ w=w||0; return w===0?"이번 주":w===1?"다음 주":w===-1?"지난 주":w>0?w+"주 뒤":(-w)+"주 전"; };
+  /* ③ 장소 줄 — 5분마다 그 시각의 장소(일정 칸의 장소 > 체류) → 같은 곳끼리 묶어 띠, 바뀌는 곳마다 「시각 A → B」 */
+  V60.laneOf=function(T,rows,places,y,H){
+    var td=today(), nowM=T.d<td?1441:T.d>td?-1:nowMin();
+    var at=function(m){
+      for(var i=0;i<rows.length;i++){ var b=rows[i]; if(b.stay||!(b.s<=m&&m<b.e)) continue;
+        if(b.k==="move") return {mv:1};
+        var p=places[i]; if(!p) continue; if(p.trip) return {mv:1,n:p.name};
+        if(p.soft) return {n:"학교",s:"",c:1};
+        return {n:p.name,s:p.sub||"",c:p.campus?1:0}; }
+      var st=V60.stayAt(T.d,m); return st?{n:st.place,s:st.sub||"",c:0}:null; };
+    var key=function(p){ return !p?"":p.mv?"~":p.n; };
+    var segs=[], STEP=5;
+    for(var m=0;m<1440;m+=STEP){ var p=at(m), k=key(p), L=segs[segs.length-1];
+      if(L&&L.k===k){ L.e=m+STEP; if(p&&!p.mv&&p.s&&L.p.s!==p.s&&L.p.s.indexOf(p.s)<0) L.p.s=L.p.s?L.p.s+" · "+p.s:p.s; }
+      else segs.push({k:k,s:m,e:m+STEP,p:p?Object.assign({},p):null}); }
+    var trans=[], last=null, mvStart=null;
+    segs.forEach(function(g){ if(!g.p) return; if(g.p.mv){ if(mvStart==null) mvStart=g.s; return; }
+      if(last&&last.p.n!==g.p.n) trans.push({m:mvStart!=null?mvStart:g.s,f:last.p,t:g.p});
+      last=g; mvStart=null; });
+    var html='<div class="v73-lane" style="height:'+H+'px">'+segs.map(function(g){ if(!g.p) return "";
+        var top=y(g.s), ht=Math.max(2,y(g.e)-top), fu=g.s>=nowM?' fu':'';
+        return '<div class="v73-ls'+(g.p.mv?' mv':g.p.c?' cp':'')+fu+'" style="top:'+top+'px;height:'+ht+'px">'+(!g.p.mv&&ht>=26?'<b>'+esc(g.p.n)+'</b>'+(g.p.s&&ht>=42?'<small>'+esc(g.p.s)+'</small>':''):'')+'</div>'; }).join("")+
+      trans.map(function(t){ return '<div class="v73-tr'+(t.m>=nowM?' fu':'')+'" style="top:'+y(t.m)+'px"><time>'+hm(t.m)+'</time><span>'+esc(t.f.n)+' → '+esc(t.t.n)+'</span></div>'; }).join("")+'</div>';
+    var first=null; segs.some(function(g){ if(g.p&&!g.p.mv){ first=g; return true; } return false; });
+    var route=!first?'':'<div class="v73-route"><small>이동</small><b>'+esc(first.p.n)+'</b>'+
+      (trans.length?trans.map(function(t){ return '<i>→</i><time>'+hm(t.m)+'</time><b'+(t.m>=nowM?' class="fu"':'')+'>'+esc(t.t.n)+'</b>'; }).join(""):'<i>· 하루 종일</i>')+'</div>';
+    return {html:html,route:route};
+  };
+  /* ④ 과목 화면 혼자 풀기 — 제출 파일 목록(_private/submit.json) 중 .html(혼자 풀기)만. 정역학 Ch 버튼(V69)은 그대로 */
+  V73.solo=function(){
+    var v=$("#v-course"), c=v&&typeof course==="function"?course(ui.course):null; if(!v||!c) return;
+    var draw=function(){
+      var fs=(V60.files||[]).filter(function(f){ return f.course===c.name&&/\.html(\?|#|$)/.test(f.file); }), box=$("#v73Solo",v);
+      if(!fs.length||!ATOM_HOSTED){ if(box) box.remove(); return; }
+      var anchor=$("#v69Card",v)||$("#v58Card",v)||$("#v55Hero",v); if(!anchor) return;
+      if(!box){ box=document.createElement("div"); box.id="v73Solo"; box.className="card v73-solo"; }
+      if(box.previousElementSibling!==anchor) anchor.insertAdjacentElement("afterend",box);
+      box.innerHTML='<div class="card-h"><h3>혼자 풀기</h3></div><div class="card-b v73-sb">'+fs.map(function(f,i){ return '<button type="button" class="btn a" data-v73i="'+i+'">'+esc(f.label||"혼자 풀기")+'</button>'; }).join("")+'</div>';
+      $$("[data-v73i]",box).forEach(function(b){ b.onclick=function(){ var f=fs[+b.getAttribute("data-v73i")]; if(typeof openNote==="function") openNote(f.file,c.name+" · "+(f.label||"혼자 풀기")); else location.href=f.file; }; });
+    };
+    if(V60.files==null&&V60.loadFiles) V60.loadFiles().then(draw); else draw();
+  };
+  if(window.V69&&V69.render){ var _r=V69.render; V69.render=function(){ var x=_r.apply(this,arguments); try{ V73.solo(); }catch(e){} return x; }; }
+  var css=document.createElement("style"); css.id="v73css";
+  css.textContent=[
+    ".v73-bar{display:flex;align-items:center;gap:8px}",
+    ".v73-nav,.v73-vw{display:flex;align-items:center;gap:2px;padding:3px;border-radius:12px;background:color-mix(in srgb,var(--line) 45%,transparent)}",
+    ".v73-bar button{min-width:36px;height:34px;padding:0 8px;border:0;border-radius:9px;background:transparent;color:var(--ink,#1d1d1f);display:grid;place-items:center;cursor:pointer;font:inherit;font-weight:700;font-size:13px}",
+    ".v73-bar button[aria-pressed=true]{background:var(--surface,#fff);box-shadow:0 1px 3px rgba(0,0,0,.12);color:#0a6fd8}",
+    ".v73-bar .v73-tdy[aria-current]{color:var(--ink-3)}",
+    ".v60-day.lane{grid-template-columns:52px minmax(0,1fr) 150px}",
+    ".v60-day.lane .v60-db .v60-dp{display:none!important}",
+    ".v73-lane{position:relative;border-left:1px dashed color-mix(in srgb,var(--line) 90%,transparent)}",
+    ".v73-ls{position:absolute;left:8px;right:2px;box-sizing:border-box;border-radius:8px;background:color-mix(in srgb,#9CB78B 18%,var(--surface,#fff));border:1px solid color-mix(in srgb,#9CB78B 50%,transparent);padding:4px 7px;overflow:hidden;font-size:12px;line-height:1.3}",
+    ".v73-ls.cp{background:color-mix(in srgb,#5B6B8C 13%,var(--surface,#fff));border-color:color-mix(in srgb,#5B6B8C 40%,transparent)}",
+    ".v73-ls.mv{background:repeating-linear-gradient(135deg,color-mix(in srgb,#8A94A6 35%,transparent) 0 4px,transparent 4px 8px);border:1px dashed color-mix(in srgb,#8A94A6 55%,transparent)}",
+    ".v73-ls.fu{opacity:.5}",
+    ".v73-ls b{display:block;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v73-ls small{display:block;color:var(--ink-3);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
+    ".v73-tr{position:absolute;left:-4px;right:0;transform:translateY(-50%);z-index:3;display:flex;flex-direction:column;align-items:flex-start;padding:3px 8px;border-radius:10px;background:#1d1d1f;color:#fff;font-size:11px;line-height:1.25;box-shadow:0 2px 8px rgba(0,0,0,.2)}",
+    ".v73-tr.fu{background:#5c6270}",
+    ".v73-tr time{font-weight:800;font-variant-numeric:tabular-nums}.v73-tr span{font-weight:600;word-break:keep-all}",
+    ".v73-route{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 6px;margin:2px 0 10px;font-size:13.5px}.v73-route small{color:var(--ink-3);font-weight:700;margin-right:4px}",
+    ".v73-route time{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}.v73-route i{font-style:normal;color:var(--ink-3)}.v73-route b.fu{opacity:.6}",
+    ".v73-sb{display:flex;flex-wrap:wrap;gap:8px}",
+    "@media (max-width:600px){.v60-day.lane{grid-template-columns:40px minmax(0,1fr) 92px;gap:4px}.v73-ls{left:5px;padding:3px 5px;font-size:11px}.v73-tr{font-size:10.5px;padding:2px 6px}.v73-bar{gap:6px}.v73-bar button{min-width:32px;height:32px;padding:0 6px}}"
+  ].join("\n");
+  document.head.appendChild(css);
 })();
 /* ============================================================
    V62 LAYER — 대표님 2026-10-02 「공업수학 3.3까지가 시험범위, 다음주 수요일에 시험범위 다 나간다」 (BUILD 2026-10-02.104 · .105 공수1 시험일 · .109 일물2 금요일 · .110 캘린더 날짜 · 2026-10-03.129 창업 10/19 · CADD 11/3 · 미적2·일물2 확정 · .130 공수1 10/21)
