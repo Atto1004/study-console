@@ -3,7 +3,14 @@
 <title>정역학 과제 혼자 풀기</title>
 <!-- 대표님 2026-10-02 「정역학은 시험문제 과제 문제 중에 그대로 나온다고 했으니까 과제 문제 내가 혼자서 풀 수 있게」.
      원본 = docs/tools/hw_play.html → build_hw_play.py 가 notes/lessons/_private/statics/hw/index.html 로 복사(교재 스캔 그림이 있어 atom /study/ 안에서만).
-     데이터 = 같은 폴더 ch3.json · ch4.json. 기록 = localStorage mc-hw-statics(문제별 시도·힌트·혼자 풀기 연속). -->
+     데이터 = 같은 폴더 ch3.json · ch4.json. 기록 = localStorage mc-hw-statics(문제별 시도·힌트·혼자 풀기 연속).
+     2026-10-03 과목 공통: 같은 폴더 meta.json {course,title,key,exam,banner,tabs:[[id,이름]]} → 데이터 ch<id>.json (없으면 정역학 기본값).
+     대표님 10/3 「수업은 하나도 못 알아들어서 김주영 스앵님만으로 이해하고 학습」 → 단계마다 「모르겠어요」 · 틀리면 「왜 틀렸어요?」 · 질문칸 →
+     스앵님이 그 단계 문맥(문제·앞 단계·내 답·정답·풀이·필요 개념과 이해도)으로 atom /api/send(study 대화)에서 실시간 설명. 앱 밖이면 힌트·해설로 대신.
+     단계 결과는 TJ.rec(atto.evidence, 단계 nodes) → 학습앱 이해도 지도에 바로 반영. -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 <style>
 :root{--bg:#F4F6F4;--card:#fff;--ink:#141a16;--sub:#5f6a63;--line:#dde3de;--acc:#2E7D32;--acc-soft:#E6F2E6;--ok:#1B7A2E;--bad:#C7261B;--warn:#9A5B00;--hint:#1E5FA8}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:16px;-webkit-text-size-adjust:100%}
@@ -43,18 +50,25 @@ ul.given{margin:8px 0 0;padding-left:20px}ul.given li{margin:2px 0}
 .exam{margin-top:8px;font-size:14px;color:#B00020;font-weight:700}
 .zoom{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;z-index:20;cursor:zoom-out}.zoom.on{display:flex}.zoom img{max-width:96vw;max-height:94vh;background:#fff;border-radius:6px}
 .back{border:0;background:none;color:var(--acc);font-weight:800;cursor:pointer;padding:6px 0;min-height:40px}
+.btn.d{color:#6B3FA0;border-color:#C7B3E0}
+.coach{margin-top:12px;border:1.5px solid #C7B3E0;background:#F7F2FC;border-radius:12px;padding:10px 12px;font-size:15.5px;line-height:1.6}
+.coach .who{font-size:12.5px;font-weight:800;color:#6B3FA0;margin-bottom:4px}.coach .wait{color:var(--sub)}.coach .err{color:var(--bad);font-weight:700}
+.askrow{display:flex;gap:8px;margin-top:10px}.askrow input{flex:1;min-width:0;min-height:44px;border:1.5px solid var(--line);border-radius:10px;padding:0 12px}
+.askrow input:focus{outline:none;border-color:#6B3FA0}
 @media (max-width:820px){.play{grid-template-columns:1fr}.top h1{font-size:16px}}
 </style></head><body>
-<div class="top"><div class="in"><h1>정역학 과제 혼자 풀기</h1><span class="dd" id="dd"></span>
- <div class="tabs" id="tabs"><button data-ch="3">Ch.3</button><button data-ch="4">Ch.4</button></div></div></div>
+<div class="top"><div class="in"><h1 id="ttl">과제 혼자 풀기</h1><span class="dd" id="dd"></span>
+ <div class="tabs" id="tabs"></div></div></div>
 <div class="wrap" id="app"></div>
 <div class="zoom" id="zoom"><img alt=""></div>
 <script>
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const KEY="mc-hw-statics", EXAM="2026-10-19";
-const DATA={}; let CH=new URLSearchParams(location.search).get("ch")||localStorage.getItem(KEY+"-ch")||"3";
-let REC={}; try{ REC=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ REC={}; }
+let META={course:"정역학",slug:"statics",title:"정역학 과제 혼자 풀기",key:"mc-hw-statics",exam:"2026-10-19",banner:"★ 교수님(OT 9/7) — 과제 문제 1~2개가 중간에 그대로 · 부분점수 없음",tabs:[["3","Ch.3"],["4","Ch.4"]]};
+let KEY=META.key, EXAM=META.exam;
+const DATA={}; let CH=null;
+let REC={};
+function loadRec(){ try{ REC=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ REC={}; } }
 const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(REC)); }catch(e){} };
 const rec=id=>REC[id]||(REC[id]={runs:[],clean:0});
 /* 혼자 풀기 = 힌트·해설 없이, 틀림 없이 끝까지 2번 연속 */
@@ -62,11 +76,12 @@ const status=id=>{ const r=REC[id]; if(!r||!r.runs.length) return "new"; return 
 const ST={new:["아직","new"],ing:["연습 중","ing"],ok:["혼자 ✓","ok"]};
 function dday(){ const d=Math.ceil((new Date(EXAM+"T00:00:00+09:00")-new Date())/864e5); $("#dd").textContent=d>0?"중간 D-"+d:d===0?"중간 오늘":"중간 지남"; }
 function load(ch){ if(DATA[ch]) return Promise.resolve(DATA[ch]); return fetch("ch"+ch+".json",{cache:"no-cache"}).then(r=>r.ok?r.json():null).catch(()=>null).then(d=>{ DATA[ch]=d; return d; }); }
-function tabs(){ $$("#tabs button").forEach(b=>{ b.classList.toggle("on",b.dataset.ch===CH); b.onclick=()=>{ CH=b.dataset.ch; localStorage.setItem(KEY+"-ch",CH); list(); }; }); }
+function tabs(){ const T=$("#tabs"); if(!T.children.length) T.innerHTML=META.tabs.map(t=>'<button data-ch="'+esc(t[0])+'">'+esc(t[1])+'</button>').join("");
+  $$("#tabs button").forEach(b=>{ b.classList.toggle("on",b.dataset.ch===CH); b.onclick=()=>{ CH=b.dataset.ch; localStorage.setItem(KEY+"-ch",CH); list(); }; }); }
 /* ---------- 목록 ---------- */
 function list(){ tabs(); load(CH).then(d=>{ const app=$("#app"); if(!d){ app.innerHTML='<div class="pane">없음</div>'; return; }
   const P=d.problems, n=P.length, ok=P.filter(p=>status(p.id)==="ok").length, ing=P.filter(p=>status(p.id)==="ing").length;
-  app.innerHTML='<div class="exam" style="margin:0 0 10px">★ 교수님(OT 9/7) — 과제 문제 1~2개가 중간에 그대로 · 부분점수 없음</div><div class="sum"><span>'+esc(d.title)+'</span><span>혼자 ✓<b>'+ok+' / '+n+'</b></span><span>연습 중<b>'+ing+'</b></span></div><div class="grid">'+
+  app.innerHTML=(META.banner?'<div class="exam" style="margin:0 0 10px">'+esc(META.banner)+'</div>':'')+'<div class="sum"><span>'+esc(d.title)+'</span><span>혼자 ✓<b>'+ok+' / '+n+'</b></span><span>연습 중<b>'+ing+'</b></span></div><div class="grid">'+
    P.map(p=>{ const s=ST[status(p.id)], r=REC[p.id]; const last=r&&r.runs.length?r.runs[r.runs.length-1]:null;
      return '<div class="pc" data-id="'+esc(p.id)+'"><div class="h"><span class="no">'+esc(p.id)+'</span><span class="st '+s[1]+'">'+s[0]+(s[1]==="ing"?" "+(r.clean||0)+"/2":"")+'</span></div><div class="t">'+esc(p.title)+'</div>'+
        '<div class="meta">'+(last?("마지막 "+new Date(last.ts).toLocaleDateString("ko-KR",{month:"numeric",day:"numeric"})+" · 힌트 "+last.hints+" · 틀림 "+last.wrong+(last.mode==="exam"?" · 실전":"")):"")+'</div></div>'; }).join("")+'</div>';
@@ -75,15 +90,16 @@ function list(){ tabs(); load(CH).then(d=>{ const app=$("#app"); if(!d){ app.inn
 let RUN=null;
 function open(id,mode){ let p=(DATA[CH]&&DATA[CH].problems.find(x=>x.id===id))||null;
   if(!p) for(const c in DATA){ const q=DATA[c]&&DATA[c].problems.find(x=>x.id===id); if(q){ p=q; CH=c; tabs(); break; } } if(!p) return;
-  RUN={p,mode,k:0,hints:0,wrong:0,shown:0,used:new Set(),tries:0,hk:0,fin:false};
+  RUN={p,mode,k:0,hints:0,wrong:0,shown:0,dunno:0,used:new Set(),tries:0,hk:0,fin:false,bad:false};
   const app=$("#app");
   app.innerHTML='<button class="back" id="bk">‹ 목록</button><div class="play"><div class="pane"><h2>'+esc(p.id)+' · '+esc(p.title)+'</h2>'+
-    '<div class="figbox" id="fig"><img src="'+esc(p.img)+'" alt="'+esc(p.id)+' 문제 그림"></div>'+
+    (p.img?'<div class="figbox" id="fig"><img src="'+esc(p.img)+'" alt="'+esc(p.id)+' 문제 그림"></div>':'')+
     (p.given&&p.given.length?'<ul class="given">'+p.given.map(g=>'<li>'+esc(g)+'</li>').join("")+'</ul>':'')+
     '<div class="ask">구할 것 · '+esc(p.ask||"")+'</div>'+(p.exam?'<div class="exam">★ '+esc(p.exam)+'</div>':'')+'</div>'+
     '<div class="pane"><div class="seg" style="display:flex;gap:6px;margin:0 0 10px"><button data-m="step"'+(mode==="step"?' class="on"':'')+'>단계</button><button data-m="exam"'+(mode==="exam"?' class="on"':'')+'>실전</button></div><div id="stage"></div></div></div>';
   $("#bk").onclick=list; $$(".seg button",app).forEach(b=>b.onclick=()=>open(id,b.dataset.m));
-  $("#fig").onclick=()=>{ const z=$("#zoom"); $("img",z).src=p.img; z.classList.add("on"); };
+  if($("#fig")) $("#fig").onclick=()=>{ const z=$("#zoom"); $("img",z).src=p.img; z.classList.add("on"); };
+  math($("#app"));
   window.scrollTo(0,0); mode==="exam"?examView():stepView(); }
 $("#zoom").onclick=()=>$("#zoom").classList.remove("on");
 function dots(){ const N=RUN.p.steps.length; return '<div class="dots">'+RUN.p.steps.map((s,i)=>'<i class="'+(i<RUN.k?"done":i===RUN.k?"cur":"")+'"></i>').join("")+'</div>'; }
@@ -91,20 +107,29 @@ function inputHTML(s){
   if(s.kind==="multi"||s.kind==="choice"){ const t=s.kind==="multi"?"checkbox":"radio"; return '<div class="ch">'+s.choices.map((c,i)=>'<label><input type="'+t+'" name="c" value="'+i+'"><span>'+esc(c)+'</span></label>').join("")+'</div>'; }
   if(s.kind==="num") return '<div class="num"><input id="nv" inputmode="decimal" autocomplete="off" placeholder="숫자"><span class="u">'+esc(s.answer.unit||"")+'</span></div>';
   return '<div class="model" id="mdl" hidden>'+esc(s.model||"")+'</div>'; }
-function stepView(){ const p=RUN.p, s=p.steps[RUN.k], st=$("#stage"); RUN.tries=0; RUN.hk=0;
+function stepView(){ const p=RUN.p, s=p.steps[RUN.k], st=$("#stage"); RUN.tries=0; RUN.hk=0; RUN.bad=false;
   if(!s){ return finish(); }
   st.innerHTML=dots()+'<div class="step"><div class="k">단계 '+(RUN.k+1)+' / '+p.steps.length+'</div><div class="q">'+esc(s.q)+'</div>'+inputHTML(s)+
     '<div class="hints" id="hs"></div><div id="fb"></div><div class="btns">'+
     (s.kind==="self"?'<button class="btn p" id="go">다 썼어요</button>':'<button class="btn p" id="go">확인</button>')+
-    '<button class="btn h" id="hint">힌트 1/3</button><button class="btn" id="give">해설</button></div></div>';
+    '<button class="btn h" id="hint">힌트 1/3</button><button class="btn d" id="dk">모르겠어요</button><button class="btn" id="give">해설</button></div>'+
+    '<div id="coach"></div><div class="askrow"><input id="aq" placeholder="스앵님에게 질문 — 예: 왜 여기서 외적을 써요?" autocomplete="off"><button class="btn d" id="ab">질문</button></div></div>';
+  math(st);
+  $("#dk").onclick=()=>{ RUN.dunno++; RUN.bad=true; RUN.used.add(RUN.k); coachAsk(s,"dunno",null); };
+  $("#ab").onclick=()=>{ const q=($("#aq").value||"").trim(); if(!q) return; $("#aq").value=""; coachAsk(s,"ask",null,q); };
+  $("#aq").onkeydown=e=>{ if(e.key==="Enter") $("#ab").click(); };
   $$(".ch label",st).forEach(l=>{ const i=$("input",l); i.onchange=()=>$$(".ch label",st).forEach(x=>x.classList.toggle("sel",$("input",x).checked)); });
   const nv=$("#nv"); if(nv){ nv.focus(); nv.onkeydown=e=>{ if(e.key==="Enter") $("#go").click(); }; }
   $("#hint").onclick=()=>{ if(RUN.hk>=3) return; const h=(s.hints||[])[RUN.hk]; if(h==null) return; RUN.hk++; RUN.hints++; RUN.used.add(RUN.k);
-    $("#hs").insertAdjacentHTML("beforeend",'<div>'+esc(h)+'</div>'); $("#hint").textContent=RUN.hk>=3?"힌트 끝":"힌트 "+(RUN.hk+1)+"/3"; if(RUN.hk>=3) $("#hint").disabled=true; };
+    RUN.bad=true; $("#hs").insertAdjacentHTML("beforeend",'<div>'+esc(h)+'</div>'); math($("#hs")); $("#hint").textContent=RUN.hk>=3?"힌트 끝":"힌트 "+(RUN.hk+1)+"/3"; if(RUN.hk>=3) $("#hint").disabled=true; };
   $("#give").onclick=()=>reveal(s,true);
   $("#go").onclick=()=>{ if(s.kind==="self") return selfCheck(s); const ok=judge(s); if(ok===null) return;
-    if(ok){ $("#fb").innerHTML='<div class="fb ok">맞아요. '+esc(s.explain||"")+'</div>'; mark(s,true); nextBtn(); }
-    else { RUN.wrong++; RUN.tries++; mark(s,false); if(RUN.tries>=3) return reveal(s,false); $("#fb").innerHTML='<div class="fb bad">다시 · '+RUN.tries+'/3</div>'; } }; }
+    if(ok){ $("#fb").innerHTML='<div class="fb ok">맞아요. '+esc(s.explain||"")+'</div>'; math($("#fb")); mark(s,true); nextBtn(); }
+    else { RUN.wrong++; RUN.tries++; RUN.bad=true; mark(s,false); const my=myAnswer(s); if(RUN.tries>=3) return reveal(s,false);
+      $("#fb").innerHTML='<div class="fb bad">다시 · '+RUN.tries+'/3 <button class="btn d" id="why" style="min-height:34px;margin-left:8px">왜 틀렸어요?</button></div>';
+      $("#why").onclick=()=>coachAsk(s,"wrong",my); } }; }
+function myAnswer(s){ if(s.kind==="num") return ($("#nv").value||"").trim()+" "+((s.answer&&s.answer.unit)||"");
+  const sel=$$(".ch input",$("#stage")).filter(i=>i.checked).map(i=>s.choices[+i.value]); return sel.join(" · "); }
 function judge(s){ const st=$("#stage");
   if(s.kind==="num"){ const raw=($("#nv").value||"").replace(/,/g,"").replace(/×\s*10\^?/,"e").replace(/\s/g,""); if(raw==="") return null; const x=Number(raw); if(!isFinite(x)) return false;
     const v=Number(s.answer.v), tol=s.answer.tol!=null?Number(s.answer.tol):.01; return Math.abs(v)<1e-9?Math.abs(x)<=.01:Math.abs(x-v)<=Math.abs(v)*tol+1e-9; }
@@ -115,14 +140,14 @@ function mark(s,ok){ if(s.kind!=="multi"&&s.kind!=="choice") return; const ans=s
   $$(".ch label",$("#stage")).forEach((l,i)=>{ l.classList.remove("right","wrong"); const c=$("input",l).checked; if(ok&&ans.includes(i)) l.classList.add("right"); else if(!ok&&c&&!ans.includes(i)) l.classList.add("wrong"); }); }
 function answerText(s){ if(s.kind==="num") return (Math.round(s.answer.v*1000)/1000)+" "+(s.answer.unit||""); if(s.kind==="choice") return s.choices[s.answer]; if(s.kind==="multi") return s.answer.map(i=>s.choices[i]).join(" · "); return s.model||""; }
 function reveal(s,asked){ RUN.shown++; RUN.used.add(RUN.k); mark(s,true);
-  $("#fb").innerHTML='<div class="fb show">정답 · '+esc(answerText(s))+'<br>'+esc(s.explain||"")+'</div>'; nextBtn(); }
+  RUN.bad=true; $("#fb").innerHTML='<div class="fb show">정답 · '+esc(answerText(s))+'<br>'+esc(s.explain||"")+'</div>'; math($("#fb")); nextBtn(); }
 function selfCheck(s){ $("#mdl").hidden=false; $("#go").remove(); $("#hint").remove(); $("#give").remove();
   $("#fb").innerHTML='<div class="btns"><button class="btn p" id="same">같게 그렸어요</button><button class="btn" id="diff">다르게 그렸어요</button></div>';
   $("#same").onclick=()=>{ $("#fb").innerHTML='<div class="fb ok">'+esc(s.explain||"")+'</div>'; nextBtn(); };
-  $("#diff").onclick=()=>{ RUN.wrong++; RUN.used.add(RUN.k); $("#fb").innerHTML='<div class="fb show">'+esc(s.explain||"")+'</div>'; nextBtn(); }; }
+  $("#diff").onclick=()=>{ RUN.wrong++; RUN.bad=true; RUN.used.add(RUN.k); $("#fb").innerHTML='<div class="fb show">'+esc(s.explain||"")+'</div>'; nextBtn(); }; }
 function nextBtn(){ const b=$(".btns",$("#stage")); if(!b) return; $$("button",b).forEach(x=>{ if(x.id!=="nx") x.disabled=true; });
   b.insertAdjacentHTML("beforeend",'<button class="btn p" id="nx">'+(RUN.k+1<RUN.p.steps.length?"다음 단계":"끝")+'</button>'); $("#nx").disabled=false; $("#nx").focus();
-  $("#nx").onclick=()=>{ RUN.k++; stepView(); }; }
+  $("#nx").onclick=()=>{ evid(RUN.p.steps[RUN.k],!RUN.bad); RUN.k++; stepView(); }; }
 /* 실전: 단계·힌트 없이 종이에 다 풀고, 숫자 답만 한꺼번에 */
 function examView(){ const p=RUN.p, st=$("#stage"), nums=p.steps.map((s,i)=>[s,i]).filter(([s])=>s.kind==="num");
   st.innerHTML='<div class="step"><div class="q">종이에 처음부터 끝까지 푼 뒤 답만</div>'+nums.map(([s,i])=>'<div class="k" style="margin-top:10px">'+esc(s.q)+'</div><div class="num"><input data-i="'+i+'" inputmode="decimal" autocomplete="off"><span class="u">'+esc(s.answer.unit||"")+'</span></div>').join("")+
@@ -142,6 +167,60 @@ function finish(){ const clean=record(), r=REC[RUN.p.id], st=$("#stage");
     '<div class="btns" style="justify-content:center"><button class="btn p" id="again">다시 백지로</button><button class="btn" id="ex">실전</button><button class="btn" id="nxp">다음 문제</button></div></div>';
   $("#again").onclick=()=>open(RUN.p.id,"step"); $("#ex").onclick=()=>open(RUN.p.id,"exam");
   $("#nxp").onclick=()=>{ const P=DATA[CH].problems, i=P.findIndex(x=>x.id===RUN.p.id); i+1<P.length?open(P[i+1].id,"step"):list(); }; }
-window.__hw={get REC(){return REC;},get RUN(){return RUN;},open,list,load};
-dday(); { const m=/[#&]p=([\d.]+)/.exec(location.hash||""); if(m){ load(CH).then(()=>open(m[1],"step")); } else list(); }
+/* ---------- 수식 ---------- */
+function math(el){ if(!el) return; const go=()=>{ try{ renderMathInElement(el,{delimiters:[{left:"\\(",right:"\\)",display:false},{left:"\\[",right:"\\]",display:true},{left:"$$",right:"$$",display:true}],throwOnError:false}); }catch(e){} };
+  if(window.renderMathInElement) go(); else window.addEventListener("load",go,{once:true}); }
+/* ---------- 이해도 기록 (tutor_judge — 빌드 때 아래 자리에 들어감) ---------- */
+/*__JUDGE__*/
+function evid(s,ok){ const n=(s&&s.nodes&&s.nodes.length?s.nodes:(RUN.p.nodes||[])); if(!n.length||!window.TJ) return;
+  try{ TJ.rec({k:"quiz",n:n.slice(),ok:!!ok,lid:"hw-"+(META.slug||""),qid:RUN.p.id+"#"+(RUN.k+1)}); }catch(e){} }
+/* ---------- 스앵님 코칭 ---------- */
+const CO={conv:null,busy:false,G:null};
+function loadGraph(){ if(CO.G) return Promise.resolve(CO.G); return fetch("../../../../../knowledge/graph.json",{cache:"no-cache"}).then(r=>r.ok?r.json():null).catch(()=>null)
+  .then(j=>{ const m={}; ((j&&j.nodes)||[]).forEach(n=>{ if(n&&n.id) m[n.id]=n; }); return CO.G=m; }); }
+function mstate(id){ try{ const m=JSON.parse(localStorage.getItem("atto.mastery")||"{}"); const x=m[id]; return x&&x.state?({known:"앎",shaky:"흔들림",unknown:"모름"}[x.state]||x.state):"기록 없음"; }catch(e){ return "기록 없음"; } }
+function coachCtx(s,why,my){ const p=RUN.p, L=[], G=CO.G||{};
+  L.push("과목: "+META.course+" · 과제 혼자 풀기 "+p.id+" "+(p.title||""));
+  if(p.given&&p.given.length) L.push("주어진 것: "+p.given.join(" / "));
+  L.push("구할 것: "+(p.ask||""));
+  const prev=p.steps.slice(0,RUN.k).map((x,i)=>(i+1)+") "+x.q+" → "+answerText(x)); if(prev.length) L.push("앞 단계(이미 함): "+prev.join(" | "));
+  L.push("지금 단계 "+(RUN.k+1)+"/"+p.steps.length+": "+s.q);
+  if(s.choices&&s.choices.length) L.push("보기: "+s.choices.map((c,i)=>"("+(i+1)+") "+c).join("  "));
+  L.push("아토 상태: "+why+(my?" · 아토 답: "+my:""));
+  if(s.kind!=="self") L.push("정답(스앵님만 참고 — 아토에게 바로 말하지 말 것): "+answerText(s));
+  if(s.explain) L.push("이 단계 풀이(참고): "+s.explain);
+  const ns=(s.nodes&&s.nodes.length?s.nodes:(p.nodes||[])); if(ns.length) L.push("필요 개념(아토 이해도): "+ns.map(id=>((G[id]&&G[id].name)||id)+" — "+mstate(id)).join(", "));
+  if(p.img) L.push("(문제 그림이 있음 — 그림 속 수치는 위 「주어진 것」에 적힌 것만 믿을 것)");
+  return L.join("\n"); }
+function mdLite(t){ return esc(t).replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace(/\n/g,"<br>"); }
+function coachAsk(s,mode,my,q){ const box=$("#coach"); if(!box||CO.busy) return;
+  const n=(s.nodes&&s.nodes.length?s.nodes:(RUN.p.nodes||[])); if(n.length&&window.TJ&&mode!=="wrong") try{ TJ.rec({k:"ask",n:n.slice(),lid:"hw-"+(META.slug||""),qid:RUN.p.id+"#"+(RUN.k+1)}); }catch(e){}
+  const head={dunno:"아토가 이 단계에서 「모르겠어요」를 눌렀다. 이 단계에 필요한 기초를 아토 이해도에 맞춰 바닥부터 3~6줄로 설명하고(교수님 풀이 방식·기호 그대로), 정답은 말하지 말고 이 단계를 다시 풀 수 있게 확인 질문 1개로 끝내라.",
+    wrong:"아토가 이 단계를 틀렸다. 아토 답이 어디서 어긋났는지 한 줄로 짚고, 맞게 가는 생각 순서를 3~5줄로. 정답 숫자·보기 번호는 말하지 말 것.",
+    ask:"아토 질문 — "+(q||"")}[mode];
+  box.innerHTML='<div class="coach"><div class="who">김주영 스앵님</div><div class="body"><span class="wait">보는 중…</span></div></div>'; const body=$(".body",box);
+  const fallback=why=>{ const h=mode==="ask"?"":(s.hints||[]).map(x=>"· "+x).join("\n"); body.innerHTML='<span class="err">'+esc(why)+'</span>'+(h?"<br>"+mdLite(h):""); math(body); };
+  CO.busy=true; const done=()=>{ CO.busy=false; };
+  loadGraph().then(()=>{
+    const text="[학습 질문]\n질문: [과제 혼자 풀기 코칭] "+head+"\n--- 참고 문맥 (과제 혼자 풀기 화면에서 자동 수집) ---\n"+coachCtx(s,mode==="dunno"?"모르겠어요":mode==="wrong"?"오답":"질문",my);
+    const conv=CO.conv?Promise.resolve(CO.conv):fetch("/api/conversations",{credentials:"same-origin"}).then(r=>{ if(!r.ok) throw {k:r.status===401?"unauth":"http"}; return r.json(); })
+      .then(l=>{ const a=Array.isArray(l)?l:(l&&l.conversations)||[]; const c=a.find(x=>x.kind==="study"); if(!c) throw {k:"nostudy"}; return CO.conv=c.id; });
+    return conv.then(id=>fetch("/api/send",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({conv_id:id,text,client:"study"})}))
+      .then(r=>{ if(!r.ok) throw {k:r.status===401?"unauth":"http"}; if((r.headers.get("content-type")||"").indexOf("text/event-stream")<0) throw {k:"http"};
+        const rd=r.body.getReader(), dec=new TextDecoder("utf-8"); let buf="", out="";
+        const pump=()=>rd.read().then(x=>{ if(x.done) return; buf+=dec.decode(x.value,{stream:true}); let i;
+          while((i=buf.indexOf("\n\n"))>=0){ const fr=buf.slice(0,i); buf=buf.slice(i+2); const ev=(fr.match(/^event: ?(.*)$/m)||[])[1]||"message";
+            const dl=fr.split("\n").filter(l=>l.indexOf("data:")===0).map(l=>l.slice(5).replace(/^ /,"")).join("\n"); let d={}; try{ d=dl?JSON.parse(dl):{}; }catch(e){ d={}; }
+            if(ev==="error") throw {k:"busy",m:d.message||""};
+            if(ev==="token"){ out+=String(d.text||""); body.innerHTML=mdLite(out); }
+            if(ev==="done"&&d.text){ out=String(d.text); body.innerHTML=mdLite(out); } }
+          return pump(); });
+        return pump().then(()=>{ if(!out) throw {k:"empty"}; math(body); }); });
+  }).catch(e=>{ const k=e&&e.k; fallback(k==="unauth"?"atom 로그인이 필요해요 — 대신 힌트":k==="busy"?"스앵님이 다른 질문에 답하는 중 — 대신 힌트":k==="nostudy"?"스앵님 대화를 못 찾았어요 — 대신 힌트":"학습앱(atom) 안에서 열면 스앵님이 설명해요 — 대신 힌트"); })
+  .then(done,done); }
+window.__hw={get REC(){return REC;},get RUN(){return RUN;},get META(){return META;},open,list,load,coachCtx};
+fetch("meta.json",{cache:"no-cache"}).then(r=>r.ok?r.json():null).catch(()=>null).then(m=>{ if(m) META=Object.assign(META,m);
+  KEY=META.key; EXAM=META.exam; loadRec(); document.title=META.title; $("#ttl").textContent=META.title;
+  CH=new URLSearchParams(location.search).get("ch")||localStorage.getItem(KEY+"-ch")||META.tabs[0][0];
+  tabs(); dday(); const m2=/[#&]p=([\d.\-]+)/.exec(location.hash||""); if(m2){ const pc=m2[1].split(/[.\-]/)[0]; if(META.tabs.some(t=>t[0]===pc)) CH=pc; tabs(); load(CH).then(()=>open(m2[1],"step")); } else list(); });
 </script></body></html>
