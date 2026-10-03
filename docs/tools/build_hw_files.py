@@ -29,8 +29,13 @@ def main():
         if not os.path.isdir(d):
             continue
         dst = os.path.join(ICLOUD, subj, "과제")
-        for f in sorted(os.listdir(d)):
+        names = set(os.listdir(d))
+        for f in sorted(names):
             if not f.lower().endswith((".pdf", ".docx", ".hwp")) or "긴검증" in f:
+                continue
+            st, ext = os.path.splitext(f)
+            if st + "_늦은제출" + ext in names:
+                # 늦은제출판이 있으면 예전 판은 목록·복사에서 뺀다(대표님 10/3 「제일 좋은 것만 남기고」). 이미 있는 사본 삭제는 대표님이 직접
                 continue
             p = os.path.join(d, f)
             k = kind(f)
