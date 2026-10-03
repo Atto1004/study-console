@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-03.145";
+var BUILD="2026-10-03.146";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,9 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-03.146",d:"10-03",items:[
+    "공부계획 「오늘만」 보기를 24시간 시간표로 — 0~24시 1시간 칸(30분 옅은 선), 정해진 일정만 그 시각에 놓고 나머지는 빈 칸, 지금 시각 빨간 줄"
+  ]},
   {v:"2026-10-03.145",d:"10-03",items:[
     "공부계획 과제 옆 「혼자 풀기 (스앵님 코칭)」 — 새 탭 대신 앱 안 창으로 열려 스앵님 코칭이 이어짐"
   ]},
@@ -12497,23 +12500,27 @@ var V33={};
       var same=prevKey!=null&&prevKey===label(pl); prevKey=label(pl);
       return '<div class="v60-tp '+(pl.home?'home':(pl.campus?'campus':'out'))+(same?' same':'')+'">'+(same?'<i></i>':'<span class="v60-tpn">'+esc(pl.name)+(pl.sub?' <small>'+esc(pl.sub)+'</small>':'')+(pl.ask?' <small class="v60-rask">자리 ❓</small>':'')+'</span>')+'</div>';
     };
-    var trs=rows.map(function(b,ri){ var past=b.e<=nowM, cur=b.s<=nowM&&nowM<b.e, act="";
-      if(b.meta&&b.meta.hw) act+=' <button type="button" class="v60-chk" data-v60done="'+esc(b.meta.hw.k)+'" aria-label="완료"></button>';
-      if(b.meta&&b.meta.x) act+=' <button type="button" class="btn xs a" data-v60go="'+b.meta.c.id+'|'+b.meta.x.w+'|'+b.meta.x.date+'">열기</button> <button type="button" class="v60-chk" data-v60sdone="'+b.meta.c.id+'|'+b.meta.x.date+'" aria-label="완료"></button>';
-      if(b.meta&&b.meta.memo) act+=' <button type="button" class="btn xs a" data-v60memo="1">카드</button> <button type="button" class="v60-chk" data-v60mdone="'+esc(b.meta.d)+'" aria-label="완료"></button>';
-      return '<div class="v60-tr'+(past?' past':'')+(cur?' cur':'')+'" data-s="'+b.s+'" data-e="'+b.e+'"><span class="v60-tt">'+hm2(b.s)+'<small>'+hm2(b.e)+'</small></span><i class="v60-tb k-'+b.k+'"></i><div class="v60-tx"><span class="v60-tk">'+esc(V60.KN[b.k]||"")+(cur?' · 지금':'')+'</span><b>'+esc(b.t)+'</b>'+(b.note?' <span class="v60-note">'+esc(b.note)+'</span>':'')+(b.meta&&b.meta.hw?V60.filesHTML(b.meta.hw):'')+act+'</div>'+placeCell(ri)+'</div>'; });
-    /* 지금 줄 (대표님 10/3 「현재시간 표시 안 되어 있고」) — 아직 시작 안 한 첫 일정 앞. 30초마다 V60.nowTick 이 옮긴다 */
-    if(trs.length){ var ni=0; while(ni<rows.length&&rows[ni].s<=nowM) ni++; trs.splice(ni,0,'<div class="v60-nowrow" id="v60NowRow"><span class="v60-nowt">'+hm2(nowM)+'</span><i class="v60-nowl"></i></div>'); }
-    var list=trs.join("");
-    if(T){ list+='<div class="v60-tr bed"><span class="v60-tt">'+hm2(T.bed)+'</span><i class="v60-tb k-sleep"></i><div class="v60-tx"><span class="v60-tk">수면</span><b>취침</b></div><div class="v60-tp home"><span class="v60-tpn">'+esc((V60.stayAt(T.d,T.bed)||{place:"집"}).place)+'</span></div></div>'; }
-    return '<div class="card v60-today"><div class="card-h"><h3>오늘 '+esc(V60.md(today()))+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b">'+V60.whereHTML(T)+'<div class="v60-thead"><span>시각</span><span></span><span>일정</span><span>장소 · 이동</span></div><div class="v60-tlist">'+(list||'<div class="empty">일정이 없습니다.</div>')+'</div></div></div>';
+    /* 24시간 · 1시간 칸 시간표 (대표님 10/3 「오늘 24시간으로 되어 있는 거 왜 한 칸밖에 없는 거지」) — 칸은 늘 24개, 정해진 일정만 그 시각에 놓고 나머지는 빈 칸 */
+    var PXH=V60.DPX, H=24*PXH, y=function(m){ return Math.max(0,Math.min(1440,m))/60*PXH; };
+    var hrs=''; for(var h=0;h<24;h++) hrs+='<span style="top:'+(h*PXH)+'px">'+pad2(h)+':00</span>';
+    var shade=T?'<i class="v60-dsl" style="top:0;height:'+y(T.wake)+'px"></i>'+(T.bed<1440?'<i class="v60-dsl" style="top:'+y(T.bed)+'px;height:'+(H-y(T.bed))+'px"></i>':''):'';
+    var blks=rows.map(function(b,ri){ if(b.e<=0||b.s>=1440) return ""; var top=y(b.s), ht=Math.max(16,y(b.e)-top), past=b.e<=nowM, cur=b.s<=nowM&&nowM<b.e;
+      var pc=placeCell(ri).replace(/^<div class="v60-tp/,'<div class="v60-tp v60-dp');
+      return '<div class="v60-db k-'+b.k+(past?' past':'')+(cur?' cur':'')+(ht<34?' thin':'')+'" style="top:'+top+'px;height:'+ht+'px"><div class="v60-dbt"><b>'+esc(b.t)+'</b><small>'+hm2(b.s)+'–'+hm2(b.e)+(b.note?' · '+esc(b.note):'')+'</small></div>'+pc+'</div>'; }).join("");
+    var bed=T&&T.bed<1440?'<div class="v60-db k-sleep thin" style="top:'+y(T.bed)+'px;height:16px"><div class="v60-dbt"><b>취침</b><small>'+hm2(T.bed)+'</small></div></div>':'';
+    var now=(T&&T.d===today())?'<i class="v60-dnow" style="top:'+y(nowM)+'px"><b>'+hm(nowM)+'</b></i>':'';
+    return '<div class="card v60-today"><div class="card-h"><h3>오늘 '+esc(V60.md(today()))+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b">'+V60.whereHTML(T)+
+      '<div class="v60-day"><div class="v60-dhs" style="height:'+H+'px">'+hrs+'</div><div class="v60-dcol" style="height:'+H+'px;background-size:100% '+PXH+'px">'+shade+blks+bed+now+'</div></div>'+
+      (rows.length?'':'<div class="hint" style="padding:6px 2px">오늘 정해진 일정이 없습니다 — 빈 칸 = 정해지지 않은 시간</div>')+'</div></div>';
   };
+  V60.DPX=44;
 
   /* 지금 줄 옮기기 (대표님 10/3 「현재시간 표시」) — 30초마다 위치·시각만. 전체 다시 그리기·캘린더 재조회는 하지 않는다 */
   V60.nowTick=function(){
     if(document.hidden) return; var m=nowMin(), g=V60._g;
     var ln=document.querySelector(".v60-col.today .v60-now"); if(ln&&g){ ln.style.top=((m-g.H0)*g.PX)+"px"; var lb=ln.querySelector("b"); if(lb) lb.textContent=hm(m); }
     $$("[data-v60clock]").forEach(function(s){ var r=V60.runOf(s.getAttribute("data-v60clock")); if(r) s.textContent=V60.clock(V60.runMs(r)); });
+    var dn=document.querySelector(".v60-dnow"); if(dn){ dn.style.top=(m/60*V60.DPX)+"px"; var db=dn.querySelector("b"); if(db) db.textContent=hm(m); }
     var nr=document.getElementById("v60NowRow"); if(!nr||!nr.parentNode) return;
     var t=nr.querySelector(".v60-nowt"); if(t) t.textContent=hm(m);
     var trs=nr.parentNode.querySelectorAll(".v60-tr[data-s]"), nx=null;
@@ -12705,6 +12712,18 @@ var V33={};
     ".v60-ck{display:flex!important;align-items:center;gap:8px;flex-direction:row!important}",
     ".v60-where{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin:0 0 10px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--line) 30%,transparent)}.v60-where small{color:var(--ink-3);margin-right:6px;font-size:11.5px}",
     ".v60-tks .v60-est{white-space:nowrap;display:inline-flex;align-items:center;gap:3px}",
+    /* 오늘 24시간 시간표 (10/3) — 1시간 = 44px, 30분은 칸 가운데 옅은 선 */
+    ".v60-day{display:grid;grid-template-columns:52px 1fr;gap:6px;margin-top:4px}",
+    ".v60-dhs{position:relative}.v60-dhs span{position:absolute;right:4px;transform:translateY(-50%);font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}.v60-dhs span:first-child{transform:none}",
+    ".v60-dcol{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background-image:linear-gradient(to bottom,transparent 0,transparent 21.6px,color-mix(in srgb,var(--line) 45%,transparent) 21.6px,color-mix(in srgb,var(--line) 45%,transparent) 22px,transparent 22px,transparent 43.2px,var(--line) 43.2px,var(--line) 44px);background-repeat:repeat-y}",
+    ".v60-dsl{position:absolute;left:0;right:0;background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--line) 35%,transparent) 0 6px,transparent 6px 12px)}",
+    ".v60-db{position:absolute;left:6px;right:6px;border-radius:8px;padding:4px 10px;display:flex;justify-content:space-between;gap:10px;overflow:hidden;color:#fff;box-shadow:0 1px 0 rgba(0,0,0,.08)}",
+    ".v60-db.past{opacity:.55}.v60-db.cur{outline:2.5px solid #1d1d1f;outline-offset:1px}",
+    ".v60-dbt{min-width:0}.v60-dbt b{display:block;font-size:13.5px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v60-dbt small{display:block;font-size:11.5px;opacity:.9}",
+    ".v60-db.thin{padding:0 10px;align-items:center}.v60-db.thin .v60-dbt{display:flex;gap:8px;align-items:baseline}.v60-db.thin .v60-dbt b{font-size:12px}.v60-db.thin .v60-dbt small{font-size:11px}",
+    ".v60-db.k-cls{background:#5B6B8C}.v60-db.k-work{background:#C26A12}.v60-db.k-ev{background:#7A869A}.v60-db.k-trip{background:#8A5A2B}.v60-db.k-meal,.v60-db.k-life{background:#9CB78B}.v60-db.k-move{background:#C9D1DC;color:#223}.v60-db.k-sleep{background:#3B4256}",
+    ".v60-dp{flex:none;background:rgba(255,255,255,.18)!important;border:0!important;color:inherit!important;border-radius:6px;padding:1px 8px;font-size:11.5px;align-self:flex-start;max-width:45%}.v60-dp *{color:inherit!important}.v60-dp i{display:none}",
+    ".v60-dnow{position:absolute;left:-2px;right:-2px;height:2.5px;background:#E5484D;z-index:5;pointer-events:none}.v60-dnow b{position:absolute;left:4px;top:-17px;font-size:11px;color:#E5484D;background:var(--surface);padding:0 4px;border-radius:4px}",
     "@media (max-width:600px){.v60-tk2{flex-wrap:wrap}.v60-tkm{flex-basis:100%}.v60-tka{margin-left:auto}.v60-grp.die .v60-tk2{flex-wrap:nowrap}.v60-grp.die .v60-tkm{flex-basis:auto}}",
     ".v60-col.today .v60-cb{border-color:var(--ac,#4F9A35);box-shadow:0 0 0 1px var(--ac,#4F9A35)}",
     ".v60-sleep{position:absolute;left:0;right:0;background:repeating-linear-gradient(135deg,rgba(60,70,100,.10) 0 6px,rgba(60,70,100,.04) 6px 12px)}",

@@ -4,6 +4,9 @@
 
 ## 2026-10-03
 
+### .146 — 오늘만 보기 24시간 시간표
+- 대표님 10/3 「오늘 24시간으로 되어 있는 거 왜 한 칸밖에 없는 거지」. V60.todayHTML 목록 → 24칸 절대 위치 시간표(V60.DPX 44px), 장소 칩은 블록 오른쪽, nowTick 이 .v60-dnow 이동.
+
 ### .145 — 공부계획 html 링크 = 앱 안 보기 창
 - os-a4 가 _private/submit.json 에 넣은 「혼자 풀기 (스앵님 코칭)」 html(?ch=) 링크 — V60.filesHTML 이 .html 이면 data-v60note 로 openNote(#ntvFrame) 열기. V67 → V45 스앵님 코칭은 #ntvFrame 에서만 이어짐.
 
