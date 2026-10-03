@@ -34,10 +34,16 @@
   };
   V72.stamp=function(ms){ var d=new Date(ms), z=function(n){ return (n<10?"0":"")+n; }; return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())+" "+z(d.getHours())+":"+z(d.getMinutes()); };
   V72.nameOf=function(c){ var P=V72.st().places, best=null, bd=1e9; Object.keys(P).forEach(function(k){ var d=V72.dist(c.la,c.lo,P[k].la,P[k].lo); if(d<Math.max(200,P[k].r||0)&&d<bd){ bd=d; best=k; } }); return best; };
-  V72.learn=function(said){   /* 대표님이 말한 짧은 체류와 겹치는 위치 → 그 이름을 배운다 */
-    var P=V72.st().places, ch=false, now=V72.stamp(Date.now());
-    V72.clusters().forEach(function(c){ var a=V72.stamp(c.t), b=V72.stamp(c.t2);
-      said.forEach(function(s){ var e=s.to||now; if(s.from<=b&&e>=a&&s.place&&!P[s.place]){ P[s.place]={la:+c.la.toFixed(5),lo:+c.lo.toFixed(5),r:150}; ch=true; } }); });
+  /* 대표님이 말한 짧은 체류와 겹치는 위치 → 그 이름을 배운다.
+     10/4 버그: 끝 시각 없는(지금까지) 체류 「스타벅스」를 배우는 동안 집에서 잡힌 위치까지 「스타벅스」로 배움 →
+     ① 끝 시각이 정해진 체류에서만 ② 위치 묶음 시간의 절반 이상이 그 체류 안일 때만 배운다. 예전 규칙으로 배운 이름은 한 번 비운다(geo.v=2) */
+  V72.learn=function(said){
+    var g=V72.st(), P=g.places, ch=false;
+    if(g.v!==2){ g.places=P={}; g.v=2; ch=true; }
+    var ms=function(t){ return new Date(String(t).replace(" ","T")).getTime(); };
+    V72.clusters().forEach(function(c){ var dur=Math.max(60000,c.t2-c.t);
+      said.forEach(function(s){ if(!s.to||!s.place||P[s.place]) return; var ov=Math.min(c.t2,ms(s.to))-Math.max(c.t,ms(s.from));
+        if(ov>=dur*0.5){ P[s.place]={la:+c.la.toFixed(5),lo:+c.lo.toFixed(5),r:150}; ch=true; } }); });
     if(ch) persist();
   };
   V72.stays=function(){

@@ -20,11 +20,13 @@
   function hm(m){ m=Math.round(m); var h=Math.floor(m/60), r=m%60; return pad2(h%24)+":"+pad2(r); }
   function dur(m){ return fmtMin(m); }
   /* 아침 수면 빗금 = 수면 기록이 있거나, 아직 오지 않은 시간(앞으로의 계획)일 때만 — 지난 시간에 짐작한 기상 시각은 그리지 않는다 (10/3) */
-  V60.sleepKnown=function(d,wake){ var sl=V60.sleepOf(d); if(sl&&sl.wake) return true; var t=today(); return d>t||(d===t&&wake>nowMin()); };
+  /* 10/4 대표님 「안 자고 있는데 취침을 넣으면 무슨 소용」 → 수면은 기록(앱 · sleep.json)이 있을 때만. 앞으로의 짐작 수면도 그리지 않는다 */
+  V60.sleepKnown=function(d,wake){ var sl=V60.sleepOf(d); return !!(sl&&sl.wake); };
   V60.I=function(t){ return window.V71?V71.info(t):""; };   /* 설명 문구는 (i) 안으로 — 지침 학습시스템 §30 */
   function cByName(n){ return courses().filter(function(c){ return c.name===n; })[0]; }
   V60.st=function(){ if(!S.v60) S.v60={est:{},done:{},cfg:{}}; S.v60.est=S.v60.est||{}; S.v60.done=S.v60.done||{}; S.v60.cfg=S.v60.cfg||{}; return S.v60; };
-  V60.cfg=function(k,def){ var v=V60.st().cfg[k]; return (v==null||v==="")?def:v; };
+  V60.p165=function(){ var st=V60.st(); if(st.p165noguess) return; st.cfg=st.cfg||{}; delete st.cfg.autoMeal; st.p165noguess=1; try{ persist(); }catch(e){} };
+  V60.cfg=function(k,def){ if(!V60._p165){ V60._p165=1; try{ V60.p165(); }catch(e){} } var v=V60.st().cfg[k]; return (v==null||v==="")?def:v; };
   V60.endOf=function(name,dow){ var e=(V60.st().cfg.ends||{})[name+"|"+dow]; return e||""; };
   V60.slotRows=function(){
     var DW=["일","월","화","수","목","금","토"], out=[];
@@ -172,10 +174,10 @@
     var wake=Math.max(5*60,need!=null?Math.min(wakeNat,need):wakeNat), short=need!=null&&need<wakeNat, slept=null;
     var sl=V60.sleepOf(d);                                                 /* 실제 수면 기록이 있으면 그 기상 시각 */
     if(sl&&sl.wake){ wake=toMin(sl.wake); if(sl.bed){ var bm=toMin(sl.bed); slept=wake>=bm?wake-bm:wake+1440-bm; short=slept<7*60; } }
-    var blk=fx.slice(), guess=!!+V60.cfg("autoMeal",1);   /* 짐작 칸(식사 · 휴식 · 준비)은 「제안」(sug, 점선)으로 — 확정 일정과 구분 (대표님 10/3 「오늘 스케줄 날아간 거 복구」, 설정에서 끌 수 있음) */
+    var blk=fx.slice(), guess=!!+V60.cfg("autoMeal",0);   /* 10/4 기본 끔 — 「빈 일정에 대해 확정하지 마」 */   /* 짐작 칸(식사 · 휴식 · 준비)은 「제안」(sug, 점선)으로 — 확정 일정과 구분 (대표님 10/3 「오늘 스케줄 날아간 거 복구」, 설정에서 끌 수 있음) */
     /* 대표님이 말한 일정이 기상 시각 근처에 있으면(「기상 · 씻고 준비」 등) 앱이 만든 기상·준비 칸은 넣지 않는다 — 같은 일 두 번 · 칸 겹침 금지 (10/4) */
     var wakeTaken=fx.some(function(b){ return b.s<wake+prep&&b.e>wake-30; });
-    if(!wakeTaken&&(guess||(sl&&sl.wake))) blk.push({s:wake,e:wake+prep,t:"기상·준비",k:"life",sug:(sl&&sl.wake)?0:1});
+    if(!wakeTaken&&guess) blk.push({s:wake,e:wake+prep,t:"기상·준비",k:"life",sug:1});   /* 준비 길이는 짐작 — 짐작 켰을 때만 제안 칸 */
     var home=null;
     if(sch.length){ var ss=sch.slice().sort(function(a,b){ return a.s-b.s; });
       blk.push({s:ss[0].s-mv.toSchool,e:ss[0].s,t:"이동",k:"move"});
@@ -325,7 +327,7 @@
       var bl=x.blk.map(function(b){ return {s:b.s,e:b.e,t:b.t,k:b.k,sug:b.sug}; }).concat(x.items.map(function(b){ return {s:b.s,e:b.e,t:b.t,k:b.k,sug:1}; }));   /* 과제 · 공부 배정 = 제안 칸 */
       var isT=x.d===td;
       return '<div class="v60-col'+(isT?' today':'')+(x.past?' past':'')+'" data-d="'+x.d+'"><div class="v60-ch"><b>'+V60.md(x.d)+'</b><small>빈 '+dur(x.avail)+(x.actual?' · 공부 '+dur(x.actual):'')+'</small></div><div class="v60-cb" style="height:'+((H1-H0)*PX)+'px">'+(V60.regionOf(x.d).length?'<i class="v60-cbrg">'+esc(V60.regionOf(x.d).join(" → "))+'</i>':'')+
-        (V60.sleepKnown(x.d,x.wake)?'<i class="v60-sleep" style="top:'+Math.max(0,((x.sleepFrom||0)-H0)*PX)+'px;height:'+Math.max(0,(x.wake-Math.max(H0,x.sleepFrom||0))*PX)+'px"></i>':'')+(x.d>=td?'<i class="v60-sleep" style="top:'+((x.bed-H0)*PX)+'px;height:'+Math.max(0,(H1-x.bed)*PX)+'px"></i>':'')+
+        (V60.sleepKnown(x.d,x.wake)?'<i class="v60-sleep" style="top:'+Math.max(0,((x.sleepFrom||0)-H0)*PX)+'px;height:'+Math.max(0,(x.wake-Math.max(H0,x.sleepFrom||0))*PX)+'px"></i>':'')+((V60.sleepOf(addDays(x.d,1))||{}).bed?'<i class="v60-sleep" style="top:'+((x.bed-H0)*PX)+'px;height:'+Math.max(0,(H1-x.bed)*PX)+'px"></i>':'')+
         bl.filter(function(b){ return b.e>H0&&b.s<H1; }).map(function(b){ var s=Math.max(b.s,H0), e=Math.min(b.e,H1), h=(e-s)*PX;
           return '<div class="v60-b k-'+b.k+(b.sug?' sug':'')+'" style="top:'+((s-H0)*PX)+'px;height:'+h+'px" title="'+esc(hm(b.s)+'–'+hm(b.e)+' '+b.t)+'">'+(h>=15?'<span>'+esc(b.t)+'</span>':'')+(h>=30?'<small>'+hm(b.s)+'</small>':'')+'</div>'; }).join("")+
         (isT&&nowM>H0&&nowM<H1?'<i class="v60-now" style="top:'+((nowM-H0)*PX)+'px"><b>'+hm(nowM)+'</b></i>':'')+'</div></div>';
@@ -520,7 +522,7 @@
        지난 날 밤인데 다음 날 기록이 없으면 짐작이라 그리지 않는다(.152 원칙) */
     if(T){ var tdS=today(), nx=V60.sleepOf(addDays(T.d,1));
       if(V60.sleepKnown(T.d,T.wake)&&T.wake>(T.sleepFrom||0)){ var bc=toMin(V60.cfg("bed","01:00")), sf=T.sleepFrom||(!V60.sleepOf(T.d)&&T.d>tdS&&bc<6*60?bc:0); rows.push({s:sf,e:T.wake,t:"취침",k:"sleep",sug:V60.sleepOf(T.d)?0:1}); }
-      if(T.bed<1440&&(T.d>=tdS||nx)) rows.push({s:T.bed,e:1440,t:"취침",k:"sleep",sug:nx?0:1});
+      if(T.bed<1440&&nx&&nx.bed) rows.push({s:T.bed,e:1440,t:"취침",k:"sleep",sug:0});
       rows.sort(function(a,b){ return a.s-b.s||a.e-b.e; }); }
     var hm2=function(m){ m=Math.round(m); return (m>=1440?"익일 ":"")+(Math.floor(m/60)%24<10?"0":"")+(Math.floor(m/60)%24)+":"+(m%60<10?"0":"")+(m%60); };
     var sc=rows.filter(function(b){ return b.school; }), back=rows.filter(function(b){ return b.t==="귀가"; });
@@ -594,7 +596,7 @@
   /* 끝 시각을 모르는 체류(to 없음)는 지금까지만 — 앞으로는 짐작하지 않는다(대표님 10/3) */
   /* 체류 = 대표님 말(plan.json) + 앱 위치(V72) — 우선순위: 말한 짧은 체류(12시간 이하) > 앱 위치 > 긴 숙소 체류 (대표님 10/3) */
   V60.allStays=function(){ var s=((V60.pp&&V60.pp.stays)||[]).slice(); try{ if(window.V72) s=s.concat(V72.stays()); }catch(e){} return s; };
-  V60.stayRank=function(x){ if(x.src==="geo") return 1; var h=(new Date((x.to||V60.stamp(today(),nowMin())).replace(" ","T"))-new Date(x.from.replace(" ","T")))/3600000; return h<=12?2:0; };
+  V60.stayRank=function(x){ if(x.src==="geo") return x.place==="새 장소"?-1:1;   /* 이름 모르는 앱 위치는 대표님이 말한 숙소보다 뒤 (10/4) */ var h=(new Date((x.to||V60.stamp(today(),nowMin())).replace(" ","T"))-new Date(x.from.replace(" ","T")))/3600000; return h<=12?2:0; };
   V60.stayAt=function(d,m){ var t=V60.stamp(d,m), now=V60.stamp(today(),nowMin());
     return V60.allStays().filter(function(x){ return t>=x.from&&(x.to?t<x.to:t<=now); }).sort(function(a,b){ return V60.stayRank(b)-V60.stayRank(a)||(a.from<b.from?1:-1); })[0]||null; };
   V60.whereHTML=function(T){ if(!T) return ""; var d=T.d, a=d+" 00:00", z=addDays(d,1)+" 00:00", now=V60.stamp(today(),nowMin());
