@@ -4,6 +4,9 @@
 
 ## 2026-10-03
 
+### .149 — 「오늘 죽어도」 없애고 마감 임박만 빨강
+- 대표님 10/3 「오늘 죽어도 없애고 오늘 할 일에 오늘 꼭 해야 하는 마감 임박 얼마 안 남은 것만 따로 빨갛게」. V60 render: v60-top.one(mustDo 하나) · taskCard: 마감 diffDays≤1 줄 .urgent, 묶음 .hot 위로 정렬, 제목 「마감 임박 N」, 시험 오늘·내일 줄.
+
 ### .148 — 앱을 열 때 내 위치 기록 · 타임라인 보정
 - 대표님 10/3 「웹 열 때 내 위치 파악해서 달라질 때마다 기록하고, 자기 전에 타임라인 내보내기로 오차 수정」. V72 LAYER(navigator.geolocation → S.geo.pts, 150 m 체류 묶음, said 체류에서 장소 이름 학습 S.geo.places, 외부 주소 변환 없음) · V60 allStays/stayRank(말한 짧은 체류 > 앱 위치 > 숙소) · whereHTML 정리 + 22:30 타임라인 안내 · check_integrations.ps1 9) timeline_import.py 매시간.
 

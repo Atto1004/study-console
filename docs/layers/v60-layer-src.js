@@ -332,7 +332,8 @@
       '<div class="v60-sh">오늘 수면</div><div class="v60-sf">'+(function(){ var sl=V60.sleepOf(td)||{}; return '<label>취침<input class="input" type="time" data-v60sleep="bed" value="'+esc(sl.bed||"")+'"></label><label>기상<input class="input" type="time" data-v60sleep="wake" value="'+esc(sl.wake||"")+'"></label>'; })()+'</div>'+
       '<div class="v60-sh">장소</div><div class="v60-sf"><label>근로장학 장소<input class="input" data-v60cfg="place:근로장학" placeholder="예: 제1공학관 2층 학과 사무실" value="'+esc(V60.cfg("place:근로장학",""))+'"></label></div>'+
       '<div class="v60-sh">수업 끝나는 시각</div><div class="v60-sf">'+V60.slotRows()+'</div></details>';
-    body.innerHTML='<div class="v60-top">'+die+mustDo+'</div>'+nums+grid+
+    /* 대표님 10/3 「오늘 죽어도 없애고 오늘 할 일에 오늘 꼭 해야 하는 마감 임박만 따로 빨갛게」 → 카드 하나(오늘 할 과제), 마감 오늘·내일 줄만 빨강 */
+    body.innerHTML='<div class="v60-top one">'+mustDo+'</div>'+nums+grid+
       '<div class="card"><div class="card-h"><h3>끝낸 과제 · 실제 소요'+V60.I("▶ 재생 → ■ 종료로 끝낸 과제가 실제 걸린 시간과 함께 여기 쌓이고, 같은 과목 · 같은 종류 과제의 예상 시간이 됩니다.")+'</h3><span class="hs">'+actL.length+'</span></div><div class="card-b tight">'+hwRows+
         '<div class="v60-add"><select class="input" id="v60aC">'+V60.MID.concat(["아카데믹글쓰기","창업아이디어탐색","사회봉사","기타"]).map(function(n){ return '<option>'+esc(n)+'</option>'; }).join("")+'</select><input class="input" id="v60aT" placeholder="할 일"><input class="input" type="date" id="v60aD" value="'+td+'"><input class="input" type="time" id="v60aH" value="23:59"><input class="input" type="number" id="v60aM" value="60" min="10" step="10"><button type="button" class="btn a" id="v60aB">추가</button></div></div></div>'+
       '<div class="card"><div class="card-h"><h3>진도</h3></div><div class="card-b tight">'+prog+'</div></div>'+set;
@@ -374,7 +375,10 @@
   V60.taskCard=function(P,T,td){
     var left=P.asg.filter(function(a){ return !a.done&&a.due>=td; });
     var sum=function(xs){ return xs.reduce(function(s,a){ return s+(a.noplan?0:a.est); },0); };
-    var groups=function(xs){ var by={}, ord=[]; xs.forEach(function(a){ if(!by[a.c]){ by[a.c]=[]; ord.push(a.c); } by[a.c].push(a); }); return ord.map(function(c){ return {c:c,xs:by[c]}; }); };
+    var isHot=function(a){ return diffDays(td,a.due)<=1; };
+    var groups=function(xs){ var by={}, ord=[]; xs.forEach(function(a){ if(!by[a.c]){ by[a.c]=[]; ord.push(a.c); } by[a.c].push(a); });
+      return ord.map(function(c){ var g=by[c].slice().sort(function(a,b){ return (isHot(b)?1:0)-(isHot(a)?1:0); }); return {c:c,xs:g,hot:g.some(isHot)}; })
+        .sort(function(a,b){ return (b.hot?1:0)-(a.hot?1:0); }); };
     var due=function(a){ var dd=diffDays(td,a.due); return '<span class="v60-due'+(dd<=1?' hot':'')+'">'+(dd===0?'오늘 '+esc(a.time):dd===1?'내일 '+esc(a.time):V60.md(a.due)+' · D-'+dd)+'</span>'; };
     var row=function(a){
       var r=a.run, on=r&&r.t0, k=esc(a.k);
@@ -382,12 +386,13 @@
         (on?'<button type="button" class="v60-ib" data-v60pause="'+k+'" aria-label="일시정지" title="일시정지">'+V60.ICON.pause+'</button>'
            :'<button type="button" class="v60-ib play" data-v60play="'+k+'" aria-label="'+(r?'이어서':'시작')+'" title="'+(r?'이어서':'시작')+'">'+V60.ICON.play+'</button>')+
         (r?'<button type="button" class="v60-ib stop" data-v60stop="'+k+'" aria-label="종료 · 완료" title="종료 · 완료">'+V60.ICON.stop+'</button>':'');
-      return '<div class="v60-tk2'+(on?' run':r?' paused':'')+'"><div class="v60-tkm"><div class="v60-tkt">'+esc(V60.tt(a))+'</div><div class="v60-tks">'+due(a)+' · '+
+      var hot=diffDays(td,a.due)<=1;
+      return '<div class="v60-tk2'+(on?' run':r?' paused':'')+(hot?' urgent':'')+'"><div class="v60-tkm"><div class="v60-tkt">'+esc(V60.tt(a))+'</div><div class="v60-tks">'+due(a)+' · '+
         (a.noplan?esc(a.noplan):'<label class="v60-est">약 <input type="number" min="5" step="5" value="'+a.est+'" data-v60est="'+esc(a.k)+'">분</label> <small>'+esc(a.kind)+' · '+esc(a.estSrc)+'</small>')+V60.filesHTML(a)+'</div></div>'+
         '<div class="v60-tka">'+act+'<button type="button" class="v60-chk" data-v60done="'+esc(a.k)+'" aria-label="완료"></button></div></div>'; };
     var sec=function(title,xs){ if(!xs.length) return "";
       return '<div class="v60-sec"><div class="v60-sech">'+title+'</div>'+groups(xs).map(function(g){ var m=sum(g.xs);
-        return '<div class="v60-grp"><div class="v60-grph"><b>'+esc(g.c)+'</b><span>'+g.xs.length+'개'+(m?' · 약 '+fmtMin(m):'')+'</span></div>'+g.xs.map(row).join("")+'</div>'; }).join("")+'</div>'; };
+        return '<div class="v60-grp'+(g.hot?' hot':'')+'"><div class="v60-grph"><b>'+esc(g.c)+'</b><span>'+g.xs.length+'개'+(m?' · 약 '+fmtMin(m):'')+'</span></div>'+g.xs.map(row).join("")+'</div>'; }).join("")+'</div>'; };
     /* 공부 — 과제 끝낸 뒤 */
     var st=[], seen={}; (T?T.items:[]).filter(function(b){ return b.k==="st"||b.k==="memo"; }).forEach(function(b){ if(seen[b.t]){ seen[b.t].min+=b.e-b.s; return; } seen[b.t]={b:b,min:b.e-b.s}; st.push(seen[b.t]); });
     var sd=V60.st().done, own=(V60.priv||[]).concat(V60.st().extra||[]).filter(function(x){ return x&&(x.kind==="study"||x.kind==="prep")&&x.due>=td; }).map(function(x){ var o={c:x.c||"기타",t:x.t,due:x.due,time:x.time||"23:59",kind:x.kind}; o.k=V60.key(o); o.done=!!sd[o.k]; return o; }).filter(function(o){ return !o.done; }).sort(function(a,b){ return (a.due+a.time)<(b.due+b.time)?-1:1; });
@@ -398,8 +403,11 @@
         (m.x?'<button type="button" class="btn xs a" data-v60go="'+m.c.id+'|'+m.x.w+'|'+m.x.date+'">열기</button><button type="button" class="v60-chk" data-v60sdone="'+m.c.id+'|'+m.x.date+'" aria-label="완료"></button>':'')+
         (m.memo?'<button type="button" class="btn xs a" data-v60memo="1">카드</button><button type="button" class="v60-chk" data-v60mdone="'+esc(m.d)+'" aria-label="완료"></button>':'')+'</div></div>'; }).join(""));
     var stHTML=stBody?'<div class="v60-sec st"><div class="v60-sech">공부'+V60.I("과제를 끝낸 뒤에 합니다 — 과제를 해야 공부를 할 수 있다.\n남은 과제가 오늘 안에 다 안 들어가면 복습 · 밀린 회차 · 암기는 배정하지 않습니다.\n흐린 줄 = 과제가 남아 아직 차례가 아닌 공부.")+'</div>'+stBody+'</div>':'';
-    return '<div class="v60-must"><div class="v60-h">오늘 할 과제 <span class="v60-hs">'+left.length+'개'+(sum(left)?' · 예상 합계 '+fmtMin(sum(left)):'')+'</span>'+V60.I("시각 없이 남은 과제 전부 — 과목별 · 마감 순.\n「과제」 = LMS 과제 · 「할 일」 = 직접 넣거나 말로 준 것.\n▶ 재생 · ⏸ 일시정지 · ■ 종료(= 완료 + 실제 걸린 시간 기록). 그 기록이 같은 과목 · 같은 종류 과제의 예상 시간이 됩니다.")+'</div>'+
-      sec("과제",left.filter(function(a){ return !a.own; }))+sec("할 일",left.filter(function(a){ return a.own; }))+stHTML+'</div>';
+    var exH=exams().filter(function(e){ return e.date===td||e.date===addDays(td,1); }).map(function(e){ var n=(course(e.courseId)||{}).name||"";
+      return '<div class="v60-tk2 urgent"><div class="v60-tkm"><div class="v60-tkt"><b>'+esc(n)+'</b> · '+esc(e.kind||"시험")+'</div><div class="v60-tks"><span class="v60-due hot">'+(e.date===td?"오늘":"내일")+(e.time?" "+esc(e.time):"")+'</span></div></div></div>'; }).join("");
+    var nHot=left.filter(isHot).length;
+    return '<div class="v60-must"><div class="v60-h">오늘 할 과제 '+(nHot?'<span class="v60-hotn">마감 임박 '+nHot+'</span> ':'')+'<span class="v60-hs">'+left.length+'개'+(sum(left)?' · 예상 합계 '+fmtMin(sum(left)):'')+'</span>'+V60.I("시각 없이 남은 과제 전부 — 과목별 · 마감 순.\n「과제」 = LMS 과제 · 「할 일」 = 직접 넣거나 말로 준 것.\n▶ 재생 · ⏸ 일시정지 · ■ 종료(= 완료 + 실제 걸린 시간 기록). 그 기록이 같은 과목 · 같은 종류 과제의 예상 시간이 됩니다.")+'</div>'+
+      exH+sec("과제",left.filter(function(a){ return !a.own; }))+sec("할 일",left.filter(function(a){ return a.own; }))+stHTML+'</div>';
   };
 
   /* ---------- 오늘만 보기: 하루 시간표를 한 줄씩 ---------- */
@@ -713,6 +721,9 @@
     ".v60-callist{margin-top:12px;display:flex;flex-direction:column;gap:6px}",
     ".v60-cev{background:#1E5FA8!important;color:#fff!important}.v60-cev.hot{background:#C7261B!important}",
     "@media (max-width:900px){.v60-top{grid-template-columns:1fr}}",
+    ".v60-top.one{grid-template-columns:1fr}",
+    ".v60-tk2.urgent{background:color-mix(in srgb,#C7261B 9%,transparent);border-left:4px solid #C7261B;border-radius:8px;padding-left:8px;padding-right:4px}.v60-tk2.urgent .v60-tkt{color:#B3170E;font-weight:800}",
+    ".v60-grp.hot>.v60-grph b{color:#C7261B}.v60-hotn{font-size:12px;font-weight:800;color:#fff;background:#C7261B;border-radius:99px;padding:2px 9px;margin-left:4px;vertical-align:middle}",
     "@media (max-width:600px){.v60-grid{grid-template-columns:28px repeat(7,minmax(46px,1fr))}.v60-b span{font-size:9.5px}.v60-b small{display:none}.v60-sf{grid-template-columns:1fr 1fr}.v60-hw{flex-wrap:wrap}}"
   ].join("\n");
   document.head.appendChild(css);
