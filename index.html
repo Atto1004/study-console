@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-03.142";
+var BUILD="2026-10-03.143";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,10 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-03.143",d:"10-03",items:[
+    "「수업 자료」 과제 줄에 상태 표시 — 제출 · 지각 제출 · 미제출(마감 지남, 아직 낼 수 있음) · 못 냄(LMS 닫힘) · 제출 확인 안 됨. LMS 제출 시각으로 판정하고, 칠판 과제는 대표님이 말해 준 것만. 카드 요약에 「과제 못 냄 1」 같은 개수",
+    "(.140 몫) 정역학 「세부단원」 — Ch.1~5 단원별로 절(3.1 ~ 5.4) 나눔. 절마다 교수님 필기 해당 쪽 · 교실 · 수업 노트 · 덱 파트 · 과제 혼자 풀기 · 암기노트"
+  ]},
   {v:"2026-10-03.142",d:"10-03",items:[
     "과제 버튼을 글자 대신 아이콘으로 — 재생 · 일시정지 · 종료. 일시정지하면 시간이 멈추고, 재생하면 이어서 잼. 종료 = 완료 + 실제 걸린 시간 기록",
     "재생 중인 과제는 옆에 분:초 시계"
@@ -11731,21 +11735,29 @@ var V33={};
       '<td>'+V58.attHTML(r,s)+'</td>'+cells+'</tr>';
   };
   V58.dueTxt=function(a){ if(!a.due) return "마감 없음"; var t=a.due.slice(11,16); return md(a.due.slice(0,10))+(t?" "+t:""); };
+  /* 대표님 10/3 「과제 미제출 · 못 냄 · 지각 제출 표시」(BUILD .143) — 상태는 _진도커버리지.py 가 LMS(제출 시각·late·잠김 시각)로 판정,
+     칠판 과제는 대표님이 말해 준 것만. 제출 / 지각 제출 / 미제출(마감 지남 · 아직 낼 수 있음) / 못 냄(잠김) / 확인 안 됨(말 안 해 준 칠판 과제) */
+  V58.whenTxt=function(s){ return s?md(s.slice(0,10))+" "+s.slice(11,16):""; };
   V58.asgState=function(a){
-    if(a.status==="제출") return {cls:"ok",t:"제출"};
-    if(a.status) return {cls:"warn",t:a.status};
+    var tip=a.statusNote||"";
+    if(a.status==="제출") return {cls:"ok",t:"제출",tip:a.submittedAt?"제출 "+V58.whenTxt(a.submittedAt):tip};
+    if(a.status==="지각 제출") return {cls:"late",t:"지각 제출",tip:a.submittedAt?"제출 "+V58.whenTxt(a.submittedAt)+" · 마감 "+V58.dueTxt(a):tip};
+    if(a.status==="미제출"||a.status==="LMS 미제출") return {cls:"miss",t:a.lockAt?"미제출 · "+V58.whenTxt(a.lockAt)+"까지 늦게 낼 수 있음":"미제출",tip:tip};
+    if(a.status==="못 냄") return {cls:"fail",t:"못 냄",tip:tip||"마감 지나 LMS 제출 닫힘"};
+    if(a.status==="제출 불필요") return {cls:"past",t:"제출 불필요",tip:tip};
+    if(a.status) return {cls:"warn",t:a.status,tip:tip};
     if(!a.due) return null;
     var now=new Date(), d=new Date(a.due.replace("T"," ").replace(/-/g,"/")+":00");
     if(isNaN(d)) return null;
-    if(d<now) return {cls:"past",t:"마감 지남"};
+    if(d<now) return {cls:"past",t:"제출 확인 안 됨",tip:"마감 지남 · 낸 기록이 아직 없음 — 냈으면 말씀해 주세요"};
     var n=Math.ceil((D(a.due.slice(0,10))-D(today()))/86400000);
     return {cls:n<=2?"soon":"fut",t:n<=0?"오늘 마감":"D-"+n};
   };
   V58.asgHTML=function(r){
     var a=r.asg, st=V58.asgState(a);
-    var chip=st?' <span class="v58-st '+st.cls+'">'+esc(st.t)+'</span>':'';
+    var chip=st?' <span class="v58-st '+st.cls+'"'+(st.tip?' title="'+esc(st.tip)+'"':'')+'>'+esc(st.t)+'</span>':'';
     var est=a.dueNote?' <small title="'+esc(a.dueNote)+'">(추정)</small>':'';
-    if(r.kind==="given") return '<tr class="v58-asg"><td></td><td colspan="7"><span class="v58-tag g">과제</span> <b>'+esc(a.title)+'</b> <span class="v58-arrow">'+(a.due?'→ 마감 '+esc(V58.dueTxt(a)):'· 마감 없음')+'</span>'+est+'</td></tr>';
+    if(r.kind==="given") return '<tr class="v58-asg"><td></td><td colspan="7"><span class="v58-tag g">과제</span> <b>'+esc(a.title)+'</b> <span class="v58-arrow">'+(a.due?'→ 마감 '+esc(V58.dueTxt(a)):'· 마감 없음')+'</span>'+est+chip+'</td></tr>';
     var sh=a.title.replace(/Homework Assignment\s*-\s*/i,"HW ").replace(/\s*(을|를)?\s*제출해\s*주세요\.?$/,"").replace(/\s+/g," ").trim(); if(sh.length>26) sh=sh.slice(0,26)+"…";
     return '<tr class="v58-asg due"><td></td><td colspan="7"><span class="v58-tag d">마감</span> '+esc(V58.dueTxt(a))+est+' · <span title="'+esc(a.title)+'">'+two(a.title,sh)+'</span>'+chip+'</td></tr>';
   };
@@ -11765,7 +11777,9 @@ var V33={};
     var asOf=V58.M&&V58.M.generatedAt?V58.M.generatedAt.replace(/^\d{4}-(\d\d)-(\d\d)T(\d\d:\d\d).*$/,function(_,m,d,t){ return (+m)+"/"+(+d)+" "+t; }):"";
     var mc=V58.M&&V58.M.courses&&V58.M.courses[c.name], nx=null, now=new Date();
     ((mc&&mc.assignments)||[]).forEach(function(a){ if(!a.due||a.status==="제출") return; var d=new Date(a.due.replace("T"," ").replace(/-/g,"/")+":00"); if(!isNaN(d)&&d>=now&&(!nx||a.due<nx.due)) nx=a; });
-    return (held?"출석 "+((n.present||0)+(n.late||0)+(n.vlate||0))+"/"+held:"")+(miss?" · 빠진 자료 "+miss+"회차":"")+(nx?" · 다음 마감 "+V58.dueTxt(nx):"")+(asOf?" · PC 자료 "+asOf:"");
+    var cnt={}; ((mc&&mc.assignments)||[]).forEach(function(a){ var s=a.status==="LMS 미제출"?"미제출":a.status; if(s==="못 냄"||s==="미제출"||s==="지각 제출") cnt[s]=(cnt[s]||0)+1; });
+    var ac=["못 냄","미제출","지각 제출"].filter(function(k){ return cnt[k]; }).map(function(k){ return "과제 "+k+" "+cnt[k]; }).join(" · ");
+    return (held?"출석 "+((n.present||0)+(n.late||0)+(n.vlate||0))+"/"+held:"")+(miss?" · 빠진 자료 "+miss+"회차":"")+(ac?" · "+ac:"")+(nx?" · 다음 마감 "+V58.dueTxt(nx):"")+(asOf?" · PC 자료 "+asOf:"");
   };
   V58.fill=function(c,card){
     var tok=++V58.tok;
@@ -11829,7 +11843,7 @@ var V33={};
     ".v58-t tr.v58-asg td{text-align:left;font-size:12.5px;padding:6px 6px;background:color-mix(in srgb,#1CB0F6 7%,transparent)}.v58-t tr.v58-asg.due td{background:color-mix(in srgb,#FF9600 9%,transparent)}",
     ".v58-tag{display:inline-block;font-size:11px;font-weight:800;padding:1px 7px;border-radius:6px;margin-right:4px;color:#fff}.v58-tag.g{background:#1E5FA8}.v58-tag.d{background:#B85C00}",
     ".v58-arrow{color:var(--ink-3);font-weight:700;white-space:nowrap}.v58-t tr.v58-asg small{color:var(--ink-3)}",
-    ".v58-st{display:inline-block;font-size:11px;font-weight:800;padding:1px 7px;border-radius:99px;margin-left:6px;border:1.5px solid currentColor}.v58-st.ok{color:#1B7A2E}.v58-st.warn{color:#9A5B00}.v58-st.past{color:var(--ink-3)}.v58-st.soon{color:#C7261B}.v58-st.fut{color:#1E5FA8}",
+    ".v58-st{display:inline-block;font-size:11px;font-weight:800;padding:1px 7px;border-radius:99px;margin-left:6px;border:1.5px solid currentColor}.v58-st.ok{color:#1B7A2E}.v58-st.warn{color:#9A5B00}.v58-st.past{color:var(--ink-3)}.v58-st.late{color:#fff;background:#B85C00;border-color:#B85C00}.v58-st.miss{color:#C7261B;background:color-mix(in srgb,#C7261B 8%,transparent)}.v58-st.fail{color:#fff;background:#C7261B;border-color:#C7261B}.v58-st.soon{color:#C7261B}.v58-st.fut{color:#1E5FA8}",
     ".v58 .sm{display:none}",
     "@media (max-width:600px){.v58-b{padding:8px 6px 12px}.v58-t{min-width:0;font-size:12px}.v58 .lg{display:none}.v58 .sm{display:inline}.v58-t th,.v58-t td{padding:6px 2px}.v58-d{min-width:0}.v58-d small{display:none}.v58-n{width:22px}.v58-n small{display:none}.v58-a{font-size:10.5px;padding:1px 6px}.v58-c{font-size:11.5px}.v58-tab{padding:4px 10px;font-size:12px}}"
   ].join("\n");

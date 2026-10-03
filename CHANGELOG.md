@@ -4,6 +4,10 @@
 
 ## 2026-10-03
 
+### .143 — 과제 상태: 제출 · 지각 제출 · 미제출 · 못 냄
+- 대표님 10/3 「수업자료상에 과제 미제출, 과제 못 냄, 지각 제출 표시」. lms_sync 가 submission.submitted_at·late·missing·assignment.lock_at 저장 → _진도커버리지.py 판정(제출 시각 > 마감 = 지각, 마감 지남 + 잠김 전 = 미제출, 잠김 지남 = 못 냄) → materials.json status·submittedAt·lockAt → V58.asgState 배지(.late/.miss/.fail) · 과제 「나옴」 줄에도 배지 · 요약 개수. 칠판 과제(공수1)는 _과제목록.json status 만, 없으면 「제출 확인 안 됨」.
+- (.140 몫으로 빠졌던 항목) 정역학 「세부단원」 V63 — knowledge/sections.json 정역학 절 21개, 교수 필기 조각·과제 혼자 풀기 링크.
+
 ### .142 — 과제 재생 · 일시정지 · 종료 아이콘
 - 대표님 10/3 「과제 시작 말고 재생 · 일시정지 · 종료 버튼으로, 텍스트 말고 이미지 버튼」. S.v60.run[k]={t0,acc}(예전 숫자 형식도 읽음), V60.runOf/runMs/clock, SVG 아이콘 .v60-ib, 재생 중일 때만 1초 시계. (.141 은 os-a4 몫으로 비워 둠)
 
