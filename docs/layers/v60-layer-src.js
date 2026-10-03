@@ -21,12 +21,13 @@
   function dur(m){ return fmtMin(m); }
   /* 아침 수면 빗금 = 수면 기록이 있거나, 아직 오지 않은 시간(앞으로의 계획)일 때만 — 지난 시간에 짐작한 기상 시각은 그리지 않는다 (10/3) */
   /* 10/4 대표님 「안 자고 있는데 취침을 넣으면 무슨 소용」 → 수면은 기록(앱 · sleep.json)이 있을 때만. 앞으로의 짐작 수면도 그리지 않는다 */
-  V60.sleepKnown=function(d,wake){ var sl=V60.sleepOf(d); return !!(sl&&sl.wake); };
+  V60.sleepKnown=function(d,wake){ var sl=V60.sleepOf(d); return !!(sl&&sl.wake)||d>today(); };   /* 기록 · 또는 앞으로의 날(계획 = 제안 칸). 오늘 새벽은 기록만 */
   V60.I=function(t){ return window.V71?V71.info(t):""; };   /* 설명 문구는 (i) 안으로 — 지침 학습시스템 §30 */
   function cByName(n){ return courses().filter(function(c){ return c.name===n; })[0]; }
   V60.st=function(){ if(!S.v60) S.v60={est:{},done:{},cfg:{}}; S.v60.est=S.v60.est||{}; S.v60.done=S.v60.done||{}; S.v60.cfg=S.v60.cfg||{}; return S.v60; };
+  V60.p167=function(){ var st=V60.st(); if(st.p167sleep) return; st.cfg=st.cfg||{}; st.cfg.sleepH=8; st.p167sleep=1; try{ persist(); }catch(e){} };
   V60.p165=function(){ var st=V60.st(); if(st.p165noguess) return; st.cfg=st.cfg||{}; delete st.cfg.autoMeal; st.p165noguess=1; try{ persist(); }catch(e){} };
-  V60.cfg=function(k,def){ if(!V60._p165){ V60._p165=1; try{ V60.p165(); }catch(e){} } var v=V60.st().cfg[k]; return (v==null||v==="")?def:v; };
+  V60.cfg=function(k,def){ if(!V60._p165){ V60._p165=1; try{ V60.p165(); V60.p167(); }catch(e){} } var v=V60.st().cfg[k]; return (v==null||v==="")?def:v; };
   V60.endOf=function(name,dow){ var e=(V60.st().cfg.ends||{})[name+"|"+dow]; return e||""; };
   V60.slotRows=function(){
     var DW=["일","월","화","수","목","금","토"], out=[];
@@ -165,13 +166,13 @@
   }
   V60.day=function(d,nowM){
     var nxs=V60.sleepOf(addDays(d,1));   /* 그날 밤 실제 취침 = 다음 날 수면 기록의 bed (대표님 10/4 「취침한 시간 알려 줬는데 반영 안 함」) */
-    var fx=V60.fixed(d), R=V60.R||{}, bed=toMin((nxs&&nxs.bed)||V60.cfg("bed","01:00")), sleepH=+V60.cfg("sleepH",(S.profile&&S.profile.sleepH)||7);
+    var fx=V60.fixed(d), R=V60.R||{}, bed=toMin((nxs&&nxs.bed)||V60.cfg("bed","01:00")), sleepH=+V60.cfg("sleepH",8);   /* 10/4 「가능하면 7~8시간」 — 목표 8시간, 7시간 밑이면 부족 표시 */
     var bedAbs=bed<6*60?bed+1440:bed;                                      /* 취침 01:00 = 그날 25:00 */
     var prep=+(R.prep||60), mv=R.moves||{toSchool:10,toHome:20};
     var sch=fx.filter(function(b){ return b.school; });
     var wakeNat=(bedAbs-1440)+sleepH*60;                                   /* 전날 취침 + 수면 */
     var first=fx.length?fx[0].s:null, need=first!=null?first-(sch.length&&sch[0].s===first?mv.toSchool:0)-prep:null;
-    var wake=Math.max(5*60,need!=null?Math.min(wakeNat,need):wakeNat), short=need!=null&&need<wakeNat, slept=null;
+    var wake=Math.max(5*60,need!=null?Math.min(wakeNat,need):wakeNat), short=need!=null&&need<(bedAbs-1440)+7*60, slept=null;
     var sl=V60.sleepOf(d);                                                 /* 실제 수면 기록이 있으면 그 기상 시각 */
     if(sl&&sl.wake){ wake=toMin(sl.wake); if(sl.bed){ var bm=toMin(sl.bed); slept=wake>=bm?wake-bm:wake+1440-bm; short=slept<7*60; } }
     var blk=fx.slice(), guess=!!+V60.cfg("autoMeal",0);   /* 10/4 기본 끔 — 「빈 일정에 대해 확정하지 마」 */   /* 짐작 칸(식사 · 휴식 · 준비)은 「제안」(sug, 점선)으로 — 확정 일정과 구분 (대표님 10/3 「오늘 스케줄 날아간 거 복구」, 설정에서 끌 수 있음) */
@@ -213,7 +214,9 @@
     var slots=start<end?free([start,end],blk.filter(function(b){ return b.k!=="life"||true; })):[];
     slots=slots.filter(function(r){ return r[1]-r[0]>=25; });
     var avail=slots.reduce(function(a,r){ return a+(r[1]-r[0]); },0);
-    var sleepFrom=(sl&&sl.bed&&toMin(sl.bed)<12*60)?toMin(sl.bed):0;   /* 새벽에 잤으면 그 전(0시~취침)은 깨어 있던 시간 — 아침 빗금 시작 */
+    var sleepFrom=(sl&&sl.bed&&toMin(sl.bed)<12*60)?toMin(sl.bed):0;
+    /* 앞으로의 날 수면 계획 — 수업 때문에 일찍 일어나야 하면 취침을 당겨 최소 7시간(대표님 10/4 「가능하면 7~8시간」) */
+    if(!(sl&&sl.wake)&&d>today()){ var pb=Math.max(0,Math.min(bedAbs-1440,wake-7*60)); sleepFrom=pb; if(wake-pb>=7*60) short=false; }   /* 새벽에 잤으면 그 전(0시~취침)은 깨어 있던 시간 — 아침 빗금 시작 */
     if(!(sl&&sl.wake)&&d===today()&&typeof nowM==="number"&&nowM<wake) sleepFrom=Math.max(sleepFrom,nowM);   /* 기록 없는 오늘 = 아직 안 잠 — 지금 이후만 예상 수면(지난 시간은 짐작해서 칠하지 않음) */
     return {d:d,blk:blk,stays:stays,wake:wake,bed:bedAbs,sleepFrom:sleepFrom,short:short,slept:slept,slots:slots,avail:avail};
   };
@@ -327,7 +330,7 @@
       var bl=x.blk.map(function(b){ return {s:b.s,e:b.e,t:b.t,k:b.k,sug:b.sug}; }).concat(x.items.map(function(b){ return {s:b.s,e:b.e,t:b.t,k:b.k,sug:1}; }));   /* 과제 · 공부 배정 = 제안 칸 */
       var isT=x.d===td;
       return '<div class="v60-col'+(isT?' today':'')+(x.past?' past':'')+'" data-d="'+x.d+'"><div class="v60-ch"><b>'+V60.md(x.d)+'</b><small>빈 '+dur(x.avail)+(x.actual?' · 공부 '+dur(x.actual):'')+'</small></div><div class="v60-cb" style="height:'+((H1-H0)*PX)+'px">'+(V60.regionOf(x.d).length?'<i class="v60-cbrg">'+esc(V60.regionOf(x.d).join(" → "))+'</i>':'')+
-        (V60.sleepKnown(x.d,x.wake)?'<i class="v60-sleep" style="top:'+Math.max(0,((x.sleepFrom||0)-H0)*PX)+'px;height:'+Math.max(0,(x.wake-Math.max(H0,x.sleepFrom||0))*PX)+'px"></i>':'')+((V60.sleepOf(addDays(x.d,1))||{}).bed?'<i class="v60-sleep" style="top:'+((x.bed-H0)*PX)+'px;height:'+Math.max(0,(H1-x.bed)*PX)+'px"></i>':'')+
+        (V60.sleepKnown(x.d,x.wake)?'<i class="v60-sleep" style="top:'+Math.max(0,((x.sleepFrom||0)-H0)*PX)+'px;height:'+Math.max(0,(x.wake-Math.max(H0,x.sleepFrom||0))*PX)+'px"></i>':'')+((V60.sleepOf(addDays(x.d,1))||{}).bed||(x.d>=td&&x.bed<1440)?'<i class="v60-sleep" style="top:'+((x.bed-H0)*PX)+'px;height:'+Math.max(0,(H1-x.bed)*PX)+'px"></i>':'')+
         bl.filter(function(b){ return b.e>H0&&b.s<H1; }).map(function(b){ var s=Math.max(b.s,H0), e=Math.min(b.e,H1), h=(e-s)*PX;
           return '<div class="v60-b k-'+b.k+(b.sug?' sug':'')+'" style="top:'+((s-H0)*PX)+'px;height:'+h+'px" title="'+esc(hm(b.s)+'–'+hm(b.e)+' '+b.t)+'">'+(h>=15?'<span>'+esc(b.t)+'</span>':'')+(h>=30?'<small>'+hm(b.s)+'</small>':'')+'</div>'; }).join("")+
         (isT&&nowM>H0&&nowM<H1?'<i class="v60-now" style="top:'+((nowM-H0)*PX)+'px"><b>'+hm(nowM)+'</b></i>':'')+'</div></div>';
@@ -522,7 +525,7 @@
        지난 날 밤인데 다음 날 기록이 없으면 짐작이라 그리지 않는다(.152 원칙) */
     if(T){ var tdS=today(), nx=V60.sleepOf(addDays(T.d,1));
       if(V60.sleepKnown(T.d,T.wake)&&T.wake>(T.sleepFrom||0)){ var bc=toMin(V60.cfg("bed","01:00")), sf=T.sleepFrom||(!V60.sleepOf(T.d)&&T.d>tdS&&bc<6*60?bc:0); rows.push({s:sf,e:T.wake,t:"취침",k:"sleep",sug:V60.sleepOf(T.d)?0:1}); }
-      if(T.bed<1440&&nx&&nx.bed) rows.push({s:T.bed,e:1440,t:"취침",k:"sleep",sug:0});
+      if(T.bed<1440&&((nx&&nx.bed)||T.d>=tdS)) rows.push({s:T.bed,e:1440,t:"취침",k:"sleep",sug:(nx&&nx.bed)?0:1});   /* 앞으로의 밤 = 계획(제안) */
       rows.sort(function(a,b){ return a.s-b.s||a.e-b.e; }); }
     var hm2=function(m){ m=Math.round(m); return (m>=1440?"익일 ":"")+(Math.floor(m/60)%24<10?"0":"")+(Math.floor(m/60)%24)+":"+(m%60<10?"0":"")+(m%60); };
     var sc=rows.filter(function(b){ return b.school; }), back=rows.filter(function(b){ return b.t==="귀가"; });
