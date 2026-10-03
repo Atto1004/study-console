@@ -4,6 +4,9 @@
 
 ## 2026-10-03
 
+### .144 — 클로바노트 반영 상태 줄
+- 대표님 10/3 「상단에 연결끊김 한양포털 대신 클로바노트 녹음본 변환 몇 개 대기 중이고, 최근 어떤 과목 녹음본까지 적용했는지」. V70 LAYER(V48 배너 감싸기, portal·hylue 제외) + docs/tools/clova_status.py → knowledge/clova-status.json(.gitignore), check_integrations.ps1 매시간.
+
 ### .143 — 과제 상태: 제출 · 지각 제출 · 미제출 · 못 냄
 - 대표님 10/3 「수업자료상에 과제 미제출, 과제 못 냄, 지각 제출 표시」. lms_sync 가 submission.submitted_at·late·missing·assignment.lock_at 저장 → _진도커버리지.py 판정(제출 시각 > 마감 = 지각, 마감 지남 + 잠김 전 = 미제출, 잠김 지남 = 못 냄) → materials.json status·submittedAt·lockAt → V58.asgState 배지(.late/.miss/.fail) · 과제 「나옴」 줄에도 배지 · 요약 개수. 칠판 과제(공수1)는 _과제목록.json status 만, 없으면 「제출 확인 안 됨」.
 - (.140 몫으로 빠졌던 항목) 정역학 「세부단원」 V63 — knowledge/sections.json 정역학 절 21개, 교수 필기 조각·과제 혼자 풀기 링크.
