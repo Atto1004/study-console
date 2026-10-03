@@ -277,7 +277,7 @@
     var nums='<div class="v60-nums"><span><small>지금부터 빈 시간</small><b>'+dur(T?T.avail:0)+'</b></span><span><small>과제</small><b>'+dur(hwMin)+'</b></span><span><small>공부</small><b>'+dur(stMin)+'</b></span><span><small>오늘 실제 공부</small><b>'+dur(T?T.actual:0)+'</b></span>'+
       (T&&T.slept!=null?'<span class="'+(T.short?'warn':'')+'"><small>어젯밤 수면</small><b>'+dur(T.slept)+'</b></span>':(T&&T.short?'<span class="warn"><small>수면</small><b>부족</b></span>':''))+'</div>';
     /* 주간 격자 */
-    var H0=7*60, H1=26*60, PX=0.62, nowM=nowMin();
+    var H0=7*60, H1=26*60, PX=0.62, nowM=nowMin(); V60._g={H0:H0,H1:H1,PX:PX};
     var cols=P.days.map(function(x){
       var bl=x.blk.map(function(b){ return {s:b.s,e:b.e,t:b.t,k:b.k}; }).concat(x.items);
       var isT=x.d===td;
@@ -285,7 +285,7 @@
         '<i class="v60-sleep" style="top:0;height:'+Math.max(0,(x.wake-H0)*PX)+'px"></i><i class="v60-sleep" style="top:'+((x.bed-H0)*PX)+'px;height:'+Math.max(0,(H1-x.bed)*PX)+'px"></i>'+
         bl.filter(function(b){ return b.e>H0&&b.s<H1; }).map(function(b){ var s=Math.max(b.s,H0), e=Math.min(b.e,H1), h=(e-s)*PX;
           return '<div class="v60-b k-'+b.k+'" style="top:'+((s-H0)*PX)+'px;height:'+h+'px" title="'+esc(hm(b.s)+'–'+hm(b.e)+' '+b.t)+'">'+(h>=15?'<span>'+esc(b.t)+'</span>':'')+(h>=30?'<small>'+hm(b.s)+'</small>':'')+'</div>'; }).join("")+
-        (isT&&nowM>H0?'<i class="v60-now" style="top:'+((nowM-H0)*PX)+'px"></i>':'')+'</div></div>';
+        (isT&&nowM>H0&&nowM<H1?'<i class="v60-now" style="top:'+((nowM-H0)*PX)+'px"><b>'+hm(nowM)+'</b></i>':'')+'</div></div>';
     }).join("");
     var hours=''; for(var h=7;h<=26;h+=1) hours+='<span style="top:'+((h*60-H0)*PX)+'px">'+pad2(h%24)+'</span>';
     var seg='<div class="seg" id="v60Wk"><button data-w="t"'+(V60.ui.today?' aria-pressed="true"':'')+'>오늘만</button><button data-w="0"'+(!V60.ui.today&&V60.ui.week===0?' aria-pressed="true"':'')+'>이번 주</button><button data-w="1"'+(!V60.ui.today&&V60.ui.week===1?' aria-pressed="true"':'')+'>다음 주</button></div>';
@@ -353,14 +353,31 @@
       var same=prevKey!=null&&prevKey===label(pl); prevKey=label(pl);
       return '<div class="v60-tp '+(pl.home?'home':(pl.campus?'campus':'out'))+(same?' same':'')+'">'+(same?'<i></i>':'<span class="v60-tpn">'+esc(pl.name)+(pl.sub?' <small>'+esc(pl.sub)+'</small>':'')+(pl.ask?' <small class="v60-rask">자리 ❓</small>':'')+'</span>')+'</div>';
     };
-    var list=rows.map(function(b,ri){ var past=b.e<=nowM, cur=b.s<=nowM&&nowM<b.e, act="";
+    var trs=rows.map(function(b,ri){ var past=b.e<=nowM, cur=b.s<=nowM&&nowM<b.e, act="";
       if(b.meta&&b.meta.hw) act+=' <button type="button" class="v60-chk" data-v60done="'+esc(b.meta.hw.k)+'" aria-label="완료"></button>';
       if(b.meta&&b.meta.x) act+=' <button type="button" class="btn xs a" data-v60go="'+b.meta.c.id+'|'+b.meta.x.w+'|'+b.meta.x.date+'">열기</button> <button type="button" class="v60-chk" data-v60sdone="'+b.meta.c.id+'|'+b.meta.x.date+'" aria-label="완료"></button>';
       if(b.meta&&b.meta.memo) act+=' <button type="button" class="btn xs a" data-v60memo="1">카드</button> <button type="button" class="v60-chk" data-v60mdone="'+esc(b.meta.d)+'" aria-label="완료"></button>';
-      return '<div class="v60-tr'+(past?' past':'')+(cur?' cur':'')+'"><span class="v60-tt">'+hm2(b.s)+'<small>'+hm2(b.e)+'</small></span><i class="v60-tb k-'+b.k+'"></i><div class="v60-tx"><span class="v60-tk">'+esc(V60.KN[b.k]||"")+(cur?' · 지금':'')+'</span><b>'+esc(b.t)+'</b>'+(b.note?' <span class="v60-note">'+esc(b.note)+'</span>':'')+(b.meta&&b.meta.hw?V60.filesHTML(b.meta.hw):'')+act+'</div>'+placeCell(ri)+'</div>'; }).join("");
+      return '<div class="v60-tr'+(past?' past':'')+(cur?' cur':'')+'" data-s="'+b.s+'" data-e="'+b.e+'"><span class="v60-tt">'+hm2(b.s)+'<small>'+hm2(b.e)+'</small></span><i class="v60-tb k-'+b.k+'"></i><div class="v60-tx"><span class="v60-tk">'+esc(V60.KN[b.k]||"")+(cur?' · 지금':'')+'</span><b>'+esc(b.t)+'</b>'+(b.note?' <span class="v60-note">'+esc(b.note)+'</span>':'')+(b.meta&&b.meta.hw?V60.filesHTML(b.meta.hw):'')+act+'</div>'+placeCell(ri)+'</div>'; });
+    /* 지금 줄 (대표님 10/3 「현재시간 표시 안 되어 있고」) — 아직 시작 안 한 첫 일정 앞. 30초마다 V60.nowTick 이 옮긴다 */
+    if(trs.length){ var ni=0; while(ni<rows.length&&rows[ni].s<=nowM) ni++; trs.splice(ni,0,'<div class="v60-nowrow" id="v60NowRow"><span class="v60-nowt">'+hm2(nowM)+'</span><i class="v60-nowl"></i></div>'); }
+    var list=trs.join("");
     if(T){ list+='<div class="v60-tr bed"><span class="v60-tt">'+hm2(T.bed)+'</span><i class="v60-tb k-sleep"></i><div class="v60-tx"><span class="v60-tk">수면</span><b>취침</b></div><div class="v60-tp home"><span class="v60-tpn">'+esc((V60.stayAt(T.d,T.bed)||{place:"집"}).place)+'</span></div></div>'; }
     return '<div class="card v60-today"><div class="card-h"><h3>오늘 '+esc(V60.md(today()))+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b"><div class="v60-thead"><span>시각</span><span></span><span>일정</span><span>장소 · 이동</span></div><div class="v60-tlist">'+(list||'<div class="empty">일정이 없습니다.</div>')+'</div></div></div>';
   };
+
+  /* 지금 줄 옮기기 (대표님 10/3 「현재시간 표시」) — 30초마다 위치·시각만. 전체 다시 그리기·캘린더 재조회는 하지 않는다 */
+  V60.nowTick=function(){
+    if(document.hidden) return; var m=nowMin(), g=V60._g;
+    var ln=document.querySelector(".v60-col.today .v60-now"); if(ln&&g){ ln.style.top=((m-g.H0)*g.PX)+"px"; var lb=ln.querySelector("b"); if(lb) lb.textContent=hm(m); }
+    var nr=document.getElementById("v60NowRow"); if(!nr||!nr.parentNode) return;
+    var t=nr.querySelector(".v60-nowt"); if(t) t.textContent=hm(m);
+    var trs=nr.parentNode.querySelectorAll(".v60-tr[data-s]"), nx=null;
+    for(var i=0;i<trs.length;i++){ var s=+trs[i].getAttribute("data-s"), e=+trs[i].getAttribute("data-e");
+      trs[i].classList.toggle("past",e<=m); if(!nx&&s>m) nx=trs[i]; }
+    if(!nx) nx=nr.parentNode.querySelector(".v60-tr.bed");
+    if(nx&&nr.nextElementSibling!==nx) nr.parentNode.insertBefore(nr,nx);
+  };
+  if(!V60._nowT) V60._nowT=setInterval(V60.nowTick,30000);
 
   /* ---------- 오늘의 이동 경로 (대표님 10/2 「오늘만 우측 여백에 일정에 따른 나의 위치 이동, 이동 경로」) ----------
      장소: 수업 = 시간표 강의실(slots.room) · 루틴 = place(설정 place:<제목> 이 있으면 그걸로) · 캘린더 = location.
@@ -516,7 +533,7 @@
     ".v60-b{position:absolute;left:2px;right:2px;border-radius:6px;padding:1px 4px;overflow:hidden;font-size:10.5px;line-height:1.2;color:#fff;border:1px solid rgba(0,0,0,.06)}",
     ".v60-b span{display:block;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v60-b small{font-size:9.5px;opacity:.85}",
     ".v60-b.k-trip,.v60-tb.k-trip{background:#8A5A2B}.v60-b.k-cls,.v60-leg .k-cls{background:#5B6B8C}.v60-b.k-work,.v60-leg .k-work{background:#C26A12}.v60-b.k-ev,.v60-leg .k-ev{background:#7A869A}.v60-b.k-meal,.v60-b.k-life,.v60-leg .k-meal{background:#9CB78B}.v60-b.k-move{background:#C9D1DC}.v60-b.k-hw,.v60-leg .k-hw{background:#C7261B}.v60-b.k-st,.v60-leg .k-st{background:#1E5FA8}.v60-b.k-memo,.v60-leg .k-memo{background:#7C3AED}",
-    ".v60-b.k-move{color:#334}.v60-now{position:absolute;left:0;right:0;height:2px;background:#C7261B;z-index:3}",
+    ".v60-b.k-move{color:#334}.v60-now{position:absolute;left:-3px;right:-3px;height:3px;margin-top:-1px;background:#1d1d1f;box-shadow:0 0 0 1.5px #fff;border-radius:2px;z-index:6;pointer-events:none}.v60-now b{position:absolute;right:2px;top:-9px;font-style:normal;font-weight:800;font-size:10.5px;line-height:1;font-variant-numeric:tabular-nums;color:#fff;background:#1d1d1f;border:1.5px solid #fff;border-radius:8px;padding:2px 5px}.v60-nowrow{display:flex;align-items:center;gap:10px;margin:4px 0;color:#1d1d1f}.v60-nowt{flex:none;font-weight:800;font-size:13px;font-variant-numeric:tabular-nums;background:#1d1d1f;color:#fff;border-radius:10px;padding:3px 9px}.v60-nowl{flex:1;height:3px;border-radius:2px;background:#1d1d1f;position:relative}.v60-nowl::before{content:'';position:absolute;left:-4px;top:-3.5px;width:10px;height:10px;border-radius:50%;background:#1d1d1f}",
     ".v60-hw .v60-est{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;color:var(--ink-2);margin:0 8px;white-space:nowrap}.v60-hw .v60-est input{width:62px;min-height:36px;border:1px solid var(--line);border-radius:8px;padding:0 6px;font:inherit}",
     ".v60-hw.done .t{text-decoration:line-through;color:var(--ink-3)}.v60-warn{color:#C7261B}",
     ".v60-set{margin:4px 0 20px}.v60-set summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}.v60-sf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.v60-sf label{display:flex;flex-direction:column;font-size:12.5px;gap:3px}",
