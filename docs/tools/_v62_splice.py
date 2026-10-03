@@ -22,7 +22,7 @@ else:
     how = "삽입"
 assert s.count(hdr) == 1
 
-B_OLD, B_NEW = 'var BUILD="2026-10-02.128";', 'var BUILD="2026-10-03.129";'
+B_OLD, B_NEW = 'var BUILD="2026-10-03.129";', 'var BUILD="2026-10-03.130";'
 if B_NEW not in s:
     assert s.count(B_OLD) == 1; s = s.replace(B_OLD, B_NEW)
 
@@ -55,5 +55,10 @@ ITEM5 = ('  {v:"2026-10-03.129",d:"10-03",items:[\n'
          '  ]},\n')
 if '{v:"2026-10-03.129"' not in s:
     assert s.count(PN) == 1; s = s.replace(PN, PN + ITEM5)
+ITEM6 = ('  {v:"2026-10-03.130",d:"10-03",items:[\n'
+         '    "공업수학1 중간 = 10/21(수) 09:00 가정 (10/2 녹음 8주차 시험 · 대표님 10/3 선택, 공지 전) — 이전 가정 10/16(금)"\n'
+         '  ]},\n')
+if '{v:"2026-10-03.130"' not in s:
+    assert s.count(PN) == 1; s = s.replace(PN, PN + ITEM6)
 io.open(IDX, "w", encoding="utf-8", newline="\n").write(s)
 print("V62", how)

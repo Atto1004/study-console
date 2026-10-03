@@ -1,5 +1,5 @@
 /* ============================================================
-   V62 LAYER — 대표님 2026-10-02 「공업수학 3.3까지가 시험범위, 다음주 수요일에 시험범위 다 나간다」 (BUILD 2026-10-02.104 · .105 공수1 시험일 · .109 일물2 금요일 · .110 캘린더 날짜 · 2026-10-03.129 창업 10/19 · CADD 11/3 · 미적2·일물2 확정)
+   V62 LAYER — 대표님 2026-10-02 「공업수학 3.3까지가 시험범위, 다음주 수요일에 시험범위 다 나간다」 (BUILD 2026-10-02.104 · .105 공수1 시험일 · .109 일물2 금요일 · .110 캘린더 날짜 · 2026-10-03.129 창업 10/19 · CADD 11/3 · 미적2·일물2 확정 · .130 공수1 10/21)
    boot 패치 1회: 공업수학1 중간 범위 = 1장 ~ 3.3 (10/7 수업에서 범위 끝까지). 시험 카드·시험 모드 범위 주차가 이 문자열을 읽는다.
    ============================================================ */
 (function(){
@@ -48,5 +48,13 @@
     set("일반물리학2","2026-10-23","10:30",false,"교수 10/2 녹음 「우리 23일」 · 한양 캘린더 10/23(금)");
     t.patchV62e=true; persist();
   };
-  var _boot=boot; boot=function(){ _boot(); try{ V62.patch(); V62.patchDate(); V62.patchPhys(); V62.patchCal(); V62.patchMid3(); }catch(e){ if(window.console) console.warn("V62 패치", e); } };
+  /* 10/3 결재(BUILD .130): 공수1 = 대표님 선택 「10/21(수)로 옮김」 — 10/2 녹음 「8주차에 시험」·「10/14 진도 끝」, 공지 전이라 가정 유지.
+     patchV62e 는 이미 저장 상태에 서 있어 새 플래그(patchV62f)로 한 번 더 */
+  V62.patchEm1b=function(){
+    var t=term(); if(!t||t.patchV62f) return;
+    var c=(t.courses||[]).filter(function(x){ return x.name==="공업수학1"; })[0];
+    if(c) (t.exams||[]).forEach(function(e){ if(e.courseId===c.id&&e.kind==="중간"){ e.date="2026-10-21"; e.time="09:00"; e.assumed=true; e.note="10/2 녹음 「8주차에 시험」 → 10/21(수) (대표님 10/3) · 공지 전"; } });
+    t.patchV62f=true; persist();
+  };
+  var _boot=boot; boot=function(){ _boot(); try{ V62.patch(); V62.patchDate(); V62.patchPhys(); V62.patchCal(); V62.patchMid3(); V62.patchEm1b(); }catch(e){ if(window.console) console.warn("V62 패치", e); } };
 })();
