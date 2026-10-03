@@ -69,6 +69,13 @@
       (t.exams||[]).forEach(function(e){ if(e.courseId===c.id&&e.kind==="중간"){ e.scopeOk=true; e.scopeSrc=o[2]; } }); });
     t.patchV62g=true; persist();
   };
+  /* 10/4 대표님 「중간고사 19일 시작」 — 상단 D-day 기준일이 9/26 「7주차 가정」 10/13 으로 고정돼 있었음 → 10/19(정역학 · 첫 중간) */
+  V62.patchDday=function(){
+    var t=term(); if(!t||S.patchV62h) return;
+    if(S.profile&&(!S.profile.dday||!S.profile.dday.date||S.profile.dday.date<"2026-10-19")) S.profile.dday={date:"2026-10-19",label:"중간"};
+    S.patchV62h=true; persist();
+    try{ if(window.V44&&V44.renderHead) V44.renderHead(); }catch(e){}
+  };
   V62.scopeHTML=function(c){
     var o=V62.SCOPE_OK[c.name]; if(!o) return "";
     var e=(term().exams||[]).filter(function(x){ return x.courseId===c.id&&x.kind==="중간"; })[0]; if(!e) return "";
@@ -92,5 +99,5 @@
     ".v62s-r{font-size:16px;font-weight:800;margin-top:6px;line-height:1.45}.v62s-n{font-size:13.5px;color:#C7261B;font-weight:700;margin-top:3px}.v62s-src{font-size:12px;color:var(--ink-3,#777);margin-top:3px}"+
     "@media (max-width:600px){.v62s-d{margin-left:0;width:100%}.v62s-r{font-size:15px}}";
   document.head.appendChild(css);
-  var _boot=boot; boot=function(){ _boot(); try{ V62.patch(); V62.patchDate(); V62.patchPhys(); V62.patchCal(); V62.patchMid3(); V62.patchEm1b(); V62.patchScope(); }catch(e){ if(window.console) console.warn("V62 패치", e); } };
+  var _boot=boot; boot=function(){ _boot(); try{ V62.patch(); V62.patchDate(); V62.patchPhys(); V62.patchCal(); V62.patchMid3(); V62.patchEm1b(); V62.patchScope(); V62.patchDday(); }catch(e){ if(window.console) console.warn("V62 패치", e); } };
 })();
