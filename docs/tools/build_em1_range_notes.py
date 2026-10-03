@@ -213,7 +213,7 @@ def main():
              '<div class="sub">교수님 슬라이드(p.1~105) + 회차별 교수님 설명 · 칠판 판서</div>'
              '<div class="body"><div class="col"><table class="ss"><tr><th>회차</th><th>슬라이드</th><th>진도</th><th>수업 기록</th></tr>%s</table>'
              '<div class="legend">빨간 꼬리표 쪽 = 그날 교수님 설명(클로바 녹음) · ★ 시험 언급 · 칠판 판서 사진 — 해당 슬라이드 바로 뒤에 끼움.<br>'
-             '회색 꼬리표 = 결석 회차(녹음·판서 없음, 슬라이드로 보강). 시험 10/16(금) 또는 10/21(수) · 10/14 정리 수업.</div></div></div><div class="orn"></div></div>') % rows
+             '회색 꼬리표 = 결석 회차(녹음·판서 없음, 슬라이드로 보강). 시험 10/21(수) 09:00 (8주차, 공지 전 가정) · 10/14 정리 수업.</div></div></div><div class="orn"></div></div>') % rows
     pages.append((0, cover))
     for d, lab, pp, prog in SESS:
         r = recs.get(d)
