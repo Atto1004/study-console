@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-03.149";
+var BUILD="2026-10-03.150";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -4838,6 +4838,9 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-03.150",d:"10-03",items:[
+    "공부계획 시간표에 빠졌던 오늘 스케줄 복구 — 과제 · 공부 배치와 기상 · 식사 · 휴식이 다시 보임. 정해진 일정은 꽉 찬 칸, 앱이 짐작으로 놓은 것은 점선 칸(제안)"
+  ]},
   {v:"2026-10-03.149",d:"10-03",items:[
     "공부계획 「오늘 죽어도」 카드 없앰 — 「오늘 할 과제」 하나로. 마감이 오늘·내일인 과제만 빨간 줄로 표시하고 그 과목 묶음을 맨 위로, 제목 옆에 「마감 임박 N」. 시험이 오늘·내일이면 카드 맨 위 빨간 한 줄"
   ]},
@@ -12256,8 +12259,8 @@ var V33={};
     var wake=Math.max(5*60,need!=null?Math.min(wakeNat,need):wakeNat), short=need!=null&&need<wakeNat, slept=null;
     var sl=V60.sleepOf(d);                                                 /* 실제 수면 기록이 있으면 그 기상 시각 */
     if(sl&&sl.wake){ wake=toMin(sl.wake); if(sl.bed){ var bm=toMin(sl.bed); slept=wake>=bm?wake-bm:wake+1440-bm; short=slept<7*60; } }
-    var blk=fx.slice(), guess=!!+V60.cfg("autoMeal",0);   /* 미확정은 채우지 않는다(대표님 10/3) — 식사 · 휴식 · 준비 추정 칸은 설정에서 켤 때만 */
-    if(guess||(sl&&sl.wake)) blk.push({s:wake,e:wake+prep,t:"기상·준비",k:"life"});
+    var blk=fx.slice(), guess=!!+V60.cfg("autoMeal",1);   /* 짐작 칸(식사 · 휴식 · 준비)은 「제안」(sug, 점선)으로 — 확정 일정과 구분 (대표님 10/3 「오늘 스케줄 날아간 거 복구」, 설정에서 끌 수 있음) */
+    if(guess||(sl&&sl.wake)) blk.push({s:wake,e:wake+prep,t:"기상·준비",k:"life",sug:(sl&&sl.wake)?0:1});
     var home=null;
     if(sch.length){ var ss=sch.slice().sort(function(a,b){ return a.s-b.s; });
       blk.push({s:ss[0].s-mv.toSchool,e:ss[0].s,t:"이동",k:"move"});
@@ -12268,12 +12271,12 @@ var V33={};
     var dinLen=+V60.cfg("dinnerMin",60), rest=+V60.cfg("restMin",30), dinDone=false;
     if(!guess) dinDone=true;
     if(guess&&home!=null&&home>=16*60&&home<=20*60){                              /* 집에 오면 바로 저녁 → 쉬고 나서 공부 (대표님 10/2) */
-      var ds=Math.ceil(home/5)*5; if(!blk.some(function(b){ return b.s<ds+dinLen&&b.e>ds&&b.k!=="move"; })){ blk.push({s:ds,e:ds+dinLen,t:"저녁",k:"meal"}); if(rest>0) blk.push({s:ds+dinLen,e:ds+dinLen+rest,t:"휴식",k:"life"}); dinDone=true; } }
+      var ds=Math.ceil(home/5)*5; if(!blk.some(function(b){ return b.s<ds+dinLen&&b.e>ds&&b.k!=="move"; })){ blk.push({s:ds,e:ds+dinLen,t:"저녁",k:"meal",sug:1}); if(rest>0) blk.push({s:ds+dinLen,e:ds+dinLen+rest,t:"휴식",k:"life",sug:1}); dinDone=true; } }
     [["lunch","12:00",60,"점심",11*60+30,14*60],["dinner","18:30",60,"저녁",17*60+30,20*60+30]].forEach(function(m){
       if(!guess||(m[0]==="dinner"&&dinDone)) return;
       var len=+V60.cfg(m[0]+"Min",m[2]), at=toMin(V60.cfg(m[0],m[1])), lo=m[4], hi=m[5], done=false;
-      for(var s=at;s<=hi-len&&!done;s+=15){ if(!blk.some(function(b){ return b.s<s+len&&b.e>s; })){ blk.push({s:s,e:s+len,t:m[3],k:"meal"}); if(m[0]==="dinner"&&rest>0) blk.push({s:s+len,e:s+len+rest,t:"휴식",k:"life"}); done=true; } }
-      for(var s2=at-15;s2>=lo&&!done;s2-=15){ if(!blk.some(function(b){ return b.s<s2+len&&b.e>s2; })){ blk.push({s:s2,e:s2+len,t:m[3],k:"meal"}); done=true; } }
+      for(var s=at;s<=hi-len&&!done;s+=15){ if(!blk.some(function(b){ return b.s<s+len&&b.e>s; })){ blk.push({s:s,e:s+len,t:m[3],k:"meal",sug:1}); if(m[0]==="dinner"&&rest>0) blk.push({s:s+len,e:s+len+rest,t:"휴식",k:"life",sug:1}); done=true; } }
+      for(var s2=at-15;s2>=lo&&!done;s2-=15){ if(!blk.some(function(b){ return b.s<s2+len&&b.e>s2; })){ blk.push({s:s2,e:s2+len,t:m[3],k:"meal",sug:1}); done=true; } }
     });
     blk.sort(function(a,b){ return a.s-b.s; });
     var start=wake, end=bedAbs;
@@ -12388,17 +12391,17 @@ var V33={};
     /* 24시간 · 1시간 칸 · 30분은 칸 가운데 옅은 선(대표님 10/3). 빈 시간은 비워 둔다 — 과제 · 공부 자동 배정은 칸에 그리지 않고 위 목록에만 */
     var H0=0, H1=1440, PX=0.6, nowM=nowMin(); V60._g={H0:H0,H1:H1,PX:PX};
     var cols=P.days.map(function(x){
-      var bl=x.blk.map(function(b){ return {s:b.s,e:b.e,t:b.t,k:b.k}; });
+      var bl=x.blk.map(function(b){ return {s:b.s,e:b.e,t:b.t,k:b.k,sug:b.sug}; }).concat(x.items.map(function(b){ return {s:b.s,e:b.e,t:b.t,k:b.k,sug:1}; }));   /* 과제 · 공부 배정 = 제안 칸 */
       var isT=x.d===td;
       return '<div class="v60-col'+(isT?' today':'')+(x.past?' past':'')+'" data-d="'+x.d+'"><div class="v60-ch"><b>'+V60.md(x.d)+'</b><small>빈 '+dur(x.avail)+(x.actual?' · 공부 '+dur(x.actual):'')+'</small></div><div class="v60-cb" style="height:'+((H1-H0)*PX)+'px">'+
         '<i class="v60-sleep" style="top:0;height:'+Math.max(0,(x.wake-H0)*PX)+'px"></i><i class="v60-sleep" style="top:'+((x.bed-H0)*PX)+'px;height:'+Math.max(0,(H1-x.bed)*PX)+'px"></i>'+
         bl.filter(function(b){ return b.e>H0&&b.s<H1; }).map(function(b){ var s=Math.max(b.s,H0), e=Math.min(b.e,H1), h=(e-s)*PX;
-          return '<div class="v60-b k-'+b.k+'" style="top:'+((s-H0)*PX)+'px;height:'+h+'px" title="'+esc(hm(b.s)+'–'+hm(b.e)+' '+b.t)+'">'+(h>=15?'<span>'+esc(b.t)+'</span>':'')+(h>=30?'<small>'+hm(b.s)+'</small>':'')+'</div>'; }).join("")+
+          return '<div class="v60-b k-'+b.k+(b.sug?' sug':'')+'" style="top:'+((s-H0)*PX)+'px;height:'+h+'px" title="'+esc(hm(b.s)+'–'+hm(b.e)+' '+b.t)+'">'+(h>=15?'<span>'+esc(b.t)+'</span>':'')+(h>=30?'<small>'+hm(b.s)+'</small>':'')+'</div>'; }).join("")+
         (isT&&nowM>H0&&nowM<H1?'<i class="v60-now" style="top:'+((nowM-H0)*PX)+'px"><b>'+hm(nowM)+'</b></i>':'')+'</div></div>';
     }).join("");
     var hours=''; for(var h=0;h<=24;h+=1) hours+='<span style="top:'+((h*60-H0)*PX)+'px">'+pad2(h%24)+'</span>';
     var seg='<div class="seg" id="v60Wk"><button data-w="t"'+(V60.ui.today?' aria-pressed="true"':'')+'>오늘만</button><button data-w="0"'+(!V60.ui.today&&V60.ui.week===0?' aria-pressed="true"':'')+'>이번 주</button><button data-w="1"'+(!V60.ui.today&&V60.ui.week===1?' aria-pressed="true"':'')+'>다음 주</button></div>';
-    var grid=V60.ui.today?V60.todayHTML(T,nowM,seg):'<div class="card v60-gridcard"><div class="card-h"><h3>'+(V60.ui.week?'다음 주':'이번 주')+V60.I("정해진 일정만 그 시각에 놓습니다.\n빈 칸 = 정해지지 않은 시간 · 빗금 = 수면.\n과제 · 공부는 칸에 채우지 않고 「오늘 할 과제」 목록으로.")+'</h3><span class="hs"></span><div class="ha">'+seg+'</div></div>'+
+    var grid=V60.ui.today?V60.todayHTML(T,nowM,seg):'<div class="card v60-gridcard"><div class="card-h"><h3>'+(V60.ui.week?'다음 주':'이번 주')+V60.I("꽉 찬 칸 = 정해진 일정 · 점선 칸 = 제안(앱이 짐작으로 배치한 과제 · 공부 · 식사 · 휴식).\n빗금 = 수면.")+'</h3><span class="hs"></span><div class="ha">'+seg+'</div></div>'+
       '<div class="card-b"><div class="v60-leg"><i class="k-cls"></i>수업<i class="k-work"></i>근무·알바<i class="k-ev"></i>일정<i class="k-meal"></i>식사·준비<i class="k-move"></i>이동</div>'+
       '<div class="v60-grid"><div class="v60-hrs" style="height:'+((H1-H0)*PX)+'px">'+hours+'</div>'+cols+'</div></div></div>';
     /* 과제 */
@@ -12504,7 +12507,7 @@ var V33={};
   /* ---------- 오늘만 보기: 하루 시간표를 한 줄씩 ---------- */
   V60.KN={cls:"수업",work:"근무",ev:"일정",trip:"이동(차편)",meal:"식사",life:"생활",move:"이동",hw:"과제",st:"공부",memo:"암기"};
   V60.todayHTML=function(T,nowM,seg){
-    var rows=T?T.blk.filter(function(b){ return b.e>T.wake-1; }).sort(function(a,b){ return a.s-b.s||a.e-b.e; }):[];   /* 정해진 일정만 — 빈 시간은 비워 둔다(대표님 10/3) */
+    var rows=T?T.blk.concat(T.items.map(function(b){ return Object.assign({sug:1},b); })).filter(function(b){ return b.e>T.wake-1; }).sort(function(a,b){ return a.s-b.s||a.e-b.e; }):[];   /* 정해진 일정만 — 빈 시간은 비워 둔다(대표님 10/3) */
     var hm2=function(m){ m=Math.round(m); return (m>=1440?"익일 ":"")+(Math.floor(m/60)%24<10?"0":"")+(Math.floor(m/60)%24)+":"+(m%60<10?"0":"")+(m%60); };
     var sc=rows.filter(function(b){ return b.school; }), back=rows.filter(function(b){ return b.t==="귀가"; });
     var sch=sc.length?{s:Math.min.apply(null,sc.map(function(b){ return b.s; })),e:back.length?back[back.length-1].s:Math.max.apply(null,sc.map(function(b){ return b.e; }))}:null;
@@ -12527,10 +12530,10 @@ var V33={};
     var shade=T?'<i class="v60-dsl" style="top:0;height:'+y(T.wake)+'px"></i>'+(T.bed<1440?'<i class="v60-dsl" style="top:'+y(T.bed)+'px;height:'+(H-y(T.bed))+'px"></i>':''):'';
     var blks=rows.map(function(b,ri){ if(b.e<=0||b.s>=1440) return ""; var top=y(b.s), ht=Math.max(16,y(b.e)-top), past=b.e<=nowM, cur=b.s<=nowM&&nowM<b.e;
       var pc=placeCell(ri).replace(/^<div class="v60-tp/,'<div class="v60-tp v60-dp');
-      return '<div class="v60-db k-'+b.k+(past?' past':'')+(cur?' cur':'')+(ht<34?' thin':'')+'" style="top:'+top+'px;height:'+ht+'px"><div class="v60-dbt"><b>'+esc(b.t)+'</b><small>'+hm2(b.s)+'–'+hm2(b.e)+(b.note?' · '+esc(b.note):'')+'</small></div>'+pc+'</div>'; }).join("");
+      return '<div class="v60-db k-'+b.k+(b.sug?' sug':'')+(past?' past':'')+(cur?' cur':'')+(ht<34?' thin':'')+'" style="top:'+top+'px;height:'+ht+'px"><div class="v60-dbt"><b>'+esc(b.t)+'</b><small>'+hm2(b.s)+'–'+hm2(b.e)+(b.note?' · '+esc(b.note):'')+'</small></div>'+pc+'</div>'; }).join("");
     var bed=T&&T.bed<1440?'<div class="v60-db k-sleep thin" style="top:'+y(T.bed)+'px;height:16px"><div class="v60-dbt"><b>취침</b><small>'+hm2(T.bed)+'</small></div></div>':'';
     var now=(T&&T.d===today())?'<i class="v60-dnow" style="top:'+y(nowM)+'px"><b>'+hm(nowM)+'</b></i>':'';
-    return '<div class="card v60-today"><div class="card-h"><h3>오늘 '+esc(V60.md(today()))+V60.I("24시간 · 1시간 칸 시간표입니다.\n정해진 일정(수업 · 근무 · 캘린더 · 차편)만 그 시각에 놓습니다.\n빈 칸 = 정해지지 않은 시간 · 빗금 = 수면 · 빨간 줄 = 지금.\n과제 · 공부는 위 「오늘 할 과제」 목록에 있습니다.")+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b">'+V60.whereHTML(T)+
+    return '<div class="card v60-today"><div class="card-h"><h3>오늘 '+esc(V60.md(today()))+V60.I("24시간 · 1시간 칸 시간표입니다.\n꽉 찬 칸 = 정해진 일정(수업 · 근무 · 캘린더 · 차편).\n점선 칸 = 제안 — 빈 시간에 앱이 짐작으로 배치한 과제 · 공부 · 식사 · 휴식(확정 아님).\n빈 칸 = 아무것도 없는 시간 · 빗금 = 수면 · 빨간 줄 = 지금.")+'</h3><span class="hs">빈 '+fmtMin(T?T.avail:0)+'</span><div class="ha">'+seg+'</div></div><div class="card-b">'+V60.whereHTML(T)+
       '<div class="v60-day"><div class="v60-dhs" style="height:'+H+'px">'+hrs+'</div><div class="v60-dcol" style="height:'+H+'px;background-size:100% '+PXH+'px">'+shade+blks+bed+now+'</div></div></div></div>';
   };
   V60.DPX=44;
@@ -12738,6 +12741,11 @@ var V33={};
     ".v60-tk2.paused .v60-run{color:var(--ink-3)}.v60-tk2.paused{background:color-mix(in srgb,var(--line) 25%,transparent);border-radius:8px;padding-left:6px;padding-right:4px}",
     ".v60-run{min-width:44px;text-align:right}",
     ".v60-ck{display:flex!important;align-items:center;gap:8px;flex-direction:row!important}",
+    ".v60-db.k-hw{background:#C7261B}.v60-db.k-st{background:#1E5FA8}.v60-db.k-memo{background:#7C3AED}",
+    /* 제안 칸(짐작 · 자동 배정) = 점선 · 옅게 — 확정 일정과 구분 (10/3) */
+    ".v60-db.sug,.v60-b.sug{background:transparent!important;border:2px dashed currentColor;box-shadow:none}",
+    ".v60-db.sug.k-hw,.v60-b.sug.k-hw{color:#C7261B}.v60-db.sug.k-st,.v60-b.sug.k-st{color:#1E5FA8}.v60-db.sug.k-memo,.v60-b.sug.k-memo{color:#7C3AED}.v60-db.sug.k-meal,.v60-db.sug.k-life,.v60-b.sug.k-meal,.v60-b.sug.k-life{color:#5E7F4A}",
+    ".v60-db.sug .v60-dbt small,.v60-b.sug small{opacity:.8}.v60-db.sug .v60-dp{background:transparent!important}",
     ".v60-tln{display:inline-flex;align-items:center;color:#B45309}.v60-tln b{font-weight:800}",
     ".v60-where{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin:0 0 10px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--line) 30%,transparent)}.v60-where small{color:var(--ink-3);margin-right:6px;font-size:11.5px}",
     ".v60-tks .v60-est{white-space:nowrap;display:inline-flex;align-items:center;gap:3px}",
