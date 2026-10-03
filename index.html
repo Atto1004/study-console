@@ -2259,7 +2259,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-04.158";
+var BUILD="2026-10-04.159";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -13590,7 +13590,7 @@ var V33={};
   setTimeout(V72.ping,3000);
 })();
 /* ============================================================
-   V73 LAYER — 공부계획 하루 보기 개편 (대표님 2026-10-04) (BUILD 2026-10-04.157)
+   V73 LAYER — 공부계획 하루 보기 개편 (대표님 2026-10-04) (BUILD 2026-10-04.157 · .159 화면 기억 · A++O 위치 · 지금 추정 위치)
    ① 보기 전환 = 구글 캘린더식 아이콘(하루 · 한 주) + ‹ 오늘 › 이동 — 「오늘만 · 이번 주 · 다음 주 버튼 말고 1day · 1week 아이콘」
    ② 하루 보기에서 어제 · 내일로 넘기기(V60.ui.off) — 「오늘만에서 어제랑 내일로 이동」
    ③ 시간표 오른쪽 장소 줄(폰에서도) + 경계마다 「14:30 집 → 카페」, 위에 하루 경로 한 줄 — 「위치는 항상 우측 · 어디서 어디로 한눈에」
@@ -13652,7 +13652,7 @@ var V33={};
     var first=null; segs.some(function(g){ if(g.p&&!g.p.mv){ first=g; return true; } return false; });
     var route=!first?'':'<div class="v73-route"><small>이동</small><b>'+esc(first.p.n)+'</b>'+
       (trans.length?trans.map(function(t){ return t.guess?'<i>→ 이후 예상</i><b class="fu">'+esc(t.t.n)+'</b>':'<i>→</i><time>'+hm(t.m)+'</time><b'+(t.m>=nowM?' class="fu"':'')+'>'+esc(t.t.n)+'</b>'; }).join(""):'<i>· 하루 종일</i>')+'</div>';
-    return {html:html,route:route};
+    return {html:html,route:""};   /* 하루 경로 한 줄은 뺐다(대표님 10/4 「상단에 머무는 곳 · 오늘 간 곳 · 이동 다 빼고」) — 오른쪽 장소 줄은 그대로 */
   };
   /* ④ 과목 화면 혼자 풀기 — 제출 파일 목록(_private/submit.json) 중 .html(혼자 풀기)만. 정역학 Ch 버튼(V69)은 그대로 */
   V73.solo=function(){
@@ -13669,6 +13669,59 @@ var V33={};
     if(V60.files==null&&V60.loadFiles) V60.loadFiles().then(draw); else draw();
   };
   if(window.V69&&V69.render){ var _r=V69.render; V69.render=function(){ var x=_r.apply(this,arguments); try{ V73.solo(); }catch(e){} return x; }; }
+  /* ⑤ 새로고침해도 보던 화면 그대로 (대표님 10/4 「새로고침하면 과목 화면으로 돌아가는데 마지막에 있던 위치 기억」) — 이 탭(sessionStorage)만, 12시간 안 */
+  V73.SK="mc-last-view";
+  try{ V73.saved=JSON.parse(sessionStorage.getItem("mc-last-view")||"null"); }catch(e){ V73.saved=null; }   /* 부팅 전에 미리 읽는다 — 부팅 중 첫 화면 이동이 저장을 덮어써서 */
+  V73.ready=false;
+  V73.save=function(){ if(!V73.ready) return; try{ sessionStorage.setItem(V73.SK,JSON.stringify({v:ui.view,c:ui.course,y:Math.round(window.scrollY||0),t:Date.now(),po:V60.ui.off||0,pw:V60.ui.week||0,pt:!!V60.ui.today})); }catch(e){} };
+  if(typeof go==="function"){ var _go=go; go=function(){ var r=_go.apply(this,arguments); V73.save(); return r; }; }
+  var svT=0; addEventListener("scroll",function(){ clearTimeout(svT); svT=setTimeout(V73.save,300); },{passive:true});
+  addEventListener("pagehide",V73.save); document.addEventListener("visibilitychange",function(){ if(document.hidden) V73.save(); });
+  V73.restore=function(){
+    var s=V73.saved; V73.saved=null; if(!s||!s.v||Date.now()-s.t>12*3600000){ V73.ready=true; return; }
+    if(s.v==="plan"){ V60.ui.off=s.po||0; V60.ui.week=s.pw||0; V60.ui.today=!!s.pt; }
+    if(s.v!==ui.view||s.c!==ui.course) go(s.v,s.c||undefined);
+    var y=s.y||0, n=0; if(!y){ V73.ready=true; V73.save(); return; }
+    var put=function(){ if(document.documentElement.scrollHeight>=y+innerHeight*0.6||n>24){ window.scrollTo(0,y); V73.ready=true; V73.save(); return; } n++; setTimeout(put,250); };   /* 내용이 다 그려질 때까지 기다렸다가 */
+    setTimeout(put,300);
+  };
+  if(typeof boot==="function"){ var _bt=boot; boot=function(){ var r=_bt.apply(this,arguments); try{ V73.restore(); }catch(e){} return r; }; }
+
+  /* ⑥ A++O 위치 = 공부계획 위치 (대표님 10/4) — 서버 위치점(A++O 화면·학습앱 공통, 이 PC 안)을 V72 체류 계산에 합친다. 이름 배우기·우선순위(V60.stayRank)는 그대로 */
+  V73.srv=[]; V73.srvAt=0;
+  V73.pull=function(force){
+    if(!ATOM_HOSTED||(!force&&Date.now()-V73.srvAt<120000)) return; V73.srvAt=Date.now();
+    fetch("/api/location/points?days=7",{cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).then(function(j){
+      if(!j||!j.points) return; var ch=j.points.length!==V73.srv.length; V73.srv=j.points; if(ch&&ui.view==="plan") V60.render(); }).catch(function(){});
+  };
+  V73.pts=function(){ var own=window.V72?V72.st().pts:[]; var extra=V73.srv.filter(function(p){ return !own.some(function(q){ return Math.abs(q.t-p.t)<90000; }); });
+    return own.concat(extra).sort(function(a,b){ return a.t-b.t; }); };
+  if(window.V72){
+    var _cl=V72.clusters; V72.clusters=function(){ var g=V72.st(), keep=g.pts; g.pts=V73.pts(); try{ return _cl.apply(this,arguments); } finally{ g.pts=keep; } };
+    var _add=V72.add; V72.add=function(p){ var r=_add.apply(this,arguments);
+      try{ var c=p&&p.coords; if(c&&c.accuracy<=1000) fetch("/api/location",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lat:c.latitude,lon:c.longitude,acc:c.accuracy,src:"study"})}).then(function(){ V73.pull(true); }).catch(function(){}); }catch(e){}
+      return r; };
+  }
+  V73.pull(true); setInterval(function(){ if(!document.hidden) V73.pull(); },120000);
+  document.addEventListener("visibilitychange",function(){ if(!document.hidden) V73.pull(true); });
+  var agoS=function(ms){ var m=Math.max(0,Math.round((Date.now()-ms)/60000)); return m<1?"방금":m<60?m+"분 전":m<1440?Math.round(m/60)+"시간 전":Math.round(m/1440)+"일 전"; };
+  /* 지금 추정 위치 — 30분 안 위치점이 있으면 그 자리(배운 이름, 모르면 「새 장소」), 아니면 체류 우선순위(V60.stayAt) */
+  V73.now=function(){
+    var pts=V73.pts(), last=pts.length?pts[pts.length-1]:null, lt=last?(last.t2||last.t):0;
+    if(last&&Date.now()-lt<30*60000&&window.V72){ var cl=V72.clusters(), c=cl[cl.length-1], nm=c?V72.nameOf(c):null;
+      return {place:nm||"새 장소",sub:nm?"":"처음 온 곳 — 이름을 말해 주시면 기억해요",when:agoS(lt)+" 위치 기준"}; }
+    var st=V60.stayAt(today(),nowMin());
+    return {place:st?st.place:"모름",sub:st?(st.sub||""):"",when:last?"마지막 위치 "+agoS(lt)+" · 그 뒤는 짐작":"위치 기록 없음"};
+  };
+  var _where=V60.whereHTML;
+  V60.whereHTML=function(T){
+    if(!T) return "";
+    var nag=""; try{ var tmp=document.createElement("div"); tmp.innerHTML=_where(T)||""; var g=tmp.querySelector(".v60-tln"); if(g) nag=g.outerHTML; }catch(e){}   /* 22:30 이후 타임라인 내보내기 안내는 그대로(학습앱 세션 10/3) */
+    if(T.d!==today()) return nag?'<div class="v60-where">'+nag+'</div>':"";
+    var e=V73.now();
+    return '<div class="v60-where v73-where"><span><small>지금 추정 위치</small><b>'+esc(e.place)+'</b>'+(e.sub?' '+esc(e.sub):'')+'<em>'+esc(e.when)+'</em></span>'+nag+'</div>';
+  };
+
   var css=document.createElement("style"); css.id="v73css";
   css.textContent=[
     ".v73-bar{display:flex;align-items:center;gap:8px}",
@@ -13690,6 +13743,7 @@ var V33={};
     ".v73-route{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 6px;margin:2px 0 10px;font-size:13.5px}.v73-route small{color:var(--ink-3);font-weight:700;margin-right:4px}",
     ".v73-route time{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}.v73-route i{font-style:normal;color:var(--ink-3)}.v73-route b.fu{opacity:.6}",
     ".v73-sb{display:flex;flex-wrap:wrap;gap:8px}",
+    ".v73-where em{font-style:normal;font-size:12px;color:var(--ink-3);margin-left:8px}",
     "@media (max-width:600px){.v60-day.lane{grid-template-columns:40px minmax(0,1fr) 92px;gap:4px}.v73-ls{left:5px;padding:3px 5px;font-size:11px}.v73-tr{font-size:10.5px;padding:2px 6px}.v73-bar{gap:6px}.v73-bar button{min-width:32px;height:32px;padding:0 6px}}"
   ].join("\n");
   document.head.appendChild(css);
