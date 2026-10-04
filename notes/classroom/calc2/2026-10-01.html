@@ -292,6 +292,7 @@ main{max-width:1040px;margin:0 auto;padding:14px 20px 18px}
 #laser{background:linear-gradient(90deg,rgba(255,70,70,.0),rgba(255,70,70,.85))!important}#laser::after{left:auto!important;right:-6px}
 @media (max-width:760px){.text{font-size:18px!important}}
 @media (prefers-reduced-motion: reduce){.text.sub-in{animation:none}}
+#laser{display:none!important}
 </style>
 </head>
 <body>
@@ -990,8 +991,7 @@ function drawLaser(){ const lz=$("#laser"), slide=$(".slide"), bc=$("#bc"); if(!
   let x2=cr.right+6; const kids=bt.lastChild; try{ const rg=document.createRange(); rg.selectNodeContents(bt); const rr=rg.getBoundingClientRect(); if(rr.width) x2=rr.right+6; }catch(e){}
   const y2=cr.top+Math.min(cr.height/2,18), x1=tp.x, y1=tp.y, dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy); if(len<20){ lz.classList.remove("on"); return false; }
   lz.style.left=(x1-sr.left)+"px"; lz.style.top=(y1-sr.top)+"px"; lz.style.width=len+"px"; lz.style.transformOrigin="0 50%"; lz.style.transform="rotate("+(Math.atan2(dy,dx)*180/Math.PI)+"deg)"; lz.classList.add("on"); return true; }
-{ let raf=null; const loop=()=>{ raf=null; drawLaser(); if(S.mode==="step"&&!document.hidden) raf=requestAnimationFrame(loop); };
-  const _sf=stageFx; stageFx=function(){ _sf(); if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(loop); }; }
+/* 22) 레이저 없앰(대표님 10/4) — 그리지 않음 */
 window.addEventListener("resize",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,120); });
 setInterval(()=>{ const t=$("#tutor"); if(t) t.classList.toggle("talking",!!typing||ASKING); },300);
 /* ---------- 키보드 ---------- */

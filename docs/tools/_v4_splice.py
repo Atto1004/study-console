@@ -435,6 +435,12 @@ function drawLaser(){ const lz=$("#laser"), slide=$(".slide"), bc=$("#bc"); if(!
   lz.style.left=(x1-sr.left)+"px"; lz.style.top=(y1-sr.top)+"px"; lz.style.width=len+"px"; lz.style.transformOrigin="0 50%"; lz.style.transform="rotate("+(Math.atan2(dy,dx)*180/Math.PI)+"deg)"; lz.classList.add("on"); return true; }
 { let raf=null; const loop=()=>{ raf=null; drawLaser(); if(S.mode==="step"&&!document.hidden) raf=requestAnimationFrame(loop); };
   const _sf=stageFx; stageFx=function(){ _sf(); if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(loop); }; }""", "레이저 지시봉 끝")
+# 22) 레이저 없앰 (대표님 2026-10-04 「레이저 포인트 너무 밤티임 — 이런 식으로 구현할 거면 아예 만들 생각을 하지 마」)
+#     매 프레임 그리던 고리를 빼고, 혹시 남은 #laser 요소는 화면에서 숨김. 20)·21)절 코드는 다시 켤 일 없으면 다음 정리 때 통째로 지움.
+LOOP = '{ let raf=null; const loop=()=>{ raf=null; drawLaser(); if(S.mode==="step"&&!document.hidden) raf=requestAnimationFrame(loop); };\n  const _sf=stageFx; stageFx=function(){ _sf(); if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(loop); }; }'
+assert s.count(LOOP) == 1, "레이저 고리 자리"
+s = s.replace(LOOP, "/* 22) 레이저 없앰(대표님 10/4) — 그리지 않음 */", 1)
+s = s.replace("</style>", "#laser{display:none!important}\n</style>", 1)
 assert "wrap.scrollTop=wrap.scrollHeight" not in s.split("function renderStepV2")[1].split("function replayFig")[0], "renderStepV2 에 맨 아래 스크롤이 남음"
 assert s.index("stackFig();") < s.index('$$("[data-step]",root)'), "칸 쌓기가 단계 숨김보다 뒤"
 io.open(TPL, "w", encoding="utf-8", newline="\n").write(s)
