@@ -346,8 +346,6 @@ sub1('</style>', '#faceImg{display:none!important}.box .name{display:none}'
 #     뒤돌아 칠판에 쓰는 장면은 뒷모습 그림이 없어 아직 못 넣음(그림 세트 g/write.png 가 생기면 판서 줄이 써지는 동안 그 그림으로).
 sub1('</style>', '@keyframes pace{0%,100%{transform:translateX(0)}25%{transform:translateX(-7%)}50%{transform:translateX(3%)}75%{transform:translateX(-11%)}}'
      '#tutor.talking{animation:pace 9s ease-in-out infinite}'
-     '#laser{position:absolute;z-index:3;height:3px;transform-origin:0 50%;background:linear-gradient(90deg,rgba(255,80,80,0),rgba(255,80,80,.9));border-radius:3px;pointer-events:none;opacity:0;transition:opacity .25s}'
-     '#laser.on{opacity:1}#laser::after{content:"";position:absolute;left:-6px;top:-5px;width:13px;height:13px;border-radius:50%;background:radial-gradient(circle,#fff 0,#FF5050 45%,rgba(255,80,80,0) 70%)}'
      '.bl.mk-hl>*:not(.fn):not(.tg){background-image:linear-gradient(transparent 58%,rgba(255,214,0,.42) 58%,rgba(255,214,0,.42) 92%,transparent 92%);background-repeat:no-repeat;background-size:0% 100%;animation:hl .9s .25s ease-out forwards}'
      '@keyframes hl{to{background-size:100% 100%}}'
      '.bl.mk-ul>*:not(.fn):not(.tg){text-decoration:underline;text-decoration-color:rgba(255,120,120,.95);text-decoration-thickness:3px;text-underline-offset:5px}'
@@ -356,17 +354,10 @@ sub1('</style>', '@keyframes pace{0%,100%{transform:translateX(0)}25%{transform:
      '@media (prefers-reduced-motion: reduce){#tutor.talking{animation:none}.bl.mk-hl>*{animation:none;background-size:100% 100%}}\n</style>', "강사 연출 CSS")
 sub1('const _render=render; render=function(){ _render(); ctx(); };',
      'const _render=render; render=function(){ _render(); ctx(); setTimeout(stageFx,60); };\n'
-     '/* 강사 연출: 중요한 줄 표시(형광펜 = 정의·외울 것 · 밑줄 = 결론·함정 · 별표 = 시험) · 지금 줄을 레이저로 짚기 · 말하는 동안 좌우로 오가기 */\n'
+     '/* 강사 연출: 중요한 줄 표시(형광펜 = 정의·외울 것 · 밑줄 = 결론·함정 · 별표 = 시험) · 말하는 동안 좌우로 오가기 */\n'
      'function stageFx(){ try{ const bc=$("#bc"); if(!bc) return;\n'
      '  $$(".bl",bc).forEach(el=>{ const c=el.className; if(/k-(def|memo)\\b/.test(c)) el.classList.add("mk-hl"); if(/k-(res|pit)\\b/.test(c)) el.classList.add("mk-ul"); if(/k-(exam|star)\\b/.test(c)) el.classList.add("mk-star"); });\n'
-     '  const slide=$(".slide"), tut=$("#tutor"), cur=$$(".bl.cur",bc).pop(); let lz=$("#laser"); if(!lz&&slide){ lz=document.createElement("i"); lz.id="laser"; slide.appendChild(lz); }\n'
-     '  if(!lz||!cur||!tut||!slide||getComputedStyle($("#tutorCard")).display==="none"){ if(lz) lz.classList.remove("on"); return; }\n'
-     '  const sr=slide.getBoundingClientRect(), cr=cur.getBoundingClientRect(), tr=$("#tutorCard").getBoundingClientRect();\n'
-     '  if(cr.bottom<sr.top||cr.top>sr.bottom){ lz.classList.remove("on"); return; }\n'
-     '  const x1=tr.left-sr.left+tr.width*0.18, y1=tr.top-sr.top+tr.height*0.36, x2=Math.min(cr.right,cr.left+cr.width*0.6)-sr.left, y2=cr.top-sr.top+cr.height/2;\n'
-     '  const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy), ang=Math.atan2(dy,dx)*180/Math.PI;\n'
-     '  lz.style.left=x1+"px"; lz.style.top=y1+"px"; lz.style.width=len+"px"; lz.style.transform="rotate("+ang+"deg) scaleX(-1)"; lz.style.transformOrigin="0 50%";\n'
-     '  lz.style.left=x2+"px"; lz.style.top=y2+"px"; lz.style.transform="rotate("+(ang+180)+"deg)"; lz.classList.add("on");\n'
+     '  /* 20) 레이저는 없앰(대표님 10/4) — 중요한 줄 표시만 */\n'
      '}catch(e){} }\n'
      '$("#bwrap")&&$("#bwrap").addEventListener("scroll",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,80); },{passive:true});\n'
      'window.addEventListener("resize",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,120); });\n'
@@ -381,7 +372,6 @@ sub1('</style>', """
  text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 10px rgba(0,0,0,.55),0 0 22px rgba(0,0,0,.35)!important}
 .text .cur{display:none!important}#tMore{display:none!important}
 .text.sub-in{animation:subin .22s ease-out}@keyframes subin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-#laser{background:linear-gradient(90deg,rgba(255,70,70,.0),rgba(255,70,70,.85))!important}#laser::after{left:auto!important;right:-6px}
 @media (max-width:760px){.text{font-size:18px!important}}
 @media (prefers-reduced-motion: reduce){.text.sub-in{animation:none}}
 </style>""", "넷플릭스 자막 글씨·레이저 끝점")
@@ -413,34 +403,9 @@ skipTyping=function(){ if(typing){ clearTimeout(typing); typing=null; const f=ty
 { const _ca=cancelAll; cancelAll=function(){ clearTimeout(SUBT); SUBT=null; return _ca.apply(this,arguments); }; }
 function toggleText(){""", "자막 한 문장씩")
 sub1("$(\"#bwrap\")&&$(\"#bwrap\").addEventListener(\"scroll\",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,80); },{passive:true});",
-     r"""$("#bwrap")&&$("#bwrap").addEventListener("scroll",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,80); },{passive:true});
-/* 21) 레이저: 지시봉 끝(그림 안 좌표, 좌우 반전 반영)에서 지금 줄 글자 끝까지 — 지시봉 없는 동작이면 끔, 오가는 동안 매 프레임 */
-const TIPS={"g/point":[0.998,0.131,0.906,0.192],"g/up":[0.997,0.132,0.906,0.191],"pose-point":[0.985,0.201,0.871,0.255]};  /* [끝 x,y, 지시봉 위 손 쪽 점 x,y] — 그림 비율 좌표(2026-10-02 실측) */
-function tipPt(){ const box=$("#tutor"); if(!box) return null; let img=null, op=0; $$("#tutor img").forEach(x=>{ const c=getComputedStyle(x); const o=c.display==="none"||c.visibility==="hidden"?0:parseFloat(c.opacity)||0; if(o>op){ op=o; img=x; } });
-  if(!img||op<.85||!img.naturalWidth) return null;
-  const m=/(g\/[a-z]+|pose-[a-z]+)\.png/.exec(img.getAttribute("src")||""); if(!m||!TIPS[m[1]]) return null;
-  const tx=TIPS[m[1]][0], ty=TIPS[m[1]][1], r=img.getBoundingClientRect(), cs=getComputedStyle(img); let L=r.left,T=r.top,W=r.width,H=r.height;
-  if(cs.objectFit==="contain"){ const k=Math.min(W/img.naturalWidth,H/img.naturalHeight), dw=img.naturalWidth*k, dh=img.naturalHeight*k; L+=(W-dw)*.5; T+=(H-dh); W=dw; H=dh; }
-  let mir=false; try{ mir=new DOMMatrix(cs.transform==="none"?"":cs.transform).a<0; }catch(e){}
-  const P=(u,v)=>({x:mir?L+W*(1-u):L+W*u, y:T+H*v}); const tip=P(tx,ty), base=P(TIPS[m[1]][2],TIPS[m[1]][3]);
-  /* 스앵님 상자가 칠판 쪽에서 그림을 자르므로, 지시봉 선이 상자 경계를 넘으면 경계에서 보이는 끝으로 */
-  const card=$("#tutorCard"); if(card){ const c=card.getBoundingClientRect(); if(tip.x<c.left+2&&base.x>tip.x){ const t=(c.left+2-base.x)/(tip.x-base.x); if(t<1) return {x:c.left+2, y:base.y+(tip.y-base.y)*t}; }
-    if(tip.x>c.right-2&&base.x<tip.x){ const t=(c.right-2-base.x)/(tip.x-base.x); if(t<1) return {x:c.right-2, y:base.y+(tip.y-base.y)*t}; } }
-  return tip; }
-function drawLaser(){ const lz=$("#laser"), slide=$(".slide"), bc=$("#bc"); if(!lz||!slide||!bc) return false;
-  const cur=$$(".bl.cur",bc).pop(), tp=tipPt(); if(!cur||!tp||S.mode!=="step"){ lz.classList.remove("on"); return false; }
-  const sr=slide.getBoundingClientRect(), bt=cur.querySelector(".bt")||cur, cr=bt.getBoundingClientRect(); if(cr.bottom<sr.top||cr.top>sr.bottom){ lz.classList.remove("on"); return false; }
-  let x2=cr.right+6; const kids=bt.lastChild; try{ const rg=document.createRange(); rg.selectNodeContents(bt); const rr=rg.getBoundingClientRect(); if(rr.width) x2=rr.right+6; }catch(e){}
-  const y2=cr.top+Math.min(cr.height/2,18), x1=tp.x, y1=tp.y, dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy); if(len<20){ lz.classList.remove("on"); return false; }
-  lz.style.left=(x1-sr.left)+"px"; lz.style.top=(y1-sr.top)+"px"; lz.style.width=len+"px"; lz.style.transformOrigin="0 50%"; lz.style.transform="rotate("+(Math.atan2(dy,dx)*180/Math.PI)+"deg)"; lz.classList.add("on"); return true; }
-{ let raf=null; const loop=()=>{ raf=null; drawLaser(); if(S.mode==="step"&&!document.hidden) raf=requestAnimationFrame(loop); };
-  const _sf=stageFx; stageFx=function(){ _sf(); if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(loop); }; }""", "레이저 지시봉 끝")
+     r"""$("#bwrap")&&$("#bwrap").addEventListener("scroll",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,80); },{passive:true});""", "레이저 지시봉 끝(없앰)")
 # 22) 레이저 없앰 (대표님 2026-10-04 「레이저 포인트 너무 밤티임 — 이런 식으로 구현할 거면 아예 만들 생각을 하지 마」)
-#     매 프레임 그리던 고리를 빼고, 혹시 남은 #laser 요소는 화면에서 숨김. 20)·21)절 코드는 다시 켤 일 없으면 다음 정리 때 통째로 지움.
-LOOP = '{ let raf=null; const loop=()=>{ raf=null; drawLaser(); if(S.mode==="step"&&!document.hidden) raf=requestAnimationFrame(loop); };\n  const _sf=stageFx; stageFx=function(){ _sf(); if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(loop); }; }'
-assert s.count(LOOP) == 1, "레이저 고리 자리"
-s = s.replace(LOOP, "/* 22) 레이저 없앰(대표님 10/4) — 그리지 않음 */", 1)
-s = s.replace("</style>", "#laser{display:none!important}\n</style>", 1)
+#     → 같은 날 오타 개편안 ②로 20)·21)절의 레이저 CSS·계산·매 프레임 고리를 통째로 지움(대체 표시 없음, 중요한 줄 표시만 유지).
 assert "wrap.scrollTop=wrap.scrollHeight" not in s.split("function renderStepV2")[1].split("function replayFig")[0], "renderStepV2 에 맨 아래 스크롤이 남음"
 assert s.index("stackFig();") < s.index('$$("[data-step]",root)'), "칸 쌓기가 단계 숨김보다 뒤"
 io.open(TPL, "w", encoding="utf-8", newline="\n").write(s)

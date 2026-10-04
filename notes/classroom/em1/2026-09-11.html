@@ -282,17 +282,15 @@ main{max-width:1040px;margin:0 auto;padding:14px 20px 18px}
 .clr-key span{display:inline-flex;align-items:center;gap:5px}.clr-key i{width:10px;height:10px;border-radius:50%;display:inline-block}
 #askbar{display:flex;gap:8px;margin:10px 0 0;padding:6px;border-radius:14px;background:rgba(8,16,12,.55);border:1px solid rgba(255,255,255,.14)}#askbar input{flex:1;min-width:0;min-height:46px;border:0;border-radius:10px;padding:0 14px;font:inherit;font-size:16px;background:rgba(255,255,255,.08);color:#F6FAF7;outline:none}#askbar input::placeholder{color:rgba(246,250,247,.55)}#askbar input:focus{background:rgba(255,255,255,.14)}#askbar button{flex:none;min-height:46px;min-width:88px;border:0;border-radius:10px;font:inherit;font-weight:800;background:var(--yel,#FFD84D);color:#1B2A20;cursor:pointer}#askbar.busy button{opacity:.5;pointer-events:none}
 #faceImg{display:none!important}.box .name{display:none}.box{background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:0!important;box-shadow:none!important;justify-content:center;padding:6px 18px 14px!important}.box .sb{text-align:center;max-width:46em;margin:0 auto}.text{font-family:var(--fh)!important;font-weight:700;font-size:21px!important;line-height:1.5!important;min-height:0!important;max-height:calc(1.5em * 3 + 2px)!important;color:#fff!important;text-shadow:0 0 2px #000,0 0 4px #000,0 2px 6px rgba(0,0,0,.9),1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000;letter-spacing:.01em}.slide::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(to top,rgba(0,0,0,.35),rgba(0,0,0,0));pointer-events:none;z-index:1}#tMore{background:rgba(0,0,0,.62)!important;color:#fff!important;border-radius:7px;padding:2px 9px}@media (max-width:760px){.text{font-size:17px!important}}
-@keyframes pace{0%,100%{transform:translateX(0)}25%{transform:translateX(-7%)}50%{transform:translateX(3%)}75%{transform:translateX(-11%)}}#tutor.talking{animation:pace 9s ease-in-out infinite}#laser{position:absolute;z-index:3;height:3px;transform-origin:0 50%;background:linear-gradient(90deg,rgba(255,80,80,0),rgba(255,80,80,.9));border-radius:3px;pointer-events:none;opacity:0;transition:opacity .25s}#laser.on{opacity:1}#laser::after{content:"";position:absolute;left:-6px;top:-5px;width:13px;height:13px;border-radius:50%;background:radial-gradient(circle,#fff 0,#FF5050 45%,rgba(255,80,80,0) 70%)}.bl.mk-hl>*:not(.fn):not(.tg){background-image:linear-gradient(transparent 58%,rgba(255,214,0,.42) 58%,rgba(255,214,0,.42) 92%,transparent 92%);background-repeat:no-repeat;background-size:0% 100%;animation:hl .9s .25s ease-out forwards}@keyframes hl{to{background-size:100% 100%}}.bl.mk-ul>*:not(.fn):not(.tg){text-decoration:underline;text-decoration-color:rgba(255,120,120,.95);text-decoration-thickness:3px;text-underline-offset:5px}.bl.mk-star{position:relative}.bl.mk-star::before{content:"★";position:absolute;left:-22px;top:2px;color:#FFD84D;font-size:18px;animation:starpop .5s .2s both;text-shadow:0 0 6px rgba(255,216,77,.7)}@keyframes starpop{0%{transform:scale(0) rotate(-40deg);opacity:0}70%{transform:scale(1.3) rotate(8deg);opacity:1}100%{transform:scale(1) rotate(0)}}@media (prefers-reduced-motion: reduce){#tutor.talking{animation:none}.bl.mk-hl>*{animation:none;background-size:100% 100%}}
+@keyframes pace{0%,100%{transform:translateX(0)}25%{transform:translateX(-7%)}50%{transform:translateX(3%)}75%{transform:translateX(-11%)}}#tutor.talking{animation:pace 9s ease-in-out infinite}.bl.mk-hl>*:not(.fn):not(.tg){background-image:linear-gradient(transparent 58%,rgba(255,214,0,.42) 58%,rgba(255,214,0,.42) 92%,transparent 92%);background-repeat:no-repeat;background-size:0% 100%;animation:hl .9s .25s ease-out forwards}@keyframes hl{to{background-size:100% 100%}}.bl.mk-ul>*:not(.fn):not(.tg){text-decoration:underline;text-decoration-color:rgba(255,120,120,.95);text-decoration-thickness:3px;text-underline-offset:5px}.bl.mk-star{position:relative}.bl.mk-star::before{content:"★";position:absolute;left:-22px;top:2px;color:#FFD84D;font-size:18px;animation:starpop .5s .2s both;text-shadow:0 0 6px rgba(255,216,77,.7)}@keyframes starpop{0%{transform:scale(0) rotate(-40deg);opacity:0}70%{transform:scale(1.3) rotate(8deg);opacity:1}100%{transform:scale(1) rotate(0)}}@media (prefers-reduced-motion: reduce){#tutor.talking{animation:none}.bl.mk-hl>*{animation:none;background-size:100% 100%}}
 
 .text{font-family:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif!important;font-weight:600!important;font-size:22px!important;line-height:1.45!important;
  max-height:38vh!important;overflow-y:auto!important;letter-spacing:-.005em!important;color:#fff!important;
  text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 10px rgba(0,0,0,.55),0 0 22px rgba(0,0,0,.35)!important}
 .text .cur{display:none!important}#tMore{display:none!important}
 .text.sub-in{animation:subin .22s ease-out}@keyframes subin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-#laser{background:linear-gradient(90deg,rgba(255,70,70,.0),rgba(255,70,70,.85))!important}#laser::after{left:auto!important;right:-6px}
 @media (max-width:760px){.text{font-size:18px!important}}
 @media (prefers-reduced-motion: reduce){.text.sub-in{animation:none}}
-#laser{display:none!important}
 </style>
 </head>
 <body>
@@ -959,39 +957,12 @@ function ctx(){ if(!CTX_GEN||!EMB) return; let label="", q=null, sid="";
   post({type:"mc-slide",v:1,gen:CTX_GEN,deck:D.id,title:document.title.slice(0,80),sid:sid,stype:S.mode==="quiz"?"quiz":"concept",part:null,partTitle:document.title.slice(0,60),label:("교실 · "+label).slice(0,80),q:q}); }
 window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!==window.parent) return; const d=e.data; if(d&&d.type==="mc-ctx?"&&typeof d.gen==="string"&&d.gen.length<64){ CTX_GEN=d.gen; ctx(); } });
 const _render=render; render=function(){ _render(); ctx(); setTimeout(stageFx,60); };
-/* 강사 연출: 중요한 줄 표시(형광펜 = 정의·외울 것 · 밑줄 = 결론·함정 · 별표 = 시험) · 지금 줄을 레이저로 짚기 · 말하는 동안 좌우로 오가기 */
+/* 강사 연출: 중요한 줄 표시(형광펜 = 정의·외울 것 · 밑줄 = 결론·함정 · 별표 = 시험) · 말하는 동안 좌우로 오가기 */
 function stageFx(){ try{ const bc=$("#bc"); if(!bc) return;
   $$(".bl",bc).forEach(el=>{ const c=el.className; if(/k-(def|memo)\b/.test(c)) el.classList.add("mk-hl"); if(/k-(res|pit)\b/.test(c)) el.classList.add("mk-ul"); if(/k-(exam|star)\b/.test(c)) el.classList.add("mk-star"); });
-  const slide=$(".slide"), tut=$("#tutor"), cur=$$(".bl.cur",bc).pop(); let lz=$("#laser"); if(!lz&&slide){ lz=document.createElement("i"); lz.id="laser"; slide.appendChild(lz); }
-  if(!lz||!cur||!tut||!slide||getComputedStyle($("#tutorCard")).display==="none"){ if(lz) lz.classList.remove("on"); return; }
-  const sr=slide.getBoundingClientRect(), cr=cur.getBoundingClientRect(), tr=$("#tutorCard").getBoundingClientRect();
-  if(cr.bottom<sr.top||cr.top>sr.bottom){ lz.classList.remove("on"); return; }
-  const x1=tr.left-sr.left+tr.width*0.18, y1=tr.top-sr.top+tr.height*0.36, x2=Math.min(cr.right,cr.left+cr.width*0.6)-sr.left, y2=cr.top-sr.top+cr.height/2;
-  const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy), ang=Math.atan2(dy,dx)*180/Math.PI;
-  lz.style.left=x1+"px"; lz.style.top=y1+"px"; lz.style.width=len+"px"; lz.style.transform="rotate("+ang+"deg) scaleX(-1)"; lz.style.transformOrigin="0 50%";
-  lz.style.left=x2+"px"; lz.style.top=y2+"px"; lz.style.transform="rotate("+(ang+180)+"deg)"; lz.classList.add("on");
+  /* 20) 레이저는 없앰(대표님 10/4) — 중요한 줄 표시만 */
 }catch(e){} }
 $("#bwrap")&&$("#bwrap").addEventListener("scroll",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,80); },{passive:true});
-/* 21) 레이저: 지시봉 끝(그림 안 좌표, 좌우 반전 반영)에서 지금 줄 글자 끝까지 — 지시봉 없는 동작이면 끔, 오가는 동안 매 프레임 */
-const TIPS={"g/point":[0.998,0.131,0.906,0.192],"g/up":[0.997,0.132,0.906,0.191],"pose-point":[0.985,0.201,0.871,0.255]};  /* [끝 x,y, 지시봉 위 손 쪽 점 x,y] — 그림 비율 좌표(2026-10-02 실측) */
-function tipPt(){ const box=$("#tutor"); if(!box) return null; let img=null, op=0; $$("#tutor img").forEach(x=>{ const c=getComputedStyle(x); const o=c.display==="none"||c.visibility==="hidden"?0:parseFloat(c.opacity)||0; if(o>op){ op=o; img=x; } });
-  if(!img||op<.85||!img.naturalWidth) return null;
-  const m=/(g\/[a-z]+|pose-[a-z]+)\.png/.exec(img.getAttribute("src")||""); if(!m||!TIPS[m[1]]) return null;
-  const tx=TIPS[m[1]][0], ty=TIPS[m[1]][1], r=img.getBoundingClientRect(), cs=getComputedStyle(img); let L=r.left,T=r.top,W=r.width,H=r.height;
-  if(cs.objectFit==="contain"){ const k=Math.min(W/img.naturalWidth,H/img.naturalHeight), dw=img.naturalWidth*k, dh=img.naturalHeight*k; L+=(W-dw)*.5; T+=(H-dh); W=dw; H=dh; }
-  let mir=false; try{ mir=new DOMMatrix(cs.transform==="none"?"":cs.transform).a<0; }catch(e){}
-  const P=(u,v)=>({x:mir?L+W*(1-u):L+W*u, y:T+H*v}); const tip=P(tx,ty), base=P(TIPS[m[1]][2],TIPS[m[1]][3]);
-  /* 스앵님 상자가 칠판 쪽에서 그림을 자르므로, 지시봉 선이 상자 경계를 넘으면 경계에서 보이는 끝으로 */
-  const card=$("#tutorCard"); if(card){ const c=card.getBoundingClientRect(); if(tip.x<c.left+2&&base.x>tip.x){ const t=(c.left+2-base.x)/(tip.x-base.x); if(t<1) return {x:c.left+2, y:base.y+(tip.y-base.y)*t}; }
-    if(tip.x>c.right-2&&base.x<tip.x){ const t=(c.right-2-base.x)/(tip.x-base.x); if(t<1) return {x:c.right-2, y:base.y+(tip.y-base.y)*t}; } }
-  return tip; }
-function drawLaser(){ const lz=$("#laser"), slide=$(".slide"), bc=$("#bc"); if(!lz||!slide||!bc) return false;
-  const cur=$$(".bl.cur",bc).pop(), tp=tipPt(); if(!cur||!tp||S.mode!=="step"){ lz.classList.remove("on"); return false; }
-  const sr=slide.getBoundingClientRect(), bt=cur.querySelector(".bt")||cur, cr=bt.getBoundingClientRect(); if(cr.bottom<sr.top||cr.top>sr.bottom){ lz.classList.remove("on"); return false; }
-  let x2=cr.right+6; const kids=bt.lastChild; try{ const rg=document.createRange(); rg.selectNodeContents(bt); const rr=rg.getBoundingClientRect(); if(rr.width) x2=rr.right+6; }catch(e){}
-  const y2=cr.top+Math.min(cr.height/2,18), x1=tp.x, y1=tp.y, dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy); if(len<20){ lz.classList.remove("on"); return false; }
-  lz.style.left=(x1-sr.left)+"px"; lz.style.top=(y1-sr.top)+"px"; lz.style.width=len+"px"; lz.style.transformOrigin="0 50%"; lz.style.transform="rotate("+(Math.atan2(dy,dx)*180/Math.PI)+"deg)"; lz.classList.add("on"); return true; }
-/* 22) 레이저 없앰(대표님 10/4) — 그리지 않음 */
 window.addEventListener("resize",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,120); });
 setInterval(()=>{ const t=$("#tutor"); if(t) t.classList.toggle("talking",!!typing||ASKING); },300);
 /* ---------- 키보드 ---------- */
