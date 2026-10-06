@@ -140,6 +140,9 @@ function row(host, title, detail, action, label = "열기") {
   host.append(item);
 }
 function showLobby() {
+  $("assignments").hidden = true;
+  $("learningArea").setAttribute("aria-pressed", "true");
+  $("assignmentArea").setAttribute("aria-pressed", "false");
   document.querySelector(".school").dataset.mode = "lobby";
   stopVoice();
   closeDialogs();
@@ -176,6 +179,67 @@ function showLobby() {
     : "상담에서 시작점을 정하고 자신의 답으로 확인합니다.";
 }
 $("home").onclick = showLobby;
+$("learningArea").onclick = showLobby;
+$("assignmentArea").onclick = () => showAssignments();
+let assignmentFilter = "전체", assignmentStatus = "진행";
+async function showAssignments() {
+  const generation = ++requestGeneration;
+  stopVoice(); closeDialogs(); current = null;
+  document.querySelector(".school").dataset.mode = "assignments";
+  $("scene").className = "scene lobby";
+  $("lobby").hidden = $("room").hidden = $("dialogue").hidden = true;
+  $("assignments").hidden = false;
+  $("location").textContent = "과제";
+  $("learningArea").setAttribute("aria-pressed", "false");
+  $("assignmentArea").setAttribute("aria-pressed", "true");
+  const host = $("assignments");
+  host.replaceChildren(node("h1", "과제"), node("p", "과제를 불러오고 있습니다."));
+  try {
+    const data = await api("assignments");
+    if (generation !== requestGeneration) return;
+    function draw() {
+      host.replaceChildren(node("h1", "과제"));
+      const tools = node("div", undefined, "assignment-filters");
+      const select = node("select"); select.setAttribute("aria-label", "과제 과목");
+      for (const name of ["전체", ...new Set(data.rows.map(r => r.course))]) {
+        const option = node("option", name); option.value = name; select.append(option);
+      }
+      select.value = assignmentFilter;
+      if (!select.value) assignmentFilter = select.value = "전체";
+      select.onchange = () => { assignmentFilter = select.value; draw(); };
+      tools.append(select);
+      for (const label of ["진행", "제출 확인", "전체"]){
+        const b = button(label, () => { assignmentStatus = label; draw(); });
+        b.setAttribute("aria-pressed", String(assignmentStatus === label)); tools.append(b);
+      }
+      const help = node("details"); help.append(node("summary", "ⓘ"), node("p", data.notice)); tools.append(help);
+      tools.append(link("과제 상태 관리 ↗", "index.html?view=classic")); host.append(tools);
+      const rows = data.rows.filter(r => (assignmentFilter === "전체" || r.course === assignmentFilter) && (assignmentStatus === "전체" || r.submitted === (assignmentStatus === "제출 확인")));
+      host.append(node("p", `${rows.length}건 · 자료 기준 ${data.asOf || "확인 필요"}`));
+      if (!rows.length) host.append(node("p", "해당 과제가 없습니다."));
+      let category = null;
+      for (const task of rows) {
+        const group = task.category || "assignment";
+        if (category !== group) { host.append(node("h2", group === "assignment" ? "수업 과제" : "과제 관련 할 일")); category = group; }
+        const card = node("article", undefined, "assignment-card");
+        card.append(node("small", task.course), node("h2", task.title));
+        card.append(node("p", `마감 ${task.due ? task.due.replace("T", " ") : "미확인"} · ${task.submission}${task.workDone ? " · 작업 완료" : ""}`));
+        const files = node("div", undefined, "assignment-files");
+        for (const file of task.files) files.append(link(file.label, file.href));
+        card.append(files);
+        if (catalog.courses.some(c => c.name === task.course))
+          card.append(button("필요한 개념 학습", () => { showLobby(); showCourse(task.course); }));
+        if (task.source) { const detail = node("details"); detail.append(node("summary", "근거"), node("p", task.source)); card.append(detail); }
+        host.append(card);
+      }
+    }
+    draw(); status("과제 원본 연결 완료");
+  } catch(error) {
+    if (generation !== requestGeneration) return;
+    host.replaceChildren(node("h1", "과제"), node("p", error.message, "error"), button("다시 불러오기", () => showAssignments()));
+    status(error.message, true);
+  }
+}
 $("courses").onclick = () => {
   const host = panel("과목 교실");
   for (const c of catalog.courses)
@@ -246,6 +310,7 @@ $("resume").onclick = () => {
   else consult(course);
 };
 async function startLesson(id) {
+  $("assignments").hidden = true;
   const generation = ++requestGeneration;
   try {
     status("수업을 준비하고 있습니다.");
@@ -1670,6 +1735,8 @@ async function boot() {
       lastLesson = position.lesson;
     for (const id of [
       "home",
+      "learningArea",
+      "assignmentArea",
       "courses",
       "library",
       "records",

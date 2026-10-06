@@ -17,6 +17,7 @@ w.fetch=async(url,options={})=>{
  if(parsed.pathname.endsWith('/catalog'))body=fixture.catalog;
  else if(parsed.pathname.endsWith('/state'))body=state;
  else if(parsed.pathname.endsWith('/capabilities'))body={testMode:true,engines:['auto','claude','codex'],voice:false};
+ else if(parsed.pathname.endsWith('/assignments'))body={asOf:'2026-10-06',notice:'작업 완료와 제출은 별개',rows:[{course:'공업수학1',title:'풀이 과제',due:'2026-10-07',submission:'미제출',submitted:false,files:[],source:'판서'},{course:'정역학',title:'제출 과제',due:'2026-10-05',submission:'제출',submitted:true,files:[]}]};
  else if(parsed.pathname.endsWith('/lesson'))body=fixture.lessons[parsed.searchParams.get('id')];
  else if(parsed.pathname.endsWith('/event')){
   const event={...JSON.parse(options.body),at:Date.now()/1000};
@@ -42,6 +43,8 @@ const settle=()=>new Promise(resolve=>setTimeout(resolve,10));
 const byText=text=>[...d.querySelectorAll('button')].find(b=>b.textContent===text);
 (async()=>{
  await settle();assert.equal(d.querySelector('#resume').disabled,false,d.querySelector('#status').textContent+' '+errors.map(String).join(' '));assert.equal(d.querySelectorAll('.door').length,7);
+ d.querySelector('#assignmentArea').click();await settle();assert.equal(d.querySelector('#lobby').hidden,true);assert.equal(d.querySelector('#assignments').hidden,false);assert.ok(d.querySelector('#assignments').textContent.includes('풀이 과제'));assert.ok(!d.querySelector('#assignments').textContent.includes('제출 과제'));
+ byText('제출 확인').click();assert.ok(d.querySelector('#assignments').textContent.includes('제출 과제'));d.querySelector('#learningArea').click();assert.equal(d.querySelector('#assignments').hidden,true);assert.equal(d.querySelector('#lobby').hidden,false);
  d.querySelector('#consult').click();assert.equal(d.querySelector('#panel').open,true);
  d.querySelector('#panelBody form').dispatchEvent(new w.Event('submit',{cancelable:true}));await settle();
  for(let i=0;i<5&&byText('아직 모르겠어요');i++){byText('아직 모르겠어요').click();await settle();}

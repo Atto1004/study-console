@@ -12,6 +12,18 @@ def stage(root,name,text):
     blob=subprocess.check_output(['git','hash-object','-w','--stdin'],input=text.encode('utf-8'),cwd=root).decode().strip()
     subprocess.run(['git','update-index','--add','--cacheinfo','100644,'+blob+','+name],cwd=root,check=True)
 
+current=(study/'index.html').read_text(encoding='utf-8')
+page=head(study,'index.html')
+if 'var BUILD="2026-10-06.179";' in page:
+    page=page.replace('var BUILD="2026-10-06.179";','var BUILD="2026-10-06.180";',1)
+    note=current.split('var PATCHNOTES=[',1)[1].split('  {v:"2026-10-06.179"',1)[0]
+    stage(study,'index.html',page.replace('var PATCHNOTES=[','var PATCHNOTES=['+note,1))
+    section=(study/'CHANGELOG.md').read_text(encoding='utf-8').split('### .180',1)[1].split('### .179',1)[0]
+    old=head(study,'CHANGELOG.md')
+    stage(study,'CHANGELOG.md',old.replace('## 2026-10-06\n\n','## 2026-10-06\n\n### .180'+section,1))
+    print('학습·과제 분리의 빌드와 패치 기록만 준비했습니다.')
+    raise SystemExit(0)
+
 backend=head(atom,'server.py')
 backend=backend.replace('import sys\n','import sys\nimport school_runtime\n',1)
 anchor='        if work_dashboard.get_route(self, sys.modules[__name__], p):\n            return\n'

@@ -7,6 +7,13 @@
 body {
   background: #0b211c;
 }
+.assignment-content { width: min(1180px, calc(100% - 48px)); margin: 32px auto 80px; padding: 28px; color: var(--school-ink); background: var(--school-paper); border: 3px solid var(--school-brass); }
+.assignment-filters, .assignment-files { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.assignment-card { padding: 22px 0; border-top: 1px solid #b5b29e; }
+.assignment-card h2 { font-size: 20px; }
+.assignment-files { margin-bottom: 12px; }
+.assignment-content button, .assignment-content select { color: var(--school-ink); background: #eee6cc; border: 1px solid #9c895c; }
+button[aria-pressed="true"] { outline: 2px solid var(--school-brass); outline-offset: 2px; }
 .brand:hover {
   background: none;
 }
@@ -527,8 +534,12 @@ dialog form > .primary {
 }
 @media (min-width: 651px) and (max-width: 1100px) {
   header {
-    padding: 0 22px;
+    padding: 10px 22px;
+    height: auto;
+    flex-wrap: wrap;
+    gap: 12px;
   }
+  header nav { flex-wrap: wrap; }
   .lobby-content {
     padding-left: 30px;
     padding-right: 30px;
