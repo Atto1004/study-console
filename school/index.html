@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#12382d" />
+    <title>그린라이트 학교</title>
+    <link rel="icon" href="../icon.svg" />
+    <link rel="stylesheet" href="school.css" />
+    <link rel="stylesheet" href="design.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/galmuri@latest/dist/galmuri.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&amp;display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+      crossorigin="anonymous"
+    />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script type="module" src="school.js"></script>
+  </head>
+  <body>
+    <div class="school">
+      <header>
+        <button id="home" disabled class="brand">
+          GREENLIGHT <span>학교</span></button
+        ><span id="location">학교 로비</span>
+        <nav>
+          <button id="courses" disabled>과목</button
+          ><button id="library" disabled>자료실</button
+          ><button id="records" disabled>학습 기록</button
+          ><button id="settings" disabled>스앵님 설정</button>
+        </nav>
+      </header>
+      <main id="scene" class="scene lobby">
+        <section id="lobby" class="lobby-content">
+          <div class="welcome">
+            <p class="eyebrow">GREENLIGHT ACADEMY · 안내 데스크</p>
+            <h1>오늘의 공부를<br />시작해볼까요.</h1>
+            <p id="today">학습 자료를 확인하고 있습니다.</p>
+            <button id="consult" disabled class="primary">
+              스앵님과 시작점 정하기
+            </button>
+          </div>
+          <section class="class-directory" aria-label="교실 안내">
+            <div class="directory-heading">
+              <div>
+                <p class="eyebrow">CLASSROOMS</p>
+                <h2>과목별 교실</h2>
+              </div>
+              <span>교실을 선택해 들어가세요</span>
+            </div>
+            <div id="courseDoors" class="doors" aria-label="과목 교실"></div>
+          </section>
+          <div class="resume">
+            <span id="resumeText"
+              >상담에서 출발점을 정하고 한 단계씩 배웁니다.</span
+            ><button id="resume" disabled class="primary">학습 이어가기</button
+            ><button id="review" disabled>복습 확인</button>
+          </div>
+        </section>
+        <section id="room" hidden>
+          <div class="room-title">
+            <span id="roomLabel"></span><span id="stepLabel"></span>
+          </div>
+          <div class="teaching-space">
+            <section
+              id="board"
+              class="board"
+              aria-live="polite"
+              aria-label="칠판"
+            ></section>
+            <div class="teacher">
+              <img
+                id="teacher"
+                src="../notes/classroom/assets/tutor/neutral.png"
+                alt="김주영 스앵님"
+                hidden
+              /><span>김주영 스앵님</span>
+            </div>
+          </div>
+        </section>
+      </main>
+      <section id="dialogue" hidden>
+        <div class="speech">
+          <div class="speaker">
+            김주영 스앵님 <small id="saveStatus">서버 기록</small>
+          </div>
+          <p id="speech" aria-live="polite"></p>
+          <button id="listen" aria-label="스앵님 대사 듣기">듣기</button>
+        </div>
+        <div id="choices" class="choices"></div>
+        <aside id="chat" class="tutor-chat" hidden aria-label="스앵님과 대화">
+          <button id="closeChat" class="close">접기</button>
+          <p class="eyebrow">김주영 스앵님과 대화</p>
+          <div id="chatMessages" aria-live="polite"></div>
+          <form id="chatForm">
+            <label for="question">질문 또는 직접 설명한 답</label>
+            <div class="input-row">
+              <textarea
+                id="question"
+                maxlength="3000"
+                rows="2"
+                required
+                placeholder="제가 이해한 내용을 설명해볼게요."
+              ></textarea>
+              <button id="send" type="submit" class="primary">보내기</button>
+            </div>
+          </form>
+          <p id="chatStatus" role="status"></p>
+        </aside>
+        <div class="tools">
+          <button id="back">이전</button><button id="hint">힌트</button
+          ><button id="simpler">더 쉽게</button
+          ><button id="askToggle">질문하기</button
+          ><button id="source">이 수업의 근거</button
+          ><button id="generate">맞춤 보충 수업</button
+          ><button id="next" class="primary">다음</button>
+        </div>
+      </section>
+      <footer>
+        <a href="../index.html?view=classic">출결 · 과제 · 시험 관제탑 ↗</a
+        ><span id="status" role="status">연결 중</span><small>.179</small
+        ><button id="retry" hidden>저장 재시도</button>
+      </footer>
+    </div>
+    <dialog id="panel">
+      <button id="closePanel" class="close">닫기</button>
+      <div id="panelBody"></div>
+    </dialog>
+  </body>
+</html>

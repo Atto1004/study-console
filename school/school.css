@@ -1,0 +1,1081 @@
+:root {
+  color-scheme: dark;
+  --green: #12382d;
+  --paper: #f1e9d0;
+  --gold: #c5ab71;
+  --muted: #b9c5b2;
+  font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  background: #0e281f;
+  color: var(--paper);
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+a {
+  touch-action: manipulation;
+}
+button {
+  cursor: pointer;
+  min-height: 44px;
+  border: 1px solid #9d8758;
+  background: #23483a;
+  color: var(--paper);
+  padding: 8px 15px;
+}
+button:hover {
+  background: #345c47;
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid #ffe099;
+  outline-offset: 3px;
+}
+[hidden] {
+  display: none !important;
+}
+.primary {
+  background: #d2ba7a;
+  color: #17372a;
+  border-color: #d2ba7a;
+  font-weight: bold;
+}
+.primary:hover {
+  background: #e7d399;
+}
+a {
+  color: #d7bf82;
+}
+h1,
+h2 {
+  font-family: "Batang", Georgia, serif;
+  font-weight: normal;
+}
+p {
+  line-height: 1.65;
+}
+small {
+  color: var(--muted);
+}
+.school {
+  height: 100dvh;
+  min-height: 620px;
+  display: flex;
+  flex-direction: column;
+}
+header {
+  height: 62px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 28px;
+  background: #102c25;
+  border-bottom: 3px solid #9c824e;
+  z-index: 2;
+}
+.brand {
+  border: 0;
+  background: none;
+  font-family: Georgia, serif;
+  letter-spacing: 2px;
+  font-weight: bold;
+  font-size: 17px;
+  color: #e5d7ae;
+  white-space: nowrap;
+}
+.brand span {
+  font-size: 12px;
+  letter-spacing: 0;
+  font-weight: normal;
+  margin-left: 10px;
+}
+#location {
+  font-size: 12px;
+  color: #d4c89f;
+}
+nav {
+  display: flex;
+  gap: 6px;
+  font-size: 12px;
+}
+.scene {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background: #263e32 url("../docs/preview/school/assets/classroom-v2.webp")
+    center/cover no-repeat;
+}
+.scene.lobby {
+  background-image: url("../docs/preview/school/assets/lobby-v2.webp");
+}
+.scene.office {
+  background-image: url("../docs/preview/school/assets/office-v2.webp");
+}
+.lobby-content {
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(250px, 0.9fr) 1.4fr;
+  align-items: center;
+  gap: 6%;
+  padding: 4% 6% 110px;
+}
+.welcome {
+  background: #102e25ed;
+  border: 2px solid #b29a61;
+  padding: 28px;
+  box-shadow: 5px 5px 0 #071b1688;
+}
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #d4bb7f;
+  margin: 0 0 15px;
+}
+.welcome h1 {
+  font-size: clamp(28px, 3.4vw, 46px);
+  line-height: 1.45;
+  margin: 0 0 18px;
+}
+.welcome > p:not(.eyebrow) {
+  font-size: 14px;
+  color: #ced3bc;
+}
+.doors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.door {
+  background: #12382de8;
+  border: 2px solid #b29a61;
+  min-height: 105px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+  padding: 16px;
+  text-align: left;
+  box-shadow: 4px 4px 0 #071b1666;
+}
+.door b {
+  font-size: 17px;
+  font-weight: 500;
+}
+.door small {
+  margin-top: 8px;
+  font-size: 11px;
+}
+.resume {
+  position: absolute;
+  bottom: 22px;
+  left: 6%;
+  right: 6%;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 18px;
+  background: #102e25ed;
+  border: 2px solid #ad925c;
+  font-size: 12px;
+}
+.resume span {
+  flex: 1;
+}
+#room {
+  height: 100%;
+  padding: 12px 5% 22px;
+}
+.room-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  background: #14382ded;
+  border: 1px solid #af955f;
+  padding: 9px 14px;
+  margin-bottom: 12px;
+}
+.teaching-space {
+  height: calc(100% - 50px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 24%;
+  gap: 22px;
+}
+.board {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px 32px;
+  background: #173e32fa;
+  border: 8px solid #785a36;
+  box-shadow:
+    inset 0 0 0 2px #c0a271,
+    4px 6px 0 #10231bb8;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.board .caption {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #cfceac;
+}
+.board h1 {
+  font-size: clamp(22px, 2.4vw, 34px);
+  line-height: 1.45;
+  margin: 0;
+}
+.board .content {
+  font-size: clamp(17px, 1.6vw, 23px);
+  line-height: 1.75;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.board .annotation {
+  border-top: 1px solid #c2d2b840;
+  padding-top: 12px;
+  font-size: 12px;
+  color: #cedac6;
+}
+.board .katex-display {
+  margin: 8px 0;
+  white-space: normal;
+}
+.board .katex {
+  font-size: 1.15em;
+}
+.office .board {
+  background: #f0e5cbf5;
+  color: #263f31;
+}
+.office .board .caption,
+.office .board .annotation {
+  color: #5b674d;
+}
+.office .board .annotation {
+  border-color: #98a280;
+}
+.teacher {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+  min-height: 0;
+}
+.teacher img {
+  max-height: calc(100% - 38px);
+  max-width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(4px 5px 0 #10251c70);
+}
+.teacher > span {
+  font-size: 12px;
+  padding: 8px 14px;
+  background: #12382d;
+  border: 2px solid #b39860;
+}
+#dialogue {
+  flex: none;
+  padding: 12px 5% 10px;
+  background: #102f27;
+  border-top: 3px solid #b69a60;
+}
+.speech {
+  display: flex;
+  gap: 18px;
+  align-items: start;
+}
+.speaker {
+  width: 145px;
+  flex: none;
+  font-size: 13px;
+  color: #e1c88e;
+  padding-top: 3px;
+}
+.speaker small {
+  display: block;
+  font-size: 10px;
+  margin-top: 7px;
+}
+.speech p {
+  margin: 0;
+  flex: 1;
+  font-size: 15px;
+  line-height: 1.6;
+  max-height: 76px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+.speech > button {
+  font-size: 11px;
+  min-height: 36px;
+  padding: 5px 10px;
+}
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 10px 0 0 163px;
+}
+.choices button {
+  font-size: 14px;
+  flex: 1;
+  text-align: left;
+  min-width: 120px;
+  max-width: 48%;
+}
+.tools {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+.tools > button {
+  border: 0;
+  background: none;
+  color: #d0c29a;
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  padding: 4px 10px;
+  min-height: 40px;
+}
+.tools > #next {
+  margin-left: auto;
+  text-decoration: none;
+  border: 1px solid #c5ab71;
+  background: #d2ba7a;
+  color: #17372a;
+  min-width: 100px;
+}
+.foot,
+footer {
+  flex: none;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 25px;
+  gap: 12px;
+  font-size: 10px;
+  color: #b9c2ac;
+  background: #0b251d;
+}
+footer button {
+  min-height: 24px;
+  padding: 2px 8px;
+  font-size: 10px;
+}
+dialog {
+  color: #263d30;
+  background: #f5efd9;
+  border: 3px solid #ab915b;
+  width: min(850px, 94%);
+  max-height: 88dvh;
+  padding: 25px;
+  overflow: auto;
+}
+dialog::backdrop {
+  background: #071d17b8;
+}
+.close {
+  float: right;
+  background: transparent;
+  color: #3c5037;
+  border-color: #a79770;
+  margin-left: 15px;
+}
+dialog .eyebrow {
+  color: #60744e;
+}
+dialog h2 {
+  font-size: 28px;
+  margin-top: 12px;
+}
+dialog h3 {
+  font-size: 17px;
+  font-weight: 600;
+}
+dialog a {
+  color: #2b6346;
+}
+dialog small {
+  color: #627055;
+}
+dialog button {
+  background: #234a38;
+  color: #f2e9cb;
+}
+dialog .primary {
+  background: #d2ba7a;
+  color: #17372a;
+}
+.list-row {
+  border-bottom: 1px solid #d6c9a6;
+  padding: 13px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.list-row > div {
+  flex: 1;
+}
+.list-row small {
+  display: block;
+  margin-top: 6px;
+}
+.list-row p {
+  font-size: 13px;
+  margin: 5px 0;
+}
+.fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+label {
+  display: block;
+  font-size: 13px;
+  margin: 10px 0 5px;
+}
+input,
+select,
+textarea {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #b2ac8c;
+  background: #fffdf3;
+  color: #243e2b;
+  padding: 10px;
+  min-width: 0;
+}
+textarea {
+  resize: vertical;
+}
+.input-row {
+  display: flex;
+  gap: 8px;
+  align-items: end;
+}
+.input-row button {
+  flex: none;
+}
+#chatMessages {
+  margin: 20px 0;
+  max-height: 40dvh;
+  overflow: auto;
+}
+#chatMessages p {
+  padding: 12px;
+  border-left: 3px solid #b49b5e;
+  background: #e9e2cd;
+  white-space: pre-wrap;
+  font-size: 14px;
+}
+#chatMessages .student {
+  border-color: #5c8055;
+  background: #eff0e0;
+}
+#chatStatus {
+  font-size: 12px;
+  color: #617253;
+}
+.notice {
+  padding: 12px;
+  background: #e7e3cc;
+  border-left: 3px solid #a18d55;
+  font-size: 13px;
+}
+.pill {
+  font-size: 11px;
+  display: inline-block;
+  padding: 3px 7px;
+  border: 1px solid #b2a479;
+  margin-right: 5px;
+}
+.error {
+  color: #a7422e;
+}
+.success {
+  color: #367146;
+}
+.check-answer {
+  background: #2c5942 !important;
+}
+.summary {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 18px 0;
+}
+.summary strong {
+  font-size: 24px;
+  display: block;
+}
+.summary span {
+  font-size: 12px;
+}
+.mono {
+  font-family: monospace;
+}
+.board-overflow {
+  display: none;
+}
+@media (max-height: 760px) {
+  header {
+    height: 52px;
+  }
+  .board {
+    padding: 15px 24px;
+    gap: 10px;
+  }
+  .board h1 {
+    font-size: 24px;
+  }
+  .board .content {
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .board .annotation {
+    padding-top: 8px;
+    font-size: 11px;
+  }
+  .speech p {
+    font-size: 14px;
+    max-height: 48px;
+  }
+  #dialogue {
+    padding-top: 9px;
+  }
+  .choices {
+    margin-top: 7px;
+  }
+  .welcome {
+    padding: 20px;
+  }
+  .door {
+    min-height: 85px;
+  }
+  .doors {
+    gap: 9px;
+  }
+}
+@media (max-width: 1020px) {
+  header {
+    padding: 0 16px;
+  }
+  #location {
+    display: none;
+  }
+  .lobby-content {
+    gap: 25px;
+    padding-left: 5%;
+    padding-right: 5%;
+  }
+  .teaching-space {
+    grid-template-columns: minmax(0, 1fr) 170px;
+    gap: 12px;
+  }
+  .speaker {
+    width: 120px;
+  }
+  .choices {
+    margin-left: 138px;
+  }
+  .tools {
+    gap: 0;
+  }
+  .tools > button {
+    padding: 4px 8px;
+  }
+  .welcome h1 {
+    font-size: 32px;
+  }
+}
+@media (max-width: 650px) {
+  .school {
+    min-height: 760px;
+    height: auto;
+  }
+  .scene {
+    min-height: 520px;
+    background-image: none !important;
+  }
+  .teacher {
+    display: none;
+  }
+  .teaching-space {
+    grid-template-columns: 1fr;
+  }
+  .lobby-content {
+    display: block;
+    padding: 24px 18px 130px;
+  }
+  .welcome {
+    margin-bottom: 15px;
+  }
+  .welcome h1 {
+    font-size: 28px;
+  }
+  .doors {
+    gap: 8px;
+  }
+  .door {
+    min-height: 80px;
+  }
+  .door b {
+    font-size: 14px;
+  }
+  .resume {
+    left: 18px;
+    right: 18px;
+    bottom: 15px;
+    flex-wrap: wrap;
+  }
+  .resume span {
+    flex-basis: 100%;
+  }
+  header {
+    height: auto;
+    min-height: 100px;
+    flex-wrap: wrap;
+    padding: 10px 16px;
+  }
+  nav {
+    width: 100%;
+    justify-content: space-between;
+  }
+  nav button {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+  .speech {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .speaker {
+    width: 100%;
+  }
+  .speaker small {
+    display: inline;
+    margin-left: 10px;
+  }
+  .speech p {
+    max-height: 150px;
+    font-size: 15px;
+  }
+  .choices {
+    margin-left: 0;
+  }
+  .choices button {
+    max-width: none;
+  }
+  .tools {
+    flex-wrap: wrap;
+  }
+  .board {
+    min-height: 320px;
+    overflow: visible;
+  }
+  .board .content {
+    font-size: 17px;
+  }
+  .fields {
+    grid-template-columns: 1fr;
+  }
+  footer {
+    flex-wrap: wrap;
+    padding: 8px 16px;
+  }
+  #room {
+    padding: 16px;
+  }
+  .room-title {
+    font-size: 11px;
+  }
+  .board h1 {
+    font-size: 24px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
+.tutor-chat {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(260px, 1fr);
+  gap: 0 24px;
+  width: 100%;
+  padding: 14px 20px;
+  background: #f5efd9;
+  color: #263d30;
+  border: 3px solid #ab915b;
+  box-shadow: 0 3px 0 #071b1688;
+}
+.chatting > .speech,
+.chatting > .choices {
+  display: none;
+}
+.tutor-chat .eyebrow {
+  grid-column: 1 / -1;
+}
+.tutor-chat .close {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+}
+.tutor-chat #chatForm {
+  align-self: center;
+  padding-top: 8px;
+}
+.tutor-chat #chatStatus {
+  grid-column: 1 / -1;
+}
+.tutor-chat .eyebrow {
+  color: #60744e;
+  margin: 2px 0 10px;
+}
+.tutor-chat .close {
+  min-height: 32px;
+  margin-top: -8px;
+}
+.tutor-chat #chatMessages {
+  height: 150px;
+  overflow-y: auto;
+  margin: 10px 0;
+}
+.tutor-chat label {
+  font-size: 12px;
+}
+.tutor-chat textarea {
+  max-height: 130px;
+}
+.tutor-chat #chatStatus {
+  margin: 8px 0 0;
+  font-size: 11px;
+}
+.tutor-chat #chatMessages p {
+  margin: 6px 0;
+  padding: 10px;
+}
+.tutor-chat button {
+  background: #234a38;
+  color: #f2e9cb;
+}
+.tutor-chat .primary {
+  background: #d2ba7a;
+  color: #17372a;
+}
+@media (max-width: 650px) {
+  .tutor-chat {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+  .tutor-chat #chatMessages {
+    max-height: 28dvh;
+  }
+}
+.board-pages {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: #cfceac;
+}
+@media (min-width: 651px) and (max-width: 1000px) and (orientation: portrait) {
+  .teaching-space {
+    display: block;
+    position: relative;
+  }
+  .board {
+    height: 64%;
+    width: 100%;
+  }
+  .teacher {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 34%;
+    height: 34%;
+  }
+  .lobby-content {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    align-content: center;
+    padding-bottom: 130px;
+  }
+  .welcome h1 {
+    font-size: 36px;
+  }
+  .door {
+    min-height: 95px;
+  }
+}
+.board-pages button {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 11px;
+  border-color: #829476;
+  background: #234c3b;
+}
+.board-pages span {
+  flex: 1;
+  text-align: center;
+}
+details pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font:
+    13px/1.7 "Malgun Gothic",
+    sans-serif;
+}
+details {
+  padding: 10px 0;
+  border-bottom: 1px solid #d6c9a6;
+}
+summary {
+  cursor: pointer;
+}
+.concept-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.concept-list button {
+  text-align: left;
+  background: #ede4cc;
+  color: #263d30;
+  border-color: #cbb98e;
+  font-size: 13px;
+}
+.concept-list button:hover {
+  background: #e3d4ad;
+}
+@media (max-width: 650px) {
+  .concept-list {
+    grid-template-columns: 1fr;
+  }
+}
+.teacher img.speaking {
+  filter: drop-shadow(3px 3px 0 #10251c);
+}
+
+/* 도트 통일 .177 — 그린라이트 scene.css 와 같은 판. 배경 그림은 유지, 창·버튼·글자만 도트.
+   긴 문장은 Gowun Dodum. 이름·버튼·제목만 Galmuri 를 11px 의 정수배로. */
+:root {
+  --dot-ink: #101c16;
+  --dot-frame: #c6a15b;
+  --dot-frame-d: #6e5424;
+  --dot-moss: #1c4636;
+  --dot-paper: #f6f0e2;
+  --dot-px: "Galmuri11", "Galmuri9", "Malgun Gothic", sans-serif;
+  --dot-body: "Gowun Dodum", "Pretendard Variable", "Malgun Gothic", sans-serif;
+}
+body,
+.board .content,
+.speech p,
+.welcome > p:not(.eyebrow),
+dialog p,
+.list-row p {
+  font-family: var(--dot-body);
+}
+.brand,
+.eyebrow,
+.welcome h1,
+.board h1,
+.board .caption,
+.door b,
+.speaker,
+.room-title,
+header,
+footer,
+button,
+dialog h2,
+.teacher > span {
+  font-family: var(--dot-px);
+  font-weight: 400;
+  letter-spacing: 0;
+  -webkit-font-smoothing: none;
+}
+.welcome h1,
+.board h1,
+dialog h2 {
+  font-size: 33px;
+  line-height: 1.45;
+}
+button {
+  border-radius: 0;
+  border: 2px solid var(--dot-frame);
+  background: var(--dot-moss);
+  color: var(--dot-paper);
+  box-shadow: inset 0 0 0 1px rgba(246, 240, 226, 0.16), 0 3px 0 var(--dot-ink);
+}
+button:hover {
+  background: #2a5c45;
+}
+button:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 0 0 1px rgba(246, 240, 226, 0.16), 0 1px 0 var(--dot-ink);
+}
+.primary,
+.tools > #next,
+dialog .primary {
+  background: #e7d7a4;
+  color: var(--dot-ink);
+  border-color: #8d7040;
+  box-shadow: inset 0 1px 0 #fff6, 0 3px 0 #5c4318;
+}
+.primary:hover,
+.tools > #next:hover {
+  background: #f3e6c0;
+}
+header {
+  background: #10261f;
+  border-bottom: 0;
+  box-shadow: inset 0 -3px 0 var(--dot-frame), inset 0 -6px 0 var(--dot-ink);
+}
+header button:not(.brand),
+footer button {
+  min-height: 32px;
+  padding: 4px 10px;
+  box-shadow: inset 0 0 0 1px rgba(246, 240, 226, 0.14), 0 2px 0 var(--dot-ink);
+}
+.brand {
+  border: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--dot-paper);
+}
+.brand:active {
+  transform: none;
+}
+.welcome,
+.door,
+.resume,
+.room-title,
+#dialogue,
+.teacher > span,
+dialog,
+.tutor-chat {
+  border-radius: 0;
+  border: 2px solid var(--dot-frame);
+  background: #14352ce8;
+  box-shadow: inset 0 0 0 1px rgba(246, 240, 226, 0.14), 4px 4px 0 rgba(8, 16, 12, 0.72);
+}
+.door {
+  background:
+    linear-gradient(var(--dot-frame), var(--dot-frame)) 0 0 / 12px 2px no-repeat,
+    linear-gradient(var(--dot-frame), var(--dot-frame)) 0 0 / 2px 12px no-repeat,
+    linear-gradient(var(--dot-frame), var(--dot-frame)) 100% 0 / 12px 2px no-repeat,
+    linear-gradient(var(--dot-frame), var(--dot-frame)) 100% 0 / 2px 12px no-repeat,
+    linear-gradient(var(--dot-frame), var(--dot-frame)) 0 100% / 12px 2px no-repeat,
+    linear-gradient(var(--dot-frame), var(--dot-frame)) 0 100% / 2px 12px no-repeat,
+    linear-gradient(var(--dot-frame), var(--dot-frame)) 100% 100% / 12px 2px no-repeat,
+    linear-gradient(var(--dot-frame), var(--dot-frame)) 100% 100% / 2px 12px no-repeat,
+    #14352ce6;
+}
+.door small,
+#location,
+footer,
+.resume span {
+  font-family: var(--dot-body);
+  letter-spacing: 0;
+}
+.board {
+  border: 4px solid #5c4318;
+  box-shadow:
+    inset 0 0 0 2px var(--dot-frame),
+    inset 0 0 0 6px #2a2114,
+    4px 4px 0 rgba(8, 16, 12, 0.72);
+}
+.office .board {
+  background: #f6f0e2f5;
+  color: #1a2e24;
+}
+.tools > button {
+  border: 2px solid var(--dot-frame);
+  background: var(--dot-moss);
+  color: var(--dot-paper);
+  text-decoration: none;
+  box-shadow: 0 3px 0 var(--dot-ink);
+}
+.teacher img,
+.teacher img.speaking {
+  filter: drop-shadow(3px 3px 0 #10251c);
+}
+dialog {
+  background: var(--dot-paper);
+  color: #1a2e24;
+}
+dialog button:not(.primary):not(.close) {
+  background: var(--dot-moss);
+  color: var(--dot-paper);
+}
+@media (max-width: 650px) {
+  .welcome h1,
+  .board h1,
+  dialog h2 {
+    font-size: 22px;
+  }
+  .scene.lobby {
+    background-image: url("../docs/preview/school/assets/lobby-v2.webp") !important;
+  }
+  .scene.office {
+    background-image: url("../docs/preview/school/assets/office-v2.webp") !important;
+  }
+  .scene:not(.lobby):not(.office) {
+    background-image: url("../docs/preview/school/assets/classroom-v2.webp") !important;
+  }
+  .scene {
+    background-size: cover;
+    background-position: center;
+  }
+  header {
+    min-height: 0;
+  }
+  nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .welcome,
+  .resume,
+  .door {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  .welcome > p:not(.eyebrow) {
+    white-space: normal;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  button:active {
+    transform: none;
+  }
+}

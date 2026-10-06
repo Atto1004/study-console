@@ -1,0 +1,716 @@
+/* 학교 디자인 .178: 배경은 공간, 창은 안내판, 칠판은 학습 내용. */
+:root {
+  --school-ink: #102c25;
+  --school-paper: #f5efdf;
+  --school-brass: #c7a76a;
+}
+body {
+  background: #0b211c;
+}
+.brand:hover {
+  background: none;
+}
+.source-photo {
+  display: block;
+  width: 100%;
+  max-height: 65dvh;
+  object-fit: contain;
+  margin: 16px 0;
+  background: #e7e3d5;
+}
+.feedback small {
+  display: block;
+  margin: 8px 0;
+  color: #425c3c;
+}
+.feedback button {
+  margin: 8px 8px 0 0;
+  font-size: 12px;
+}
+.school[data-mode="office"] .tools {
+  display: none;
+}
+button {
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
+}
+button:disabled {
+  opacity: 0.48;
+}
+header {
+  height: 64px;
+  padding: 0 32px;
+  gap: 24px;
+}
+.brand {
+  padding-left: 0;
+  font-size: 18px;
+}
+.brand span {
+  border-left: 1px solid #907b51;
+  padding-left: 14px;
+  margin-left: 14px;
+}
+#location {
+  border: 1px solid #6e7659;
+  padding: 6px 13px;
+  color: #e1d9bd;
+}
+nav {
+  gap: 8px;
+}
+header nav button {
+  min-height: 40px;
+  padding: 7px 14px;
+  border-color: #6b775c;
+  font-size: 12px;
+}
+header nav button:hover {
+  border-color: var(--school-brass);
+}
+.scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, #0b251b38, transparent 55%),
+    linear-gradient(0deg, #071c1759, transparent 40%);
+}
+.lobby-content {
+  max-width: 1450px;
+  margin: auto;
+  padding: 38px 48px 124px;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(480px, 1.25fr);
+  gap: 48px;
+}
+.welcome {
+  position: relative;
+  padding: 34px 32px 32px;
+  border-color: #bea16c;
+  background: #14352cf5;
+  box-shadow:
+    inset 0 0 0 4px #14352c,
+    inset 0 0 0 5px #657253,
+    6px 7px 0 #091b1880;
+}
+.welcome::before {
+  content: "";
+  display: block;
+  width: 34px;
+  height: 3px;
+  background: #e3cd95;
+  margin-bottom: 24px;
+}
+.welcome .eyebrow {
+  font: 10px/1.6 var(--dot-body);
+  letter-spacing: 1.6px;
+  color: #d5bf8a;
+}
+.welcome h1 {
+  font-size: 33px;
+  line-height: 1.65;
+  margin-bottom: 20px;
+  text-wrap: balance;
+}
+.welcome > p:not(.eyebrow) {
+  font-size: 15px;
+  color: #d4decc;
+  margin: 0 0 26px;
+  max-width: 28em;
+}
+#consult {
+  width: 100%;
+  min-height: 50px;
+  font-size: 14px;
+}
+.class-directory {
+  min-width: 0;
+}
+.directory-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  padding: 0 3px 18px;
+  color: #fff5dd;
+  text-shadow: 0 2px 3px #102c25;
+}
+.directory-heading .eyebrow {
+  margin: 0 0 6px;
+  font: 10px var(--dot-body);
+  letter-spacing: 2px;
+  color: #f5deb0;
+}
+.directory-heading h2 {
+  font: 22px/1.3 var(--dot-px);
+  margin: 0;
+}
+.directory-heading > span {
+  font-size: 11px;
+  color: #fff3da;
+}
+.doors {
+  gap: 10px;
+}
+.door {
+  min-height: 88px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
+  gap: 13px;
+  padding: 14px 16px;
+  background: #153b30f2;
+  border-color: #bfa169;
+  box-shadow:
+    inset 0 0 0 2px #153b30,
+    inset 0 0 0 3px #556449,
+    3px 4px 0 #091b1880;
+}
+.door:hover {
+  background: #244d3cf9;
+  border-color: #f1d39c;
+}
+.door-number {
+  display: flex;
+  flex: none;
+  justify-content: center;
+  align-items: center;
+  width: 34px;
+  height: 40px;
+  color: #c6b481;
+  border: 1px solid #647150;
+  font: 13px var(--dot-px);
+}
+.door-info {
+  min-width: 0;
+  flex: 1;
+}
+.door b {
+  display: block;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.door small {
+  display: block;
+  font-size: 11px;
+  margin-top: 3px;
+  color: #c3ceba;
+}
+.door-arrow {
+  color: #dec58d;
+  font:
+    25px Georgia,
+    serif;
+}
+.resume {
+  left: max(48px, calc((100% - 1354px) / 2));
+  right: max(48px, calc((100% - 1354px) / 2));
+  bottom: 25px;
+  min-height: 78px;
+  padding: 15px 20px;
+  gap: 14px;
+  background: #112f27f5;
+}
+.resume span {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #e0e3ce;
+}
+.resume button {
+  min-height: 46px;
+  font-size: 12px;
+}
+footer {
+  min-height: 32px;
+  padding: 4px 28px;
+  color: #a9b7a7;
+}
+footer a {
+  color: #d5c39a;
+  text-decoration: none;
+}
+footer a:hover {
+  text-decoration: underline;
+}
+footer #status {
+  text-align: right;
+  margin-left: auto;
+}
+#room {
+  max-width: 1480px;
+  margin: auto;
+  padding: 18px 38px 22px;
+}
+.room-title {
+  border: 0;
+  border-bottom: 1px solid #d0b6747a;
+  box-shadow: none;
+  background: #102e25ed;
+  padding: 10px 15px;
+  margin-bottom: 16px;
+}
+#roomLabel {
+  font-size: 14px;
+}
+#stepLabel {
+  color: #d4c38e;
+  font: 12px var(--dot-body);
+}
+.teaching-space {
+  height: calc(100% - 59px);
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 23%);
+  gap: 28px;
+}
+.board {
+  padding: 28px 36px;
+  gap: 17px;
+  background: #173e32fb;
+}
+.board .caption {
+  color: #c9d6b7;
+  font-size: 11px;
+}
+.board h1 {
+  font-size: 28px;
+  line-height: 1.6;
+}
+.board .content {
+  font: 20px/1.75 var(--dot-body);
+}
+.board .annotation {
+  font: 12px/1.65 var(--dot-body);
+  color: #c5d2b9;
+}
+.teacher > span {
+  background: #15392ff7;
+  font-size: 12px;
+  padding: 10px 16px;
+}
+#dialogue {
+  border-width: 2px 0 0;
+  box-shadow: none;
+  padding: 16px max(38px, calc((100% - 1404px) / 2)) 12px;
+  background: #102d26;
+}
+.speaker {
+  font-size: 13px;
+  width: 155px;
+  line-height: 1.5;
+}
+.speaker small {
+  color: #a8b7a6;
+  font: 10px var(--dot-body);
+}
+.speech p {
+  font-size: 16px;
+  max-height: 78px;
+}
+.choices {
+  margin-left: 173px;
+  gap: 9px;
+  margin-top: 12px;
+}
+.choices button {
+  font: 14px/1.5 var(--dot-body);
+  min-height: 46px;
+  padding: 9px 14px;
+  border-color: #728267;
+}
+.choices button:hover {
+  border-color: #d5bd7e;
+}
+.tools {
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #6e7c5c66;
+}
+.tools > button {
+  font-size: 11px;
+  min-height: 40px;
+  border: 1px solid #61745a;
+  box-shadow: none;
+  color: #d6dcc5;
+  padding: 7px 12px;
+}
+.tools > #next {
+  min-width: 110px;
+  border-color: #b59a61;
+  font-size: 13px;
+}
+#listen:disabled {
+  display: none;
+}
+.tutor-chat {
+  background: var(--school-paper);
+  color: #213c2d;
+  border-color: #bba06b;
+  padding: 18px 22px;
+  gap: 0 28px;
+}
+.tutor-chat .eyebrow {
+  color: #506c4d;
+  font-size: 12px;
+}
+.tutor-chat #chatMessages {
+  height: 132px;
+  margin: 5px 0;
+}
+.tutor-chat #chatMessages p {
+  font: 14px/1.65 var(--dot-body);
+}
+.tutor-chat .close {
+  background: transparent;
+  color: #314d38;
+  border: 1px solid #a0916b;
+  box-shadow: none;
+  top: 20px;
+}
+.tutor-chat #chatStatus:empty {
+  display: none;
+}
+dialog {
+  width: min(820px, calc(100% - 64px));
+  max-height: min(840px, 88dvh);
+  padding: 32px;
+  background: var(--school-paper);
+  color: #203a2c;
+  box-shadow:
+    inset 0 0 0 4px var(--school-paper),
+    inset 0 0 0 5px #bdab82,
+    8px 10px 0 #071a1770;
+}
+dialog::backdrop {
+  background: #071a17b5;
+  backdrop-filter: blur(3px);
+}
+dialog .eyebrow {
+  font: 10px/1.5 var(--dot-body);
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+dialog h2 {
+  font-size: 27px;
+  margin: 0 70px 24px 0;
+  line-height: 1.6;
+}
+dialog h3 {
+  margin: 26px 0 12px;
+  color: #294d37;
+}
+dialog p {
+  font-size: 14px;
+}
+dialog .close {
+  color: #304b37;
+  background: transparent;
+  border: 1px solid #a89972;
+  box-shadow: none;
+  min-height: 38px;
+  font-size: 11px;
+}
+.list-row {
+  gap: 20px;
+  padding: 16px 0;
+}
+.list-row b {
+  font-size: 14px;
+  line-height: 1.7;
+}
+.list-row small {
+  font: 12px/1.6 var(--dot-body);
+}
+.list-row button {
+  font-size: 12px;
+  min-width: 70px;
+}
+.notice {
+  background: #e5e8d5;
+  border-color: #688158;
+  padding: 14px 16px;
+  line-height: 1.75;
+}
+.fields {
+  gap: 12px 20px;
+}
+label {
+  font-size: 13px;
+  color: #405d43;
+  margin-top: 16px;
+}
+input,
+select,
+textarea {
+  font: 14px/1.5 var(--dot-body);
+  background: #fffdf5;
+  border-color: #b8b598;
+  padding: 11px 12px;
+}
+dialog form > .primary {
+  margin-top: 20px;
+  min-height: 48px;
+  width: 100%;
+}
+.concept-list button {
+  box-shadow: 0 2px 0 #c3b58e;
+  padding: 11px 13px;
+  min-height: 46px;
+  font: 13px var(--dot-body);
+}
+.pill {
+  font: 11px/1.6 var(--dot-body);
+  background: #ece5d2;
+}
+@media (max-height: 800px) and (min-width: 651px) {
+  header {
+    height: 54px;
+  }
+  .lobby-content {
+    padding-top: 22px;
+    padding-bottom: 112px;
+    gap: 32px;
+  }
+  .welcome {
+    padding: 24px;
+  }
+  .welcome::before {
+    margin-bottom: 17px;
+  }
+  .welcome h1 {
+    font-size: 29px;
+    margin-bottom: 14px;
+  }
+  .welcome > p:not(.eyebrow) {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .door {
+    min-height: 76px;
+    padding: 10px 13px;
+  }
+  .directory-heading {
+    padding-bottom: 12px;
+  }
+  .board {
+    padding: 18px 26px;
+    gap: 11px;
+  }
+  .board h1 {
+    font-size: 24px;
+  }
+  .board .content {
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  #room {
+    padding-top: 12px;
+  }
+  #dialogue {
+    padding-top: 11px;
+  }
+  .speech p {
+    font-size: 14px;
+    max-height: 52px;
+  }
+  .tools {
+    margin-top: 10px;
+    padding-top: 8px;
+  }
+  .tutor-chat {
+    padding: 12px 18px;
+  }
+  .tutor-chat #chatMessages {
+    height: 104px;
+  }
+}
+@media (min-width: 651px) and (max-width: 1100px) {
+  header {
+    padding: 0 22px;
+  }
+  .lobby-content {
+    padding-left: 30px;
+    padding-right: 30px;
+    gap: 26px;
+    grid-template-columns: minmax(245px, 0.85fr) minmax(400px, 1.25fr);
+  }
+  .welcome {
+    padding: 24px;
+  }
+  .welcome h1 {
+    font-size: 28px;
+  }
+  .door {
+    gap: 10px;
+    padding: 12px;
+  }
+  .door b {
+    font-size: 14px;
+  }
+  .door-number {
+    width: 27px;
+    height: 34px;
+    font-size: 11px;
+  }
+  .directory-heading > span {
+    display: none;
+  }
+  .resume {
+    left: 30px;
+    right: 30px;
+  }
+  #room {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+  .teaching-space {
+    gap: 18px;
+    grid-template-columns: minmax(0, 1fr) 170px;
+  }
+  #dialogue {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+  .speaker {
+    width: 120px;
+  }
+  .choices {
+    margin-left: 138px;
+  }
+  .tools {
+    gap: 6px;
+  }
+  .tools > button {
+    padding: 6px 8px;
+  }
+}
+@media (min-width: 651px) and (max-width: 1100px) and (orientation: portrait) {
+  .lobby-content {
+    grid-template-columns: 1fr;
+    align-content: center;
+    gap: 30px;
+    padding: 36px 54px 150px;
+  }
+  .welcome {
+    padding: 30px;
+  }
+  .welcome h1 {
+    font-size: 33px;
+  }
+  .welcome > p:not(.eyebrow) {
+    max-width: none;
+  }
+  #consult {
+    width: auto;
+    min-width: 260px;
+  }
+  .door {
+    min-height: 86px;
+  }
+  .door b {
+    font-size: 16px;
+  }
+  .resume {
+    left: 54px;
+    right: 54px;
+    bottom: 30px;
+    flex-wrap: wrap;
+  }
+  .resume span {
+    flex-basis: 100%;
+  }
+  .teaching-space {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 155px;
+    align-items: stretch;
+  }
+  .board {
+    height: 100%;
+    width: auto;
+    padding: 24px;
+  }
+  .teacher {
+    position: static;
+    width: auto;
+    height: 100%;
+  }
+  .teacher > span {
+    font-size: 11px;
+    padding: 9px;
+  }
+  .board .content {
+    font-size: 18px;
+  }
+  .tutor-chat {
+    grid-template-columns: 1fr;
+  }
+  .tutor-chat #chatMessages {
+    height: 112px;
+  }
+  .tutor-chat #chatForm {
+    padding-top: 0;
+  }
+  .tools {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 650px) {
+  header {
+    height: auto;
+    padding: 12px 18px;
+  }
+  .lobby-content {
+    padding: 24px 18px 165px;
+  }
+  .welcome {
+    padding: 24px;
+  }
+  .welcome h1 {
+    font-size: 27px;
+  }
+  .directory-heading {
+    margin-top: 24px;
+  }
+  .directory-heading > span {
+    display: none;
+  }
+  .doors {
+    grid-template-columns: 1fr;
+  }
+  .door {
+    min-height: 76px;
+  }
+  .resume {
+    left: 18px;
+    right: 18px;
+    bottom: 18px;
+  }
+  #room {
+    padding: 16px;
+  }
+  #dialogue {
+    padding: 16px;
+  }
+  .choices {
+    margin-left: 0;
+  }
+  .board .content {
+    font-size: 17px;
+  }
+  dialog {
+    width: calc(100% - 24px);
+    padding: 22px;
+  }
+  dialog h2 {
+    font-size: 22px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
+  dialog::backdrop {
+    backdrop-filter: none;
+  }
+}
