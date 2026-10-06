@@ -12,6 +12,8 @@ body {
 .assignment-card { padding: 22px 0; border-top: 1px solid #b5b29e; }
 .assignment-card h2 { font-size: 20px; }
 .assignment-files { margin-bottom: 12px; }
+.assignment-content a { color: #24543b; }
+.assignment-card small { color: #4b5a4d; }
 .assignment-content button, .assignment-content select { color: var(--school-ink); background: #eee6cc; border: 1px solid #9c895c; }
 button[aria-pressed="true"] { outline: 2px solid var(--school-brass); outline-offset: 2px; }
 .brand:hover {
