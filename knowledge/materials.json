@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-10-07T15:37:45",
+ "generatedAt": "2026-10-07T22:04:23",
  "asOf": "2026-10-07",
  "termEnd": "2026-12-21",
  "courses": {
@@ -523,14 +523,14 @@
     "2026-09-09": {
      "k": {
       "pre": 1,
-      "profnote": 7,
+      "profnote": 10,
       "summary": 2,
       "lmsvideo": 1
      }
     },
     "2026-09-14": {
      "k": {
-      "profnote": 6,
+      "profnote": 7,
       "summary": 2,
       "lmsvideo": 1,
       "rec": 1
@@ -538,7 +538,7 @@
     },
     "2026-09-16": {
      "k": {
-      "profnote": 3,
+      "profnote": 4,
       "photo": 3,
       "summary": 1,
       "lmsvideo": 1
@@ -572,6 +572,13 @@
       "summary": 1,
       "lmsvideo": 1
      }
+    },
+    "2026-10-07": {
+     "k": {
+      "profnote": 2,
+      "summary": 1,
+      "lmsvideo": 1
+     }
     }
    },
    "assignments": [
@@ -583,18 +590,18 @@
      "status": "못 냄"
     },
     {
+     "title": "Homework Assignment - Chapter 4",
+     "given": "2026-09-28",
+     "due": "2026-10-19T23:59",
+     "src": "LMS",
+     "status": "제출",
+     "submittedAt": "2026-10-03T22:01"
+    },
+    {
      "title": "Homework Assignment - Chapter 5",
      "given": "2026-09-30",
      "due": "2026-10-19T23:59",
      "src": "LMS"
-    },
-    {
-     "title": "Homework Assignment - Chapter 4",
-     "given": "2026-09-28",
-     "due": "2026-11-05T23:59",
-     "src": "LMS",
-     "status": "제출",
-     "submittedAt": "2026-10-03T22:01"
     }
    ]
   },
@@ -725,6 +732,7 @@
     },
     "2026-09-29": {
      "k": {
+      "lmsvideo": 2,
       "rec": 1,
       "derived": 3,
       "summary": 1,
@@ -733,9 +741,11 @@
     },
     "2026-10-06": {
      "k": {
+      "lmsvideo": 2,
+      "derived": 2,
       "summary": 1,
       "note": 1,
-      "pre": 1
+      "pre": 2
      }
     }
    },
