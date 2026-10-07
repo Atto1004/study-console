@@ -7536,11 +7536,11 @@ function importJSON(){
       S=migrate(j); persist(); closeSheet(); render(); toast("가져왔습니다"); }}]});
 }
 function saveFile(name,text){
-  if(!window.claude||!claude.use){ toast("이 화면에서는 파일 저장을 지원하지 않습니다"); return; }
+  if(!window.claude||!claude.use){ toast("이 화면에선 파일 저장을 못 해요"); return; }
   claude.use("downloads").then(function(d){
-    if(!d){ toast("파일 저장을 쓸 수 없습니다 — 복사를 이용하세요"); return; }
+    if(!d){ toast("파일 저장을 못 해요 — 복사를 이용해봐요"); return; }
     return d.save({filename:name,data:text});
-  }).then(function(){ toast("저장했습니다"); },function(){ toast("저장이 취소되었습니다"); });
+  }).then(function(){ toast("저장했어요"); },function(){ toast("저장을 그만뒀어요"); });
 }
 
 /* ---------- 클라우드 저장 (이 페이지 자체에 데이터 굽기) ---------- */
@@ -7560,24 +7560,24 @@ function cloudSave(){
   if(ATOM_HOSTED){
     var b0=$("#btnSave"); b0.disabled=true; b0.textContent="저장 중…";
     fetch("/api/study/state",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({state:S,client:atomClient})})
-      .then(function(r){ if(!r.ok) throw new Error("http"); ui.dirty=false; b0.disabled=false; markSave(); toast("아톰에 저장했습니다 — 폰·PC 어디서든 같은 데이터로 열립니다"); })
-      ["catch"](function(){ b0.disabled=false; markSave("failed"); toast("아톰 저장 실패 — 연결을 확인하세요"); });
+      .then(function(r){ if(!r.ok) throw new Error("http"); ui.dirty=false; b0.disabled=false; markSave(); toast("아톰에 저장했어요 — 폰이든 PC든 같은 데이터로 열려요"); })
+      ["catch"](function(){ b0.disabled=false; markSave("failed"); toast("아톰에 저장 못했어요 — 연결 확인해봐요"); });
     return;
   }
   if(!window.claude||!claude.use){
-    toast("이 화면에서는 클라우드 저장을 쓸 수 없습니다 — JSON 백업을 이용하세요"); return;
+    toast("이 화면에선 클라우드 저장을 못 해요 — JSON 백업을 이용해봐요"); return;
   }
   var b=$("#btnSave"); b.disabled=true; b.textContent="저장 중…";
   claude.use("artifact").then(function(a){
     if(!a) throw new Error("na");
     return a.publish(serialize());
   }).then(function(){
-    ui.dirty=false; b.disabled=false; markSave(); toast("저장했습니다 — 다른 기기에서도 열립니다");
+    ui.dirty=false; b.disabled=false; markSave(); toast("저장했어요 — 다른 기기에서도 열려요");
   })["catch"](function(err){
     b.disabled=false; markSave("failed");
     var code=(err&&err.code)||"";
-    if(code==="conflict") toast("다른 곳에서 먼저 저장됐습니다. 새로고침 후 다시 시도하세요");
-    else toast("클라우드 저장 실패 — JSON 백업을 이용하세요");
+    if(code==="conflict") toast("다른 곳에서 먼저 저장됐어요. 새로고침 후 다시 해봐요");
+    else toast("클라우드 저장 못했어요 — JSON 백업을 이용해봐요");
   });
 }
 
