@@ -51,10 +51,12 @@ export function recommendPlans(data, calendar, now=new Date(), budget, preferred
 const ROOM={main:'lobby',learning:'class',materials:'library',progress:'library',attendance:'library',assignments:'homework'};
 const pct=x=>Math.round(x*100);
 export function createWorkspace(app){
+  let corridorSaeng=null, corridorGen=0;
   let data=null, calendar=null, assignments=null, assignmentError='', area='main', generation=0, navigation=0, consultBusy=false, proposal=[], filter='', kindFilter='', timer=null;
   const root=el('section',undefined,'workspace');root.id='workspace';document.getElementById('scene').append(root);
   const navIds=['mainArea','learningArea','progressArea','materialsArea','attendanceArea','assignmentArea'];
   async function activate(which,token){
+    corridorSaeng?.destroy();corridorSaeng=null;++corridorGen;
     await app.leave();
     if(token!==navigation)return false;
     area=which;
@@ -100,17 +102,20 @@ export function createWorkspace(app){
   }
   function examMetrics(){
     const written=data.exams.filter(e=>e.written&&e.kind==='중간'&&e.dday>=0).sort((a,b)=>a.dday-b.dday);
-    return written.map(e=>{
-      const course=app.catalog().courses.find(c=>c.name===e.course);
-      const events=(app.events?.()||[]).filter(x=>x.course===e.course);
-      return {exam:e,m:courseMetrics({lessons:course?.lessons||[],events,exam:e,today:data.date})};
-    });
+    const names=[...new Set([...written.map(e=>e.course),...(app.rooms?.()||[])])];
+    return names.map(name=>{
+      const exam=written.find(e=>e.course===name)||null;
+      const course=app.catalog().courses.find(c=>c.name===name);
+      if(!exam&&!course)return null;
+      const events=(app.events?.()||[]).filter(x=>x.course===name);
+      return {name,exam,m:courseMetrics({lessons:course?.lessons||[],events,exam,today:data.date})};
+    }).filter(Boolean).sort((a,b)=>(a.exam?a.exam.dday:999)-(b.exam?b.exam.dday:999));
   }
   // 로비 = 복도 장면. 문 하나가 과목 하나, 문패가 진행판, 퀘스트 문이 빛난다. 문을 누르면 1인칭 교실로 들어간다.
   function renderCorridor(){
     const rows=examMetrics();
     const deadlines=pendingDeadlines(assignments?.rows||[],data.date);
-    const quest=pickQuest(rows,deadlines);
+    const quest=pickQuest(rows.filter(r=>r.exam),deadlines);
     const day=new Intl.DateTimeFormat('ko-KR',{month:'long',day:'numeric',weekday:'short',timeZone:'Asia/Seoul'}).format(new Date(data.date+'T12:00:00+09:00'));
     const scene=el('section',undefined,'corridor');scene.setAttribute('aria-label','학교 복도');
     const backdrop=el('div',undefined,'corridor-backdrop');backdrop.setAttribute('aria-hidden','true');
@@ -142,11 +147,12 @@ export function createWorkspace(app){
     q.append(steps);hud.append(q);scene.append(hud);
     // 문
     const doors=el('div',undefined,'corridor-doors');
-    for(const {exam:e,m} of rows){
-      const d=el('button',undefined,'corridor-door pace-'+m.pace+(e.course===target?' is-target':'')+(e.assumed?' is-assumed':''));d.type='button';
-      d.setAttribute('aria-label',`${e.course} 교실 · A+ 준비도 ${m.readiness} · ${ddayLabel(e.dday)}`);d.onclick=()=>walkTo(e.course);
-      if(e.course===target)d.append(el('span',quest?.type==='assignment'?'오늘 할 일':'지금 여기','door-marker'));
-      const plate=el('span',undefined,'door-plate'),name=el('span',undefined,'door-name');name.append(el('b',e.course),el('em',ddayLabel(e.dday)+(e.assumed?' 예정':'')));
+    for(const {name:course,exam:e,m} of rows){
+      const when=e?ddayLabel(e.dday)+(e.assumed?' 예정':''):'시험 없음';
+      const d=el('button',undefined,'corridor-door pace-'+m.pace+(course===target?' is-target':'')+(e?.assumed?' is-assumed':''));d.type='button';
+      d.setAttribute('aria-label',`${course} 교실 · A+ 준비도 ${m.readiness} · ${when}`);d.onclick=()=>walkTo(course);
+      if(course===target)d.append(el('span',quest?.type==='assignment'?'오늘 할 일':'지금 여기','door-marker'));
+      const plate=el('span',undefined,'door-plate'),name=el('span',undefined,'door-name');name.append(el('b',course),el('em',when));
       const bar=el('span',undefined,'door-bar'),fill=el('i');fill.style.width=Math.max(2,pct(m.progress))+'%';bar.append(fill);
       const nums=el('span',undefined,'door-nums');nums.append(el('span',`진도 ${m.covered}/${m.scope}`),el('span',`이해 ${m.tested?pct(m.understanding)+'%':'—'}`));
       plate.append(name,bar,nums);
@@ -154,19 +160,20 @@ export function createWorkspace(app){
       const score=el('span',undefined,'door-score');score.style.setProperty('--s',m.readiness);score.append(el('b',String(m.readiness)),el('small','A+ 준비도'));
       d.append(plate,frame,score);doors.append(d);
     }
-    if(!rows.length)doors.append(el('p','다가오는 중간고사가 없어요.','corridor-empty'));
+    if(!rows.length)doors.append(el('p','등록된 과목 교실이 없어요.','corridor-empty'));
     scene.append(doors);
     const left=btn('← 자료실',()=>open('materials'),'corridor-sign sign-library'),right=btn(`과제실 · ${deadlines.filter(r=>r.deadlineDays!==null&&r.deadlineDays>=0).length}건 →`,()=>open('assignments'),'corridor-sign sign-homework');
     scene.append(left,right);
     // 스앵님 + 대사창
     const face=el('div',undefined,'corridor-saeng');face.append(Object.assign(el('img'),{src:'../notes/classroom/assets/tutor/neutral.png',alt:''}));
     scene.append(face);
-    attachSaeng(face).then(s=>{if(!s)return;s.react(react);s.speak(line);});
+    corridorSaeng?.destroy();corridorSaeng=null;const gen=++corridorGen;
+    attachSaeng(face).then(s=>{if(!s)return;if(gen!==corridorGen||!face.isConnected){s.destroy();return;}corridorSaeng=s;s.react(react);s.speak(line);});
     const vn=el('div',undefined,'corridor-vn');vn.setAttribute('role','dialog');vn.setAttribute('aria-label','김주영 스앵님');
     const choices=el('div',undefined,'vn-choices');
     if(primary)choices.append(btn(primary.label,primary.go,'primary'));
-    const alt=rows.filter(r=>r.exam.course!==target).sort((a,b)=>(100-b.m.readiness)/Math.max(b.exam.dday,1)-(100-a.m.readiness)/Math.max(a.exam.dday,1))[0];
-    if(alt)choices.append(btn(`${alt.exam.course} 먼저 할래요`,()=>walkTo(alt.exam.course)));
+    const alt=rows.filter(r=>r.exam&&r.name!==target).sort((a,b)=>(100-b.m.readiness)/Math.max(b.exam.dday,1)-(100-a.m.readiness)/Math.max(a.exam.dday,1))[0];
+    if(alt)choices.append(btn(`${alt.name} 먼저 할래요`,()=>walkTo(alt.name)));
     choices.append(btn('오늘 계획 다시 짜줘요',()=>{const box=root.querySelector('.main-tutor textarea');if(box){box.value='오늘 계획 다시 잡아줘';box.scrollIntoView({block:'center'});box.focus();}}));
     vn.append(el('span','김주영','vn-tag'),el('p',line,'vn-line'),choices);
     scene.append(vn);
@@ -175,7 +182,7 @@ export function createWorkspace(app){
     root.append(info);
   }
   function walkTo(course){
-    if(app.walk)app.walk(course);else startCourse(course);
+    return app.walk?app.walk(course):startCourse(course);
   }
   function renderMain(){
     renderCorridor();

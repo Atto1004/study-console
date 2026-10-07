@@ -52,7 +52,7 @@ const strip=s=>s.replace(/^import[\s\S]*?from\s+["'][^"']+["'];\s*/gm,'').replac
 // 모듈 상수는 eval 마다 갇히므로 다른 파일이 쓰는 것만 창에 올린다.
 const shared={'metrics.js':'window.KINDS=KINDS;window.WEIGHTS=WEIGHTS;'};
 for(const f of ['metrics.js','saeng.js','workspace.js','mission.js'])w.eval(strip(fs.readFileSync(path.join(root,'school',f),'utf8'))+'\n'+(shared[f]||''));
-w.createSpace=()=>({seated(){},view(){},hide(){}});w.createGrowth=()=>({notifySkills(){},stop:async()=>{},step(){},task(){},tutorPlan(){}});
+w.createSpace=()=>({seated(){},view(){},hide(){},walk(){}});w.ROOMS=[{name:'정역학'},{name:'공업수학1'}];w.createGrowth=()=>({notifySkills(){},stop:async()=>{},step(){},task(){},tutorPlan(){}});
 w.eval(source+'\nwindow.__smokeAssignments=showAssignments;window.__smokeConcept=()=>startLesson(lastLesson,{concept:true});window.__smokeLobby=()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;};');
 const settle=()=>new Promise(resolve=>setTimeout(resolve,10));
 const check=(label)=>[...d.querySelectorAll('.assignment-check')].find(el=>el.textContent===label)?.querySelector('input');
@@ -62,7 +62,7 @@ const byText=text=>[...d.querySelectorAll('button')].find(b=>b.textContent===tex
  await settle();await settle();d.querySelector('#learningArea').click();await settle();w.__smokeLobby();assert.equal(d.querySelector('#resume').disabled,false,d.querySelector('#status').textContent+' '+errors.map(String).join(' '));assert.equal(d.querySelectorAll('.door').length,7);
  assert.equal(d.querySelectorAll('header nav.rooms .room-door').length,4,'방 4개: 로비·교실·자료실·과제실');
  assert.equal(d.querySelectorAll('.room-sub button').length,2);
- d.querySelector('#mainArea').click();await settle();assert.ok(d.querySelector('.corridor .corridor-vn'),'로비 복도 장면과 스앵님 대사창');assert.ok(d.querySelector('.corridor-quest'),'퀘스트 판');assert.equal(d.querySelector('.school').dataset.room,'lobby');
+ d.querySelector('#mainArea').click();await settle();assert.ok(d.querySelector('.corridor .corridor-vn'),'로비 복도 장면과 스앵님 대사창');assert.ok(d.querySelector('.corridor-quest'),'퀘스트 판');assert.equal(d.querySelectorAll('.corridor-door').length,2,'시험이 없어도 1인칭 교실이 있는 과목 문은 나온다');assert.equal(d.querySelector('.school').dataset.room,'lobby');
  d.querySelector('#materialsArea').click();for(let i=0;i<20&&!d.querySelector('.kind-chip');i++)await settle();assert.equal(d.querySelector('.school').dataset.room,'library');assert.equal(d.querySelectorAll('.kind-chip').length,5,'자료 4분류 + 전체');
  d.querySelector('#progressArea').click();await settle();assert.equal(d.querySelector('#workspace').hidden,false);
  w.__smokeAssignments();await settle();assert.equal(d.querySelector('#lobby').hidden,true);assert.equal(d.querySelector('#assignments').hidden,false);assert.ok(d.querySelector('#assignments').textContent.includes('풀이 과제'));assert.ok(!d.querySelector('#assignments').textContent.includes('제출 과제'));

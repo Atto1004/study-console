@@ -208,10 +208,12 @@ html body .school #scene { background: var(--scene-room) !important; background-
 .door-score:before { content: ""; position: absolute; inset: 6px; border-radius: 50%; background: var(--door); }
 .door-score b { position: relative; font-size: 19px; font-weight: 800; font-variant-numeric: tabular-nums; }
 .door-score small { position: absolute; top: 62px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 10px; color: var(--ink-2); }
-.corridor-door.is-target .door-frame { box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--room-homework), 0 0 40px 10px rgba(197,123,61,.35); animation: door-glow 2.4s ease-in-out infinite; }
-.door-marker { position: absolute; left: 50%; top: -30px; transform: translateX(-50%); z-index: 3; padding: 3px 10px; border-radius: 999px; background: var(--room-homework); color: #fff; font-size: 11px; font-weight: 800; white-space: nowrap; animation: door-bob 1.6s ease-in-out infinite; }
+.corridor { --glow: var(--room-homework); --glow-a: rgba(197,123,61,.35); --glow-b: rgba(197,123,61,.45); }
+.corridor:has(.corridor-quest:not(.is-deadline)) { --glow: var(--brand); --glow-a: rgba(33,116,90,.3); --glow-b: rgba(33,116,90,.4); }
+.corridor-door.is-target .door-frame { box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--glow), 0 0 40px 10px var(--glow-a); animation: door-glow 2.4s ease-in-out infinite; }
+.door-marker { position: absolute; left: 50%; top: -30px; transform: translateX(-50%); z-index: 3; padding: 3px 10px; border-radius: 999px; background: var(--glow); color: #fff; font-size: 11px; font-weight: 800; white-space: nowrap; animation: door-bob 1.6s ease-in-out infinite; }
 .corridor-door.is-assumed .door-plate { opacity: .82; }
-@keyframes door-glow { 50% { box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--room-homework), 0 0 56px 16px rgba(197,123,61,.45); } }
+@keyframes door-glow { 50% { box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--glow), 0 0 56px 16px var(--glow-b); } }
 @keyframes door-bob { 50% { transform: translate(-50%, -4px); } }
 .corridor-empty { position: absolute; left: 0; right: 0; top: 120px; text-align: center; color: var(--ink-2); }
 
@@ -228,8 +230,6 @@ html body .school #scene { background: var(--scene-room) !important; background-
 .vn-choices button { min-height: 40px !important; padding: 0 15px !important; border-radius: 11px !important; border: 1px solid var(--line) !important; background: var(--surface-2) !important; color: var(--ink) !important; font-weight: 600; font-size: 14px !important; }
 .vn-choices button.primary { background: var(--room-homework) !important; border-color: transparent !important; color: #fff !important; }
 .corridor:has(.corridor-quest:not(.is-deadline)) .vn-choices button.primary { background: var(--brand) !important; }
-.corridor:has(.corridor-quest:not(.is-deadline)) .door-marker { background: var(--brand); }
-.corridor:has(.corridor-quest:not(.is-deadline)) .corridor-door.is-target .door-frame { box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--brand), 0 0 40px 10px rgba(33,116,90,.3); }
 .school[data-mode=workspace][data-room=lobby] > .dock { display: none; }
 .workspace details.ready-info { border: 0 !important; background: none !important; padding: 0 !important; margin: 0 0 12px !important; color: var(--ink-3); font-size: var(--fs-1); }
 
@@ -284,6 +284,17 @@ html body .school #scene { background: var(--scene-room) !important; background-
 footer { background: var(--surface) !important; color: var(--ink-3) !important; border-top: 1px solid var(--line) !important; font-size: var(--fs-1) !important; }
 
 @media (max-width: 760px) {
+  .corridor { height: auto; padding: 12px 12px 14px; display: flex; flex-direction: column; gap: 12px; }
+  .corridor-hud, .corridor-doors, .corridor-vn, .corridor-sign { position: static !important; }
+  .corridor-hud { flex-wrap: wrap; }
+  .corridor-quest { margin-left: 0; width: 100%; }
+  .corridor-doors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 34px 10px; padding-top: 30px; }
+  .corridor-door { max-width: none; height: 250px; }
+  .corridor-saeng { display: none; }
+  .corridor-vn { padding: 22px 16px 14px; }
+  .vn-tag { left: 16px; }
+  .corridor-backdrop { display: none; }
+
   header { height: auto !important; flex-wrap: wrap !important; padding: 8px 12px !important; row-gap: 8px !important; }
   header nav.rooms { order: 3; width: 100%; margin: 0 !important; justify-content: space-between; }
   header nav.rooms .room-door { flex: 1; justify-content: center; }

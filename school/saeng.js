@@ -71,7 +71,9 @@ export async function mountSaeng(host, { dir = "../docs/demo/saeng/layers2/" } =
 
   let expr = "neutral", blinking = false, gazing = false, talking = false, alive = true;
   const timers = new Set();
-  const later = (fn, ms) => { const t = setTimeout(() => { timers.delete(t); if (alive) fn(); }, ms); timers.add(t); return t; };
+  const stop = () => { alive = false; for (const t of timers) clearTimeout(t); timers.clear(); };
+  // 화면에서 빠진 스앵님은 스스로 멈춘다(다시 그릴 때 타이머가 쌓이지 않게).
+  const later = (fn, ms) => { const t = setTimeout(() => { timers.delete(t); if (!alive) return; if (!el.isConnected) { stop(); return; } fn(); }, ms); timers.add(t); return t; };
 
   const set = (n, on, snap) => { const i = LY[n]; if (!i) return; i.classList.toggle("snap", !!snap); i.classList.toggle("on", !!on); };
   const only = (group, n, snap) => { for (const k in LY) if (k.startsWith(group)) set(k, k === n, snap); };
@@ -150,6 +152,6 @@ export async function mountSaeng(host, { dir = "../docs/demo/saeng/layers2/" } =
     speak,
     react,
     get expr() { return expr; },
-    destroy() { alive = false; for (const t of timers) clearTimeout(t); timers.clear(); el.remove(); },
+    destroy() { stop(); el.remove(); },
   };
 }
