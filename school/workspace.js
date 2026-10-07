@@ -112,14 +112,22 @@ export function createWorkspace(app){
     });
   }
   function renderToday(){
-    const host=el('section',undefined,'today-strip');host.setAttribute('aria-label','오늘 수업과 일정');
+    const day=new Intl.DateTimeFormat('ko-KR',{month:'long',day:'numeric',weekday:'short',timeZone:'Asia/Seoul'}).format(new Date(data.date+'T12:00:00+09:00'));
+    const head=el('div',undefined,'lobby-head');head.append(el('p',`로비 · ${day}`,'lobby-eyebrow'),el('h1','오늘도, 한 걸음 가까이.'));root.append(head);
+    const host=el('section',undefined,'today-cards');host.setAttribute('aria-label','오늘 수업·마감·시험');
     const classes=data.scheduled.filter(s=>!s.record?.cancelled).sort((a,b)=>a.s.localeCompare(b.s));
     const others=(calendar?.events||[]).filter(e=>!e.allDay&&e.start).filter(e=>!classes.some(c=>c.s===e.start));
-    host.append(el('b',new Intl.DateTimeFormat('ko-KR',{month:'long',day:'numeric',weekday:'short',timeZone:'Asia/Seoul'}).format(new Date(data.date+'T12:00:00+09:00')),'today-date'));
-    if(!classes.length&&!others.length)host.append(el('span',calendar?.verified?'오늘 수업·일정 없음':'오늘 일정 확인 필요','today-empty'));
-    for(const c of classes)host.append(el('span',`${c.s} ${c.course}`,'today-class'));
-    for(const e of others.slice(0,4))host.append(el('span',`${e.start} ${e.title||e.summary||'일정'}`,'today-event'));
-    root.append(host);
+    const lessons=el('div',undefined,'today-card today-lessons');lessons.append(el('small','오늘 수업'));
+    if(!classes.length&&!others.length)lessons.append(el('strong',calendar?.verified?'수업 없음':'일정 확인 필요'));
+    for(const c of classes)lessons.append(el('strong',`${c.s} ${c.course}`));
+    for(const e of others.slice(0,2))lessons.append(el('span',`${e.start} ${e.title||e.summary||'일정'}`));
+    const due=pendingDeadlines(assignments?.rows||[],data.date).find(r=>r.deadlineDays!==null&&r.deadlineDays>=0);
+    const dueCard=el('button',undefined,'today-card today-due');dueCard.type='button';dueCard.onclick=()=>open('assignments');
+    dueCard.append(el('small','가장 가까운 마감'),el('strong',due?`${due.deadlineDays?'D-'+due.deadlineDays:'오늘'} · ${due.course}`:'남은 마감 없음'));if(due)dueCard.append(el('span',due.title));
+    const exam=data.exams.filter(e=>e.written&&e.dday>=0).sort((a,b)=>a.dday-b.dday)[0];
+    const examCard=el('div',undefined,'today-card today-exam');
+    examCard.append(el('small','시험까지'),el('strong',exam?`${ddayLabel(exam.dday)} · ${exam.course}`:'예정 시험 없음'));if(exam)examCard.append(el('span',`${exam.date.slice(5).replace('-','/')} ${exam.time||''}${exam.assumed?' · 예정':''}`));
+    host.append(lessons,dueCard,examCard);root.append(host);
   }
   function renderBoard(){
     const rows=examMetrics();

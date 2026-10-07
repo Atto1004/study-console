@@ -1,20 +1,21 @@
 /* 학교 화면 겉모양. 피그마 결과는 이 파일의 토큰과 이미지 슬롯만 바꿔 넣는다(docs/atom/figma-brief-1007.md). */
+/* 색·모서리·그림자 = 오타 시안 A(10/7) 값 */
 :root {
   --font: "Pretendard Variable", Pretendard, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  --bg: #f3f4f6;
+  --bg: #f5f6f2;
   --surface: #ffffff;
-  --surface-2: #f8f9fb;
-  --ink: #14171c;
-  --ink-2: #4b5260;
-  --ink-3: #8a919e;
-  --line: #e3e6eb;
-  --brand: #1f7a4d;
+  --surface-2: #f5f7f3;
+  --ink: #182a24;
+  --ink-2: #65736c;
+  --ink-3: #85938b;
+  --line: #dfe7df;
+  --brand: #21745a;
   --brand-ink: #ffffff;
-  --radius-s: 8px;
-  --radius: 14px;
-  --radius-l: 20px;
-  --shadow-1: 0 1px 2px rgba(20, 23, 28, .06), 0 1px 1px rgba(20, 23, 28, .04);
-  --shadow-2: 0 8px 24px rgba(20, 23, 28, .10), 0 2px 6px rgba(20, 23, 28, .06);
+  --radius-s: 12px;
+  --radius: 18px;
+  --radius-l: 24px;
+  --shadow-1: 0 3px 14px #203d2310;
+  --shadow-2: 0 18px 50px #264c3020;
   --gap-1: 6px;
   --gap-2: 12px;
   --gap-3: 20px;
@@ -23,18 +24,18 @@
   --fs-2: 14px;
   --fs-3: 16px;
   --fs-4: 22px;
-  --fs-5: 34px;
-  --room-lobby: #1f7a4d;
-  --room-class: #2f5bd3;
-  --room-library: #6a4fd8;
-  --room-homework: #e0731f;
-  --kind-original: #6b7280;
-  --kind-tutor: #26408b;
-  --kind-generated: #7c4ddb;
-  --kind-assignment: #e0731f;
-  --ok: #1f9d55;
-  --tight: #d99a06;
-  --behind: #d93d3d;
+  --fs-5: 36px;
+  --room-lobby: #21745a;
+  --room-class: #4273a4;
+  --room-library: #8265ac;
+  --room-homework: #c57b3d;
+  --kind-original: #687781;
+  --kind-tutor: #426b9c;
+  --kind-generated: #8a66b4;
+  --kind-assignment: #c57b3d;
+  --ok: #3f9461;
+  --tight: #c9932f;
+  --behind: #cc5b5b;
   --dock-w: 300px;
 }
 @media (prefers-color-scheme: dark) {
@@ -164,26 +165,34 @@ html body .school #scene { background: var(--scene-room) !important; background-
 .school dialog#panel { border: 0 !important; border-radius: var(--radius-l) !important; background: var(--surface) !important; color: var(--ink) !important; box-shadow: var(--shadow-2) !important; }
 
 /* 로비: 오늘 줄 */
-.today-strip { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap-1); margin-bottom: var(--gap-2); }
-.today-strip .today-date { font-size: var(--fs-4); font-weight: 800; margin-right: var(--gap-2); }
-.today-strip span { padding: 6px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-size: var(--fs-2); color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.today-strip .today-class { border-color: color-mix(in srgb, var(--room-class) 40%, var(--line)); color: var(--room-class); font-weight: 600; }
+.lobby-head { margin: 6px 0 18px; }
+.lobby-eyebrow { margin: 0 0 6px; font-size: 11px; font-weight: 800; letter-spacing: 1.8px; color: var(--brand); }
+.workspace .lobby-head h1 { font-size: var(--fs-5) !important; line-height: 1.2 !important; letter-spacing: -1.5px; margin: 0 !important; }
+.today-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.today-card { display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 14px 18px !important; min-height: 0 !important;
+  background: var(--surface) !important; color: var(--ink) !important; border: 0 !important; border-left: 3px solid var(--room-class) !important;
+  border-radius: var(--radius-s) !important; box-shadow: var(--shadow-1) !important; font-variant-numeric: tabular-nums; }
+.today-card small { font-size: 11px; color: var(--ink-2); margin-bottom: 2px; }
+.today-card strong { font-size: var(--fs-3); font-weight: 700; }
+.today-card span { font-size: var(--fs-1); color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.today-due { border-left-color: var(--room-homework) !important; cursor: pointer; }
+.today-exam { border-left-color: var(--room-lobby) !important; }
 
 /* 로비: 지금 할 것 + 과목별 준비도 */
 .ready-board { padding: var(--gap-3) !important; }
 .next-quest {
   display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto auto; column-gap: var(--gap-3); align-items: center;
-  padding: var(--gap-3); margin-bottom: var(--gap-3); border-radius: var(--radius);
-  background: linear-gradient(135deg, #14171c, #263040); color: #fff;
+  padding: 22px 26px; margin-bottom: var(--gap-3); border-radius: var(--radius-l);
+  background: linear-gradient(120deg, #e4eee5, #edf3dc); color: var(--ink); border: 1px solid var(--line);
 }
-.next-quest small { color: #9fe3bf; font-weight: 700; font-size: var(--fs-1); letter-spacing: .06em; }
-.next-quest b { font-size: var(--fs-4); font-weight: 800; }
-.next-quest span { color: #c6ccd6; font-size: var(--fs-2); font-variant-numeric: tabular-nums; }
-.next-quest button { grid-column: 2; grid-row: 1 / 4; min-width: 120px; min-height: 52px !important; border-radius: 999px !important; font-size: var(--fs-3) !important; background: #2ed47a !important; color: #0b2a1a !important; border: 0 !important; transition: transform .15s ease; }
+.next-quest small { color: var(--brand); font-weight: 800; font-size: 11px; letter-spacing: 1.8px; }
+.next-quest b { font-size: 25px; font-weight: 800; letter-spacing: -.6px; margin: 4px 0; }
+.next-quest span { color: var(--ink-2); font-size: var(--fs-1); font-variant-numeric: tabular-nums; }
+.next-quest button { grid-column: 2; grid-row: 1 / 4; min-width: 128px; min-height: 50px !important; border-radius: var(--radius-s) !important; font-size: var(--fs-3) !important; background: var(--brand) !important; color: #fff !important; border: 0 !important; font-weight: 700; transition: transform .15s ease; }
 .next-quest button:active { transform: scale(.96); }
-.next-quest.quest-deadline { background: linear-gradient(135deg, #3a1d08, #7a3a10); }
-.next-quest.quest-deadline small { color: #ffc28a; }
-.next-quest.quest-deadline button { background: #ff9a3d !important; color: #2a1200 !important; }
+.next-quest.quest-deadline { background: linear-gradient(120deg, #f8eadb, #f3e4cf); }
+.next-quest.quest-deadline small { color: var(--room-homework); }
+.next-quest.quest-deadline button { background: var(--room-homework) !important; color: #fff !important; }
 .ready-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(166px, 1fr)); gap: var(--gap-2); }
 .ready-tile {
   --pace: var(--ok);
@@ -269,6 +278,7 @@ footer { background: var(--surface) !important; color: var(--ink-3) !important; 
   html body .school #scene { overflow-x: hidden !important; }
   .workspace, .school .lobby-content { padding: 12px 12px 150px !important; }
   .ready-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .today-cards { grid-template-columns: 1fr; }
   .next-quest { grid-template-columns: 1fr; }
   .next-quest button { grid-column: 1; grid-row: auto; margin-top: 12px; }
   header nav.rooms .room-door { padding: 0 12px !important; }
