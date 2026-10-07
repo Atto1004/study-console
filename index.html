@@ -8136,7 +8136,7 @@ var V25={};
     if(ATOM_HOSTED&&patch&&patch.status==="absent"&&was!=="absent"){
       var c=course(cid); if(!c) return s; var dow=D(date).getDay(); var sl=(c.slots||[]).filter(function(x){return x.d===dow;})[0];
       fetch("/api/absent",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({course:c.name,date:date,start:sl?sl.s:"",end:sl?sl.e:"",reason:diffDays(today(),date)>0?"사전 지정":"결석"})})
-        .then(function(r){return r.json();}).then(function(j){ toast(j&&j.ok?"아톰이 캘린더 블록을 결석(토마토)으로 표시합니다":"아톰 요청 실패"); })["catch"](function(){});
+        .then(function(r){if(!r.ok) throw new Error("HTTP "+r.status); return r.json();}).then(function(j){ toast(j&&j.ok?"아톰이 캘린더 블록을 결석(토마토)으로 표시합니다":"아톰 요청 실패"); })["catch"](function(err){ toast("결석 처리 못했어요 — 다시 시도해봐요"); });
     }
     return s;
   };
@@ -13897,7 +13897,7 @@ var V33={};
   if(window.V72){
     var _cl=V72.clusters; V72.clusters=function(){ var g=V72.st(), keep=g.pts; g.pts=V73.pts(); try{ return _cl.apply(this,arguments); } finally{ g.pts=keep; } };
     var _add=V72.add; V72.add=function(p){ var r=_add.apply(this,arguments);
-      try{ var c=p&&p.coords; if(c&&c.accuracy<=1000) fetch("/api/location",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lat:c.latitude,lon:c.longitude,acc:c.accuracy,src:"study"})}).then(function(){ V73.pull(true); }).catch(function(){}); }catch(e){}
+      try{ var c=p&&p.coords; if(c&&c.accuracy<=1000) fetch("/api/location",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lat:c.latitude,lon:c.longitude,acc:c.accuracy,src:"study"})}).then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); V73.pull(true); }).catch(function(err){ console.warn("위치 저장 실패",err); }); }catch(e){}
       return r; };
   }
   V73.pull(true); setInterval(function(){ if(!document.hidden) V73.pull(); },120000);
