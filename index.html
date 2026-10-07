@@ -3032,21 +3032,31 @@ function load(){
   /* 시각과 상관없이, 못 올라간 표시가 있는 로컬은 서버와 다르면 먼저 복구 사본으로 옮긴다 */
   var unsynced=0; try{ unsynced=+localStorage.getItem(KEY+".unsynced")||0; }catch(e){}
   if(pick===atomState&&loc&&unsynced&&(loc.updatedAt||0)!==(atomState.updatedAt||0)){
-    try{ localStorage.setItem(KEY+".recovery",JSON.stringify(loc)); localStorage.removeItem(KEY+".unsynced"); }catch(e){}
+    var list=recoveryList();
+    if(!list.some(function(x){ return (x.updatedAt||0)===(loc.updatedAt||0); })) list.push(loc);
+    try{ localStorage.setItem(KEY+".recovery",JSON.stringify(list)); localStorage.removeItem(KEY+".unsynced"); }catch(e){}
   }
-  if(pick===atomState){ try{ var rec=localStorage.getItem(KEY+".recovery"); if(rec) ui.recovery=JSON.parse(rec); }catch(e){} }
+  if(pick===atomState){ var have=recoveryList(); if(have.length) ui.recovery=have; }
   S=migrate(pick);
 }
-/* 복구 사본은 되돌리거나 지울 때까지 남고, 들어올 때마다 다시 묻는다 */
+/* 복구 사본은 여러 개를 쌓아 두고, 되돌리거나 지운 것만 빠진다. 예전 한 개 형식도 읽는다 */
+function recoveryList(){
+  try{ var v=JSON.parse(localStorage.getItem(KEY+".recovery")||"[]"); return Array.isArray(v)?v:[v]; }catch(e){ return []; }
+}
 function offerRecovery(){
-  var loc=ui.recovery; if(!loc) return; ui.recovery=null;
-  var at=new Date(loc.updatedAt||0).toLocaleString("ko-KR"), server=new Date((atomState&&atomState.updatedAt)||0).toLocaleString("ko-KR");
-  if(confirm("서버에 저장되지 못한 이 기기 입력이 있어요.\n이 기기: "+at+"\n서버: "+server+"\n\n이 기기 입력으로 되돌릴까요?")){
-    S=migrate(loc); persist(); render();
-    try{ localStorage.removeItem(KEY+".recovery"); }catch(e){}
-  }else if(confirm("이 기기 입력(복구 사본)을 지울까요?\n취소하면 남겨 두고 다음에 다시 물어요.")){
-    try{ localStorage.removeItem(KEY+".recovery"); }catch(e){}
+  var list=ui.recovery; if(!list||!list.length) return; ui.recovery=null;
+  list=list.slice().sort(function(a,b){ return (b.updatedAt||0)-(a.updatedAt||0); });
+  var keep=[], server=new Date((atomState&&atomState.updatedAt)||0).toLocaleString("ko-KR"), restored=false;
+  for(var i=0;i<list.length;i++){
+    var loc=list[i], at=new Date(loc.updatedAt||0).toLocaleString("ko-KR");
+    if(restored){ keep.push(loc); continue; }
+    if(confirm("서버에 저장되지 못한 이 기기 입력이 있어요 ("+(i+1)+"/"+list.length+").\n이 기기: "+at+"\n서버: "+server+"\n\n이 입력으로 되돌릴까요?")){
+      S=migrate(loc); persist(); render(); restored=true;
+    }else if(!confirm("이 입력(복구 사본)을 지울까요?\n취소하면 남겨 두고 다음에 다시 물어요.")){
+      keep.push(loc);
+    }
   }
+  try{ if(keep.length) localStorage.setItem(KEY+".recovery",JSON.stringify(keep)); else localStorage.removeItem(KEY+".recovery"); }catch(e){}
 }
 function persist(){
   S.updatedAt=Date.now(); ui.dirty=true;

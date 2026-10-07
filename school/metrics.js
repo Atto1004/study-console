@@ -54,8 +54,8 @@ export function sourceKind(item = {}) {
   const text = [item.file, item.title, item.label, item.href, item.module].filter(Boolean).join(" ");
   if (KINDS[item.kind]) return { kind: item.kind, sure: true };
   if (item.assignment) return { kind: "assignment", sure: true };
-  if (item.lms) return { kind: ASSIGNMENT_TEXT.test(text) ? "assignment" : "original", sure: true };
   if (SERVER_KIND[item.kind]) return { kind: SERVER_KIND[item.kind], sure: true };
+  if (item.lms) return { kind: ASSIGNMENT_TEXT.test(text) ? "assignment" : "original", sure: true };
   if (ASSIGNMENT_TEXT.test(text)) return { kind: "assignment", sure: false };
   if (/강의자료|교수필기|강의계획서|교재|판서|녹음|클로바|clova|영상|\.mp4$/i.test(text)) return { kind: "original", sure: false };
   if (/수업\s*노트|notes\/lessons\/|notes\/classroom\/|기호\s*사전/.test(text)) return { kind: "tutor", sure: false };

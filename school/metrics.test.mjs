@@ -85,6 +85,7 @@ test("자료 4분류 — 명시된 종류가 먼저, 이름으로만 짐작하�
   assert.deepEqual(sourceKind({ file: "HW-Ch5_제출본_v11.pdf" }), { kind: "assignment", sure: false });
   assert.deepEqual(sourceKind({ kind: "material", file: "HW-Ch3.pdf" }), { kind: "original", sure: true }, "서버가 정한 종류를 이름이 덮지 않는다");
   assert.deepEqual(sourceKind({ kind: "summary", file: "HW-Ch3.pdf" }), { kind: "tutor", sure: true });
+  assert.deepEqual(sourceKind({ kind: "summary", lms: true, file: "HW-Ch3.pdf" }), { kind: "tutor", sure: true }, "LMS 표시가 있어도 서버 종류가 먼저");
   assert.deepEqual(sourceKind({ assignment: true, file: "x.pdf" }), { kind: "assignment", sure: true });
   assert.equal(classifySource({ href: "notes/statics-mid2-slides.html" }), "generated");
 });
