@@ -14,10 +14,7 @@
     <link rel="stylesheet" href="reading.css" />
     <link rel="stylesheet" href="workspace.css" />
     <link rel="stylesheet" href="academy.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/galmuri@latest/dist/galmuri.css"
-    />
+    <link rel="stylesheet" href="skin.css" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
@@ -49,14 +46,16 @@
         <button id="home" disabled class="brand">
           GREENLIGHT <span>학교</span></button
         ><span id="location">학교 로비</span>
-        <nav>
-          <button id="mainArea" disabled aria-pressed="true">메인</button>
-          <button id="learningArea" disabled aria-pressed="true">공부하기</button>
-          <button id="progressArea" disabled aria-pressed="false">진도관리</button>
-          <button id="materialsArea" disabled aria-pressed="false">수업자료</button>
-          <button id="attendanceArea" disabled aria-pressed="false">출결</button>
-          <button id="assignmentArea" disabled aria-pressed="false">과제</button>
+        <nav class="rooms" aria-label="학교 공간">
+          <button id="mainArea" class="room-door" data-room="lobby" disabled aria-pressed="true"><i aria-hidden="true"></i>로비</button>
+          <button id="learningArea" class="room-door" data-room="class" disabled aria-pressed="false"><i aria-hidden="true"></i>교실</button>
+          <button id="materialsArea" class="room-door" data-room="library" disabled aria-pressed="false"><i aria-hidden="true"></i>자료실</button>
+          <button id="assignmentArea" class="room-door" data-room="homework" disabled aria-pressed="false"><i aria-hidden="true"></i>과제실</button>
         </nav>
+        <div class="room-sub" aria-label="자료실 안">
+          <button id="progressArea" disabled aria-pressed="false">수업 범위</button>
+          <button id="attendanceArea" disabled aria-pressed="false">출결</button>
+        </div>
         <details class="secondary-menu">
           <summary>더보기</summary>
           <div>
@@ -156,10 +155,15 @@
           ><button id="next" class="primary">다음</button>
         </div>
       </section>
+      <aside id="dock" class="dock" aria-label="김주영 스앵님">
+        <div id="dockFace" class="dock-face"><img src="../notes/classroom/assets/tutor/neutral.png" alt="김주영 스앵님" /></div>
+        <p id="dockLine" class="dock-line" aria-live="polite">오늘은 어디부터 볼까요.</p>
+        <button id="dockTalk" type="button" class="dock-talk">상담</button>
+      </aside>
       <footer>
         <button id="studyTimer" hidden title="누르면 타이머 중지"></button>
         <span>학습 · 수업 자료 · 과제</span>
-        <span id="status" role="status">연결 중</span><small>.191</small
+        <span id="status" role="status">연결 중</span><small>.192</small
         ><button id="retry" hidden>저장 재시도</button>
       </footer>
     </div>

@@ -16,7 +16,7 @@
 <div class="row" id="row"></div>
 <div id="log"></div>
 <script type="module">
-import { mountSaeng } from "./saeng.js";
+import { mountSaeng } from "../../../school/saeng.js";
 const kinds = ["idle", "correct", "wrong", "stuck", "deadline", "question"];
 const row = document.getElementById("row"), log = document.getElementById("log");
 const out = [];
@@ -25,7 +25,7 @@ for (const k of kinds) {
   const host = document.createElement("div"); host.className = "host";
   const cap = document.createElement("div"); cap.textContent = k;
   cell.append(host, cap); row.append(cell);
-  const s = await mountSaeng(host);
+  const s = await mountSaeng(host, { dir: "layers2/" });
   s.react(k);
   out.push([k, s]);
 }

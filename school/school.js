@@ -7,6 +7,7 @@ import {
 } from "./learning.js";
 import { createWorkspace } from "./workspace.js";
 import { createMission } from "./mission.js";
+import { attachSaeng } from "./saeng.js";
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
 let catalog,
@@ -818,7 +819,8 @@ function answer(choice) {
   const step = current.steps[index],
     correct = choice === step.answer;
   $("choices").querySelectorAll('button').forEach((b,i)=>{b.removeAttribute('data-result');if(i===choice)b.dataset.result=correct?'correct':'wrong';});
-  mission?.feedback(correct?'correct':'retry');
+  if (mission) mission.feedback(correct?'correct':'retry');
+  else window.dispatchEvent(new CustomEvent('saeng',{detail:{react:correct?'correct':'wrong'}}));
   record({
     kind: "answer",
     course,
@@ -2137,7 +2139,10 @@ async function boot() {
     $("listen").title = capabilities.voice
       ? "Fish 음성으로 대사 듣기"
       : "서버에 Fish 음성 연결 설정이 필요합니다.";
-    showLobby();
+    const room = new URLSearchParams(location.search).get("room"), lessonId = new URLSearchParams(location.search).get("lesson");
+    if (lessonId) startLesson(lessonId);
+    else if (["learning", "materials", "progress", "attendance", "assignments"].includes(room)) workspace.open(room);
+    else showLobby();
     status("학교 연결 완료");
   } catch (error) {
     $("today").textContent =
@@ -2147,7 +2152,20 @@ async function boot() {
   }
 }
 mission = createMission({api,context:()=>current?{lesson:current,step:current.steps[index],index,assisted,total:missionIndices?.length,number:missionIndices?missionIndices.indexOf(index)+1:undefined}:null,feedback:(text,kind)=>{$('speech').textContent=text;mission.feedback(kind);renderMath($('speech'));},allowNext:()=>{status('풀이 피드백은 관찰 기록입니다. 확인 문제의 정답 검증은 별도로 진행합니다.');}});
-workspace = createWorkspace({api,status,panel,record,close:closeDialogs,catalog:()=>catalog,evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,leave:async()=>{await mission.save();if(current)await saveSession(current,index);stopVoice();closeDialogs();++requestGeneration;},lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode)});
+workspace = createWorkspace({api,status,panel,record,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,leave:async()=>{await mission.save();if(current)await saveSession(current,index);stopVoice();closeDialogs();++requestGeneration;},lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode)});
+const DOCK_LINES={correct:'좋아요. 그 감각 그대로 다음 문제.',wrong:'괜찮아요. 조건부터 다시 나눠 적어봐요.',stuck:'막힌 데서 같이 볼게요.',deadline:'마감이 가까워요. 과제부터 끝내요.'};
+let dockSaeng=null;
+attachSaeng($('dockFace')).then(s=>{dockSaeng=s;});
+window.addEventListener('saeng',e=>{
+  const {react,line}=e.detail||{};
+  if(react)dockSaeng?.react(react);
+  const text=line||DOCK_LINES[react];
+  if(text){$('dockLine').textContent=text;dockSaeng?.speak(text);}
+});
+// 수업 중에는 도크가 칠판 옆 스앵님 자리로 들어가고, 나오면 화면 아래로 돌아온다.
+new MutationObserver(()=>{const inClass=document.querySelector('.school').dataset.mode==='classroom',seat=document.querySelector('.teacher'),dock=$('dock');if(inClass&&seat&&dock.parentElement!==seat)seat.append(dock);else if(!inClass&&dock.parentElement===seat)document.querySelector('.school').insertBefore(dock,document.querySelector('.school > footer'));}).observe(document.querySelector('.school'),{attributes:true,attributeFilter:['data-mode']});
+new MutationObserver(()=>{const t=$('speech').textContent.trim();if(t&&!$('dialogue').hidden)dockSaeng?.speak(t.slice(0,80));}).observe($('speech'),{childList:true,characterData:true,subtree:true});
+$('dockTalk').onclick=()=>{if(document.querySelector('.school').dataset.mode==='classroom'){$('askToggle').click();return;}workspace.open('main').then(()=>document.querySelector('.main-tutor textarea')?.focus());};
 $('home').onclick=()=>workspace.open('main');
 $('mainArea').onclick=()=>workspace.open('main');
 $('learningArea').onclick=()=>workspace.open('learning');

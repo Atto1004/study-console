@@ -83,5 +83,5 @@ export function createMission(app){
     finally{if(b.isConnected)b.disabled=false;}
   }
   window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
-  return {mount,setMode,get mode(){return mode;},save:()=>dirty?save():saveQueue.catch(()=>{}),hide:async()=>{if(dirty)await save();host.hidden=true;},feedback:(kind)=>{host.dataset.feedback=kind;const face=document.getElementById('missionTutorFace');const expression='../notes/classroom/assets/tutor/'+(kind==='correct'?'proud':kind==='retry'?'sharp':'neutral')+'.png';if(face)face.src=expression;const teacher=document.getElementById('teacher');if(teacher)teacher.src=expression;}};
+  return {mount,setMode,get mode(){return mode;},save:()=>dirty?save():saveQueue.catch(()=>{}),hide:async()=>{if(dirty)await save();host.hidden=true;},feedback:(kind)=>{host.dataset.feedback=kind;window.dispatchEvent(new CustomEvent('saeng',{detail:{react:kind==='correct'?'correct':kind==='retry'?'wrong':'idle'}}));const face=document.getElementById('missionTutorFace');const expression='../notes/classroom/assets/tutor/'+(kind==='correct'?'proud':kind==='retry'?'sharp':'neutral')+'.png';if(face)face.src=expression;const teacher=document.getElementById('teacher');if(teacher)teacher.src=expression;}};
 }

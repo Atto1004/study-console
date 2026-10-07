@@ -33,6 +33,11 @@ function injectCss() {
   document.head.append(s);
 }
 
+// 그림을 못 받으면 원래 자리의 정지 그림을 그대로 둔다.
+export async function attachSaeng(host, options) {
+  try { return await mountSaeng(host, options); } catch { return null; }
+}
+
 export async function mountSaeng(host, { dir = "../docs/demo/saeng/layers2/" } = {}) {
   injectCss();
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -105,12 +110,15 @@ export async function mountSaeng(host, { dir = "../docs/demo/saeng/layers2/" } =
   }
 
   // 글자를 찍는 쪽은 부른 화면이 맡고, 여기서는 입만 움직인다. onChar 로 한 글자씩 넘겨준다.
+  let talkId = 0;
   function speak(text, onChar = () => {}) {
+    const id = ++talkId;
     return new Promise((done) => {
       talking = true;
       let i = 0, m = 0;
       const shapes = ["mouth_closed", "mouth_half", "mouth_open", "mouth_half"];
       const step = () => {
+        if (id !== talkId) { done(); return; }
         if (i >= text.length) { talking = false; mouthRest(); done(); return; }
         const ch = text[i++];
         onChar(ch, i);
