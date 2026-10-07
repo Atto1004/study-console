@@ -154,7 +154,7 @@ export function createWorkspace(app){
       tile.append(head,track,stats,pace);grid.append(tile);
     }
     board.append(grid);
-    const info=el('details',undefined,'ready-info');info.append(el('summary','ⓘ'),el('p','A+ 준비도 = 이해도 50 + 정답률 30 + 진도 20. 이해도 = 혼자 맞힌 문항 비율, 정답률 = 도움 포함 맞힌 비율, 진도 = 시험 전 수업 중 공부한 회차. 성적 예측이 아닙니다.'));
+    const info=el('details',undefined,'ready-info');info.append(el('summary','ⓘ'),el('p','A+ 준비도 = 진도 × (이해도 50 + 정답률 30 + 20). 진도 = 시험 전 회차 중 문제를 푼 회차 비율, 이해도 = 혼자 맞힌 문항 비율, 정답률 = 도움 포함 맞힌 비율(둘 다 시험 전 회차 문항만). 잊는 정도와 교수님이 정한 범위 문장은 아직 반영하지 않아요. 성적 예측이 아니에요.'));
     board.append(info);root.append(board);
   }
   function renderMain(){

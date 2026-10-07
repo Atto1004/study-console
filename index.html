@@ -3029,18 +3029,23 @@ function load(){
   try{ var l=localStorage.getItem(KEY); if(l) loc=JSON.parse(l); }catch(e){}
   var pick=(ATOM_HOSTED&&atomState) ? atomState : (emb&&loc) ? ((loc.updatedAt||0)>=(emb.updatedAt||0)?loc:emb) : (loc||emb);
   /* 서버가 기준이지만, 서버에 못 올라간 이 기기 입력은 버리지 않고 복구 사본으로 남긴다 */
+  /* 시각과 상관없이, 못 올라간 표시가 있는 로컬은 서버와 다르면 먼저 복구 사본으로 옮긴다 */
   var unsynced=0; try{ unsynced=+localStorage.getItem(KEY+".unsynced")||0; }catch(e){}
-  if(pick===atomState&&loc&&unsynced&&(loc.updatedAt||0)>(atomState.updatedAt||0)){
-    try{ localStorage.setItem(KEY+".recovery",JSON.stringify(loc)); }catch(e){}
-    ui.recovery=loc;
+  if(pick===atomState&&loc&&unsynced&&(loc.updatedAt||0)!==(atomState.updatedAt||0)){
+    try{ localStorage.setItem(KEY+".recovery",JSON.stringify(loc)); localStorage.removeItem(KEY+".unsynced"); }catch(e){}
   }
+  if(pick===atomState){ try{ var rec=localStorage.getItem(KEY+".recovery"); if(rec) ui.recovery=JSON.parse(rec); }catch(e){} }
   S=migrate(pick);
 }
+/* 복구 사본은 되돌리거나 지울 때까지 남고, 들어올 때마다 다시 묻는다 */
 function offerRecovery(){
   var loc=ui.recovery; if(!loc) return; ui.recovery=null;
-  var at=new Date(loc.updatedAt||0).toLocaleString("ko-KR");
-  if(confirm("서버에 저장되지 못한 입력이 있어요 ("+at+").\n이 기기 입력으로 되돌릴까요?\n취소하면 서버 기록을 쓰고, 이 기기 입력은 복구 사본으로 남겨 둬요.")){
+  var at=new Date(loc.updatedAt||0).toLocaleString("ko-KR"), server=new Date((atomState&&atomState.updatedAt)||0).toLocaleString("ko-KR");
+  if(confirm("서버에 저장되지 못한 이 기기 입력이 있어요.\n이 기기: "+at+"\n서버: "+server+"\n\n이 기기 입력으로 되돌릴까요?")){
     S=migrate(loc); persist(); render();
+    try{ localStorage.removeItem(KEY+".recovery"); }catch(e){}
+  }else if(confirm("이 기기 입력(복구 사본)을 지울까요?\n취소하면 남겨 두고 다음에 다시 물어요.")){
+    try{ localStorage.removeItem(KEY+".recovery"); }catch(e){}
   }
 }
 function persist(){
