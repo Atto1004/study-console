@@ -122,14 +122,14 @@ nav {
   position: relative;
   isolation: isolate;
   overflow: clip;
-  background: #263e32 url("../docs/preview/school/assets/classroom-v2.webp")
+  background: #263e32 none
     center/cover no-repeat;
 }
 .scene.lobby {
-  background-image: url("../docs/preview/school/assets/lobby-v2.webp");
+  background-image: none;
 }
 .scene.office {
-  background-image: url("../docs/preview/school/assets/office-v2.webp");
+  background-image: none;
 }
 .lobby-content {
   height: 100%;
@@ -1044,13 +1044,13 @@ dialog button:not(.primary):not(.close) {
     font-size: 22px;
   }
   .scene.lobby {
-    background-image: url("../docs/preview/school/assets/lobby-v2.webp") !important;
+    background-image: none !important;
   }
   .scene.office {
-    background-image: url("../docs/preview/school/assets/office-v2.webp") !important;
+    background-image: none !important;
   }
   .scene:not(.lobby):not(.office) {
-    background-image: url("../docs/preview/school/assets/classroom-v2.webp") !important;
+    background-image: none !important;
   }
   .scene {
     background-size: cover;

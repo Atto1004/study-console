@@ -8,8 +8,8 @@ header .brand { background:transparent; border:0; }
 header nav { position:fixed; bottom:0; left:0; right:0; z-index:25; height:64px; display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:0; background:#173b31; border-top:1px solid #76816a; padding:7px max(10px,calc((100vw - 900px)/2)); }
 header nav button { color:#dfdfce; background:transparent; font-size:14px; border:0; border-radius:9px; min-width:0; }
 header nav button[aria-pressed=true] { background:#d9e4cf; color:#203e2d; }
-.school[data-mode=workspace] .scene.workspace-scene,.school .scene.lobby { background:linear-gradient(#173b3199,#173b3166),url('../docs/preview/school/assets/lobby-v2.webp') center/cover fixed !important; }
-.school[data-mode=classroom] .scene.classroom { background:linear-gradient(#16372d88,#16372d66),url('../docs/preview/school/assets/classroom-v2.webp') center/cover fixed !important; }
+.school[data-mode=workspace] .scene.workspace-scene,.school .scene.lobby { background:linear-gradient(#173b3199,#173b3166),none center/cover fixed !important; }
+.school[data-mode=classroom] .scene.classroom { background:linear-gradient(#16372d88,#16372d66),none center/cover fixed !important; }
 .workspace { padding:24px 28px 36px; }
 .workspace-title { color:#f3efdd; }
 .workspace-title h1 { font-size:24px; }

@@ -97,7 +97,14 @@ header .secondary-menu > div { background: var(--surface) !important; border: 1p
 header .secondary-menu button { background: transparent !important; color: var(--ink) !important; border: 0 !important; }
 
 /* 장면: 방마다 대표색 띠 */
-html body .school #scene:not(.classroom) { background: var(--bg) !important; background-image: none !important; }
+/* 장면 배경 슬롯: 방마다 하나. 피그마 그림이 오면 이 변수에 url(...) 를 넣는다 */
+:root { --scene-lobby: var(--bg); --scene-library: var(--bg); --scene-homework: var(--bg); --scene-class: linear-gradient(180deg, #e9eef3 0%, #dde5ec 100%); }
+.school { --scene-room: var(--scene-lobby); }
+.school[data-room=class] { --scene-room: var(--scene-class); }
+.school[data-room=library] { --scene-room: var(--scene-library); }
+.school[data-room=homework] { --scene-room: var(--scene-homework); }
+.school[data-mode=classroom] { --scene-room: var(--scene-class); }
+html body .school #scene { background: var(--scene-room) !important; background-size: cover !important; background-position: center !important; }
 .scene::before, .scene::after { display: none !important; }
 .school { --room: var(--room-lobby); }
 .school[data-room=class] { --room: var(--room-class); }
@@ -239,8 +246,7 @@ html body .school #scene:not(.classroom) { background: var(--bg) !important; bac
 .school[data-mode=integrated] .dock { display: none; }
 
 /* 교실(수업 중) 장면 · 칠판. 배경 그림은 --scene-class 슬롯 하나로 교체 */
-:root { --scene-class: linear-gradient(180deg, #e9eef3 0%, #dde5ec 100%); --board: #1f3d33; --board-ink: #f3f1e8; }
-html body .school #scene.classroom { background: var(--scene-class) !important; }
+:root { --board: #1f3d33; --board-ink: #f3f1e8; }
 .school[data-mode=classroom] .board { background: var(--board) !important; color: var(--board-ink) !important; border: 0 !important; border-radius: var(--radius-l) !important; box-shadow: var(--shadow-2), inset 0 0 0 1px rgba(255,255,255,.06) !important; }
 .school[data-mode=classroom] .room-title, .school[data-mode=classroom] .room-title * { color: var(--ink-2) !important; }
 .school[data-mode=classroom] #dialogue .speech { grid-template-columns: auto 1fr auto !important; }
@@ -272,3 +278,6 @@ footer { background: var(--surface) !important; color: var(--ink-3) !important; 
   .dock-face > img, .dock-face > .saeng { width: 104px !important; margin: -6px 0 0 -20px; }
 }
 @media (prefers-reduced-motion: reduce) { .ready-tile, .room-door, .dday-track i, .ready-ring .ring-fg { transition: none !important; } }
+
+.workspace details.ready-info { border: 0 !important; background: none !important; padding: 0 !important; margin: 8px 0 0 !important; }
+.kind-badge.guessed { opacity: .75; border: 1px dashed currentColor; }

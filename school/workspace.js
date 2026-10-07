@@ -1,4 +1,4 @@
-import { courseMetrics, classifySource, pickQuest, KINDS } from "./metrics.js";
+import { courseMetrics, sourceKind, pickQuest, KINDS } from "./metrics.js";
 const el = (tag, text, cls) => { const e=document.createElement(tag); if(text!==undefined)e.textContent=text; if(cls)e.className=cls; return e; };
 const btn = (text, action, cls='') => { const b=el('button',text,cls); b.type='button'; b.onclick=action; return b; };
 const minutes = s => Number(s.slice(0,2))*60+Number(s.slice(3));
@@ -122,8 +122,8 @@ export function createWorkspace(app){
   function renderBoard(){
     const rows=examMetrics();
     const board=card('','ready-board');
-    if(!rows.length){board.append(el('p','다가오는 중간고사가 없습니다.'));root.append(board);return;}
     const quest=pickQuest(rows,pendingDeadlines(assignments?.rows||[],data.date));
+    if(!quest){board.append(el('p','다가오는 중간고사와 하루 안 마감 과제가 없습니다.'));root.append(board);return;}
     const next=el('div',undefined,'next-quest');
     if(quest.type==='assignment'){
       const t=quest.task;
@@ -138,6 +138,7 @@ export function createWorkspace(app){
       window.dispatchEvent(new CustomEvent('saeng',{detail:{react:'idle',line:`${exam.course}부터 가요. 시험 ${ddayLabel(exam.dday)}, 준비도 ${m.readiness}.`}}));
     }
     board.append(next);
+    if(!rows.length){board.append(el('p','다가오는 중간고사가 없습니다.'));root.append(board);return;}
     const grid=el('div',undefined,'ready-grid');
     for(const {exam:e,m} of rows){
       const tile=el('button',undefined,'ready-tile pace-'+m.pace);tile.type='button';tile.onclick=()=>startCourse(e.course);
@@ -266,9 +267,9 @@ export function createWorkspace(app){
     if(area==='materials'){renderMaterials();renderChecks();}else if(area==='attendance')renderAttendance();else renderProgress();
   }
   function renderMaterials(){
-    const sources=data.sources.filter(s=>!filter||s.course===filter).map(s=>({...s,cls:classifySource(s)}));
-    const lmsItems=(data.lmsMaterials||[]).filter(i=>!filter||i.course===filter).map(i=>({...i,cls:classifySource({...i,lms:true})}));
-    const homework=(assignments?.rows||[]).filter(r=>!filter||r.course===filter).flatMap(r=>(r.files||[]).map(f=>({course:r.course,title:r.title,file:f.label||f.file||f.href,href:f.href,cls:/혼자\s*풀기|스앵님|코칭/.test(f.label||'')?'tutor':'assignment'})));
+    const sources=data.sources.filter(s=>!filter||s.course===filter).map(s=>{const k=sourceKind(s);return {...s,cls:k.kind,sure:k.sure};});
+    const lmsItems=(data.lmsMaterials||[]).filter(i=>!filter||i.course===filter).map(i=>({...i,cls:sourceKind({...i,lms:true}).kind,sure:true}));
+    const homework=(assignments?.rows||[]).filter(r=>!filter||r.course===filter).flatMap(r=>(r.files||[]).map(f=>({course:r.course,title:r.title,file:f.label||f.file||f.href,href:f.href,cls:/혼자\s*풀기|스앵님|코칭/.test(f.label||'')?'tutor':'assignment',sure:true})));
     const all=[...sources,...lmsItems,...homework];
     const kinds=el('div',undefined,'kind-filter');kinds.setAttribute('role','group');kinds.setAttribute('aria-label','자료 종류');
     for(const [key,{label}] of [['',{label:'전체'}],...Object.entries(KINDS).sort((a,b)=>a[1].order-b[1].order)]){
@@ -277,14 +278,14 @@ export function createWorkspace(app){
     }
     root.append(kinds);
     const show=x=>!kindFilter||x.cls===kindFilter;
-    const badge=c=>el('span',KINDS[c].label,'kind-badge kind-'+c);
+    const badge=(c,sure=true)=>{const b=el('span',KINDS[c].label+(sure?'':' · 추정'),'kind-badge kind-'+c+(sure?'':' guessed'));if(!sure)b.title='파일 이름으로 짐작한 분류예요.';return b;};
     const items=sources.filter(show),by=new Map();for(const s of items){const key=s.course+' · '+s.date;if(!by.has(key))by.set(key,[]);by.get(key).push(s);}
     root.append(btn('전체 교재·자료실',()=>app.library()),btn('수업자료 색인 갱신',async()=>{data=await app.api('sync',{});render();}));
     const lmsShown=lmsItems.filter(show);
     if(lmsShown.length){const lms=el('details',undefined,'material-group');lms.append(el('summary',`LMS 강의자료·영상 · ${lmsShown.length}개`));for(const item of lmsShown){const row=el('div',undefined,'material-row'),a=el('a',`${item.course||item.lmsCourse+' · 과목 연결 확인 필요'} · ${item.module} · ${item.title}`);a.href=item.url;a.target='_blank';a.rel='noopener';row.append(badge(item.cls),a);lms.append(row);}root.append(lms);}
     const hwShown=homework.filter(show);
     if(hwShown.length){const hw=el('details',undefined,'material-group');hw.append(el('summary',`과제 파일 · ${hwShown.length}개`));for(const f of hwShown){const row=el('div',undefined,'material-row');row.append(badge(f.cls),el('span',`${f.course} · ${f.title} · ${f.file}`));if(f.href){const a=el('a','열기');a.href='../'+f.href;a.target='_blank';a.rel='noopener';row.append(a);}hw.append(row);}root.append(hw);}
-    for(const [key,files] of [...by].reverse()){const group=el('details',undefined,'material-group');group.append(el('summary',`${key} · ${files.length}개`));for(const f of files){const row=el('div',undefined,'material-row');row.append(badge(f.cls),el('span',f.file),el('small',({summary:'정리본',photo:'사진·필기',recording:'녹음·텍스트',material:'수업자료'})[f.kind]||''));const a=el('a','열기');a.href=f.href?'../'+f.href:'/api/school/source-file?id='+f.id;a.target='_blank';a.rel='noopener';a.onclick=()=>app.record({kind:'review',course:f.course,action:'material-opened',sourceId:f.id,date:f.date});row.append(a,btn('수업 연결',()=>linkSource(f)));if(f.candidate)row.append(el('small','범위 후보: '+f.candidate));group.append(row);}root.append(group);}
+    for(const [key,files] of [...by].reverse()){const group=el('details',undefined,'material-group');group.append(el('summary',`${key} · ${files.length}개`));for(const f of files){const row=el('div',undefined,'material-row');row.append(badge(f.cls,f.sure),el('span',f.file),el('small',({summary:'정리본',photo:'사진·필기',recording:'녹음·텍스트',material:'수업자료'})[f.kind]||''));const a=el('a','열기');a.href=f.href?'../'+f.href:'/api/school/source-file?id='+f.id;a.target='_blank';a.rel='noopener';a.onclick=()=>app.record({kind:'review',course:f.course,action:'material-opened',sourceId:f.id,date:f.date});row.append(a,btn('수업 연결',()=>linkSource(f)));if(f.candidate)row.append(el('small','범위 후보: '+f.candidate));group.append(row);}root.append(group);}
     if(!all.filter(show).length)root.append(el('p','이 종류의 자료가 아직 없습니다.'));
   }
   function linkSource(source){const host=app.panel('자료의 수업 회차 연결'),select=el('select'),day=el('input');day.type='date';day.value=source.date;for(const c of data.courses){const o=el('option',c.name);o.value=c.id;select.append(o);}select.value=data.courses.find(c=>c.name===source.course)?.id||data.courses[0]?.id;host.append(el('p',source.file),select,day,btn('이 회차로 연결',async()=>{if(await change({op:'source-link',sourceId:source.id,courseId:select.value,date:day.value}))app.close();},'primary'));}

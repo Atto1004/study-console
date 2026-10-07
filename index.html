@@ -3000,10 +3000,11 @@ function atomPush(){
   if(!ATOM_HOSTED) return;
   clearTimeout(atomPushT);
   atomPushT=setTimeout(function(){
+    var sentAt=S.updatedAt||0;
     try{ fetch("/api/study/state",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({state:S,client:atomClient})})
       .then(function(r){
         if(r.ok){
-          return r.json().then(function(saved){ S.v60=S.v60||{}; if(typeof saved.workspaceRevision==="number") S.v60.workspaceRevision=saved.workspaceRevision; ui.dirty=false; markSave(); atomPushRetry=0; atomPushErrShown=false; });
+          return r.json().then(function(saved){ S.v60=S.v60||{}; if(typeof saved.workspaceRevision==="number") S.v60.workspaceRevision=saved.workspaceRevision; ui.dirty=false; markSave(); atomPushRetry=0; atomPushErrShown=false; try{ if(+localStorage.getItem(KEY+".unsynced")<=sentAt) localStorage.removeItem(KEY+".unsynced"); }catch(e){} });
         }
         if(r.status===409){
           toast("다른 화면에서 학교 기록이 바뀌었습니다. 현재 입력을 보관한 뒤 새로 불러와주세요.");
@@ -3027,11 +3028,24 @@ function load(){
   if(atomState&&typeof atomState==="object") emb=atomState;
   try{ var l=localStorage.getItem(KEY); if(l) loc=JSON.parse(l); }catch(e){}
   var pick=(ATOM_HOSTED&&atomState) ? atomState : (emb&&loc) ? ((loc.updatedAt||0)>=(emb.updatedAt||0)?loc:emb) : (loc||emb);
+  /* 서버가 기준이지만, 서버에 못 올라간 이 기기 입력은 버리지 않고 복구 사본으로 남긴다 */
+  var unsynced=0; try{ unsynced=+localStorage.getItem(KEY+".unsynced")||0; }catch(e){}
+  if(pick===atomState&&loc&&unsynced&&(loc.updatedAt||0)>(atomState.updatedAt||0)){
+    try{ localStorage.setItem(KEY+".recovery",JSON.stringify(loc)); }catch(e){}
+    ui.recovery=loc;
+  }
   S=migrate(pick);
+}
+function offerRecovery(){
+  var loc=ui.recovery; if(!loc) return; ui.recovery=null;
+  var at=new Date(loc.updatedAt||0).toLocaleString("ko-KR");
+  if(confirm("서버에 저장되지 못한 입력이 있어요 ("+at+").\n이 기기 입력으로 되돌릴까요?\n취소하면 서버 기록을 쓰고, 이 기기 입력은 복구 사본으로 남겨 둬요.")){
+    S=migrate(loc); persist(); render();
+  }
 }
 function persist(){
   S.updatedAt=Date.now(); ui.dirty=true;
-  try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+  try{ localStorage.setItem(KEY,JSON.stringify(S)); if(ATOM_HOSTED) localStorage.setItem(KEY+".unsynced",String(S.updatedAt)); }catch(e){}
   markSave();
   atomPush();
 }
@@ -8002,7 +8016,7 @@ function boot(){
 var scLoaded=function(){ var l=document.getElementById("sc-loading"); if(l) l.remove(); };   /* 「불러오는 중」 걷기 — boot 가 실패해도 걷어서 오류 화면이 보이게 */
 function start(){
   if(!ATOM_HOSTED){ try{ boot(); }finally{ scLoaded(); } return; }
-  var done=false, go=function(){ if(done) return; done=true; try{ boot(); }finally{ scLoaded(); } if(!atomState||(S.updatedAt||0)>(atomState.updatedAt||0)) atomPush(); };
+  var done=false, go=function(){ if(done) return; done=true; try{ boot(); }finally{ scLoaded(); } if(!atomState||(S.updatedAt||0)>(atomState.updatedAt||0)) atomPush(); setTimeout(offerRecovery,800); };
   fetch("/api/study/state").then(function(r){ return r.json(); }).then(function(j){ atomState=(j&&j.state)||null; go(); })["catch"](go);
   setTimeout(go,4000);
 }
