@@ -5,6 +5,8 @@ import {
   splitText,
   learningPath,
 } from "./learning.js";
+import { createWorkspace } from "./workspace.js";
+import { createMission } from "./mission.js";
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
 let catalog,
@@ -21,8 +23,10 @@ let pending = [],
   chatBusy = false,
   lastLesson = null;
 let pausedLesson = null;
+let activeSession = null, sessionQueue = Promise.resolve();
 let resizeBoard;
 let chatMode = "question";
+let workspace, mission, legacyLobbyMode = false, missionIndices = null;
 const eventId = () => crypto.randomUUID();
 function node(tag, text, cls) {
   const el = document.createElement(tag);
@@ -43,6 +47,72 @@ function link(text, href) {
   el.target = "_blank";
   el.rel = "noopener";
   return el;
+}
+function isStudyPractice(file) {
+  return /혼자\s*풀기|스앵님|코칭/.test(file.label || "") || /\/hw(?:\d+)?\//.test(file.href || file.file || "");
+}
+let integratedCleanup = null, overviewGeneration = 0;
+function openIntegrated(title, section, options = {}) {
+  if (TEST) { status("통합 편집은 검증 모드에서 열지 않습니다. 실제 기록을 보호합니다.", true); return; }
+  if (integratedCleanup) integratedCleanup();
+  stopVoice(); closeDialogs(); ++requestGeneration;
+  for (const id of ["lobby", "room", "dialogue", "progress", "assignments"]) $(id).hidden = true;
+  document.querySelector(".school").dataset.mode = "integrated";
+  $("location").textContent = title;
+  const area = options.area || "learningArea";
+  for (const id of ["learningArea", "progressArea", "assignmentArea"])
+    $(id).setAttribute("aria-pressed", String(id === area));
+  let host = $("integratedWorkspace");
+  if (!host) { host = node("section", undefined, "integrated-workspace"); host.id = "integratedWorkspace"; $("scene").append(host); }
+  host.hidden = false;
+  const heading = node("div", undefined, "integrated-heading");
+  heading.append(node("h1", title), button(area === "progressArea" ? "수업 자료로 돌아가기" : "공부하기로 돌아가기", () => area === "progressArea" ? showProgress() : showLobby()));
+  const message = node("p", "불러오는 중…"); message.setAttribute("role", "status");
+  const frame = node("iframe"); frame.title = title; frame.className = "integrated-frame";
+  const params = new URLSearchParams({view: "classic", integrated: "1", lobby:"off", section});
+  for (const key of ["course", "date", "mode"]) if (options[key]) params.set(key, options[key]);
+  frame.src = "../index.html?" + params;
+  host.replaceChildren(heading, message, frame);
+  const receive = event => {
+    if (event.origin !== location.origin || event.source !== frame.contentWindow || !host.contains(frame)) return;
+    if (event.data?.type === "school-integrated-ready") { message.hidden = true; window.removeEventListener("message", receive); }
+    if (event.data?.type === "school-integrated-error") { message.textContent = event.data.message; window.removeEventListener("message", receive); }
+  };
+  window.addEventListener("message", receive);
+  integratedCleanup = () => { window.removeEventListener("message", receive); integratedCleanup = null; };
+  frame.addEventListener("load", () => { if (!host.contains(frame)) window.removeEventListener("message", receive); });
+}
+function openStudyAsset(title, path) {
+  const host = panel(title), frame = node("iframe");
+  frame.title = title; frame.className = "study-asset-frame"; frame.src = "../" + path;
+  host.append(frame);
+}
+async function drawStudyOverview() {
+  if (workspace) return;
+  const generation = ++overviewGeneration;
+  const host = $("studyOverview");
+  if (!host) return;
+  host.replaceChildren(node("h2", "오늘 공부·계획"));
+  const tools = node("div", undefined, "assignment-filters");
+  tools.append(button("오늘 공부·타이머", () => openIntegrated("오늘 공부", "today")), button("공부 계획", () => openIntegrated("공부 계획", "plan")), button("시험 대비·학습 기록", () => openIntegrated("시험 대비·학습 기록", "study")), button("학기·개인 공부", () => openIntegrated("학기·개인 공부", "shelf")));
+  host.append(tools);
+  try {
+    const response = await fetch("/api/study/state", {credentials:"same-origin",cache:"no-store"});
+    if (!response.ok) throw new Error("시험 정보를 불러오지 못했습니다.");
+    const {state: original} = await response.json();
+    if (generation !== overviewGeneration) return;
+    const term = original?.terms?.find(t => t.id === original.activeTermId);
+    const today = new Intl.DateTimeFormat("sv-SE", {timeZone:"Asia/Seoul"}).format(new Date());
+    const exams = (term?.exams || []).filter(e => e.date >= today).sort((a,b) => a.date.localeCompare(b.date));
+    const list = node("div", undefined, "exam-overview");
+    list.append(node("h3", "다가오는 시험"));
+    if (!exams.length) list.append(node("p", "등록된 예정 시험이 없습니다."));
+    for (const exam of exams.slice(0,7)) {
+      const c = term.courses.find(c => c.id === exam.courseId);
+      row(list, `${c?.name || "과목 확인 필요"} · ${exam.kind || "시험"}`, `${exam.date} ${exam.time || ""} · ${exam.scope || "범위 확인 필요"}`, () => openIntegrated("시험 대비", "study"), "대비");
+    }
+    host.append(list);
+  } catch (error) { if (generation === overviewGeneration) host.append(node("p", error.message)); }
 }
 async function api(path, body) {
   const response = await fetch("/api/school/" + path, {
@@ -121,6 +191,38 @@ function renderMath(root) {
       ],
       throwOnError: false,
     });
+  requestAnimationFrame(() => {
+    if (!root.isConnected) return;
+    let hasOverflow = false;
+    for (const formula of root.querySelectorAll(
+      ".board .katex-display, .board .content > .katex",
+    )) {
+      const overflow = formula.scrollWidth > formula.clientWidth + 2;
+      hasOverflow ||= overflow;
+      formula.classList.toggle("formula-scrollable", overflow);
+      if (overflow) {
+        formula.tabIndex = 0;
+        formula.setAttribute("role", "region");
+        formula.setAttribute(
+          "aria-label",
+          "긴 수식 · 좌우로 스크롤하여 전체 보기",
+        );
+        formula.title = "좌우로 스크롤하세요. 키보드는 방향키를 사용하세요.";
+      } else {
+        formula.removeAttribute("tabindex");
+        formula.removeAttribute("role");
+        formula.removeAttribute("aria-label");
+        formula.removeAttribute("title");
+      }
+    }
+    if (root.classList.contains("board")) {
+      const previousHint = root.querySelector(".formula-scroll-hint");
+      if (previousHint) previousHint.remove();
+      if (hasOverflow) root.querySelector(".caption")?.append(
+        node("small", " · 긴 수식은 좌우로 스크롤하세요", "formula-scroll-hint"),
+      );
+    }
+  });
 }
 function panel(title) {
   $("panelBody").replaceChildren(
@@ -140,6 +242,10 @@ function row(host, title, detail, action, label = "열기") {
   host.append(item);
 }
 function showLobby() {
+  if (workspace && !legacyLobbyMode) { workspace.open('main'); return; }
+  if ($("integratedWorkspace")) $("integratedWorkspace").hidden = true;
+  $("progress").hidden = true;
+  $("progressArea").setAttribute("aria-pressed", "false");
   $("assignments").hidden = true;
   $("learningArea").setAttribute("aria-pressed", "true");
   $("assignmentArea").setAttribute("aria-pressed", "false");
@@ -152,9 +258,10 @@ function showLobby() {
   $("lobby").hidden = false;
   $("room").hidden = true;
   $("dialogue").hidden = true;
-  $("location").textContent = "학교 로비";
+  $("location").textContent = "공부하기";
   $("today").textContent =
     "기호부터 교수님 수업 문제까지, 한 단계씩 확인합니다.";
+  drawStudyOverview();
   const doors = $("courseDoors");
   doors.replaceChildren();
   for (const [position, c] of catalog.courses
@@ -180,11 +287,110 @@ function showLobby() {
 }
 $("home").onclick = showLobby;
 $("learningArea").onclick = showLobby;
+$("progressArea").onclick = showProgress;
 $("assignmentArea").onclick = () => showAssignments();
+  async function showProgress() {
+    if (workspace) { workspace.open('progress'); return; }
+    if ($("integratedWorkspace")) $("integratedWorkspace").hidden = true;
+  stopVoice(); closeDialogs(); const generation = ++requestGeneration; current = null;
+  document.querySelector(".school").dataset.mode = "progress";
+  $("scene").className = "scene lobby";
+  $("lobby").hidden = $("room").hidden = $("dialogue").hidden = $("assignments").hidden = true;
+  $("progress").hidden = false;
+  $("location").textContent = "진도관리";
+  for (const id of ["learningArea", "progressArea", "assignmentArea"])
+    $(id).setAttribute("aria-pressed", String(id === "progressArea"));
+  const host = $("progress");
+  host.replaceChildren(node("h1", "진도관리"), node("p", "수업 내용과 자료를 불러오고 있습니다."));
+  try {
+      const [materials, sessions, files, original] = await Promise.all([...["knowledge/materials.json", "knowledge/sessions.json", "_private/class-files.json"].map(async path => {
+      const response = await fetch("../" + path, {credentials: "same-origin", cache: "no-store"});
+      if (!response.ok) throw new Error("수업 자료 목록을 불러오지 못했습니다.");
+      return response.json();
+      }), fetch("/api/study/state", {credentials:"same-origin",cache:"no-store"}).then(async response => {
+        if (!response.ok) throw new Error("수업 기록을 불러오지 못했습니다.");
+        return (await response.json()).state;
+      })]);
+    if (generation !== requestGeneration) return;
+    const names = catalog.courses.filter(c => c.name !== "사회봉사").map(c => c.name);
+    if (!names.includes(course)) course = names[0];
+    const kinds = {textbook:"교재", pre:"강의자료", board:"판서", photo:"수업 사진", rec:"녹음", summary:"정리본", note:"내 필기", profnote:"교수 필기", derived:"변환본", lmsvideo:"강의 영상", other:"수업 자료"};
+    function appendFiles(parent, list) {
+      if (!list.length) { parent.append(node("p", "연결된 파일이 없습니다.")); return; }
+      const groups = new Map();
+      for (const file of list) {
+        const kind = file.file.startsWith("중복_") ? "duplicate" : file.type;
+        if (!groups.has(kind)) groups.set(kind, []);
+        groups.get(kind).push(file);
+      }
+      for (const [kind, entries] of groups) {
+        const group = node("details");
+        group.append(node("summary", `${kind === "duplicate" ? "중복 표시 파일" : kinds[kind] || "수업 자료"} ${entries.length}개`));
+        for (const file of entries) {
+        const p = node("p");
+        p.append(file.href ? link(file.file, file.href) : node("span", `${file.file} · 로컬 보관`));
+        group.append(p);
+        }
+        parent.append(group);
+      }
+    }
+    function draw() {
+      host.replaceChildren(node("h1", "진도관리"), node("p", "수업에서 배운 범위와 회차별 자료를 관리합니다."));
+      const tools = node("div", undefined, "assignment-filters"), select = node("select");
+      select.setAttribute("aria-label", "진도관리 과목");
+      for (const name of names) { const option = node("option", name); option.value = name; select.append(option); }
+      select.value = course; select.onchange = () => { course = select.value; draw(); };
+        tools.append(select, button("자료 대조·교수 규칙", () => showSources(course)), button("출결·회차 관리", () => openIntegrated("출결·회차 관리", "cal", {area:"progressArea",mode:"grid"})), button("시간표", () => openIntegrated("시간표", "cal", {area:"progressArea"})), button("성적·학점", () => openIntegrated("성적·학점", "grade", {area:"progressArea"})));
+      host.append(tools, node("p", `자료 기준 ${materials.asOf || "확인 필요"}`));
+        const c = catalog.courses.find(c => c.name === course), plan = materials.courses[course]?.sessions || {}, notes = sessions.courses[course] || {};
+        const term = original?.terms?.find(t => t.id === original.activeTermId);
+        const savedCourse = term?.courses?.find(c => c.name === course);
+        const savedSessions = (term?.sessions || []).filter(s => s.courseId === savedCourse?.id);
+      const courseFiles = files.items.filter(f => f.course === course);
+      const shared = node("details"); shared.append(node("summary", "교재·공통 강의자료"));
+      appendFiles(shared, courseFiles.filter(f => !f.date)); host.append(shared);
+        const dates = [...new Set([...Object.keys(plan), ...Object.keys(notes), ...c.lessons.map(l => l.date), ...courseFiles.map(f => f.date).filter(Boolean), ...savedSessions.map(s => s.date)])].sort().reverse();
+      const upcoming = node("details"); upcoming.append(node("summary", "앞으로의 수업 계획"));
+      if (!dates.length) host.append(node("p", "아직 수업 회차 기록이 없습니다."));
+      for (const date of dates) {
+        const info = notes[date] || {}, material = plan[date] || {}, lesson = c.lessons.find(l => l.date === date);
+        const scheduled = date > materials.asOf;
+          const week = lesson?.week || Math.floor((Date.parse(date + "T00:00:00Z") - Date.parse("2026-08-30T00:00:00Z")) / (7 * 86400000)) + 1;
+          const savedSession = savedSessions.find(s => s.date === date);
+          const weekNote = savedCourse?.weekNotes?.[week];
+        const card = node("details", undefined, "assignment-card");
+        card.append(node("summary", `${date} · ${week}주차 · ${info.title || lesson?.title || (material.plan?.topic ? "예고: " + material.plan.topic : "수업 내용 확인 필요")}${scheduled ? " · 예정" : ""}`));
+          if (info.prog) card.append(node("p", "수업 기록: " + info.prog));
+          if (savedSession?.progress) card.append(node("p", "직접 기록한 범위: " + savedSession.progress));
+          if (savedSession?.memo) card.append(node("p", "수업 메모: " + savedSession.memo));
+          if (savedSession?.status) card.append(node("p", "출결: " + ({present:"출석",late:"지각",vlate:"개큰지각",ghost:"출튀",excused:"인정결석",absent:"결석"}[savedSession.status] || savedSession.status)));
+          if (weekNote?.range || weekNote?.summary) card.append(node("p", `${week}주차 기록: ` + [weekNote.range, weekNote.summary].filter(Boolean).join(" · ")));
+        if (material.plan?.topic || material.plan?.pre) card.append(node("p", "강의계획·예고: " + [material.plan.topic, material.plan.pre].filter(Boolean).join(" · ")));
+        if (material.plan?.src) card.append(node("small", "범위 근거: " + material.plan.src));
+          if (!info.prog && !savedSession?.progress && !weekNote?.range) card.append(node("p", scheduled ? "예정 범위입니다. 실제 수업 후 확인합니다." : "실제 진행 범위의 상세 기록을 확인해야 합니다."));
+        const counts = material.k || {};
+        card.append(node("p", "자료 색인 · " + ["pre", "board", "rec", "summary", "note"].map(k => `${kinds[k]} ${counts[k] || 0}`).join(" · ")));
+        if (material.none) card.append(node("p", "수업 없음으로 기록된 회차"));
+          if (lesson) card.append(button("수업 내용 열기", () => startLesson(lesson.id)));
+          card.append(button("수업 기록·출결 수정", () => openIntegrated(`${course} · ${date} 수업 기록`, "course", {area:"progressArea",course,date})));
+        appendFiles(card, courseFiles.filter(f => f.date === date));
+        (scheduled ? upcoming : host).append(card);
+      }
+      if (upcoming.children.length > 1) host.append(upcoming);
+    }
+    draw();
+  } catch (error) {
+    if (generation !== requestGeneration) return;
+    host.replaceChildren(node("h1", "진도관리"), node("p", error.message), button("다시 불러오기", showProgress));
+  }
+}
 let assignmentFilter = "전체", assignmentStatus = "진행";
-async function showAssignments() {
+  async function showAssignments() {
+    if ($("integratedWorkspace")) $("integratedWorkspace").hidden = true;
+  $("progress").hidden = true;
+  $("progressArea").setAttribute("aria-pressed", "false");
   const generation = ++requestGeneration;
-  stopVoice(); closeDialogs(); current = null;
+  stopVoice(); closeDialogs();
   document.querySelector(".school").dataset.mode = "assignments";
   $("scene").className = "scene lobby";
   $("lobby").hidden = $("room").hidden = $("dialogue").hidden = true;
@@ -208,13 +414,18 @@ async function showAssignments() {
       if (!select.value) assignmentFilter = select.value = "전체";
       select.onchange = () => { assignmentFilter = select.value; draw(); };
       tools.append(select);
-      for (const label of ["진행", "제출 확인", "전체"]){
+        for (const label of ["진행", "지난 기록", "제출 완료", "전체"]){
         const b = button(label, () => { assignmentStatus = label; draw(); });
         b.setAttribute("aria-pressed", String(assignmentStatus === label)); tools.append(b);
       }
       const help = node("details"); help.append(node("summary", "ⓘ"), node("p", data.notice)); tools.append(help);
-      tools.append(link("과제 상태 관리 ↗", "index.html?view=classic")); host.append(tools);
-      const rows = data.rows.filter(r => (assignmentFilter === "전체" || r.course === assignmentFilter) && (assignmentStatus === "전체" || r.submitted === (assignmentStatus === "제출 확인")));
+        if(activeSession)tools.append(button("수업 이어가기",resumeSession));
+        host.append(tools);
+        const today = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+        const isPast = r => /^\d{4}-\d{2}-\d{2}/.test(r.due||'') && r.due.slice(0,10)<today;
+        const rows = data.rows.filter(r => (assignmentFilter === "전체" || r.course === assignmentFilter) &&
+          (assignmentStatus === "전체" || assignmentStatus === "지난 기록" && isPast(r) ||
+           assignmentStatus === "제출 완료" && r.submitted || assignmentStatus === "진행" && !r.submitted && (!isPast(r)||r.continueActive)));
       host.append(node("p", `${rows.length}건 · 자료 기준 ${data.asOf || "확인 필요"}`));
       if (!rows.length) host.append(node("p", "해당 과제가 없습니다."));
       let category = null;
@@ -223,12 +434,39 @@ async function showAssignments() {
         if (category !== group) { host.append(node("h2", group === "assignment" ? "수업 과제" : "과제 관련 할 일")); category = group; }
         const card = node("article", undefined, "assignment-card");
         card.append(node("small", task.course), node("h2", task.title));
-        card.append(node("p", `마감 ${task.due ? task.due.replace("T", " ") : "미확인"} · ${task.submission}${task.workDone ? " · 작업 완료" : ""}`));
+          card.append(node("p", `마감 ${task.due ? task.due.replace("T", " ") : "미확인"} · ${task.workDone ? "풀이 완료" : "풀이 중"} · ${task.submitted ? "제출 완료" : "제출 전"}`));
+          card.append(node("small", task.manualSubmitted ? "제출 상태: 직접 표시" : "원본 제출 기록: " + task.submission));
+          const actions = node("div", undefined, "assignment-checks");
+          const message = node("p"); message.setAttribute("role", "status");
+          for (const [field, label] of [["workDone", "풀이 완료"], ["submitted", "제출 완료"], ["hiddenFromMain", "메인에서 숨김 · 마감 당일 표시"]]) {
+              const choice = node("label", undefined, "assignment-check");
+              const toggle = node("input"); toggle.type = "checkbox"; toggle.checked = !!task[field];
+              if(field === 'hiddenFromMain')toggle.disabled = !task.workDone;
+              if(field === 'hiddenFromMain')toggle.title = '풀이 완료한 과제를 메인에서 숨깁니다. 제출 마감 당일에는 다시 표시합니다.';
+              toggle.onchange = async () => {
+                const value = toggle.checked;
+                for (const b of actions.querySelectorAll("input")) b.disabled = true;
+              message.textContent = "저장 중…";
+              try {
+                  const saved = await api("assignment-status", {id: task.id, field, value});
+                Object.assign(task, saved);
+                if (generation === requestGeneration) { draw(); status(label + " 상태 저장 완료"); }
+              } catch (error) {
+                message.textContent = error.message;
+                  toggle.checked = !!task[field];
+                  [...actions.querySelectorAll("input")].forEach((b,i)=>b.disabled=i===2&&!task.workDone);
+              }
+              };
+              choice.append(toggle, node("span", label)); actions.append(choice);
+          }
+          if (isPast(task)) actions.append(button(task.continueActive ? '진행 목록에서 빼기' : '계속 진행', async () => {
+            try { Object.assign(task, await api('assignment-status',{id:task.id,field:'continueActive',value:!task.continueActive})); draw(); }
+            catch(error) { message.textContent=error.message; }
+          }));
+          card.append(actions, message);
         const files = node("div", undefined, "assignment-files");
-        for (const file of task.files) files.append(link(file.label, file.href));
+        for (const file of task.files.filter(file => !isStudyPractice(file))) files.append(link(file.label, file.href));
         card.append(files);
-        if (catalog.courses.some(c => c.name === task.course))
-          card.append(button("필요한 개념 학습", () => { showLobby(); showCourse(task.course); }));
         if (task.source) { const detail = node("details"); detail.append(node("summary", "근거"), node("p", task.source)); card.append(detail); }
         host.append(card);
       }
@@ -245,10 +483,15 @@ $("courses").onclick = () => {
   for (const c of catalog.courses)
     row(host, c.name, c.strategy, () => showCourse(c.name), "들어가기");
 };
-function showCourse(name) {
+  function showCourse(name) {
   course = name;
   const c = catalog.courses.find((c) => c.name === name);
-  const host = panel(name);
+    const host = panel(name);
+    const assets = node("div", undefined, "assignment-filters");
+    const slug = {"공업수학1":"em1", "미분적분학2":"calc2", "일반물리학2":"phys2", "정역학":"statics"}[name];
+    if (slug) assets.append(button("암기노트", () => openStudyAsset(name + " · 암기노트", "notes/memo/" + slug + ".html")));
+    assets.append(button("개념지도", () => openStudyAsset(name + " · 개념지도", "learn.html?subject=" + encodeURIComponent(name))), button("단원·시험 대비·학습 기록", () => openIntegrated(name + " · 학습", "course", {course:name})));
+    host.append(assets);
   host.append(node("p", c.strategy, "notice"));
   const plan = state.plans[name];
   if (plan)
@@ -302,6 +545,19 @@ function showCourse(name) {
     row(others, n.name, n.level, () => startLesson("node:" + n.id), "배우기");
   host.append(others);
   host.append(button("과목별 자료·교수 규칙", () => showSources(name)));
+  const practice = node("section");
+  host.append(practice);
+  fetch("../_private/submit.json", {credentials: "same-origin", cache: "no-store"})
+    .then(response => { if (!response.ok) throw new Error("연습 자료를 불러오지 못했습니다."); return response.json(); })
+    .then(registry => {
+      if (!practice.isConnected) return;
+      const seen = new Set();
+      const files = [...(registry.practices || []), ...(registry.files || []).filter(isStudyPractice)]
+        .filter(file => file.course === name && !seen.has(file.file) && seen.add(file.file));
+      if (files.length) practice.append(node("h3", "혼자 풀기"));
+      for (const file of files) { const p = node("p"); p.append(link(file.label, file.file)); practice.append(p); }
+    })
+    .catch(error => { if (practice.isConnected) practice.append(node("p", error.message)); });
 }
 $("resume").onclick = () => {
   const plan = state.plans[course];
@@ -309,18 +565,35 @@ $("resume").onclick = () => {
   else if (plan) startLesson(plan.start);
   else consult(course);
 };
-async function startLesson(id) {
-  $("assignments").hidden = true;
+async function startLesson(id, options = {}) {
+  try { await mission?.save(); } catch (error) { status(error.message, true); return; }
   const generation = ++requestGeneration;
   try {
     status("수업을 준비하고 있습니다.");
     const lesson = await api("lesson?id=" + encodeURIComponent(id));
     if (generation !== requestGeneration) return;
+    let targetIndex = options.index ?? Math.min(state.progress[id]?.index || 0, lesson.steps.length - 1);
+    if (options.resume) { const restored = lesson.steps.findIndex(s=>s.id===options.resume.stepId); if(restored<0)throw new Error('이전 단계가 변경되었습니다. 수업 자료를 확인해주세요.'); targetIndex=restored; }
+    const questions = lesson.steps.map((s,i)=>s.kind==='quiz'?i:-1).filter(i=>i>=0);
+    const examples = lesson.steps.map((s,i)=>s.kind==='example'?i:-1).filter(i=>i>=0);
+    missionIndices = options.purpose !== "exam" ? null : (questions.length ? questions : examples.length ? examples : lesson.steps.map((s,i)=>i)).slice(0,3);
+    if (missionIndices && !missionIndices.includes(targetIndex)) targetIndex=missionIndices[0];
+    await saveSession(lesson, targetIndex, {newSession: !options.resume, purpose: options.purpose || 'tutoring', assisted: options.assisted ?? !!options.resume?.assisted, returnTo: options.returnTo || null});
+    if (generation !== requestGeneration) return;
+  workspace?.hide();
+  for (const id of ['mainArea','learningArea','progressArea','materialsArea','attendanceArea','assignmentArea']) $(id)?.setAttribute('aria-pressed',String(id==='learningArea'));
+  if ($("integratedWorkspace")) $("integratedWorkspace").hidden = true;
+  $("progress").hidden = true;
+  $("progressArea").setAttribute("aria-pressed", "false");
+  $("learningArea").setAttribute("aria-pressed", "true");
+  $("assignmentArea").setAttribute("aria-pressed", "false");
+  $("assignments").hidden = true;
     current = lesson;
     document.querySelector(".school").dataset.mode = "classroom";
     lastLesson = id;
     if (lesson.course !== "공통") course = lesson.course;
-    index = Math.min(state.progress[id]?.index || 0, lesson.steps.length - 1);
+    index = targetIndex;
+    if (missionIndices && !missionIndices.includes(index)) index = missionIndices[0];
     assisted = false;
     passed = false;
     closeDialogs();
@@ -336,7 +609,38 @@ async function startLesson(id) {
     status(error.message, true);
   }
 }
+function saveSession(lesson, targetIndex, options = {}) {
+  const task = sessionQueue.catch(() => {}).then(async () => {
+    const request = {id: options.newSession ? eventId() : activeSession?.id || eventId(),
+      revision: activeSession?.revision || 0, course: lesson.course, lessonId: lesson.id,
+      stepId: lesson.steps[targetIndex].id, purpose: options.purpose || activeSession?.purpose || 'tutoring',
+      assisted: options.assisted ?? assisted,
+      returnTo: Object.hasOwn(options, 'returnTo') ? options.returnTo : activeSession?.returnTo || null};
+    try { activeSession = await api('session', request); return activeSession; }
+    catch(error) {
+      status(error.message, true);
+      const host = panel('수업 저장 확인');
+      host.append(node('p', error.message), node('p', '현재 풀이와 입력은 이 화면에 보존했습니다. 최신 수업을 확인한 뒤 이동할 수 있습니다.'),
+        button('최신 수업 확인', async () => { activeSession = await api('session'); current=null; closeDialogs(); workspace.open('main'); }));
+      throw error;
+    }
+  });
+  sessionQueue = task;
+  return task;
+}
+async function resumeSession() {
+  const saved = activeSession;
+  if (!saved) return workspace.open('learning');
+  if(saved.returnTo){const base=await api('lesson?id='+encodeURIComponent(saved.returnTo.lessonId));const at=base.steps.findIndex(s=>s.id===saved.returnTo.stepId);if(at>=0)pausedLesson={lesson:base.id,index:at,course:base.course};}
+  await startLesson(saved.lessonId, {resume: saved, purpose: saved.purpose, returnTo: saved.returnTo});
+}
+function returnReference() {
+  return current ? {lessonId: current.id, stepId: current.steps[index].id,
+    phase: current.steps[index].kind, workKey: current.id+'/'+current.steps[index].id,
+    assisted: true, conversationCursor: [...state.events].reverse().find(e=>e.kind==='question')?.id || ''} : null;
+}
 function closeDialogs() {
+  document.querySelector(".secondary-menu").open = false;
   if ($("panel").open) $("panel").close();
   $("chat").hidden = true;
   $("dialogue").classList.remove("chatting");
@@ -418,14 +722,14 @@ function renderStep() {
   stopVoice();
   const step = current.steps[index];
   for (const id of ["simpler", "source", "generate"]) $(id).disabled = false;
-  assisted = false;
+  assisted = activeSession?.lessonId===current.id && activeSession?.stepId===step.id ? !!activeSession.assisted : false;
   passed = false;
   const prior = currentEvidence();
   if (prior) {
-    assisted = !!prior.assisted || !prior.correct;
+    assisted = assisted || !!prior.assisted || !prior.correct;
     if (prior.correct) passed = true;
   }
-  $("stepLabel").textContent = `${index + 1} / ${current.steps.length}`;
+  $("stepLabel").textContent = missionIndices ? `${missionIndices.indexOf(index)+1} / ${missionIndices.length} · 미션` : `${index + 1} / ${current.steps.length}`;
   $("choices").replaceChildren();
   const kind =
     {
@@ -446,7 +750,7 @@ function renderStep() {
   $("speech").textContent =
     step.kind === "quiz"
       ? "직접 골라주세요. 틀리면 어디서 막혔는지 짚고 다시 풀어볼게요."
-      : step.speech ||
+      : step.kind === "example" ? "판서를 한 단계씩 보면서 같이 풀어봅시다. 지금 식 다음에 무엇을 해야 할지 설명해보세요. 막히면 ‘더 쉽게’로 한 단계만 같이 볼 수 있어요." : step.speech ||
         "읽은 뒤 이 내용을 자신의 말로 설명해보세요. 모르는 부분은 바로 질문해주세요.";
   if (step.options) {
     step.options.forEach((option, i) => {
@@ -480,7 +784,7 @@ function renderStep() {
     );
   $("next").disabled = !passed;
   $("next").textContent =
-    index === current.steps.length - 1 ? "수업 정리" : "다음";
+    (missionIndices ? index === missionIndices.at(-1) : index === current.steps.length - 1) ? "미션 결과 보기" : "다음 도전";
   $("back").disabled = index === 0;
   $("hint").disabled = !step.options;
   if (["rejected", "pending"].includes(current.review?.status)) {
@@ -495,11 +799,12 @@ function renderStep() {
   }
   if (pausedLesson && current.id !== pausedLesson.lesson)
     $("choices").append(button("원래 문제로 돌아가기", returnToQuestion));
+  mission?.mount();
 }
 async function returnToQuestion() {
   const saved = pausedLesson;
   if (!saved) return;
-  await startLesson(saved.lesson);
+  await startLesson(saved.lesson,{index:saved.index,assisted:true,returnTo:null});
   if (current?.id !== saved.lesson) return;
   index = saved.index;
   course = saved.course;
@@ -512,6 +817,8 @@ async function returnToQuestion() {
 function answer(choice) {
   const step = current.steps[index],
     correct = choice === step.answer;
+  $("choices").querySelectorAll('button').forEach((b,i)=>{b.removeAttribute('data-result');if(i===choice)b.dataset.result=correct?'correct':'wrong';});
+  mission?.feedback(correct?'correct':'retry');
   record({
     kind: "answer",
     course,
@@ -527,14 +834,13 @@ function answer(choice) {
     $("next").disabled = false;
     $("speech").textContent = assisted
       ? "도움을 받아 해결했습니다. 다음 복습에서는 힌트 없이 다시 확인해요."
-      : "힌트 없이 해결했습니다. 조건이 다른 문제와 며칠 뒤 복습에서도 확인해요.";
+      : "좋아요. 이 문제는 혼자 해결했어요. 다음 도전으로 이어가볼까요?";
   } else {
     assisted = true;
     passed = false;
     $("next").disabled = true;
     $("speech").textContent =
-      "아직 맞지 않습니다. " +
-      (step.why || "문제의 조건과 기호를 다시 확인해주세요.");
+      "아직 맞지 않습니다. 먼저 문제에 주어진 조건과 구해야 할 양을 나눠 적어볼까요? 힌트가 필요하면 한 단계씩 같이 보겠습니다.";
     const available = [
       ...catalog.basics,
       ...catalog.courses.flatMap((c) => c.nodes),
@@ -561,7 +867,7 @@ function answer(choice) {
               returnIndex: pausedLesson.index,
             });
             await flush();
-            if (!pending.length) startLesson("node:" + prerequisite);
+            if (!pending.length) startLesson("node:" + prerequisite,{returnTo:returnReference()});
           },
           "remedial",
         ),
@@ -571,41 +877,46 @@ function answer(choice) {
 }
 $("hint").onclick = () => {
   assisted = true;
-  const step = current.steps[index];
-  $("speech").textContent =
-    step.why ||
-    "문제의 조건을 하나씩 적고, 어떤 정의나 법칙을 써야 할지 먼저 골라보세요.";
-  renderMath($("speech"));
+  saveSession(current,index,{assisted:true}).catch(()=>{});
+  openChat('정답이나 전체 풀이를 공개하지 말고, 지금 문제에서 시작할 힌트 하나와 내가 답할 질문 하나만 주세요.', 'hint');
 };
 $("simpler").onclick = () => {
   assisted = true;
-  openChat(
-    "지금 판서를 처음 배우는 사람에게 쉬운 비유로 설명하고, 확인 질문 하나를 주세요.",
-  );
+  saveSession(current,index,{assisted:true}).catch(()=>{});
+  openChat('지금 문제의 첫 단계 하나만 같이 풀고, 내가 이어서 할 다음 단계를 질문해주세요. 정답과 전체 해설은 아직 주지 마세요.', 'together');
 };
-$("back").onclick = () => {
+$("back").onclick = async () => {
+  try { await mission?.save(); } catch { return; }
   if (index > 0) {
+    const target=missionIndices ? missionIndices[Math.max(0,missionIndices.indexOf(index)-1)] : index-1;
+    try { await saveSession(current,target,{assisted:false}); } catch { return; }
     requestGeneration++;
-    index--;
+    index=target;
     record({ kind: "position", course, lesson: current.id, index });
     renderStep();
   }
 };
-$("next").onclick = () => {
+$("next").onclick = async () => {
   if (!passed) return;
+  try { await mission?.save(); } catch { return; }
   requestGeneration++;
-  if (index < current.steps.length - 1) {
-    index++;
+  if (missionIndices ? index !== missionIndices.at(-1) : index < current.steps.length - 1) {
+    const target=missionIndices ? missionIndices[missionIndices.indexOf(index)+1] : index+1;
+    try { await saveSession(current,target,{assisted:false}); } catch { return; }
+    index=target;
     record({ kind: "position", course, lesson: current.id, index });
     renderStep();
   } else finish();
 };
 function finish() {
-  const host = panel("오늘의 수업 정리");
+  const host = panel("미션 완료 · 다음 도전");
   const answers = evidenceSummary(
     [...state.events, ...pending].filter((e) => e.lesson === current.id),
   );
   host.append(node("p", current.title));
+  const celebration=node('div',undefined,'mission-result');
+  celebration.append(node('span',answers.independent?'도전 성공':'미션 기록 완료','mission-result-tag'),node('h2',answers.independent?`${answers.independent}문제를 혼자 해결했어요.`:'오늘 시도한 풀이를 남겼어요.'),node('p',answers.retry?'막힌 문제를 한 번 더 풀면 다음 도전이 쉬워져요.':'스앵님과 다음 도전으로 이어가볼까요?'));
+  host.append(celebration);
   const summary = node("div", undefined, "summary");
   for (const [label, value] of [
     ["확인 문제", answers.tested],
@@ -654,6 +965,12 @@ function finish() {
     );
 }
 async function consult(name = course) {
+  if ($("integratedWorkspace")) $("integratedWorkspace").hidden = true;
+  $("progress").hidden = $("assignments").hidden = true;
+  $("progressArea").setAttribute("aria-pressed", "false");
+  $("assignmentArea").setAttribute("aria-pressed", "false");
+  $("learningArea").setAttribute("aria-pressed", "true");
+  document.querySelector(".secondary-menu").open = false;
   document.querySelector(".school").dataset.mode = "office";
   course = name;
   requestGeneration++;
@@ -909,6 +1226,20 @@ function showReviews() {
 $("review").onclick = showReviews;
 $("records").onclick = () => {
   const host = panel("학생 기록");
+  const courseRecords = node("section");
+  courseRecords.append(node("h3", "수업·진도 기록")); host.append(courseRecords);
+  fetch("/api/study/state", {credentials:"same-origin",cache:"no-store"})
+    .then(async response => { if(!response.ok) throw new Error("수업 기록을 불러오지 못했습니다."); return (await response.json()).state; })
+    .then(original => {
+      if (!courseRecords.isConnected) return;
+      const term = original?.terms?.find(t => t.id === original.activeTermId);
+      for (const c of term?.courses || []) {
+        const entries = (term.sessions || []).filter(s => s.courseId === c.id && (s.progress || s.memo || s.reviewed));
+        const weeks = Object.values(c.weekNotes || {}).filter(n => n.range || n.summary);
+        row(courseRecords, c.name, `회차 기록 ${entries.length} · 주차 기록 ${weeks.length}`, () => openIntegrated(c.name + " · 학습 기록", "course", {course:c.name}), "보기");
+      }
+    }).catch(error => { if(courseRecords.isConnected) courseRecords.append(node("p",error.message)); });
+  host.append(node("h3", "문제 풀이·질문·학습 계획"));
   for (const c of catalog.courses) {
     const summary = evidenceSummary(state.events, c.name);
     if (!summary.tested && !state.plans[c.name]) continue;
@@ -1064,10 +1395,21 @@ async function showSources(name = course) {
     const form = node("form");
     form.innerHTML =
       '<label for="ruleClaim">특징·풀이 방식·주의점</label><input id="ruleClaim" required maxlength="1200"><label for="ruleSource">출처(자료명·페이지 또는 녹음 시각)</label><input id="ruleSource" required maxlength="600"><div class="fields"><div><label for="ruleDate">근거 날짜</label><input id="ruleDate" type="date" required></div><div><label for="certainty">근거 등급</label><select id="certainty"><option value="unverified">미확인</option><option value="inferred">추정</option><option value="confirmed">확정</option></select></div></div><button type="submit">근거와 함께 기록</button>';
-    const categoryLabel = node("label","기록 종류");categoryLabel.htmlFor="ruleCategory";
-    const category=node("select");category.id="ruleCategory";
-    for(const [value,label] of [["style","교수님 특징"],["exam","출제 유형"],["solution","풀이 순서"],["caution","주의점"]]){const option=node("option",label);option.value=value;category.append(option);}
-    form.prepend(categoryLabel,category);
+    const categoryLabel = node("label", "기록 종류");
+    categoryLabel.htmlFor = "ruleCategory";
+    const category = node("select");
+    category.id = "ruleCategory";
+    for (const [value, label] of [
+      ["style", "교수님 특징"],
+      ["exam", "출제 유형"],
+      ["solution", "풀이 순서"],
+      ["caution", "주의점"],
+    ]) {
+      const option = node("option", label);
+      option.value = value;
+      category.append(option);
+    }
+    form.prepend(categoryLabel, category);
     form.onsubmit = async (e) => {
       e.preventDefault();
       record({
@@ -1141,6 +1483,7 @@ $("settings").onclick = async () => {
     status(error.message, true);
   }
   const host = panel("김주영 스앵님 두뇌");
+  host.append(button("학기·과목·기록 설정", () => openIntegrated("학기·과목·기록 설정", "set")));
   host.append(button("이 기기의 화면 점검", () => deviceCheck(host)));
   host.append(
     node(
@@ -1259,6 +1602,7 @@ function openChat(prefill = "", mode = "question") {
           lesson: event.lesson,
           index: event.index,
           course: event.course,
+          id: event.id,
         });
     }
     renderMath($("chatMessages"));
@@ -1309,8 +1653,11 @@ $("chatForm").onsubmit = async (event) => {
     mode: chatMode,
     id: eventId(),
   };
+  const generation=requestGeneration, sessionId=activeSession?.id;
   try {
-    const answer = await api("coach", context);
+    if(current)await saveSession(current,index,{assisted:true});
+    const answer = await api("coach", {...context,sessionId});
+    if(generation!==requestGeneration || sessionId!==activeSession?.id || current?.id!==context.lesson || index!==context.index)return;
     reply.textContent = answer.answer
       .replace(/\*\*([^*]+)\*\*/g, "$1")
       .replace(/^#{1,6}\s+/gm, "");
@@ -1326,6 +1673,8 @@ $("chatForm").onsubmit = async (event) => {
       " · 답변 기록 저장";
     state = await api("state");
   } catch (error) {
+    if(generation!==requestGeneration)return;
+    if(!$("question").value)$("question").value=question;
     reply.textContent = error.message;
     reply.className = "error";
     $("chatStatus").textContent =
@@ -1345,7 +1694,14 @@ function renderFeedback(feedback, context) {
   );
   if (feedback.studentQuote)
     note.append(node("small", `내 답: “${feedback.studentQuote}”`));
-  note.append(button("다시 설명하기", () => openChat("", "teachback")));
+  const uncertainCount=[...state.events].filter(e=>e.kind==='question'&&e.lesson===context.lesson&&e.index===context.index&&e.feedback?.assessment==='uncertain').length + (feedback.assessment==='uncertain'&&!state.events.some(e=>e.id===context.id)?1:0);
+  if(feedback.assessment==='uncertain' && uncertainCount>=2) {
+    note.append(node('p','판단을 보류했습니다. 풀이를 보존했으며 정답이나 이해 완료로 기록하지 않습니다. 문제 조건이나 사진을 보완해주세요.'));
+    if(current?.id===context.lesson && !['rejected','pending'].includes(current.review?.status)) {
+      const target=current.steps.findIndex((s,i)=>i>context.index&&s.kind==='quiz'&&s.options);
+      if(target>=0)note.append(button('원자료의 확인 문제로 계속',()=>startLesson(current.id,{index:target,returnTo:activeSession?.returnTo})));
+    }
+  } else note.append(button("다시 설명하기", () => openChat("", "teachback")));
   if (feedback.target)
     note.append(
       button(feedback.target.label, async () => {
@@ -1366,7 +1722,7 @@ function renderFeedback(feedback, context) {
           await flush();
           if (pending.length) return;
         }
-        await startLesson(feedback.target.lesson);
+        await startLesson(feedback.target.lesson,{index:Number.isInteger(feedback.target.index)?feedback.target.index:undefined,returnTo:feedback.target.lesson!==saved.lesson?returnReference():activeSession?.returnTo});
         if (current?.id !== feedback.target.lesson) return;
         if (feedback.target.lesson !== saved.lesson) pausedLesson = saved;
         if (Number.isInteger(feedback.target.index)) {
@@ -1582,7 +1938,30 @@ async function showVisual(name, date) {
       image.loading = "lazy";
       image.className = "source-photo";
       image.src = `/api/school/visual-image?${new URLSearchParams({ course: name, date, file: file.name })}`;
-      item.append(image);
+      const imageError = node("div", undefined, "source-photo-error");
+      imageError.hidden = true;
+      imageError.append(
+        node(
+          "p",
+          "사진을 불러오지 못했습니다. 연결과 로그인을 확인하고 다시 시도해주세요.",
+        ),
+        button("사진 다시 불러오기", () => {
+          imageError.hidden = true;
+          image.hidden = false;
+          const retry = new URL(image.src);
+          retry.searchParams.set("retry", Date.now());
+          image.src = retry.href;
+        }),
+      );
+      image.onerror = () => {
+        image.hidden = true;
+        imageError.hidden = false;
+      };
+      image.onload = () => {
+        image.hidden = false;
+        imageError.hidden = true;
+      };
+      item.append(image, imageError);
       const display = (audit) => {
         result.replaceChildren(
           node("p", audit.notice, "notice"),
@@ -1677,7 +2056,9 @@ $("generate").onclick = async () => {
           () => startLesson(draft.id),
           "primary",
         );
-        openDraft.disabled = ["rejected", "pending"].includes(draft.review?.status);
+        openDraft.disabled = ["rejected", "pending"].includes(
+          draft.review?.status,
+        );
         host.append(openDraft);
         renderMath(host);
       } catch (error) {
@@ -1704,13 +2085,15 @@ if ($("teacher").complete && $("teacher").naturalWidth)
   $("teacher").hidden = false;
 async function boot() {
   try {
-    [catalog, state, capabilities] = await Promise.all([
+    [catalog, state, capabilities, activeSession] = await Promise.all([
       api("catalog"),
       api("state"),
       api("capabilities"),
+      api("session"),
     ]);
     if (TEST && !capabilities.testMode)
       throw new Error("검증 모드 서버 적용이 필요합니다.");
+    if(activeSession?.returnTo){const base=await api('lesson?id='+encodeURIComponent(activeSession.returnTo.lessonId));const at=base.steps.findIndex(s=>s.id===activeSession.returnTo.stepId);if(at>=0)pausedLesson={lesson:base.id,index:at,course:base.course};}
     const last = [...state.events]
       .reverse()
       .find((e) => e.course || e.plan?.course);
@@ -1722,7 +2105,7 @@ async function boot() {
           e.kind === "review" &&
           ["prerequisite", "returned"].includes(e.action),
       );
-    if (remedial?.action === "prerequisite")
+    if (!activeSession && remedial?.action === "prerequisite")
       pausedLesson = {
         lesson: remedial.returnLesson,
         index: remedial.returnIndex,
@@ -1736,6 +2119,10 @@ async function boot() {
     for (const id of [
       "home",
       "learningArea",
+      "mainArea",
+      "progressArea",
+      "materialsArea",
+      "attendanceArea",
       "assignmentArea",
       "courses",
       "library",
@@ -1759,4 +2146,13 @@ async function boot() {
     $("courseDoors").replaceChildren(button("다시 연결", boot));
   }
 }
+mission = createMission({api,context:()=>current?{lesson:current,step:current.steps[index],index,assisted,total:missionIndices?.length,number:missionIndices?missionIndices.indexOf(index)+1:undefined}:null,feedback:(text,kind)=>{$('speech').textContent=text;mission.feedback(kind);renderMath($('speech'));},allowNext:()=>{status('풀이 피드백은 관찰 기록입니다. 확인 문제의 정답 검증은 별도로 진행합니다.');}});
+workspace = createWorkspace({api,status,panel,record,close:closeDialogs,catalog:()=>catalog,evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,leave:async()=>{await mission.save();if(current)await saveSession(current,index);stopVoice();closeDialogs();++requestGeneration;},lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode)});
+$('home').onclick=()=>workspace.open('main');
+$('mainArea').onclick=()=>workspace.open('main');
+$('learningArea').onclick=()=>workspace.open('learning');
+$('progressArea').onclick=()=>workspace.open('progress');
+$('materialsArea').onclick=()=>workspace.open('materials');
+$('attendanceArea').onclick=()=>workspace.open('attendance');
+$('assignmentArea').onclick=()=>workspace.open('assignments');
 boot();

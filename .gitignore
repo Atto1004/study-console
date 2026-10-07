@@ -39,3 +39,4 @@ _shot_cr_m.html
 /_private/
 # 근무 루틴(개인 일정) — atom /study/ 로컬 서빙에서만
 knowledge/routine-week.json
+.test-tools/

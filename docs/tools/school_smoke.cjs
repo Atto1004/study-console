@@ -3,21 +3,31 @@ const root=path.resolve(__dirname,'../..');
 const {JSDOM}=require(path.join(root,'.test-tools/node_modules/jsdom'));
 const fixture=JSON.parse(fs.readFileSync(path.join(root,'.test-tools/school-fixture.json'),'utf8'));
 const html=fs.readFileSync(path.join(root,'school/index.html'),'utf8');
-const source=fs.readFileSync(path.join(root,'school/school.js'),'utf8').replace(/^import[\s\S]*?from\s+["'][^"']+["'];\s*/,'');
+const source=fs.readFileSync(path.join(root,'school/school.js'),'utf8').replace(/^import[\s\S]*?from\s+["'][^"']+["'];\s*/gm,'');
 new vm.Script(source);
 let state={version:1,revision:0,plans:{},events:[],rules:{},progress:{},drafts:{},settings:{engine:'auto',voice:false}}, prerequisiteMode=false;
 const errors=[];
+const assignments={asOf:'2026-10-06',notice:'풀이 완료와 제출 완료',rows:[{id:'a',course:'공업수학1',title:'풀이 과제',due:'2026-10-07',submission:'미제출',workDone:false,submitted:false,files:[],source:'판서'},{id:'b',course:'정역학',title:'제출 과제',due:'2026-10-05',submission:'제출',workDone:false,submitted:true,files:[]}]};
 const dom=new JSDOM(html,{url:'https://school.invalid/kingdom/study/school/index.html?test=1',runScripts:'outside-only',pretendToBeVisual:true});
 const w=dom.window,d=w.document;
 w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};
-w.requestAnimationFrame=()=>{};
+w.requestAnimationFrame=()=>{};w.structuredClone=structuredClone;w.HTMLCanvasElement.prototype.getContext=()=>null;
 w.addEventListener('error',e=>errors.push(e.error||e.message));
 w.fetch=async(url,options={})=>{
  const parsed=new URL(url,w.location.href);let body;
- if(parsed.pathname.endsWith('/catalog'))body=fixture.catalog;
+ if(parsed.pathname.endsWith('/knowledge/materials.json'))body=JSON.parse(fs.readFileSync(path.join(root,'knowledge/materials.json'),'utf8'));
+ else if(parsed.pathname.endsWith('/knowledge/sessions.json'))body=JSON.parse(fs.readFileSync(path.join(root,'knowledge/sessions.json'),'utf8'));
+ else if(parsed.pathname.endsWith('/_private/class-files.json'))body=JSON.parse(fs.readFileSync(path.join(root,'_private/class-files.json'),'utf8'));
+ else if(parsed.pathname.endsWith('/_private/submit.json'))body=JSON.parse(fs.readFileSync(path.join(root,'_private/submit.json'),'utf8'));
+ else if(parsed.pathname.endsWith('/workspace'))body={date:'2026-10-07',termId:'test',revision:0,courses:fixture.catalog.courses,exams:[],plans:[],sessions:[],scheduled:[],sources:[],candidates:[],profile:{dailyCap:4},sync:{}};
+ else if(parsed.pathname.endsWith('/cal'))body={ok:true,days:{'2026-10-07':[]}};
+ else if(parsed.pathname.endsWith('/work'))body={revision:0,strokes:[]};
+ else if(parsed.pathname.endsWith('/catalog'))body=fixture.catalog;
+ else if(parsed.pathname.endsWith('/session')){if(options.body){const request=JSON.parse(options.body);assert.equal(request.revision,state.activeSession?.revision||0);state.activeSession={...request,revision:request.revision+1};}body=state.activeSession||null;}
  else if(parsed.pathname.endsWith('/state'))body=state;
  else if(parsed.pathname.endsWith('/capabilities'))body={testMode:true,engines:['auto','claude','codex'],voice:false};
- else if(parsed.pathname.endsWith('/assignments'))body={asOf:'2026-10-06',notice:'작업 완료와 제출은 별개',rows:[{course:'공업수학1',title:'풀이 과제',due:'2026-10-07',submission:'미제출',submitted:false,files:[],source:'판서'},{course:'정역학',title:'제출 과제',due:'2026-10-05',submission:'제출',submitted:true,files:[]}]};
+ else if(parsed.pathname.endsWith('/assignments'))body=assignments;
+ else if(parsed.pathname.endsWith('/assignment-status')){const request=JSON.parse(options.body);body=assignments.rows.find(r=>r.id===request.id);body[request.field]=request.value;}
  else if(parsed.pathname.endsWith('/lesson'))body=fixture.lessons[parsed.searchParams.get('id')];
  else if(parsed.pathname.endsWith('/event')){
   const event={...JSON.parse(options.body),at:Date.now()/1000};
@@ -34,17 +44,29 @@ w.fetch=async(url,options={})=>{
   body={answer:'다시 확인해볼게요.',engine:'fixture',feedback};
   state.events.push({...request,kind:'question',answer:body.answer,feedback,engine:body.engine,at:Date.now()/1000});
  }else throw new Error('예상하지 않은 요청 '+url);
- if(!body)throw new Error('없는 fixture '+url);
+ if(body===undefined)throw new Error('없는 fixture '+url);
  return {ok:true,json:async()=>JSON.parse(JSON.stringify(body))};
 };
 w.eval(fs.readFileSync(path.join(root,'school/learning.js'),'utf8').replace(/^export /gm,''));
-w.eval(source);
+for(const f of ['workspace.js','mission.js'])w.eval(fs.readFileSync(path.join(root,'school',f),'utf8').replace(/^export /gm,''));
+w.eval(source+'\nwindow.__smokeConcept=()=>startLesson(lastLesson,{concept:true});window.__smokeLobby=()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;};');
 const settle=()=>new Promise(resolve=>setTimeout(resolve,10));
+const check=(label)=>[...d.querySelectorAll('.assignment-check')].find(el=>el.textContent===label)?.querySelector('input');
 const byText=text=>[...d.querySelectorAll('button')].find(b=>b.textContent===text);
 (async()=>{
- await settle();assert.equal(d.querySelector('#resume').disabled,false,d.querySelector('#status').textContent+' '+errors.map(String).join(' '));assert.equal(d.querySelectorAll('.door').length,7);
+ await settle();await settle();d.querySelector('#learningArea').click();await settle();w.__smokeLobby();assert.equal(d.querySelector('#resume').disabled,false,d.querySelector('#status').textContent+' '+errors.map(String).join(' '));assert.equal(d.querySelectorAll('.door').length,7);
+ assert.equal(d.querySelectorAll('header nav button').length,6);
+ d.querySelector('#progressArea').click();await settle();assert.equal(d.querySelector('#workspace').hidden,false);
  d.querySelector('#assignmentArea').click();await settle();assert.equal(d.querySelector('#lobby').hidden,true);assert.equal(d.querySelector('#assignments').hidden,false);assert.ok(d.querySelector('#assignments').textContent.includes('풀이 과제'));assert.ok(!d.querySelector('#assignments').textContent.includes('제출 과제'));
- byText('제출 확인').click();assert.ok(d.querySelector('#assignments').textContent.includes('제출 과제'));d.querySelector('#learningArea').click();assert.equal(d.querySelector('#assignments').hidden,true);assert.equal(d.querySelector('#lobby').hidden,false);
+ assert.ok(!d.querySelector('#assignments').textContent.includes('혼자 풀기'));assert.ok(!d.querySelector('#assignments').textContent.includes('필요한 개념 학습'));
+ assert.equal(w.eval('isStudyPractice({label:"혼자 풀기 (스앵님 코칭)",href:"notes/lessons/_private/em1/hw/index.html"})'),true);
+ assert.equal(w.eval('isStudyPractice({label:"문제지 PDF",href:"_private/submit/statics_ch5_questions.pdf"})'),false);
+ check('풀이 완료').click();await settle();assert.equal(assignments.rows[0].workDone,true);assert.equal(assignments.rows[0].submitted,false);assert.equal(check('풀이 완료').checked,true);
+ d.querySelector('#assignmentArea').click();await settle();assert.equal(check('풀이 완료').checked,true,'다시 조회해도 완료 표시 유지');
+ check('풀이 완료').click();await settle();assert.equal(assignments.rows[0].workDone,false);
+ check('제출 완료').click();await settle();assert.equal(assignments.rows[0].submitted,true);assert.equal(assignments.rows[0].workDone,false);assert.ok(!d.querySelector('#assignments').textContent.includes('풀이 과제'));
+ byText('제출 완료').click();assert.ok(d.querySelector('#assignments').textContent.includes('제출 과제'));check('제출 완료').click();await settle();assert.equal(assignments.rows[0].submitted,false);
+ w.__smokeLobby();assert.equal(d.querySelector('#assignments').hidden,true);assert.equal(d.querySelector('#lobby').hidden,false);
  d.querySelector('#consult').click();assert.equal(d.querySelector('#panel').open,true);
  d.querySelector('#panelBody form').dispatchEvent(new w.Event('submit',{cancelable:true}));await settle();
  for(let i=0;i<5&&byText('아직 모르겠어요');i++){byText('아직 모르겠어요').click();await settle();}

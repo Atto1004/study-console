@@ -2,8 +2,7 @@
 if (
   /^\/(kingdom\/)?study\//.test(location.pathname) &&
   !location.search &&
-  !location.hash &&
-  matchMedia("(min-width:700px)").matches
+  !location.hash
 ) {
   location.replace(new URL("school/index.html", location.href));
 }

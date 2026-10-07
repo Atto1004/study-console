@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>그린라이트 학교 · 첫 수업 시안</title>
+  <link rel="stylesheet" href="school.css">
+  <script defer src="school.js"></script>
+</head>
+<body>
+  <div class="school">
+    <header class="top">
+      <button id="home" class="brand">GREENLIGHT <span>학교</span></button>
+      <div id="location">첫 수업을 앞두고</div>
+      <div class="top-actions"><button id="library">자료실</button><button id="records">수업 기록</button><button id="sources">출처</button></div>
+    </header>
+    <main id="scene" class="scene lobby" aria-label="학교 로비">
+      <div class="light" aria-hidden="true"></div>
+      <div class="window" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="wall-line" aria-hidden="true"></div>
+      <div id="lobby" class="lobby-content">
+        <div class="welcome"><p>GREENLIGHT ACADEMY</p><h1>오늘의 공부가<br>시작되는 곳.</h1><div>공업수학1<br>1.1 기본개념과 모델화</div></div>
+        <div class="doors">
+          <button class="door office" data-room="consult"><span class="door-tag">01 · 상담실</span><b>김주영 스앵님</b><span>출발점 함께 정하기</span><i aria-hidden="true"></i></button>
+          <button class="door classroom" data-room="class"><span class="door-tag">02 · 과목 교실</span><b>공업수학1</b><span>변화를 식으로</span><i aria-hidden="true"></i></button>
+        </div>
+        <div class="bench" aria-hidden="true"></div>
+        <div class="resume"><span id="resumeText">짧은 상담으로 시작점을 정해보세요.</span><button id="resume">상담 시작</button></div>
+      </div>
+      <section id="room" class="room" hidden>
+        <div class="room-title"><span id="roomLabel">상담실</span><span id="stepLabel"></span></div>
+        <div class="teaching-space">
+          <section id="board" class="board" aria-label="현재 칠판" aria-live="polite"></section>
+          <div class="teacher"><img id="teacher" src="../../../notes/classroom/assets/tutor/neutral.png" alt="김주영 스앵님" hidden><span>김주영 스앵님</span></div>
+        </div>
+        <div class="desk-edge" aria-hidden="true"></div>
+      </section>
+    </main>
+    <section id="dialogue" class="dialogue" hidden aria-label="스앵님과 수업">
+      <div class="speech"><div class="speaker">김주영 스앵님 <span id="saveStatus">시안 기록</span></div><p id="speech" aria-live="polite"></p></div>
+      <div id="choices" class="choices"></div>
+      <form id="answerForm" hidden><label for="answer">직접 계산한 답</label><div><input id="answer" autocomplete="off" inputmode="decimal" placeholder="숫자로 답해주세요"><button type="submit">답 확인</button></div></form>
+      <div class="lesson-tools"><button id="hint">힌트</button><button id="simpler">더 쉽게</button><button id="back">이전 단계</button><button id="askToggle">스앵님에게 질문</button><span>첫 단원 시범 수업 · 음성 연결 전</span></div>
+      <form id="askForm" hidden><label for="question">현재 수업에 대해 질문하세요</label><div><input id="question" autocomplete="off" maxlength="1500" placeholder="왜 출발점이 필요한가요?"><button id="askSend" type="submit">질문하기</button><button id="askStop" type="button" hidden>멈추기</button></div></form>
+      <div id="coachReply" class="coach-reply" hidden aria-live="polite"></div>
+    </section>
+    <footer class="foot"><a href="../../../index.html">기존 학습앱 열기</a><span id="footNote">기존 학습 기록은 변경하지 않습니다.</span></footer>
+  </div>
+  <dialog id="sourceDialog"><button id="closeSources" class="close">닫기</button><p class="eyebrow">수업을 만든 근거</p><h2>공업수학1 · 1.1</h2><p>아래 기존 자료를 바탕으로 구성한 첫 수업 시안입니다. 원자료의 전체 대조와 녹음 누락 탐지는 아직 검증하지 않았습니다.</p><ul><li><a href="../../../notes/lessons/_private/em1/slides/1.1.pdf" target="_blank" rel="noopener">교수님 슬라이드 · 기존 색인 p.2~12</a></li><li><a href="../../../notes/lessons/em1/2026-09-02.html" target="_blank" rel="noopener">9/2 수업 정리 · 모델화와 미분방정식</a></li><li><a href="../../../notes/lessons/em1/2026-09-04.html" target="_blank" rel="noopener">9/4 수업 정리 · 초기값 문제</a></li></ul><p>진단 질문과 숫자 예제는 시안용 보충 자료입니다. 교수님의 실제 출제 문제로 표시하지 않습니다.</p></dialog>
+  <dialog id="libraryDialog"><button class="close" data-close="libraryDialog">닫기</button><p class="eyebrow">자료실</p><h2>공업수학1 자료</h2><p>기존 자료 색인의 확보 현황입니다. 건수는 내용의 완전성을 뜻하지 않습니다.</p><div id="materialList">자료 색인을 읽는 중입니다.</div></dialog>
+  <dialog id="recordDialog"><button class="close" data-close="recordDialog">닫기</button><p class="eyebrow">수업 기록</p><h2>이번 수업에서 확인한 것</h2><div id="recordList"></div><p>시범 수업 기록은 기존 이해도와 분리해 저장합니다. 반복 성공을 전체 단원 이해로 단정하지 않습니다.</p><button id="exportRecord">기록 파일 받기</button></dialog>
+</body>
+</html>

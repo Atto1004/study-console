@@ -1,4 +1,15 @@
 /* 학교 디자인 .178: 배경은 공간, 창은 안내판, 칠판은 학습 내용. */
+.secondary-menu { position: relative; margin-left: auto; }
+.secondary-menu summary { cursor: pointer; color: #e1d9bd; padding: 10px; white-space: nowrap; }
+.secondary-menu > div { position: absolute; right: 0; top: 100%; z-index: 30; display: grid; gap: 8px; padding: 12px; width: 190px; background: #12382d; border: 2px solid #b39b61; }
+.secondary-menu button { text-align: left; }
+.school[data-mode="progress"] .scene,
+.school[data-mode="assignments"] .scene { overflow-y: auto; }
+@media (max-width: 650px) {
+  header { flex-wrap: wrap; }
+  header nav { order: 3; width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); }
+  header nav button { padding: 8px 6px; }
+}
 :root {
   --school-ink: #102c25;
   --school-paper: #f5efdf;
@@ -14,6 +25,13 @@ body {
 .assignment-files { margin-bottom: 12px; }
 .assignment-content a { color: #24543b; }
 .assignment-card small { color: #4b5a4d; }
+.assignment-checks { display: flex; flex-wrap: wrap; gap: 12px 28px; margin-top: 16px; }
+.assignment-check { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
+.assignment-check input { appearance: none; width: 20px; height: 20px; min-height: 20px; flex: 0 0 20px; margin: 0; padding: 0; border: 1px solid #737c62; border-radius: 3px; background: transparent; display: grid; place-content: center; cursor: pointer; }
+.assignment-check input:checked { background: #263e30; border-color: #263e30; }
+.assignment-check input:checked::after { content: ""; width: 5px; height: 10px; border: solid #faf6e8; border-width: 0 2px 2px 0; transform: translateY(-1px) rotate(45deg); }
+.assignment-check input:focus-visible { outline: 2px solid #85743e; outline-offset: 4px; }
+.assignment-check input:disabled { opacity: .5; cursor: wait; }
 .assignment-content button, .assignment-content select { color: var(--school-ink); background: #eee6cc; border: 1px solid #9c895c; }
 button[aria-pressed="true"] { outline: 2px solid var(--school-brass); outline-offset: 2px; }
 .brand:hover {
@@ -287,6 +305,33 @@ footer #status {
 }
 .board .content {
   font: 20px/1.75 var(--dot-body);
+}
+.board .katex-display,
+.board .content > .katex {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.3em 0;
+}
+.board .content > .katex {
+  display: inline-block;
+  vertical-align: middle;
+}
+.board .formula-scrollable > .katex,
+.board .content > .formula-scrollable > .katex-html {
+  display: inline-block;
+  min-width: max-content;
+  text-align: left;
+}
+.board .formula-scrollable {
+  text-align: left;
+}
+.board .formula-scrollable:focus-visible {
+  outline: 2px solid var(--school-brass);
+  outline-offset: 2px;
+}
+.source-photo[hidden], .source-photo-error[hidden] {
+  display: none;
 }
 .board .annotation {
   font: 12px/1.65 var(--dot-body);
@@ -701,6 +746,14 @@ dialog form > .primary {
   }
   #room {
     padding: 16px;
+  }
+  .teaching-space {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .board {
+    width: 100%;
+    padding: 20px;
   }
   #dialogue {
     padding: 16px;

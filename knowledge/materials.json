@@ -1,7 +1,7 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-10-03T17:38:59",
- "asOf": "2026-10-03",
+ "generatedAt": "2026-10-07T15:37:45",
+ "asOf": "2026-10-07",
  "termEnd": "2026-12-21",
  "courses": {
   "공업수학1": {
@@ -118,7 +118,11 @@
      }
     },
     "2026-10-07": {
-     "k": {},
+     "k": {
+      "summary": 1,
+      "board": 11,
+      "note": 2
+     },
      "plan": {
       "topic": "Ch.3 3.1~3.2 고계 제차 선형 · 상수계수",
       "pre": "Ch.3 슬라이드 p.3~12",
@@ -394,6 +398,13 @@
       "board": 11,
       "note": 1
      }
+    },
+    "2026-10-06": {
+     "k": {
+      "summary": 1,
+      "board": 4,
+      "note": 2
+     }
     }
    },
    "assignments": [
@@ -476,6 +487,13 @@
       "summary": 1,
       "board": 14
      }
+    },
+    "2026-10-07": {
+     "k": {
+      "summary": 1,
+      "board": 16,
+      "note": 4
+     }
     }
    },
    "assignments": []
@@ -498,21 +516,21 @@
       "rec": 1,
       "summary": 1,
       "board": 1,
-      "profnote": 1
+      "profnote": 2
      },
      "novideo": true
     },
     "2026-09-09": {
      "k": {
       "pre": 1,
-      "profnote": 2,
+      "profnote": 7,
       "summary": 2,
       "lmsvideo": 1
      }
     },
     "2026-09-14": {
      "k": {
-      "profnote": 2,
+      "profnote": 6,
       "summary": 2,
       "lmsvideo": 1,
       "rec": 1
@@ -520,7 +538,7 @@
     },
     "2026-09-16": {
      "k": {
-      "profnote": 2,
+      "profnote": 3,
       "photo": 3,
       "summary": 1,
       "lmsvideo": 1
@@ -565,10 +583,18 @@
      "status": "못 냄"
     },
     {
+     "title": "Homework Assignment - Chapter 5",
+     "given": "2026-09-30",
+     "due": "2026-10-19T23:59",
+     "src": "LMS"
+    },
+    {
      "title": "Homework Assignment - Chapter 4",
      "given": "2026-09-28",
      "due": "2026-11-05T23:59",
-     "src": "LMS"
+     "src": "LMS",
+     "status": "제출",
+     "submittedAt": "2026-10-03T22:01"
     }
    ]
   },
@@ -610,7 +636,15 @@
     "2026-09-29": {
      "k": {
       "photo": 28,
-      "lmsvideo": 1
+      "lmsvideo": 1,
+      "pre": 1
+     }
+    },
+    "2026-10-06": {
+     "k": {
+      "lmsvideo": 1,
+      "summary": 1,
+      "pre": 3
      }
     }
    },
@@ -630,6 +664,14 @@
      "src": "LMS",
      "status": "제출",
      "submittedAt": "2026-09-29T15:19"
+    },
+    {
+     "title": "Week6 과제제출란",
+     "given": "2026-10-06",
+     "due": "2026-10-12T23:59",
+     "src": "LMS",
+     "status": "제출",
+     "submittedAt": "2026-10-06T16:33"
     },
     {
      "title": "Week2 과제 제출란",
@@ -688,6 +730,13 @@
       "summary": 1,
       "pre": 4
      }
+    },
+    "2026-10-06": {
+     "k": {
+      "summary": 1,
+      "note": 1,
+      "pre": 1
+     }
     }
    },
    "assignments": [
@@ -711,7 +760,9 @@
      "title": "[글쓰기 활동 ④] 자기서사를 잘 쓰기 위한 활동지를 제출해 주세요.",
      "given": "2026-09-29",
      "due": "2026-10-04T23:59",
-     "src": "LMS"
+     "src": "LMS",
+     "status": "제출",
+     "submittedAt": "2026-10-04T08:17"
     },
     {
      "title": "[글쓰기 활동① ] 주제문 쓰기",

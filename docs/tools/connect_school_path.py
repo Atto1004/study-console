@@ -1,0 +1,7 @@
+from pathlib import Path
+p=Path(__file__).resolve().parents[2]/'school/school.js'
+s=p.read_text(encoding='utf-8').replace('recommendStart,splitText}', 'recommendStart,splitText,learningPath}')
+s=s.replace("const target=[...catalog.basics,...c.nodes].find(n=>'node:'+n.id===start.id);", "const route=learningPath(c,catalog.basics,start.id,preferences.background==='처음부터 배우기');if(route.path.length)start.id=route.path[0];const target=[...catalog.basics,...c.nodes].find(n=>'node:'+n.id===start.id);if(route.missing.length)host.append(node('p','아직 보충 자료가 없는 선수 개념: '+route.missing.join(', ')+'. 해당 개념은 수업 중 따로 질문하며 확인해야 합니다.','notice'));host.append(node('p','기초에서 수업 자료까지 '+route.path.length+'개 학습 묶음을 연결했습니다. 한 번에 전부 진행하지 않습니다.'));")
+s=s.replace("diagnostic,strategy:c.strategy", "diagnostic,path:route.path,missing:route.missing,strategy:c.strategy")
+s=s.replace("button('과목 교실로',()=>showCourse(course)));}", "button('과목 교실로',()=>showCourse(course)));const path=state.plans[course]?.path||[],position=path.indexOf(current.id),next=path[position+1];if(next&&position>=0){host.append(button('계획의 다음 학습으로',async()=>{const plan={...state.plans[course],start:next};record({kind:'plan',plan});await flush();if(!pending.length)startLesson(next);},'primary'));}if(answers.retry||answers.assisted)host.append(node('p','도움받거나 막힌 문제는 다음 내용을 배우기 전에 다시 설명해보세요. 복습 기록도 따로 남습니다.','notice'));}")
+p.write_text(s,encoding='utf-8')

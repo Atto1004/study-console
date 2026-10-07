@@ -2263,7 +2263,7 @@ var PHASE={
 };
 
 /* ---------- 상태 ---------- */
-var BUILD="2026-10-06.180";
+var BUILD="2026-10-07.191";
 var KEY="mech-console-v2";
 var S=null, ui={view:"shelf",course:null,dirty:false};
 
@@ -2831,7 +2831,7 @@ function seedStatics(){
   var midWeek=pl.filter(function(p){return p.week===8;})[0];
   var finWeek=pl.filter(function(p){return p.week===16;})[0]||pl[pl.length-1];
   if(midWeek) t.exams.push({id:uid(),courseId:c.id,kind:"중간",date:midWeek.date,time:"15:00",
-    scope:"Ch.3 Forces · Ch.4 Systems of Forces and Moments · Ch.5 Objects in Equilibrium — 과제 1~2문제 그대로 출제(부분점수 없음), 영어 답안, 절대평가",weight:30});
+    scope:"전체 6~7문제 · 과제 수준 · 절대평가 (대표님 전달 2026-10-07) — Ch.3 Forces · Ch.4 Systems of Forces and Moments · Ch.5 Objects in Equilibrium — 과제 1~2문제 그대로 출제(부분점수 없음), 영어 답안, 절대평가",weight:30});
   if(finWeek) t.exams.push({id:uid(),courseId:c.id,kind:"기말",date:finWeek.date,time:"15:00",
     scope:"Ch.6 Structures in Equilibrium · Ch.7 Centroids and Centers of Mass · Ch.8 Moments of Inertia — 중간 범위 제외, 성적의 50%",weight:50});
 }
@@ -3019,14 +3019,14 @@ function atomPush(){
         }
       });
     }catch(e){}
-  },700);
+  },new URLSearchParams(location.search).get("integrated")==="1" ? 0 : 700);
 }
 function load(){
   var emb=null, loc=null;
   try{ var t=$("#state").textContent.trim(); if(t&&t!=="null") emb=JSON.parse(t); }catch(e){}
   if(atomState&&typeof atomState==="object") emb=atomState;
   try{ var l=localStorage.getItem(KEY); if(l) loc=JSON.parse(l); }catch(e){}
-  var pick=(emb&&loc) ? ((loc.updatedAt||0)>=(emb.updatedAt||0)?loc:emb) : (loc||emb);
+  var pick=(ATOM_HOSTED&&atomState) ? atomState : (emb&&loc) ? ((loc.updatedAt||0)>=(emb.updatedAt||0)?loc:emb) : (loc||emb);
   S=migrate(pick);
 }
 function persist(){
@@ -4859,10 +4859,26 @@ function renderTaskAll(){
 }
 /* ---------- 패치 노트 (최근 항목 · 전체는 저장소 CHANGELOG.md) ---------- */
 var PATCHNOTES=[
+  {v:"2026-10-07.191",d:"10-07",items:["학교 공간·스앵님·하단 6개 메뉴 통합, 실제 수업 단계 이어하기","기본 수업 전체 흐름과 선택형 시험 확인 문제 분리, 선수 보충 복귀 저장","지난 과제는 기록으로 분리하고 계속 진행을 직접 선택"]},
+  {v:"2026-10-07.190",d:"10-07",items:["풀이 완료 과제 메인 숨김·복구, 제출 완료 상태와 별도 저장","숨긴 과제도 제출 마감 당일 오늘 제출에 다시 표시"]},
+  {v:"2026-10-07.189",d:"10-07",items:["메인 시험 D-day 아래 과제 제출 마감: 미제출 과제를 가까운 마감 순으로 표시","풀이 완료도 제출 전이면 유지, 제출 완료 제외, 마감 미확인은 마지막 표시"]},
+  {v:"2026-10-07.188",d:"10-07",items:["메인·공부·진도·자료·출결·과제의 6개 영역과 시험 대비 D-day","스앵님 상담 계획 미리보기·적용과 오늘 계획","펜슬·공책·화면 풀이 미션, 자동 풀이 저장·원문 변경 확인","로컬 자료 10분 색인·범위 후보와 출결 직접 확인, 동시 저장 보호"]},
+  {v:"2026-10-07.187",d:"10-07",items:["학습 기능을 세 파트 안으로 통합: 오늘·계획·시험·암기·개념·기존 기록","진도관리에서 출결·시간표·학점과 과목·회차 기록 수정","휴대폰도 같은 학습 화면으로 진입"]},
+  {v:"2026-10-07.186",d:"10-07",items:["학습앱 도트 배경·글꼴·게임 장식을 줄이고 읽기 중심 화면으로 변경"]},
+  {v:"2026-10-07.185",d:"10-07",items:["과제 풀이 완료·제출 완료를 체크칸으로 변경"]},
+  {v:"2026-10-07.184",d:"10-07",items:["과제마다 풀이 완료·제출 완료 표시와 취소 버튼 추가","완료 상태 서버 저장 · 새로고침 후 유지"]},
+  {v:"2026-10-07.183",d:"10-07",items:[
+    "혼자 풀기·코칭은 공부하기로 이동. 과제에서는 연습·개념 학습 진입을 제거하고 문제지·제출용 파일·마감·제출 상태를 확인"
+  ]},
+  {v:"2026-10-07.182",d:"10-07",items:[
+    "진도관리 의미 수정 — 수업 범위·날짜·주차와 교재·강의자료·판서·녹음·정리본 관리. 풀이 성취는 상세 학습 기록으로. 예정 범위와 실제 수업 기록 구분"
+  ]},
+  {v:"2026-10-07.181",d:"10-07",items:[
+    "학교를 공부하기·진도관리·과제 세 파트로 구성. 과목별 학습한 수업과 독립 풀이·도움·재시도, 복습을 진도관리에서 확인. 자료실·상세 기록·설정은 더보기로 이동"
+  ]},
   {v:"2026-10-06.180",d:"10-06",items:[
     "학습·과제 영역 분리 — 과목별 마감·제출 확인·제출본을 모으고 필요한 개념 학습으로 연결. 작업 완료와 실제 제출 상태 구분"
   ]},
-
   {v:"2026-10-06.179",d:"10-06",items:[
     "내 설명의 오개념 피드백·선수 보충과 원래 수업 복귀·관찰 기록, 사진 원본 판독, 실제 잔여 사용량 기반 모델 선택. 내용 검토 대기 교재의 학습 기록 차단"
   ]},
@@ -4880,7 +4896,9 @@ var PATCHNOTES=[
     "웹·태블릿 첫 화면을 학교로 연결 — 과목 교실·시작 상담·원자료 학습·질문·풀이 증거·지연 복습·교수 규칙을 서버 기록으로 연결. 기존 출결·과제·시험은 관제탑에서 계속 사용",
     "모델과 학생 기억 분리, Claude/Codex 선택·자동 전환, 원자료를 유지하는 보충 수업 생성과 검증 상태 표시. Fish 음성은 서버 키·reference ID 설정 후 사용"
   ]},
-
+  {v:"2026-10-05.174",d:"10-05",items:[
+    "학습 탭을 그린라이트 학습층으로 개편 — 다음 교실을 한 번에 열고, 과목 교실·자습실·자료실·시간표로 바로 이동. 기존 학습 기록과 화면은 그대로 연결"
+  ]},
   {v:"2026-10-04.173",d:"10-04",items:[
     "A++O 와 같은 도트 게임 그림체로 — 같은 교실에서 창밖만 낮·밤으로 바뀌고, 카드·버튼은 황동 테두리 판, 제목·탭·시계는 도트 글꼴"
   ]},
@@ -7729,7 +7747,7 @@ function boot(){
       if(!Array.isArray(st.examForm)||!st.examForm.length) st.examForm=["주관식 계산","영어 답안"];
       t.exams.filter(function(e){return e.courseId===st.id;}).forEach(function(e){
         if(/^\(추정\)/.test(e.scope||"")||!(e.scope||"").trim()){
-          if(e.kind==="중간"){ e.scope="Ch.3 Forces · Ch.4 Systems of Forces and Moments · Ch.5 Objects in Equilibrium — 과제 1~2문제 그대로 출제(부분점수 없음), 영어 답안, 절대평가"; e.weight=30; }
+          if(e.kind==="중간"){ e.scope="전체 6~7문제 · 과제 수준 · 절대평가 (대표님 전달 2026-10-07) — Ch.3 Forces · Ch.4 Systems of Forces and Moments · Ch.5 Objects in Equilibrium — 과제 1~2문제 그대로 출제(부분점수 없음), 영어 답안, 절대평가"; e.weight=30; }
           if(e.kind==="기말"){ e.scope="Ch.6 Structures in Equilibrium · Ch.7 Centroids and Centers of Mass · Ch.8 Moments of Inertia — 중간 범위 제외, 성적의 50%"; e.weight=50; }
         }
       });
@@ -12895,7 +12913,7 @@ var V33={};
   };
 
   /* ---------- 휴강 공지 반영 (교수 공지 → 앱 회차 취소, 한 번만) ---------- */
-  V60.CANCEL=[["일반물리학2","2026-10-21","휴강 — 10/2 수업 공지(대표님 전달): 21일 수업 없음"]];
+  V60.CANCEL=[["일반물리학2","2026-10-21","휴강 — 10/2 수업 공지(대표님 전달): 21일 수업 없음"],["공업수학1","2026-10-23","휴강 — 대표님 10/7 전달: 23일 공수 수업 없음"]];
   V60.patchCancel=function(){
     if(typeof S==="undefined"||!S||!S.terms) return; S.v60p=S.v60p||{}; var n=0;
     V60.CANCEL.forEach(function(x){ var k="cancel:"+x[0]+":"+x[1]; if(S.v60p[k]) return;
@@ -14057,6 +14075,13 @@ var V33={};
     if(c) (t.exams||[]).forEach(function(e){ if(e.courseId===c.id&&e.kind==="중간"){ e.date="2026-10-21"; e.time="09:00"; e.assumed=true; e.note="10/2 녹음 「8주차에 시험」 → 10/21(수) (대표님 10/3) · 공지 전"; } });
     t.patchV62f=true; persist();
   };
+  /* 10/7 대표님 전달: 공수1 중간 10/21(수) 확정 — 가정(assumed) 풀기. patchV62f 는 이미 저장돼 있어 새 플래그 patchV62g */
+  V62.patchEm1c=function(){
+    var t=term(); if(!t||t.patchV62g) return;
+    var c=(t.courses||[]).filter(function(x){ return x.name==="공업수학1"; })[0];
+    if(c) (t.exams||[]).forEach(function(e){ if(e.courseId===c.id&&e.kind==="중간"){ e.date="2026-10-21"; e.time="09:00"; e.assumed=false; e.note="10/21(수) 09:00 확정 (대표님 10/7 전달)"; } });
+    t.patchV62g=true; persist();
+  };
   /* 10/3 대표님 「과목 들어가서 맨 상단에 이번 시험범위 확정된 거 있으면 표시」(BUILD .137) — 범위가 교수 근거로 확정된 과목만 scopeOk.
      정역학 = OT p.8 · 공수1 = 교수 10/2 · 일물2 = 교수 9/18 녹음. 미적2 = 10/1 안내문에 날짜·장소만(범위 없음) → 표시 안 함 */
   V62.SCOPE_OK={
@@ -14100,7 +14125,7 @@ var V33={};
     ".v62s-r{font-size:16px;font-weight:800;margin-top:6px;line-height:1.45}.v62s-n{font-size:13.5px;color:#C7261B;font-weight:700;margin-top:3px}.v62s-src{font-size:12px;color:var(--ink-3,#777);margin-top:3px}"+
     "@media (max-width:600px){.v62s-d{margin-left:0;width:100%}.v62s-r{font-size:15px}}";
   document.head.appendChild(css);
-  var _boot=boot; boot=function(){ _boot(); try{ V62.patch(); V62.patchDate(); V62.patchPhys(); V62.patchCal(); V62.patchMid3(); V62.patchEm1b(); V62.patchScope(); V62.patchDday(); }catch(e){ if(window.console) console.warn("V62 패치", e); } };
+  var _boot=boot; boot=function(){ _boot(); try{ V62.patch(); V62.patchDate(); V62.patchPhys(); V62.patchCal(); V62.patchMid3(); V62.patchEm1b(); V62.patchEm1c(); V62.patchScope(); V62.patchDday(); }catch(e){ if(window.console) console.warn("V62 패치", e); } };
 })();
 /* ============================================================
    V63 LAYER — 과목 화면 「세부단원」: 절(1.1 ~ 3.3)마다 학습 경로 (BUILD 2026-10-02.111 · 정역학 2026-10-03.140)
@@ -14215,6 +14240,70 @@ var V33={};
   ].join("\n");
   document.head.appendChild(css);
 })();
-if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start);
+ /* 학습층 허브 — 기존 학습 화면과 저장 형식에 그대로 연결한다. */
+ (function(){
+   var V75=window.V75={};
+   V75.render=function(){
+     var view=document.getElementById("v-study"); if(!view||!window.V56||V56.off()) return;
+     view.classList.remove("ow"); view.classList.add("v75");
+     var hero=document.getElementById("v56Hero");
+     if(!hero){ hero=document.createElement("div"); hero.id="v56Hero"; view.insertBefore(hero,view.firstChild); }
+     var mission=V56.mission(), review=view.querySelector("#stq [data-stu]"), courses=term().courses||[];
+     var nextName=mission?(mission.name||"수업 따라가기"):review?(review.closest(".st-row").querySelector(".t").textContent.trim()):"선택된 수업 없음";
+     var nextLine=mission?(mission.line||"교실에서 이어서 공부합니다"):review?"자습실에서 이어서 복습합니다":"과목 교실에서 직접 고를 수 있습니다";
+     hero.innerHTML='<div class="v75-school" aria-label="그린라이트 학습층">'+
+       '<div class="v75-top"><span>GREENLIGHT · STUDY FLOOR</span><strong>학습층</strong><span>'+esc(todayLabel())+'</span></div>'+
+       '<div class="v75-building" aria-hidden="true"><div class="v75-roof"></div><div class="v75-windows"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="v75-doors"><i></i><i></i><i></i></div></div>'+
+       '<div class="v75-next"><div><small>다음 공부</small><b>'+esc(nextName)+'</b><span>'+esc(nextLine)+'</span></div>'+
+       (mission||review?'<button type="button" id="v75Next">이어서 공부하기 →</button>':'<button type="button" id="v75Choose">교실 고르기 →</button>')+'</div>'+
+       '<div class="v75-rooms">'+
+         '<button type="button" data-v75="courses"><span>01</span><b>과목 교실</b><small>수업·문제·시험 범위</small></button>'+
+         '<button type="button" data-v75="study"><span>02</span><b>자습실</b><small>복습할 단원</small></button>'+
+         '<button type="button" data-v75="lib"><span>03</span><b>자료실</b><small>노트·강의자료</small></button>'+
+         '<button type="button" data-v75="plan"><span>04</span><b>시간표</b><small>오늘의 공부 계획</small></button>'+
+       '</div><div class="v75-course-list" id="v75Courses" hidden><strong>과목 교실</strong><div>'+
+       courses.map(function(c,i){return '<button type="button" data-v75-course="'+i+'">'+esc(c.name)+'</button>';}).join("")+
+       (courses.length?'':'<span>등록된 과목이 없습니다.</span>')+'</div></div></div>';
+     var next=document.getElementById("v75Next"); if(next) next.onclick=function(){ var m=V56.mission(); if(m&&m.btn) m.btn.click(); else { var b=view.querySelector("#stq [data-stu]"); if(b) b.click(); } };
+     var choose=document.getElementById("v75Choose"); if(choose) choose.onclick=function(){ V75.courses(); };
+     hero.querySelectorAll("[data-v75]").forEach(function(b){ b.onclick=function(){
+       var k=b.dataset.v75;
+       if(k==="courses") V75.courses();
+       else if(k==="study") document.getElementById("stq").scrollIntoView({block:"start"});
+       else go(k);
+     }; });
+     hero.querySelectorAll("[data-v75-course]").forEach(function(b){ b.onclick=function(){ var c=courses[+b.dataset.v75Course]; if(c) go("course",c.id); }; });
+   };
+   V75.courses=function(){ var el=document.getElementById("v75Courses"); if(!el) return; el.hidden=!el.hidden; if(!el.hidden) el.scrollIntoView({block:"nearest"}); };
+   V56.apply=V75.render;
+   var css=document.createElement("style"); css.id="v75css";
+   css.textContent=[
+     "#v-study.v75{background:transparent;color:var(--ink);padding:0;overflow:visible;box-shadow:none}",
+     "#v-study.v75>.vh{display:none}",
+     "#v-study.v75 #v32StudyEntry{display:none}",
+     ".v75-school{border:2px solid #9A7D43;border-radius:10px;background:#F7F0DE;color:#252B23;box-shadow:0 5px 0 rgba(66,52,28,.35);overflow:hidden;margin-bottom:18px}",
+     ".v75-top{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#274D35;color:#F8F2DF;padding:12px 18px;font-family:Galmuri11,var(--font-head);font-size:12px}.v75-top strong{font-size:18px;font-weight:400}",
+     ".v75-building{height:154px;max-width:500px;margin:20px auto 8px;position:relative;border:5px solid #8A704A;background:repeating-linear-gradient(0deg,#E6D8B9 0 24px,#D6C5A4 25px 27px);box-shadow:8px 8px 0 #C0A873}",
+     ".v75-roof{position:absolute;left:-13px;right:-13px;top:-19px;height:15px;background:#426646;border:4px solid #294B36}.v75-windows{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 36px;padding:16px 45px}.v75-windows i{height:34px;border:4px solid #685539;background:#92BEC0;box-shadow:inset 7px 0 rgba(255,255,255,.32)}.v75-doors{position:absolute;bottom:0;left:50%;transform:translateX(-50%);display:flex;gap:2px}.v75-doors i{height:43px;width:26px;background:#385B4B;border:4px solid #685539}",
+     ".v75-next{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:8px 18px 16px;padding:16px 18px;background:#FFFDF7;border:2px solid #B79B60;border-radius:8px}.v75-next div{display:flex;flex-direction:column;gap:3px;min-width:0}.v75-next small{font-size:11px;color:#667064}.v75-next b{font-size:18px}.v75-next span{font-size:13px;color:#4D5A4F;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.v75-next button{min-height:44px;flex:none;padding:8px 16px;border:2px solid #1C6E2D;border-radius:6px;background:#2FB344;color:#102B18;font-weight:800;cursor:pointer}",
+     ".v75-rooms{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:0 18px 18px}.v75-rooms button{display:flex;flex-direction:column;text-align:left;gap:5px;min-height:96px;padding:11px;border:2px solid #A58B5D;border-radius:7px;background:#FFFDF7;color:#252B23;cursor:pointer;box-shadow:0 3px 0 #C2AC80}.v75-rooms button:hover,.v75-rooms button:focus-visible{border-color:#28763D;background:#E7F5E2}.v75-rooms span{font-size:11px;color:#43814D}.v75-rooms b{font-size:15px}.v75-rooms small{font-size:11px;color:#657064}",
+     ".v75-course-list{padding:0 18px 18px}.v75-course-list[hidden]{display:none}.v75-course-list strong{display:block;margin-bottom:8px}.v75-course-list>div{display:flex;flex-wrap:wrap;gap:8px}.v75-course-list button{min-height:44px;padding:8px 12px;border:2px solid #A58B5D;border-radius:6px;background:#FFFDF7;color:#252B23;cursor:pointer}",
+     "@media(max-width:760px){.v75-top{padding:10px 12px}.v75-top span:first-child{display:none}.v75-building{height:118px;margin:20px 24px 8px}.v75-windows{gap:8px 15px;padding:10px 25px}.v75-windows i{height:25px}.v75-doors i{height:31px;width:20px}.v75-next{flex-direction:column;align-items:stretch;margin:8px 12px 12px;padding:12px}.v75-next span{white-space:normal}.v75-rooms{grid-template-columns:repeat(2,minmax(0,1fr));padding:0 12px 12px}.v75-course-list{padding:0 12px 12px}}"
+   ].join("\n"); document.head.appendChild(css);
+ })();
+ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start);
 else start();
 </script>
+
+<script src="aliveweek-entry.js"></script>
+<script>
+/* 대표님 10/7 전달: 기존 범위 패치 뒤에 전체 문항 수와 난도를 보존한다. */
+(function(){
+  if(!S) return;
+  var t=term(); if(!t||t.patchSchool188Exam) return;
+  var c=(t.courses||[]).find(function(c){return c.name==="정역학";});
+  if(c) (t.exams||[]).forEach(function(e){if(e.courseId===c.id&&e.kind==="중간"&&!/^전체 6~7문제/.test(e.scope||""))e.scope="전체 6~7문제 · 과제 수준 · 절대평가 (대표님 전달 2026-10-07) — "+(e.scope||"");});
+  t.patchSchool188Exam=true; persist();
+})();
+</script>
+<script src="school/integrated.js"></script>

@@ -1,0 +1,20 @@
+const fs=require('fs'),path=require('path'),assert=require('assert/strict');
+const root=path.resolve(__dirname,'../..'),{JSDOM}=require(path.join(root,'.test-tools/node_modules/jsdom'));
+const dom=new JSDOM('<div id="room"></div><div id="dialogue"><div class="speech"></div></div>',{url:'https://test.invalid',runScripts:'outside-only'}),w=dom.window;
+w.structuredClone=structuredClone;w.HTMLCanvasElement.prototype.getContext=()=>null;
+w.eval(fs.readFileSync(path.join(root,'school/mission.js'),'utf8').replace(/^export /gm,''));
+const context={lesson:{id:'L',course:'C',steps:[{id:'Q',kind:'quiz'}]},step:{id:'Q',kind:'quiz'},index:0};
+let rejectFirst;const writes=[];
+const mission=w.createMission({context:()=>context,api:(route,request)=>{if(!request)return Promise.resolve({revision:2,text:'server answer',strokes:[],sourceChanged:true});writes.push({...request});return writes.length===1?new Promise((r,j)=>rejectFirst=j):Promise.reject(new Error('source changed'));},feedback:()=>{},allowNext:()=>{}});
+const tick=()=>new Promise(r=>setTimeout(r,0));
+const click=fragment=>{const b=[...w.document.querySelectorAll('button')].find(x=>x.textContent.includes(fragment));assert.ok(b,fragment);b.click();};
+(async()=>{
+ await mission.mount();const input=w.document.querySelector('textarea');input.value='first';input.dispatchEvent(new w.Event('input'));
+ const first=mission.save().catch(()=>{});await tick();input.value='newer';input.dispatchEvent(new w.Event('input'));const queued=mission.save().catch(()=>{});
+ rejectFirst(new Error('CAS conflict'));await first;await queued;
+ const findings=[];if(writes.length>1)findings.push('RED: prequeued save still sends after previous save fails.');
+ click('최신 풀이 확인');await tick();click('비교 완료');await tick();
+ click('변경된 문제를 확인');await tick();click('최신 풀이 확인');await tick();click('비교 완료');await tick();
+ if(!writes.some(r=>r.acknowledgeSource))findings.push('RED: source-change acknowledgment is lost when latest draft is adopted during recovery.');
+ console.log(JSON.stringify({writes:writes.map(r=>({text:r.text,revision:r.revision,acknowledgeSource:r.acknowledgeSource})),findings},null,2));w.close();
+})().catch(e=>{console.error(e);w.close();process.exitCode=1;});

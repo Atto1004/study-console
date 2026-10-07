@@ -1,0 +1,24 @@
+const fs=require('fs'),path=require('path'),assert=require('assert/strict');
+const root=path.resolve(__dirname,'../..');
+const {JSDOM}=require(path.join(root,'.test-tools/node_modules/jsdom'));
+const findings=[];
+const dom=new JSDOM('<div id="room"></div><div id="dialogue"><div class="speech"></div></div>',{url:'https://test.invalid',runScripts:'outside-only'}),w=dom.window;
+w.structuredClone=structuredClone;w.HTMLCanvasElement.prototype.getContext=()=>null;
+w.eval(fs.readFileSync(path.join(root,'school/workspace.js'),'utf8').replace(/^export /gm,''));
+const data={date:'2026-10-07',plans:[],profile:{dailyCap:1},exams:[],courses:[1,2,3].map(id=>({id,name:'course'+id,typeA:'EXAM'})),sessions:[],scheduled:[]};
+const proposed=w.recommendPlans(data,{verified:false},new Date('2026-10-07T00:00:00Z'),30);
+if(proposed.reduce((n,p)=>n+p.duration,0)>30)findings.push('RED: unverified calendar recommendations exceed 30-minute total budget ('+proposed.reduce((n,p)=>n+p.duration,0)+' minutes).');
+w.eval(fs.readFileSync(path.join(root,'school/mission.js'),'utf8').replace(/^export /gm,''));
+let resolveRead;const writes=[];
+const context={lesson:{id:'L',course:'C',steps:[{id:'Q',kind:'quiz'}]},step:{id:'Q',kind:'quiz'},index:0};
+const mission=w.createMission({context:()=>context,api:(route,request)=>request?(writes.push(request),Promise.resolve({...request,revision:1})):new Promise(r=>resolveRead=r),feedback:()=>{},allowNext:()=>{}});
+(async()=>{
+ const pending=mission.mount();const input=w.document.querySelector('textarea');
+ input.value='new work typed during load';input.dispatchEvent(new w.Event('input'));
+ resolveRead({revision:2,text:'older persisted work',strokes:[]});await pending;
+ if(input.value!=='new work typed during load')findings.push('RED: delayed GET work overwrites text entered while loading.');
+ await mission.save();
+ if(writes[0]?.text==='older persisted work')findings.push('RED: subsequent save persists old loaded text after losing newly entered text.');
+ assert.ok(proposed.length>0);assert.ok(writes.length>0);
+ console.log(JSON.stringify({tests:3,findings},null,2));w.close();
+})().catch(e=>{console.error(e);process.exitCode=1;w.close();});

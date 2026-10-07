@@ -71,7 +71,23 @@ export function learningPath(course, basics, start, beginner = false) {
   return { path, missing: [...missing] };
 }
 export function splitText(text, limit = 330) {
-  const paragraphs = String(text || "").split(/\n\s*\n/),
+  const formulas = [],
+    source = String(text || "");
+  let marker = "\uE000";
+  while (source.includes(marker)) marker += "\uE000";
+  // 문장·빈 줄 분할보다 먼저 수식을 보호하며 원래 길이를 유지합니다.
+  const protectedText = source.replace(
+    /\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|\$[^$\n]*\$/g,
+    (formula) => {
+      const token = (marker + formulas.length + "\uE001").padEnd(
+        formula.length,
+        "\uE001",
+      );
+      formulas.push({ token, formula });
+      return token;
+    },
+  );
+  const paragraphs = protectedText.split(/\n\s*\n/),
     pages = [];
   for (const paragraph of paragraphs) {
     if (paragraph.length <= limit) {
@@ -98,5 +114,9 @@ export function splitText(text, limit = 330) {
     }
     if (page) pages.push(page.trim());
   }
-  return pages.length ? pages : [""];
+  return (pages.length ? pages : [""]).map((page) => {
+    for (const { token, formula } of formulas)
+      page = page.split(token).join(formula);
+    return page;
+  });
 }
