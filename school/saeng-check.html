@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>스앵님 엔진 확인</title>
+<style>
+  body{margin:0;background:#eef0f3;font:14px system-ui,sans-serif;color:#1d1f22}
+  .row{display:flex;gap:18px;padding:18px;flex-wrap:wrap}
+  .cell{width:180px;text-align:center}
+  .cell div.host{width:180px}
+  #log{padding:0 18px;white-space:pre}
+</style>
+</head>
+<body>
+<div class="row" id="row"></div>
+<div id="log"></div>
+<script type="module">
+import { mountSaeng } from "./saeng.js";
+const kinds = ["idle", "correct", "wrong", "stuck", "deadline", "question"];
+const row = document.getElementById("row"), log = document.getElementById("log");
+const out = [];
+for (const k of kinds) {
+  const cell = document.createElement("div"); cell.className = "cell";
+  const host = document.createElement("div"); host.className = "host";
+  const cap = document.createElement("div"); cap.textContent = k;
+  cell.append(host, cap); row.append(cell);
+  const s = await mountSaeng(host);
+  s.react(k);
+  out.push([k, s]);
+}
+const talker = out[0][1];
+talker.speak("자, 오늘은 평형부터 봐요.");
+setTimeout(() => {
+  const on = out.map(([k, s]) => k + ": expr=" + s.expr + " on=" + [...s.el.querySelectorAll(".ly.on")].map(i => i.src.split("/").pop()).join(","));
+  log.textContent = on.join("\n");
+  document.title = "ready";
+}, 700);
+</script>
+</body>
+</html>
