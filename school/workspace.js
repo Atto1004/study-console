@@ -1,4 +1,5 @@
 import { courseMetrics, sourceKind, pickQuest, KINDS } from "./metrics.js";
+import { attachSaeng } from "./saeng.js";
 const el = (tag, text, cls) => { const e=document.createElement(tag); if(text!==undefined)e.textContent=text; if(cls)e.className=cls; return e; };
 const btn = (text, action, cls='') => { const b=el('button',text,cls); b.type='button'; b.onclick=action; return b; };
 const minutes = s => Number(s.slice(0,2))*60+Number(s.slice(3));
@@ -49,12 +50,6 @@ export function recommendPlans(data, calendar, now=new Date(), budget, preferred
 
 const ROOM={main:'lobby',learning:'class',materials:'library',progress:'library',attendance:'library',assignments:'homework'};
 const pct=x=>Math.round(x*100);
-function ring(value){
-  const r=34,c=2*Math.PI*r,svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-  svg.setAttribute('viewBox','0 0 84 84');svg.setAttribute('class','ready-ring');svg.setAttribute('aria-hidden','true');
-  svg.innerHTML=`<circle cx="42" cy="42" r="${r}" class="ring-bg"/><circle cx="42" cy="42" r="${r}" class="ring-fg" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-value/100)}"/>`;
-  return svg;
-}
 export function createWorkspace(app){
   let data=null, calendar=null, assignments=null, assignmentError='', area='main', generation=0, navigation=0, consultBusy=false, proposal=[], filter='', kindFilter='', timer=null;
   const root=el('section',undefined,'workspace');root.id='workspace';document.getElementById('scene').append(root);
@@ -111,65 +106,79 @@ export function createWorkspace(app){
       return {exam:e,m:courseMetrics({lessons:course?.lessons||[],events,exam:e,today:data.date})};
     });
   }
-  function renderToday(){
-    const day=new Intl.DateTimeFormat('ko-KR',{month:'long',day:'numeric',weekday:'short',timeZone:'Asia/Seoul'}).format(new Date(data.date+'T12:00:00+09:00'));
-    const head=el('div',undefined,'lobby-head');head.append(el('p',`로비 · ${day}`,'lobby-eyebrow'),el('h1','오늘도, 한 걸음 가까이.'));root.append(head);
-    const host=el('section',undefined,'today-cards');host.setAttribute('aria-label','오늘 수업·마감·시험');
-    const classes=data.scheduled.filter(s=>!s.record?.cancelled).sort((a,b)=>a.s.localeCompare(b.s));
-    const others=(calendar?.events||[]).filter(e=>!e.allDay&&e.start).filter(e=>!classes.some(c=>c.s===e.start));
-    const lessons=el('div',undefined,'today-card today-lessons');lessons.append(el('small','오늘 수업'));
-    if(!classes.length&&!others.length)lessons.append(el('strong',calendar?.verified?'수업 없음':'일정 확인 필요'));
-    for(const c of classes)lessons.append(el('strong',`${c.s} ${c.course}`));
-    for(const e of others.slice(0,2))lessons.append(el('span',`${e.start} ${e.title||e.summary||'일정'}`));
-    const due=pendingDeadlines(assignments?.rows||[],data.date).find(r=>r.deadlineDays!==null&&r.deadlineDays>=0);
-    const dueCard=el('button',undefined,'today-card today-due');dueCard.type='button';dueCard.onclick=()=>open('assignments');
-    dueCard.append(el('small','가장 가까운 마감'),el('strong',due?`${due.deadlineDays?'D-'+due.deadlineDays:'오늘'} · ${due.course}`:'남은 마감 없음'));if(due)dueCard.append(el('span',due.title));
-    const exam=data.exams.filter(e=>e.written&&e.dday>=0).sort((a,b)=>a.dday-b.dday)[0];
-    const examCard=el('div',undefined,'today-card today-exam');
-    examCard.append(el('small','시험까지'),el('strong',exam?`${ddayLabel(exam.dday)} · ${exam.course}`:'예정 시험 없음'));if(exam)examCard.append(el('span',`${exam.date.slice(5).replace('-','/')} ${exam.time||''}${exam.assumed?' · 예정':''}`));
-    host.append(lessons,dueCard,examCard);root.append(host);
-  }
-  function renderBoard(){
+  // 로비 = 복도 장면. 문 하나가 과목 하나, 문패가 진행판, 퀘스트 문이 빛난다. 문을 누르면 1인칭 교실로 들어간다.
+  function renderCorridor(){
     const rows=examMetrics();
-    const board=card('','ready-board');
-    const quest=pickQuest(rows,pendingDeadlines(assignments?.rows||[],data.date));
-    if(!quest){board.append(el('p','다가오는 중간고사와 하루 안 마감 과제가 없습니다.'));root.append(board);return;}
-    const next=el('div',undefined,'next-quest');
-    if(quest.type==='assignment'){
-      const t=quest.task;
-      next.classList.add('quest-deadline');
-      next.append(el('small','지금 할 것 · 과제'),el('b',`${t.course} · ${t.title}`),el('span',`${t.deadlineDays?'내일':'오늘'} ${t.deadlineTime||''} 마감 · ${t.workDone?'풀이 완료, 제출만 남음':'제출 전'}`));
-      next.append(btn('과제실로',()=>open('assignments'),'primary'));
-      window.dispatchEvent(new CustomEvent('saeng',{detail:{react:'deadline',line:`${t.course} ${t.title}, ${t.deadlineDays?'내일':'오늘'} 마감이에요. 이것부터.`}}));
-    }else{
-      const {exam,m}=quest;
-      next.append(el('small','지금 할 것'),el('b',`${exam.course} · ${m.remaining?`남은 수업 ${m.remaining}회차`:'문제 풀기'}`),el('span',`A+ 준비도 ${m.readiness} · 시험 ${ddayLabel(exam.dday)}`));
-      next.append(btn('시작',()=>startCourse(exam.course),'primary'));
-      window.dispatchEvent(new CustomEvent('saeng',{detail:{react:'idle',line:`${exam.course}부터 가요. 시험 ${ddayLabel(exam.dday)}, 준비도 ${m.readiness}.`}}));
-    }
-    board.append(next);
-    if(!rows.length){board.append(el('p','다가오는 중간고사가 없습니다.'));root.append(board);return;}
-    const grid=el('div',undefined,'ready-grid');
+    const deadlines=pendingDeadlines(assignments?.rows||[],data.date);
+    const quest=pickQuest(rows,deadlines);
+    const day=new Intl.DateTimeFormat('ko-KR',{month:'long',day:'numeric',weekday:'short',timeZone:'Asia/Seoul'}).format(new Date(data.date+'T12:00:00+09:00'));
+    const scene=el('section',undefined,'corridor');scene.setAttribute('aria-label','학교 복도');
+    const backdrop=el('div',undefined,'corridor-backdrop');backdrop.setAttribute('aria-hidden','true');
+    for(const x of [9,24,68,83]){const w=el('i',undefined,'corridor-window');w.style.left=x+'%';backdrop.append(w);}
+    backdrop.append(el('i',undefined,'corridor-base'),el('i',undefined,'corridor-floor'));
+    scene.append(backdrop);
+    // HUD: 날짜 · 오늘 수업 · 첫 시험
+    const hud=el('div',undefined,'corridor-hud');
+    const chip=(label,value)=>{const c=el('div',undefined,'hud-chip');c.append(el('small',label),el('b',value));return c;};
+    const classes=data.scheduled.filter(s=>!s.record?.cancelled).sort((a,b)=>a.s.localeCompare(b.s));
+    const first=data.exams.filter(e=>e.written&&e.dday>=0).sort((a,b)=>a.dday-b.dday)[0];
+    hud.append(chip('복도 · 1층',day),chip('오늘 수업',classes.length?classes.map(c=>`${c.s} ${c.course}`).join(' · '):(calendar?.verified?'없음':'확인 필요')),chip('첫 시험',first?`${ddayLabel(first.dday)} ${first.course}`:'없음'));
+    // 퀘스트
+    const q=el('div',undefined,'corridor-quest');
+    const steps=el('ul');const step=(text,done)=>{const li=el('li',text);if(done)li.className='done';steps.append(li);};
+    let primary,line,react,target=null;
+    if(quest?.type==='assignment'){
+      const t=quest.task;target=null;
+      q.classList.add('is-deadline');q.append(el('small',`퀘스트 · ${t.deadlineDays?'내일':'오늘'} 마감`),el('b',`${t.course} ${t.title}`));
+      step('풀이',t.workDone);step('제출',t.submitted);
+      primary={label:t.workDone?'제출하러 과제실로':'풀이부터 할래요',go:()=>t.workDone?open('assignments'):walkTo(t.course)};
+      line=`${t.course} ${t.title}, ${t.deadlineDays?'내일':'오늘'}${t.deadlineTime?' '+t.deadlineTime:''}까지예요. ${t.workDone?'제출만 남았어요.':'지금 같이 풀어요.'}`;react='deadline';target=t.course;
+    }else if(quest){
+      const {exam,m}=quest;q.append(el('small',`퀘스트 · 시험 ${ddayLabel(exam.dday)}`),el('b',`${exam.course} 준비도 올리기`));
+      step(`수업 ${m.covered}/${m.scope}회차 풀기`,m.scope>0&&m.covered===m.scope);step(`혼자 맞히기 ${m.tested?pct(m.understanding)+'%':'아직'}`,m.tested>0&&m.understanding>=.8);
+      primary={label:`${exam.course} 교실로`,go:()=>walkTo(exam.course)};
+      line=`${exam.course}부터 가요. 시험 ${ddayLabel(exam.dday)}, 준비도 ${m.readiness}. ${m.remaining?`남은 수업 ${m.remaining}회차예요.`:'문제로 다지면 돼요.'}`;react='idle';target=exam.course;
+    }else{q.append(el('small','퀘스트'),el('b','오늘은 급한 일이 없어요'));line='급한 건 없어요. 약한 과목부터 한 문제만 풀어요.';react='idle';}
+    q.append(steps);hud.append(q);scene.append(hud);
+    // 문
+    const doors=el('div',undefined,'corridor-doors');
     for(const {exam:e,m} of rows){
-      const tile=el('button',undefined,'ready-tile pace-'+m.pace);tile.type='button';tile.onclick=()=>startCourse(e.course);
-      const head=el('div',undefined,'ready-head'),score=el('div',undefined,'ready-score');
-      score.append(ring(m.readiness),el('strong',String(m.readiness)));
-      const title=el('div');title.append(el('b',e.course),el('small',`${ddayLabel(e.dday)} · ${e.date.slice(5).replace('-','/')}${e.assumed?' 예정':''}`));
-      head.append(score,title);
-      const track=el('div',undefined,'dday-track');track.setAttribute('aria-label',`진도 ${pct(m.progress)}%`);
-      const fill=el('i');fill.style.width=pct(m.progress)+'%';track.append(fill);
-      const stats=el('dl',undefined,'ready-stats');
-      for(const [k,v] of [['진도',`${m.covered}/${m.scope}`],['정답률',m.tested?pct(m.accuracy)+'%':'—'],['이해도',m.tested?pct(m.understanding)+'%':'—']]){stats.append(el('dt',k),el('dd',v));}
-      const pace=el('p',m.remaining?(m.perDay===Infinity?`남은 ${m.remaining}회차 · 오늘 안에`:`하루 ${Math.ceil(m.perDay*10)/10}회차씩`):'범위 수업 다 봄','pace');
-      tile.append(head,track,stats,pace);grid.append(tile);
+      const d=el('button',undefined,'corridor-door pace-'+m.pace+(e.course===target?' is-target':'')+(e.assumed?' is-assumed':''));d.type='button';
+      d.setAttribute('aria-label',`${e.course} 교실 · A+ 준비도 ${m.readiness} · ${ddayLabel(e.dday)}`);d.onclick=()=>walkTo(e.course);
+      if(e.course===target)d.append(el('span',quest?.type==='assignment'?'오늘 할 일':'지금 여기','door-marker'));
+      const plate=el('span',undefined,'door-plate'),name=el('span',undefined,'door-name');name.append(el('b',e.course),el('em',ddayLabel(e.dday)+(e.assumed?' 예정':'')));
+      const bar=el('span',undefined,'door-bar'),fill=el('i');fill.style.width=Math.max(2,pct(m.progress))+'%';bar.append(fill);
+      const nums=el('span',undefined,'door-nums');nums.append(el('span',`진도 ${m.covered}/${m.scope}`),el('span',`이해 ${m.tested?pct(m.understanding)+'%':'—'}`));
+      plate.append(name,bar,nums);
+      const frame=el('span',undefined,'door-frame');frame.append(el('i',undefined,'door-pane'),el('i',undefined,'door-knob'));
+      const score=el('span',undefined,'door-score');score.style.setProperty('--s',m.readiness);score.append(el('b',String(m.readiness)),el('small','A+ 준비도'));
+      d.append(plate,frame,score);doors.append(d);
     }
-    board.append(grid);
-    const info=el('details',undefined,'ready-info');info.append(el('summary','ⓘ'),el('p','A+ 준비도 = 진도 × (이해도 50 + 정답률 30 + 20). 진도 = 시험 전 회차 중 문제를 푼 회차 비율, 이해도 = 혼자 맞힌 문항 비율, 정답률 = 도움 포함 맞힌 비율(둘 다 시험 전 회차 문항만). 잊는 정도와 교수님이 정한 범위 문장은 아직 반영하지 않아요. 성적 예측이 아니에요.'));
-    board.append(info);root.append(board);
+    if(!rows.length)doors.append(el('p','다가오는 중간고사가 없어요.','corridor-empty'));
+    scene.append(doors);
+    const left=btn('← 자료실',()=>open('materials'),'corridor-sign sign-library'),right=btn(`과제실 · ${deadlines.filter(r=>r.deadlineDays!==null&&r.deadlineDays>=0).length}건 →`,()=>open('assignments'),'corridor-sign sign-homework');
+    scene.append(left,right);
+    // 스앵님 + 대사창
+    const face=el('div',undefined,'corridor-saeng');face.append(Object.assign(el('img'),{src:'../notes/classroom/assets/tutor/neutral.png',alt:''}));
+    scene.append(face);
+    attachSaeng(face).then(s=>{if(!s)return;s.react(react);s.speak(line);});
+    const vn=el('div',undefined,'corridor-vn');vn.setAttribute('role','dialog');vn.setAttribute('aria-label','김주영 스앵님');
+    const choices=el('div',undefined,'vn-choices');
+    if(primary)choices.append(btn(primary.label,primary.go,'primary'));
+    const alt=rows.filter(r=>r.exam.course!==target).sort((a,b)=>(100-b.m.readiness)/Math.max(b.exam.dday,1)-(100-a.m.readiness)/Math.max(a.exam.dday,1))[0];
+    if(alt)choices.append(btn(`${alt.exam.course} 먼저 할래요`,()=>walkTo(alt.exam.course)));
+    choices.append(btn('오늘 계획 다시 짜줘요',()=>{const box=root.querySelector('.main-tutor textarea');if(box){box.value='오늘 계획 다시 잡아줘';box.scrollIntoView({block:'center'});box.focus();}}));
+    vn.append(el('span','김주영','vn-tag'),el('p',line,'vn-line'),choices);
+    scene.append(vn);
+    root.append(scene);
+    const info=el('details',undefined,'ready-info');info.append(el('summary','ⓘ 숫자 읽는 법'),el('p','문 가운데 숫자 = A+ 준비도 = 진도 × (이해도 50 + 정답률 30 + 20). 진도 = 시험 전 회차 중 문제를 푼 회차 비율, 이해도 = 혼자 맞힌 문항 비율. 잊는 정도와 교수님이 정한 범위 문장은 아직 반영하지 않아요. 성적 예측이 아니에요.'));
+    root.append(info);
+  }
+  function walkTo(course){
+    if(app.walk)app.walk(course);else startCourse(course);
   }
   function renderMain(){
-    renderToday();
-    renderBoard();
+    renderCorridor();
     const written=data.exams.filter(e=>e.written&&e.kind==='중간');
     const exams=card('','exam-board other-exams');
     const other=el('details');other.append(el('summary','발표·과제 대체 및 다른 시험'));
