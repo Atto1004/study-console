@@ -2995,13 +2995,30 @@ if(ATOM_HOSTED) document.documentElement.classList.add("atom-hosted");
     var t=e&&e.data&&e.data.atomTheme; if(t==="dark"||t==="light") document.documentElement.setAttribute("data-theme",t);
   });
 })();
-var atomState=null, atomPushT=null, atomClient=Math.random().toString(36).slice(2);
+var atomState=null, atomPushT=null, atomClient=Math.random().toString(36).slice(2), atomPushRetry=0, atomPushErrShown=false;
 function atomPush(){
   if(!ATOM_HOSTED) return;
   clearTimeout(atomPushT);
   atomPushT=setTimeout(function(){
     try{ fetch("/api/study/state",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({state:S,client:atomClient})})
-      .then(function(r){ if(r.ok){ ui.dirty=false; markSave(); } })["catch"](function(){}); }catch(e){}
+      .then(function(r){
+        if(r.ok){
+          return r.json().then(function(saved){ S.v60=S.v60||{}; if(typeof saved.workspaceRevision==="number") S.v60.workspaceRevision=saved.workspaceRevision; ui.dirty=false; markSave(); atomPushRetry=0; atomPushErrShown=false; });
+        }
+        if(r.status===409){
+          toast("다른 화면에서 학교 기록이 바뀌었습니다. 현재 입력을 보관한 뒤 새로 불러와주세요.");
+          return;
+        }
+        throw new Error("HTTP "+r.status);
+      })
+      ["catch"](function(err){
+        ui.dirty=true; markSave("failed"); atomPushRetry++;
+        if(!atomPushErrShown){ toast("저장에 실패했습니다. 자동으로 다시 시도합니다."); atomPushErrShown=true; }
+        if(atomPushRetry<=3){
+          var delayMs=Math.pow(2,atomPushRetry)*1000; atomPushT=setTimeout(atomPush,delayMs);
+        }
+      });
+    }catch(e){}
   },700);
 }
 function load(){
