@@ -1,7 +1,7 @@
 const node=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
 const button=(text,action)=>{const b=node('button',text);b.type='button';b.onclick=action;return b;};
 export function createMission(app){
-  let mode='screen';try{mode=localStorage.getItem('school-solve-mode')||'screen';}catch{}
+  let mode='pencil';try{mode=localStorage.getItem('school-solve-mode')||'pencil';}catch{}
   let currentKey='',draft={},strokes=[],image=null,undo=[],tool='pen',active=null,saveQueue=Promise.resolve(),delay=null,generation=0,dirty=false,workContext=null,editingVersion=0,loading=false,saveError=false,latestDraft=null;
   const host=node('section',undefined,'mission-work');host.id='missionWork';document.getElementById('room').append(host);
   const canvas=node('canvas');canvas.width=1200;canvas.height=720;canvas.setAttribute('aria-label','문제 풀이 필기 공간');
@@ -57,6 +57,7 @@ export function createMission(app){
     const imageInput=node('input');imageInput.type='file';imageInput.accept='image/png,image/jpeg';imageInput.setAttribute('aria-label','공책 풀이 사진 첨부');imageInput.onchange=async()=>{const file=imageInput.files?.[0];if(!file)return;if(file.size>15_000_000||!['image/png','image/jpeg'].includes(file.type)){stateLabel.textContent='PNG/JPEG 사진, 15MB 이내로 선택해주세요.';return;}try{const bitmap=await createImageBitmap(file),scale=Math.min(1,2000/Math.max(bitmap.width,bitmap.height)),copy=document.createElement('canvas');copy.width=Math.round(bitmap.width*scale);copy.height=Math.round(bitmap.height*scale);copy.getContext('2d').drawImage(bitmap,0,0,copy.width,copy.height);bitmap.close();image=copy.toDataURL('image/jpeg',.85);schedule();draw();}catch{stateLabel.textContent='사진을 읽지 못했습니다. PNG/JPEG로 다시 선택해주세요.';}};host.append(imageInput);
     if(image||draft.image){const preview=node('img');preview.className='work-preview';preview.alt='내 풀이 사진';preview.src=image||'/api/school/work-image?id='+draft.image;host.append(preview);}
     const actions=node('div',undefined,'work-actions');actions.append(button('풀이 저장',()=>save().catch(()=>{})),button('풀이 제출·피드백',submit));host.append(actions,stateLabel);
+    if(draft.review)showReview(draft.review);
     let backup=null;try{backup=JSON.parse(sessionStorage.getItem('school-work-backup:'+currentKey)||'null');}catch{}
     if(backup)host.append(button('보관된 입력 복구',()=>{input.value=backup.text||'';strokes=backup.strokes||[];image=backup.image||null;mode=backup.mode||mode;draw();schedule();}));
     if(saveError){
@@ -77,10 +78,19 @@ export function createMission(app){
       if(mode==='pencil'&&strokes.length)image=canvas.toDataURL('image/png');
       await save(true);if(token!==generation)return;
       app.feedback('풀이를 남겼습니다. 스앵님이 계산·단위·방향에서 확인할 부분을 짚고 있어요.','submitted');
-      const result=await app.api('coach',{id:crypto.randomUUID(),lesson:c.lesson.id,index:c.index,course:c.lesson.course,mode:'work',question:input.value||'첨부한 풀이를 읽고 확인 가능한 부분과 고칠 한 곳을 짚어주세요.'});
-      if(token===generation){app.feedback(result.answer,'review');app.allowNext();stateLabel.textContent='AI 피드백 · 독립 정답으로 확정하지 않았습니다.';}
+      const result=await app.api('work-review',{lesson:c.lesson.id,step:c.step.id});
+      if(token===generation){draft.review=result;app.helped?.();app.feedback(result.hint+'\n'+result.followUp,result.status==='retry'?'retry':'review');draw();stateLabel.textContent=result.assessment;}
     }catch(e){if(token===generation){app.feedback(e.message+' 풀이와 사진은 저장된 상태를 확인하고 다시 요청할 수 있습니다.','retry');}}
     finally{if(b.isConnected)b.disabled=false;}
+  }
+  function showReview(review){
+    const section=node('section',undefined,'work-diagnosis');section.append(node('h3',review.requiresConfirmation?'필기 판독 확인':review.status==='retry'?'처음 확인할 단계':review.status==='supported'?'풀이 확인 · 새 문제에서 다시 확인':'판단 보류'));
+    if(review.firstError)section.append(node('mark',review.firstError),node('p','확인할 부분: '+review.category));
+    section.append(node('p',review.hint),node('p',review.followUp));
+    if(review.requiresConfirmation){const transcript=node('textarea');transcript.value=review.transcript;transcript.rows=6;transcript.maxLength=6000;transcript.setAttribute('aria-label','인식된 필기 · 직접 확인하고 수정');const confirm=button('이렇게 쓴 게 맞아요 · 풀이 분석',async()=>{const token=generation;try{await saveQueue;if(dirty||review.workRevision!==draft.revision)throw new Error('풀이가 바뀌었습니다. 현재 풀이로 피드백을 다시 받아주세요.');const result=await app.api('work-review',{lesson:workContext.lesson.id,step:workContext.step.id,transcript:transcript.value,reviewId:review.id,workRevision:review.workRevision});if(token!==generation)return;draft.review=result;app.feedback(result.hint+'\n'+result.followUp,result.status==='retry'?'retry':'review');draw();}catch(e){stateLabel.textContent=e.message;}});confirm.disabled=dirty||review.workRevision!==draft.revision;section.append(transcript,confirm);}
+    else section.append(button('힌트 없이 새 문제 풀기',()=>app.retest?.(workContext.lesson.id)));
+    if(review.workRevision!==draft.revision)section.append(node('small','이 관찰 이후 풀이가 수정되었습니다. 저장 후 다시 피드백을 받아주세요.'));
+    section.append(node('small','AI 관찰입니다. 읽히지 않은 식은 확인하며 스킬 획득으로 자동 처리하지 않습니다.'));host.append(section);
   }
   window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
   return {mount,setMode,get mode(){return mode;},save:()=>dirty?save():saveQueue.catch(()=>{}),hide:async()=>{if(dirty)await save();host.hidden=true;},feedback:(kind)=>{host.dataset.feedback=kind;window.dispatchEvent(new CustomEvent('saeng',{detail:{react:kind==='correct'?'correct':kind==='retry'?'wrong':'idle'}}));const face=document.getElementById('missionTutorFace');const expression='../notes/classroom/assets/tutor/'+(kind==='correct'?'proud':kind==='retry'?'sharp':'neutral')+'.png';if(face)face.src=expression;const teacher=document.getElementById('teacher');if(teacher)teacher.src=expression;}};

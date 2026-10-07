@@ -8,6 +8,8 @@ import {
 import { createWorkspace } from "./workspace.js";
 import { createMission } from "./mission.js";
 import { attachSaeng } from "./saeng.js";
+import { createSpace } from "./space.js";
+import { createGrowth } from "./growth.js";
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
 let catalog,
@@ -27,8 +29,14 @@ let pausedLesson = null;
 let activeSession = null, sessionQueue = Promise.resolve();
 let resizeBoard;
 let chatMode = "question";
-let workspace, mission, legacyLobbyMode = false, missionIndices = null;
+let workspace, mission, space, growth, legacyLobbyMode = false, missionIndices = null;
 const eventId = () => crypto.randomUUID();
+function rememberScreen(fields){
+  const url=new URL(location.href);
+  for(const key of ['room','lesson','step','world','subject','camera'])url.searchParams.delete(key);
+  for(const [key,value] of Object.entries(fields))if(value)url.searchParams.set(key,value);
+  history.replaceState(null,'',url);
+}
 function node(tag, text, cls) {
   const el = document.createElement(tag);
   if (text !== undefined) el.textContent = text;
@@ -158,6 +166,7 @@ function flush() {
         pending.shift();
       }
       status("서버에 학습 기록 저장");
+      growth?.notifySkills();
       $("saveStatus").textContent = "서버에 저장됨";
       $("retry").hidden = true;
     } catch (error) {
@@ -244,6 +253,7 @@ function row(host, title, detail, action, label = "열기") {
 }
 function showLobby() {
   if (workspace && !legacyLobbyMode) { workspace.open('main'); return; }
+  rememberScreen({room:'learning'});
   if ($("integratedWorkspace")) $("integratedWorkspace").hidden = true;
   $("progress").hidden = true;
   $("progressArea").setAttribute("aria-pressed", "false");
@@ -435,6 +445,7 @@ let assignmentFilter = "전체", assignmentStatus = "진행";
         if (category !== group) { host.append(node("h2", group === "assignment" ? "수업 과제" : "과제 관련 할 일")); category = group; }
         const card = node("article", undefined, "assignment-card");
         card.append(node("small", task.course), node("h2", task.title));
+        card.append(button('과제 작업 시작 · 얼라이브위크 기록',()=>growth.task(task)));
           card.append(node("p", `마감 ${task.due ? task.due.replace("T", " ") : "미확인"} · ${task.workDone ? "풀이 완료" : "풀이 중"} · ${task.submitted ? "제출 완료" : "제출 전"}`));
           card.append(node("small", task.manualSubmitted ? "제출 상태: 직접 표시" : "원본 제출 기록: " + task.submission));
           const actions = node("div", undefined, "assignment-checks");
@@ -567,13 +578,14 @@ $("resume").onclick = () => {
   else consult(course);
 };
 async function startLesson(id, options = {}) {
-  try { await mission?.save(); } catch (error) { status(error.message, true); return; }
+  try { await mission?.save(); await growth?.stop('pause'); } catch (error) { status(error.message, true); return; }
   const generation = ++requestGeneration;
   try {
     status("수업을 준비하고 있습니다.");
     const lesson = await api("lesson?id=" + encodeURIComponent(id));
     if (generation !== requestGeneration) return;
     let targetIndex = options.index ?? Math.min(state.progress[id]?.index || 0, lesson.steps.length - 1);
+    if(options.stepId){const at=lesson.steps.findIndex(s=>s.id===options.stepId);if(at<0)throw new Error('이전 문제 위치를 확인해주세요.');targetIndex=at;}
     if (options.resume) { const restored = lesson.steps.findIndex(s=>s.id===options.resume.stepId); if(restored<0)throw new Error('이전 단계가 변경되었습니다. 수업 자료를 확인해주세요.'); targetIndex=restored; }
     const questions = lesson.steps.map((s,i)=>s.kind==='quiz'?i:-1).filter(i=>i>=0);
     const examples = lesson.steps.map((s,i)=>s.kind==='example'?i:-1).filter(i=>i>=0);
@@ -604,7 +616,7 @@ async function startLesson(id, options = {}) {
     $("scene").className = "scene classroom";
     $("location").textContent = course;
     $("roomLabel").textContent = lesson.title;
-    renderStep();
+    await renderStep(options.camera);
     status("수업 준비 완료");
   } catch (error) {
     status(error.message, true);
@@ -718,10 +730,11 @@ function currentEvidence() {
     )
     .at(-1);
 }
-function renderStep() {
+async function renderStep(camera) {
   if (!current) return;
   stopVoice();
   const step = current.steps[index];
+  rememberScreen({lesson:current.id,step:step.id});
   for (const id of ["simpler", "source", "generate"]) $(id).disabled = false;
   assisted = activeSession?.lessonId===current.id && activeSession?.stepId===step.id ? !!activeSession.assisted : false;
   passed = false;
@@ -800,7 +813,9 @@ function renderStep() {
   }
   if (pausedLesson && current.id !== pausedLesson.lesson)
     $("choices").append(button("원래 문제로 돌아가기", returnToQuestion));
-  mission?.mount();
+  await mission?.mount();
+  await space?.seated(course,step.kind,camera);
+  await growth?.step(activeSession);
 }
 async function returnToQuestion() {
   const saved = pausedLesson;
@@ -910,7 +925,8 @@ $("next").onclick = async () => {
     renderStep();
   } else finish();
 };
-function finish() {
+async function finish() {
+  try{await growth?.stop('finish');}catch(e){status(e.message,true);}
   const host = panel("미션 완료 · 다음 도전");
   const answers = evidenceSummary(
     [...state.events, ...pending].filter((e) => e.lesson === current.id),
@@ -2086,6 +2102,7 @@ $("teacher").onload = () => ($("teacher").hidden = false);
 if ($("teacher").complete && $("teacher").naturalWidth)
   $("teacher").hidden = false;
 async function boot() {
+  const entry=new URLSearchParams(location.search);
   try {
     [catalog, state, capabilities, activeSession] = await Promise.all([
       api("catalog"),
@@ -2139,21 +2156,38 @@ async function boot() {
     $("listen").title = capabilities.voice
       ? "Fish 음성으로 대사 듣기"
       : "서버에 Fish 음성 연결 설정이 필요합니다.";
-    const room = new URLSearchParams(location.search).get("room"), lessonId = new URLSearchParams(location.search).get("lesson");
-    if (lessonId) startLesson(lessonId);
-    else if (["learning", "materials", "progress", "attendance", "assignments"].includes(room)) workspace.open(room);
-    else showLobby();
+    const room=entry.get('room'),lessonId=entry.get('lesson'),stepId=entry.get('step');
+    if(entry.get('world')==='walking'){await workspace.open('main');await space.walk(entry.get('subject')||undefined);}
+    else if(lessonId){const resume=activeSession?.lessonId===lessonId&&(!stepId||activeSession.stepId===stepId)?activeSession:null;await startLesson(lessonId,{stepId:stepId||undefined,resume,purpose:resume?.purpose,returnTo:resume?.returnTo,camera:entry.get('camera')});}
+    else await workspace.open(['main','learning','materials','progress','attendance','assignments'].includes(room)?room:'main');
     status("학교 연결 완료");
   } catch (error) {
     $("today").textContent =
       "학교 서버를 준비하지 못했습니다. " + error.message;
     status(error.message, true);
     $("courseDoors").replaceChildren(button("다시 연결", boot));
+  } finally {delete document.querySelector('.school').dataset.booting;$('bootScreen')?.remove();}
+}
+async function retest(id){
+  try{await mission.save();status('조건이 다른 확인 문제를 준비하고 검토합니다.');const lesson=await api('generate',{lesson:id,course});state=await api('state');if(lesson.review?.status!=='reviewed')throw new Error('새 문제 검토가 완료되지 않았습니다. 원자료의 확인 문제를 사용해주세요.');await startLesson(lesson.id,{purpose:'exam',assisted:false});}catch(e){status(e.message,true);}
+}
+mission = createMission({api,context:()=>current?{lesson:current,step:current.steps[index],index,assisted,total:missionIndices?.length,number:missionIndices?missionIndices.indexOf(index)+1:undefined}:null,feedback:(text,kind)=>{$('speech').textContent=text;mission.feedback(kind);renderMath($('speech'));},retest,helped:()=>{assisted=true;saveSession(current,index,{assisted:true}).catch(()=>{});},allowNext:()=>{status('풀이 피드백은 관찰 기록입니다. 확인 문제의 정답 검증은 별도로 진행합니다.');}});
+growth = createGrowth({api,status,panel,start:startLesson,retest,courses:()=>workspace?.data?.courses||[],home:()=>workspace.open('main')});
+workspace = createWorkspace({api,status,panel,record,screen:rememberScreen,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,tutorPlan:(host,data,refresh)=>growth.tutorPlan(host,data,refresh),leave:async()=>{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);stopVoice();closeDialogs();++requestGeneration;},lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode)});
+space = createSpace({status,panel,screen:rememberScreen,view:camera=>{if(current)rememberScreen({lesson:current.id,step:current.steps[index].id,camera});},home:()=>workspace.open('main'),pause:async()=>{await mission.save();await growth.stop('pause');},ask:()=>openChat('','hint'),select:name=>{space.hide();workspace.startCourse(name);}});
+const DOCK_LINES={correct:'좋아요. 그 감각 그대로 다음 문제.',wrong:'괜찮아요. 조건부터 다시 나눠 적어봐요.',stuck:'막힌 데서 같이 볼게요.',deadline:'마감이 가까워요. 과제부터 끝내요.'};
+// 표정은 얼굴로만 보여준다. 대사와 동작 버튼에는 상태 이름을 붙이지 않는다.
+const DOCK_EMOTIONS=new Set(['상냥','상냥함','다정','엄격','단호','차분','중립','미소','놀람','칭찬','기쁨','화남','neutral','smile','strict','surprise','praise']);
+const hiddenEmotionLabels=new WeakSet();
+function hideDockEmotionLabels(){
+  for(const el of $('dock').querySelectorAll('span,small,b,em,p,div')){
+    if(el.children.length||el.id==='dockLine'||el.id==='dockFace')continue;
+    if(DOCK_EMOTIONS.has(el.textContent.trim())){el.style.setProperty('display','none','important');hiddenEmotionLabels.add(el);}
+    else if(hiddenEmotionLabels.has(el)){el.style.removeProperty('display');hiddenEmotionLabels.delete(el);}
   }
 }
-mission = createMission({api,context:()=>current?{lesson:current,step:current.steps[index],index,assisted,total:missionIndices?.length,number:missionIndices?missionIndices.indexOf(index)+1:undefined}:null,feedback:(text,kind)=>{$('speech').textContent=text;mission.feedback(kind);renderMath($('speech'));},allowNext:()=>{status('풀이 피드백은 관찰 기록입니다. 확인 문제의 정답 검증은 별도로 진행합니다.');}});
-workspace = createWorkspace({api,status,panel,record,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,leave:async()=>{await mission.save();if(current)await saveSession(current,index);stopVoice();closeDialogs();++requestGeneration;},lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode)});
-const DOCK_LINES={correct:'좋아요. 그 감각 그대로 다음 문제.',wrong:'괜찮아요. 조건부터 다시 나눠 적어봐요.',stuck:'막힌 데서 같이 볼게요.',deadline:'마감이 가까워요. 과제부터 끝내요.'};
+hideDockEmotionLabels();
+new MutationObserver(hideDockEmotionLabels).observe($('dock'),{childList:true,characterData:true,subtree:true});
 let dockSaeng=null;
 attachSaeng($('dockFace')).then(s=>{dockSaeng=s;});
 window.addEventListener('saeng',e=>{

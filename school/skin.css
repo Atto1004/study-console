@@ -229,7 +229,6 @@ html body .school #scene { background: var(--scene-room) !important; background-
 .school[data-mode=classroom] .teaching-space { grid-template-columns: minmax(0, 1fr) 150px !important; }
 .teacher .dock { position: static; width: 150px; grid-template-columns: 1fr; padding: 8px; }
 .teacher .dock-face { grid-row: auto; width: 134px; height: 170px; }
-.teacher .dock-face > img, .teacher .dock-face > .saeng { width: 190px !important; margin: -6px 0 0 -28px; }
 .teacher .dock-line { display: none; }
 .teacher .dock-talk { justify-self: stretch; margin-top: 8px; }
 .dock {
@@ -239,8 +238,9 @@ html body .school #scene { background: var(--scene-room) !important; background-
   background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-2);
 }
 .dock-face { grid-row: 1 / 3; align-self: end; width: 92px; height: 110px; overflow: hidden; border-radius: 14px; background: linear-gradient(180deg, #e8f3ec, #d5e9dc); }
-.dock-face > img, .dock-face > .saeng { width: 150px !important; max-width: none; margin: -8px 0 0 -29px; }
-.dock-face > img { height: auto; }
+.dock-face { display: flex; align-items: center; justify-content: center; }
+.dock-face > img { width: 100% !important; height: 100%; max-width: 100%; margin: 0 !important; object-fit: contain; }
+.dock-face > .saeng { width: auto !important; height: 100%; max-width: 100%; margin: 0 !important; flex: none; }
 .dock-line { margin: 2px 0 6px; font-size: var(--fs-2); line-height: 1.45; color: var(--ink); word-break: keep-all; }
 .dock-talk { justify-self: start; min-height: 32px !important; padding: 0 14px !important; border-radius: 999px !important; border: 0 !important; background: var(--brand) !important; color: #fff !important; font-size: var(--fs-1) !important; font-weight: 700; }
 .school[data-mode=integrated] .dock { display: none; }
@@ -275,7 +275,6 @@ footer { background: var(--surface) !important; color: var(--ink-3) !important; 
   header nav.rooms .room-door i { display: none; }
   .dock { left: var(--gap-2); right: var(--gap-2); width: auto; bottom: 40px; grid-template-columns: 64px 1fr; }
   .dock-face { width: 64px; height: 76px; }
-  .dock-face > img, .dock-face > .saeng { width: 104px !important; margin: -6px 0 0 -20px; }
 }
 @media (prefers-reduced-motion: reduce) { .ready-tile, .room-door, .dday-track i, .ready-ring .ring-fg { transition: none !important; } }
 

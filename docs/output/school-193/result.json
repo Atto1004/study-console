@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "errors": [],
+  "checks": [
+    "tutor plan",
+    "lecture/notebook transition",
+    "draft preserved",
+    "error quote",
+    "live activity and pause",
+    "first-person movement and door interaction",
+    "five classrooms",
+    "responsive main and notebook",
+    "AliveWeek return link"
+  ],
+  "model": "isolated fixture"
+}

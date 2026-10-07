@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="reading.css" />
     <link rel="stylesheet" href="workspace.css" />
     <link rel="stylesheet" href="academy.css" />
-    <link rel="stylesheet" href="skin.css" />
+    <link rel="stylesheet" href="skin.css?v=196" />
+    <link rel="stylesheet" href="space.css?v=196" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
@@ -38,10 +39,12 @@
       src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
       crossorigin="anonymous"
     ></script>
-    <script type="module" src="school.js"></script>
+    <script type="module" src="school.js?v=197"></script>
+      <style>.school[data-booting] #scene,.school[data-booting] #dialogue,.school[data-booting] #dock{visibility:hidden}#bootScreen{position:fixed;inset:64px 0 0;z-index:60;background:#f5f6f2;display:grid;place-items:center;color:#315b49}</style>
   </head>
   <body>
-    <div class="school">
+    <div class="school" data-booting="true">
+      <div id="bootScreen" role="status">학습 화면을 불러오고 있습니다.</div>
       <header>
         <button id="home" disabled class="brand">
           GREENLIGHT <span>학교</span></button
@@ -163,7 +166,7 @@
       <footer>
         <button id="studyTimer" hidden title="누르면 타이머 중지"></button>
         <span>학습 · 수업 자료 · 과제</span>
-        <span id="status" role="status">연결 중</span><small>.192</small
+        <span id="status" role="status">연결 중</span><small>.197</small
         ><button id="retry" hidden>저장 재시도</button>
       </footer>
     </div>
