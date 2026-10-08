@@ -76,6 +76,10 @@ const byText=text=>[...d.querySelectorAll('button')].find(b=>b.textContent===tex
  byText('제출 완료').click();assert.ok(d.querySelector('#assignments').textContent.includes('제출 과제'));check('제출 완료').click();await settle();assert.equal(assignments.rows[0].submitted,false);
  w.__smokeLobby();assert.equal(d.querySelector('#assignments').hidden,true);assert.equal(d.querySelector('#lobby').hidden,false);
  d.querySelector('#consult').click();assert.equal(d.querySelector('#panel').open,true);
+ {const p=d.querySelector('#panel'),fire=(t,x)=>p.dispatchEvent(new w.MouseEvent(t,{bubbles:true,clientX:x,clientY:5}));p.getBoundingClientRect=()=>({left:100,right:500,top:0,bottom:400});
+  fire('pointerdown',300);fire('click',600);assert.equal(p.open,true,'창 안에서 시작해 바깥에서 뗀 클릭은 닫지 않는다');
+  fire('pointerdown',600);fire('click',600);assert.equal(p.open,false,'바깥(어두운 부분)을 누르면 닫힌다');delete p.getBoundingClientRect;}
+ d.querySelector('#consult').click();assert.equal(d.querySelector('#panel').open,true);
  d.querySelector('#panelBody form').dispatchEvent(new w.Event('submit',{cancelable:true}));await settle();
  for(let i=0;i<5&&byText('아직 모르겠어요');i++){byText('아직 모르겠어요').click();await settle();}
  assert.ok(byText('이 계획 적용하고 시작'));byText('이 계획 적용하고 시작').click();await settle();

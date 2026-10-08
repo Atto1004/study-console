@@ -244,6 +244,20 @@ function panel(title) {
   return $("panelBody");
 }
 $("closePanel").onclick = () => $("panel").close();
+// 팝업은 바깥을 누르면 닫는다(모든 dialog 공통). 창 안에서 누르기 시작해 바깥에서 뗀 경우(글자 끌어 선택)는 닫지 않는다.
+const outside = (d, e) => { const r = d.getBoundingClientRect(); return e.target === d && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom); };
+let backdropDown = null;
+document.addEventListener("pointerdown", (e) => {
+  backdropDown = [...document.querySelectorAll("dialog[open]")].find((d) => outside(d, e)) || null;
+  for (const m of document.querySelectorAll("details.secondary-menu[open]")) if (!m.contains(e.target)) m.open = false;
+});
+document.addEventListener("click", (e) => {
+  const d = backdropDown; backdropDown = null;
+  if (d && d.open && outside(d, e)) d.close();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") for (const m of document.querySelectorAll("details.secondary-menu[open]")) m.open = false;
+});
 function row(host, title, detail, action, label = "열기") {
   const item = node("div", undefined, "list-row"),
     text = node("div");
