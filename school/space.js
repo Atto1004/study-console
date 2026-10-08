@@ -11,9 +11,9 @@ export const ROOMS=[
 export function createSpace(app){
   const school=document.querySelector('.school'),layer=make('div',null,'school-world');layer.id='schoolWorld';layer.setAttribute('aria-hidden','true');school.prepend(layer);
   const hud=make('section',null,'world-hud');hud.hidden=true;hud.setAttribute('aria-label','1인칭 교실 이동');
-  const title=make('b','학교 복도'),help=make('p','WASD 이동 · 마우스로 시선 · E 문 열기/앉기 · Esc 마우스 해제'),action=button('앞의 문·자리에 상호작용',interact);
+  const title=make('b','학교 복도'),help=make('p',matchMedia('(pointer: coarse)').matches?'왼쪽 아래 버튼을 누르고 있으면 이동 · 화면을 끌어 시선 · 문 앞에서 위 버튼으로 열기/앉기':'WASD 이동 · 마우스로 시선 · E 문 열기/앉기 · Esc 마우스 해제'),action=button('앞의 문·자리에 상호작용',interact);
   const doors=make('div',null,'world-quick');for(const r of ROOMS)doors.append(button(r.name,()=>enter(r.name)));
-  const pad=make('div',null,'world-pad');for(const [key,label] of [['w','앞으로'],['a','왼쪽'],['s','뒤로'],['d','오른쪽']]){const b=button(label,()=>{});b.onpointerdown=e=>{e.preventDefault();keys.add(key);b.setPointerCapture(e.pointerId);};b.onpointerup=b.onpointercancel=()=>keys.delete(key);pad.append(b);}
+  const pad=make('div',null,'world-pad');for(const [key,label] of [['w','앞으로'],['a','왼쪽'],['s','뒤로'],['d','오른쪽']]){const b=button(label,()=>{});b.onpointerdown=e=>{e.preventDefault();keys.add(key);b.dataset.held='';try{b.setPointerCapture(e.pointerId);}catch{}};b.onpointerup=b.onpointercancel=b.onlostpointercapture=()=>{keys.delete(key);delete b.dataset.held;};b.oncontextmenu=e=>e.preventDefault();pad.append(b);}
   const reduced=make('input');reduced.type='checkbox';try{reduced.checked=localStorage.getItem('school-reduced-motion')==='1'||matchMedia('(prefers-reduced-motion: reduce)').matches;}catch{}
   const label=make('label','시점 흔들림·전환 줄이기');label.prepend(reduced);reduced.onchange=()=>{try{localStorage.setItem('school-reduced-motion',reduced.checked?'1':'0');}catch{}};
   hud.append(title,help,action,button('이 교실 내 자리에 앉기',()=>{if(room)app.select(room.name);else help.textContent='교실에 먼저 들어가세요.';}),doors,pad,label,button('학습 메인으로',()=>{hide();app.home();}));school.append(hud);
@@ -35,7 +35,7 @@ export function createSpace(app){
     scene.add(new T.HemisphereLight(0xfff7e6,0x64786b,2.3));const sun=new T.DirectionalLight(0xfff0d8,2.1);sun.position.set(-7,12,5);scene.add(sun);
     build();loaded=true;resize();renderer.setAnimationLoop(frame);
     renderer.domElement.onclick=()=>{if(walking&&!pointerDragged){const request=renderer.domElement.requestPointerLock?.();request?.catch?.(()=>{});}};
-    renderer.domElement.onpointerdown=e=>{renderer.domElement.focus();pointerDragged=false;if(walking&&document.pointerLockElement!==renderer.domElement){drag={id:e.pointerId,x:e.clientX,y:e.clientY};renderer.domElement.setPointerCapture(e.pointerId);}};
+    renderer.domElement.onpointerdown=e=>{renderer.domElement.focus();pointerDragged=false;if(walking&&document.pointerLockElement!==renderer.domElement){drag={id:e.pointerId,x:e.clientX,y:e.clientY};try{renderer.domElement.setPointerCapture(e.pointerId);}catch{}}};
     renderer.domElement.onpointermove=e=>{if(!walking)return;if(document.pointerLockElement===renderer.domElement){yaw-=e.movementX*.0025;pitch=Math.max(-1.1,Math.min(1.1,pitch-e.movementY*.0025));}else if(drag?.id===e.pointerId){if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>2)pointerDragged=true;yaw-=(e.clientX-drag.x)*.005;pitch=Math.max(-1.1,Math.min(1.1,pitch-(e.clientY-drag.y)*.005));drag={id:e.pointerId,x:e.clientX,y:e.clientY};}};
     renderer.domElement.onpointerup=renderer.domElement.onpointercancel=()=>drag=null;
     renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();hide();app.status('3D 화면 연결이 끊겼습니다. 학습 화면에서 이어갈 수 있습니다.',true);});
