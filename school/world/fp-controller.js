@@ -43,7 +43,7 @@ export function createController({ T, camera, canvas, isOverlay = () => false, b
     // 상태 바꾸기: 벗어날 때 키·끌기·포인터 잠금을 모두 푼다
     setMode(next) { if (next !== mode) { release(); mode = next; } arms.visible = mode === 'walking'; },
     get yaw() { return yaw; }, set yaw(v) { yaw = v; },
-    get pitch() { return pitch; }, set pitch(v) { pitch = clampPitch(v); },
+    get pitch() { return pitch; }, set pitch(v) { pitch = mode === 'seated' ? Math.max(-Math.PI / 2, Math.min(Math.PI / 2, v)) : clampPitch(v); },
     // 터치 패드 버튼이 누르고 떼는 키
     hold(key, down) { if (down && (mode !== 'walking' || overlay())) return; if (down) keys.add(key); else keys.delete(key); },
     interact,

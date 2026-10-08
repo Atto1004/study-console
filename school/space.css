@@ -41,3 +41,7 @@
 @media (pointer:fine){.world-pad{display:none}}
 .world-hud .world-sit{flex-direction:row;height:44px;padding:0 14px 0 10px!important}
 .world-hud .world-sit svg{width:20px;height:20px}
+
+/* 3D 면은 이동이 끝난 뒤 투영 좌표로 다시 놓는다. */
+.school.view-moving #room{animation:none}
+.school.view-moving .board,.school.view-moving .mission-work{visibility:hidden}
