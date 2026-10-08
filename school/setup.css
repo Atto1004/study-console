@@ -43,6 +43,5 @@
 .school[data-setup=paper] #missionWork{display:block!important}
 .school[data-setup=paper] #missionWork canvas,.school[data-setup=paper] .pen-tools{display:none!important}
 
-/* 아이패드만: 칠판을 위로 쓸면 책상, 책상 보기의 위쪽 칠판 띠를 아래로 쓸면 칠판. */
-.school[data-setup=solo][data-world=seated] .board{touch-action:pan-x}
+/* 아이패드만: 칠판을 위로 쓸면 책상, 책상 보기의 위쪽 칠판 띠를 아래로 쓸면 칠판(space.js, 스크롤은 그대로). */
 .school[data-setup=solo][data-world=seated][data-view=notebook] .board{cursor:ns-resize}

@@ -155,7 +155,7 @@ export function createAvatar(T, spec) {
   const LA = arm(1), RA = arm(-1);
 
   // 동작
-  let pose = "stand", t = 0, nextBlink = 2 + Math.random() * 3, blinkT = -1, talking = false, waving = false;
+  let pose = "stand", t = 0, nextBlink = 2 + Math.random() * 3, blinkT = -1, talking = false, waving = false, typing = false, dozing = false;
   const cur = { ...POSES.stand };
   const seatDrop = legLen - 0.46;                         // 의자 높이 0.46m 에 앉는다
   function target(time) {
@@ -164,6 +164,9 @@ export function createAvatar(T, spec) {
       const w = time * 7.2, s = Math.sin(w);
       Object.assign(p, POSES.stand, { lHip: s * 0.5, rHip: -s * 0.5, lKnee: Math.max(0, -Math.cos(w)) * 0.7, rKnee: Math.max(0, Math.cos(w)) * 0.7, lShX: -s * 0.4, rShX: s * 0.4, lEl: -0.3, rEl: -0.3, spine: 0.05 });
     }
+    // 타자: 두 팔을 책상 위로 뻗고 번갈아 두드린다. 졸기: 고개를 떨군다.
+    if (typing) Object.assign(p, { lShX: -1.05 + Math.sin(time * 11) * 0.06, rShX: -1.05 + Math.sin(time * 11 + 1.7) * 0.06, lEl: -0.75, rEl: -0.75, lSh: 0.12, rSh: -0.12, head: 0.18 });
+    if (dozing) Object.assign(p, { head: 0.5, spine: 0.16, lShX: -0.25, rShX: -0.25, lEl: -0.6, rEl: -0.6 });
     if (waving) Object.assign(p, { rSh: -2.6, rShX: 0, rEl: -0.5 + Math.sin(time * 9) * 0.35 });
     return p;
   }
@@ -178,7 +181,8 @@ export function createAvatar(T, spec) {
     const breath = 1 + Math.sin(t * (2 * Math.PI / 3.4)) * 0.012;  // 숨: 3.4초 주기
     chest.scale.set(breath, 1 + (breath - 1) * 0.6, breath);
     headG.rotation.y = Math.sin(t * 0.37) * 0.08 + (talking ? Math.sin(t * 3) * 0.04 : 0);
-    if (blinkT < 0 && t > nextBlink) blinkT = 0;          // 깜빡임: 3~6초 무작위, 가끔 두 번
+    if (dozing) { for (const e of eyes) e.scale.y = 0.08; blinkT = -1; nextBlink = t + 1; }
+    else if (blinkT < 0 && t > nextBlink) blinkT = 0;          // 깜빡임: 3~6초 무작위, 가끔 두 번
     if (blinkT >= 0) {
       blinkT += dt; const c = blinkT < 0.07 ? 1 - blinkT / 0.07 : blinkT < 0.14 ? (blinkT - 0.07) / 0.07 : 1;
       for (const e of eyes) e.scale.y = Math.max(0.08, c);
@@ -193,5 +197,7 @@ export function createAvatar(T, spec) {
     get pose() { return pose; },
     talk(on) { talking = !!on; },
     wave(on) { waving = !!on; },
+    type(on) { typing = !!on; },
+    doze(on) { if (dozing && !on) for (const e of eyes) e.scale.y = 1; dozing = !!on; },
   };
 }

@@ -105,10 +105,11 @@ export function createSpace(app){
   const MOVE={KeyW:'w',ArrowUp:'w',KeyS:'s',ArrowDown:'s',KeyA:'a',ArrowLeft:'a',KeyD:'d',ArrowRight:'d',ShiftLeft:'shift',ShiftRight:'shift'};
   // 고개 동작(아이패드만 쓸 때): ↑ 칠판 보기 · ↓ 책상 내려다보기, 칠판을 위로 쓸면 책상, 위쪽 칠판 띠를 아래로 쓸면 칠판.
   window.addEventListener('keydown',e=>{if(school.dataset.world!=='seated'||walking||app.fixedView?.()||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.target.isContentEditable)return;if(e.key==='ArrowUp'){e.preventDefault();view('lecture');}else if(e.key==='ArrowDown'){e.preventDefault();view('notebook');}});
+  // 스크롤은 막지 않는다: 끝까지 내린 칠판에서 위로 쓸면 책상, 맨 위인 칠판 띠에서 아래로 쓸면 칠판.
   {let swipe=null;const board=document.getElementById('board');
-   board.addEventListener('pointerdown',e=>{if(school.dataset.world==='seated'&&!app.fixedView?.())swipe={id:e.pointerId,y:e.clientY,x:e.clientX};});
-   board.addEventListener('pointerup',e=>{if(swipe?.id!==e.pointerId)return;const dy=e.clientY-swipe.y,dx=e.clientX-swipe.x;swipe=null;if(Math.abs(dy)<60||Math.abs(dy)<Math.abs(dx)*1.5)return;if(dy<0&&school.dataset.view==='lecture')view('notebook');else if(dy>0&&school.dataset.view==='notebook')view('lecture');});
-   board.addEventListener('pointercancel',()=>swipe=null);}
+   board.addEventListener('touchstart',e=>{if(school.dataset.world!=='seated'||app.fixedView?.()||e.touches.length!==1){swipe=null;return;}const t=e.touches[0];swipe={x:t.clientX,y:t.clientY,top:board.scrollTop<=1,bottom:board.scrollTop+board.clientHeight>=board.scrollHeight-2};},{passive:true});
+   board.addEventListener('touchend',e=>{if(!swipe)return;const t=e.changedTouches[0],dy=t.clientY-swipe.y,dx=t.clientX-swipe.x,s0=swipe;swipe=null;if(Math.abs(dy)<60||Math.abs(dy)<Math.abs(dx)*1.5)return;if(dy<0&&s0.bottom&&school.dataset.view==='lecture')view('notebook');else if(dy>0&&s0.top&&school.dataset.view==='notebook')view('lecture');},{passive:true});
+   board.addEventListener('touchcancel',()=>swipe=null);}
   window.addEventListener('keydown',e=>{if(walking&&e.key==='Escape'){document.exitPointerLock?.();keys.clear();return;}if(!walking||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;const k=MOVE[e.code];if(k){keys.add(k);e.preventDefault();}if(e.code==='KeyE'&&!e.repeat){e.preventDefault();interact();}});window.addEventListener('keyup',e=>{const k=MOVE[e.code];if(k)keys.delete(k);});window.addEventListener('blur',()=>keys.clear());document.addEventListener('visibilitychange',()=>{if(document.hidden)keys.clear();});
   new MutationObserver(()=>{if(school.dataset.mode!=='classroom'&&!walking)hide();}).observe(school,{attributes:true,attributeFilter:['data-mode']});
   layer.hidden=true;return {walk,enter,seated,view,hide,refresh:()=>{if(school.dataset.world==='seated'){const v=school.dataset.view;view(v==='notebook'?'notebook':'lecture');}},get mode(){return school.dataset.view;}};

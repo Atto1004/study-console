@@ -28,7 +28,9 @@ let pending = [],
   chatBusy = false,
   lastLesson = null;
 let pausedLesson = null;
-let activeSession = null, sessionQueue = Promise.resolve(), setup = null;
+let activeSession = null, sessionQueue = Promise.resolve(), setup = null, sessionEpoch = 0;
+// 두 기기 학습의 칠판(모니터)은 받기만 한다: 수업 위치·학습 활동 기록을 쓰지 않는다(오타 10/8 RED).
+const isBoard = () => document.querySelector('.school')?.dataset.role === 'board';
 let resizeBoard;
 let chatMode = "question";
 let workspace, mission, space, growth, legacyLobbyMode = false, missionIndices = null;
@@ -594,7 +596,7 @@ $("resume").onclick = () => {
   else consult(course);
 };
 async function startLesson(id, options = {}) {
-  try { await mission?.save(); await growth?.stop('pause'); } catch (error) { status(error.message, true); return; }
+  try { await mission?.save(); if (!options.follow && !isBoard()) await growth?.stop('pause'); } catch (error) { status(error.message, true); return; }
   const generation = ++requestGeneration;
   try {
     status("수업을 준비하고 있습니다.");
@@ -605,8 +607,10 @@ async function startLesson(id, options = {}) {
     if (options.resume) { const restored = lesson.steps.findIndex(s=>s.id===options.resume.stepId); if(restored<0)throw new Error('이전 단계가 변경되었습니다. 수업 자료를 확인해주세요.'); targetIndex=restored; }
     missionIndices = options.purpose !== "exam" ? null : pickQuestions({ steps: lesson.steps, events: [...state.events, ...pending], lessonId: lesson.id, n: 3 });
     // 시험 대비는 저장된 마지막 위치와 상관없이 고른 첫 문제(가장 약한 문제)부터. 이어 하기·특정 문제 지정은 그대로 둔다.
-    if (missionIndices && (!missionIndices.includes(targetIndex) || (!options.resume && !options.stepId && options.index === undefined))) targetIndex=missionIndices[0];
-    await saveSession(lesson, targetIndex, {newSession: !options.resume, purpose: options.purpose || 'tutoring', assisted: options.assisted ?? !!options.resume?.assisted, returnTo: options.returnTo || null});
+    if (options.follow) { if (missionIndices && !missionIndices.includes(targetIndex)) missionIndices = [targetIndex, ...missionIndices.filter(i => i !== targetIndex)].slice(0, missionIndices.length); }
+    else if (missionIndices && (!missionIndices.includes(targetIndex) || (!options.resume && !options.stepId && options.index === undefined))) targetIndex=missionIndices[0];
+    if (options.follow) activeSession = options.resume;
+    else await saveSession(lesson, targetIndex, {newSession: !options.resume, purpose: options.purpose || 'tutoring', assisted: options.assisted ?? !!options.resume?.assisted, returnTo: options.returnTo || null});
     if (generation !== requestGeneration) return;
   workspace?.hide();
   for (const id of ['mainArea','learningArea','progressArea','materialsArea','attendanceArea','assignmentArea']) $(id)?.setAttribute('aria-pressed',String(id==='learningArea'));
@@ -639,6 +643,8 @@ async function startLesson(id, options = {}) {
   }
 }
 function saveSession(lesson, targetIndex, options = {}) {
+  if (isBoard()) return Promise.resolve(activeSession);
+  sessionEpoch++;
   const task = sessionQueue.catch(() => {}).then(async () => {
     const request = {id: options.newSession ? eventId() : activeSession?.id || eventId(),
       revision: activeSession?.revision || 0, course: lesson.course, lessonId: lesson.id,
@@ -850,7 +856,7 @@ async function renderStep(camera) {
     $("choices").append(button("원래 문제로 돌아가기", returnToQuestion));
   await mission?.mount();
   if (['walking','seated'].includes(document.querySelector('.school').dataset.world)) await space?.seated(course,step.kind,camera);
-  await growth?.step(activeSession);
+  if (!isBoard()) await growth?.step(activeSession);
 }
 async function returnToQuestion() {
   const saved = pausedLesson;
@@ -2238,15 +2244,20 @@ async function follow(){
   following=true;
   try{
     await sessionQueue.catch(()=>{});
+    const epoch=sessionEpoch;
     const s=await api('session');
-    if(!s||!current||(s.id===activeSession?.id&&s.revision===activeSession?.revision))return;
-    if(s.lessonId!==current.id){activeSession=s;await startLesson(s.lessonId,{resume:s,purpose:s.purpose,returnTo:s.returnTo});return;}
+    // 읽는 동안 이 기기에서 이동했으면, 또는 이미 더 최신을 갖고 있으면 응답을 버린다.
+    if(epoch!==sessionEpoch||!s||!current)return;
+    if(s.id===activeSession?.id&&s.revision<=activeSession.revision)return;
+    if(s.lessonId!==current.id){await startLesson(s.lessonId,{resume:s,purpose:s.purpose,returnTo:s.returnTo,follow:true});return;}
     activeSession=s;
     const at=current.steps.findIndex(x=>x.id===s.stepId);
     if(at<0||at===index)return;
     try{await mission?.save();}catch{}
+    if(epoch!==sessionEpoch)return;
     requestGeneration++;
-    if(missionIndices&&!missionIndices.includes(at))missionIndices=null;
+    // 시험 대비 3문제 제한은 유지: 받은 문제를 목록 앞에 두고 같은 개수로 자른다.
+    if(missionIndices&&!missionIndices.includes(at))missionIndices=[at,...missionIndices.filter(i=>i!==at)].slice(0,missionIndices.length);
     index=at;
     renderStep();
   }catch{}finally{following=false;}
