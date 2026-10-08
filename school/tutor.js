@@ -117,7 +117,7 @@ export function createTutor(app) {
     app.assist(); waiting = true; resumeLine = asked; const mode = form.dataset.mode, k = key;
     app.say('좋은 질문이에요. 잠깐만요.', 'neutral');
     try { const r = await coach('question', text); if (k !== key) return; app.say(clean(r?.answer) || '그건 이 단계 근거만으로는 답하기 어려워요.', 'neutral'); }
-    catch (e) { app.say('지금은 답을 못 가져왔어요. 하던 걸 이어서 해요.', 'neutral'); }
+    catch (e) { if (k !== key) return; app.say('지금은 답을 못 가져왔어요. 하던 걸 이어서 해요.', 'neutral'); }
     finally {
       waiting = false;
       if (resumeLine && phase !== 'done') later(() => ask(resumeLine, mode), 2500);

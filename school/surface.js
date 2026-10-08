@@ -9,7 +9,7 @@ export function startSurfaces() {
   // 위쪽은 HUD(미션 진행·수업 제목) 아래부터
   const hudBottom = () => Math.max(112, ...['#missionHeader', '#room .room-title'].map((q) => { const e = document.querySelector(q); const r = e && e.getClientRects().length ? e.getBoundingClientRect() : null; return r ? r.bottom + 8 : 0; }));
   const safe = () => { const top = hudBottom(), dlg = document.getElementById('dialogue'); const bottom = dlg && !dlg.hidden ? dlg.getBoundingClientRect().top - 10 : innerHeight - 10; return { top, bottom: Math.max(top + 40, bottom) }; };
-  const place = (el, r) => { const s = safe(); const y = Math.max(r.y, s.top), h = Math.min(r.y + r.h, s.bottom) - y; el.style.left = r.x + 'px'; el.style.top = y + 'px'; el.style.width = r.w + 'px'; el.style.height = Math.max(40, h) + 'px'; };   // 쓸 수 있는 높이보다 크게 잡지 않는다(대화 바에 가리지 않게)
+  const place = (el, r) => { const s = safe(); const y = Math.max(r.y, s.top), h = Math.min(r.y + r.h, s.bottom) - y; el.style.left = r.x + 'px'; el.style.top = y + 'px'; el.style.width = r.w + 'px'; el.style.height = Math.max(0, h) + 'px'; };   // 쓸 수 있는 높이를 절대 넘지 않는다 — 최소값 때문에 대화 바와 겹치던 것(오타 10/8)
   const clear = (el) => { if (!el) return; for (const k of ['left', 'top', 'width', 'height']) el.style[k] = ''; el.classList.remove('on-surface', 'on-paper'); };
   function apply(d) {
     last = d;
@@ -20,7 +20,7 @@ export function startSurfaces() {
     school.dataset.surface = view === 'notebook' ? 'desk' : 'board';
     // 공책 보기: 풀 때도 문제가 보여야 한다 — 공책 면 위쪽에 문제(칠판 내용)를 종이 위 글씨로, 그 아래가 풀이 칸
     if (view === 'notebook') {
-      const sf = safe(), y0 = Math.max(target.y, sf.top), y1 = Math.min(target.y + target.h, sf.bottom), h = Math.max(80, y1 - y0);
+      const sf = safe(), y0 = Math.max(target.y, sf.top), y1 = Math.min(target.y + target.h, sf.bottom), h = Math.max(0, y1 - y0);
       const head = Math.min(300, Math.round(h * 0.4));
       place(board, { x: target.x, y: y0, w: target.w, h: head }); board.classList.add('on-surface', 'on-paper');
       if (notebook) { place(notebook, { x: target.x, y: y0 + head, w: target.w, h: h - head }); notebook.classList.add('on-surface'); }
