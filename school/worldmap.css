@@ -1,0 +1,23 @@
+/* 학교 탭 바 → 지도 아이콘 (게임 UI 규격 초안 §2, 대표님 10/8) — worldmap.js */
+.school > header .rooms{display:none!important}
+.map-trigger{margin-left:auto;width:42px;height:42px;padding:0;display:inline-grid;place-items:center;border-radius:12px;border:1px solid #d3dbd3;background:#fff;color:#25483e;cursor:pointer;flex:none}
+.map-trigger svg{width:22px;height:22px}
+.map-trigger[aria-expanded=true]{background:#eef6f1;border-color:#21745a}
+.map-sheet{position:fixed;inset:0;z-index:90;display:grid;place-items:start end;padding:72px 16px 16px;background:#14231c40}
+.map-sheet[hidden]{display:none}
+.map-card{width:min(360px,100%);background:#fbfaf6;color:#1f3d33;border-radius:18px;padding:18px;box-shadow:0 24px 60px #0f1f1838;font-family:"Pretendard Variable",Pretendard,sans-serif}
+.map-card h2{margin:0 0 12px;font-size:17px}
+.map-places{display:grid;gap:6px}
+.map-place{display:grid;grid-template-columns:28px 1fr;grid-template-rows:auto auto;column-gap:12px;align-items:center;text-align:left;padding:10px 12px;border-radius:12px;border:1.5px solid transparent;background:#fff;color:inherit;font:inherit;cursor:pointer}
+.map-place svg{grid-row:1/3;width:26px;height:26px;color:#21745a}
+.map-place b{font-size:15px}
+.map-place small{color:#5c6f65;font-size:12.5px}
+.map-place[aria-current]{border-color:#21745a;background:#eef6f1}
+.map-place[aria-current] small{color:#21745a;font-weight:600}
+.map-place:disabled{opacity:.45;cursor:default}
+.map-place:not(:disabled):hover{border-color:#cfdcd2}
+.map-trigger + .secondary-menu{margin-left:10px}
+/* 복도 위쪽 줄의 대표실 표지판(걷기 아이콘 옆) */
+.hud-office{height:46px;min-height:0!important;padding:0 14px 0 8px!important;display:inline-flex;align-items:center;gap:2px;border-radius:14px!important;background:rgba(255,255,255,.88)!important;border:0!important;box-shadow:0 4px 14px rgba(32,61,35,.10)!important;color:#5b4327!important;font:600 14px "Pretendard Variable",Pretendard,sans-serif!important;cursor:pointer}
+.hud-office svg{width:20px;height:20px;pointer-events:none}
+@media (max-width:640px){.map-sheet{place-items:end stretch;padding:16px}.map-card{width:auto}}

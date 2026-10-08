@@ -50,8 +50,8 @@ w.fetch=async(url,options={})=>{
 w.eval(fs.readFileSync(path.join(root,'school/learning.js'),'utf8').replace(/^export /gm,''));
 const strip=s=>s.replace(/^import[\s\S]*?from\s+["'][^"']+["'];\s*/gm,'').replace(/^export /gm,'');
 // 모듈 상수는 eval 마다 갇히므로 다른 파일이 쓰는 것만 창에 올린다.
-const shared={'metrics.js':'window.KINDS=KINDS;window.WEIGHTS=WEIGHTS;'};
-for(const f of ['metrics.js','saeng.js','workspace.js','mission.js'])w.eval(strip(fs.readFileSync(path.join(root,'school',f),'utf8'))+'\n'+(shared[f]||''));
+const shared={'metrics.js':'window.KINDS=KINDS;window.WEIGHTS=WEIGHTS;','worldmap.js':'window.officeHref=officeHref;'};
+for(const f of ['metrics.js','saeng.js','worldmap.js','setup.js','workspace.js','mission.js'])w.eval(strip(fs.readFileSync(path.join(root,'school',f),'utf8'))+'\n'+(shared[f]||''));
 w.createSpace=()=>({seated(){},view(){},hide(){},walk(){}});w.ROOMS=[{name:'정역학'},{name:'공업수학1'}];w.createGrowth=()=>({notifySkills(){},stop:async()=>{},step(){},task(){},tutorPlan(){}});
 w.eval(source+'\nwindow.__smokeAssignments=showAssignments;window.__smokeConcept=()=>startLesson(lastLesson,{concept:true});window.__smokeLobby=()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;};');
 const settle=()=>new Promise(resolve=>setTimeout(resolve,10));

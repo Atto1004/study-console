@@ -4,6 +4,7 @@ const { webkit, devices } = require(require('path').resolve(__dirname,'../../.te
   const browser = await webkit.launch();
   const ctx = await browser.newContext({ ...devices['iPad Pro 11 landscape'] });
   const page = await ctx.newPage();
+  await page.addInitScript(() => localStorage.setItem('school-setup', 'solo'));  // 학습 방식 고르는 창(10/8) 건너뛰기
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.goto('http://127.0.0.1:8797/school/index.html', { waitUntil: 'load' });

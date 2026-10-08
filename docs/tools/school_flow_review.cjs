@@ -1,7 +1,8 @@
 const {chromium}=require('../../.test-tools/node_modules/playwright');
 const assert=require('node:assert/strict');
 (async()=>{const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});try{
-const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+const page=await browser.newPage({viewport:{width:1440,height:1000}});await page.addInitScript(() => localStorage.setItem('school-setup', 'solo'));  // 학습 방식 고르는 창(10/8) 건너뛰기
+,errors=[];page.on('pageerror',e=>errors.push(e.message));
 const base='http://127.0.0.1:8801/kingdom/study/school/index.html';
 const get=path=>page.evaluate(p=>fetch('/api/'+p).then(r=>r.json()),path);
 const boot=()=>page.waitForFunction(()=>!document.querySelector('.school').dataset.booting);
@@ -32,7 +33,7 @@ await work.fill('ΣFx=0: Ax=0\nΣFy=0: Ay=500 N\nΣMA=0: MA-500×2=0\nMA=1000 N�
 await page.getByRole('button',{name:'풀이 제출·피드백',exact:true}).click();await page.getByText('풀이 확인 · 새 문제에서 다시 확인',{exact:true}).waitFor();
 await page.getByRole('button',{name:'공부 종료',exact:true}).click();await page.waitForFunction(()=>new URL(location.href).searchParams.get('room')==='main');
 let live=await get('aliveweek/live');assert.equal(live.active,null);assert.ok(live.records.some(r=>r.lessonId==='statics-2026-09-30'));
-await page.locator('#assignmentArea').click();const tasks=page.getByRole('button',{name:'과제 작업 시작 · 얼라이브위크 기록',exact:true});await tasks.first().click();
+await page.click('.map-trigger').then(()=>page.click('.map-place[data-place=homework]'));const tasks=page.getByRole('button',{name:'과제 작업 시작 · 얼라이브위크 기록',exact:true});await tasks.first().click();
 await page.waitForFunction(async()=>!!(await fetch('/api/aliveweek/live').then(r=>r.json())).active?.taskKey);
 await page.getByRole('button',{name:'공부 종료',exact:true}).click();
 await page.waitForFunction(async()=>(await fetch('/api/aliveweek/live').then(r=>r.json())).active===null);

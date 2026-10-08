@@ -4,6 +4,7 @@ async function run(kind) {
   const browser = kind === 'chrome' ? await chromium.launch({ channel: 'chrome', headless: true }) : await webkit.launch();
   const ctx = kind === 'chrome' ? await browser.newContext({ viewport: { width: 1040, height: 918 } }) : await browser.newContext({ ...devices['iPad Pro 11 landscape'] });
   const page = await ctx.newPage();
+  await page.addInitScript(() => localStorage.setItem('school-setup', 'solo'));  // 학습 방식 고르는 창(10/8) 건너뛰기
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   const press = (x, y) => kind === 'chrome' ? page.mouse.click(x, y) : page.touchscreen.tap(x, y);
   await page.goto('http://127.0.0.1:8797/school/index.html?room=learning', { waitUntil: 'load' });

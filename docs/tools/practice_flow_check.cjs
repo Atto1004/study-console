@@ -4,6 +4,7 @@ async function run(kind) {
   const browser = kind === 'chrome' ? await chromium.launch({ channel: 'chrome', headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] }) : await webkit.launch();
   const ctx = kind === 'chrome' ? await browser.newContext({ viewport: { width: 1040, height: 918 } }) : await browser.newContext({ ...devices['iPad Pro 11 landscape'] });
   const page = await ctx.newPage();
+  await page.addInitScript(() => localStorage.setItem('school-setup', 'solo'));  // 학습 방식 고르는 창(10/8) 건너뛰기
   const errors = [], three = [];
   page.on('pageerror', e => errors.push(e.message));
   page.on('request', r => { if (/three\.(module|core)\.js/.test(r.url())) three.push(r.url().split('/').pop()); });
@@ -18,7 +19,7 @@ async function run(kind) {
   const practiced = await st();
   const threeAfterPractice = three.length;
 
-  await page.click('#mainArea'); await page.waitForSelector('.hud-walk');
+  await page.click('.map-trigger').then(()=>page.click('.map-place[data-place=lobby]')); await page.waitForSelector('.hud-walk');
   await page.locator('.hud-walk').click(); await page.waitForTimeout(4000);
   const walking = await st();
   await page.getByRole('button', { name: '자리에 앉아 수업 시작' }).click(); await page.waitForTimeout(5000);

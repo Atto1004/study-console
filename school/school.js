@@ -11,6 +11,7 @@ import { attachSaeng } from "./saeng.js";
 import { createSpace, ROOMS } from "./space.js";
 import { pickLesson, pickQuestions } from "./metrics.js";
 import { createSetup } from "./setup.js";
+import { createWorldMap } from "./worldmap.js";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
@@ -2238,6 +2239,7 @@ mission = createMission({api,forcedMode:()=>setup?.solveMode(),context:()=>curre
 growth = createGrowth({api,status,panel,start:startLesson,retest,courses:()=>workspace?.data?.courses||[],home:()=>workspace.open('main')});
 workspace = createWorkspace({api,status,panel,record,screen:rememberScreen,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],walk:name=>space&&ROOMS.some(r=>r.name===name)?space.walk(name):showCourse(name),practice,rooms:()=>ROOMS.map(r=>r.name),evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,tutorPlan:(host,data,refresh)=>growth.tutorPlan(host,data,refresh),leave:async()=>{space?.hide();await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);stopVoice();closeDialogs();++requestGeneration;},lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode)});
 space = createSpace({fixedView:()=>setup?.fixedView(),status,panel,screen:rememberScreen,view:camera=>{if(current)rememberScreen({lesson:current.id,step:current.steps[index].id,camera});},home:()=>workspace.open('main'),pause:async()=>{await mission.save();await growth.stop('pause');},ask:()=>openChat('','hint'),select:sitDown});
+createWorldMap();
 setup = createSetup({onChange:()=>{const m=setup.solveMode();if(m)mission.setMode(m);space?.refresh();}});
 {const m=setup.solveMode();if(m)mission.setMode(m);}
 // 모니터 + 아이패드: 두 기기가 서버의 같은 수업 위치(activeSession)를 따라간다. 어느 쪽에서 넘겨도 다른 쪽이 2초 안에 맞춘다.

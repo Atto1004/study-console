@@ -1,5 +1,6 @@
 import { courseMetrics, sourceKind, pickQuest, KINDS } from "./metrics.js";
 import { attachSaeng } from "./saeng.js";
+import { officeHref } from "./worldmap.js";
 const el = (tag, text, cls) => { const e=document.createElement(tag); if(text!==undefined)e.textContent=text; if(cls)e.className=cls; return e; };
 const btn = (text, action, cls='') => { const b=el('button',text,cls); b.type='button'; b.onclick=action; return b; };
 const minutes = s => Number(s.slice(0,2))*60+Number(s.slice(3));
@@ -145,6 +146,8 @@ export function createWorkspace(app){
       line=`${exam.course}부터 가요. 시험 ${ddayLabel(exam.dday)}, 준비도 ${m.readiness}. ${m.remaining?`남은 수업 ${m.remaining}회차예요.`:'문제로 다지면 돼요.'}`;react='idle';target=exam.course;
     }else{q.append(el('small','퀘스트'),el('b','오늘은 급한 일이 없어요'));line='급한 건 없어요. 약한 과목부터 한 문제만 풀어요.';react='idle';}
     const walk=btn('',()=>walkTo(target||rows[0]?.name),'hud-walk');walk.setAttribute('aria-label','1인칭으로 걸어서 들어가기');walk.title='1인칭으로 걸어서 들어가기';walk.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="M9 22l2-7 3 3v6M7 12l3-4 4 1 2 4 3 1M10 8l-1 5"/></svg>';if(rows.length)hud.append(walk);
+    // 대표실로 돌아가는 표지판 — A++O 주소 아래에서만(데모·GitHub Pages 판에는 대표실이 없다)
+    if(officeHref()){const office=btn('',()=>{location.href=officeHref();},'hud-office');office.setAttribute('aria-label','대표실로 돌아가기');office.title='대표실로 돌아가기';office.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span>대표실</span>';hud.append(office);}
     q.append(steps);hud.append(q);scene.append(hud);
     // 문
     const doors=el('div',undefined,'corridor-doors');
@@ -165,6 +168,7 @@ export function createWorkspace(app){
     scene.append(doors);
     const left=btn('← 자료실',()=>open('materials'),'corridor-sign sign-library'),right=btn(`과제실 · ${deadlines.filter(r=>r.deadlineDays!==null&&r.deadlineDays>=0).length}건 →`,()=>open('assignments'),'corridor-sign sign-homework');
     scene.append(left,right);
+
     // 스앵님 + 대사창
     const face=el('div',undefined,'corridor-saeng');face.append(Object.assign(el('img'),{src:'../notes/classroom/assets/tutor/neutral.png',alt:''}));
     scene.append(face);

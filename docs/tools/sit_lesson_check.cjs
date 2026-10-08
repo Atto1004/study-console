@@ -4,6 +4,7 @@ async function run(kind) {
   const browser = kind === 'chrome' ? await chromium.launch({ channel: 'chrome', headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] }) : await webkit.launch();
   const ctx = kind === 'chrome' ? await browser.newContext({ viewport: { width: 1040, height: 918 } }) : await browser.newContext({ ...devices['iPad Pro 11 landscape'] });
   const page = await ctx.newPage();
+  await page.addInitScript(() => localStorage.setItem('school-setup', 'solo'));  // 학습 방식 고르는 창(10/8) 건너뛰기
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   const st = () => page.evaluate(() => ({ world: document.querySelector('.school').dataset.world || null, mode: document.querySelector('.school').dataset.mode, lesson: document.querySelector('#roomLabel')?.textContent || null, padShown: getComputedStyle(document.querySelector('.world-pad')).display !== 'none', hudButtons: [...document.querySelectorAll('.world-hud button')].filter(b => !b.hidden).map(b => b.textContent), walkBtn: !!document.querySelector('#walkSchool') }));
