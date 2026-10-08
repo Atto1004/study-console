@@ -818,6 +818,7 @@ async function renderStep(camera) {
   if (step.options) {
     step.options.forEach((option, i) => {
       const b = button(option, () => answer(i));
+      b.dataset.opt = String.fromCharCode(65 + i);   // 보기 A~D 배지(v3.css)
       b.disabled = ["rejected", "pending"].includes(current.review?.status);
       $("choices").append(b);
     });
