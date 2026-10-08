@@ -55,7 +55,8 @@ export async function mountOffice3D() {
     s.avatar.type(!asleep && gaze === 'work' && modes[s.id] === 'work');
     s.avatar.talk(!asleep && bubble && !bubble.hidden);
     let turn = 0;
-    const other = staff.find((o) => o.id === gaze);
+    // 동료 대화는 두 사람 모두 gaze='peer'(company.js) → 같이 peer 인 다른 비서가 상대.
+    const other = gaze === 'peer' ? staff.find((o) => o !== s && o.node.dataset.gaze === 'peer') : staff.find((o) => o.id === gaze);
     if (other) turn = Math.sign(centerX(other) - centerX(s)) * 0.7;
     s.turn += (turn - s.turn) * 0.12;
     s.avatar.group.rotation.y = s.turn;

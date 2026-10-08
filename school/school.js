@@ -597,11 +597,14 @@ $("resume").onclick = () => {
 };
 async function startLesson(id, options = {}) {
   try { await mission?.save(); if (!options.follow && !isBoard()) await growth?.stop('pause'); } catch (error) { status(error.message, true); return; }
+  // 받기 경로: 기다리는 동안 이 기기에서 이동했으면 받은(이제 오래된) 세션을 적용하지 않는다.
+  const stale = () => options.follow && options.epoch !== sessionEpoch;
+  if (stale()) return;
   const generation = ++requestGeneration;
   try {
     status("수업을 준비하고 있습니다.");
     const lesson = await api("lesson?id=" + encodeURIComponent(id));
-    if (generation !== requestGeneration) return;
+    if (generation !== requestGeneration || stale()) return;
     let targetIndex = options.index ?? Math.min(state.progress[id]?.index || 0, lesson.steps.length - 1);
     if(options.stepId){const at=lesson.steps.findIndex(s=>s.id===options.stepId);if(at<0)throw new Error('이전 문제 위치를 확인해주세요.');targetIndex=at;}
     if (options.resume) { const restored = lesson.steps.findIndex(s=>s.id===options.resume.stepId); if(restored<0)throw new Error('이전 단계가 변경되었습니다. 수업 자료를 확인해주세요.'); targetIndex=restored; }
@@ -2249,7 +2252,8 @@ async function follow(){
     // 읽는 동안 이 기기에서 이동했으면, 또는 이미 더 최신을 갖고 있으면 응답을 버린다.
     if(epoch!==sessionEpoch||!s||!current)return;
     if(s.id===activeSession?.id&&s.revision<=activeSession.revision)return;
-    if(s.lessonId!==current.id){await startLesson(s.lessonId,{resume:s,purpose:s.purpose,returnTo:s.returnTo,follow:true});return;}
+    // 다른 수업이거나 목적(수업↔시험 대비)이 바뀌면 문제 목록까지 다시 구성한다.
+    if(s.lessonId!==current.id||s.purpose!==activeSession?.purpose){await startLesson(s.lessonId,{resume:s,purpose:s.purpose,returnTo:s.returnTo,follow:true,epoch});return;}
     activeSession=s;
     const at=current.steps.findIndex(x=>x.id===s.stepId);
     if(at<0||at===index)return;
