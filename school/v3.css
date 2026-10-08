@@ -45,6 +45,8 @@
 .v3-work #choices > button:not([data-opt]){grid-column:1/-1;justify-self:start}
 .v3-work #choices > button[data-opt]{width:100%!important;max-width:none!important;flex:none!important;display:flex!important;align-items:center;gap:12px;min-height:56px;padding:10px 14px!important;border-radius:14px!important;text-align:left;background:#fff!important;border:1.5px solid #dbe3dc!important;font:500 15.5px/1.4 "Pretendard Variable",Pretendard,sans-serif}
 .v3-work #choices > button[data-opt]::before{content:attr(data-opt);flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;border:1.5px solid #cfdad2;color:#21745a;font:700 13px "Pretendard Variable",Pretendard,sans-serif}
+.v3-work #choices > button[data-opt] > .opt-body{flex:1 1 auto;min-width:0;overflow-x:auto;overflow-y:hidden;overflow-wrap:anywhere;white-space:normal}
+.v3-work #choices > button[data-opt] > .opt-body .katex-display{margin:0}
 .v3-work #choices > button:hover{border-color:#21745a!important}
 .v3-work #choices > button[data-result=correct]{border-color:#21745a!important;background:#e8f3ec!important}
 .v3-work #choices > button[data-result=correct]::before{background:#21745a;border-color:#21745a;color:#fff}

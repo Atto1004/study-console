@@ -823,6 +823,8 @@ async function renderStep(camera) {
       $("choices").append(b);
     });
     renderMath($("choices"));
+    // 보기 글·수식은 한 덩어리(.opt-body)로 — 배지와 나란히, 안에서는 줄바꿈, 긴 수식은 안에서만 밀림(오타 검수 10/8)
+    for (const b of $("choices").querySelectorAll("button[data-opt]")) { const body = document.createElement("span"); body.className = "opt-body"; body.append(...b.childNodes); b.append(body); }
     if (passed)
       $("speech").textContent =
         "이 문제는 전에 해결했습니다. 다시 풀거나 다음으로 갈 수 있어요.";
