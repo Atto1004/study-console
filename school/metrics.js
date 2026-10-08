@@ -41,23 +41,38 @@ export function pickQuest(rows, deadlines = []) {
 }
 
 // 공부할 회차 하나(시험 대비 효율 우선). 이어 하던 수업 > 시험 범위 중 틀린 채 남은 회차 > 안 푼 회차 > 도움받아서만 맞힌 회차 > 최근 회차.
-// 수업으로 변환된 회차를 먼저 보고, 원본 메모 회차(id 가 session: 으로 시작, 예: 오리엔테이션)는 뒤로 미룬다.
+// 수업으로 변환된 회차를 먼저 보고, 원본 메모 회차(id 가 session: 으로 시작, 예: 오리엔테이션)는 변환 회차에 할 게 없을 때 본다.
+// 시험이 있는데 시험 범위에 회차가 없으면 null(범위 밖 수업을 시작하지 않는다).
 export function pickLesson({ course, lessons = [], events = [], today, exam = null, session = null }) {
   if (session?.course === course && session.lessonId) return { id: session.lessonId, resume: true, why: "resume" };
   const scope = lessons.filter((l) => l.date && l.date <= today && (!exam || l.date < exam.date)).sort((a, b) => a.date.localeCompare(b.date));
-  if (!scope.length) return lessons[0] ? { id: lessons[0].id, resume: false, why: "first" } : null;
-  const converted = scope.filter((l) => !String(l.id).startsWith("session:"));
-  const pool = converted.length ? converted : scope;
+  if (!scope.length) return !exam && lessons[0] ? { id: lessons[0].id, resume: false, why: "first" } : null;
   const answers = latestAnswers(events.filter((e) => e.course === course));
   const byLesson = new Map();
   for (const e of answers) { if (!byLesson.has(e.lesson)) byLesson.set(e.lesson, []); byLesson.get(e.lesson).push(e); }
-  const retry = pool.find((l) => (byLesson.get(l.id) || []).some((e) => !e.correct));
-  if (retry) return { id: retry.id, resume: false, why: "retry" };
-  const fresh = pool.find((l) => !byLesson.has(l.id));
-  if (fresh) return { id: fresh.id, resume: false, why: "new" };
-  const assisted = pool.find((l) => (byLesson.get(l.id) || []).some((e) => e.assisted));
-  if (assisted) return { id: assisted.id, resume: false, why: "assisted" };
-  return { id: pool[pool.length - 1].id, resume: false, why: "latest" };
+  const tiers = (pool) => {
+    const retry = pool.find((l) => (byLesson.get(l.id) || []).some((e) => !e.correct));
+    if (retry) return { id: retry.id, resume: false, why: "retry" };
+    const fresh = pool.find((l) => !byLesson.has(l.id));
+    if (fresh) return { id: fresh.id, resume: false, why: "new" };
+    const assisted = pool.find((l) => (byLesson.get(l.id) || []).some((e) => e.assisted));
+    if (assisted) return { id: assisted.id, resume: false, why: "assisted" };
+    return null;
+  };
+  const converted = scope.filter((l) => !String(l.id).startsWith("session:"));
+  const raw = scope.filter((l) => String(l.id).startsWith("session:"));
+  return tiers(converted) || tiers(raw) || { id: (converted.length ? converted : scope).at(-1).id, resume: false, why: "latest" };
+}
+
+// 회차 안에서 풀 문제 n개: 틀린 문제 > 안 푼 문제 > 도움받아 맞힌 문제 > 혼자 맞힌 문제(같은 등급은 원래 순서).
+// steps = 회차 단계, 반환 = 단계 번호 목록. 확인 문제가 없으면 예제, 그것도 없으면 앞에서부터.
+export function pickQuestions({ steps = [], events = [], lessonId, n = 3 }) {
+  const quiz = steps.map((s, i) => (s.kind === "quiz" ? i : -1)).filter((i) => i >= 0);
+  const examples = steps.map((s, i) => (s.kind === "example" ? i : -1)).filter((i) => i >= 0);
+  if (!quiz.length) return (examples.length ? examples : steps.map((s, i) => i)).slice(0, n);
+  const last = new Map(latestAnswers(events.filter((e) => e.lesson === lessonId)).map((e) => [e.step, e]));
+  const rank = (i) => { const e = last.get(steps[i].id); return !e ? 1 : !e.correct ? 0 : e.assisted ? 2 : 3; };
+  return [...quiz].sort((a, b) => rank(a) - rank(b) || a - b).slice(0, n);
 }
 
 // 자료 하나 = 종류 하나. 기준은 "누가 만들었나". 겹치면 과제 > 원본 > 스앵님 정리 > 생성.

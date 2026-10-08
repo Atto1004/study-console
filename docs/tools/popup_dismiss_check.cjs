@@ -22,4 +22,14 @@ async function run(kind) {
   await browser.close();
   return { kind, opened, insideStill, afterOutside, menuOpen, menuAfter, errors };
 }
-(async () => { console.log(JSON.stringify(await run('chrome'))); console.log(JSON.stringify(await run('ipad'))); })().catch(e => { console.error('FAIL', e.message); process.exit(1); });
+function verify(r) {
+  const a = require('assert/strict');
+  a.equal(r.opened, true, r.kind + ': 창 열림');
+  a.equal(r.insideStill, true, r.kind + ': 창 안을 누르면 유지');
+  a.equal(r.afterOutside, false, r.kind + ': 바깥을 누르면 닫힘');
+  a.equal(r.menuOpen, true, r.kind + ': 더보기 열림');
+  a.equal(r.menuAfter, false, r.kind + ': 더보기 바깥 누르면 닫힘');
+  a.deepEqual(r.errors, [], r.kind + ': 페이지 오류 없음');
+  return r;
+}
+(async () => { console.log(JSON.stringify(verify(await run('chrome')))); console.log(JSON.stringify(verify(await run('ipad')))); console.log('ok'); })().catch(e => { console.error('FAIL', e.message); process.exit(1); });

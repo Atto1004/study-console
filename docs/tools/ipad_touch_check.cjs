@@ -29,5 +29,6 @@ const { webkit, devices } = require(require('path').resolve(__dirname,'../../.te
   await page.waitForTimeout(500);
   const after = await page.screenshot({ });
   console.log(JSON.stringify({ info, moved: !before.equals(after), errors }));
+  const a = require('assert/strict'); a.equal(info.canvasTouch, 'none'); a.equal(info.padTouch, 'none'); a.equal(info.padSelect, 'none'); a.ok(!before.equals(after), '앞으로 버튼으로 움직인다'); a.deepEqual(errors, []);
   await browser.close();
 })().catch(e => { console.error('FAIL', e.message); process.exit(1); });

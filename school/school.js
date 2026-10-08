@@ -9,7 +9,7 @@ import { createWorkspace } from "./workspace.js";
 import { createMission } from "./mission.js?v=199";
 import { attachSaeng } from "./saeng.js";
 import { createSpace, ROOMS } from "./space.js";
-import { pickLesson } from "./metrics.js";
+import { pickLesson, pickQuestions } from "./metrics.js";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
@@ -602,10 +602,9 @@ async function startLesson(id, options = {}) {
     let targetIndex = options.index ?? Math.min(state.progress[id]?.index || 0, lesson.steps.length - 1);
     if(options.stepId){const at=lesson.steps.findIndex(s=>s.id===options.stepId);if(at<0)throw new Error('이전 문제 위치를 확인해주세요.');targetIndex=at;}
     if (options.resume) { const restored = lesson.steps.findIndex(s=>s.id===options.resume.stepId); if(restored<0)throw new Error('이전 단계가 변경되었습니다. 수업 자료를 확인해주세요.'); targetIndex=restored; }
-    const questions = lesson.steps.map((s,i)=>s.kind==='quiz'?i:-1).filter(i=>i>=0);
-    const examples = lesson.steps.map((s,i)=>s.kind==='example'?i:-1).filter(i=>i>=0);
-    missionIndices = options.purpose !== "exam" ? null : (questions.length ? questions : examples.length ? examples : lesson.steps.map((s,i)=>i)).slice(0,3);
-    if (missionIndices && !missionIndices.includes(targetIndex)) targetIndex=missionIndices[0];
+    missionIndices = options.purpose !== "exam" ? null : pickQuestions({ steps: lesson.steps, events: [...state.events, ...pending], lessonId: lesson.id, n: 3 });
+    // 시험 대비는 저장된 마지막 위치와 상관없이 고른 첫 문제(가장 약한 문제)부터. 이어 하기·특정 문제 지정은 그대로 둔다.
+    if (missionIndices && (!missionIndices.includes(targetIndex) || (!options.resume && !options.stepId && options.index === undefined))) targetIndex=missionIndices[0];
     await saveSession(lesson, targetIndex, {newSession: !options.resume, purpose: options.purpose || 'tutoring', assisted: options.assisted ?? !!options.resume?.assisted, returnTo: options.returnTo || null});
     if (generation !== requestGeneration) return;
   workspace?.hide();
@@ -666,7 +665,7 @@ function weakLesson(name, session = null) {
 }
 async function practice(name) {
   const pick = weakLesson(name);
-  if (!pick) { status(`${name}에 연결된 수업이 아직 없습니다.`, true); return; }
+  if (!pick) { status(`${name} 시험 범위에 연결된 수업이 아직 없습니다.`, true); return; }
   await startLesson(pick.id, { purpose: "exam" });
 }
 async function sitDown(name) {

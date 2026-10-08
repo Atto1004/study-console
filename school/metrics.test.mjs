@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { courseMetrics, classifySource, sourceKind, pickQuest, pickLesson } from "./metrics.js";
+import { courseMetrics, classifySource, sourceKind, pickQuest, pickLesson, pickQuestions } from "./metrics.js";
 
 const lessons = [
   { id: "a", date: "2026-09-01" },
@@ -86,11 +86,31 @@ test("공부할 회차: 이어 하던 수업 > 틀린 회차 > 안 푼 회차 > 
   assert.equal(pick([ev("a", true), ev("b", false)]).id, "b", "틀린 채 남은 회차가 먼저");
   assert.equal(pick([ev("a", true), ev("b", false), ev("b", true, false, 2)]).id, "c", "다시 맞히면 안 푼 회차로");
   assert.equal(pick([ev("a", true), ev("b", true, true), ev("c", true)]).why, "assisted");
-  assert.equal(pick([ev("a", true), ev("b", true), ev("c", true)]).id, "c", "다 풀었으면 최근 회차");
+  assert.equal(pick([ev("a", true), ev("b", true), ev("c", true)]).id, "session:정역학:2026-09-02", "변환 회차를 다 풀면 안 푼 원본 메모 회차");
+  assert.equal(pick([ev("a", true), ev("b", true), ev("c", true), ev("session:정역학:2026-09-02", true)]).id, "c", "모두 풀었으면 최근 변환 회차");
   assert.deepEqual(pick([], { course: "정역학", lessonId: "b" }), { id: "b", resume: true, why: "resume" });
   assert.equal(pick([], { course: "미적2", lessonId: "x" }).id, "a", "다른 과목 세션은 무시");
   assert.equal(pickLesson({ course: "정역학", lessons: [ls[0]], events: [], today: "2026-10-08", exam: ex }).id, "session:정역학:2026-09-02", "변환된 회차가 없으면 원본 메모라도");
   assert.equal(pickLesson({ course: "정역학", lessons: [], events: [], today: "2026-10-08" }), null);
+});
+
+test("오타 재현 ① 틀린 4번 문제는 앞 3문제에 밀려 빠지지 않는다", () => {
+  const steps = [{ id: "c1", kind: "concept" }, { id: "q1", kind: "quiz" }, { id: "q2", kind: "quiz" }, { id: "q3", kind: "quiz" }, { id: "q4", kind: "quiz" }, { id: "q5", kind: "quiz" }];
+  const ev = [answer("L", "q1", true), answer("L", "q2", true, true), answer("L", "q4", false)];
+  assert.deepEqual(pickQuestions({ steps, events: ev, lessonId: "L" }), [4, 3, 5], "틀린 q4 > 안 푼 q3·q5");
+  assert.deepEqual(pickQuestions({ steps, events: [], lessonId: "L" }), [1, 2, 3], "기록이 없으면 앞에서부터");
+  assert.deepEqual(pickQuestions({ steps: [{ id: "e", kind: "example" }, { id: "c", kind: "concept" }], events: [], lessonId: "L" }), [0], "확인 문제가 없으면 예제");
+});
+
+test("오타 재현 ② 원본 메모 회차는 변환 회차에 할 게 없을 때 돌아온다", () => {
+  const ls = [{ id: "session:raw", date: "2026-09-02" }, { id: "a", date: "2026-09-07" }, { id: "b", date: "2026-09-14" }];
+  const ev = ["a", "b"].map((l) => ({ ...answer(l, 1, true), course: "정역학" }));
+  assert.deepEqual(pickLesson({ course: "정역학", lessons: ls, events: ev, today: "2026-10-08", exam: { date: "2026-10-19" } }), { id: "session:raw", resume: false, why: "new" });
+});
+
+test("오타 재현 ③ 시험 범위에 회차가 없으면 범위 밖 수업을 시작하지 않는다", () => {
+  assert.equal(pickLesson({ course: "정역학", lessons: [{ id: "x", date: "2026-11-01" }], events: [], today: "2026-10-08", exam: { date: "2026-10-19" } }), null);
+  assert.equal(pickLesson({ course: "정역학", lessons: [{ id: "x", date: "2026-11-01" }], events: [], today: "2026-10-08" }).id, "x", "시험이 없으면 첫 회차");
 });
 
 test("자료 4분류 — 명시된 종류가 먼저, 이름으로만 짐작하면 추정", () => {

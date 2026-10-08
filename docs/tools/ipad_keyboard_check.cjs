@@ -21,5 +21,6 @@ const { webkit, devices } = require(require('path').resolve(__dirname,'../../.te
   await page.evaluate(() => { const c = document.querySelector('#schoolWorld canvas'); for (let i = 0; i < 10; i++) c.dispatchEvent(new WheelEvent('wheel', { deltaX: 30, deltaY: 0, bubbles: true, cancelable: true, clientX: 500, clientY: 400 })); });
   await page.waitForTimeout(500); b = await shot(); const wheel = !a.equals(b);
   console.log(JSON.stringify({ hangulW, latinW, arrow, wheel, errors }));
+  const A = require('assert/strict'); A.ok(hangulW, '한글 W'); A.ok(latinW, '영문 W'); A.ok(arrow, '방향키'); A.ok(wheel, '두 손가락 쓸기'); A.deepEqual(errors, []);
   await browser.close();
 })().catch(e => { console.error('FAIL', e.message); process.exit(1); });

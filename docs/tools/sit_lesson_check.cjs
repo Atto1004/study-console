@@ -25,4 +25,16 @@ async function run(kind) {
   await browser.close();
   return { kind, walking, seated: { world: seated.world, mode: seated.mode, lesson: seated.lesson }, stood: { world: stood.world }, out: { world: out.world, mode: out.mode }, errors };
 }
-(async () => { console.log(JSON.stringify(await run('chrome'))); console.log(JSON.stringify(await run('ipad'))); })().catch(e => { console.error('FAIL', e.message); process.exit(1); });
+function verify(r) {
+  const a = require('assert/strict');
+  a.equal(r.walking.world, 'walking', r.kind + ': 걷기');
+  a.equal(r.walking.padShown, r.kind === 'ipad', r.kind + ': 이동 버튼은 터치 기기에서만');
+  a.equal(r.seated.world, 'seated', r.kind + ': 앉으면 수업');
+  a.equal(r.seated.mode, 'classroom', r.kind + ': 수업 화면');
+  a.ok(r.seated.lesson, r.kind + ': 수업 제목');
+  a.equal(r.stood.world, 'walking', r.kind + ': 일어나기');
+  a.equal(r.out.world, null, r.kind + ': 나가기');
+  a.deepEqual(r.errors, [], r.kind + ': 페이지 오류 없음');
+  return r;
+}
+(async () => { console.log(JSON.stringify(verify(await run('chrome')))); console.log(JSON.stringify(verify(await run('ipad')))); console.log('ok'); })().catch(e => { console.error('FAIL', e.message); process.exit(1); });

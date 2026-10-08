@@ -26,4 +26,15 @@ async function run(kind) {
   await browser.close();
   return { kind, doorLabel, practiceMs, practiced, threeAfterPractice, walking: walking.world, seated: { world: seated.world, lesson: seated.lesson }, threeTotal: three.length, errors };
 }
-(async () => { console.log(JSON.stringify(await run('chrome'))); console.log(JSON.stringify(await run('ipad'))); })().catch(e => { console.error('FAIL', e.message); process.exit(1); });
+function verify(r) {
+  const a = require('assert/strict');
+  a.equal(r.practiced.mode, 'classroom', r.kind + ': 문을 누르면 수업 화면');
+  a.equal(r.practiced.world, null, r.kind + ': 문제 풀기는 3D 없이');
+  a.equal(r.threeAfterPractice, 0, r.kind + ': 문제 풀기에서 three.js 를 받지 않는다');
+  a.ok(/1\s*\/\s*3/.test(r.practiced.mission || ''), r.kind + ': 문제 미션 1/3');
+  a.equal(r.walking, 'walking', r.kind + ': 걷기 아이콘으로 1인칭');
+  a.equal(r.seated.world, 'seated', r.kind + ': 앉으면 3D 수업');
+  a.deepEqual(r.errors, [], r.kind + ': 페이지 오류 없음');
+  return r;
+}
+(async () => { console.log(JSON.stringify(verify(await run('chrome')))); console.log(JSON.stringify(verify(await run('ipad')))); console.log('ok'); })().catch(e => { console.error('FAIL', e.message); process.exit(1); });
