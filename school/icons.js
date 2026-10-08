@@ -44,6 +44,8 @@ const ICON = {
   done: 'M22 11.1V12a10 10 0 1 1-5.9-9.1M22 4 12 14l-3-3',
   office: 'M3 21h18M5 21V8l7-4 7 4v13M9 21v-5h6v5M9 11h.01M15 11h.01',
   seat: 'M7 3h10v8H7zM5 11h14v3H5zM7 14v7M17 14v7',
+  collapse: 'M6 9l6 6 6-6',
+  close: 'M18 6 6 18M6 6l12 12',
 };
 // [글자(정확히) 또는 정규식, 아이콘, 배지로 쓸 정규식 묶음 번호]
 const RULES = [
@@ -64,6 +66,8 @@ const RULES = [
   ['수업 범위 확인', 'range'], ['출결 확인', 'attendance'], ['자료 관리', 'folder'], ['전체 교재·자료실', 'library'],
   ['수업 이어가기', 'play'], [/^.+ · 수업 이어가기$/, 'play'], ['과제 작업 시작 · 얼라이브위크 기록', 'play'],
   ['대표실', 'office'], ['수업 시작', 'seat'],
+  ['회차 확보·교수 규칙 보기', 'info'],
+  ['접기', 'collapse'], ['보내기', 'send'], ['닫기', 'close'],
   ['진행', 'clock'], ['지난 기록', 'history'], ['제출 완료', 'done'], ['전체', 'list'],
 ];
 // 내용인 버튼(답·대사 선택지)은 바꾸지 않는다.
@@ -81,12 +85,34 @@ function iconify(b) {
   const badge = b.querySelector(':scope > .ico-badge')?.textContent || '';
   const text = (b.textContent || '').replace(/\s+/g, ' ').trim();
   if (b.dataset.ico && b.querySelector(':scope > svg.ico') && text === badge) return;   // 이미 바꿨고 글자가 다시 안 붙음
-  const hit = match(text); if (!hit) return;
+  const hit = match(text);
+  if (!hit) { if (b.dataset.ico) unconvert(b); return; }   // 규칙 밖 글자로 바뀌면 이 층이 붙인 이름·모양을 걷어 낸다(오타 10/8)
+  // 이름: 원래 설명이 따로 붙어 있던 버튼(예: 「자리에 앉아 수업 시작」)은 그 설명을 지키고,
+  // 그 밖에는 이 층이 글자로 이름을 붙이고 글자가 바뀌면 같이 바꾼다(일시정지 ↔ 공부 계속하기).
+  if (!b.dataset.icoOwn) b.dataset.icoOwn = b.hasAttribute('aria-label') && b.getAttribute('aria-label') !== text ? '1' : '0';
+  if (b.dataset.icoOwn === '0') b.setAttribute('aria-label', text);
   b.dataset.ico = hit.icon; b.classList.add('ico-btn');
-  if (!b.dataset.icoOwnLabel) b.dataset.icoOwnLabel = b.hasAttribute('aria-label') ? '1' : '0';
-  if (b.dataset.icoOwnLabel === '0') b.setAttribute('aria-label', text);
-  b.title = b.getAttribute('aria-label') || text;
+  b.dataset.tip = b.getAttribute('aria-label') || text;
+  b.removeAttribute('title');
   b.innerHTML = svg(ICON[hit.icon]) + (hit.badge ? `<b class="ico-badge" aria-hidden="true">${hit.badge}</b>` : '');
+}
+function unconvert(b) {
+  b.classList.remove('ico-btn', 'tip-on');
+  if (b.dataset.icoOwn === '0') b.removeAttribute('aria-label');
+  delete b.dataset.ico; delete b.dataset.tip; delete b.dataset.icoOwn;
+}
+// 아이콘 뜻 보기: 마우스는 올리면, 키보드는 포커스하면, 터치는 0.5초 길게 누르면 이름 말풍선(오타 10/8 — 터치에서 뜻 확인).
+// 길게 눌러 말풍선을 본 뒤 손을 떼면 그 버튼은 눌리지 않는다.
+function startTips() {
+  let timer = null, shown = null, swallow = null;
+  document.addEventListener('pointerdown', (e) => {
+    const b = e.target.closest?.('.ico-btn'); clearTimeout(timer);
+    if (!b || e.pointerType === 'mouse') return;
+    timer = setTimeout(() => { shown?.classList.remove('tip-on'); shown = b; swallow = b; b.classList.add('tip-on'); setTimeout(() => b.classList.remove('tip-on'), 1600); }, 500);
+  }, true);
+  for (const t of ['pointerup', 'pointercancel', 'pointermove']) document.addEventListener(t, (e) => { if (t !== 'pointermove' || Math.abs(e.movementX) + Math.abs(e.movementY) > 6) clearTimeout(timer); }, true);
+  document.addEventListener('click', (e) => { if (swallow && e.target.closest?.('.ico-btn') === swallow) { e.preventDefault(); e.stopImmediatePropagation(); } swallow = null; }, true);
+  document.addEventListener('contextmenu', (e) => { if (e.target.closest?.('.ico-btn')) e.preventDefault(); }, true);
 }
 let busy = false;
 function sweep(root = document) {
@@ -94,7 +120,7 @@ function sweep(root = document) {
   try { for (const b of root.querySelectorAll('button, summary')) iconify(b); } finally { busy = false; }
 }
 export function startIcons() {
-  sweep();
+  sweep(); startTips();
   new MutationObserver((list) => {
     if (busy) return;
     const targets = new Set();

@@ -4,6 +4,13 @@
 .ico-btn .ico-badge{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#c57b3d;color:#fff;font:700 11px/18px "Pretendard Variable",Pretendard,sans-serif;text-align:center}
 summary.ico-btn{list-style:none;cursor:pointer}
 summary.ico-btn::-webkit-details-marker{display:none}
+/* 이름 말풍선: 마우스 올림·키보드 포커스·터치 길게 누름(icons.js) */
+:where(.ico-btn){position:relative}   /* 다른 규칙이 위치를 정했으면 그쪽이 이긴다 */
+.school > header .ico-btn[data-tip]::after{bottom:auto;top:calc(100% + 8px)}
+.ico-btn[data-tip]::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 8px);transform:translate(-50%,4px);padding:6px 10px;border-radius:8px;background:#1f3d33;color:#fff;font:600 12.5px/1.2 "Pretendard Variable",Pretendard,sans-serif;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .12s,transform .12s;z-index:200}
+.ico-btn.tip-on::after,.ico-btn:focus-visible::after{opacity:1;transform:translate(-50%,0)}
+@media (hover:hover) and (pointer:fine){.ico-btn:hover::after{opacity:1;transform:translate(-50%,0);transition-delay:.35s}}
+@media (prefers-reduced-motion:reduce){.ico-btn[data-tip]::after{transition:none}}
 /* 복도 표지판은 아이콘 하나로 */
 .corridor-sign.ico-btn{width:auto;min-width:48px}
 .corridor-sign.ico-btn > svg.ico{width:22px;height:22px}
