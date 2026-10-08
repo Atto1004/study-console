@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A++O 캐릭터</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  :root{--bg:#f5f6f2;--ink:#182a24;--ink-2:#65736c;--line:#dfe7df;--brand:#21745a}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",Pretendard,sans-serif}
+  #stage{position:fixed;inset:0;touch-action:none}
+  .bar{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);display:flex;gap:6px;padding:6px;border-radius:999px;background:#ffffffe8;box-shadow:0 8px 24px #20302a1f}
+  .bar button{border:0;border-radius:999px;padding:10px 16px;font:600 14px inherit;font-family:inherit;background:transparent;color:var(--ink-2);cursor:pointer}
+  .bar button[aria-pressed=true]{background:var(--brand);color:#fff}
+  .tag{position:fixed;transform:translate(-50%,0);text-align:center;pointer-events:none}
+  .tag b{display:block;font-size:15px}.tag small{color:var(--ink-2);font-size:12px}
+  h1{position:fixed;left:20px;top:14px;margin:0;font-size:18px}
+  p.note{position:fixed;left:20px;top:44px;margin:0;font-size:12px;color:var(--ink-2)}
+</style>
+</head>
+<body>
+<h1>A++O 캐릭터 · 3D 구조 시안</h1>
+<p class="note">외형은 구조만(얼굴·옷 디테일은 나중). 끌어서 돌려 보기.</p>
+<div id="stage"></div>
+<nav class="bar" aria-label="동작">
+  <button data-pose="stand" aria-pressed="true">서 있기</button>
+  <button data-pose="walk">걷기</button>
+  <button data-pose="sit">앉기</button>
+  <button data-act="talk">말하기</button>
+  <button data-act="wave">손 흔들기</button>
+</nav>
+<script type="module">
+import * as T from "./vendor/three.module.js";
+import { CAST, createAvatar } from "./avatar3d.js";
+const stage = document.getElementById("stage");
+const renderer = new T.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.shadowMap.enabled = true;
+stage.append(renderer.domElement);
+const scene = new T.Scene(); scene.background = new T.Color(0xf5f6f2);
+const camera = new T.PerspectiveCamera(32, 1, 0.1, 100);
+scene.add(new T.HemisphereLight(0xffffff, 0xcfd8cf, 2.2));
+const sun = new T.DirectionalLight(0xffffff, 1.6); sun.position.set(3, 6, 5); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024); scene.add(sun);
+const floor = new T.Mesh(new T.CircleGeometry(6, 48), new T.MeshStandardMaterial({ color: 0xe6ebe4, roughness: 1 })); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+const keys = ["atto", "atom", "otta", "toto", "saeng"];
+const avatars = keys.map((k, i) => {
+  const a = createAvatar(T, k); a.group.position.x = (i - 2) * 0.95; scene.add(a.group);
+  const chair = new T.Mesh(new T.BoxGeometry(0.45, 0.06, 0.42), new T.MeshStandardMaterial({ color: 0xd8d2c4 })); chair.position.set(a.group.position.x, 0.43, -0.05); chair.visible = false; scene.add(chair); a.chair = chair;
+  const tag = document.createElement("div"); tag.className = "tag"; tag.innerHTML = `<b>${CAST[k].name}</b><small>${CAST[k].role}</small>`; document.body.append(tag); a.tag = tag;
+  return a;
+});
+let yaw = 0.35, drag = null;
+stage.addEventListener("pointerdown", (e) => { drag = e.clientX; stage.setPointerCapture(e.pointerId); });
+stage.addEventListener("pointermove", (e) => { if (drag !== null) { yaw += (e.clientX - drag) * 0.006; drag = e.clientX; } });
+stage.addEventListener("pointerup", () => (drag = null));
+for (const b of document.querySelectorAll("[data-pose]")) b.onclick = () => {
+  for (const x of document.querySelectorAll("[data-pose]")) x.setAttribute("aria-pressed", String(x === b));
+  for (const a of avatars) { a.setPose(b.dataset.pose); a.chair.visible = b.dataset.pose === "sit"; }
+};
+for (const b of document.querySelectorAll("[data-act]")) b.onclick = () => {
+  const on = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", String(on));
+  for (const a of avatars) a[b.dataset.act](on);
+};
+const q = new URLSearchParams(location.search);
+if (q.get("pose")) document.querySelector(`[data-pose="${q.get("pose")}"]`)?.click();
+for (const act of (q.get("act") || "").split(",").filter(Boolean)) document.querySelector(`[data-act="${act}"]`)?.click();
+function resize() { renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize();
+const clock = new T.Clock(), v = new T.Vector3();
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  camera.position.set(Math.sin(yaw) * 7.2, 1.55, Math.cos(yaw) * 7.2); camera.lookAt(0, 0.95, 0);
+  for (const a of avatars) {
+    a.update(dt);
+    v.set(a.group.position.x, 0, a.group.position.z).project(camera);
+    a.tag.style.left = ((v.x + 1) / 2 * innerWidth) + "px"; a.tag.style.top = ((-v.y + 1) / 2 * innerHeight + 8) + "px";
+  }
+  renderer.render(scene, camera);
+});
+document.title = "A++O 캐릭터"; window.__ready = true;
+</script>
+</body>
+</html>

@@ -22,7 +22,7 @@ export function createSpace(app){
   hud.append(title,action,sit,exit);school.append(hud,pad);
   const controls=make('nav',null,'seat-controls');controls.hidden=true;controls.setAttribute('aria-label','학습 시점');
   controls.append(iconButton('board','앞의 설명 보기',()=>view('lecture')),iconButton('notebook','내 공책 내려다보기',()=>view('notebook')),iconButton('ask','옆의 스앵님께 질문',()=>{view('notebook');app.ask();}),iconButton('tools','교실 도구',()=>tools()),iconButton('stand','자리에서 일어나기',async()=>{await app.pause();walk(room.name);}));document.getElementById('room').prepend(controls);
-  let T,scene,camera,renderer,loaded=false,room=null,walking=false,yaw=0,pitch=0,transition=null,last=0,step=0,drag=null,doors3=[],targets=[],colliders=[],lastTarget=null,loadingPromise=null,generation=0,pointerDragged=false;
+  let T,AV,avatars=[],scene,camera,renderer,loaded=false,room=null,walking=false,yaw=0,pitch=0,transition=null,last=0,step=0,drag=null,doors3=[],targets=[],colliders=[],lastTarget=null,loadingPromise=null,generation=0,pointerDragged=false;
   const keys=new Set();
   async function load(){
     if(!loadingPromise)loadingPromise=loadScene().catch(e=>{loadingPromise=null;throw e;});
@@ -30,7 +30,7 @@ export function createSpace(app){
   }
   async function loadScene(){
     if(loaded)return;
-    T=await import('./vendor/three.module.js');
+    T=await import('./vendor/three.module.js');AV=await import('./avatar3d.js');
     scene=new T.Scene();scene.background=new T.Color(0xe0e7e3);scene.fog=new T.Fog(0xe0e7e3,23,55);
     camera=new T.PerspectiveCamera(65,innerWidth/innerHeight,.05,100);camera.rotation.order='YXZ';camera.position.set(0,1.65,1);
     renderer=new T.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));layer.append(renderer.domElement);renderer.domElement.tabIndex=0;renderer.domElement.setAttribute('aria-label','학교 공간 · 마우스로 시선 이동');
@@ -63,8 +63,8 @@ export function createSpace(app){
       sign(r.name,3.4,.55,11.02,2.5,r.z,-Math.PI/2);sign(r.tools,3.5,.38,11.01,1.95,r.z,-Math.PI/2);
       for(const x of [5.1,7.5])for(const zz of [-1.55,1.55])desk(x,r.z+zz,r,false);
       r.desk=desk(8.1,r.z,r,true);
-      // A recognizable tutor lives beside the board; learning uses the existing portrait.
-      new T.TextureLoader().load('../notes/classroom/assets/tutor/neutral.png',texture=>{texture.colorSpace=T.SRGBColorSpace;const teacher=new T.Sprite(new T.SpriteMaterial({map:texture,transparent:true}));teacher.position.set(10.25,1.2,r.z+1.6);teacher.scale.set(1.25,2.25,1);r.teacher=teacher;teacher.visible=school.dataset.world!=='seated';scene.add(teacher);});
+      // The tutor is the shared 3D avatar, standing beside the board and facing the desks.
+      {const teacher=AV.createAvatar(T,'saeng');teacher.group.position.set(10.1,0,r.z+1.6);teacher.group.rotation.y=-Math.PI/2;teacher.group.visible=school.dataset.world!=='seated';scene.add(teacher.group);avatars.push(teacher);r.teacher=teacher.group;}
       props(r);
     }
     box(.18,3.4,2.3,2.4,1.7,-33,0xe7e7de,true);
@@ -82,7 +82,7 @@ export function createSpace(app){
   function frame(t){const dt=Math.min((t-last)/1000||0,.05);last=t;if(!loaded||layer.hidden||document.hidden)return;
     if(transition){const f=Math.min(1,(t-transition.at)/(reduced.checked?1:700)),a=f*f*(3-2*f);camera.position.lerpVectors(transition.from,transition.to,a);yaw=transition.y0+(transition.y1-transition.y0)*a;pitch=transition.p0+(transition.p1-transition.p0)*a;if(f===1){transition=null;school.classList.remove('view-moving');}}
     else if(walking){let forward=(keys.has('w')?1:0)-(keys.has('s')?1:0),side=(keys.has('d')?1:0)-(keys.has('a')?1:0);const n=Math.hypot(forward,side)||1;forward/=n;side/=n;const speed=2.65*dt*(keys.has('shift')?1.9:1),x=camera.position.x+(-Math.sin(yaw)*forward+Math.cos(yaw)*side)*speed,z=camera.position.z+(-Math.cos(yaw)*forward-Math.sin(yaw)*side)*speed;if(!blocked(x,camera.position.z))camera.position.x=x;if(!blocked(camera.position.x,z))camera.position.z=z;step+=speed*(Math.abs(forward)+Math.abs(side));camera.position.y=1.65+(reduced.checked?0:Math.sin(step*8)*.022*(Math.abs(forward)+Math.abs(side)));}
-    camera.rotation.set(pitch,yaw,0,'YXZ');
+    camera.rotation.set(pitch,yaw,0,'YXZ');for(const a of avatars)if(a.group.visible)a.update(dt);
     if(walking){const ray=new T.Raycaster();ray.setFromCamera(new T.Vector2(0,0),camera);const hit=ray.intersectObjects(targets).find(x=>x.distance<3);lastTarget=hit?.object.userData||null;action.hidden=!lastTarget;if(lastTarget)action.textContent=lastTarget.kind==='door'?`${lastTarget.room.name} 문 ${lastTarget.room.open?'닫기':'열기'} · E`:`${lastTarget.room.name} 내 자리에 앉기 · E`;sit.hidden=!room;}
     renderer.render(scene,camera);
   }
