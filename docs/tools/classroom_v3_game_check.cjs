@@ -32,5 +32,9 @@ const OUT = 'C:/Users/user/.claude/jobs/a132f963/tmp/';
   await p.screenshot({ path: OUT + 'v3-game-to-site.png' });
   await p.click('.view-toggle'); await p.waitForTimeout(4000); out.back = await snap();
   expect(out.back.world === 'seated' && out.back.canvasIn, '다시 게임으로 3D 복귀 안 됨');
+  // 착석 중 전환 경쟁(오타 재검수 P2): 사이트 → 게임 → 곧바로 사이트. 늦게 끝난 착석이 3D 를 다시 붙이면 안 된다
+  await p.click('.view-toggle'); await p.waitForTimeout(300); await p.click('.view-toggle'); await p.waitForTimeout(30); await p.click('.view-toggle'); await p.waitForTimeout(5000);
+  out.race = await snap();
+  expect(out.race.view3 === 'site' && !out.race.canvasIn && out.race.world !== 'seated', '착석 중 사이트로 바꿨는데 3D 가 다시 붙음 ' + JSON.stringify(out.race));
   out.errors = errors; out.fail = fail; console.log(JSON.stringify(out)); await b.close(); process.exit(fail.length || errors.length ? 1 : 0);
 })().catch((e) => { console.error('FAIL', e.message); process.exit(1); });

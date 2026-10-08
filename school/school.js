@@ -2232,13 +2232,19 @@ workspace = createWorkspace({api,status,panel,record,screen:rememberScreen,close
 space = createSpace({fixedView:()=>setup?.fixedView(),leaveTo:async url=>{try{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);}catch(e){status('저장하지 못해 이동하지 않았습니다. '+(e.message||''),true);return false;}stopVoice();location.href=url;return true;},status,panel,screen:rememberScreen,view:camera=>{if(current)rememberScreen({lesson:current.id,step:current.steps[index].id,camera});},home:()=>workspace.open('main'),pause:async()=>{await mission.save();await growth.stop('pause');},ask:()=>openChat('','hint'),select:sitDown});
 // 교실 v3(대표님 10/8): 위 강의 · 가운데 문제 · 아래 대화, 게임↔사이트
 // 교실 v3 3D 무대(오타 검수 10/8 P2): 게임 보기 + 시험 대비가 아님 → 강의 칸에 앉힘(같은 과목이면 다시 앉히지 않음), 아니면 3D 를 내린다
-let stagedCourse=null;
+// 무대 세대(오타 재검수 P2): 호출마다 올리고, 착석을 기다린 뒤 세대·보기·수업이 그대로일 때만 붙인다. 그사이 사이트로 바뀌었으면 늦게 끝난 착석을 내린다.
+let stagedCourse=null,stageGen=0;
 async function stage3d(kind,camera){
-  const world=document.querySelector('.school').dataset.world;
+  const my=++stageGen,lesson=current,school=document.querySelector('.school'),world=school.dataset.world;
   // 시험 대비 문제 풀기(복도 문)는 3D 없이, 다만 걸어가 직접 앉았으면(walking/seated) 목적과 상관없이 3D 수업
   if(v3?.view==='game'&&space?.mount&&current&&(activeSession?.purpose!=='exam'||['walking','seated'].includes(world))){
     if(world==='seated'&&stagedCourse===course)return;
-    await space.seated(course,kind,camera);space.mount(v3.mount3d);stagedCourse=course;return;
+    await space.seated(course,kind,camera);
+    if(my!==stageGen||v3.view!=='game'||current!==lesson||school.dataset.mode!=='classroom'){
+      if(v3.view!=='game'){stagedCourse=null;space.mount(null);space.hide();}   // 같은 게임 보기에서 새 호출·걷기로 넘어간 경우는 그쪽에 맡긴다
+      return;
+    }
+    space.mount(v3.mount3d);stagedCourse=course;return;
   }
   stagedCourse=null;
   if(['walking','seated'].includes(world)){space?.mount?.(null);space?.hide();}
