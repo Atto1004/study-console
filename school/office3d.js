@@ -34,7 +34,7 @@ export async function mountOffice3D() {
     const scene = new T.Scene();
     scene.add(new T.HemisphereLight(0xfff6e6, 0x6b5a48, 2.2));
     const sun = new T.DirectionalLight(0xfff1dc, 1.5); sun.position.set(1.5, 3, 4); scene.add(sun);
-    const avatar = createAvatar(T, id); avatar.setPose('sit'); scene.add(avatar.group);
+    const avatar = createAvatar(T, id); avatar.setPose('sit'); avatar.snap(); scene.add(avatar.group);
     const camera = new T.PerspectiveCamera(30, 1, 0.1, 20);
     // 자리 그림(의자 등받이·노트북)에 맞춰 상반신이 노트북 위로 보이게 잡는다.
     camera.position.set(0, 1.2, 2.3); camera.lookAt(0, 1.05, 0);
