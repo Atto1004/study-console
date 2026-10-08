@@ -16,7 +16,7 @@ const { webkit, devices } = require(require('path').resolve(__dirname,'../../.te
   });
   const before = await page.screenshot();
   // 앞으로 버튼을 1.5초 누르고 있기(터치 포인터)
-  const box = await page.locator('.world-pad button', { hasText: '앞으로' }).boundingBox();
+  const box = await page.locator('.world-pad [aria-label="앞으로"]').boundingBox();
   await page.evaluate(({ x, y }) => {
     const b = document.elementFromPoint(x, y);
     b.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerId: 7, pointerType: 'touch', isPrimary: true, clientX: x, clientY: y }));

@@ -24,3 +24,20 @@
 @media (prefers-reduced-motion:reduce){.world-hud .world-action{animation:none}}
 .world-pad{position:fixed;bottom:24px;left:24px;z-index:52}
 .school:not([data-world=walking]) .world-pad{display:none}
+
+/* 아이콘 버튼(대표님 규칙: 이동·보기 전환은 표준 아이콘) */
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:44px;min-height:44px;padding:0 10px!important}
+.icon-btn svg{width:22px;height:22px;flex:none}
+.world-pad{display:grid;grid-template-columns:repeat(3,64px);grid-template-rows:repeat(2,64px);gap:8px}
+.world-pad .icon-btn{width:64px;height:64px;min-height:0!important;padding:0!important;border-radius:16px!important;background:#f8f5edd9!important;color:#244a3e!important;border:1px solid #abb9ac!important}
+.world-pad .icon-btn svg{width:28px;height:28px}
+.world-pad .pad-up{grid-column:2;grid-row:1}.world-pad .pad-left{grid-column:1;grid-row:2}.world-pad .pad-down{grid-column:2;grid-row:2}.world-pad .pad-right{grid-column:3;grid-row:2}
+.world-pad .pad-run{position:fixed;left:auto;right:24px;bottom:24px;width:76px;height:76px;border-radius:50%!important}
+.world-pad .pad-run[data-held]{background:#c57b3d!important;color:#fff!important}
+.world-hud .world-exit{width:44px;padding:0!important}
+.seat-controls .icon-btn{width:48px;height:44px;padding:0!important}
+.seat-controls .icon-btn[aria-pressed=true]{background:#315b49!important;color:#fff!important}
+.icon-btn svg{pointer-events:none}
+@media (pointer:fine){.world-pad{display:none}}
+.world-hud .world-sit{flex-direction:row;height:44px;padding:0 14px 0 10px!important}
+.world-hud .world-sit svg{width:20px;height:20px}
