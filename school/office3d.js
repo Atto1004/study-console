@@ -16,20 +16,26 @@ async function waitFor(fn, ms = 30000) {
 // 그림 경로는 대표실 img/office/cast.json 의 stand[표정] — 그림 교체는 그 파일만.
 async function mountRealistic() {
   let cast;
-  try { cast = await (await fetch('img/office/cast.json', { cache: 'no-cache' })).json(); } catch { return null; }
+  // 3초 안에 못 받으면 기존 3D 로(오타 검수 10/9)
+  const ac = new AbortController(), to = setTimeout(() => ac.abort(), 3000);
+  try { cast = await (await fetch('img/office/cast.json', { cache: 'no-cache', signal: ac.signal })).json(); } catch { return null; } finally { clearTimeout(to); }
   if (!/realistic/.test(cast?.version || '') || !IDS.every((id) => cast[id]?.stand?.neutral)) return null;
+  // 세 사람 기본 그림을 먼저 다 받아 본다 — 하나라도 실패하면 기존 그림을 숨기지 않고 3D 로(비서가 사라지지 않게)
+  const loadImg = (src) => new Promise((res, rej) => { const im = new Image(); im.decoding = 'async'; im.onload = () => res(im); im.onerror = rej; im.src = src; setTimeout(() => rej(new Error('timeout')), 8000); });
+  let firsts;
+  try { firsts = await Promise.all(IDS.map((id) => loadImg(cast[id].stand.neutral))); } catch { return null; }
   const style = document.createElement('style');
   style.textContent = `.gl-person.has-real .gl-sprite{visibility:hidden}
-.gl-real{position:absolute;left:50%;bottom:0;height:104%;width:auto;max-width:none;transform:translateX(-50%) scaleX(var(--face,1));transform-origin:50% 100%;pointer-events:none;transition:transform .35s ease,opacity .3s,filter .3s;filter:drop-shadow(0 6px 10px #0004)}
+.gl-real{position:absolute;left:50%;bottom:0;height:104%;width:auto;max-width:none;transform:translateX(calc(-50% + var(--lean,0) * 7%)) rotate(calc(var(--lean,0) * 1.5deg));transform-origin:50% 100%;pointer-events:none;transition:transform .35s ease,opacity .3s,filter .3s;filter:drop-shadow(0 6px 10px #0004)}
 .gl-workstation.away .gl-real{opacity:.45;filter:grayscale(.7)}
 .gl-workstation:has(.has-real) .gl-bubble{translate:0 calc(-1 * var(--real-lift,56px))}   /* 실사 그림은 옛 도트보다 키가 커서 말풍선이 얼굴을 가린다 — 머리 위로 */
-.gl-real[data-expr=sleep]{filter:brightness(.72) saturate(.8);transform:translateX(-50%) scaleX(var(--face,1)) rotate(-4deg) translateY(4%)}
+.gl-real[data-expr=sleep]{filter:brightness(.72) saturate(.8);transform:translateX(-50%) rotate(-4deg) translateY(4%)}
 @media (prefers-reduced-motion:reduce){.gl-real{transition:none}}`;
   document.head.append(style);
-  const staff = IDS.map((id) => {
+  const staff = IDS.map((id, k) => {
     const node = document.querySelector(`.gl-workstation.${id}`), person = node.querySelector('.gl-person');
     if (getComputedStyle(person).position === 'static') person.style.position = 'relative';
-    const img = new Image(); img.className = 'gl-real'; img.alt = ''; img.decoding = 'async'; img.src = cast[id].stand.neutral;
+    const img = firsts[k]; img.className = 'gl-real'; img.alt = '';
     // 표정 그림을 미리 받아 둔다(바뀔 때 깜빡임 없게)
     for (const src of new Set(Object.values(cast[id].stand))) { const pre = new Image(); pre.src = src; }
     person.append(img); person.classList.add('has-real');
@@ -48,13 +54,15 @@ async function mountRealistic() {
         const expr = asleep ? 'sleep' : bubble && !bubble.hidden ? 'smile' : gaze === 'work' && modes[s.id] === 'work' ? 'serious' : 'neutral';
         if (expr !== s.expr) { s.expr = expr; s.img.dataset.expr = expr; const src = pick(s.id, expr === 'sleep' ? 'neutral' : expr); if (s.img.getAttribute('src') !== src) s.img.src = src; }
         const other = gaze === 'peer' ? staff.find((o) => o !== s && o.node.dataset.gaze === 'peer') : staff.find((o) => o.id === gaze);
-        s.img.style.setProperty('--face', other && centerX(other) < centerX(s) ? -1 : 1);   // 그림은 정면 — 왼쪽 상대면 좌우 반전으로 몸을 돌린 느낌
+        // 정면 얼굴을 좌우 반전하면 머리·옷만 뒤집혀 어색하다(오타 검수) — 대화 상대 쪽으로 살짝 기울기만
+        s.img.style.setProperty('--lean', other ? Math.sign(centerX(other) - centerX(s)) : 0);
       }
     }
-    setTimeout(tick, 400);
+    timer = setTimeout(tick, 400);
   }
-  tick();
-  const api = { mode: 'realistic', staff: Object.fromEntries(staff.map((s) => [s.id, s.img])), stop() { stopped = true; for (const s of staff) { s.img.remove(); s.person.classList.remove('has-real'); } } };
+  let timer = 0; tick();
+  const api = { mode: 'realistic', staff: Object.fromEntries(staff.map((s) => [s.id, s.img])),
+    stop() { stopped = true; clearTimeout(timer); for (const s of staff) { s.img.remove(); s.person.classList.remove('has-real'); } style.remove(); if (window.__office3d === api) delete window.__office3d; } };
   window.__office3d = api;
   return api;
 }

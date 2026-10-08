@@ -11,6 +11,8 @@ const SRC = fs.readFileSync(require('path').join(__dirname, '../../school/office
   await ctx.addCookies([{ name: 'atom_auth', value: token, domain: '127.0.0.1', path: '/' }]);
   await ctx.route('**/api/**', (r) => (r.request().method() === 'GET' ? r.continue() : r.fulfill({ json: {} })));
   await ctx.route('**/kingdom/study/school/office3d.js', (r) => r.fulfill({ status: 200, contentType: 'text/javascript', body: SRC }));
+  // FAIL=1: 아톰 기본 그림을 404 로 → 사실풍을 포기하고 기존 3D(비서가 사라지지 않음)여야 한다
+  if (process.env.FAIL) await ctx.route('**/img/office/v3/atom-neutral.webp', (r) => r.fulfill({ status: 404, body: '' }));
   const p = await ctx.newPage(); const errors = []; const bad = [];
   p.on('pageerror', (e) => errors.push(e.message)); p.on('response', (res) => { if (/office\/v3/.test(res.url()) && res.status() >= 400) bad.push(res.status() + ' ' + res.url()); });
   await p.goto(`http://127.0.0.1:8787/kingdom/release/${VER}/index.html`, { waitUntil: 'load', timeout: 60000 });
@@ -18,6 +20,11 @@ const SRC = fs.readFileSync(require('path').join(__dirname, '../../school/office
   await p.waitForTimeout(2500);
   const st = await p.evaluate(() => ({ mode: window.__office3d?.mode || (window.__office3d ? '3d' : 'none'), imgs: [...document.querySelectorAll('.gl-real')].map((i) => ({ src: i.getAttribute('src').split('/').pop(), ok: i.complete && i.naturalWidth > 0, expr: i.dataset.expr || '', box: (() => { const r = i.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)]; })() })) }));
   await p.screenshot({ path: OUT + `office-real-${W}.png` });
+  if (process.env.FAIL) {
+    const f = await p.evaluate(() => ({ real: document.querySelectorAll('.gl-real').length, canvas: document.querySelectorAll('.gl-avatar3d').length, hiddenSprites: [...document.querySelectorAll('.gl-person.has-real')].length }));
+    console.log('FAIL-path', JSON.stringify({ mode: st.mode, ...f }));
+    await b.close(); process.exit(st.mode === 'realistic' || f.real || f.hiddenSprites ? 1 : 0);
+  }
   // 상태 바꿔 보기: 오타 자리에 말풍선, 토토 잠
   await p.evaluate(() => { const o = document.querySelector('.gl-workstation.otta'); let bb = o.querySelector('.gl-bubble'); if (bb) bb.hidden = false; const t = document.querySelector('.gl-workstation.toto'); t.dataset.gaze = 'sleep'; });
   await p.waitForTimeout(1200);
