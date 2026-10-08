@@ -161,7 +161,7 @@ export function createWorkspace(app){
       const nums=el('span',undefined,'door-nums');nums.append(el('span',`진도 ${m.covered}/${m.scope}`),el('span',`정답 ${m.tested?pct(m.accuracy)+'%':'—'}`),el('span',`이해 ${m.tested?pct(m.understanding)+'%':'—'}`));
       // 남은 기간 대비 진도: 시험까지 하루에 몇 회차를 풀어야 하는지(숫자로)
       // 하루 1회차 이상 필요할 때만 「하루 N회차」, 여유 있으면 「N회차 남음」(0.2회차 같은 숫자는 읽기 어렵다)
-      if(e&&m.remaining>0)nums.append(el('span',m.daysLeft<=0?'오늘 시험':m.perDay>=1?`하루 ${Math.ceil(m.perDay)}`:`남음 ${m.remaining}`,'door-pace'));   // 「이름 값」 순서(문 숫자는 위 이름·아래 값 두 줄)
+      if(e&&m.remaining>0)nums.append(el('span',m.daysLeft<=0?'시험 오늘':m.perDay>=1?`하루 ${Math.ceil(m.perDay)}`:`남음 ${m.remaining}`,'door-pace'));   // 「이름 값」 순서(문 숫자는 위 이름·아래 값 두 줄)
       plate.append(name,bar,nums);
       const frame=el('span',undefined,'door-frame');frame.append(el('i',undefined,'door-pane'),el('i',undefined,'door-knob'));
       const score=el('span',undefined,'door-score');score.style.setProperty('--s',m.readiness);score.append(el('b',String(m.readiness)),el('small','A+ 준비도'));
@@ -186,7 +186,7 @@ export function createWorkspace(app){
     vn.append(el('span','김주영','vn-tag'),el('p',line,'vn-line'),choices);
     scene.append(vn);
     root.append(scene);
-    const info=el('details',undefined,'ready-info');info.append(el('summary','ⓘ 숫자 읽는 법'),el('p','문 가운데 숫자 = A+ 준비도 = 진도 × (이해도 50 + 정답률 30 + 20). 진도 = 시험 전 회차 중 문제를 푼 회차 비율, 정답 = 맞힌 문항 비율, 이해도 = 혼자 맞힌 문항 비율, 「남음」 = 시험 전까지 아직 안 푼 회차 수, 「하루」 = 하루에 1회차 넘게 풀어야 할 만큼 급할 때 하루 몫. 잊는 정도와 교수님이 정한 범위 문장은 아직 반영하지 않아요. 성적 예측이 아니에요.'));
+    const info=el('details',undefined,'ready-info');info.append(el('summary','ⓘ 숫자 읽는 법'),el('p','문 가운데 숫자 = A+ 준비도 = 진도 × (이해도 50 + 정답률 30 + 20). 진도 = 시험 전 회차 중 문제를 푼 회차 비율, 정답 = 맞힌 문항 비율, 이해도 = 혼자 맞힌 문항 비율, 「남음」 = 시험 전까지 아직 안 푼 회차 수, 「하루」 = 하루에 1회차 이상 풀어야 할 만큼 급할 때 하루 몫, 「시험 오늘」 = 오늘이 시험일. 잊는 정도와 교수님이 정한 범위 문장은 아직 반영하지 않아요. 성적 예측이 아니에요.'));
     root.append(info);
   }
   function walkTo(course){

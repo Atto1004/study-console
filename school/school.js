@@ -458,13 +458,15 @@ let assignmentFilter = "전체", assignmentStatus = "진행";
         host.append(tools);
         const today = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
         const isPast = r => /^\d{4}-\d{2}-\d{2}/.test(r.due||'') && r.due.slice(0,10)<today;
+        const groupRank = new Map([["assignment", 0]]); for (const r of data.rows) { const g = r.category || "assignment"; if (!groupRank.has(g)) groupRank.set(g, groupRank.size); }
         const rows = data.rows.filter(r => (assignmentFilter === "전체" || r.course === assignmentFilter) &&
           (assignmentStatus === "전체" || assignmentStatus === "지난 기록" && isPast(r) ||
            assignmentStatus === "제출 완료" && r.submitted || assignmentStatus === "진행" && !r.submitted && (!isPast(r)||r.continueActive)))
           // 마감순(묶음 안에서): 진행·전체는 가까운 마감 먼저, 지난 기록·제출 완료는 최근 것 먼저, 마감 미확인은 맨 뒤
           .map((r, i) => [r, i]).sort(([a, ai], [b, bi]) => {
-            const ga = a.category || "assignment", gb = b.category || "assignment";
-            if (ga !== gb) return ga === "assignment" ? -1 : gb === "assignment" ? 1 : ai - bi;
+            // 묶음 순위는 고정(수업 과제 0, 나머지는 처음 나온 순서) — 비교가 순환하지 않게(오타 검수 10/8)
+            const ra = groupRank.get(a.category || "assignment"), rb = groupRank.get(b.category || "assignment");
+            if (ra !== rb) return ra - rb;
             const da = /^\d{4}-\d{2}-\d{2}/.test(a.due || "") ? a.due : null, db = /^\d{4}-\d{2}-\d{2}/.test(b.due || "") ? b.due : null;
             if (!da || !db) return da ? -1 : db ? 1 : ai - bi;
             const back = assignmentStatus === "지난 기록" || assignmentStatus === "제출 완료";
