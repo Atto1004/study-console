@@ -113,7 +113,11 @@
   .school[data-layout=v3] .v3-subtitle{right:10px!important;left:10px!important;max-width:none}
   .school[data-layout=v3] .v3-stage{height:clamp(160px,30dvh,260px)}
   .school[data-layout=v3][data-lecture=playing] .v3-stage{height:auto}
-  .school[data-layout=v3][data-mode=classroom] .subject-rail{display:none!important}
+  /* 과목 레일: 머리줄 바로 아래 한 줄(겹쳐 떠 있지 않게) — 지도엔 과목이 없어서 숨기면 과목 바꾸기가 두 단계가 된다 */
+  .school[data-layout=v3][data-mode=classroom] > header{order:0}
+  .school[data-layout=v3][data-mode=classroom] .subject-rail{order:1;position:static!important;inset:auto!important;transform:none!important;flex:none;width:auto!important;height:auto!important;margin:0 8px;padding:4px 6px!important;justify-content:space-between}
+  .school[data-layout=v3][data-mode=classroom] #scene{order:2}
+  .school[data-layout=v3][data-mode=classroom] #dialogue{order:3}
   .school[data-layout=v3][data-mode=classroom] > header{flex-wrap:nowrap!important;gap:6px;padding:8px 10px!important;min-height:0!important}
   .school[data-layout=v3][data-mode=classroom] > header > *{flex-shrink:1;min-width:0}
   .school[data-layout=v3][data-mode=classroom] > header .view-toggle{margin-left:auto;margin-right:0;flex:none}
