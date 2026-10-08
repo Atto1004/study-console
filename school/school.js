@@ -460,7 +460,16 @@ let assignmentFilter = "전체", assignmentStatus = "진행";
         const isPast = r => /^\d{4}-\d{2}-\d{2}/.test(r.due||'') && r.due.slice(0,10)<today;
         const rows = data.rows.filter(r => (assignmentFilter === "전체" || r.course === assignmentFilter) &&
           (assignmentStatus === "전체" || assignmentStatus === "지난 기록" && isPast(r) ||
-           assignmentStatus === "제출 완료" && r.submitted || assignmentStatus === "진행" && !r.submitted && (!isPast(r)||r.continueActive)));
+           assignmentStatus === "제출 완료" && r.submitted || assignmentStatus === "진행" && !r.submitted && (!isPast(r)||r.continueActive)))
+          // 마감순(묶음 안에서): 진행·전체는 가까운 마감 먼저, 지난 기록·제출 완료는 최근 것 먼저, 마감 미확인은 맨 뒤
+          .map((r, i) => [r, i]).sort(([a, ai], [b, bi]) => {
+            const ga = a.category || "assignment", gb = b.category || "assignment";
+            if (ga !== gb) return ga === "assignment" ? -1 : gb === "assignment" ? 1 : ai - bi;
+            const da = /^\d{4}-\d{2}-\d{2}/.test(a.due || "") ? a.due : null, db = /^\d{4}-\d{2}-\d{2}/.test(b.due || "") ? b.due : null;
+            if (!da || !db) return da ? -1 : db ? 1 : ai - bi;
+            const back = assignmentStatus === "지난 기록" || assignmentStatus === "제출 완료";
+            return (back ? db.localeCompare(da) : da.localeCompare(db)) || ai - bi;
+          }).map(([r]) => r);
       host.append(node("p", `${rows.length}건 · 자료 기준 ${data.asOf || "확인 필요"}`));
       if (!rows.length) host.append(node("p", "해당 과제가 없습니다."));
       let category = null;
