@@ -1,0 +1,9 @@
+/* 아이콘 버튼(icons.js) — 원래 버튼의 색·배경은 그대로, 글자 자리만 아이콘으로 */
+.ico-btn{display:inline-grid!important;grid-auto-flow:column;place-items:center;gap:4px;min-width:40px;min-height:40px;padding:0 10px!important;line-height:1}
+.ico-btn > svg.ico{width:20px;height:20px;flex:none;pointer-events:none}
+.ico-btn .ico-badge{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#c57b3d;color:#fff;font:700 11px/18px "Pretendard Variable",Pretendard,sans-serif;text-align:center}
+summary.ico-btn{list-style:none;cursor:pointer}
+summary.ico-btn::-webkit-details-marker{display:none}
+/* 복도 표지판은 아이콘 하나로 */
+.corridor-sign.ico-btn{width:auto;min-width:48px}
+.corridor-sign.ico-btn > svg.ico{width:22px;height:22px}
