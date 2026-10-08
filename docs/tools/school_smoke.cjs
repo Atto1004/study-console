@@ -53,7 +53,7 @@ w.eval(fs.readFileSync(path.join(root,'school/learning.js'),'utf8').replace(/^ex
 const strip=s=>s.replace(/^import[\s\S]*?from\s+["'][^"']+["'];\s*/gm,'').replace(/^export /gm,'');
 // 모듈 상수는 eval 마다 갇히므로 다른 파일이 쓰는 것만 창에 올린다.
 const shared={'metrics.js':'window.KINDS=KINDS;window.WEIGHTS=WEIGHTS;','worldmap.js':'window.officeHref=officeHref;'};
-for(const f of ['metrics.js','saeng.js','worldmap.js','setup.js','workspace.js','mission.js','tutor.js','subject-rail.js','surface.js'])w.eval(strip(fs.readFileSync(path.join(root,'school',f),'utf8'))+'\n'+(shared[f]||''));
+for(const f of ['metrics.js','saeng.js','worldmap.js','setup.js','workspace.js','mission.js','tutor.js','subject-rail.js','surface.js','lecture.js','classroom-v3.js'])w.eval(strip(fs.readFileSync(path.join(root,'school',f),'utf8'))+'\n'+(shared[f]||''));
 w.createSpace=()=>({seated(){},view(){},hide(){},walk(){}});w.ROOMS=[{name:'정역학'},{name:'공업수학1'}];w.createGrowth=()=>({notifySkills(){},stop:async()=>{},step(){},task(){},tutorPlan(){}});
 w.eval(source+'\nwindow.__smokeAssignments=showAssignments;window.__smokeConcept=()=>startLesson(lastLesson,{concept:true});window.__smokeLobby=()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;};');
 const settle=()=>new Promise(resolve=>setTimeout(resolve,10));
@@ -87,7 +87,7 @@ const byText=text=>[...d.querySelectorAll('button')].find(b=>b.textContent===tex
  assert.ok(byText('이 계획 적용하고 시작'));byText('이 계획 적용하고 시작').click();await settle();
  assert.equal(d.querySelector('#panel').open,false,'계획 저장을 기다린 뒤 수업으로 진입');
  assert.equal(d.querySelector('#room').hidden,false);assert.equal(d.querySelector('#next').disabled,true);
- for(let i=0;i<300&&d.querySelector('#dialogue').dataset.tutor!=='check';i++)await settle();assert.equal(d.querySelector('#dialogue').dataset.tutor,'check','칠판 설명 뒤 스앵님 확인 질문');d.querySelector('#tutorInput').value='핵심은 단위를 맞춰 더하는 거예요';d.querySelector('.tutor-reply').dispatchEvent(new w.Event('submit',{cancelable:true}));for(let i=0;i<20&&d.querySelector('#next').disabled;i++)await settle();assert.equal(d.querySelector('#next').disabled,false);
+ /* 교실 v3: 단계에 들어가면 강의가 먼저 재생 → ⏭ 로 넘겨 끝내면 확인 질문 */assert.equal(d.querySelector('.school').dataset.lecture,'playing','단계 시작 때 강의 자동 재생');for(let i=0;i<300&&d.querySelector('#dialogue').dataset.tutor!=='check';i++){d.querySelector('.v3-skip')?.click();await settle();}assert.equal(d.querySelector('#dialogue').dataset.tutor,'check','강의 뒤 스앵님 확인 질문');d.querySelector('#tutorInput').value='핵심은 단위를 맞춰 더하는 거예요';d.querySelector('.tutor-reply').dispatchEvent(new w.Event('submit',{cancelable:true}));for(let i=0;i<20&&d.querySelector('#next').disabled;i++)await settle();assert.equal(d.querySelector('#next').disabled,false);
  d.querySelector('#next').click();await settle();assert.equal(state.progress[state.plans['공업수학1'].start].index,1);
  d.querySelector('#askToggle').click();assert.equal(d.querySelector('#chat').hidden,false);d.querySelector('#closeChat').click();assert.equal(d.querySelector('#chat').hidden,true);
  d.querySelector('#askToggle').click();d.querySelector('#question').value='분수 단위가 같다고 생각해요';

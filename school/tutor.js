@@ -22,7 +22,7 @@ export function createTutor(app) {
   const send = el('button', '보내기'); send.type = 'submit';
   const dunno = el('button', '모르겠어요', 'tutor-dunno'); dunno.type = 'button';
   form.append(input, dunno, send);
-  dialogue.querySelector('.speech')?.after(form);
+  (document.getElementById('workZone') || dialogue.querySelector('.speech')?.parentElement || dialogue).prepend(form);
 
   let timers = [];
   const later = (fn, ms) => { const k = key; timers.push(setTimeout(() => { if (k === key) fn(); }, ms)); };
@@ -46,7 +46,7 @@ export function createTutor(app) {
 
   function ask(line, mode) {
     asked = line; app.say(line, 'stuck');
-    form.hidden = readOnly(); form.dataset.mode = mode;
+    form.hidden = readOnly() || mode !== 'answer'; form.dataset.mode = mode;
     input.placeholder = mode === 'answer' ? '한 문장으로 답하기 (Q)' : '궁금한 거 물어보기 (Q)';
     dunno.hidden = mode !== 'answer';
   }
@@ -58,15 +58,15 @@ export function createTutor(app) {
     for (const t of timers) clearTimeout(t); timers = [];
     waiting = false; resumeLine = '';
     if (c.blocked) { form.hidden = true; setPhase('idle'); return; }   // 검토 안 된 교재 등
-    setPhase('explain');
-    const intro = clean(c.step.speech) || (c.step.options ? '문제부터 볼게요. 칠판 잘 보세요.' : '자, 칠판 보세요. 하나씩 쓸게요.');
-    app.say(intro, 'neutral'); app.lecture?.(true);
-    reveal(() => {
-      app.lecture?.(false);
-      if (c.passed) { setPhase('done'); ask('이건 전에 해결했어요. Space 로 다음, 다시 풀어도 돼요.', 'question'); return; }
-      if (c.step.options) { setPhase('quiz'); ask(tries ? '다시 골라 볼까요? 조건부터 하나씩요.' : '직접 골라 보세요. 틀려도 어디서 막혔는지 같이 볼게요.', 'question'); }
-      else { setPhase('check'); ask(pick(ASK[c.step.kind] || ASK.understand, tries), 'answer'); }
-    });
+    setPhase('lecture'); form.hidden = true;   // 강의(lecture.js)가 먼저, 끝나면 afterLecture()
+  }
+
+  // 강의가 끝나면: 이미 푼 단계 / 문제 단계 / 개념 단계 확인 질문
+  function afterLecture() {
+    const c = app.ctx(); if (!c || c.blocked) return;
+    if (c.passed) { setPhase('done'); ask('이건 전에 해결했어요. ⏭ 로 다음, 다시 풀어도 돼요.', 'question'); return; }
+    if (c.step.options) { setPhase('quiz'); ask(tries ? '다시 골라 볼까요? 조건부터 하나씩요.' : '이제 직접 골라 보세요. 틀려도 어디서 막혔는지 같이 볼게요.', 'question'); form.hidden = true; }
+    else { setPhase('check'); ask(pick(ASK[c.step.kind] || ASK.understand, tries), 'answer'); }
   }
 
   async function coach(mode, text) {
@@ -134,14 +134,14 @@ export function createTutor(app) {
 
   return {
     onStep,
+    afterLecture,
+    question(text) { if (!waiting && !readOnly() && String(text || '').trim()) question(String(text).trim()); },
     // answer()(선택지)가 판정한 뒤 부른다
     onAnswer(correct) {
       if (correct) { setPhase('done'); later(() => ask('맞아요. 왜 맞는지 한 줄로 말해 볼래요? 아니면 Space 로 다음.', 'question'), 1200); return; }
       tries++; setPhase('quiz');
       later(() => ask(tries >= 2 ? '두 번 막혔네요. 「더 쉽게」(E)로 한 단계만 같이 하거나, 아래 선수 개념부터 볼까요?' : '어디서 갈렸는지 볼까요? 주어진 조건이랑 구할 걸 나눠 보세요.', 'question'), 1200);
     },
-    // Space: 칠판 쓰는 중이면 바로 다 보이게, 아니면 false(다음으로 넘기는 건 school.js)
-    skipReveal() { if (revealTimer) { finishReveal(); return true; } return false; },
     focus() { if (readOnly()) return; form.hidden = false; input.focus(); },
     get phase() { return phase; },
     hide() { form.hidden = true; clearTimeout(revealTimer); revealTimer = null; setPhase('idle'); },

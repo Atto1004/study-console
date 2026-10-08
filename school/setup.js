@@ -58,16 +58,16 @@ export function createSetup({ onChange }) {
     }
     // 화면: 움직임 줄이기 · 해상도 자동 조절(렉 줄이기, 10/8)
     const toggles = document.createElement('div'); toggles.className = 'setup-toggles';
-    for (const [key, label, def] of [['school-reduced-motion', '움직임 줄이기 (걸을 때 흔들림·전환 효과 끔)', '0'], ['world-adaptive', '3D 해상도 자동 조절 (버벅이면 낮춤)', '1']]) {
+    for (const [key, label, def] of [['school-reduced-motion', '움직임 줄이기 (걸을 때 흔들림·전환 효과 끔)', '0'], ['world-adaptive', '3D 해상도 자동 조절 (버벅이면 낮춤)', '1'], ['school-voice', '강의를 목소리로 읽기 (꺼 두면 자막만)', '0']]) {
       const row = document.createElement('label'); row.className = 'setup-toggle';
       const box = document.createElement('input'); box.type = 'checkbox'; box.checked = (read(key) ?? def) === '1' || (key === 'world-adaptive' && read(key) !== '0');
-      if (key === 'school-reduced-motion') box.checked = read(key) === '1';
+      if (key !== 'world-adaptive') box.checked = read(key) === '1';
       box.onchange = () => { write(key, box.checked ? '1' : '0'); onChange?.(setup, role, key); };
       row.append(box, document.createTextNode(label)); toggles.append(row);
     }
     // 단축키
     const keys = document.createElement('dl'); keys.className = 'setup-keys';
-    for (const [k, v] of [['W · ↑', '칠판 보기'], ['S · ↓', '책상(공책) 보기'], ['Space · Enter', '다음'], ['←', '이전'], ['H', '힌트'], ['E', '더 쉽게'], ['Q', '스앵님께 말하기'], ['1 ~ 5', '과목 바꾸기'], ['Esc', '자리에서 일어나기']]) {
+    for (const [k, v] of [['Space', '강의 멈춤 · 계속'], ['Enter · →', '다음 문장 · 다음 단계'], ['←', '이전'], ['W · ↑ / S · ↓', '게임 모드: 칠판 · 책상 보기'], ['H', '힌트'], ['E', '더 쉽게'], ['Q', '스앵님께 말하기'], ['1 ~ 5', '과목 바꾸기'], ['Esc', '자리에서 일어나기']]) {
       const dt = document.createElement('dt'); dt.textContent = k; const dd = document.createElement('dd'); dd.textContent = v; keys.append(dt, dd);
     }
     card.append(x, h, p, sec('학습 방식'), list, roles, sec('화면'), toggles, sec('단축키'), keys); sheet.replaceChildren(card);

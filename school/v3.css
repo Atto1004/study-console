@@ -1,0 +1,76 @@
+/* 교실 v3: 위 강의 · 가운데 문제 · 아래 대화 (classroom-v3.js) — 수업 중(data-mode=classroom)에만 */
+.school[data-layout=v3][data-mode=classroom]{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+.school[data-layout=v3][data-mode=classroom] > header{flex:none}
+.school[data-layout=v3][data-mode=classroom] #scene{flex:1;min-height:0;overflow:hidden!important;padding:10px 16px 6px max(92px,env(safe-area-inset-left))!important;background:#eef1ec!important}
+.school[data-layout=v3][data-mode=classroom] #room{display:flex!important;flex-direction:column;gap:10px;height:100%;max-width:1280px;margin:0 auto;padding:0!important;background:transparent!important}
+/* 쓰지 않는 것 */
+.school[data-layout=v3][data-mode=classroom] .seat-controls,.school[data-layout=v3][data-mode=classroom] .learning-strip,.school[data-layout=v3][data-mode=classroom] #missionHeader,.school[data-layout=v3][data-mode=classroom] .room-title,.school[data-layout=v3][data-mode=classroom] #dialogue .speech,.school[data-layout=v3][data-mode=classroom] #dialogue .tools,.school[data-layout=v3][data-mode=classroom] #chat,.school[data-layout=v3][data-mode=classroom] > footer{display:none!important}
+
+/* 위: 강의 */
+.v3-stage{position:relative;flex:none;height:clamp(200px,38dvh,440px);border-radius:18px;overflow:hidden;background:linear-gradient(#dfe6df,#d3dbd3)}
+.v3-stage .teaching-space{position:absolute!important;inset:0;display:grid!important;grid-template-columns:minmax(0,1fr) 168px!important;gap:14px!important;padding:14px!important;max-width:none!important;margin:0!important;height:auto!important}
+.v3-stage #board{margin:0!important;min-height:0!important;max-height:none!important;height:100%!important;overflow:auto;border-radius:12px!important;padding:18px 22px!important}
+.v3-stage #board .content{clip-path:inset(0 0 calc((1 - var(--reveal,1)) * 100%) 0);transition:clip-path .7s ease}
+@media (prefers-reduced-motion:reduce){.v3-stage #board .content{transition:none}}
+.v3-stage .teacher{display:flex!important;align-items:flex-end;justify-content:center;position:relative!important;width:auto!important;inset:auto!important}
+.v3-subtitle{position:absolute;z-index:6;right:190px;bottom:22px;max-width:min(520px,60%);padding:10px 14px;border-radius:14px 14px 4px 14px;background:#fffffff5;color:#1f3d33;font:500 15.5px/1.5 "Pretendard Variable",Pretendard,sans-serif;box-shadow:0 8px 24px #1f3d3326}
+.v3-subtitle[hidden]{display:none}
+.v3-3d{position:absolute;inset:0;display:none}
+/* 게임(3D): 3D 강의실이 위 칸을 채우고 2D 초상은 숨김. 칠판 내용은 3D 칠판 면 위(surface.js), 자막은 스앵님 머리 위 */
+.school[data-view3=game] .v3-3d{display:block}
+.school[data-view3=game][data-world=seated] .v3-stage .teaching-space{display:contents!important}
+.school[data-view3=game][data-world=seated] .v3-stage .teacher{display:none!important}
+.school[data-view3=game][data-world=seated] .v3-subtitle{right:auto;bottom:auto;left:clamp(8px,calc(var(--hx,70%) - 260px),calc(100% - 528px));top:max(8px,calc(var(--hy,20%) - 90px));border-radius:14px 14px 14px 4px}
+
+/* 가운데: 문제 — 강의 중엔 흐리게, 끝나면 또렷하게 */
+.v3-work{flex:1;min-height:110px;overflow:auto;overscroll-behavior:contain;border-radius:18px;background:#fff;padding:14px 16px;box-shadow:0 1px 0 #d9e1d8}
+.v3-work #choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:8px 0 0}
+.v3-work #missionWork{margin:10px 0 0!important;max-width:none!important;box-shadow:none!important}
+.v3-work .tutor-reply{margin:0 0 6px}
+.school[data-lecture=playing] .v3-work > *{opacity:.35;pointer-events:none}
+.school[data-lecture=playing] .v3-work::before{content:"강의 중 — 끝나면 여기서 풀어요 · ⏭ 로 건너뛰기";display:block;margin:0 0 6px;color:#5c6f65;font:600 13px "Pretendard Variable",Pretendard,sans-serif}
+
+/* 아래: 대화 + 진행 */
+.school[data-layout=v3][data-mode=classroom] #dialogue{flex:none;position:relative!important;inset:auto!important;margin:0 16px 10px max(92px,env(safe-area-inset-left))!important;width:auto!important;max-width:1280px;max-height:none!important;border-radius:18px!important;background:#fff!important;box-shadow:0 -6px 22px #1f3d3314!important;padding:10px 14px!important;display:flex;flex-direction:column;gap:8px}
+@media (min-width:1400px){.school[data-layout=v3][data-mode=classroom] #dialogue{margin-left:auto!important;margin-right:auto!important;width:min(1280px,calc(100% - 108px))!important}}
+.v3-log:empty{display:none}
+.v3-log{max-height:min(18dvh,160px);overflow:auto;display:flex;flex-direction:column;gap:6px;padding:2px}
+.v3-msg{display:block;flex:none}
+.v3-msg p{display:inline-block;text-align:left;vertical-align:top;margin:0;height:auto;max-width:78%;padding:8px 12px;border-radius:14px;font:15px/1.5 "Pretendard Variable",Pretendard,sans-serif;white-space:pre-line}
+.v3-msg.v3-saeng p{background:#eef4f0;color:#1f3d33;border-bottom-left-radius:4px}
+.v3-msg.v3-me{text-align:right}
+.v3-msg.v3-me p{background:#21745a;color:#fff;border-bottom-right-radius:4px}
+.v3-chat{display:flex;gap:8px}
+.v3-chat input{flex:1;min-width:0;height:44px;padding:0 14px;border-radius:12px;border:1.5px solid #cfd9d1;font:15px "Pretendard Variable",Pretendard,sans-serif}
+.v3-bar{display:flex;align-items:center;gap:8px}
+.v3-btn{width:44px;height:44px;border-radius:12px;border:1px solid #d9e1d8;background:#fff;color:#1f3d33;display:inline-grid;place-items:center;cursor:pointer}
+.v3-btn svg{width:20px;height:20px}
+.v3-play{width:52px;background:#21745a;color:#fff;border-color:#21745a}
+.v3-progress{font:600 13px "Pretendard Variable",Pretendard,sans-serif;color:#5c6f65;white-space:nowrap}
+.v3-track{flex:1;height:6px;border-radius:3px;background:#e3e9e3;overflow:hidden}
+.v3-track i{display:block;height:100%;width:0;background:#21745a;transition:width .4s}
+.v3-bar #hint,.v3-bar #simpler{width:44px;height:44px}
+.v3-more{position:relative}
+.v3-more summary{list-style:none;width:44px;height:44px;border-radius:12px;border:1px solid #d9e1d8;display:grid;place-items:center;cursor:pointer}
+.v3-more summary::-webkit-details-marker{display:none}
+.v3-more summary svg{width:20px;height:20px}
+.v3-menu{position:absolute;right:0;bottom:52px;z-index:40;display:grid;min-width:170px;padding:6px;border-radius:12px;background:#fff;box-shadow:0 12px 30px #1f3d3333}
+.v3-menu-item{padding:10px 12px;border:0;background:none;text-align:left;border-radius:8px;font:15px "Pretendard Variable",Pretendard,sans-serif;cursor:pointer}
+.v3-menu-item:hover{background:#eef4f0}
+
+/* 헤더: 게임 ↔ 사이트 */
+.view-toggle{display:inline-flex;gap:2px;padding:3px;margin-left:auto;margin-right:8px;border-radius:12px;border:1px solid #d3dbd3;background:#f3f6f2;cursor:pointer}
+.view-toggle span{display:grid;place-items:center;width:38px;height:34px;border-radius:9px;color:#5c6f65}
+.view-toggle span svg{width:20px;height:20px}
+.view-toggle[data-view=site] span[data-v=site],.view-toggle[data-view=game] span[data-v=game]{background:#fff;color:#21745a;box-shadow:0 1px 4px #0001}
+.view-toggle + .map-trigger{margin-left:0}
+/* 사이트 모드에선 3D 걷기 진입을 숨긴다 */
+.school[data-view3=site] .hud-walk{display:none!important}
+
+@media (max-width:640px){
+  .school[data-layout=v3][data-mode=classroom] #scene{padding:8px!important}
+  .school[data-layout=v3][data-mode=classroom] #dialogue{margin:0 8px 8px!important}
+  .v3-stage .teaching-space{grid-template-columns:1fr!important}
+  .v3-stage .teacher{display:none!important}
+  .v3-subtitle{right:12px;left:12px;max-width:none}
+}

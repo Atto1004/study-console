@@ -15,6 +15,8 @@ import { createWorldMap } from "./worldmap.js";
 import { createTutor } from "./tutor.js";
 import { createSubjectRail } from "./subject-rail.js";
 import { startSurfaces } from "./surface.js";
+import { createLecture } from "./lecture.js";
+import { startClassroomV3 } from "./classroom-v3.js";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
@@ -32,7 +34,7 @@ let pending = [],
   chatBusy = false,
   lastLesson = null;
 let pausedLesson = null;
-let activeSession = null, sessionQueue = Promise.resolve(), setup = null, sessionEpoch = 0, tutor = null;
+let activeSession = null, sessionQueue = Promise.resolve(), setup = null, sessionEpoch = 0, tutor = null, lecture = null, v3 = null, userPaused = false;
 // 두 기기 학습의 칠판(모니터)은 받기만 한다: 수업 위치·학습 활동 기록을 쓰지 않는다(오타 10/8 RED).
 const isBoard = () => document.querySelector('.school')?.dataset.role === 'board';
 let resizeBoard;
@@ -844,6 +846,7 @@ async function renderStep(camera) {
     $("choices").append(button("원래 문제로 돌아가기", returnToQuestion));
   await mission?.mount();
   tutor?.onStep();
+  lecture?.start();
   if (['walking','seated'].includes(document.querySelector('.school').dataset.world)) await space?.seated(course,step.kind,camera);
   if (!isBoard()) await growth?.step(activeSession);
 }
@@ -2226,6 +2229,24 @@ mission = createMission({api,forcedMode:()=>setup?.solveMode(),context:()=>curre
 growth = createGrowth({api,status,panel,start:startLesson,retest,courses:()=>workspace?.data?.courses||[],home:()=>workspace.open('main')});
 workspace = createWorkspace({api,status,panel,record,screen:rememberScreen,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],walk:name=>space&&ROOMS.some(r=>r.name===name)?space.walk(name):showCourse(name),practice,rooms:()=>ROOMS.map(r=>r.name),evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,tutorPlan:(host,data,refresh)=>growth.tutorPlan(host,data,refresh),leave:async()=>{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);space?.hide();stopVoice();closeDialogs();++requestGeneration;}   /* 저장이 다 된 뒤에 3D 를 닫는다 — 실패하면 수업·3D 그대로(오타 10/8) */,lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode)});
 space = createSpace({fixedView:()=>setup?.fixedView(),leaveTo:async url=>{try{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);}catch(e){status('저장하지 못해 이동하지 않았습니다. '+(e.message||''),true);return false;}stopVoice();location.href=url;return true;},status,panel,screen:rememberScreen,view:camera=>{if(current)rememberScreen({lesson:current.id,step:current.steps[index].id,camera});},home:()=>workspace.open('main'),pause:async()=>{await mission.save();await growth.stop('pause');},ask:()=>openChat('','hint'),select:sitDown});
+// 교실 v3(대표님 10/8): 위 강의 · 가운데 문제 · 아래 대화, 게임↔사이트
+const blockedStep=()=>!current||['rejected','pending'].includes(current.review?.status);
+function advance(){   // ⏭ / Enter: 강의 중이면 다음 문장, 끝났으면 다음 단계(개념 단계는 답 안 해도 「읽음」으로 넘어감, 문제는 풀어야)
+  if(!current||blockedStep())return;
+  if(lecture&&lecture.skip())return;
+  if(passed){$('next').click();return;}
+  const step=current.steps[index];
+  if(step.options){$('speech').textContent='이 문제는 골라야 넘어가요. 막히면 힌트(H)나 더 쉽게(E)를 눌러요.';return;}
+  record({kind:'read',course,lesson:current.id,step:step.id,nodes:step.nodes||[]});passed=true;$('next').disabled=false;$('next').click();
+}
+v3 = startClassroomV3({
+  onToggle:()=>{if(!lecture)return;lecture.toggle();},
+  onRestart:()=>lecture?.restart(),
+  onSkip:advance,
+  onChat:text=>tutor?.question(text),
+  progress:()=>$('stepLabel')?.textContent||'',
+  onViewChange:async view=>{if(view==='site'){space?.hide();space?.mount?.(null);}else if(current&&document.querySelector('.school').dataset.mode==='classroom'&&space?.mount){await space.seated(course,current.steps[index].kind);space.mount(v3.mount3d);}},
+});
 tutor = createTutor({api,eventId,record,
   ctx:()=>current?{lesson:current,step:current.steps[index],index,course,passed,blocked:['rejected','pending'].includes(current.review?.status)}:null,
   pass:()=>{passed=true;$('next').disabled=false;},
@@ -2245,17 +2266,31 @@ tutor = createTutor({api,eventId,record,
    if(sc.dataset.role==='board'&&e.code!=='Escape')return;   // 두 기기의 칠판(모니터)은 보기만(오타 10/8)
    if((e.code==='Space'||e.code==='Enter')&&e.target.closest?.('button,summary,a,[role=button]'))return;   // 포커스된 버튼(답 선택지 등)은 기본 동작으로   // 창을 닫은 Esc 등 이미 처리된 키는 무시
    const click=id=>{const b=$(id);if(b&&!b.disabled){b.click();return true;}return false;};
-   if(e.code==='Space'||e.code==='Enter'){e.preventDefault();if(!tutor.skipReveal())click('next');}
+   if(e.code==='Space'){e.preventDefault();lecture?.toggle();}
+   else if(e.code==='Enter'||e.code==='ArrowRight'){e.preventDefault();advance();}
    else if(e.code==='ArrowLeft'){e.preventDefault();click('back');}
    else if(e.code==='KeyH'){e.preventDefault();click('hint');}
    else if(e.code==='KeyE'){e.preventDefault();click('simpler');}
-   else if(e.code==='KeyQ'){e.preventDefault();tutor.focus();}
+   else if(e.code==='KeyQ'){e.preventDefault();v3.focusChat();}
    else if(e.code==='Escape'&&sc.dataset.world==='seated'){e.preventDefault();document.querySelector('.seat-controls [data-icon=stand]')?.click();}
  });}
 // 과목 레일: 수업 중 과목을 바꾸면 그 과목의 약한 회차로 바로(강의실 하나, 교실 v2)
 const rail = createSubjectRail({subjects:ROOMS,current:()=>course,choose:async name=>{try{await mission?.save();}catch{return;}const seated=document.querySelector('.school').dataset.world==='seated';await sitDown(name);space?.setSubject?.(name);rail.update();if(seated)await space?.seated(name);}});
 new MutationObserver(()=>rail.update()).observe($('roomLabel'),{childList:true,characterData:true,subtree:true});
 startSurfaces();
+lecture = createLecture({
+  ctx:()=>current?{lesson:current,step:current.steps[index],index,course,passed}:null,
+  talk:on=>{space?.saeng?.lecture?.(on);},
+  subtitle:text=>{v3.subtitle(text);if(text)dockSaeng?.speak(text.slice(0,80));},
+  board:f=>v3.board(f),
+  voiceOn:()=>{try{return capabilities.voice&&localStorage.getItem('school-voice')==='1';}catch{return false;}},
+  voice:(text,signal)=>new Promise(async(resolve,reject)=>{try{const r=await fetch('/api/school/voice',{method:'POST',credentials:'same-origin',signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text.slice(0,600)})});if(!r.ok)throw new Error('voice');const url=URL.createObjectURL(await r.blob());const a=new Audio(url);const end=()=>{URL.revokeObjectURL(url);resolve();};a.onended=end;a.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('voice'));};signal.addEventListener('abort',()=>{a.pause();end();});await a.play();}catch(e){reject(e);}}),
+  onEnd:()=>tutor?.afterLecture(),
+  onState:st=>{v3.state(st);
+    // 학습 시간 기록은 강의 ▶/⏸ 를 따라간다(위쪽 따로 있던 ▶·⏹ 대신)
+    if(!st.playing&&!st.ended&&!userPaused){userPaused=true;growth?.stop('pause').catch(()=>{});}
+    else if(st.playing&&userPaused){userPaused=false;if(activeSession)growth?.start(activeSession);}},
+});
 createWorldMap();
 setup = createSetup({onChange:()=>{const m=setup.solveMode();if(m)mission.setMode(m);space?.refresh();}});
 $('learnSettings').onclick=()=>{closeDialogs();setup.open();};
