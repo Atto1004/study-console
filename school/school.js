@@ -6,10 +6,10 @@ import {
   learningPath,
 } from "./learning.js";
 import { createWorkspace } from "./workspace.js";
-import { createMission } from "./mission.js";
+import { createMission } from "./mission.js?v=199";
 import { attachSaeng } from "./saeng.js";
 import { createSpace } from "./space.js";
-import { createGrowth } from "./growth.js";
+import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
 let catalog,
@@ -811,7 +811,7 @@ async function renderStep(camera) {
     $("next").disabled = true;
     $("hint").disabled = true;
   }
-  if (pausedLesson && current.id !== pausedLesson.lesson)
+  if (pausedLesson && (current.id !== pausedLesson.lesson||index!==pausedLesson.index))
     $("choices").append(button("원래 문제로 돌아가기", returnToQuestion));
   await mission?.mount();
   await space?.seated(course,step.kind,camera);
@@ -820,7 +820,7 @@ async function renderStep(camera) {
 async function returnToQuestion() {
   const saved = pausedLesson;
   if (!saved) return;
-  await startLesson(saved.lesson,{index:saved.index,assisted:true,returnTo:null});
+  await startLesson(saved.lesson,{index:saved.index,assisted:true,returnTo:null,camera:'notebook'});
   if (current?.id !== saved.lesson) return;
   index = saved.index;
   course = saved.course;
@@ -828,7 +828,26 @@ async function returnToQuestion() {
   pausedLesson = null;
   record({ kind: "review", course, action: "returned", lesson: current.id });
   record({ kind: "position", course, lesson: current.id, index });
-  renderStep();
+}
+async function supplementWork(){
+  if(!current)return;
+  const saved={lesson:current.id,index,course},step=current.steps[index];
+  const available=[...catalog.basics,...catalog.courses.flatMap(c=>c.nodes)];
+  const concepts=available.filter(n=>(step.nodes||current.nodes||[]).includes(n.id));
+  const host=panel('풀이에 필요한 개념 보충');
+  host.append(node('p','오류 진단과 아래 개념을 대조해 필요한 부분을 선택하세요. 학습 후 원래 문제로 돌아올 수 있습니다.'));
+  const targets=[...new Set(concepts.flatMap(n=>[...(n.prereq||[]),n.id]))].map(id=>available.find(n=>n.id===id)).filter(Boolean);
+  for(const target of targets)host.append(button(target.name,async()=>{
+    await mission.save();pausedLesson=saved;
+    record({kind:'review',course,action:'prerequisite',returnLesson:saved.lesson,returnIndex:saved.index});await flush();
+    if(!pending.length)await startLesson('node:'+target.id,{assisted:true,returnTo:{lessonId:saved.lesson,stepId:step.id}});
+  }));
+  if(!targets.length){
+    let at=current.steps.findIndex(s=>['understand','remember','example'].includes(s.kind)&&(s.nodes||[]).some(id=>(step.nodes||[]).includes(id)));
+    if(at<0)at=current.steps.findIndex(s=>['understand','remember','example'].includes(s.kind));
+    if(at>=0)host.append(button('이 수업의 개념 설명 다시 보기',async()=>{pausedLesson=saved;await startLesson(saved.lesson,{index:at,assisted:true,returnTo:{lessonId:saved.lesson,stepId:step.id}});}));
+    else host.append(node('p','연결된 개념 자료가 없습니다. 문제 조건을 스앵님과 먼저 확인해주세요.'));
+  }
 }
 function answer(choice) {
   const step = current.steps[index],
@@ -2171,7 +2190,7 @@ async function boot() {
 async function retest(id){
   try{await mission.save();status('조건이 다른 확인 문제를 준비하고 검토합니다.');const lesson=await api('generate',{lesson:id,course});state=await api('state');if(lesson.review?.status!=='reviewed')throw new Error('새 문제 검토가 완료되지 않았습니다. 원자료의 확인 문제를 사용해주세요.');await startLesson(lesson.id,{purpose:'exam',assisted:false});}catch(e){status(e.message,true);}
 }
-mission = createMission({api,context:()=>current?{lesson:current,step:current.steps[index],index,assisted,total:missionIndices?.length,number:missionIndices?missionIndices.indexOf(index)+1:undefined}:null,feedback:(text,kind)=>{$('speech').textContent=text;mission.feedback(kind);renderMath($('speech'));},retest,helped:()=>{assisted=true;saveSession(current,index,{assisted:true}).catch(()=>{});},allowNext:()=>{status('풀이 피드백은 관찰 기록입니다. 확인 문제의 정답 검증은 별도로 진행합니다.');}});
+mission = createMission({api,context:()=>current?{lesson:current,step:current.steps[index],index,assisted,total:missionIndices?.length,number:missionIndices?missionIndices.indexOf(index)+1:undefined}:null,feedback:(text,kind)=>{$('speech').textContent=text;mission.feedback(kind);renderMath($('speech'));},retest,remedial:supplementWork,helped:()=>{assisted=true;saveSession(current,index,{assisted:true}).catch(()=>{});},allowNext:()=>{status('풀이 피드백은 관찰 기록입니다. 확인 문제의 정답 검증은 별도로 진행합니다.');}});
 growth = createGrowth({api,status,panel,start:startLesson,retest,courses:()=>workspace?.data?.courses||[],home:()=>workspace.open('main')});
 workspace = createWorkspace({api,status,panel,record,screen:rememberScreen,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],walk:name=>space?space.walk(name):showCourse(name),evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,tutorPlan:(host,data,refresh)=>growth.tutorPlan(host,data,refresh),leave:async()=>{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);stopVoice();closeDialogs();++requestGeneration;},lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode)});
 space = createSpace({status,panel,screen:rememberScreen,view:camera=>{if(current)rememberScreen({lesson:current.id,step:current.steps[index].id,camera});},home:()=>workspace.open('main'),pause:async()=>{await mission.save();await growth.stop('pause');},ask:()=>openChat('','hint'),select:name=>{space.hide();workspace.startCourse(name);}});

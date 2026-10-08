@@ -25,7 +25,7 @@ export function createGrowth(app){
   function enqueue(fn){const task=queue.catch(()=>{}).then(fn);queue=task;return task;}
   async function start(s){if(!s)return;return enqueue(async()=>{session=s;if(!app.courses().length&&!courseCache.length)courseCache=(await app.api('workspace')).courses;const fields=activity(s);strip.hidden=false;if(!fields){activityError='현재 과목 연결을 확인해야 합니다.';redraw();return;}if(test){paused=false;redraw();return;}
     try{live=await aw('live');const current=live.active;if(current&&current.schoolSessionId!==s.id){activityError=`얼라이브위크에서 ‘${current.label}’ 진행 중 · 그 활동을 종료한 뒤 학습 기록을 시작하세요.`;paused=true;redraw();return;}
-      const same=current?.lessonId===s.lessonId&&current?.stepId===s.stepId;
+      const same=!!current&&current.lessonId===s.lessonId&&current.stepId===s.stepId&&current.taskKey===s.taskKey&&current.phase===s.phase;
       if(!same)live=await aw('live',{operationId:crypto.randomUUID(),expectedVersion:live.version,action:current?'switch':'start',...(current?{activityId:current.id}:{}),activity:fields});
       else live=await aw('live',{operationId:crypto.randomUUID(),expectedVersion:live.version,action:'heartbeat',activityId:current.id});
       paused=false;lastInput=Date.now();activityError='';redraw();

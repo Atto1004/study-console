@@ -88,7 +88,10 @@ export function createMission(app){
     if(review.firstError)section.append(node('mark',review.firstError),node('p','확인할 부분: '+review.category));
     section.append(node('p',review.hint),node('p',review.followUp));
     if(review.requiresConfirmation){const transcript=node('textarea');transcript.value=review.transcript;transcript.rows=6;transcript.maxLength=6000;transcript.setAttribute('aria-label','인식된 필기 · 직접 확인하고 수정');const confirm=button('이렇게 쓴 게 맞아요 · 풀이 분석',async()=>{const token=generation;try{await saveQueue;if(dirty||review.workRevision!==draft.revision)throw new Error('풀이가 바뀌었습니다. 현재 풀이로 피드백을 다시 받아주세요.');const result=await app.api('work-review',{lesson:workContext.lesson.id,step:workContext.step.id,transcript:transcript.value,reviewId:review.id,workRevision:review.workRevision});if(token!==generation)return;draft.review=result;app.feedback(result.hint+'\n'+result.followUp,result.status==='retry'?'retry':'review');draw();}catch(e){stateLabel.textContent=e.message;}});confirm.disabled=dirty||review.workRevision!==draft.revision;section.append(transcript,confirm);}
-    else section.append(button('힌트 없이 새 문제 풀기',()=>app.retest?.(workContext.lesson.id)));
+    else {
+      if(review.status==='retry')section.append(button('관련 개념 보충하기',()=>app.remedial?.()));
+      section.append(button('힌트 없이 새 문제 풀기',()=>app.retest?.(workContext.lesson.id)));
+    }
     if(review.workRevision!==draft.revision)section.append(node('small','이 관찰 이후 풀이가 수정되었습니다. 저장 후 다시 피드백을 받아주세요.'));
     section.append(node('small','AI 관찰입니다. 읽히지 않은 식은 확인하며 스킬 획득으로 자동 처리하지 않습니다.'));host.append(section);
   }
