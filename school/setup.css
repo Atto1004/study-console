@@ -45,3 +45,29 @@
 
 /* 아이패드만: 칠판을 위로 쓸면 책상, 책상 보기의 위쪽 칠판 띠를 아래로 쓸면 칠판(space.js, 스크롤은 그대로). */
 .school[data-setup=solo][data-world=seated][data-view=notebook] .board{cursor:ns-resize}
+
+/* 학습 설정 패널(10/8 — 설정 항목으로 옮김) */
+.setup-card{position:relative;max-height:calc(100dvh - 32px);overflow:auto}
+.setup-close{position:absolute;top:14px;right:14px}
+.setup-sec{margin:18px 0 8px;font-size:13px;color:#5c6f65;font-weight:700;letter-spacing:.02em}
+.setup-toggles{display:grid;gap:8px}
+.setup-toggle{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:#fff;border:1.5px solid #d9e1d8;font-size:14px;cursor:pointer}
+.setup-toggle input{width:20px;height:20px;accent-color:#21745a}
+.setup-keys{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:13.5px}
+.setup-keys dt{font-weight:700;color:#1f3d33;white-space:nowrap}
+.setup-keys dd{margin:0;color:#5c6f65}
+
+/* 쌍방향 과외(tutor.js): 칠판을 분필로 쓰듯 위에서 아래로, 대화 바 안 답하기 칸 */
+@keyframes chalk-write{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+#board .content.chalk-writing{animation:chalk-write var(--chalk,3s) linear both}
+@media (prefers-reduced-motion:reduce){#board .content.chalk-writing{animation:none}}
+.tutor-reply{display:flex;gap:8px;align-items:center;margin:10px 0 0}
+.tutor-reply[hidden]{display:none}
+.tutor-reply input{flex:1;min-width:0;height:44px;padding:0 14px;border-radius:12px;border:1.5px solid #cfd9d1;background:#fff;font:15px "Pretendard Variable",Pretendard,sans-serif;color:#1f3d33}
+.tutor-reply input:focus{outline:2px solid #21745a;outline-offset:1px}
+.tutor-reply .tutor-dunno{height:44px;padding:0 14px;border-radius:12px;border:1.5px solid #d9e1d8;background:#fff;color:#5c6f65;font:600 14px "Pretendard Variable",Pretendard,sans-serif;white-space:nowrap}
+.tutor-reply .tutor-dunno[hidden]{display:none}
+#dialogue[data-tutor=explain] #choices{opacity:.35;pointer-events:none}
+
+.setup-card .setup-toggle{min-height:0!important;height:auto!important;margin:0!important;padding:10px 12px!important;display:flex!important;flex-direction:row!important}
+.setup-card .setup-toggle input{margin:0!important;flex:none}

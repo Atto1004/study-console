@@ -12,6 +12,8 @@ import { createSpace, ROOMS } from "./space.js";
 import { pickLesson, pickQuestions } from "./metrics.js";
 import { createSetup } from "./setup.js";
 import { createWorldMap } from "./worldmap.js";
+import { createTutor } from "./tutor.js";
+import { createSubjectRail } from "./subject-rail.js";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
@@ -29,7 +31,7 @@ let pending = [],
   chatBusy = false,
   lastLesson = null;
 let pausedLesson = null;
-let activeSession = null, sessionQueue = Promise.resolve(), setup = null, sessionEpoch = 0;
+let activeSession = null, sessionQueue = Promise.resolve(), setup = null, sessionEpoch = 0, tutor = null;
 // 두 기기 학습의 칠판(모니터)은 받기만 한다: 수업 위치·학습 활동 기록을 쓰지 않는다(오타 10/8 RED).
 const isBoard = () => document.querySelector('.school')?.dataset.role === 'board';
 let resizeBoard;
@@ -636,7 +638,6 @@ async function startLesson(id, options = {}) {
     $("lobby").hidden = true;
     $("room").hidden = false;
     $("dialogue").hidden = false;
-    if (!setup?.get()) setup?.open();
     $("scene").className = "scene classroom";
     $("location").textContent = course;
     $("roomLabel").textContent = lesson.title;
@@ -821,26 +822,8 @@ async function renderStep(camera) {
     if (passed)
       $("speech").textContent =
         "이 문제는 전에 해결했습니다. 다시 풀거나 다음으로 갈 수 있어요.";
-  } else
-    $("choices").append(
-      button("설명할 수 있어요 · 읽음 확인", () => {
-        record({
-          kind: "read",
-          course,
-          lesson: current.id,
-          step: step.id,
-          nodes: step.nodes || [],
-        });
-        passed = true;
-        $("next").disabled = false;
-        $("speech").textContent =
-          "읽음으로 기록했습니다. 실제 이해는 뒤의 확인 문제로 구분할게요.";
-      }),
-    );
-  if (!step.options)
-    $("choices").append(
-      button("내 말로 설명하고 피드백 받기", () => openChat("", "teachback")),
-    );
+  }
+  // 개념·예제 단계는 스앵님이 먼저 확인 질문을 하고 대화 바에서 답을 받는다(tutor.js, 교실 v2 4절).
   $("next").disabled = !passed;
   $("next").textContent =
     (missionIndices ? index === missionIndices.at(-1) : index === current.steps.length - 1) ? "미션 결과 보기" : "다음 도전";
@@ -859,6 +842,7 @@ async function renderStep(camera) {
   if (pausedLesson && (current.id !== pausedLesson.lesson||index!==pausedLesson.index))
     $("choices").append(button("원래 문제로 돌아가기", returnToQuestion));
   await mission?.mount();
+  tutor?.onStep();
   if (['walking','seated'].includes(document.querySelector('.school').dataset.world)) await space?.seated(course,step.kind,camera);
   if (!isBoard()) await growth?.step(activeSession);
 }
@@ -955,6 +939,7 @@ function answer(choice) {
       );
   }
   renderMath($("speech"));
+  tutor?.onAnswer(correct);
 }
 $("hint").onclick = () => {
   assisted = true;
@@ -2240,8 +2225,36 @@ mission = createMission({api,forcedMode:()=>setup?.solveMode(),context:()=>curre
 growth = createGrowth({api,status,panel,start:startLesson,retest,courses:()=>workspace?.data?.courses||[],home:()=>workspace.open('main')});
 workspace = createWorkspace({api,status,panel,record,screen:rememberScreen,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],walk:name=>space&&ROOMS.some(r=>r.name===name)?space.walk(name):showCourse(name),practice,rooms:()=>ROOMS.map(r=>r.name),evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,tutorPlan:(host,data,refresh)=>growth.tutorPlan(host,data,refresh),leave:async()=>{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);space?.hide();stopVoice();closeDialogs();++requestGeneration;}   /* 저장이 다 된 뒤에 3D 를 닫는다 — 실패하면 수업·3D 그대로(오타 10/8) */,lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode)});
 space = createSpace({fixedView:()=>setup?.fixedView(),leaveTo:async url=>{try{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);}catch(e){status('저장하지 못해 이동하지 않았습니다. '+(e.message||''),true);return false;}stopVoice();location.href=url;return true;},status,panel,screen:rememberScreen,view:camera=>{if(current)rememberScreen({lesson:current.id,step:current.steps[index].id,camera});},home:()=>workspace.open('main'),pause:async()=>{await mission.save();await growth.stop('pause');},ask:()=>openChat('','hint'),select:sitDown});
+tutor = createTutor({api,eventId,record,
+  ctx:()=>current?{lesson:current,step:current.steps[index],index,course,passed,blocked:['rejected','pending'].includes(current.review?.status)}:null,
+  pass:()=>{passed=true;$('next').disabled=false;},
+  assist:()=>{if(!assisted){assisted=true;saveSession(current,index,{assisted:true}).catch(()=>{});}},
+  say:(text,react)=>{$('speech').textContent=text;renderMath($('speech'));if(react)window.dispatchEvent(new CustomEvent('saeng',{detail:{react}}));},
+  react:(r)=>window.dispatchEvent(new CustomEvent('saeng',{detail:{react:r}})),
+  lecture:(on)=>space?.saeng?.lecture?.(on),
+  busy:()=>chatBusy});
+// 수업 단축키(교실 v2 2절): Space·Enter 다음(칠판 쓰는 중이면 바로 다 보이기) · ← 이전 · H 힌트 · E 더 쉽게 · Q 말하기 · Esc 일어나기.
+// 걷는 중(이동 키와 겹침)·입력 칸·겹친 창에서는 쓰지 않는다. 시점 W/S/↑/↓ 는 3D(space)가 맡는다.
+{const typing=el=>!!el&&(/INPUT|TEXTAREA|SELECT/.test(el.tagName)||el.isContentEditable);
+ const shownSel=sel=>{const e=document.querySelector(sel);return !!e&&!e.hidden&&e.getClientRects().length>0;};
+ const blocked=()=>$('panel')?.open||shownSel('#chat')||shownSel('.setup-sheet')||shownSel('.map-sheet');
+ window.addEventListener('keydown',e=>{
+   const sc=document.querySelector('.school');if(sc.dataset.mode!=='classroom'||sc.dataset.world==='walking'||!current)return;
+   if(typing(e.target)||blocked()||e.ctrlKey||e.metaKey||e.altKey)return;
+   const click=id=>{const b=$(id);if(b&&!b.disabled){b.click();return true;}return false;};
+   if(e.code==='Space'||e.code==='Enter'){e.preventDefault();if(!tutor.skipReveal())click('next');}
+   else if(e.code==='ArrowLeft'){e.preventDefault();click('back');}
+   else if(e.code==='KeyH'){e.preventDefault();click('hint');}
+   else if(e.code==='KeyE'){e.preventDefault();click('simpler');}
+   else if(e.code==='KeyQ'){e.preventDefault();tutor.focus();}
+   else if(e.code==='Escape'&&sc.dataset.world==='seated'){e.preventDefault();document.querySelector('.seat-controls [data-icon=stand]')?.click();}
+ });}
+// 과목 레일: 수업 중 과목을 바꾸면 그 과목의 약한 회차로 바로(강의실 하나, 교실 v2)
+const rail = createSubjectRail({subjects:ROOMS,current:()=>course,choose:async name=>{try{await mission?.save();}catch{return;}const seated=document.querySelector('.school').dataset.world==='seated';await sitDown(name);space?.setSubject?.(name);rail.update();if(seated)await space?.seated(name);}});
+new MutationObserver(()=>rail.update()).observe($('roomLabel'),{childList:true,characterData:true,subtree:true});
 createWorldMap();
 setup = createSetup({onChange:()=>{const m=setup.solveMode();if(m)mission.setMode(m);space?.refresh();}});
+$('learnSettings').onclick=()=>{closeDialogs();setup.open();};
 {const m=setup.solveMode();if(m)mission.setMode(m);}
 // 모니터 + 아이패드: 두 기기가 서버의 같은 수업 위치(activeSession)를 따라간다. 어느 쪽에서 넘겨도 다른 쪽이 2초 안에 맞춘다.
 let following=false;

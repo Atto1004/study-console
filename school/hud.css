@@ -1,0 +1,26 @@
+/* 교실 v2 HUD 4구역(설계 3절): 왼쪽 과목 레일 · 위 왼쪽 진행 · 아래 대화 바 · 아래 오른쪽 도구 */
+.subject-rail{position:fixed;left:14px;top:50%;transform:translateY(-50%);z-index:60;display:none;flex-direction:column;gap:10px;padding:10px 8px;border-radius:18px;background:#ffffffd9;box-shadow:0 10px 30px #1f3d331f;backdrop-filter:blur(6px)}
+.school[data-mode=classroom] .subject-rail{display:flex}
+.school[data-world=walking] .subject-rail{display:none}
+.subject-chip{position:relative;width:48px;height:48px;border-radius:50%;border:0;padding:0;background:var(--c);color:#fff;font:700 18px "Pretendard Variable",Pretendard,sans-serif;cursor:pointer;opacity:.62;transition:opacity .15s,transform .15s,box-shadow .15s}
+.subject-chip:hover{opacity:.9}
+.subject-chip[aria-current=true]{opacity:1;box-shadow:0 0 0 3px #fff,0 0 0 5px var(--c);transform:scale(1.06)}
+.subject-chip kbd{position:absolute;right:-4px;bottom:-4px;min-width:18px;height:18px;border-radius:9px;background:#fff;color:#1f3d33;font:700 11px/18px "Pretendard Variable",Pretendard,sans-serif;box-shadow:0 1px 4px #0002}
+.subject-chip[data-tip]::after{content:attr(data-tip);position:absolute;left:calc(100% + 12px);top:50%;transform:translate(-4px,-50%);padding:6px 10px;border-radius:8px;background:#1f3d33;color:#fff;font:600 12.5px/1.2 "Pretendard Variable",Pretendard,sans-serif;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .12s,transform .12s}
+.subject-chip:focus-visible::after{opacity:1;transform:translate(0,-50%)}
+@media (hover:hover) and (pointer:fine){.subject-chip:hover::after{opacity:1;transform:translate(0,-50%);transition-delay:.3s}}
+/* 레일 자리만큼 수업 화면을 오른쪽으로 */
+.school[data-mode=classroom]:not([data-world=walking]) #scene,.school[data-mode=classroom]:not([data-world=walking]) #dialogue{margin-left:max(76px,env(safe-area-inset-left))}
+/* 아래 도구: 오른쪽에 모으고 「다음」을 맨 끝 큰 버튼으로. 질문은 대화 바 입력(Q)이 대신한다 */
+.school[data-mode=classroom] #dialogue .tools{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px}
+.school[data-mode=classroom] #dialogue .tools #next{order:9;min-width:64px}
+.school[data-mode=classroom] #askToggle{display:none!important}
+@media (max-width:640px){.subject-rail{top:auto;bottom:calc(100% - 64px);left:50%;transform:translateX(-50%);flex-direction:row;padding:6px 8px}.subject-chip{width:40px;height:40px;font-size:15px}.school[data-mode=classroom]:not([data-world=walking]) #scene,.school[data-mode=classroom]:not([data-world=walking]) #dialogue{margin-left:0}}
+
+/* 위 오른쪽: 학습 기록 띠(일시정지·종료·스킬)를 작은 알약으로 — 화면 폭 전체 띠를 없앤다 */
+.school[data-mode=classroom] .learning-strip:not([hidden]){position:fixed!important;top:66px;right:16px;left:auto;z-index:55;width:auto;max-width:min(520px,60vw);flex-wrap:nowrap;padding:4px 6px 4px 14px;border-radius:999px;background:#fffffff0;border:1px solid #d9e1d8;box-shadow:0 6px 18px #1f3d331a}
+.school[data-mode=classroom] .learning-strip > span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:#5c6f65}
+.school[data-mode=classroom] .learning-strip .ico-btn{min-width:34px;min-height:34px;padding:0 6px!important;border-radius:999px!important}
+/* 아래 도구를 전부 오른쪽 한 덩어리로 */
+.school[data-mode=classroom] #dialogue .tools{justify-content:flex-end!important}
+.school[data-mode=classroom] #dialogue .tools #next{margin-left:6px!important;min-width:72px!important}

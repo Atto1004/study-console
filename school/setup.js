@@ -15,33 +15,32 @@ import { modalFocus } from './worldmap.js';
 
 export function createSetup({ onChange }) {
   const school = document.querySelector('.school');
-  let setup = SETUPS[read('school-setup')] ? read('school-setup') : null;
+  let setup = SETUPS[read('school-setup')] ? read('school-setup') : 'solo';
   let role = ROLES[read('school-role')] ? read('school-role') : 'desk';
 
   function apply() {
-    if (setup) school.dataset.setup = setup; else delete school.dataset.setup;
+    school.dataset.setup = setup;
     if (setup === 'dual') school.dataset.role = role; else delete school.dataset.role;
-    trigger.innerHTML = svg(SETUPS[setup || 'solo'].icon);
-    trigger.title = '학습 방식: ' + (setup ? SETUPS[setup].title + (setup === 'dual' ? ' · ' + ROLES[role].title : '') : '고르기');
-    trigger.setAttribute('aria-label', trigger.title);
   }
   function choose(next, nextRole) {
     const changed = next !== setup || (next === 'dual' && nextRole !== role);
     setup = next; write('school-setup', next);
     if (nextRole) { role = nextRole; write('school-role', nextRole); }
-    apply(); close();
+    apply(); if (!sheet.hidden) { render(); sheet.querySelector(`[data-setup="${setup}"]`)?.focus(); }
     if (changed) onChange?.(setup, role);
   }
 
   // 고르는 창: 바깥을 누르면 닫힌다(10/8 기본 동작).
   const sheet = document.createElement('div'); sheet.className = 'setup-sheet'; sheet.hidden = true;
-  sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-label', '학습 방식 고르기');
+  sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-label', '학습 설정');
   sheet.addEventListener('pointerdown', (e) => { if (e.target === sheet) close(); });
   document.addEventListener('keydown', (e) => { if (!sheet.hidden && e.key === 'Escape') close(); });
   function render() {
     const card = document.createElement('div'); card.className = 'setup-card';
-    const h = document.createElement('h2'); h.textContent = '어떻게 공부할까요?';
-    const p = document.createElement('p'); p.textContent = '이 기기에서만 기억합니다. 언제든 위의 아이콘으로 바꿀 수 있어요.';
+    const h = document.createElement('h2'); h.textContent = '학습 설정';
+    const p = document.createElement('p'); p.textContent = '이 기기에서만 기억합니다.';
+    const x = document.createElement('button'); x.type = 'button'; x.className = 'setup-close'; x.textContent = '닫기'; x.onclick = close;
+    const sec = (t) => { const e = document.createElement('h3'); e.className = 'setup-sec'; e.textContent = t; return e; };
     const list = document.createElement('div'); list.className = 'setup-options';
     for (const [key, s] of Object.entries(SETUPS)) {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'setup-option'; b.dataset.setup = key;
@@ -57,13 +56,25 @@ export function createSetup({ onChange }) {
       b.innerHTML = '<b></b><small></small>'; b.querySelector('b').textContent = r.title; b.querySelector('small').textContent = r.text;
       b.onclick = () => choose('dual', key); roles.append(b);
     }
-    card.append(h, p, list, roles); sheet.replaceChildren(card);
+    // 화면: 움직임 줄이기 · 해상도 자동 조절(렉 줄이기, 10/8)
+    const toggles = document.createElement('div'); toggles.className = 'setup-toggles';
+    for (const [key, label, def] of [['school-reduced-motion', '움직임 줄이기 (걸을 때 흔들림·전환 효과 끔)', '0'], ['world-adaptive', '3D 해상도 자동 조절 (버벅이면 낮춤)', '1']]) {
+      const row = document.createElement('label'); row.className = 'setup-toggle';
+      const box = document.createElement('input'); box.type = 'checkbox'; box.checked = (read(key) ?? def) === '1' || (key === 'world-adaptive' && read(key) !== '0');
+      if (key === 'school-reduced-motion') box.checked = read(key) === '1';
+      box.onchange = () => { write(key, box.checked ? '1' : '0'); onChange?.(setup, role, key); };
+      row.append(box, document.createTextNode(label)); toggles.append(row);
+    }
+    // 단축키
+    const keys = document.createElement('dl'); keys.className = 'setup-keys';
+    for (const [k, v] of [['W · ↑', '칠판 보기'], ['S · ↓', '책상(공책) 보기'], ['Space · Enter', '다음'], ['←', '이전'], ['H', '힌트'], ['E', '더 쉽게'], ['Q', '스앵님께 말하기'], ['1 ~ 5', '과목 바꾸기'], ['Esc', '자리에서 일어나기']]) {
+      const dt = document.createElement('dt'); dt.textContent = k; const dd = document.createElement('dd'); dd.textContent = v; keys.append(dt, dd);
+    }
+    card.append(x, h, p, sec('학습 방식'), list, roles, sec('화면'), toggles, sec('단축키'), keys); sheet.replaceChildren(card);
   }
   function open() { render(); sheet.hidden = false; modal.opened(sheet.querySelector('[aria-pressed=true]')); }
   function close() { if (sheet.hidden) return; sheet.hidden = true; modal.closed(); }
 
-  const trigger = document.createElement('button'); trigger.type = 'button'; trigger.className = 'setup-trigger icon-btn'; trigger.onclick = open;
-  document.querySelector('#room .room-title')?.append(trigger);
   document.body.append(sheet);
   const modal = modalFocus(sheet);
   apply();
