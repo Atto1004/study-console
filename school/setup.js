@@ -11,6 +11,7 @@ const ROLES = { board: { title: '이 기기는 칠판', text: '모니터 · 설�
 const svg = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
 const read = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
 const write = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
+import { modalFocus } from './worldmap.js';
 
 export function createSetup({ onChange }) {
   const school = document.querySelector('.school');
@@ -58,12 +59,13 @@ export function createSetup({ onChange }) {
     }
     card.append(h, p, list, roles); sheet.replaceChildren(card);
   }
-  function open() { render(); sheet.hidden = false; sheet.querySelector('[aria-pressed=true], button')?.focus(); }
-  function close() { sheet.hidden = true; }
+  function open() { render(); sheet.hidden = false; modal.opened(sheet.querySelector('[aria-pressed=true]')); }
+  function close() { if (sheet.hidden) return; sheet.hidden = true; modal.closed(); }
 
   const trigger = document.createElement('button'); trigger.type = 'button'; trigger.className = 'setup-trigger icon-btn'; trigger.onclick = open;
   document.querySelector('#room .room-title')?.append(trigger);
   document.body.append(sheet);
+  const modal = modalFocus(sheet);
   apply();
 
   return {

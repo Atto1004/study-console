@@ -13,6 +13,24 @@ const ICON = {
 // 대표실은 A++O 주소(/kingdom/) 아래에서 열렸을 때만 있다(데모·GitHub Pages 판에는 없음).
 export const officeHref = () => (location.pathname.startsWith('/kingdom/') ? '/kingdom/' : null);
 
+// 모달 창 공통(오타 10/8): 열려 있는 동안 학교 화면은 inert, Tab 은 창 안에서만 돈다.
+export function modalFocus(sheet) {
+  const school = document.querySelector('.school');
+  // 숨긴 칸(예: 학습 방식의 역할 줄) 안 버튼은 빼야 포커스가 문서 밖으로 떨어지지 않는다.
+  const focusable = () => [...sheet.querySelectorAll('button:not([disabled]),[tabindex="0"]')].filter((b) => b.getClientRects().length);
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab' || sheet.hidden) return;
+    const list = focusable(); if (!list.length) { e.preventDefault(); return; }
+    const first = list[0], last = list[list.length - 1];
+    if (e.shiftKey && (document.activeElement === first || !sheet.contains(document.activeElement))) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && (document.activeElement === last || !sheet.contains(document.activeElement))) { e.preventDefault(); first.focus(); }
+  });
+  return {
+    opened(preferred) { if (school) school.inert = true; const t = [preferred, ...focusable()].find((b) => b && !b.disabled && b.isConnected && b.getClientRects().length); (t || sheet.firstElementChild)?.focus({ preventScroll: true }); },
+    closed() { if (school) school.inert = false; },
+  };
+}
+
 export function createWorldMap() {
   const header = document.querySelector('.school > header');
   const places = [
@@ -35,9 +53,10 @@ export function createWorldMap() {
   sheet.addEventListener('pointerdown', (e) => { if (e.target === sheet) close(); });   // 바깥 누르면 닫힘(10/8 기본)
   document.addEventListener('keydown', (e) => { if (!sheet.hidden && e.key === 'Escape') close(); });
   document.body.append(sheet);
+  const modal = modalFocus(sheet);
 
   function render() {
-    const card = document.createElement('div'); card.className = 'map-card';
+    const card = document.createElement('div'); card.className = 'map-card'; card.tabIndex = -1;
     const h = document.createElement('h2'); h.textContent = '학교 지도';
     const list = document.createElement('div'); list.className = 'map-places';
     for (const p of places) {
@@ -51,8 +70,12 @@ export function createWorldMap() {
     }
     card.append(h, list); sheet.replaceChildren(card);
   }
-  function open() { render(); sheet.hidden = false; trigger.setAttribute('aria-expanded', 'true'); (sheet.querySelector('[aria-current]') || sheet.querySelector('button:not([disabled])'))?.focus(); }
-  function close() { if (sheet.hidden) return; sheet.hidden = true; trigger.setAttribute('aria-expanded', 'false'); trigger.focus({ preventScroll: true }); }
+  function open() { render(); sheet.hidden = false; trigger.setAttribute('aria-expanded', 'true'); modal.opened(sheet.querySelector('[aria-current]')); }
+  function close() { if (sheet.hidden) return; sheet.hidden = true; modal.closed(); trigger.setAttribute('aria-expanded', 'false'); trigger.focus({ preventScroll: true }); }
+  // 열린 채로 탭 상태(부팅 끝·이동)가 바뀌면 지도도 다시 그린다(오타 10/8: 부팅 중 연 지도가 비활성으로 남던 것).
+  const rooms = header?.querySelector('.rooms'), sub = header?.querySelector('.room-sub');
+  const watch = new MutationObserver(() => { if (sheet.hidden) return; const at = document.activeElement?.dataset?.place; render(); modal.opened(sheet.querySelector(`[data-place="${at}"]`) || sheet.querySelector('[aria-current]')); });
+  for (const n of [rooms, sub]) if (n) watch.observe(n, { subtree: true, attributes: true, attributeFilter: ['disabled', 'aria-pressed'] });
   trigger.onclick = () => (sheet.hidden ? open() : close());
   return { open, close };
 }
