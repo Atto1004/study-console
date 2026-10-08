@@ -22,7 +22,7 @@ export function createSpace(app){
   hud.append(title,action,sit,exit);school.append(hud,pad);
   const controls=make('nav',null,'seat-controls');controls.hidden=true;controls.setAttribute('aria-label','학습 시점');
   controls.append(iconButton('board','앞의 설명 보기',()=>view('lecture')),iconButton('notebook','내 공책 내려다보기',()=>view('notebook')),iconButton('ask','옆의 스앵님께 질문',()=>{view('notebook');app.ask();}),iconButton('tools','교실 도구',()=>tools()),iconButton('stand','자리에서 일어나기',async()=>{await app.pause();walk(room.name);}));document.getElementById('room').prepend(controls);
-  let T,AV,FP,ctl=null,avatars=[],scene,camera,renderer,loaded=false,dirty=true,ray=null,aimAt=0,boxes=[],dprMax=1.25,dpr=1.25,dprCheck=0,pendingDpr=false,justRaised=false,room=null,walking=false,transition=null,last=0,doors3=[],targets=[],colliders=[],lastTarget=null,loadingPromise=null,generation=0;
+  let T,AV,FP,WM,ctl=null,spawnAt=null,leaving=false,avatars=[],scene,camera,renderer,loaded=false,dirty=true,ray=null,aimAt=0,boxes=[],dprMax=1.25,dpr=1.25,dprCheck=0,pendingDpr=false,room=null,walking=false,transition=null,last=0,doors3=[],targets=[],colliders=[],lastTarget=null,loadingPromise=null,generation=0;
   // 겹친 창(설계 v2 계약 B): 이 중 하나라도 열려 있으면 이동·시선·E·착석 방향키·쓸기를 모두 멈춘다.
   const shown=sel=>{const e=document.querySelector(sel);return !!e&&!e.hidden&&e.getClientRects().length>0;};
   // 성능 측정(설계 F): 최근 120프레임의 렌더 시간·프레임 간격·draw call·삼각형. 검사가 window.__worldStats() 로 읽는다.
@@ -36,7 +36,7 @@ export function createSpace(app){
   }
   async function loadScene(){
     if(loaded)return;
-    T=await import('./vendor/three.module.js');AV=await import('./avatar3d.js');FP=await import('./world/fp-controller.js');
+    T=await import('./vendor/three.module.js');AV=await import('./avatar3d.js');FP=await import('./world/fp-controller.js');WM=await import('./world/world-map.js');
     scene=new T.Scene();scene.background=new T.Color(0xe0e7e3);scene.fog=new T.Fog(0xe0e7e3,23,55);
     camera=new T.PerspectiveCamera(65,innerWidth/innerHeight,.02,100);camera.rotation.order='YXZ';camera.position.set(0,1.65,1);scene.add(camera);
     renderer=new T.WebGLRenderer({antialias:true,alpha:false});dprMax=Math.min(devicePixelRatio||1,1.5);dpr=Math.min(dprMax,1.25);renderer.setPixelRatio(dpr);layer.append(renderer.domElement);renderer.domElement.tabIndex=0;renderer.domElement.setAttribute('aria-label','학교 공간 · 마우스로 시선 이동');
@@ -74,6 +74,7 @@ export function createSpace(app){
       props(r);
     }
     box(.18,3.4,2.3,2.4,1.7,-33,0xe7e7de,true);
+    WM.buildHallway({T,box,sign,targets,colliders});   // 2단계: 대표실로 가는 연결 복도
     for(let z=-2;z>-32;z-=6){box(1.8,.03,.7,0,3.35,z,0xfff6d8);box(.03,1.5,2.6,-2.29,2,z,0xaac9cb);}
   }
   function desk(x,z,r,mine){const m=box(1.55,.12,1.2,x,.82,z,0x9b7955);for(const xx of [-.63,.63])for(const zz of [-.48,.48])box(.06,.78,.06,x+xx,.39,z+zz,0x626c65);box(.1,.7,.55,x-.95,.55,z,0x6a8275);box(.75,.1,.6,x-.7,.44,z,0x6a8275);if(mine){m.userData={kind:'seat',room:r};targets.push(m);box(.65,.025,.88,x,.897,z,0xfffbeb);r.seatSign=sign('내 자리',.85,.22,x-.79,1.02,z,-Math.PI/2);}return m;}
@@ -85,26 +86,27 @@ export function createSpace(app){
   }
   function resize(){if(!renderer)return;renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();dirty=true;}
   const hitBox=(b,x,z)=>x>b.min.x-.22&&x<b.max.x+.22&&z>b.min.z-.22&&z<b.max.z+.22;
-  function blocked(x,z){if(x< -2.05||x>10.9||z>1.7||z< -33.6)return true;for(const b of boxes)if(hitBox(b,x,z))return true;for(const r of doors3)if(!r.open&&hitBox(r.box,x,z))return true;return false;}
+  function blocked(x,z){const B=WM.BOUNDS;if(x<B.minX||x>B.maxX||z>B.maxZ||z<B.minZ)return true;for(const b of boxes)if(hitBox(b,x,z))return true;for(const r of doors3)if(!r.open&&hitBox(r.box,x,z))return true;return false;}
   function frame(t){const dt=Math.min((t-last)/1000||0,.05);last=t;if(!loaded||layer.hidden||document.hidden)return;const c0=performance.now();if(pendingDpr){pendingDpr=false;renderer.setPixelRatio(dpr);renderer.setSize(innerWidth,innerHeight);dirty=true;}
     if(transition){const f=Math.min(1,(t-transition.at)/(reduced.checked?1:700)),a=f*f*(3-2*f);camera.position.lerpVectors(transition.from,transition.to,a);ctl.yaw=transition.y0+(transition.y1-transition.y0)*a;ctl.pitch=transition.p0+(transition.p1-transition.p0)*a;if(f===1){transition=null;school.classList.remove('view-moving');}}
-    else if(walking)ctl.update(dt);
+    else if(walking){ctl.update(dt);if(spawnAt&&Math.hypot(camera.position.x-spawnAt.x,camera.position.z-spawnAt.z)>=WM.GATE.armAfter)spawnAt=null;if(!spawnAt&&!leaving&&!overlay()&&WM.inGate(camera.position.x,camera.position.z))goOffice();}
     // 착석 중에는 3D 가 공부 화면 뒤에 가만히 있다: 시점이 바뀔 때만 그린다(펜·화면이 덜 버벅이게).
     if(!walking&&!transition&&!dirty)return;
     ctl.arms.visible=walking&&!transition;ctl.apply();
     // 스앵님은 플레이어가 있는 교실 근처(9m 안)에서만 보이고 움직인다.
     for(const r of doors3){if(!r.teacher)continue;const near=walking&&Math.abs(camera.position.z-r.z)<9&&camera.position.x>2;r.teacher.visible=near;}
     for(const a of avatars)if(a.group.visible)a.update(dt);
-    if(walking&&!overlay()&&t-aimAt>100){aimAt=t;ray.setFromCamera(new T.Vector2(0,0),camera);const hit=ray.intersectObjects(targets).find(x=>x.distance<3);lastTarget=hit?.object.userData||null;action.hidden=!lastTarget;if(lastTarget)action.textContent=lastTarget.kind==='door'?`${lastTarget.room.name} 문 ${lastTarget.room.open?'닫기':'열기'} · E`:`${lastTarget.room.name} 내 자리에 앉기 · E`;sit.hidden=!room;}
+    if(walking&&!overlay()&&t-aimAt>100){aimAt=t;ray.setFromCamera(new T.Vector2(0,0),camera);const hit=ray.intersectObjects(targets).find(x=>x.distance<3);lastTarget=hit?.object.userData||null;action.hidden=!lastTarget;if(lastTarget)action.textContent=lastTarget.kind==='gate'?'대표실로 · E':lastTarget.kind==='door'?`${lastTarget.room.name} 문 ${lastTarget.room.open?'닫기':'열기'} · E`:`${lastTarget.room.name} 내 자리에 앉기 · E`;sit.hidden=!room;}
     const r0=performance.now();perf.cpu.push(r0-c0);if(perf.cpu.length>120)perf.cpu.shift();renderer.render(scene,camera);perf.push(performance.now()-r0,dt,renderer.info.render);dirty=false;
     // 해상도 자동 조절: 걷는 동안 2초마다 fps 를 보고 45 미만이면 한 단계 내리고, 58 넘게 넉넉하면 올린다.
-    if(adaptive&&walking&&t-dprCheck>2000&&perf.f.length>=60){dprCheck=t;const fps=1/(perf.f.reduce((x,y)=>x+y,0)/perf.f.length);let next=dpr;if(fps<45){next=Math.max(1,dpr-.25);if(justRaised)dprMax=next;}else if(fps>58)next=Math.min(dprMax,dpr+.25);justRaised=next>dpr;if(next!==dpr){dpr=next;pendingDpr=true;}}
+    if(adaptive&&walking&&t-dprCheck>2000&&perf.f.length>=60){dprCheck=t;const fps=1/(perf.f.reduce((x,y)=>x+y,0)/perf.f.length);let next=dpr;if(fps<45){next=Math.max(1,dpr-.25);dprMax=Math.min(dprMax,next);}else if(fps>58)next=Math.min(dprMax,dpr+.25);if(next!==dpr){dpr=next;pendingDpr=true;}}   // 한 번이라도 내렸으면 이번 접속 동안 그 위로는 안 올린다(진동 방지, 오타 10/8)
   }
   function move(to,y,p){dirty=true;transition={from:camera.position.clone(),to:new T.Vector3(...to),y0:ctl.yaw,y1:y,p0:ctl.pitch,p1:p,at:performance.now()};school.classList.add('view-moving');}
-  async function walk(name){const token=++generation;try{await app.pause();await load();if(token!==generation)return;layer.hidden=false;school.dataset.world='walking';app.screen?.({world:'walking',subject:name});for(const r of doors3){if(r.teacher)r.teacher.visible=true;if(r.seatSign)r.seatSign.visible=true;}controls.hidden=true;hud.hidden=false;layer.setAttribute('aria-hidden','false');walking=true;ctl.setMode('walking');room=doors3.find(r=>r.name===name)||null;title.textContent=room?room.name+' 교실':'학교 복도';if(room){openDoor(room,true);move([6.3,1.65,room.z],-Math.PI/2,0);}else move([0,1.65,1],0,0);title.tabIndex=-1;title.focus({preventScroll:true});}catch(e){if(token!==generation)return;app.status('교실 공간을 열지 못했습니다. '+e.message,true);hide();}}
+  async function walk(name,opts={}){const token=++generation;try{await app.pause();await load();if(token!==generation)return;layer.hidden=false;school.dataset.world='walking';app.screen?.({world:'walking',subject:name});for(const r of doors3){if(r.teacher)r.teacher.visible=true;if(r.seatSign)r.seatSign.visible=true;}controls.hidden=true;hud.hidden=false;layer.setAttribute('aria-hidden','false');walking=true;ctl.setMode('walking');room=doors3.find(r=>r.name===name)||null;title.textContent=room?room.name+' 교실':'학교 복도';leaving=false;if(room){spawnAt=null;openDoor(room,true);move([6.3,1.65,room.z],-Math.PI/2,0);}else{const sp=WM.spawnOf(opts.spawn);spawnAt={x:sp.x,z:sp.z};if(opts.spawn){camera.position.set(sp.x,1.65,sp.z);ctl.yaw=sp.yaw;ctl.pitch=0;title.textContent='대표실 가는 복도';}else move([sp.x,1.65,sp.z],sp.yaw,0);}title.tabIndex=-1;title.focus({preventScroll:true});}catch(e){if(token!==generation)return;app.status('교실 공간을 열지 못했습니다. '+e.message,true);hide();}}
+  async function goOffice(){if(leaving)return;leaving=true;ctl.release();let ok=false;try{ok=await app.leaveTo?.('/kingdom/');}catch{}if(!ok){leaving=false;spawnAt={x:camera.position.x,z:camera.position.z};}}   // 실패하면 1m 벗어났다 와야 다시 시도(문 앞 반복 방지)
   function openDoor(r,value){r.open=value;r.door.visible=!value;}
   async function enter(name){await load();room=doors3.find(r=>r.name===name);if(!room)return;openDoor(room,true);await walk(name);}
-  function interact(){if(!walking||!lastTarget||overlay())return;if(lastTarget.kind==='door')openDoor(lastTarget.room,!lastTarget.room.open);else{room=lastTarget.room;app.select(room.name);}}
+  function interact(){if(!walking||!lastTarget||overlay())return;if(lastTarget.kind==='gate'){goOffice();return;}if(lastTarget.kind==='door')openDoor(lastTarget.room,!lastTarget.room.open);else{room=lastTarget.room;app.select(room.name);}}
   async function seated(name,kind='understand',cameraView){const token=++generation;try{await load();if(token!==generation)return;room=doors3.find(r=>r.name===name);if(!room){hide();return;}openDoor(room,true);walking=false;ctl.setMode('seated');hud.hidden=true;controls.hidden=false;layer.hidden=false;layer.setAttribute('aria-hidden','false');school.dataset.world='seated';for(const r of doors3){if(r.teacher)r.teacher.visible=false;if(r.seatSign)r.seatSign.visible=false;}school.dataset.subject=name;view(['lecture','notebook'].includes(cameraView)?cameraView:kind==='quiz'?'notebook':'lecture');}catch(e){if(token!==generation)return;hide();app.status('3D 표시를 준비하지 못했습니다. 기존 학습 화면에서 계속합니다.',true);}}
   function view(mode){if(!room||walking)return;mode=app.fixedView?.()||mode;document.exitPointerLock?.();school.dataset.view=mode;for(const b of controls.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.icon===(mode==='lecture'?'board':'notebook')));move([6.7,1.22,room.z],-Math.PI/2,mode==='notebook'?-.65:mode==='paper'?-.2:0);app.view?.(mode);}
   function hide(){++generation;walking=false;ctl?.setMode('hidden');layer.hidden=true;layer.setAttribute('aria-hidden','true');hud.hidden=true;controls.hidden=true;delete school.dataset.world;delete school.dataset.view;}
