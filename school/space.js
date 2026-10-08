@@ -11,7 +11,7 @@ export const ROOMS=[
 export function createSpace(app){
   const school=document.querySelector('.school'),layer=make('div',null,'school-world');layer.id='schoolWorld';layer.setAttribute('aria-hidden','true');school.prepend(layer);
   const hud=make('section',null,'world-hud');hud.hidden=true;hud.setAttribute('aria-label','1인칭 교실 이동');
-  const title=make('b','학교 복도'),help=make('p',matchMedia('(pointer: coarse)').matches?'왼쪽 아래 버튼을 누르고 있으면 이동 · 화면을 끌어 시선 · 문 앞에서 위 버튼으로 열기/앉기':'WASD 이동 · 마우스로 시선 · E 문 열기/앉기 · Esc 마우스 해제'),action=button('앞의 문·자리에 상호작용',interact);
+  const title=make('b','학교 복도'),help=make('p',matchMedia('(pointer: coarse)').matches?'이동: 왼쪽 아래 버튼 · WASD · 방향키 / 시선: 화면 끌기 · 트랙패드 두 손가락 / E: 문 열기·앉기':'WASD·방향키 이동 · 클릭 후 마우스로 시선(트랙패드 두 손가락도) · E 문 열기/앉기 · Esc 마우스 해제'),action=button('앞의 문·자리에 상호작용',interact);
   const doors=make('div',null,'world-quick');for(const r of ROOMS)doors.append(button(r.name,()=>enter(r.name)));
   const pad=make('div',null,'world-pad');for(const [key,label] of [['w','앞으로'],['a','왼쪽'],['s','뒤로'],['d','오른쪽']]){const b=button(label,()=>{});b.onpointerdown=e=>{e.preventDefault();keys.add(key);b.dataset.held='';try{b.setPointerCapture(e.pointerId);}catch{}};b.onpointerup=b.onpointercancel=b.onlostpointercapture=()=>{keys.delete(key);delete b.dataset.held;};b.oncontextmenu=e=>e.preventDefault();pad.append(b);}
   const reduced=make('input');reduced.type='checkbox';try{reduced.checked=localStorage.getItem('school-reduced-motion')==='1'||matchMedia('(prefers-reduced-motion: reduce)').matches;}catch{}
@@ -37,7 +37,7 @@ export function createSpace(app){
     renderer.domElement.onclick=()=>{if(walking&&!pointerDragged){const request=renderer.domElement.requestPointerLock?.();request?.catch?.(()=>{});}};
     renderer.domElement.onpointerdown=e=>{renderer.domElement.focus();pointerDragged=false;if(walking&&document.pointerLockElement!==renderer.domElement){drag={id:e.pointerId,x:e.clientX,y:e.clientY};try{renderer.domElement.setPointerCapture(e.pointerId);}catch{}}};
     renderer.domElement.onpointermove=e=>{if(!walking)return;if(document.pointerLockElement===renderer.domElement){yaw-=e.movementX*.0025;pitch=Math.max(-1.1,Math.min(1.1,pitch-e.movementY*.0025));}else if(drag?.id===e.pointerId){if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>2)pointerDragged=true;yaw-=(e.clientX-drag.x)*.005;pitch=Math.max(-1.1,Math.min(1.1,pitch-(e.clientY-drag.y)*.005));drag={id:e.pointerId,x:e.clientX,y:e.clientY};}};
-    renderer.domElement.onpointerup=renderer.domElement.onpointercancel=()=>drag=null;
+    renderer.domElement.onpointerup=renderer.domElement.onpointercancel=()=>drag=null;renderer.domElement.addEventListener('wheel',e=>{if(!walking)return;e.preventDefault();yaw-=e.deltaX*.004;pitch=Math.max(-1.1,Math.min(1.1,pitch-e.deltaY*.004));},{passive:false});
     renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();hide();app.status('3D 화면 연결이 끊겼습니다. 학습 화면에서 이어갈 수 있습니다.',true);});
   }
   function box(w,h,d,x,y,z,color,solid=false){const m=new T.Mesh(new T.BoxGeometry(w,h,d),new T.MeshStandardMaterial({color,roughness:.85}));m.position.set(x,y,z);scene.add(m);if(solid)colliders.push(m);return m;}
@@ -99,7 +99,9 @@ export function createSpace(app){
       else{ctx.beginPath();for(let x=-3;x<=3;x+=.025){const y=room?.name==='공업수학1'?Math.exp(a*x*.25):a*x*x;const px=360+x*90,py=320-y*35;if(x===-3)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.stroke();readout.textContent=room?.name==='공업수학1'?`예시 y′ = ${a/4}y, y(0)=1 · 계수에 따른 해 변화`:`예시 y = ${a}x² · 계수에 따른 그래프 변화`;}
     };range.oninput=draw;draw();
   }
-  window.addEventListener('resize',resize);window.addEventListener('keydown',e=>{if(walking&&e.key==='Escape'){document.exitPointerLock?.();keys.clear();return;}if(!walking||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;if(['w','a','s','d'].includes(e.key.toLowerCase())){keys.add(e.key.toLowerCase());e.preventDefault();}if(e.key.toLowerCase()==='e')interact();});window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>keys.clear());document.addEventListener('visibilitychange',()=>{if(document.hidden)keys.clear();});
+  window.addEventListener('resize',resize);// 한글 입력 상태에서도 같은 자리의 키로 움직이도록 글자(key)가 아니라 키 위치(code)로 읽는다.
+  const MOVE={KeyW:'w',ArrowUp:'w',KeyS:'s',ArrowDown:'s',KeyA:'a',ArrowLeft:'a',KeyD:'d',ArrowRight:'d'};
+  window.addEventListener('keydown',e=>{if(walking&&e.key==='Escape'){document.exitPointerLock?.();keys.clear();return;}if(!walking||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;const k=MOVE[e.code];if(k){keys.add(k);e.preventDefault();}if(e.code==='KeyE'&&!e.repeat){e.preventDefault();interact();}});window.addEventListener('keyup',e=>{const k=MOVE[e.code];if(k)keys.delete(k);});window.addEventListener('blur',()=>keys.clear());document.addEventListener('visibilitychange',()=>{if(document.hidden)keys.clear();});
   new MutationObserver(()=>{if(school.dataset.mode!=='classroom'&&!walking)hide();}).observe(school,{attributes:true,attributeFilter:['data-mode']});
   layer.hidden=true;return {walk,enter,seated,view,hide,get mode(){return school.dataset.view;}};
 }
