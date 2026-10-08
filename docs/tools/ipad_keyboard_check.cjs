@@ -8,7 +8,7 @@ const { webkit, devices } = require(require('path').resolve(__dirname,'../../.te
   page.on('pageerror', e => errors.push(e.message));
   await page.goto('http://127.0.0.1:8797/school/index.html', { waitUntil: 'load' });
   await page.waitForSelector('.corridor-door', { timeout: 20000 });
-  await page.tap('.corridor-door.is-target');
+  await page.tap('.hud-walk');
   await page.waitForTimeout(4000);
   const shot = () => page.screenshot();
   const key = (type, key, code) => page.evaluate(([type, key, code]) => window.dispatchEvent(new KeyboardEvent(type, { key, code, bubbles: true, cancelable: true })), [type, key, code]);

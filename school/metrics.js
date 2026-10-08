@@ -40,14 +40,24 @@ export function pickQuest(rows, deadlines = []) {
   return sorted.length ? { type: "course", ...sorted[0] } : null;
 }
 
-// 교실 자리에 앉으면 시작할 수업: 이어 하던 수업 > 오늘까지 나간 회차 중 문제를 안 푼 가장 이른 회차 > 가장 최근 회차.
-export function pickLesson({ course, lessons = [], events = [], today, session = null }) {
-  if (session?.course === course && session.lessonId) return { id: session.lessonId, resume: true };
-  const past = lessons.filter((l) => l.date && l.date <= today).sort((a, b) => a.date.localeCompare(b.date));
-  if (!past.length) return lessons[0] ? { id: lessons[0].id, resume: false } : null;
-  const solved = new Set(events.filter((e) => e.kind === "answer" && e.course === course).map((e) => e.lesson));
-  const next = past.find((l) => !solved.has(l.id)) || past[past.length - 1];
-  return { id: next.id, resume: false };
+// 공부할 회차 하나(시험 대비 효율 우선). 이어 하던 수업 > 시험 범위 중 틀린 채 남은 회차 > 안 푼 회차 > 도움받아서만 맞힌 회차 > 최근 회차.
+// 수업으로 변환된 회차를 먼저 보고, 원본 메모 회차(id 가 session: 으로 시작, 예: 오리엔테이션)는 뒤로 미룬다.
+export function pickLesson({ course, lessons = [], events = [], today, exam = null, session = null }) {
+  if (session?.course === course && session.lessonId) return { id: session.lessonId, resume: true, why: "resume" };
+  const scope = lessons.filter((l) => l.date && l.date <= today && (!exam || l.date < exam.date)).sort((a, b) => a.date.localeCompare(b.date));
+  if (!scope.length) return lessons[0] ? { id: lessons[0].id, resume: false, why: "first" } : null;
+  const converted = scope.filter((l) => !String(l.id).startsWith("session:"));
+  const pool = converted.length ? converted : scope;
+  const answers = latestAnswers(events.filter((e) => e.course === course));
+  const byLesson = new Map();
+  for (const e of answers) { if (!byLesson.has(e.lesson)) byLesson.set(e.lesson, []); byLesson.get(e.lesson).push(e); }
+  const retry = pool.find((l) => (byLesson.get(l.id) || []).some((e) => !e.correct));
+  if (retry) return { id: retry.id, resume: false, why: "retry" };
+  const fresh = pool.find((l) => !byLesson.has(l.id));
+  if (fresh) return { id: fresh.id, resume: false, why: "new" };
+  const assisted = pool.find((l) => (byLesson.get(l.id) || []).some((e) => e.assisted));
+  if (assisted) return { id: assisted.id, resume: false, why: "assisted" };
+  return { id: pool[pool.length - 1].id, resume: false, why: "latest" };
 }
 
 // 자료 하나 = 종류 하나. 기준은 "누가 만들었나". 겹치면 과제 > 원본 > 스앵님 정리 > 생성.

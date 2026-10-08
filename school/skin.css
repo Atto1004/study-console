@@ -308,3 +308,11 @@ footer { background: var(--surface) !important; color: var(--ink-3) !important; 
 @media (prefers-reduced-motion: reduce) { .room-door, .door-frame, .door-bar i, .door-marker, .corridor-door.is-target .door-frame { transition: none !important; animation: none !important; } }
 
 .kind-badge.guessed { opacity: .75; border: 1px dashed currentColor; }
+.corridor-hud .hud-walk{width:46px;height:46px;min-height:0!important;padding:0!important;display:grid;place-items:center;border-radius:14px!important;background:rgba(255,255,255,.88)!important;border:0!important;box-shadow:0 4px 14px rgba(32,61,35,.10)!important;color:var(--brand)!important}
+.corridor-hud .hud-walk svg{width:24px;height:24px;pointer-events:none}
+
+/* 수업 화면(2D): 칠판·스앵님을 위에 붙이고, 내 풀이가 길면 장면을 스크롤 — 문제가 화면 밖으로 밀리지 않게 */
+.school[data-mode=classroom]:not([data-world]) .teaching-space{align-items:start!important;align-self:start}
+.school[data-mode=classroom]:not([data-world]) .teaching-space>*{align-self:start}
+.school[data-mode=classroom]:not([data-world]) #missionWork{align-self:start}
+html body .school[data-mode=classroom]:not([data-world]) #scene{overflow-y:auto!important}

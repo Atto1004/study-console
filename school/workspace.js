@@ -136,21 +136,22 @@ export function createWorkspace(app){
       const t=quest.task;target=null;
       q.classList.add('is-deadline');q.append(el('small',`퀘스트 · ${t.deadlineDays?'내일':'오늘'} 마감`),el('b',`${t.course} ${t.title}`));
       step('풀이',t.workDone);step('제출',t.submitted);
-      primary={label:t.workDone?'제출하러 과제실로':'풀이부터 할래요',go:()=>t.workDone?open('assignments'):walkTo(t.course)};
+      primary={label:t.workDone?'제출하러 과제실로':'과제 풀러 가기',go:()=>open('assignments')};
       line=`${t.course} ${t.title}, ${t.deadlineDays?'내일':'오늘'}${t.deadlineTime?' '+t.deadlineTime:''}까지예요. ${t.workDone?'제출만 남았어요.':'지금 같이 풀어요.'}`;react='deadline';target=t.course;
     }else if(quest){
       const {exam,m}=quest;q.append(el('small',`퀘스트 · 시험 ${ddayLabel(exam.dday)}`),el('b',`${exam.course} 준비도 올리기`));
       step(`수업 ${m.covered}/${m.scope}회차 풀기`,m.scope>0&&m.covered===m.scope);step(`혼자 맞히기 ${m.tested?pct(m.understanding)+'%':'아직'}`,m.tested>0&&m.understanding>=.8);
-      primary={label:`${exam.course} 교실로`,go:()=>walkTo(exam.course)};
+      primary={label:`${exam.course} 문제 풀기`,go:()=>practiceIn(exam.course)};
       line=`${exam.course}부터 가요. 시험 ${ddayLabel(exam.dday)}, 준비도 ${m.readiness}. ${m.remaining?`남은 수업 ${m.remaining}회차예요.`:'문제로 다지면 돼요.'}`;react='idle';target=exam.course;
     }else{q.append(el('small','퀘스트'),el('b','오늘은 급한 일이 없어요'));line='급한 건 없어요. 약한 과목부터 한 문제만 풀어요.';react='idle';}
+    const walk=btn('',()=>walkTo(target||rows[0]?.name),'hud-walk');walk.setAttribute('aria-label','1인칭으로 걸어서 들어가기');walk.title='1인칭으로 걸어서 들어가기';walk.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="M9 22l2-7 3 3v6M7 12l3-4 4 1 2 4 3 1M10 8l-1 5"/></svg>';if(rows.length)hud.append(walk);
     q.append(steps);hud.append(q);scene.append(hud);
     // 문
     const doors=el('div',undefined,'corridor-doors');
     for(const {name:course,exam:e,m} of rows){
       const when=e?ddayLabel(e.dday)+(e.assumed?' 예정':''):'시험 없음';
       const d=el('button',undefined,'corridor-door pace-'+m.pace+(course===target?' is-target':'')+(e?.assumed?' is-assumed':''));d.type='button';
-      d.setAttribute('aria-label',`${course} 교실 · A+ 준비도 ${m.readiness} · ${when}`);d.onclick=()=>walkTo(course);
+      d.setAttribute('aria-label',`${course} · 시험 범위 문제 풀기 · A+ 준비도 ${m.readiness} · ${when}`);d.title=`${course} 문제 풀기`;d.onclick=()=>practiceIn(course);
       if(course===target)d.append(el('span',quest?.type==='assignment'?'오늘 할 일':'지금 여기','door-marker'));
       const plate=el('span',undefined,'door-plate'),name=el('span',undefined,'door-name');name.append(el('b',course),el('em',when));
       const bar=el('span',undefined,'door-bar'),fill=el('i');fill.style.width=Math.max(2,pct(m.progress))+'%';bar.append(fill);
@@ -173,7 +174,7 @@ export function createWorkspace(app){
     const choices=el('div',undefined,'vn-choices');
     if(primary)choices.append(btn(primary.label,primary.go,'primary'));
     const alt=rows.filter(r=>r.exam&&r.name!==target).sort((a,b)=>(100-b.m.readiness)/Math.max(b.exam.dday,1)-(100-a.m.readiness)/Math.max(a.exam.dday,1))[0];
-    if(alt)choices.append(btn(`${alt.name} 먼저 할래요`,()=>walkTo(alt.name)));
+    if(alt)choices.append(btn(`${alt.name} 먼저 할래요`,()=>practiceIn(alt.name)));
     choices.append(btn('오늘 계획 다시 짜줘요',()=>{const box=root.querySelector('.main-tutor textarea');if(box){box.value='오늘 계획 다시 잡아줘';box.scrollIntoView({block:'center'});box.focus();}}));
     vn.append(el('span','김주영','vn-tag'),el('p',line,'vn-line'),choices);
     scene.append(vn);
@@ -183,6 +184,9 @@ export function createWorkspace(app){
   }
   function walkTo(course){
     return app.walk?app.walk(course):startCourse(course);
+  }
+  function practiceIn(course){
+    return app.practice?app.practice(course):startCourse(course);
   }
   function renderMain(){
     renderCorridor();

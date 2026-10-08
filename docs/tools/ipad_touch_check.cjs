@@ -8,7 +8,7 @@ const { webkit, devices } = require(require('path').resolve(__dirname,'../../.te
   page.on('pageerror', e => errors.push(e.message));
   await page.goto('http://127.0.0.1:8797/school/index.html', { waitUntil: 'load' });
   await page.waitForSelector('.corridor-door', { timeout: 20000 });
-  await page.tap('.corridor-door.is-target');
+  await page.tap('.hud-walk');
   await page.waitForTimeout(4000);
   const info = await page.evaluate(() => {
     const c = document.querySelector('#schoolWorld canvas'), b = [...document.querySelectorAll('.world-pad button')][0];

@@ -73,14 +73,24 @@ test("지금 할 것: 하루 안 마감 과제 > 급한 과목, 미확정 시험
   assert.equal(pickQuest([]), null);
 });
 
-test("자리에 앉으면 시작할 수업", () => {
-  const ev = [answer("a", 1, true), answer("b", 1, false)].map((e) => ({ ...e, course: "정역학" }));
-  assert.deepEqual(pickLesson({ course: "정역학", lessons, events: ev, today: "2026-10-07" }), { id: "c", resume: false }, "문제를 안 푼 가장 이른 회차");
-  assert.deepEqual(pickLesson({ course: "정역학", lessons, events: ev, today: "2026-10-07", session: { course: "정역학", lessonId: "b" } }), { id: "b", resume: true }, "이어 하던 수업 먼저");
-  assert.deepEqual(pickLesson({ course: "정역학", lessons, events: ev, today: "2026-10-07", session: { course: "미적2", lessonId: "x" } }).id, "c", "다른 과목 세션은 무시");
-  const all = ["a", "b", "c", "d"].map((l) => ({ ...answer(l, 1, true), course: "정역학" }));
-  assert.equal(pickLesson({ course: "정역학", lessons, events: all, today: "2026-10-07" }).id, "d", "다 풀었으면 가장 최근 회차");
-  assert.equal(pickLesson({ course: "정역학", lessons: [], events: [], today: "2026-10-07" }), null);
+test("공부할 회차: 이어 하던 수업 > 틀린 회차 > 안 푼 회차 > 도움받은 회차 > 최근, 원본 메모 회차는 뒤로", () => {
+  const ls = [
+    { id: "session:정역학:2026-09-02", date: "2026-09-02" },
+    { id: "a", date: "2026-09-07" }, { id: "b", date: "2026-09-14" }, { id: "c", date: "2026-09-21" },
+    { id: "late", date: "2026-10-20" },
+  ];
+  const ex = { date: "2026-10-19" };
+  const ev = (l, correct, assisted = false, at = 1) => ({ ...answer(l, 1, correct, assisted, at), course: "정역학" });
+  const pick = (events, session) => pickLesson({ course: "정역학", lessons: ls, events, today: "2026-10-08", exam: ex, session });
+  assert.deepEqual(pick([]), { id: "a", resume: false, why: "new" }, "오리엔테이션(session:)보다 변환된 첫 회차");
+  assert.equal(pick([ev("a", true), ev("b", false)]).id, "b", "틀린 채 남은 회차가 먼저");
+  assert.equal(pick([ev("a", true), ev("b", false), ev("b", true, false, 2)]).id, "c", "다시 맞히면 안 푼 회차로");
+  assert.equal(pick([ev("a", true), ev("b", true, true), ev("c", true)]).why, "assisted");
+  assert.equal(pick([ev("a", true), ev("b", true), ev("c", true)]).id, "c", "다 풀었으면 최근 회차");
+  assert.deepEqual(pick([], { course: "정역학", lessonId: "b" }), { id: "b", resume: true, why: "resume" });
+  assert.equal(pick([], { course: "미적2", lessonId: "x" }).id, "a", "다른 과목 세션은 무시");
+  assert.equal(pickLesson({ course: "정역학", lessons: [ls[0]], events: [], today: "2026-10-08", exam: ex }).id, "session:정역학:2026-09-02", "변환된 회차가 없으면 원본 메모라도");
+  assert.equal(pickLesson({ course: "정역학", lessons: [], events: [], today: "2026-10-08" }), null);
 });
 
 test("자료 4분류 — 명시된 종류가 먼저, 이름으로만 짐작하면 추정", () => {

@@ -656,11 +656,21 @@ function saveSession(lesson, targetIndex, options = {}) {
   sessionQueue = task;
   return task;
 }
-// 교실 자리에 앉으면 이어 하던 수업, 없으면 안 푼 가장 이른 회차를 바로 시작한다.
-async function sitDown(name) {
+// 시험 대비 효율 우선: 시험 범위에서 약한 회차를 골라 바로 시작한다.
+// practice = 확인 문제 위주로 짧게(복도 문·선택지), sitDown = 같은 회차의 전체 수업(1인칭 자리).
+function weakLesson(name, session = null) {
   const c = catalog?.courses.find((x) => x.name === name);
   const today = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Seoul" }).format(new Date());
-  const pick = pickLesson({ course: name, lessons: c?.lessons || [], events: [...state.events, ...pending], today, session: activeSession });
+  const exam = (workspace?.data?.exams || []).find((e) => e.course === name && e.written && e.kind === "중간") || null;
+  return pickLesson({ course: name, lessons: c?.lessons || [], events: [...state.events, ...pending], today, exam, session });
+}
+async function practice(name) {
+  const pick = weakLesson(name);
+  if (!pick) { status(`${name}에 연결된 수업이 아직 없습니다.`, true); return; }
+  await startLesson(pick.id, { purpose: "exam" });
+}
+async function sitDown(name) {
+  const pick = weakLesson(name, activeSession);
   if (!pick) { status(`${name} 교실에 연결된 수업이 아직 없습니다.`, true); return; }
   if (pick.resume) return resumeSession();
   await startLesson(pick.id, { purpose: "tutoring" });
@@ -838,7 +848,7 @@ async function renderStep(camera) {
   if (pausedLesson && (current.id !== pausedLesson.lesson||index!==pausedLesson.index))
     $("choices").append(button("원래 문제로 돌아가기", returnToQuestion));
   await mission?.mount();
-  await space?.seated(course,step.kind,camera);
+  if (['walking','seated'].includes(document.querySelector('.school').dataset.world)) await space?.seated(course,step.kind,camera);
   await growth?.step(activeSession);
 }
 async function returnToQuestion() {
@@ -2216,7 +2226,7 @@ async function retest(id){
 }
 mission = createMission({api,context:()=>current?{lesson:current,step:current.steps[index],index,assisted,total:missionIndices?.length,number:missionIndices?missionIndices.indexOf(index)+1:undefined}:null,feedback:(text,kind)=>{$('speech').textContent=text;mission.feedback(kind);renderMath($('speech'));},retest,remedial:supplementWork,helped:()=>{assisted=true;saveSession(current,index,{assisted:true}).catch(()=>{});},allowNext:()=>{status('풀이 피드백은 관찰 기록입니다. 확인 문제의 정답 검증은 별도로 진행합니다.');}});
 growth = createGrowth({api,status,panel,start:startLesson,retest,courses:()=>workspace?.data?.courses||[],home:()=>workspace.open('main')});
-workspace = createWorkspace({api,status,panel,record,screen:rememberScreen,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],walk:name=>space&&ROOMS.some(r=>r.name===name)?space.walk(name):showCourse(name),rooms:()=>ROOMS.map(r=>r.name),evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,tutorPlan:(host,data,refresh)=>growth.tutorPlan(host,data,refresh),leave:async()=>{space?.hide();await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);stopVoice();closeDialogs();++requestGeneration;},lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode)});
+workspace = createWorkspace({api,status,panel,record,screen:rememberScreen,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],walk:name=>space&&ROOMS.some(r=>r.name===name)?space.walk(name):showCourse(name),practice,rooms:()=>ROOMS.map(r=>r.name),evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,tutorPlan:(host,data,refresh)=>growth.tutorPlan(host,data,refresh),leave:async()=>{space?.hide();await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);stopVoice();closeDialogs();++requestGeneration;},lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode)});
 space = createSpace({status,panel,screen:rememberScreen,view:camera=>{if(current)rememberScreen({lesson:current.id,step:current.steps[index].id,camera});},home:()=>workspace.open('main'),pause:async()=>{await mission.save();await growth.stop('pause');},ask:()=>openChat('','hint'),select:sitDown});
 const DOCK_LINES={correct:'좋아요. 그 감각 그대로 다음 문제.',wrong:'괜찮아요. 조건부터 다시 나눠 적어봐요.',stuck:'막힌 데서 같이 볼게요.',deadline:'마감이 가까워요. 과제부터 끝내요.'};
 // 표정은 얼굴로만 보여준다. 대사와 동작 버튼에는 상태 이름을 붙이지 않는다.

@@ -9,7 +9,7 @@ async function run(kind) {
   const st = () => page.evaluate(() => ({ world: document.querySelector('.school').dataset.world || null, mode: document.querySelector('.school').dataset.mode, lesson: document.querySelector('#roomLabel')?.textContent || null, padShown: getComputedStyle(document.querySelector('.world-pad')).display !== 'none', hudButtons: [...document.querySelectorAll('.world-hud button')].filter(b => !b.hidden).map(b => b.textContent), walkBtn: !!document.querySelector('#walkSchool') }));
   await page.goto('http://127.0.0.1:8797/school/index.html', { waitUntil: 'load' });
   await page.waitForSelector('.corridor-door');
-  if (kind === 'chrome') await page.click('.corridor-door.is-target'); else await page.tap('.corridor-door.is-target');
+  if (kind === 'chrome') await page.click('.hud-walk'); else await page.tap('.hud-walk');
   await page.waitForTimeout(3500);
   const walking = await st();
   await page.getByRole('button', { name: '자리에 앉아 수업 시작' }).click();
