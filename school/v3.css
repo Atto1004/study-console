@@ -8,8 +8,10 @@
 
 /* 위: 강의 */
 /* 강의 중엔 위 강의 칸이 크게, 끝나면 가운데 문제 칸이 크게(세로 아이패드에서 강의 중 빈 칸이 반을 차지하던 것) */
-.school[data-lecture=playing] .v3-stage,.school[data-lecture=paused] .v3-stage{flex:1 1 auto;height:auto;min-height:200px}
-.school[data-lecture=playing] .v3-work,.school[data-lecture=paused] .v3-work{flex:0 0 auto;min-height:0;max-height:96px;overflow:hidden}
+/* ⏸ 로 멈추면 문제 칸을 펼쳐 바로 읽고 답할 수 있게(오타 검수 10/8) — 줄이는 건 재생 중일 때만 */
+.school[data-lecture=playing] .v3-stage{flex:1 1 auto;height:auto;min-height:200px}
+.school[data-lecture=playing] .v3-work{flex:0 0 auto;min-height:0;max-height:96px;overflow:hidden}
+.school[data-lecture=paused] .v3-work > *{opacity:1;pointer-events:auto}
 .v3-stage{position:relative;flex:none;height:clamp(200px,38dvh,440px);border-radius:18px;overflow:hidden;background:linear-gradient(#dfe6df,#d3dbd3)}
 .v3-stage .teaching-space{position:absolute!important;top:0!important;left:0!important;right:0!important;bottom:0!important;width:auto!important;height:100%!important;box-sizing:border-box;display:grid!important;grid-template-columns:minmax(0,1fr) 168px!important;grid-template-rows:minmax(0,1fr)!important;gap:14px!important;padding:14px!important;max-width:none!important;margin:0!important}   /* WebKit: inset+height:auto 로는 늘어나지 않아 칠판이 64px 로 줄었다(아이패드 10/8) */
 .v3-stage #board:not(.on-surface){height:100%!important}
@@ -24,10 +26,10 @@
 .school[data-view3=site] .v3-subtitle{left:14px;right:196px;bottom:14px;max-width:none;min-height:52px;display:flex;align-items:center;border-radius:12px 12px 12px 12px}
 .school[data-view3=site] .v3-subtitle[hidden]{display:none}
 .v3-3d{position:absolute;inset:0;display:none}
-/* 시점 아이콘 줄은 v3 에서 「일어나기」 하나만, 게임 보기에서 앉아 있을 때만 */
-.school[data-layout=v3] .seat-controls{display:none!important}
-.school[data-layout=v3][data-view3=game][data-world=seated] #lectureStage.v3-stage > nav.seat-controls{display:flex!important;position:absolute!important;top:10px;left:10px;right:auto;bottom:auto;transform:none;z-index:7;padding:0;background:none;box-shadow:none}
-.school[data-layout=v3] .v3-stage .seat-controls > :not([data-icon=stand]){display:none!important}
+.school[data-layout=v3] #room .seat-controls{display:none!important}   /* hud.css [data-world][data-surface] 규칙보다 구체적이어야 이긴다 */
+/* 시점 아이콘 줄은 오타 A3 대로 무대 안에선 숨김(hidden). v3 는 따로 「일어나기」 아이콘 하나(classroom-v3.js .v3-stand)를 강의 칸 왼쪽 위에 */
+.v3-stand{position:absolute;top:10px;left:10px;z-index:7;display:none;background:#ffffffe6}
+.school[data-layout=v3][data-view3=game][data-world=seated] .v3-stand{display:inline-grid}
 /* 게임(3D): 3D 강의실이 위 칸을 채우고 2D 초상은 숨김. 칠판 내용은 3D 칠판 면 위(surface.js), 자막은 스앵님 머리 위 */
 .school[data-view3=game] .v3-3d{display:block}
 .school[data-view3=game][data-world=seated] .v3-stage .teaching-space{display:contents!important}

@@ -30,12 +30,15 @@ const OUT = 'C:/Users/user/.claude/jobs/a132f963/tmp/';
       expect(st.minBtn >= 44, '버튼 44px 미만 ' + st.minBtn);
       if (view === 'game') {
         expect(st.world === 'seated', '게임 보기인데 3D 착석 안 됨');
-        const sd = await p.evaluate(() => { const n = document.querySelector('.seat-controls'), s = document.getElementById('lectureStage').getBoundingClientRect(), r = n.getBoundingClientRect(); return { pos: getComputedStyle(n).position, dx: r.left - s.left, dy: r.top - s.top }; });
+        const sd = await p.evaluate(() => { const n = document.querySelector('.v3-stand'), s = document.getElementById('lectureStage').getBoundingClientRect(), r = n.getBoundingClientRect(); return { pos: getComputedStyle(n).position, dx: r.left - s.left, dy: r.top - s.top }; });
         expect(sd.pos === 'absolute' && sd.dx < 30 && sd.dy < 30, '일어나기 버튼이 강의 칸 왼쪽 위가 아님 ' + JSON.stringify(sd));
       }
       await p.screenshot({ path: OUT + `ipad-${name}-${view}.png` });
       await p.locator('.v3-play').tap(); await p.waitForTimeout(300);
       const paused = await p.evaluate(() => document.querySelector('.school').dataset.lecture); expect(paused === 'paused', '탭 ⏸ 안 됨');
+      // 멈추면 문제 칸이 펼쳐지고 누를 수 있어야(오타 검수 10/8): 높이 ≥150, 안쪽 요소 pointer-events·불투명
+      const pz = await p.evaluate(() => { const w = document.getElementById('workZone'); const k = [...w.children].find((x) => x.getClientRects().length); return { h: Math.round(w.getBoundingClientRect().height), pe: k ? getComputedStyle(k).pointerEvents : 'none', op: k ? getComputedStyle(k).opacity : '0', scroll: w.scrollHeight > w.clientHeight ? getComputedStyle(w).overflowY : 'fits' }; });
+      expect(pz.h >= 150 && pz.pe !== 'none' && pz.op === '1' && pz.scroll !== 'hidden', '멈춤 중 문제 칸 못 씀 ' + JSON.stringify(pz));
       for (let i = 0; i < 30 && (await p.evaluate(() => document.querySelector('.school').dataset.lecture)) !== 'ended'; i++) { await p.locator('.v3-skip').tap(); await p.waitForTimeout(120); }
       await p.waitForTimeout(500);
       const end = await p.evaluate(() => ({ tutor: document.getElementById('dialogue').dataset.tutor, form: !document.querySelector('#workZone form')?.hidden }));

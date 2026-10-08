@@ -33,8 +33,10 @@ export function startClassroomV3(app) {
   stage.append(mount3d, teaching, subtitle);
   room.append(stage, work);
   const choices = document.getElementById('choices'); work.append(choices);
-  const moveWork = () => { const w = document.getElementById('missionWork'); if (w && w.parentElement !== work) work.append(w);
-    const sc = room.querySelector(':scope > .seat-controls'); if (sc) stage.append(sc); };   // 게임 보기: 「자리에서 일어나기」만 강의 칸 모서리에
+  const moveWork = () => { const w = document.getElementById('missionWork'); if (w && w.parentElement !== work) work.append(w); };
+  // 게임 보기에서 앉아 있을 때: 「자리에서 일어나기」 하나(기존 시점 줄의 같은 버튼을 누른다 — 줄 자체는 오타 A3 대로 숨김)
+  const stand = iconBtn('stand', '자리에서 일어나기 (Esc)', 'v3-stand'); stand.innerHTML = svg('M12 19V5M5 12l7-7 7 7');
+  stand.onclick = () => document.querySelector('.seat-controls [data-icon=stand]')?.click(); stage.append(stand);
   moveWork(); new MutationObserver(moveWork).observe(room, { childList: true });
 
   // ── 아래: 대화 기록 + 입력 + 진행 조작
