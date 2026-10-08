@@ -7,7 +7,7 @@ export function createMission(app){
   const canvas=node('canvas');canvas.width=1200;canvas.height=720;canvas.setAttribute('aria-label','문제 풀이 필기 공간');
   const input=node('textarea');input.placeholder='최종 답과 풀이 과정을 적어주세요. 단위와 방향도 함께 확인해요.';input.maxLength=6000;input.rows=4;input.setAttribute('aria-label','내 답과 풀이');
   const stateLabel=node('small','풀이를 불러오는 중…');stateLabel.setAttribute('role','status');
-  function setMode(value){mode=value;try{localStorage.setItem('school-solve-mode',mode);}catch{}if(host.isConnected&&currentKey){draw();schedule();}}
+  function setMode(value){if(value===mode)return;mode=value;try{localStorage.setItem('school-solve-mode',mode);}catch{}if(host.isConnected&&currentKey){draw();schedule();}}
   function renderCanvas(){
     const ctx=canvas.getContext?.('2d');if(!ctx)return;
     ctx.clearRect(0,0,1200,720);
@@ -22,7 +22,9 @@ export function createMission(app){
   function schedule(){dirty=true;++editingVersion;stateLabel.textContent='풀이 저장 대기…';clearTimeout(delay);delay=setTimeout(()=>save().catch(()=>{}),650);}
   function snapshot(){const c=workContext;return {lesson:c.lesson.id,step:c.step.id,mode,text:input.value,strokes:structuredClone(strokes),assisted:app.context()?.lesson.id===c.lesson.id?app.context().assisted:c.assisted,revision:draft.revision||0,acknowledgeSource:!!draft.acknowledgeSource,...(image?{image}:{})};}
   function save(submit=false){
-    clearTimeout(delay);if(!currentKey)return Promise.resolve();if(loading||saveError)return Promise.reject(new Error(loading?'풀이를 불러오는 중입니다.':'최신 풀이 확인 후 저장해주세요.'));
+    clearTimeout(delay);if(!currentKey)return Promise.resolve();
+    // 두 기기 학습에서 칠판 쪽(모니터)은 보기만 한다. 책상(아이패드)의 풀이를 덮어쓰지 않게.
+    if(document.querySelector('.school')?.dataset.role==='board'){dirty=false;return Promise.resolve();}if(loading||saveError)return Promise.reject(new Error(loading?'풀이를 불러오는 중입니다.':'최신 풀이 확인 후 저장해주세요.'));
     const key=currentKey,request=snapshot(),token=generation,version=editingVersion;
     saveQueue=saveQueue.catch(()=>{}).then(async()=>{
       if(token!==generation&&!submit)return;
@@ -44,7 +46,7 @@ export function createMission(app){
     if(key===currentKey){draw();return;}
     if(dirty){try{await save();}catch{return;}}
     currentKey=key;workContext=c;++generation;const token=generation,loadVersion=editingVersion;draft={revision:0};strokes=[];image=null;input.value='';saveError=false;latestDraft=null;loading=true;draw();host.inert=true;input.disabled=true;
-    try{const saved=await app.api('work?lesson='+encodeURIComponent(c.lesson.id)+'&step='+encodeURIComponent(c.step.id));if(token!==generation)return;draft=saved;if(loadVersion===editingVersion){strokes=saved.strokes||[];input.value=saved.text||'';if(saved.mode)mode=saved.mode;}stateLabel.textContent=saved.at?'이전 풀이를 이어서 할 수 있습니다.':'풀이 방식은 언제든 바꿀 수 있습니다.';draw();}catch(e){if(token===generation)stateLabel.textContent=e.message;}finally{if(token===generation){loading=false;host.inert=false;input.disabled=false;}}
+    try{const saved=await app.api('work?lesson='+encodeURIComponent(c.lesson.id)+'&step='+encodeURIComponent(c.step.id));if(token!==generation)return;draft=saved;if(loadVersion===editingVersion){strokes=saved.strokes||[];input.value=saved.text||'';if(saved.mode)mode=app.forcedMode?.()||saved.mode;}stateLabel.textContent=saved.at?'이전 풀이를 이어서 할 수 있습니다.':'풀이 방식은 언제든 바꿀 수 있습니다.';draw();}catch(e){if(token===generation)stateLabel.textContent=e.message;}finally{if(token===generation){loading=false;host.inert=false;input.disabled=false;}}
   }
   function draw(){
     host.replaceChildren(node('h2','내 풀이'));
@@ -52,7 +54,7 @@ export function createMission(app){
     const modes=node('div',undefined,'solve-modes');for(const [value,label] of [['pencil','펜슬로 풀기'],['notebook','공책에 풀기'],['screen','화면으로 풀기']]){const b=button(label,()=>setMode(value));b.setAttribute('aria-pressed',String(mode===value));modes.append(b);}host.append(modes);
     if(mode==='pencil'){
       const tools=node('div',undefined,'pen-tools');for(const [value,label] of [['pen','펜'],['eraser','지우개']]){const b=button(label,()=>{tool=value;draw();});b.setAttribute('aria-pressed',String(tool===value));tools.append(b);}tools.append(button('되돌리기',()=>{if(strokes.length)undo.push(strokes.pop());renderCanvas();schedule();}),button('다시 하기',()=>{if(undo.length)strokes.push(undo.pop());renderCanvas();schedule();}),button('넓게 쓰기',()=>{host.classList.toggle('expanded');canvas.focus();}));host.append(tools,canvas);renderCanvas();
-    }else if(mode==='notebook')host.append(node('p','문제를 보며 공책에 풀어주세요. 풀이 사진 또는 답·과정을 제출하면 스앵님과 확인할 수 있어요.'));
+    }else if(mode==='notebook')host.append(node('p','공책에 풀고, 답은 아래에서 골라 바로 확인해요. 풀이 사진을 올리면 스앵님이 과정까지 봐 줘요.'));
     host.append(input);
     const imageInput=node('input');imageInput.type='file';imageInput.accept='image/png,image/jpeg';imageInput.setAttribute('aria-label','공책 풀이 사진 첨부');imageInput.onchange=async()=>{const file=imageInput.files?.[0];if(!file)return;if(file.size>15_000_000||!['image/png','image/jpeg'].includes(file.type)){stateLabel.textContent='PNG/JPEG 사진, 15MB 이내로 선택해주세요.';return;}try{const bitmap=await createImageBitmap(file),scale=Math.min(1,2000/Math.max(bitmap.width,bitmap.height)),copy=document.createElement('canvas');copy.width=Math.round(bitmap.width*scale);copy.height=Math.round(bitmap.height*scale);copy.getContext('2d').drawImage(bitmap,0,0,copy.width,copy.height);bitmap.close();image=copy.toDataURL('image/jpeg',.85);schedule();draw();}catch{stateLabel.textContent='사진을 읽지 못했습니다. PNG/JPEG로 다시 선택해주세요.';}};host.append(imageInput);
     if(image||draft.image){const preview=node('img');preview.className='work-preview';preview.alt='내 풀이 사진';preview.src=image||'/api/school/work-image?id='+draft.image;host.append(preview);}

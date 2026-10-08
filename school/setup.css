@@ -1,0 +1,48 @@
+/* 학습 방식 (대표님 10/8) — setup.js. 칠판 = 설명, 책상 = 문제·풀이. */
+.room-title{display:flex;align-items:center;gap:10px}
+.setup-trigger{margin-left:auto;width:40px;height:40px;padding:0!important;display:inline-grid;place-items:center;border-radius:12px;border:1px solid #c9d3c9;background:#fffffff0;color:#25483e;cursor:pointer;flex:none}
+.setup-trigger svg{width:22px;height:22px}
+.setup-sheet{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:16px;background:#14231c66}
+.setup-sheet[hidden]{display:none}
+.setup-card{width:min(640px,100%);background:#fbfaf6;color:#1f3d33;border-radius:20px;padding:24px;box-shadow:0 24px 60px #0f1f1838;font-family:"Pretendard Variable",Pretendard,sans-serif}
+.setup-card h2{margin:0 0 4px;font-size:22px}
+.setup-card>p{margin:0 0 18px;color:#5c6f65;font-size:14px}
+.setup-options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.setup-option,.setup-roles button{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;padding:16px;border-radius:14px;border:1.5px solid #d9e1d8;background:#fff;color:inherit;font:inherit;cursor:pointer}
+.setup-option svg{width:40px;height:40px;color:#21745a}
+.setup-option b,.setup-roles b{font-size:16px}
+.setup-option small,.setup-roles small{color:#5c6f65;font-size:13px;line-height:1.4}
+.setup-option[aria-pressed=true],.setup-roles button[aria-pressed=true]{border-color:#21745a;background:#eef6f1}
+.setup-roles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid #e3e8e2}
+.setup-roles[hidden]{display:none}
+@media (max-width:640px){.setup-options{grid-template-columns:1fr}}
+
+/* 방식이 정해지면 풀이 방식 버튼은 숨긴다(방식이 대신 정한다). 시점이 고정되면 칠판/공책 아이콘도 숨긴다. */
+.school[data-setup] .solve-modes{display:none!important}
+.school[data-setup=dual] .seat-controls [data-icon=board],.school[data-setup=dual] .seat-controls [data-icon=notebook],
+.school[data-setup=paper] .seat-controls [data-icon=board],.school[data-setup=paper] .seat-controls [data-icon=notebook]{display:none!important}
+
+/* 모니터(칠판): 설명만 크게. 답하기·풀이·넘기기는 아이패드에서. */
+.school[data-role=board] #missionWork,.school[data-role=board] #choices,.school[data-role=board] #dialogue .tools{display:none!important}
+.school[data-role=board][data-mode=classroom] #room{grid-template-columns:1fr!important;width:min(1500px,100%)}
+.school[data-role=board] .teaching-space{display:grid!important;grid-template-columns:minmax(0,1fr) 180px!important;max-width:none!important;gap:20px}
+.school[data-role=board] .board{min-height:min(60dvh,640px)!important}
+.school[data-role=board] .board .content{font-size:clamp(20px,2.1vw,30px)!important;line-height:1.6}
+.school[data-role=board] .board h1{font-size:clamp(26px,2.8vw,40px)!important}
+.school[data-role=board] #dialogue .speech::after{content:"아이패드에서 풀고 넘기면 이 화면도 같이 넘어갑니다";display:block;margin-top:8px;color:#5c6f65;font-size:13px}
+
+/* 아이패드(책상): 칠판은 위쪽 띠로 줄이고 문제·펜 공책을 크게. */
+.school[data-role=desk] .teaching-space{display:block!important}
+.school[data-role=desk] .board{min-height:0!important;max-height:26dvh;overflow:auto;padding:12px 18px!important;background:#fffaf0!important;color:#25483e!important;border:1px solid #c4c9b7!important;box-shadow:none!important}
+.school[data-role=desk] .board .content,.school[data-role=desk] .board h1{color:#25483e!important;font-size:17px!important}
+.school[data-role=desk] .board .caption{color:#5a7a6a!important;opacity:1!important}
+.school[data-role=desk] .teacher{width:96px!important;margin-top:10px}
+.school[data-role=desk] #missionWork{display:block!important}
+
+/* 아이패드 + 공책: 펜 칸 없이 설명·문제·답 고르기를 한 화면에. */
+.school[data-setup=paper] #missionWork{display:block!important}
+.school[data-setup=paper] #missionWork canvas,.school[data-setup=paper] .pen-tools{display:none!important}
+
+/* 아이패드만: 칠판을 위로 쓸면 책상, 책상 보기의 위쪽 칠판 띠를 아래로 쓸면 칠판. */
+.school[data-setup=solo][data-world=seated] .board{touch-action:pan-x}
+.school[data-setup=solo][data-world=seated][data-view=notebook] .board{cursor:ns-resize}

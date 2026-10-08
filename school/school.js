@@ -10,6 +10,7 @@ import { createMission } from "./mission.js?v=199";
 import { attachSaeng } from "./saeng.js";
 import { createSpace, ROOMS } from "./space.js";
 import { pickLesson, pickQuestions } from "./metrics.js";
+import { createSetup } from "./setup.js";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
@@ -27,7 +28,7 @@ let pending = [],
   chatBusy = false,
   lastLesson = null;
 let pausedLesson = null;
-let activeSession = null, sessionQueue = Promise.resolve();
+let activeSession = null, sessionQueue = Promise.resolve(), setup = null;
 let resizeBoard;
 let chatMode = "question";
 let workspace, mission, space, growth, legacyLobbyMode = false, missionIndices = null;
@@ -627,6 +628,7 @@ async function startLesson(id, options = {}) {
     $("lobby").hidden = true;
     $("room").hidden = false;
     $("dialogue").hidden = false;
+    if (!setup?.get()) setup?.open();
     $("scene").className = "scene classroom";
     $("location").textContent = course;
     $("roomLabel").textContent = lesson.title;
@@ -2223,10 +2225,34 @@ async function boot() {
 async function retest(id){
   try{await mission.save();status('조건이 다른 확인 문제를 준비하고 검토합니다.');const lesson=await api('generate',{lesson:id,course});state=await api('state');if(lesson.review?.status!=='reviewed')throw new Error('새 문제 검토가 완료되지 않았습니다. 원자료의 확인 문제를 사용해주세요.');await startLesson(lesson.id,{purpose:'exam',assisted:false});}catch(e){status(e.message,true);}
 }
-mission = createMission({api,context:()=>current?{lesson:current,step:current.steps[index],index,assisted,total:missionIndices?.length,number:missionIndices?missionIndices.indexOf(index)+1:undefined}:null,feedback:(text,kind)=>{$('speech').textContent=text;mission.feedback(kind);renderMath($('speech'));},retest,remedial:supplementWork,helped:()=>{assisted=true;saveSession(current,index,{assisted:true}).catch(()=>{});},allowNext:()=>{status('풀이 피드백은 관찰 기록입니다. 확인 문제의 정답 검증은 별도로 진행합니다.');}});
+mission = createMission({api,forcedMode:()=>setup?.solveMode(),context:()=>current?{lesson:current,step:current.steps[index],index,assisted,total:missionIndices?.length,number:missionIndices?missionIndices.indexOf(index)+1:undefined}:null,feedback:(text,kind)=>{$('speech').textContent=text;mission.feedback(kind);renderMath($('speech'));},retest,remedial:supplementWork,helped:()=>{assisted=true;saveSession(current,index,{assisted:true}).catch(()=>{});},allowNext:()=>{status('풀이 피드백은 관찰 기록입니다. 확인 문제의 정답 검증은 별도로 진행합니다.');}});
 growth = createGrowth({api,status,panel,start:startLesson,retest,courses:()=>workspace?.data?.courses||[],home:()=>workspace.open('main')});
 workspace = createWorkspace({api,status,panel,record,screen:rememberScreen,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],walk:name=>space&&ROOMS.some(r=>r.name===name)?space.walk(name):showCourse(name),practice,rooms:()=>ROOMS.map(r=>r.name),evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,tutorPlan:(host,data,refresh)=>growth.tutorPlan(host,data,refresh),leave:async()=>{space?.hide();await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);stopVoice();closeDialogs();++requestGeneration;},lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode)});
-space = createSpace({status,panel,screen:rememberScreen,view:camera=>{if(current)rememberScreen({lesson:current.id,step:current.steps[index].id,camera});},home:()=>workspace.open('main'),pause:async()=>{await mission.save();await growth.stop('pause');},ask:()=>openChat('','hint'),select:sitDown});
+space = createSpace({fixedView:()=>setup?.fixedView(),status,panel,screen:rememberScreen,view:camera=>{if(current)rememberScreen({lesson:current.id,step:current.steps[index].id,camera});},home:()=>workspace.open('main'),pause:async()=>{await mission.save();await growth.stop('pause');},ask:()=>openChat('','hint'),select:sitDown});
+setup = createSetup({onChange:()=>{const m=setup.solveMode();if(m)mission.setMode(m);space?.refresh();}});
+{const m=setup.solveMode();if(m)mission.setMode(m);}
+// 모니터 + 아이패드: 두 기기가 서버의 같은 수업 위치(activeSession)를 따라간다. 어느 쪽에서 넘겨도 다른 쪽이 2초 안에 맞춘다.
+let following=false;
+async function follow(){
+  if(following||document.hidden||setup?.get()!=='dual'||!current||document.querySelector('.school').dataset.mode!=='classroom')return;
+  following=true;
+  try{
+    await sessionQueue.catch(()=>{});
+    const s=await api('session');
+    if(!s||!current||(s.id===activeSession?.id&&s.revision===activeSession?.revision))return;
+    if(s.lessonId!==current.id){activeSession=s;await startLesson(s.lessonId,{resume:s,purpose:s.purpose,returnTo:s.returnTo});return;}
+    activeSession=s;
+    const at=current.steps.findIndex(x=>x.id===s.stepId);
+    if(at<0||at===index)return;
+    try{await mission?.save();}catch{}
+    requestGeneration++;
+    if(missionIndices&&!missionIndices.includes(at))missionIndices=null;
+    index=at;
+    renderStep();
+  }catch{}finally{following=false;}
+}
+setInterval(follow,2000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)follow();});
 const DOCK_LINES={correct:'좋아요. 그 감각 그대로 다음 문제.',wrong:'괜찮아요. 조건부터 다시 나눠 적어봐요.',stuck:'막힌 데서 같이 볼게요.',deadline:'마감이 가까워요. 과제부터 끝내요.'};
 // 표정은 얼굴로만 보여준다. 대사와 동작 버튼에는 상태 이름을 붙이지 않는다.
 const DOCK_EMOTIONS=new Set(['상냥','상냥함','다정','엄격','단호','차분','중립','미소','놀람','칭찬','기쁨','화남','neutral','smile','strict','surprise','praise']);
