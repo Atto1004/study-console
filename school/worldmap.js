@@ -51,7 +51,7 @@ export function createWorldMap() {
   const sheet = document.createElement('div'); sheet.className = 'map-sheet'; sheet.hidden = true;
   sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-label', '학교 지도');
   sheet.addEventListener('pointerdown', (e) => { if (e.target === sheet) close(); });   // 바깥 누르면 닫힘(10/8 기본)
-  document.addEventListener('keydown', (e) => { if (!sheet.hidden && e.key === 'Escape') close(); });
+  document.addEventListener('keydown', (e) => { if (!sheet.hidden && e.key === 'Escape') { e.preventDefault(); close(); } });
   document.body.append(sheet);
   const modal = modalFocus(sheet);
 

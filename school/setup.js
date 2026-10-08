@@ -34,7 +34,7 @@ export function createSetup({ onChange }) {
   const sheet = document.createElement('div'); sheet.className = 'setup-sheet'; sheet.hidden = true;
   sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true'); sheet.setAttribute('aria-label', '학습 설정');
   sheet.addEventListener('pointerdown', (e) => { if (e.target === sheet) close(); });
-  document.addEventListener('keydown', (e) => { if (!sheet.hidden && e.key === 'Escape') close(); });
+  document.addEventListener('keydown', (e) => { if (!sheet.hidden && e.key === 'Escape') { e.preventDefault(); close(); } });
   function render() {
     const card = document.createElement('div'); card.className = 'setup-card';
     const h = document.createElement('h2'); h.textContent = '학습 설정';

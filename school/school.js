@@ -14,6 +14,7 @@ import { createSetup } from "./setup.js";
 import { createWorldMap } from "./worldmap.js";
 import { createTutor } from "./tutor.js";
 import { createSubjectRail } from "./subject-rail.js";
+import { startSurfaces } from "./surface.js";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
@@ -2240,7 +2241,7 @@ tutor = createTutor({api,eventId,record,
  const blocked=()=>$('panel')?.open||shownSel('#chat')||shownSel('.setup-sheet')||shownSel('.map-sheet');
  window.addEventListener('keydown',e=>{
    const sc=document.querySelector('.school');if(sc.dataset.mode!=='classroom'||sc.dataset.world==='walking'||!current)return;
-   if(typing(e.target)||blocked()||e.ctrlKey||e.metaKey||e.altKey)return;
+   if(e.defaultPrevented||typing(e.target)||blocked()||e.ctrlKey||e.metaKey||e.altKey)return;   // 창을 닫은 Esc 등 이미 처리된 키는 무시
    const click=id=>{const b=$(id);if(b&&!b.disabled){b.click();return true;}return false;};
    if(e.code==='Space'||e.code==='Enter'){e.preventDefault();if(!tutor.skipReveal())click('next');}
    else if(e.code==='ArrowLeft'){e.preventDefault();click('back');}
@@ -2252,6 +2253,7 @@ tutor = createTutor({api,eventId,record,
 // 과목 레일: 수업 중 과목을 바꾸면 그 과목의 약한 회차로 바로(강의실 하나, 교실 v2)
 const rail = createSubjectRail({subjects:ROOMS,current:()=>course,choose:async name=>{try{await mission?.save();}catch{return;}const seated=document.querySelector('.school').dataset.world==='seated';await sitDown(name);space?.setSubject?.(name);rail.update();if(seated)await space?.seated(name);}});
 new MutationObserver(()=>rail.update()).observe($('roomLabel'),{childList:true,characterData:true,subtree:true});
+startSurfaces();
 createWorldMap();
 setup = createSetup({onChange:()=>{const m=setup.solveMode();if(m)mission.setMode(m);space?.refresh();}});
 $('learnSettings').onclick=()=>{closeDialogs();setup.open();};

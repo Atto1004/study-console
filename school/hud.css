@@ -24,3 +24,34 @@
 /* 아래 도구를 전부 오른쪽 한 덩어리로 */
 .school[data-mode=classroom] #dialogue .tools{justify-content:flex-end!important}
 .school[data-mode=classroom] #dialogue .tools #next{margin-left:6px!important;min-width:72px!important}
+
+/* 3D 면 위 칠판·공책(surface.js) — 착석 중에만. 2D 판(교실 카드 배치)은 숨기고 3D 칠판·공책이 화면이 된다 */
+.school[data-world=seated][data-surface] .teaching-space{display:contents!important}
+.school[data-world=seated][data-surface] .teacher{display:none!important}
+.school[data-world=seated] #board.on-surface,.school[data-world=seated] #missionWork.on-surface{position:fixed!important;z-index:20;margin:0!important;max-width:none!important;max-height:none!important;min-height:0!important;box-sizing:border-box;overflow:auto;transition:opacity .2s}
+.school[data-world=seated] #board.on-surface{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:3% 4%!important;color:#f3efe2!important}
+.school[data-world=seated] #board.on-surface .content,.school[data-world=seated] #board.on-surface h1{color:#f3efe2!important;text-shadow:0 0 1px #0004}
+.school[data-world=seated] #board.on-surface .caption,.school[data-world=seated] #board.on-surface .annotation{color:#cfe0d6!important}
+.school[data-world=seated] #missionWork.on-surface{background:#fffaf0f2!important;border-radius:4px!important;padding:12px 14px!important;box-shadow:none!important}
+.school[data-world=seated][data-surface=board] #missionWork{display:none!important}
+.school[data-world=seated][data-surface=moving] #board,.school[data-world=seated][data-surface=moving] #missionWork{opacity:0!important;pointer-events:none}
+
+/* 착석 HUD: 대화 바는 아래 고정, 옛 시점 아이콘 줄은 오른쪽 세로 묶음, 수업 제목·진행은 위 왼쪽 한 줄 */
+.school[data-world=seated][data-surface] #dialogue{position:fixed!important;left:max(92px,env(safe-area-inset-left));right:16px;bottom:12px;margin:0!important;width:auto!important;max-width:none!important;max-height:42dvh;overflow:auto;z-index:30;background:#fffffff2!important;border-radius:18px!important;box-shadow:0 12px 32px #1f3d3326!important}
+.school[data-world=seated][data-surface] .seat-controls{position:fixed!important;right:14px;top:50%;transform:translateY(-50%);z-index:31;display:flex!important;flex-direction:column;gap:8px;padding:8px;border-radius:16px;background:#ffffffd9;box-shadow:0 10px 30px #1f3d331f}
+.school[data-world=seated][data-surface] .seat-controls .icon-btn{width:44px;height:44px}
+.school[data-world=seated][data-surface] .room-title{position:fixed;left:92px;top:118px;z-index:31;max-width:min(560px,50vw);padding:6px 12px!important;border-radius:999px!important;background:#ffffffd9!important;font-size:13px}
+.school[data-world=seated][data-surface] #missionHeader{position:fixed;left:92px;top:72px;right:auto;z-index:31;width:min(520px,50vw);padding:6px 12px;border-radius:999px;background:#ffffffd9}
+.school[data-world=seated][data-surface] #room{padding:0!important;background:transparent!important}
+
+/* 공책 보기의 문제 칸: 종이 위 글씨 */
+.school[data-world=seated] #board.on-surface.on-paper{background:#fffaf0f2!important;color:#25483e!important;padding:12px 16px!important;border-bottom:1px dashed #c8bfa8!important;border-radius:4px 4px 0 0!important}
+.school[data-world=seated] #board.on-surface.on-paper .content,.school[data-world=seated] #board.on-surface.on-paper h1{color:#25483e!important;text-shadow:none;font-size:17px!important}
+.school[data-world=seated] #board.on-surface.on-paper .caption,.school[data-world=seated] #board.on-surface.on-paper .annotation{color:#5c6f65!important}
+.school[data-world=seated] #missionWork.on-surface{border-radius:0 0 4px 4px!important}
+/* 착석 중엔 페이지 아래 띠(footer) 숨김 — 3D 화면 위에 떠다니지 않게 */
+.school[data-world=seated][data-surface] > footer{display:none!important}
+
+.school[data-world=seated] #board.on-surface.on-paper .caption{display:none!important}
+.school[data-world=seated] #board.on-surface.on-paper h1{margin:0 0 6px!important;font-size:15px!important;color:#5c6f65!important}
+.school[data-world=seated] #board.on-surface.on-paper .content{margin:0!important;line-height:1.5}
