@@ -1,7 +1,7 @@
 {
  "schemaVersion": 1,
- "generatedAt": "2026-10-07T22:04:23",
- "asOf": "2026-10-07",
+ "generatedAt": "2026-10-08T08:14:39",
+ "asOf": "2026-10-08",
  "termEnd": "2026-12-21",
  "courses": {
   "공업수학1": {
@@ -601,7 +601,9 @@
      "title": "Homework Assignment - Chapter 5",
      "given": "2026-09-30",
      "due": "2026-10-19T23:59",
-     "src": "LMS"
+     "src": "LMS",
+     "status": "제출",
+     "submittedAt": "2026-10-07T22:07"
     }
    ]
   },
