@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>1인칭 팔 확인</title>
+<style>html,body{margin:0;height:100%;background:#e0e7e3}canvas{display:block}</style></head>
+<body>
+<script type="module">
+import * as T from "../vendor/three.module.js";
+import { createArms } from "./fp-arms.js";
+const r = new T.WebGLRenderer({ antialias: true }); r.setPixelRatio(Math.min(devicePixelRatio, 1.5)); document.body.append(r.domElement);
+const scene = new T.Scene(); scene.background = new T.Color(0xe0e7e3);
+const cam = new T.PerspectiveCamera(65, 1, 0.02, 100); cam.position.set(0, 1.65, 2); scene.add(cam);
+scene.add(new T.HemisphereLight(0xfff7e6, 0x64786b, 2.3)); const sun = new T.DirectionalLight(0xfff0d8, 2.1); sun.position.set(-7, 12, 5); scene.add(sun);
+const floor = new T.Mesh(new T.BoxGeometry(10, 0.1, 10), new T.MeshStandardMaterial({ color: 0xc7bba4 })); floor.position.y = -0.05; scene.add(floor);
+const door = new T.Mesh(new T.BoxGeometry(1.8, 2.5, 0.14), new T.MeshStandardMaterial({ color: 0x446c78 })); door.position.set(0, 1.25, -1); scene.add(door);
+const arms = createArms(T, cam);
+const q = new URLSearchParams(location.search), moving = q.has('walk'), reach = q.has('reach');
+const size = () => { r.setSize(innerWidth, innerHeight); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); }; addEventListener('resize', size); size();
+const clock = new T.Clock(); if (reach) setTimeout(() => arms.reach(), 300);
+r.setAnimationLoop(() => { arms.update(Math.min(clock.getDelta(), 0.05), { moving }); r.render(scene, cam); });
+window.__ready = true;
+</script></body></html>
