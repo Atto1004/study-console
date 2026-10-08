@@ -10,6 +10,7 @@ const ICON = {
   skip: 'M5 4l10 8-10 8zM19 5v14',
   more: 'M5 12h.01M12 12h.01M19 12h.01',
   send: 'M22 2 11 13M22 2l-7 20-4-9-9-4z',
+  stand: 'M12 19V5M5 12l7-7 7 7',
 };
 const svg = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
 const iconBtn = (icon, label, cls) => { const b = el('button', 'v3-btn ' + (cls || '')); b.type = 'button'; b.innerHTML = svg(ICON[icon]); b.setAttribute('aria-label', label); b.dataset.tip = label; b.classList.add('ico-btn'); return b; };
@@ -35,7 +36,7 @@ export function startClassroomV3(app) {
   const choices = document.getElementById('choices'); work.append(choices);
   const moveWork = () => { const w = document.getElementById('missionWork'); if (w && w.parentElement !== work) work.append(w); };
   // 게임 보기에서 앉아 있을 때: 「자리에서 일어나기」 하나(기존 시점 줄의 같은 버튼을 누른다 — 줄 자체는 오타 A3 대로 숨김)
-  const stand = iconBtn('stand', '자리에서 일어나기 (Esc)', 'v3-stand'); stand.innerHTML = svg('M12 19V5M5 12l7-7 7 7');
+  const stand = iconBtn('stand', '자리에서 일어나기 (Esc)', 'v3-stand');
   stand.onclick = () => document.querySelector('.seat-controls [data-icon=stand]')?.click(); stage.append(stand);
   moveWork(); new MutationObserver(moveWork).observe(room, { childList: true });
 
