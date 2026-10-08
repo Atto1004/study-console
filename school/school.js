@@ -2241,7 +2241,9 @@ tutor = createTutor({api,eventId,record,
  const blocked=()=>$('panel')?.open||shownSel('#chat')||shownSel('.setup-sheet')||shownSel('.map-sheet');
  window.addEventListener('keydown',e=>{
    const sc=document.querySelector('.school');if(sc.dataset.mode!=='classroom'||sc.dataset.world==='walking'||!current)return;
-   if(e.defaultPrevented||typing(e.target)||blocked()||e.ctrlKey||e.metaKey||e.altKey)return;   // 창을 닫은 Esc 등 이미 처리된 키는 무시
+   if(e.defaultPrevented||typing(e.target)||blocked()||e.ctrlKey||e.metaKey||e.altKey)return;
+   if(sc.dataset.role==='board'&&e.code!=='Escape')return;   // 두 기기의 칠판(모니터)은 보기만(오타 10/8)
+   if((e.code==='Space'||e.code==='Enter')&&e.target.closest?.('button,summary,a,[role=button]'))return;   // 포커스된 버튼(답 선택지 등)은 기본 동작으로   // 창을 닫은 Esc 등 이미 처리된 키는 무시
    const click=id=>{const b=$(id);if(b&&!b.disabled){b.click();return true;}return false;};
    if(e.code==='Space'||e.code==='Enter'){e.preventDefault();if(!tutor.skipReveal())click('next');}
    else if(e.code==='ArrowLeft'){e.preventDefault();click('back');}

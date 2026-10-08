@@ -17,7 +17,7 @@ const { webkit, devices } = require(require('path').resolve(__dirname,'../../.te
   const hold = async (k, c) => { await key('keydown', k, c); await page.waitForTimeout(1200); await key('keyup', k, c); await page.waitForTimeout(400); };
   let a = await shot(); await hold('ㅈ', 'KeyW'); let b = await shot(); const hangulW = a !== b;
   a = b; await hold('w', 'KeyW'); b = await shot(); const latinW = a !== b;
-  a = b; await hold('ArrowUp', 'ArrowUp'); b = await shot(); const arrow = a !== b;
+  a = b; await hold('ArrowDown', 'ArrowDown'); /* 앞(↑)은 벽에 막혀 그대로일 수 있어 뒤로 */ b = await shot(); const arrow = a !== b;
   // 트랙패드 두 손가락 쓸기(휠)로 시선
   a = b;
   await page.evaluate(() => { const c = document.querySelector('#schoolWorld canvas'); for (let i = 0; i < 10; i++) c.dispatchEvent(new WheelEvent('wheel', { deltaX: 30, deltaY: 0, bubbles: true, cancelable: true, clientX: 500, clientY: 400 })); });
