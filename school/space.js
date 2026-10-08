@@ -11,15 +11,15 @@ export const ROOMS=[
 export function createSpace(app){
   const school=document.querySelector('.school'),layer=make('div',null,'school-world');layer.id='schoolWorld';layer.setAttribute('aria-hidden','true');school.prepend(layer);
   const hud=make('section',null,'world-hud');hud.hidden=true;hud.setAttribute('aria-label','1인칭 교실 이동');
-  const title=make('b','학교 복도'),help=make('p',matchMedia('(pointer: coarse)').matches?'이동: 왼쪽 아래 버튼 · WASD · 방향키 / 시선: 화면 끌기 · 트랙패드 두 손가락 / E: 문 열기·앉기':'WASD·방향키 이동 · 클릭 후 마우스로 시선(트랙패드 두 손가락도) · E 문 열기/앉기 · Esc 마우스 해제'),action=button('앞의 문·자리에 상호작용',interact);
-  const doors=make('div',null,'world-quick');for(const r of ROOMS)doors.append(button(r.name,()=>enter(r.name)));
-  const pad=make('div',null,'world-pad');for(const [key,label] of [['w','앞으로'],['a','왼쪽'],['s','뒤로'],['d','오른쪽']]){const b=button(label,()=>{});b.onpointerdown=e=>{e.preventDefault();keys.add(key);b.dataset.held='';try{b.setPointerCapture(e.pointerId);}catch{}};b.onpointerup=b.onpointercancel=b.onlostpointercapture=()=>{keys.delete(key);delete b.dataset.held;};b.oncontextmenu=e=>e.preventDefault();pad.append(b);}
-  const reduced=make('input');reduced.type='checkbox';try{reduced.checked=localStorage.getItem('school-reduced-motion')==='1'||matchMedia('(prefers-reduced-motion: reduce)').matches;}catch{}
-  const label=make('label','시점 흔들림·전환 줄이기');label.prepend(reduced);reduced.onchange=()=>{try{localStorage.setItem('school-reduced-motion',reduced.checked?'1':'0');}catch{}};
-  hud.append(title,help,action,button('이 교실 내 자리에 앉기',()=>{if(room)app.select(room.name);else help.textContent='교실에 먼저 들어가세요.';}),doors,pad,label,button('학습 메인으로',()=>{hide();app.home();}));school.append(hud);
+  // 화면에는 지금 필요한 것만: 교실 이름 · 가까이 갔을 때의 안내 · 앉아서 수업 · 나가기. 이동 버튼은 터치 기기에서만(CSS).
+  const title=make('b','학교 복도'),action=button('',interact);action.className='world-action';action.hidden=true;
+  const sit=button('자리에 앉아 수업 시작',()=>{if(room)app.select(room.name);});sit.className='world-sit';sit.hidden=true;
+  const pad=make('div',null,'world-pad');for(const [key,label] of [['w','앞으로'],['a','왼쪽'],['s','뒤로'],['d','오른쪽'],['shift','빨리']]){const b=button(label,()=>{});if(key==='shift')b.className='pad-run';b.onpointerdown=e=>{e.preventDefault();keys.add(key);b.dataset.held='';try{b.setPointerCapture(e.pointerId);}catch{}};b.onpointerup=b.onpointercancel=b.onlostpointercapture=()=>{keys.delete(key);delete b.dataset.held;};b.oncontextmenu=e=>e.preventDefault();pad.append(b);}
+  const reduced={checked:false};try{reduced.checked=localStorage.getItem('school-reduced-motion')==='1'||matchMedia('(prefers-reduced-motion: reduce)').matches;}catch{}
+  const exit=button('나가기',()=>{hide();app.home();});exit.className='world-exit';exit.title='로비로 돌아가기';
+  hud.append(title,action,sit,exit);school.append(hud,pad);
   const controls=make('nav',null,'seat-controls');controls.hidden=true;controls.setAttribute('aria-label','학습 시점');
   controls.append(button('앞의 설명 보기',()=>view('lecture')),button('내 공책 내려다보기',()=>view('notebook')),button('옆의 스앵님께 질문',()=>{view('notebook');app.ask();}),button('교실 도구',()=>tools()),button('자리에서 일어나기',async()=>{await app.pause();walk(room.name);}));document.getElementById('room').prepend(controls);
-  const worldButton=button('교실로 걷기',()=>walk());worldButton.id='walkSchool';document.querySelector('header .rooms').append(worldButton);
   let T,scene,camera,renderer,loaded=false,room=null,walking=false,yaw=0,pitch=0,transition=null,last=0,step=0,drag=null,doors3=[],targets=[],colliders=[],lastTarget=null,loadingPromise=null,generation=0,pointerDragged=false;
   const keys=new Set();
   async function load(){
@@ -79,9 +79,9 @@ export function createSpace(app){
   function blocked(x,z){if(x< -2.05||x>10.9||z>1.7||z< -33.6)return true;for(const m of [...colliders,...doors3.filter(r=>!r.open).map(r=>r.door)]){const b=new T.Box3().setFromObject(m);if(x>b.min.x-.22&&x<b.max.x+.22&&z>b.min.z-.22&&z<b.max.z+.22)return true;}return false;}
   function frame(t){const dt=Math.min((t-last)/1000||0,.05);last=t;if(!loaded||layer.hidden||document.hidden)return;
     if(transition){const f=Math.min(1,(t-transition.at)/(reduced.checked?1:700)),a=f*f*(3-2*f);camera.position.lerpVectors(transition.from,transition.to,a);yaw=transition.y0+(transition.y1-transition.y0)*a;pitch=transition.p0+(transition.p1-transition.p0)*a;if(f===1){transition=null;school.classList.remove('view-moving');}}
-    else if(walking){let forward=(keys.has('w')?1:0)-(keys.has('s')?1:0),side=(keys.has('d')?1:0)-(keys.has('a')?1:0);const n=Math.hypot(forward,side)||1;forward/=n;side/=n;const speed=2.65*dt,x=camera.position.x+(-Math.sin(yaw)*forward+Math.cos(yaw)*side)*speed,z=camera.position.z+(-Math.cos(yaw)*forward-Math.sin(yaw)*side)*speed;if(!blocked(x,camera.position.z))camera.position.x=x;if(!blocked(camera.position.x,z))camera.position.z=z;step+=speed*(Math.abs(forward)+Math.abs(side));camera.position.y=1.65+(reduced.checked?0:Math.sin(step*8)*.022*(Math.abs(forward)+Math.abs(side)));}
+    else if(walking){let forward=(keys.has('w')?1:0)-(keys.has('s')?1:0),side=(keys.has('d')?1:0)-(keys.has('a')?1:0);const n=Math.hypot(forward,side)||1;forward/=n;side/=n;const speed=2.65*dt*(keys.has('shift')?1.9:1),x=camera.position.x+(-Math.sin(yaw)*forward+Math.cos(yaw)*side)*speed,z=camera.position.z+(-Math.cos(yaw)*forward-Math.sin(yaw)*side)*speed;if(!blocked(x,camera.position.z))camera.position.x=x;if(!blocked(camera.position.x,z))camera.position.z=z;step+=speed*(Math.abs(forward)+Math.abs(side));camera.position.y=1.65+(reduced.checked?0:Math.sin(step*8)*.022*(Math.abs(forward)+Math.abs(side)));}
     camera.rotation.set(pitch,yaw,0,'YXZ');
-    if(walking){const ray=new T.Raycaster();ray.setFromCamera(new T.Vector2(0,0),camera);const hit=ray.intersectObjects(targets).find(x=>x.distance<3);lastTarget=hit?.object.userData||null;action.textContent=lastTarget?lastTarget.kind==='door'?`${lastTarget.room.name} · 문 ${lastTarget.room.open?'닫기':'열기'} (E)`:`${lastTarget.room.name} · 내 자리 앉기 (E)`:'문이나 내 자리를 바라보고 가까이 가세요';}
+    if(walking){const ray=new T.Raycaster();ray.setFromCamera(new T.Vector2(0,0),camera);const hit=ray.intersectObjects(targets).find(x=>x.distance<3);lastTarget=hit?.object.userData||null;action.hidden=!lastTarget;if(lastTarget)action.textContent=lastTarget.kind==='door'?`${lastTarget.room.name} 문 ${lastTarget.room.open?'닫기':'열기'} · E`:`${lastTarget.room.name} 내 자리에 앉기 · E`;sit.hidden=!room;}
     renderer.render(scene,camera);
   }
   function move(to,y,p){transition={from:camera.position.clone(),to:new T.Vector3(...to),y0:yaw,y1:y,p0:pitch,p1:p,at:performance.now()};school.classList.add('view-moving');}
@@ -100,7 +100,7 @@ export function createSpace(app){
     };range.oninput=draw;draw();
   }
   window.addEventListener('resize',resize);// 한글 입력 상태에서도 같은 자리의 키로 움직이도록 글자(key)가 아니라 키 위치(code)로 읽는다.
-  const MOVE={KeyW:'w',ArrowUp:'w',KeyS:'s',ArrowDown:'s',KeyA:'a',ArrowLeft:'a',KeyD:'d',ArrowRight:'d'};
+  const MOVE={KeyW:'w',ArrowUp:'w',KeyS:'s',ArrowDown:'s',KeyA:'a',ArrowLeft:'a',KeyD:'d',ArrowRight:'d',ShiftLeft:'shift',ShiftRight:'shift'};
   window.addEventListener('keydown',e=>{if(walking&&e.key==='Escape'){document.exitPointerLock?.();keys.clear();return;}if(!walking||/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;const k=MOVE[e.code];if(k){keys.add(k);e.preventDefault();}if(e.code==='KeyE'&&!e.repeat){e.preventDefault();interact();}});window.addEventListener('keyup',e=>{const k=MOVE[e.code];if(k)keys.delete(k);});window.addEventListener('blur',()=>keys.clear());document.addEventListener('visibilitychange',()=>{if(document.hidden)keys.clear();});
   new MutationObserver(()=>{if(school.dataset.mode!=='classroom'&&!walking)hide();}).observe(school,{attributes:true,attributeFilter:['data-mode']});
   layer.hidden=true;return {walk,enter,seated,view,hide,get mode(){return school.dataset.view;}};

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { courseMetrics, classifySource, sourceKind, pickQuest } from "./metrics.js";
+import { courseMetrics, classifySource, sourceKind, pickQuest, pickLesson } from "./metrics.js";
 
 const lessons = [
   { id: "a", date: "2026-09-01" },
@@ -71,6 +71,16 @@ test("지금 할 것: 하루 안 마감 과제 > 급한 과목, 미확정 시험
   assert.equal(pickQuest(rows, [{ title: "HW5", deadlineDays: 3, submitted: false }]).type, "course");
   assert.equal(pickQuest([], due).type, "assignment");
   assert.equal(pickQuest([]), null);
+});
+
+test("자리에 앉으면 시작할 수업", () => {
+  const ev = [answer("a", 1, true), answer("b", 1, false)].map((e) => ({ ...e, course: "정역학" }));
+  assert.deepEqual(pickLesson({ course: "정역학", lessons, events: ev, today: "2026-10-07" }), { id: "c", resume: false }, "문제를 안 푼 가장 이른 회차");
+  assert.deepEqual(pickLesson({ course: "정역학", lessons, events: ev, today: "2026-10-07", session: { course: "정역학", lessonId: "b" } }), { id: "b", resume: true }, "이어 하던 수업 먼저");
+  assert.deepEqual(pickLesson({ course: "정역학", lessons, events: ev, today: "2026-10-07", session: { course: "미적2", lessonId: "x" } }).id, "c", "다른 과목 세션은 무시");
+  const all = ["a", "b", "c", "d"].map((l) => ({ ...answer(l, 1, true), course: "정역학" }));
+  assert.equal(pickLesson({ course: "정역학", lessons, events: all, today: "2026-10-07" }).id, "d", "다 풀었으면 가장 최근 회차");
+  assert.equal(pickLesson({ course: "정역학", lessons: [], events: [], today: "2026-10-07" }), null);
 });
 
 test("자료 4분류 — 명시된 종류가 먼저, 이름으로만 짐작하면 추정", () => {
