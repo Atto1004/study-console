@@ -7,8 +7,11 @@
 .school[data-layout=v3][data-mode=classroom] .learning-strip,.school[data-layout=v3][data-mode=classroom] #missionHeader,.school[data-layout=v3][data-mode=classroom] .room-title,.school[data-layout=v3][data-mode=classroom] #dialogue .speech,.school[data-layout=v3][data-mode=classroom] #dialogue .tools,.school[data-layout=v3][data-mode=classroom] #chat,.school[data-layout=v3][data-mode=classroom] > footer{display:none!important}
 
 /* 위: 강의 */
+/* 강의 중엔 위 강의 칸이 크게, 끝나면 가운데 문제 칸이 크게(세로 아이패드에서 강의 중 빈 칸이 반을 차지하던 것) */
+.school[data-lecture=playing] .v3-stage,.school[data-lecture=paused] .v3-stage{flex:1 1 auto;height:auto;min-height:200px}
+.school[data-lecture=playing] .v3-work,.school[data-lecture=paused] .v3-work{flex:0 0 auto;min-height:0;max-height:96px;overflow:hidden}
 .v3-stage{position:relative;flex:none;height:clamp(200px,38dvh,440px);border-radius:18px;overflow:hidden;background:linear-gradient(#dfe6df,#d3dbd3)}
-.v3-stage .teaching-space{position:absolute!important;inset:0;display:grid!important;grid-template-columns:minmax(0,1fr) 168px!important;gap:14px!important;padding:14px!important;max-width:none!important;margin:0!important;height:auto!important}
+.v3-stage .teaching-space{position:absolute!important;top:0!important;left:0!important;right:0!important;bottom:0!important;width:auto!important;height:100%!important;box-sizing:border-box;display:grid!important;grid-template-columns:minmax(0,1fr) 168px!important;grid-template-rows:minmax(0,1fr)!important;gap:14px!important;padding:14px!important;max-width:none!important;margin:0!important}   /* WebKit: inset+height:auto 로는 늘어나지 않아 칠판이 64px 로 줄었다(아이패드 10/8) */
 .v3-stage #board:not(.on-surface){height:100%!important}
 .v3-stage #board{margin:0!important;min-height:0!important;max-height:none!important;overflow:auto;border-radius:12px!important;padding:18px 22px!important}
 .v3-stage #board .content{clip-path:inset(0 0 calc((1 - var(--reveal,1)) * 100%) 0);transition:clip-path .7s ease}
@@ -16,18 +19,21 @@
 .v3-stage .teacher{display:flex!important;align-items:flex-end;justify-content:center;position:relative!important;width:auto!important;inset:auto!important}
 .v3-subtitle{position:absolute;z-index:6;right:190px;bottom:22px;max-width:min(520px,60%);padding:10px 14px;border-radius:14px 14px 4px 14px;background:#fffffff5;color:#1f3d33;font:500 15.5px/1.5 "Pretendard Variable",Pretendard,sans-serif;box-shadow:0 8px 24px #1f3d3326}
 .v3-subtitle[hidden]{display:none}
+/* 사이트 보기: 자막은 칠판 아래 자기 줄(칠판을 덮지 않게) — 칠판 칸 아래 72px 를 자막 자리로 비운다 */
+.school[data-view3=site] .v3-stage .teaching-space{padding-bottom:78px!important}
+.school[data-view3=site] .v3-subtitle{left:14px;right:196px;bottom:14px;max-width:none;min-height:52px;display:flex;align-items:center;border-radius:12px 12px 12px 12px}
+.school[data-view3=site] .v3-subtitle[hidden]{display:none}
 .v3-3d{position:absolute;inset:0;display:none}
 /* 시점 아이콘 줄은 v3 에서 「일어나기」 하나만, 게임 보기에서 앉아 있을 때만 */
 .school[data-layout=v3] .seat-controls{display:none!important}
-.school[data-layout=v3][data-view3=game][data-world=seated] .v3-stage .seat-controls:not([hidden]){display:flex!important;position:absolute!important;top:10px;left:10px;right:auto;bottom:auto;transform:none;z-index:7;padding:0;background:none;box-shadow:none}
+.school[data-layout=v3][data-view3=game][data-world=seated] #lectureStage.v3-stage > nav.seat-controls{display:flex!important;position:absolute!important;top:10px;left:10px;right:auto;bottom:auto;transform:none;z-index:7;padding:0;background:none;box-shadow:none}
 .school[data-layout=v3] .v3-stage .seat-controls > :not([data-icon=stand]){display:none!important}
 /* 게임(3D): 3D 강의실이 위 칸을 채우고 2D 초상은 숨김. 칠판 내용은 3D 칠판 면 위(surface.js), 자막은 스앵님 머리 위 */
 .school[data-view3=game] .v3-3d{display:block}
 .school[data-view3=game][data-world=seated] .v3-stage .teaching-space{display:contents!important}
 .school[data-view3=game][data-world=seated] .v3-stage .teacher{display:none!important}
-.school[data-view3=game][data-world=seated] .v3-subtitle{bottom:auto;max-width:min(300px,38%);top:max(8px,calc(var(--hy,20%) - 8px))}
-.school[data-view3=game][data-world=seated] .v3-subtitle[data-side=right]{right:auto;left:min(calc(var(--hx) + 40px),calc(100% - 308px));border-radius:4px 14px 14px 14px}
-.school[data-view3=game][data-world=seated] .v3-subtitle[data-side=left]{left:auto;right:calc(100% - var(--hx) + 40px);border-radius:14px 4px 14px 14px}
+/* 게임 보기 자막 = 강의 칸 아래 가운데 영화 자막(머리 옆 말풍선은 세로 화면에서 칠판을 덮었다, 아이패드 10/8) */
+.school[data-view3=game][data-world=seated] .v3-subtitle{left:50%;right:auto;top:auto;bottom:14px;transform:translateX(-50%);max-width:min(720px,calc(100% - 28px));text-align:center;border-radius:12px;background:#10241ce6;color:#fff;box-shadow:none}
 
 /* 가운데: 문제 — 강의 중엔 흐리게, 끝나면 또렷하게 */
 .v3-work{flex:1;min-height:110px;overflow:auto;overscroll-behavior:contain;border-radius:18px;background:#fff;padding:14px 16px;box-shadow:0 1px 0 #d9e1d8}
@@ -57,6 +63,8 @@
 .v3-track{flex:1;height:6px;border-radius:3px;background:#e3e9e3;overflow:hidden}
 .v3-track i{display:block;height:100%;width:0;background:#21745a;transition:width .4s}
 .v3-bar #hint,.v3-bar #simpler{width:44px;height:44px}
+/* 손가락 기준 44px(아이패드 WebKit 에서 icons.css 가 40px 로 줄이던 것) */
+.v3-bar button,.v3-bar summary,.v3-chat button,.v3-work .tutor-reply button{min-width:44px!important;min-height:44px!important}
 .v3-more{position:relative}
 .v3-more summary{list-style:none;width:44px;height:44px;border-radius:12px;border:1px solid #d9e1d8;display:grid;place-items:center;cursor:pointer}
 .v3-more summary::-webkit-details-marker{display:none}
