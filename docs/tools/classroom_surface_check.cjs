@@ -35,6 +35,7 @@ async function run(kind){
  await page.setViewportSize({width:500,height:900});await page.waitForTimeout(150);await check('board');
  await page.evaluate(()=>space.view('notebook'));await page.waitForFunction(()=>space.deskRect());await check('desk');
  await page.evaluate(()=>{fixed='lecture';space.refresh();});await page.waitForFunction(()=>space.mode==='lecture'&&space.boardRect());await page.keyboard.press('s');assert.equal(await page.evaluate(()=>space.mode),'lecture');
+ await page.evaluate(()=>{fixed='paper';space.refresh();});await page.waitForFunction(()=>space.mode==='paper'&&space.boardRect());await check('board');await page.keyboard.press('s');assert.equal(await page.evaluate(()=>space.mode),'paper');
  await page.evaluate(()=>{fixed=null;space.saeng.point();space.saeng.lecture(false);space.hide();});assert.equal(await page.evaluate(()=>space.boardRect()),null);
  assert.deepEqual(errors,[]);assert.ok(await page.evaluate(()=>events.some(e=>e.board===null)&&events.some(e=>e.board&&e.view==='lecture')&&events.some(e=>e.desk&&e.view==='notebook')));
  console.log(JSON.stringify({kind,board,desk,checks:'geometry, subjects, keys, input, overlay, resize, fixed-view, events, hide',errors}));
