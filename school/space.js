@@ -38,6 +38,7 @@ export function createSpace(app){
     renderer=new T.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));layer.append(renderer.domElement);renderer.domElement.tabIndex=0;renderer.domElement.setAttribute('aria-label','학교 공간 · 마우스로 시선 이동');
     scene.add(new T.HemisphereLight(0xfff7e6,0x64786b,2.3));const sun=new T.DirectionalLight(0xfff0d8,2.1);sun.position.set(-7,12,5);scene.add(sun);
     build();loaded=true;resize();renderer.setAnimationLoop(frame);
+    window.__schoolCamera=()=>({x:+camera.position.x.toFixed(3),z:+camera.position.z.toFixed(3),mode:ctl?.mode});   // 검사용 읽기 전용
     ctl=FP.createController({T,camera,canvas:renderer.domElement,isOverlay:overlay,blocked,onInteract:interact,reduced:()=>reduced.checked});
     renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();ctl?.release();hide();app.status('3D 화면 연결이 끊겼습니다. 학습 화면에서 이어갈 수 있습니다.',true);});
   }
