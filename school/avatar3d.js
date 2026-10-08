@@ -195,6 +195,8 @@ export function createAvatar(T, spec) {
   }
   return {
     group: root, spec, height: H,
+    // 말풍선 꼬리는 머리와 함께 움직이는 정수리 기준점을 투영한다.
+    headAnchor: headG,
     update,
     setPose(name) { pose = (POSES[name] || name === "walk") ? name : "stand"; },
     // 처음 놓을 때는 서 있다 앉는 과정 없이 바로 그 자세로(대표실에서 첫 프레임에 머리가 잘려 보이던 것).

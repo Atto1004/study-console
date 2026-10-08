@@ -24,6 +24,7 @@ export function createSpace(app){
   const controls=make('nav',null,'seat-controls');controls.hidden=true;controls.setAttribute('aria-label','학습 시점');
   controls.append(iconButton('board','앞의 설명 보기',()=>view('lecture')),iconButton('notebook','내 공책 내려다보기',()=>view('notebook')),iconButton('ask','옆의 스앵님께 질문',()=>{view('notebook');app.ask();}),iconButton('tools','교실 도구',()=>tools()),iconButton('stand','자리에서 일어나기',async()=>{await app.pause();walk(room.name);}));document.getElementById('room').prepend(controls);
   let subject=ROOMS[0].name,lecturing=false,pointAt=0;
+  let stage=null,stageObserver=null,stagePosition=null;
   let T,AV,FP,WM,ctl=null,spawnAt=null,leaving=false,avatars=[],scene,camera,renderer,loaded=false,dirty=true,ray=null,aimAt=0,boxes=[],dprMax=1.25,dpr=1.25,dprCheck=0,pendingDpr=false,room=null,walking=false,transition=null,last=0,doors3=[],targets=[],colliders=[],lastTarget=null,loadingPromise=null,generation=0;
   // 겹친 창(설계 v2 계약 B): 이 중 하나라도 열려 있으면 이동·시선·E·착석 방향키·쓸기를 모두 멈춘다.
   const shown=sel=>{const e=document.querySelector(sel);return !!e&&!e.hidden&&e.getClientRects().length>0;};
@@ -74,20 +75,43 @@ export function createSpace(app){
     return corners.map(v=>{const p=v.clone().project(camera);return {x:bounds.left+(p.x+1)*bounds.width/2,y:bounds.top+(1-p.y)*bounds.height/2};});
   }
   function surfaceRect(kind){const points=cornersFor(kind);if(!points)return null;const xs=points.map(p=>p.x),ys=points.map(p=>p.y);return {x:Math.min(...xs),y:Math.min(...ys),w:Math.max(...xs)-Math.min(...xs),h:Math.max(...ys)-Math.min(...ys)};}
-  function emitViewRect(){window.dispatchEvent(new CustomEvent('school:viewrect',{detail:{view:school.dataset.view||null,board:surfaceRect('board'),desk:surfaceRect('desk')}}));}
+  function headPoint(){
+    if(!loaded||walking||transition||school.dataset.world!=='seated'||!room?.teacher.visible)return null;
+    const avatar=room.teacherAvatar,anchor=avatar.headAnchor;if(!anchor)return null;
+    scene.updateMatrixWorld(true);camera.updateMatrixWorld();
+    const world=anchor.localToWorld(new T.Vector3(0,avatar.height/6.6*1.1,0));
+    if(world.clone().applyMatrix4(camera.matrixWorldInverse).z>=-camera.near)return null;
+    const p=world.project(camera),bounds=renderer.domElement.getBoundingClientRect();
+    return {x:bounds.left+(p.x+1)*bounds.width/2,y:bounds.top+(1-p.y)*bounds.height/2};
+  }
+  function emitViewRect(){window.dispatchEvent(new CustomEvent('school:viewrect',{detail:{view:school.dataset.view||null,board:surfaceRect('board'),desk:surfaceRect('desk'),head:headPoint()}}));}
   function fitView(){
     if(!camera)return;let fov=65;
-    if(school.dataset.world==='seated'&&room){const notebook=school.dataset.view==='notebook',distance=notebook?1.8-.9095:11.025-6.7;
+    if(stage&&school.dataset.world==='seated'&&room){
+      // Fit the full board and tutor body, with room for the subtitle tail.
+      const distance=11.025-6.7,halfWidth=3.1,halfHeight=2.0;
+      fov=2*Math.atan(Math.max(halfWidth/camera.aspect,halfHeight)*1.1/distance)*180/Math.PI;
+    }else if(school.dataset.world==='seated'&&room){const notebook=school.dataset.view==='notebook',distance=notebook?1.8-.9095:11.025-6.7;
       // 칠판보다 앞에 서 있는 스앵님까지 좁은 화면 안에 남긴다.
       const halfWidth=notebook ? .325 : 3.25,halfHeight=notebook ? .44 : 1.63;
       fov=Math.max(65,2*Math.atan(Math.max(halfWidth/camera.aspect,halfHeight)*1.08/distance)*180/Math.PI);}
     camera.fov=fov;camera.updateProjectionMatrix();
   }
-  function resize(){if(!renderer)return;renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;fitView();dirty=true;emitViewRect();}
+  function viewportSize(){const bounds=stage?.getBoundingClientRect();return {width:Math.max(1,bounds?bounds.width:innerWidth),height:Math.max(1,bounds?bounds.height:innerHeight)};}
+  function resize(){if(!renderer)return;const {width,height}=viewportSize();renderer.setSize(width,height);camera.aspect=width/height;fitView();dirty=true;emitViewRect();}
+  function mount(stageEl){
+    if(stageEl!=null&&!(stageEl instanceof Element))throw new TypeError('space.mount requires an Element or null');
+    if(stage===(stageEl||null)){resize();return;}
+    stageObserver?.disconnect();stageObserver=null;if(stagePosition!==null&&stage){stage.style.position=stagePosition;}stagePosition=null;stage=stageEl||null;
+    if(stage){if(getComputedStyle(stage).position==='static'){stagePosition=stage.style.position;stage.style.position='relative';}stage.append(layer);layer.dataset.mounted='true';stageObserver=new ResizeObserver(resize);stageObserver.observe(stage);}
+    else{school.prepend(layer);delete layer.dataset.mounted;}
+    if(school.dataset.world==='seated'&&room){controls.hidden=!!stage;view(stage?'lecture':school.dataset.view||'lecture');}
+    resize();
+  }
 
   const hitBox=(b,x,z)=>x>b.min.x-.22&&x<b.max.x+.22&&z>b.min.z-.22&&z<b.max.z+.22;
   function blocked(x,z){const B=WM.BOUNDS;if(x<B.minX||x>B.maxX||z>B.maxZ||z<B.minZ)return true;for(const b of boxes)if(hitBox(b,x,z))return true;for(const r of doors3)if(!r.open&&hitBox(r.box,x,z))return true;return false;}
-  function frame(t){const dt=Math.min((t-last)/1000||0,.05);last=t;if(!loaded||layer.hidden||document.hidden)return;const c0=performance.now();if(pendingDpr){pendingDpr=false;renderer.setPixelRatio(dpr);renderer.setSize(innerWidth,innerHeight);dirty=true;}
+  function frame(t){const dt=Math.min((t-last)/1000||0,.05);last=t;if(!loaded||layer.hidden||document.hidden)return;const c0=performance.now();if(pendingDpr){pendingDpr=false;renderer.setPixelRatio(dpr);resize();}
     if(transition){const f=Math.min(1,(t-transition.at)/(reduced.checked?1:700)),a=f*f*(3-2*f);camera.position.lerpVectors(transition.from,transition.to,a);ctl.yaw=transition.y0+(transition.y1-transition.y0)*a;ctl.pitch=transition.p0+(transition.p1-transition.p0)*a;if(f===1){transition=null;school.classList.remove('view-moving');ctl.apply();emitViewRect();}}
     else if(walking){ctl.update(dt);if(spawnAt&&Math.hypot(camera.position.x-spawnAt.x,camera.position.z-spawnAt.z)>=WM.GATE.armAfter)spawnAt=null;if(!spawnAt&&!leaving&&!overlay()&&WM.inGate(camera.position.x,camera.position.z))goOffice();}
     // 착석 중에는 3D 가 공부 화면 뒤에 가만히 있다: 시점이 바뀔 때만 그린다(펜·화면이 덜 버벅이게).
@@ -97,18 +121,18 @@ export function createSpace(app){
     for(const r of doors3){if(!r.teacher)continue;const near=walking&&Math.abs(camera.position.z-r.z)<9&&camera.position.x>2;r.teacher.visible=near||(!walking&&school.dataset.world==='seated');}
     for(const a of avatars)if(a.group.visible)a.update(reduced.checked?0:dt);
     if(walking&&!overlay()&&t-aimAt>100){aimAt=t;ray.setFromCamera(new T.Vector2(0,0),camera);const hit=ray.intersectObjects(targets).find(x=>x.distance<3);lastTarget=hit?.object.userData||null;action.hidden=!lastTarget;if(lastTarget)action.textContent=lastTarget.kind==='gate'?'대표실로 · E':lastTarget.kind==='door'?`${lastTarget.room.name} 문 ${lastTarget.room.open?'닫기':'열기'} · E`:`${lastTarget.room.name} 내 자리에 앉기 · E`;sit.hidden=!room;}
-    const r0=performance.now();perf.cpu.push(r0-c0);if(perf.cpu.length>120)perf.cpu.shift();renderer.render(scene,camera);perf.push(performance.now()-r0,dt,renderer.info.render);dirty=false;
+    const r0=performance.now();perf.cpu.push(r0-c0);if(perf.cpu.length>120)perf.cpu.shift();renderer.render(scene,camera);perf.push(performance.now()-r0,dt,renderer.info.render);dirty=false;if(!walking&&!transition)emitViewRect();
     // 해상도 자동 조절: 걷는 동안 2초마다 fps 를 보고 45 미만이면 한 단계 내리고, 58 넘게 넉넉하면 올린다.
     if(adaptive&&walking&&t-dprCheck>2000&&perf.f.length>=60){dprCheck=t;const fps=1/(perf.f.reduce((x,y)=>x+y,0)/perf.f.length);let next=dpr;if(fps<45){next=Math.max(1,dpr-.25);dprMax=Math.min(dprMax,next);}else if(fps>58)next=Math.min(dprMax,dpr+.25);if(next!==dpr){dpr=next;pendingDpr=true;}}   // 한 번이라도 내렸으면 이번 접속 동안 그 위로는 안 올린다(진동 방지, 오타 10/8)
   }
   function move(to,y,p){dirty=true;transition={from:camera.position.clone(),to:new T.Vector3(...to),y0:ctl.yaw,y1:y,p0:ctl.pitch,p1:p,at:performance.now()};school.classList.add('view-moving');emitViewRect();}
-  async function walk(name,opts={}){const token=++generation;try{await app.pause();await load();if(token!==generation)return;layer.hidden=false;school.dataset.world='walking';app.screen?.({world:'walking',subject:name});for(const r of doors3){if(r.teacher)r.teacher.visible=true;if(r.seatSign)r.seatSign.visible=true;}controls.hidden=true;hud.hidden=false;layer.setAttribute('aria-hidden','false');walking=true;ctl.setMode('walking');room=name&&setSubject(name)?doors3[0]:null;fitView();title.textContent=room?room.name+' 교실':'학교 복도';leaving=false;if(room){spawnAt=null;openDoor(room,true);move([6.3,1.65,room.z],-Math.PI/2,0);}else{const sp=WM.spawnOf(opts.spawn);spawnAt={x:sp.x,z:sp.z};if(opts.spawn){camera.position.set(sp.x,1.65,sp.z);ctl.yaw=sp.yaw;ctl.pitch=0;title.textContent='대표실 가는 복도';}else move([sp.x,1.65,sp.z],sp.yaw,0);}title.tabIndex=-1;title.focus({preventScroll:true});}catch(e){if(token!==generation)return;app.status('교실 공간을 열지 못했습니다. '+e.message,true);hide();}}
+  async function walk(name,opts={}){mount(null);const token=++generation;try{await app.pause();await load();if(token!==generation)return;layer.hidden=false;school.dataset.world='walking';app.screen?.({world:'walking',subject:name});for(const r of doors3){if(r.teacher)r.teacher.visible=true;if(r.seatSign)r.seatSign.visible=true;}controls.hidden=true;hud.hidden=false;layer.setAttribute('aria-hidden','false');walking=true;ctl.setMode('walking');room=name&&setSubject(name)?doors3[0]:null;fitView();title.textContent=room?room.name+' 교실':'학교 복도';leaving=false;if(room){spawnAt=null;openDoor(room,true);move([6.3,1.65,room.z],-Math.PI/2,0);}else{const sp=WM.spawnOf(opts.spawn);spawnAt={x:sp.x,z:sp.z};if(opts.spawn){camera.position.set(sp.x,1.65,sp.z);ctl.yaw=sp.yaw;ctl.pitch=0;title.textContent='대표실 가는 복도';}else move([sp.x,1.65,sp.z],sp.yaw,0);}title.tabIndex=-1;title.focus({preventScroll:true});}catch(e){if(token!==generation)return;app.status('교실 공간을 열지 못했습니다. '+e.message,true);hide();}}
   async function goOffice(){if(leaving)return;leaving=true;ctl.release();let ok=false;try{ok=await app.leaveTo?.('/kingdom/');}catch{}if(!ok){leaving=false;spawnAt={x:camera.position.x,z:camera.position.z};}}   // 실패하면 1m 벗어났다 와야 다시 시도(문 앞 반복 방지)
   function openDoor(r,value){r.open=value;r.door.visible=!value;}
   async function enter(name){await load();room=setSubject(name)?doors3[0]:null;if(!room)return;openDoor(room,true);await walk(name);}
   function interact(){if(!walking||!lastTarget||overlay())return;if(lastTarget.kind==='gate'){goOffice();return;}if(lastTarget.kind==='door')openDoor(lastTarget.room,!lastTarget.room.open);else{room=lastTarget.room;app.select(room.name);}}
-  async function seated(name,kind='understand',cameraView){const token=++generation;try{await load();if(token!==generation)return;room=setSubject(name)?doors3[0]:null;if(!room){hide();return;}openDoor(room,true);walking=false;ctl.setMode('seated');hud.hidden=true;controls.hidden=false;layer.hidden=false;layer.setAttribute('aria-hidden','false');school.dataset.world='seated';for(const r of doors3){if(r.teacher)r.teacher.visible=true;if(r.seatSign)r.seatSign.visible=false;}school.dataset.subject=name;view(['lecture','notebook'].includes(cameraView)?cameraView:kind==='quiz'?'notebook':'lecture');}catch(e){if(token!==generation)return;hide();app.status('3D 표시를 준비하지 못했습니다. 기존 학습 화면에서 계속합니다.',true);}}
-  function view(mode){if(!room||walking)return;mode=app.fixedView?.()||mode;document.exitPointerLock?.();school.dataset.view=mode;for(const b of controls.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.icon===(mode==='lecture'?'board':'notebook')));fitView();move(mode==='notebook'?[8.1,1.8,room.z]:[6.7,1.22,room.z],-Math.PI/2,mode==='notebook'?-Math.PI/2:0);app.view?.(mode);}
+  async function seated(name,kind='understand',cameraView){const token=++generation;try{await load();if(token!==generation)return;room=setSubject(name)?doors3[0]:null;if(!room){hide();return;}openDoor(room,true);walking=false;ctl.setMode('seated');hud.hidden=true;controls.hidden=!!stage;layer.hidden=false;layer.setAttribute('aria-hidden','false');school.dataset.world='seated';for(const r of doors3){if(r.teacher)r.teacher.visible=true;if(r.seatSign)r.seatSign.visible=false;}school.dataset.subject=name;view(['lecture','notebook'].includes(cameraView)?cameraView:kind==='quiz'?'notebook':'lecture');}catch(e){if(token!==generation)return;hide();app.status('3D 표시를 준비하지 못했습니다. 기존 학습 화면에서 계속합니다.',true);}}
+  function view(mode){if(!room||walking)return;mode=stage?'lecture':app.fixedView?.()||mode;document.exitPointerLock?.();school.dataset.view=mode;for(const b of controls.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b.dataset.icon===(mode==='lecture'?'board':'notebook')));fitView();move(mode==='notebook'?[8.1,1.8,room.z]:stage?[6.7,1.55,room.z+.25]:[6.7,1.22,room.z],-Math.PI/2,mode==='notebook'?-Math.PI/2:0);app.view?.(mode);}
   function hide(){++generation;walking=false;transition=null;school.classList.remove('view-moving');saeng.lecture(false);ctl?.setMode('hidden');layer.hidden=true;layer.setAttribute('aria-hidden','true');hud.hidden=true;controls.hidden=true;delete school.dataset.world;delete school.dataset.view;emitViewRect();}
   function tools(){const host=app.panel((room?.name||'과목')+' · 교실 도구');const c=make('canvas');c.width=720;c.height=400;c.className='subject-canvas';host.append(make('p',room?.tools),c);const range=make('input');range.type='range';range.min='-5';range.max='5';range.step='.1';range.value='1';range.setAttribute('aria-label','도형·그래프 매개변수');const readout=make('p');host.append(range,readout);
     const draw=()=>{const ctx=c.getContext('2d'),a=Number(range.value);ctx.clearRect(0,0,720,400);ctx.fillStyle='#fffaf0';ctx.fillRect(0,0,720,400);ctx.strokeStyle='#b7c5bc';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(60,320);ctx.lineTo(670,320);ctx.moveTo(360,30);ctx.lineTo(360,370);ctx.stroke();ctx.strokeStyle='#246455';ctx.lineWidth=3;
@@ -118,18 +142,19 @@ export function createSpace(app){
     };range.oninput=draw;draw();
   }
   window.addEventListener('resize',resize);
+  window.addEventListener('scroll',()=>{if(stage)emitViewRect();},true);
   // 고개 동작(아이패드만 쓸 때): ↑ 칠판 보기 · ↓ 책상 내려다보기, 칠판을 위로 쓸면 책상, 위쪽 칠판 띠를 아래로 쓸면 칠판.
-  window.addEventListener('keydown',e=>{if(school.dataset.world!=='seated'||walking||overlay()||app.fixedView?.()||FP?.typingTarget(e.target)||FP?.typingTarget(document.activeElement)||e.ctrlKey||e.metaKey||e.altKey)return;if(e.key==='ArrowUp'||e.code==='KeyW'){e.preventDefault();if(!e.repeat)view('lecture');}else if(e.key==='ArrowDown'||e.code==='KeyS'){e.preventDefault();if(!e.repeat)view('notebook');}});
+  window.addEventListener('keydown',e=>{if(school.dataset.world!=='seated'||walking||stage||overlay()||app.fixedView?.()||FP?.typingTarget(e.target)||FP?.typingTarget(document.activeElement)||e.ctrlKey||e.metaKey||e.altKey)return;if(e.key==='ArrowUp'||e.code==='KeyW'){e.preventDefault();if(!e.repeat)view('lecture');}else if(e.key==='ArrowDown'||e.code==='KeyS'){e.preventDefault();if(!e.repeat)view('notebook');}});
   // 스크롤은 막지 않는다: 끝까지 내린 칠판에서 위로 쓸면 책상, 맨 위인 칠판 띠에서 아래로 쓸면 칠판.
   {let swipe=null;const board=document.getElementById('board');
-   board.addEventListener('touchstart',e=>{if(school.dataset.world!=='seated'||overlay()||app.fixedView?.()||e.touches.length!==1){swipe=null;return;}const t=e.touches[0];swipe={x:t.clientX,y:t.clientY,top:board.scrollTop<=1,bottom:board.scrollTop+board.clientHeight>=board.scrollHeight-2};},{passive:true});
+   board.addEventListener('touchstart',e=>{if(school.dataset.world!=='seated'||stage||overlay()||app.fixedView?.()||e.touches.length!==1){swipe=null;return;}const t=e.touches[0];swipe={x:t.clientX,y:t.clientY,top:board.scrollTop<=1,bottom:board.scrollTop+board.clientHeight>=board.scrollHeight-2};},{passive:true});
    board.addEventListener('touchend',e=>{if(!swipe)return;
     // 끝날 때도 다시 본다(오타 10/8): 쓸던 중 창이 열렸거나 착석·시점 고정·입력 포커스가 바뀌었으면 이 쓸기는 버린다.
-    if(overlay()||school.dataset.world!=='seated'||walking||app.fixedView?.()||FP?.typingTarget?.(document.activeElement)){swipe=null;return;}const t=e.changedTouches[0],dy=t.clientY-swipe.y,dx=t.clientX-swipe.x,s0=swipe;swipe=null;if(Math.abs(dy)<60||Math.abs(dy)<Math.abs(dx)*1.5)return;if(dy<0&&s0.bottom&&school.dataset.view==='lecture')view('notebook');else if(dy>0&&s0.top&&school.dataset.view==='notebook')view('lecture');},{passive:true});
+    if(overlay()||stage||school.dataset.world!=='seated'||walking||app.fixedView?.()||FP?.typingTarget?.(document.activeElement)){swipe=null;return;}const t=e.changedTouches[0],dy=t.clientY-swipe.y,dx=t.clientX-swipe.x,s0=swipe;swipe=null;if(Math.abs(dy)<60||Math.abs(dy)<Math.abs(dx)*1.5)return;if(dy<0&&s0.bottom&&school.dataset.view==='lecture')view('notebook');else if(dy>0&&s0.top&&school.dataset.view==='notebook')view('lecture');},{passive:true});
    board.addEventListener('touchcancel',()=>swipe=null);}
   new MutationObserver(()=>{if(school.dataset.mode!=='classroom'&&!walking)hide();}).observe(school,{attributes:true,attributeFilter:['data-mode']});
-  const saeng={lecture(on){lecturing=!!on;doors3[0]?.teacherAvatar.lecture(lecturing);dirty=true;},point(){doors3[0]?.teacherAvatar.point();pointAt=performance.now()+1600;dirty=true;}};
+  const saeng={headPoint,lecture(on){lecturing=!!on;doors3[0]?.teacherAvatar.lecture(lecturing);dirty=true;},point(){doors3[0]?.teacherAvatar.point();pointAt=performance.now()+1600;dirty=true;}};
   // 읽기 전용 투영 관측: 실제 면의 네 꼭짓점과 공개 사각형을 대조한다.
-  window.__schoolViewGeometry=()=>({board:cornersFor('board'),desk:cornersFor('desk'),boardRect:surfaceRect('board'),deskRect:surfaceRect('desk'),doors:doors3.length,seats:targets.filter(t=>t.userData.kind==='seat').length,subject,teacherVisible:!!room?.teacher.visible});
-  layer.hidden=true;return {walk,enter,seated,view,hide,setSubject,boardRect:()=>surfaceRect('board'),deskRect:()=>surfaceRect('desk'),saeng,refresh:()=>{if(school.dataset.world==='seated'){const v=school.dataset.view;view(v==='notebook'?'notebook':'lecture');}},get mode(){return school.dataset.view;}};
+  window.__schoolViewGeometry=()=>({board:cornersFor('board'),desk:cornersFor('desk'),boardRect:surfaceRect('board'),deskRect:surfaceRect('desk'),doors:doors3.length,seats:targets.filter(t=>t.userData.kind==='seat').length,subject,teacherVisible:!!room?.teacher.visible,head:headPoint(),headWorld:room?.teacherAvatar.headAnchor?room.teacherAvatar.headAnchor.localToWorld(new T.Vector3(0,room.teacherAvatar.height/6.6*1.1,0)).toArray():null,camera:camera?{position:camera.position.toArray(),quaternion:camera.quaternion.toArray(),fov:camera.fov,aspect:camera.aspect,near:camera.near,far:camera.far}:null});
+  layer.hidden=true;return {mount,walk,enter,seated,view,hide,setSubject,boardRect:()=>surfaceRect('board'),deskRect:()=>surfaceRect('desk'),saeng,refresh:()=>{if(school.dataset.world==='seated'){const v=school.dataset.view;view(v==='notebook'?'notebook':'lecture');}},get mode(){return school.dataset.view;}};
 }

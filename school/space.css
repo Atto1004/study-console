@@ -45,3 +45,7 @@
 /* 3D 면은 이동이 끝난 뒤 투영 좌표로 다시 놓는다. */
 .school.view-moving #room{animation:none}
 .school.view-moving .board,.school.view-moving .mission-work{visibility:hidden}
+
+/* 착석 강의 무대: 레이어만 무대에 종속하며 기존 화면 배치는 호출자가 맡는다. */
+.school-world[data-mounted="true"]{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}
+.school-world[data-mounted="true"] canvas{width:100%;height:100%}
