@@ -11,13 +11,15 @@ export function createMission(app){
   function renderCanvas(){
     const ctx=canvas.getContext?.('2d');if(!ctx)return;
     ctx.clearRect(0,0,1200,720);
-    for(const s of strokes){ctx.globalCompositeOperation=s.tool==='eraser'?'destination-out':'source-over';ctx.strokeStyle='#214b67';ctx.lineCap='round';ctx.lineJoin='round';const p=s.points;if(!p.length)continue;ctx.beginPath();ctx.moveTo(p[0][0]*1200,p[0][1]*720);for(const point of p){ctx.lineWidth=s.tool==='eraser'?28:Math.max(2,point[2]*5);ctx.lineTo(point[0]*1200,point[1]*720);}ctx.stroke();}
+    for(const s of strokes)drawSegment(s,0);   // 실시간 그리기와 같은 규칙(구간마다 그 점의 압력 굵기) — 다시 그려도 똑같이 보인다(오타 10/8)
     ctx.globalCompositeOperation='source-over';
   }
   const point=e=>{const r=canvas.getBoundingClientRect();return [Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)),Math.min(1,Math.max(0,(e.clientY-r.top)/r.height)),Math.min(1,Math.max(0,e.pressure||.5))];};
-  canvas.onpointerdown=e=>{if(mode!=='pencil'||e.button>0||active)return;canvas.setPointerCapture(e.pointerId);active={id:e.pointerId,stroke:{tool,points:[point(e)]}};strokes.push(active.stroke);undo=[];renderCanvas();};
+  canvas.onpointerdown=e=>{if(mode!=='pencil'||e.button>0||active)return;canvas.setPointerCapture(e.pointerId);active={id:e.pointerId,stroke:{tool,points:[point(e)]}};strokes.push(active.stroke);undo=[];drawSegment(active.stroke,0);};
   // 펜이 움직일 때는 새로 생긴 구간만 그린다 — 획이 많아도 버벅이지 않게(대표님 10/8 「렉 최대한 안 걸리게」).
-  function drawSegment(stroke,from){const ctx=canvas.getContext?.('2d');if(!ctx)return;const p=stroke.points;ctx.globalCompositeOperation=stroke.tool==='eraser'?'destination-out':'source-over';ctx.strokeStyle='#214b67';ctx.lineCap='round';ctx.lineJoin='round';for(let i=Math.max(1,from);i<p.length;i++){ctx.lineWidth=stroke.tool==='eraser'?28:Math.max(2,p[i][2]*5);ctx.beginPath();ctx.moveTo(p[i-1][0]*1200,p[i-1][1]*720);ctx.lineTo(p[i][0]*1200,p[i][1]*720);ctx.stroke();}ctx.globalCompositeOperation='source-over';}
+  function drawSegment(stroke,from){const ctx=canvas.getContext?.('2d');if(!ctx)return;const p=stroke.points;ctx.globalCompositeOperation=stroke.tool==='eraser'?'destination-out':'source-over';ctx.strokeStyle='#214b67';ctx.lineCap='round';ctx.lineJoin='round';if(from===0&&p.length){   // 획의 첫 점(누르는 순간 찍히는 점)은 실시간·다시 그리기 모두 같게
+  ctx.lineWidth=stroke.tool==='eraser'?28:Math.max(2,p[0][2]*5);ctx.beginPath();ctx.moveTo(p[0][0]*1200,p[0][1]*720);ctx.lineTo(p[0][0]*1200,p[0][1]*720);ctx.stroke();}
+  for(let i=Math.max(1,from);i<p.length;i++){ctx.lineWidth=stroke.tool==='eraser'?28:Math.max(2,p[i][2]*5);ctx.beginPath();ctx.moveTo(p[i-1][0]*1200,p[i-1][1]*720);ctx.lineTo(p[i][0]*1200,p[i][1]*720);ctx.stroke();}ctx.globalCompositeOperation='source-over';}
   canvas.onpointermove=e=>{if(active?.id!==e.pointerId)return;const from=active.stroke.points.length;for(const sample of e.getCoalescedEvents?.()||[e])active.stroke.points.push(point(sample));drawSegment(active.stroke,from);};
   const finish=e=>{if(active?.id!==e.pointerId)return;active=null;schedule();};canvas.onpointerup=finish;canvas.onpointercancel=finish;
   input.oninput=()=>schedule();
