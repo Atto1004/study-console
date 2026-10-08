@@ -62,7 +62,8 @@
 .v3-more summary::-webkit-details-marker{display:none}
 .v3-more summary svg{width:20px;height:20px}
 .v3-menu{position:absolute;right:0;bottom:52px;z-index:40;display:grid;min-width:170px;padding:6px;border-radius:12px;background:#fff;box-shadow:0 12px 30px #1f3d3333}
-.v3-menu-item{padding:10px 12px;border:0;background:none;text-align:left;border-radius:8px;font:15px "Pretendard Variable",Pretendard,sans-serif;cursor:pointer}
+.v3-menu-item svg{width:18px;height:18px;flex:none;color:#21745a}
+.v3-menu-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:0;background:none;text-align:left;border-radius:8px;font:15px "Pretendard Variable",Pretendard,sans-serif;cursor:pointer}
 .v3-menu-item:hover{background:#eef4f0}
 
 /* 헤더: 게임 ↔ 사이트 */

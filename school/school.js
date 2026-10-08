@@ -848,9 +848,7 @@ async function renderStep(camera) {
   tutor?.onStep();
   lecture?.start();
   // 교실 v3: 게임 보기면 3D 교실을 위 강의 칸에 앉혀 붙이고, 사이트 보기면 3D 를 쓰지 않는다
-  if (v3?.view==='game'&&space?.mount&&activeSession?.purpose!=='exam'){await space.seated(course,step.kind,camera);space.mount(v3.mount3d);}   // 시험 대비 문제 풀기는 3D 없이(기존 규칙)
-  else if (v3?.view==='site'&&['walking','seated'].includes(document.querySelector('.school').dataset.world)){space?.mount?.(null);space?.hide();}
-  else if (['walking','seated'].includes(document.querySelector('.school').dataset.world)) await space?.seated(course,step.kind,camera);
+  await stage3d(step.kind,camera);
   if (!isBoard()) await growth?.step(activeSession);
 }
 async function returnToQuestion() {
@@ -2233,10 +2231,23 @@ growth = createGrowth({api,status,panel,start:startLesson,retest,courses:()=>wor
 workspace = createWorkspace({api,status,panel,record,screen:rememberScreen,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],walk:name=>space&&ROOMS.some(r=>r.name===name)?space.walk(name):showCourse(name),practice,rooms:()=>ROOMS.map(r=>r.name),evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,tutorPlan:(host,data,refresh)=>growth.tutorPlan(host,data,refresh),leave:async()=>{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);space?.hide();stopVoice();closeDialogs();++requestGeneration;}   /* 저장이 다 된 뒤에 3D 를 닫는다 — 실패하면 수업·3D 그대로(오타 10/8) */,lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode)});
 space = createSpace({fixedView:()=>setup?.fixedView(),leaveTo:async url=>{try{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);}catch(e){status('저장하지 못해 이동하지 않았습니다. '+(e.message||''),true);return false;}stopVoice();location.href=url;return true;},status,panel,screen:rememberScreen,view:camera=>{if(current)rememberScreen({lesson:current.id,step:current.steps[index].id,camera});},home:()=>workspace.open('main'),pause:async()=>{await mission.save();await growth.stop('pause');},ask:()=>openChat('','hint'),select:sitDown});
 // 교실 v3(대표님 10/8): 위 강의 · 가운데 문제 · 아래 대화, 게임↔사이트
+// 교실 v3 3D 무대(오타 검수 10/8 P2): 게임 보기 + 시험 대비가 아님 → 강의 칸에 앉힘(같은 과목이면 다시 앉히지 않음), 아니면 3D 를 내린다
+let stagedCourse=null;
+async function stage3d(kind,camera){
+  const world=document.querySelector('.school').dataset.world;
+  // 시험 대비 문제 풀기(복도 문)는 3D 없이, 다만 걸어가 직접 앉았으면(walking/seated) 목적과 상관없이 3D 수업
+  if(v3?.view==='game'&&space?.mount&&current&&(activeSession?.purpose!=='exam'||['walking','seated'].includes(world))){
+    if(world==='seated'&&stagedCourse===course)return;
+    await space.seated(course,kind,camera);space.mount(v3.mount3d);stagedCourse=course;return;
+  }
+  stagedCourse=null;
+  if(['walking','seated'].includes(world)){space?.mount?.(null);space?.hide();}
+}
 const blockedStep=()=>!current||['rejected','pending'].includes(current.review?.status);
 function advance(){   // ⏭ / Enter: 강의 중이면 다음 문장, 끝났으면 다음 단계(개념 단계는 답 안 해도 「읽음」으로 넘어감, 문제는 풀어야)
   if(!current||blockedStep())return;
   if(lecture&&lecture.skip())return;
+  if(isBoard())return;   // 칠판 역할은 넘기기·「읽음」 기록 없이 따라가기만(오타 검수 10/8 P1)
   if(passed){$('next').click();return;}
   const step=current.steps[index];
   if(step.options){$('speech').textContent='이 문제는 골라야 넘어가요. 막히면 힌트(H)나 더 쉽게(E)를 눌러요.';return;}
@@ -2248,7 +2259,7 @@ v3 = startClassroomV3({
   onSkip:advance,
   onChat:text=>tutor?.question(text),
   progress:()=>$('stepLabel')?.textContent||'',
-  onViewChange:async view=>{if(view==='site'){space?.hide();space?.mount?.(null);}else if(current&&document.querySelector('.school').dataset.mode==='classroom'&&space?.mount){await space.seated(course,current.steps[index].kind);space.mount(v3.mount3d);}},
+  onViewChange:async view=>{if(current&&document.querySelector('.school').dataset.mode==='classroom'){stagedCourse=null;await stage3d(current.steps[index].kind);}else if(view==='site'){space?.mount?.(null);space?.hide();}},
 });
 tutor = createTutor({api,eventId,record,
   ctx:()=>current?{lesson:current,step:current.steps[index],index,course,passed,blocked:['rejected','pending'].includes(current.review?.status)}:null,
@@ -2291,8 +2302,9 @@ lecture = createLecture({
   onEnd:()=>tutor?.afterLecture(),
   onState:st=>{v3.state(st);
     // 학습 시간 기록은 강의 ▶/⏸ 를 따라간다(위쪽 따로 있던 ▶·⏹ 대신)
-    if(!st.playing&&!st.ended&&!userPaused){userPaused=true;growth?.stop('pause').catch(()=>{});}
-    else if(st.playing&&userPaused){userPaused=false;if(activeSession)growth?.start(activeSession);}},
+    if(isBoard())return;
+    if(!st.playing&&!st.ended){if(!userPaused){userPaused=true;growth?.stop('pause').catch(()=>{});}}
+    else if(userPaused){userPaused=false;if(activeSession)growth?.start(activeSession);}},
 });
 createWorldMap();
 setup = createSetup({onChange:()=>{const m=setup.solveMode();if(m)mission.setMode(m);space?.refresh();}});

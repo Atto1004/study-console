@@ -39,7 +39,7 @@ export function startClassroomV3(app) {
 
   // ── 아래: 대화 기록 + 입력 + 진행 조작
   const log = el('div', 'v3-log'); log.id = 'chatLog'; log.setAttribute('aria-live', 'polite');
-  const chat = el('form', 'v3-chat'); const input = el('input'); input.id = 'chatInput'; input.placeholder = '스앵님께 말하기 · 질문은 ?로 끝내기 (Q)'; input.autocomplete = 'off'; input.maxLength = 600;
+  const chat = el('form', 'v3-chat'); const input = el('input'); input.id = 'chatInput'; input.placeholder = '스앵님께 말하기 · 질문은 ?로 끝내기 (Q)'; input.autocomplete = 'off'; input.maxLength = 600; input.setAttribute('aria-label', '스앵님께 말하기');
   const send = iconBtn('send', '보내기', 'v3-send'); send.type = 'submit'; chat.append(input, send);
   const bar = el('div', 'v3-bar');
   const restart = iconBtn('restart', '이 단계 강의 처음부터'), play = iconBtn('pause', '강의 멈춤 (Space)', 'v3-play'), skip = iconBtn('skip', '다음 (Enter)', 'v3-skip');
@@ -47,10 +47,15 @@ export function startClassroomV3(app) {
   const hint = document.getElementById('hint'), simpler = document.getElementById('simpler');
   const more = el('details', 'v3-more'); const sum = el('summary'); sum.innerHTML = svg(ICON.more); sum.setAttribute('aria-label', '더보기'); sum.dataset.tip = '근거·보충·공부 종료';
   const menu = el('div', 'v3-menu');
-  for (const [id, label] of [['source', '이 수업의 근거'], ['generate', '맞춤 보충 수업']]) { const b = el('button', 'v3-menu-item', label); b.type = 'button'; b.onclick = () => { more.open = false; document.getElementById(id)?.click(); }; menu.append(b); }
-  const endStudy = el('button', 'v3-menu-item', '공부 종료'); endStudy.type = 'button'; endStudy.onclick = () => { more.open = false; [...document.querySelectorAll('.learning-strip button')].find((b) => /공부 종료/.test(b.getAttribute('aria-label') || b.textContent))?.click(); };
-  const skills = el('button', 'v3-menu-item', '내 스킬'); skills.type = 'button'; skills.onclick = () => { more.open = false; [...document.querySelectorAll('.learning-strip button')].find((b) => /내 스킬/.test(b.getAttribute('aria-label') || b.textContent))?.click(); };
-  menu.append(endStudy, skills); more.append(sum, menu);
+  // 더보기 메뉴는 목록(아이콘 + 이름) — 대표님 규칙의 「목록」 칸
+  const strip = (re) => [...document.querySelectorAll('.learning-strip button')].find((b) => re.test(b.getAttribute('aria-label') || b.textContent));
+  for (const [icon, label, go] of [
+    ['M4 4h12l4 4v12H4zM8 12h8M8 16h5', '이 수업의 근거', () => document.getElementById('source')?.click()],
+    ['M12 3v18M3 12h18', '맞춤 보충 수업', () => document.getElementById('generate')?.click()],
+    ['M6 6h12v12H6z', '공부 종료', () => strip(/공부 종료/)?.click()],
+    ['M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z', '내 스킬', () => strip(/내 스킬/)?.click()],
+  ]) { const b = el('button', 'v3-menu-item'); b.type = 'button'; b.innerHTML = svg(icon); b.append(label); b.onclick = () => { more.open = false; go(); }; menu.append(b); }
+  more.append(sum, menu);
   bar.append(restart, play, skip, progress, track, hint, simpler, more);
   dialogue.prepend(log); dialogue.append(chat, bar);
 

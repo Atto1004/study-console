@@ -3,14 +3,16 @@
 //   칠판에 그만큼 써지고(위→아래로 드러남) · 말풍선 자막이 뜨고 · 스앵님이 말하고(게임: 3D 입·몸짓 / 사이트: 초상)
 //   · 음성이 켜져 있으면 읽어 준다(꺼져 있으면 글자 수만큼 기다림).
 // ▶/⏸ 강의 멈춤·다시, ⏮ 이 단계 처음부터, ⏭ 다음 문장(끝이면 onEnd 뒤 「다음 단계」는 school.js).
+// 재생 한 번 = 세대 하나(오타 검수 10/8 P1): 시작·멈춤·계속·처음부터·건너뛰기마다 세대를 올리고, 이전 세대의
+// 타이머·음성은 취소하며, 모든 await 뒤에 세대를 확인해 오래된 재생이 새 강의에 끼어들지 못하게 한다.
 const splitSentences = (text) => String(text || '')
   .replace(/\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]/g, (m) => m.replace(/[.!?。]/g, '․'))   // 수식 안 마침표로 자르지 않게
   .split(/(?<=[.!?。…])\s+|\n{1,}/).map((s) => s.replace(/․/g, '.').trim()).filter((s) => s.length > 1);
 const plain = (s) => s.replace(/\$\$?|\\\(|\\\)|\\\[|\\\]/g, '').replace(/\\[a-zA-Z]+/g, ' ').replace(/[{}_^]/g, '').replace(/\s+/g, ' ').trim();
 
 export function createLecture(app) {
-  // app: { ctx(), talk(on), say(text), subtitle(text|null), board(fraction), voiceOn(), voice(text, signal) → Promise, onEnd(), onState(state) }
-  let lines = [], i = 0, playing = false, timer = null, abort = null, key = '', ended = false;
+  // app: { ctx(), talk(on), subtitle(text|null), board(fraction), voiceOn(), voice(text, signal) → Promise, onEnd(), onState(state) }
+  let lines = [], i = 0, playing = false, ended = false, gen = 0, run = null;
   const total = () => lines.reduce((n, l) => n + l.length, 0) || 1;
   const done = () => lines.slice(0, i + 1).reduce((n, l) => n + l.length, 0) / total();
   const state = () => app.onState?.({ playing, index: i, count: lines.length, ended });
@@ -25,40 +27,47 @@ export function createLecture(app) {
     if (c.step.options) out.push('보기 중에서 직접 골라 보세요.');
     return out.slice(0, 24);
   }
-  function clear() { clearTimeout(timer); timer = null; abort?.abort(); abort = null; }
-  async function speakLine(idx) {
-    const text = lines[idx]; if (text == null) return;
-    app.board?.(done()); app.subtitle?.(text); app.talk?.(true);
-    const k = key, ms = Math.max(1800, Math.min(9000, plain(text).length * 95));
-    if (app.voiceOn?.()) {
-      abort = new AbortController();
-      try { await app.voice(plain(text), abort.signal); } catch { /* 음성 실패면 시간으로 */ await wait(ms); }
-    } else await wait(ms);
-    if (k !== key || !playing) return;
-    app.talk?.(false);
-    if (idx + 1 < lines.length) { i = idx + 1; state(); speakLine(i); }
-    else finish();
+  // 지금 재생을 끊는다: 세대를 올리고, 그 재생이 가진 타이머·음성을 취소(대기 Promise 도 끝낸다)
+  function cancel() { gen++; if (run) { clearTimeout(run.timer); run.abort.abort(); run.resolve?.(); run = null; } }
+  // 문장 하나를 이 세대로 말한다. 세대가 바뀌면 아무것도 하지 않고 끝난다.
+  async function play(idx) {
+    const my = ++gen; const r = { timer: null, abort: new AbortController(), resolve: null }; run = r;
+    const alive = () => my === gen && playing;
+    const wait = (ms) => new Promise((res) => { r.resolve = res; r.timer = setTimeout(res, ms); });
+    for (let k = idx; k < lines.length; k++) {
+      if (!alive()) return;
+      i = k; state(); app.board?.(done()); app.subtitle?.(lines[k]); app.talk?.(true);
+      const ms = Math.max(1800, Math.min(9000, plain(lines[k]).length * 95));
+      if (app.voiceOn?.()) {
+        try { await app.voice(plain(lines[k]), r.abort.signal); }
+        catch { if (!alive()) return; await wait(ms); }   // 취소면 바로 끝, 음성 실패만 시간으로
+      } else await wait(ms);
+      if (!alive()) return;
+      app.talk?.(false);
+    }
+    if (alive()) finish();
   }
-  function wait(ms) { return new Promise((res) => { timer = setTimeout(res, ms); }); }
-  function finish() { clear(); playing = false; ended = true; app.talk?.(false); app.board?.(1); app.subtitle?.(null); state(); app.onEnd?.(); }
+  function finish() { cancel(); playing = false; ended = true; app.talk?.(false); app.board?.(1); app.subtitle?.(null); state(); app.onEnd?.(); }
+  function begin() { const c = app.ctx(); if (!c) return false; cancel(); lines = build(); i = 0; ended = false; if (!lines.length || c.passed) { finish(); return false; } playing = true; app.board?.(0); play(0); return true; }
 
   return {
     // 단계가 바뀔 때 school.js 가 부른다 — 바로 강의 시작
-    start() {
-      clear(); const c = app.ctx(); if (!c) return;
-      key = c.lesson.id + '/' + c.step.id; lines = build(); i = 0; ended = false;
-      if (!lines.length || c.passed) { finish(); return; }
-      playing = true; app.board?.(0); state(); speakLine(0);
-    },
+    start() { begin(); },
     toggle() {
-      if (ended) { this.restart(); return; }
-      if (playing) { playing = false; clear(); app.talk?.(false); state(); }
-      else { playing = true; state(); speakLine(i); }
+      if (ended) { begin(); return; }
+      if (playing) { playing = false; cancel(); app.talk?.(false); state(); }
+      else { playing = true; play(i); }
     },
-    restart() { const c = app.ctx(); if (!c) return; clear(); key = c.lesson.id + '/' + c.step.id + '#' + Date.now(); lines = build(); i = 0; ended = false; playing = true; app.board?.(0); state(); speakLine(0); },
+    restart() { begin(); },
     // ⏭: 강의 중이면 다음 문장, 끝났으면 false(다음 단계는 school.js)
-    skip() { if (ended) return false; clear(); key += '+'; if (i + 1 < lines.length) { i++; state(); if (playing) speakLine(i); else { app.board?.(done()); app.subtitle?.(lines[i]); } } else finish(); return true; },
-    stop() { clear(); playing = false; key += '~'; app.talk?.(false); app.subtitle?.(null); },
+    skip() {
+      if (ended) return false;
+      if (i + 1 >= lines.length) { finish(); return true; }
+      cancel(); i++;
+      if (playing) play(i); else { state(); app.board?.(done()); app.subtitle?.(lines[i]); }
+      return true;
+    },
+    stop() { cancel(); playing = false; app.talk?.(false); app.subtitle?.(null); },
     get playing() { return playing; }, get ended() { return ended; },
   };
 }
