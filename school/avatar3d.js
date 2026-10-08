@@ -156,6 +156,7 @@ export function createAvatar(T, spec) {
 
   // 동작
   let pose = "stand", t = 0, nextBlink = 2 + Math.random() * 3, blinkT = -1, talking = false, waving = false, typing = false, dozing = false;
+  let lecturing = false, pointUntil = 0;
   const cur = { ...POSES.stand };
   const seatDrop = legLen - 0.46;                         // 의자 높이 0.46m 에 앉는다
   function target(time) {
@@ -167,6 +168,8 @@ export function createAvatar(T, spec) {
     // 타자: 두 팔을 책상 위로 뻗고 번갈아 두드린다. 졸기: 고개를 떨군다.
     if (typing) Object.assign(p, { lShX: -1.05 + Math.sin(time * 11) * 0.06, rShX: -1.05 + Math.sin(time * 11 + 1.7) * 0.06, lEl: -0.75, rEl: -0.75, lSh: 0.12, rSh: -0.12, head: 0.18 });
     if (dozing) Object.assign(p, { head: 0.5, spine: 0.16, lShX: -0.25, rShX: -0.25, lEl: -0.6, rEl: -0.6 });
+    if (lecturing) Object.assign(p, { lSh: 0.2, lShX: -0.25, lEl: -0.65, rSh: -0.55, rShX: 0.35 + Math.sin(time * 2.2) * 0.12, rEl: -0.4, head: Math.sin(time * 2) * 0.035 });
+    if (time < pointUntil) Object.assign(p, { rSh: -1.25, rShX: 0.35, rEl: -0.15, head: -0.04 });
     if (waving) Object.assign(p, { rSh: -2.6, rShX: 0, rEl: -0.5 + Math.sin(time * 9) * 0.35 });
     return p;
   }
@@ -198,6 +201,8 @@ export function createAvatar(T, spec) {
     snap() { Object.assign(cur, target(t)); update(0); },
     get pose() { return pose; },
     talk(on) { talking = !!on; },
+    lecture(on) { lecturing = talking = !!on; if (!on) pointUntil = 0; },
+    point() { pointUntil = t + 1.2; },
     wave(on) { waving = !!on; },
     type(on) { typing = !!on; },
     doze(on) { if (dozing && !on) for (const e of eyes) e.scale.y = 1; dozing = !!on; },
