@@ -4,7 +4,7 @@ const { webkit, devices } = require(require('path').resolve(__dirname,'../../.te
   const browser = await webkit.launch();
   const ctx = await browser.newContext({ ...devices['iPad Pro 11 landscape'] });
   const page = await ctx.newPage();
-  await page.addInitScript(() => localStorage.setItem('school-setup', 'solo'));  // 학습 방식 고르는 창(10/8) 건너뛰기
+  await page.addInitScript(() => { localStorage.setItem('school-setup', 'solo'); localStorage.setItem('school-view', 'game'); });  // 학습 방식 창 건너뛰기 · 3D 걷기 검사라 게임 보기(교실 v3 기본은 사이트)
   const errors = [];
   page.on('pageerror', e => errors.push(e.message));
   await page.goto('http://127.0.0.1:8797/school/index.html', { waitUntil: 'load' });

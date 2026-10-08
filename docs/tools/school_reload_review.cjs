@@ -1,7 +1,7 @@
 const {chromium}=require('../../.test-tools/node_modules/playwright');
 const assert=require('node:assert/strict');
 (async()=>{const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});try{
-const page=await browser.newPage({viewport:{width:1440,height:1000}});await page.addInitScript(() => localStorage.setItem('school-setup', 'solo'));  // 학습 방식 고르는 창(10/8) 건너뛰기
+const page=await browser.newPage({viewport:{width:1440,height:1000}});await page.addInitScript(() => { localStorage.setItem('school-setup', 'solo'); localStorage.setItem('school-view', 'game'); });  // 학습 방식 창 건너뛰기 · 3D 걷기 검사라 게임 보기(교실 v3 기본은 사이트)
 ,errors=[];
 page.on('pageerror',e=>errors.push(e.message));
 page.on('console',m=>console.log(m.text()));

@@ -8,14 +8,15 @@ export function startSurfaces() {
   // 3D 면 사각형을 화면에 보이는 영역(위 HUD 아래 ~ 대화 바 위)과 겹치는 부분으로 자른다 — 면이 화면보다 크면 넘치지 않게
   // 위쪽은 HUD(미션 진행·수업 제목) 아래부터
   const hudBottom = () => Math.max(112, ...['#missionHeader', '#room .room-title'].map((q) => { const e = document.querySelector(q); const r = e && e.getClientRects().length ? e.getBoundingClientRect() : null; return r ? r.bottom + 8 : 0; }));
-  const safe = () => { const top = hudBottom(), dlg = document.getElementById('dialogue'); const bottom = dlg && !dlg.hidden ? dlg.getBoundingClientRect().top - 10 : innerHeight - 10; return { top, bottom: Math.max(top + 40, bottom) }; };
+  const stage = () => school.dataset.layout === 'v3' ? document.getElementById('lectureStage') : null;   // 교실 v3: 3D 는 위 강의 칸 안에만
+  const safe = () => { const st = stage(); if (st) { const r = st.getBoundingClientRect(); return { top: r.top + 4, bottom: Math.max(r.top + 44, r.bottom - 4) }; } const top = hudBottom(), dlg = document.getElementById('dialogue'); const bottom = dlg && !dlg.hidden ? dlg.getBoundingClientRect().top - 10 : innerHeight - 10; return { top, bottom: Math.max(top + 40, bottom) }; };
   const place = (el, r) => { const s = safe(); const y = Math.max(r.y, s.top), h = Math.min(r.y + r.h, s.bottom) - y; el.style.left = r.x + 'px'; el.style.top = y + 'px'; el.style.width = r.w + 'px'; el.style.height = Math.max(0, h) + 'px'; };   // 쓸 수 있는 높이를 절대 넘지 않는다 — 최소값 때문에 대화 바와 겹치던 것(오타 10/8)
   const clear = (el) => { if (!el) return; for (const k of ['left', 'top', 'width', 'height']) el.style[k] = ''; el.classList.remove('on-surface', 'on-paper'); };
   function apply(d) {
     last = d;
     const notebook = document.getElementById('missionWork');
     if (school.dataset.world !== 'seated' || !d) { delete school.dataset.surface; clear(board); clear(notebook); return; }
-    const view = d.view, target = view === 'notebook' ? d.desk : (view === 'lecture' || view === 'paper') ? d.board : null;
+    const view = stage() ? 'lecture' : d.view, target = view === 'notebook' ? d.desk : (view === 'lecture' || view === 'paper') ? d.board : null;
     if (!target) { school.dataset.surface = 'moving'; return; }   // 시점 이동 중: 숨김
     school.dataset.surface = view === 'notebook' ? 'desk' : 'board';
     // 공책 보기: 풀 때도 문제가 보여야 한다 — 공책 면 위쪽에 문제(칠판 내용)를 종이 위 글씨로, 그 아래가 풀이 칸
@@ -28,6 +29,8 @@ export function startSurfaces() {
     else { if (notebook) clear(notebook); board.classList.remove('on-paper'); place(board, target); board.classList.add('on-surface'); }
   }
   window.addEventListener('school:viewrect', (e) => apply(e.detail));
+  // 강의 칸 크기가 바뀌어도 다시 맞춘다
+  const st0 = stage(); if (st0 && 'ResizeObserver' in window) new ResizeObserver(() => { if (last) apply(last); }).observe(st0);
   // 대화 바 높이가 바뀌면(대사가 길어짐) 다시 맞춘다
   const dlg = document.getElementById('dialogue'); if (dlg && 'ResizeObserver' in window) new ResizeObserver(() => { if (last) apply(last); }).observe(dlg);
   // 앉음이 풀리면 바로 원래 배치로

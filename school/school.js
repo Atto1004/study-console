@@ -847,7 +847,10 @@ async function renderStep(camera) {
   await mission?.mount();
   tutor?.onStep();
   lecture?.start();
-  if (['walking','seated'].includes(document.querySelector('.school').dataset.world)) await space?.seated(course,step.kind,camera);
+  // 교실 v3: 게임 보기면 3D 교실을 위 강의 칸에 앉혀 붙이고, 사이트 보기면 3D 를 쓰지 않는다
+  if (v3?.view==='game'&&space?.mount&&activeSession?.purpose!=='exam'){await space.seated(course,step.kind,camera);space.mount(v3.mount3d);}   // 시험 대비 문제 풀기는 3D 없이(기존 규칙)
+  else if (v3?.view==='site'&&['walking','seated'].includes(document.querySelector('.school').dataset.world)){space?.mount?.(null);space?.hide();}
+  else if (['walking','seated'].includes(document.querySelector('.school').dataset.world)) await space?.seated(course,step.kind,camera);
   if (!isBoard()) await growth?.step(activeSession);
 }
 async function returnToQuestion() {

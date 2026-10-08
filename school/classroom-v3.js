@@ -33,7 +33,8 @@ export function startClassroomV3(app) {
   stage.append(mount3d, teaching, subtitle);
   room.append(stage, work);
   const choices = document.getElementById('choices'); work.append(choices);
-  const moveWork = () => { const w = document.getElementById('missionWork'); if (w && w.parentElement !== work) work.append(w); };
+  const moveWork = () => { const w = document.getElementById('missionWork'); if (w && w.parentElement !== work) work.append(w);
+    const sc = room.querySelector(':scope > .seat-controls'); if (sc) stage.append(sc); };   // 게임 보기: 「자리에서 일어나기」만 강의 칸 모서리에
   moveWork(); new MutationObserver(moveWork).observe(room, { childList: true });
 
   // ── 아래: 대화 기록 + 입력 + 진행 조작
@@ -70,6 +71,9 @@ export function startClassroomV3(app) {
   function addMine(text) { addLine('me', text); }
   // 가운데 답 칸에서 낸 답도 내 말로 남김
   work.addEventListener('submit', (e) => { const i = e.target.querySelector?.('input'); if (i?.value.trim()) addMine(i.value.trim()); }, true);
+
+  // 게임 보기: 자막 말풍선이 3D 스앵님 머리를 따라간다(오타 A3 계약 school:viewrect.head)
+  window.addEventListener('school:viewrect', (e) => { const h = e.detail?.head; if (!h) { subtitle.style.removeProperty('--hx'); subtitle.style.removeProperty('--hy'); return; } const r = stage.getBoundingClientRect(); subtitle.style.setProperty('--hx', (h.x - r.left) + 'px'); subtitle.style.setProperty('--hy', (h.y - r.top) + 'px'); subtitle.dataset.side = (h.x - r.left) > r.width * 0.55 ? 'right' : 'left'; });   // 칠판을 가리지 않게 머리 바깥쪽(칠판 반대편)
 
   // ── 헤더: 게임 ↔ 사이트
   const toggle = el('button', 'view-toggle'); toggle.type = 'button';

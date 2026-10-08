@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const output=path.resolve(__dirname,'../output/school-193');fs.mkdirSync(output,{recursive:true});
 (async()=>{
  const browser=await chromium.launch({channel:'chrome',headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
- const page=await browser.newPage({viewport:{width:1440,height:1000}});await page.addInitScript(() => localStorage.setItem('school-setup', 'solo'));  // 학습 방식 고르는 창(10/8) 건너뛰기
+ const page=await browser.newPage({viewport:{width:1440,height:1000}});await page.addInitScript(() => { localStorage.setItem('school-setup', 'solo'); localStorage.setItem('school-view', 'game'); });  // 학습 방식 창 건너뛰기 · 3D 걷기 검사라 게임 보기(교실 v3 기본은 사이트)
 ,errors=[];
  page.on('pageerror',e=>errors.push(e.message));
  await page.goto('http://127.0.0.1:8801/kingdom/study/school/index.html',{waitUntil:'domcontentloaded'});

@@ -4,7 +4,7 @@ async function run(kind) {
   const browser = kind === 'chrome' ? await chromium.launch({ channel: 'chrome', headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] }) : await webkit.launch();
   const ctx = kind === 'chrome' ? await browser.newContext({ viewport: { width: 1040, height: 918 } }) : await browser.newContext({ ...devices['iPad Pro 11 landscape'] });
   const page = await ctx.newPage();
-  await page.addInitScript(() => localStorage.setItem('school-setup', 'solo'));  // 학습 방식 고르는 창(10/8) 건너뛰기
+  await page.addInitScript(() => { localStorage.setItem('school-setup', 'solo'); localStorage.setItem('school-view', 'game'); });  // 학습 방식 창 건너뛰기 · 3D 걷기 검사라 게임 보기(교실 v3 기본은 사이트)
   const errors = [], three = [];
   page.on('pageerror', e => errors.push(e.message));
   page.on('request', r => { if (/three\.(module|core)\.js/.test(r.url())) three.push(r.url().split('/').pop()); });
