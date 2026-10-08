@@ -108,10 +108,16 @@ function startTips() {
   document.addEventListener('pointerdown', (e) => {
     const b = e.target.closest?.('.ico-btn'); clearTimeout(timer);
     if (!b || e.pointerType === 'mouse') return;
-    timer = setTimeout(() => { shown?.classList.remove('tip-on'); shown = b; swallow = b; b.classList.add('tip-on'); setTimeout(() => b.classList.remove('tip-on'), 1600); }, 500);
+    timer = setTimeout(() => { shown?.classList.remove('tip-on'); shown = b; swallow = { b }; b.classList.add('tip-on'); setTimeout(() => b.classList.remove('tip-on'), 1600); }, 500);
   }, true);
-  for (const t of ['pointerup', 'pointercancel', 'pointermove']) document.addEventListener(t, (e) => { if (t !== 'pointermove' || Math.abs(e.movementX) + Math.abs(e.movementY) > 6) clearTimeout(timer); }, true);
-  document.addEventListener('click', (e) => { if (swallow && e.target.closest?.('.ico-btn') === swallow) { e.preventDefault(); e.stopImmediatePropagation(); } swallow = null; }, true);
+  // 길게 눌러 말풍선을 본 그 한 번의 떼기만 삼킨다: 취소되면 바로 풀고, 뗀 뒤 0.4초가 지나면 푼다(오타 10/8).
+  document.addEventListener('pointerup', () => { clearTimeout(timer); if (swallow) swallow.until = performance.now() + 400; }, true);
+  document.addEventListener('pointercancel', () => { clearTimeout(timer); swallow = null; }, true);
+  document.addEventListener('pointermove', (e) => { if (Math.abs(e.movementX) + Math.abs(e.movementY) > 6) clearTimeout(timer); }, true);
+  document.addEventListener('click', (e) => {
+    const s = swallow; swallow = null;
+    if (s && e.target.closest?.('.ico-btn') === s.b && performance.now() <= (s.until ?? Infinity)) { e.preventDefault(); e.stopImmediatePropagation(); }
+  }, true);
   document.addEventListener('contextmenu', (e) => { if (e.target.closest?.('.ico-btn')) e.preventDefault(); }, true);
 }
 let busy = false;
