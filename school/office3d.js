@@ -67,7 +67,8 @@ export async function mountOffice3D() {
   function frame(now) {
     if (stopped) return;
     requestAnimationFrame(frame);
-    if (document.hidden || now - last < 33) return;      // 30fps 면 충분
+    // 24fps 면 충분하고, 업무 컴퓨터 창이 화면을 덮고 있으면 그리지 않는다(렉 줄이기, 10/8).
+    if (document.hidden || document.body.classList.contains('gl-computer-open') || now - last < 41) return;
     last = now;
     const dt = Math.min(clock.getDelta(), 0.1);
     for (const s of staff) {

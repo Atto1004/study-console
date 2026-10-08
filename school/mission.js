@@ -16,7 +16,9 @@ export function createMission(app){
   }
   const point=e=>{const r=canvas.getBoundingClientRect();return [Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)),Math.min(1,Math.max(0,(e.clientY-r.top)/r.height)),Math.min(1,Math.max(0,e.pressure||.5))];};
   canvas.onpointerdown=e=>{if(mode!=='pencil'||e.button>0||active)return;canvas.setPointerCapture(e.pointerId);active={id:e.pointerId,stroke:{tool,points:[point(e)]}};strokes.push(active.stroke);undo=[];renderCanvas();};
-  canvas.onpointermove=e=>{if(active?.id!==e.pointerId)return;for(const sample of e.getCoalescedEvents?.()||[e])active.stroke.points.push(point(sample));renderCanvas();};
+  // 펜이 움직일 때는 새로 생긴 구간만 그린다 — 획이 많아도 버벅이지 않게(대표님 10/8 「렉 최대한 안 걸리게」).
+  function drawSegment(stroke,from){const ctx=canvas.getContext?.('2d');if(!ctx)return;const p=stroke.points;ctx.globalCompositeOperation=stroke.tool==='eraser'?'destination-out':'source-over';ctx.strokeStyle='#214b67';ctx.lineCap='round';ctx.lineJoin='round';for(let i=Math.max(1,from);i<p.length;i++){ctx.lineWidth=stroke.tool==='eraser'?28:Math.max(2,p[i][2]*5);ctx.beginPath();ctx.moveTo(p[i-1][0]*1200,p[i-1][1]*720);ctx.lineTo(p[i][0]*1200,p[i][1]*720);ctx.stroke();}ctx.globalCompositeOperation='source-over';}
+  canvas.onpointermove=e=>{if(active?.id!==e.pointerId)return;const from=active.stroke.points.length;for(const sample of e.getCoalescedEvents?.()||[e])active.stroke.points.push(point(sample));drawSegment(active.stroke,from);};
   const finish=e=>{if(active?.id!==e.pointerId)return;active=null;schedule();};canvas.onpointerup=finish;canvas.onpointercancel=finish;
   input.oninput=()=>schedule();
   function schedule(){dirty=true;++editingVersion;stateLabel.textContent='풀이 저장 대기…';clearTimeout(delay);delay=setTimeout(()=>save().catch(()=>{}),650);}
