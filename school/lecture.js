@@ -11,21 +11,25 @@ const splitSentences = (text) => String(text || '')
 const plain = (s) => s.replace(/\$\$?|\\\(|\\\)|\\\[|\\\]/g, '').replace(/\\[a-zA-Z]+/g, ' ').replace(/[{}_^]/g, '').replace(/\s+/g, ' ').trim();
 
 export function createLecture(app) {
-  // app: { ctx(), talk(on), subtitle(text|null), board(fraction), voiceOn(), voice(text, signal) → Promise, onEnd(), onState(state) }
+  // app: { ctx(), talk(on), subtitle(text|null), board(fraction), voiceOn(), voice(text, signal) → Promise, onEnd(), onState(state),
+  //        script(step) → [{say, mood}]|null (회차 강의안, lecture-pack.js), mood(name) }
+  // 줄 하나 = {text, mood}. 강의안이 있으면 그 대본, 없으면 예전처럼 단계 speech·본문으로 만든다.
   let lines = [], i = 0, playing = false, ended = false, gen = 0, run = null;
-  const total = () => lines.reduce((n, l) => n + l.length, 0) || 1;
-  const done = () => lines.slice(0, i + 1).reduce((n, l) => n + l.length, 0) / total();
+  const total = () => lines.reduce((n, l) => n + l.text.length, 0) || 1;
+  const done = () => lines.slice(0, i + 1).reduce((n, l) => n + l.text.length, 0) / total();
   const state = () => app.onState?.({ playing, index: i, count: lines.length, ended });
 
   function build() {
     const c = app.ctx(); if (!c) return [];
+    const script = app.script?.(c.step);
+    if (script) return script.filter((l) => l && l.say).map((l) => ({ text: l.say, mood: l.mood || 'neutral' }));
     const intro = splitSentences(c.step.speech);
     const body = splitSentences(c.step.body);
     const head = c.step.title ? [c.step.title + (c.step.options ? ' — 문제부터 볼게요.' : '.')] : [];
     const seen = new Set(); const out = [];
     for (const s of [...intro, ...head, ...body]) { const k = plain(s); if (k && !seen.has(k)) { seen.add(k); out.push(s); } }
     if (c.step.options) out.push('보기 중에서 직접 골라 보세요.');
-    return out.slice(0, 24);
+    return out.slice(0, 24).map((text) => ({ text, mood: null }));
   }
   // 지금 재생을 끊는다: 세대를 올리고, 그 재생이 가진 타이머·음성을 취소(대기 Promise 도 끝낸다)
   function cancel() { gen++; if (run) { clearTimeout(run.timer); run.abort.abort(); run.resolve?.(); run = null; } }
@@ -36,10 +40,11 @@ export function createLecture(app) {
     const wait = (ms) => new Promise((res) => { r.resolve = res; r.timer = setTimeout(res, ms); });
     for (let k = idx; k < lines.length; k++) {
       if (!alive()) return;
-      i = k; state(); app.board?.(done()); app.subtitle?.(lines[k]); app.talk?.(true);
-      const ms = Math.max(1800, Math.min(9000, plain(lines[k]).length * 95));
+      i = k; state(); app.board?.(done()); app.subtitle?.(lines[k].text); app.talk?.(true);
+      if (lines[k].mood) app.mood?.(lines[k].mood);
+      const ms = Math.max(1800, Math.min(9000, plain(lines[k].text).length * 95));
       if (app.voiceOn?.()) {
-        try { await app.voice(plain(lines[k]), r.abort.signal); }
+        try { await app.voice(plain(lines[k].text), r.abort.signal); }
         catch { if (!alive()) return; await wait(ms); }   // 취소면 바로 끝, 음성 실패만 시간으로
       } else await wait(ms);
       if (!alive()) return;
@@ -64,7 +69,7 @@ export function createLecture(app) {
       if (ended) return false;
       if (i + 1 >= lines.length) { finish(); return true; }
       cancel(); i++;
-      if (playing) play(i); else { state(); app.board?.(done()); app.subtitle?.(lines[i]); }
+      if (playing) play(i); else { state(); app.board?.(done()); app.subtitle?.(lines[i].text); }
       return true;
     },
     stop() { cancel(); playing = false; app.talk?.(false); app.subtitle?.(null); },

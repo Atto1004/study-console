@@ -16,6 +16,7 @@ import { createTutor } from "./tutor.js";
 import { createSubjectRail } from "./subject-rail.js";
 import { startSurfaces } from "./surface.js";
 import { createLecture } from "./lecture.js";
+import { loadPack, packRoute, packLines, label as packLabel } from "./lecture-pack.js";
 import { startClassroomV3 } from "./classroom-v3.js";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
@@ -39,7 +40,9 @@ let activeSession = null, sessionQueue = Promise.resolve(), setup = null, sessio
 const isBoard = () => document.querySelector('.school')?.dataset.role === 'board';
 let resizeBoard;
 let chatMode = "question";
-let workspace, mission, space, growth, legacyLobbyMode = false, missionIndices = null;
+let workspace, mission, space, growth, legacyLobbyMode = false, missionIndices = null, pack = null, stepping = false;
+// 지금 수업의 회차 강의안(lecture-pack.js). 다른 수업으로 바뀌었으면 null.
+const curPack = () => (pack && current && pack.lessonId === current.id ? pack : null);
 const eventId = () => crypto.randomUUID();
 function rememberScreen(fields){
   const url=new URL(location.href);
@@ -629,6 +632,11 @@ async function startLesson(id, options = {}) {
     // 시험 대비는 저장된 마지막 위치와 상관없이 고른 첫 문제(가장 약한 문제)부터. 이어 하기·특정 문제 지정은 그대로 둔다.
     if (options.follow) { if (missionIndices && !missionIndices.includes(targetIndex)) missionIndices = [targetIndex, ...missionIndices.filter(i => i !== targetIndex)].slice(0, missionIndices.length); }
     else if (missionIndices && (!missionIndices.includes(targetIndex) || (!options.resume && !options.stepId && options.index === undefined))) targetIndex=missionIndices[0];
+    // 회차 강의안이 있으면(시험 대비 제외) 수업 순서 = 섹션별 판서 → 섹션 확인 → 학습지. 저장 위치가 순서 밖이면 그다음 자리로.
+    const lp = options.purpose === "exam" ? null : await loadPack(lesson.id);
+    if (generation !== requestGeneration || stale()) return;
+    const lr = lp && packRoute(lp, lesson.steps);
+    if (lr) { missionIndices = lr; if (!lr.includes(targetIndex)) targetIndex = lr.find(i => i >= targetIndex) ?? lr[0]; }
     if (options.follow) activeSession = options.resume;
     else await saveSession(lesson, targetIndex, {newSession: !options.resume, purpose: options.purpose || 'tutoring', assisted: options.assisted ?? !!options.resume?.assisted, returnTo: options.returnTo || null});
     if (generation !== requestGeneration) return;
@@ -641,6 +649,7 @@ async function startLesson(id, options = {}) {
   $("assignmentArea").setAttribute("aria-pressed", "false");
   $("assignments").hidden = true;
     current = lesson;
+    pack = lr ? lp : null;
     document.querySelector(".school").dataset.mode = "classroom";
     lastLesson = id;
     if (lesson.course !== "공통") course = lesson.course;
@@ -803,7 +812,7 @@ async function renderStep(camera) {
     assisted = assisted || !!prior.assisted || !prior.correct;
     if (prior.correct) passed = true;
   }
-  $("stepLabel").textContent = missionIndices ? `${missionIndices.indexOf(index)+1} / ${missionIndices.length} · 미션` : `${index + 1} / ${current.steps.length}`;
+  $("stepLabel").textContent = curPack() ? packLabel(curPack(), step.id) : missionIndices ? `${missionIndices.indexOf(index)+1} / ${missionIndices.length} · 미션` : `${index + 1} / ${current.steps.length}`;
   $("choices").replaceChildren();
   const kind =
     {
@@ -826,6 +835,8 @@ async function renderStep(camera) {
       ? "직접 골라주세요. 틀리면 어디서 막혔는지 짚고 다시 풀어볼게요."
       : step.kind === "example" ? "판서를 한 단계씩 보면서 같이 풀어봅시다. 지금 식 다음에 무엇을 해야 할지 설명해보세요. 막히면 ‘더 쉽게’로 한 단계만 같이 볼 수 있어요." : step.speech ||
         "읽은 뒤 이 내용을 자신의 말로 설명해보세요. 모르는 부분은 바로 질문해주세요.";
+  // 강의안 수업의 판서는 대화 기록에도 옛 요약 대신 그 단계 강의 대본을 남긴다(자막과 다른 설명이 겹치지 않게).
+  if (curPack() && !step.options) { const said = packLines(curPack(), step.id).map(l => l.say).join(" "); if (said) $("speech").textContent = said; }
   if (step.options) {
     step.options.forEach((option, i) => {
       const b = button(option, () => answer(i));
@@ -843,7 +854,7 @@ async function renderStep(camera) {
   // 개념·예제 단계는 스앵님이 먼저 확인 질문을 하고 대화 바에서 답을 받는다(tutor.js, 교실 v2 4절).
   $("next").disabled = !passed;
   $("next").textContent =
-    (missionIndices ? index === missionIndices.at(-1) : index === current.steps.length - 1) ? "미션 결과 보기" : "다음 도전";
+    (missionIndices ? index === missionIndices.at(-1) : index === current.steps.length - 1) ? (curPack() ? "수업 결과 보기" : "미션 결과 보기") : "다음 도전";
   $("back").disabled = index === 0;
   $("hint").disabled = !step.options;
   if (["rejected", "pending"].includes(current.review?.status)) {
@@ -959,6 +970,8 @@ function answer(choice) {
   }
   renderMath($("speech"));
   tutor?.onAnswer(correct);
+  // 강의안 수업: 확인·학습지 문제를 맞히면 잠깐 뒤 다음 섹션(문항)으로 이어 간다. 그사이 직접 넘겼으면 아무것도 안 함.
+  if (correct && curPack() && !isBoard()) { const at = index, lid = current.id; setTimeout(() => { if (current?.id === lid && index === at && passed) $("next").click(); }, 1800); }
 }
 $("hint").onclick = () => {
   assisted = true;
@@ -982,20 +995,23 @@ $("back").onclick = async () => {
   }
 };
 $("next").onclick = async () => {
-  if (!passed) return;
-  try { await mission?.save(); } catch { return; }
-  requestGeneration++;
-  if (missionIndices ? index !== missionIndices.at(-1) : index < current.steps.length - 1) {
-    const target=missionIndices ? missionIndices[missionIndices.indexOf(index)+1] : index+1;
-    try { await saveSession(current,target,{assisted:false}); } catch { return; }
-    index=target;
-    record({ kind: "position", course, lesson: current.id, index });
-    renderStep();
-  } else finish();
+  if (!passed || stepping) return;   // 강의 끝 자동 넘김과 Enter 가 겹쳐도 한 칸만(오타 3부 조건 3)
+  stepping = true;
+  try {
+    try { await mission?.save(); } catch { return; }
+    requestGeneration++;
+    if (missionIndices ? index !== missionIndices.at(-1) : index < current.steps.length - 1) {
+      const target=missionIndices ? missionIndices[missionIndices.indexOf(index)+1] : index+1;
+      try { await saveSession(current,target,{assisted:false}); } catch { return; }
+      index=target;
+      record({ kind: "position", course, lesson: current.id, index });
+      renderStep();
+    } else finish();
+  } finally { stepping = false; }
 };
 async function finish() {
   try{await growth?.stop('finish');}catch(e){status(e.message,true);}
-  const host = panel("미션 완료 · 다음 도전");
+  const host = panel(curPack() ? "수업 완료 · 학습지 결과" : "미션 완료 · 다음 도전");
   const answers = evidenceSummary(
     [...state.events, ...pending].filter((e) => e.lesson === current.id),
   );
@@ -2271,6 +2287,7 @@ function advance(){   // ⏭ / Enter: 강의 중이면 다음 문장, 끝났으�
   if(passed){$('next').click();return;}
   const step=current.steps[index];
   if(step.options){$('speech').textContent='이 문제는 골라야 넘어가요. 막히면 힌트(H)나 더 쉽게(E)를 눌러요.';return;}
+  if(curPack()){passed=true;$('next').disabled=false;$('next').click();return;}   // 강의안 수업의 판서 건너뛰기는 「읽음」도 남기지 않는다(오타 3부: 건너뜀은 진도·이해도 밖)
   record({kind:'read',course,lesson:current.id,step:step.id,nodes:step.nodes||[]});passed=true;$('next').disabled=false;$('next').click();
 }
 v3 = startClassroomV3({
@@ -2281,7 +2298,7 @@ v3 = startClassroomV3({
   progress:()=>$('stepLabel')?.textContent||'',
   onViewChange:async view=>{if(current&&document.querySelector('.school').dataset.mode==='classroom'){stagedCourse=null;await stage3d(current.steps[index].kind);}else if(view==='site'){space?.mount?.(null);space?.hide();}},
 });
-tutor = createTutor({api,eventId,record,
+tutor = createTutor({api,eventId,record,inPack:()=>!!curPack(),
   ctx:()=>current?{lesson:current,step:current.steps[index],index,course,passed,blocked:['rejected','pending'].includes(current.review?.status)}:null,
   pass:()=>{passed=true;$('next').disabled=false;},
   assist:()=>{if(!assisted){assisted=true;saveSession(current,index,{assisted:true}).catch(()=>{});}},
@@ -2312,14 +2329,18 @@ tutor = createTutor({api,eventId,record,
 const rail = createSubjectRail({subjects:ROOMS,current:()=>course,choose:async name=>{try{await mission?.save();}catch{return;}const seated=document.querySelector('.school').dataset.world==='seated';await sitDown(name);space?.setSubject?.(name);rail.update();if(seated)await space?.seated(name);}});
 new MutationObserver(()=>rail.update()).observe($('roomLabel'),{childList:true,characterData:true,subtree:true});
 startSurfaces();
+const MOOD={smile:'smile',serious:'strict',think:'neutral',neutral:'neutral'};
 lecture = createLecture({
   ctx:()=>current?{lesson:current,step:current.steps[index],index,course,passed}:null,
+  script:step=>curPack()?packLines(curPack(),step.id):null,
+  mood:m=>dockSaeng?.setExpr?.(MOOD[m]||'neutral'),
   talk:on=>{space?.saeng?.lecture?.(on);},
   subtitle:text=>{v3.subtitle(text);if(text)dockSaeng?.speak(text.slice(0,80));},
   board:f=>v3.board(f),
   voiceOn:()=>{try{return capabilities.voice&&localStorage.getItem('school-voice')==='1';}catch{return false;}},
   voice:(text,signal)=>new Promise(async(resolve,reject)=>{try{const r=await fetch('/api/school/voice',{method:'POST',credentials:'same-origin',signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text.slice(0,600)})});if(!r.ok)throw new Error('voice');const url=URL.createObjectURL(await r.blob());const a=new Audio(url);const end=()=>{URL.revokeObjectURL(url);resolve();};a.onended=end;a.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('voice'));};signal.addEventListener('abort',()=>{a.pause();end();});await a.play();}catch(e){reject(e);}}),
-  onEnd:()=>tutor?.afterLecture(),
+  // 강의안 수업의 판서 단계는 강의가 끝나면 묻지 않고 다음 판서로(기록 없음). 칠판 역할 기기는 따라가기만.
+  onEnd:()=>{const at=index;if(tutor?.afterLecture()==='next'&&!isBoard()&&current&&index===at&&!blockedStep()){passed=true;$('next').disabled=false;$('next').click();}},
   onState:st=>{v3.state(st);
     // 학습 시간 기록은 강의 ▶/⏸ 를 따라간다(위쪽 따로 있던 ▶·⏹ 대신)
     if(isBoard())return;

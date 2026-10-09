@@ -62,8 +62,11 @@ export function createTutor(app) {
   }
 
   // 강의가 끝나면: 이미 푼 단계 / 문제 단계 / 개념 단계 확인 질문
+  // 회차 강의안이 있는 수업(app.inPack)은 판서 단계마다 묻지 않고 이어서 강의한다 → 'next' 를 돌려주면 school.js 가 기록 없이 다음 단계로.
+  //   확인은 섹션 끝 확인 문제(quiz 단계)에서만(세계 기획 v1 9절·3부).
   function afterLecture() {
     const c = app.ctx(); if (!c || c.blocked) return;
+    if (app.inPack?.() && !c.step.options) { setPhase('lecture'); form.hidden = true; return 'next'; }
     if (c.passed) { setPhase('done'); ask('이건 전에 해결했어요. ⏭ 로 다음, 다시 풀어도 돼요.', 'question'); return; }
     if (c.step.options) { setPhase('quiz'); ask(tries ? '다시 골라 볼까요? 조건부터 하나씩요.' : '이제 직접 골라 보세요. 틀려도 어디서 막혔는지 같이 볼게요.', 'question'); form.hidden = true; }
     else { setPhase('check'); ask(pick(ASK[c.step.kind] || ASK.understand, tries), 'answer'); }
@@ -138,6 +141,7 @@ export function createTutor(app) {
     question(text) { if (!waiting && !readOnly() && String(text || '').trim()) question(String(text).trim()); },
     // answer()(선택지)가 판정한 뒤 부른다
     onAnswer(correct) {
+      if (correct && app.inPack?.()) { setPhase('done'); later(() => ask('맞아요. 바로 이어서 갈게요.', 'question'), 300); return; }
       if (correct) { setPhase('done'); later(() => ask('맞아요. 왜 맞는지 한 줄로 말해 볼래요? 아니면 Space 로 다음.', 'question'), 1200); return; }
       tries++; setPhase('quiz');
       later(() => ask(tries >= 2 ? '두 번 막혔네요. 「더 쉽게」(E)로 한 단계만 같이 하거나, 아래 선수 개념부터 볼까요?' : '어디서 갈렸는지 볼까요? 주어진 조건이랑 구할 걸 나눠 보세요.', 'question'), 1200);
