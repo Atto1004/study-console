@@ -59,8 +59,10 @@ export function layoutSeat(W, H, vnH0, vnHidden = false) {
   // 세로 화면(narrow)은 칠판 판을 화면 폭에 맞춰 얹으므로 가로로 넘치는 건 괜찮다 — 세로로 걸릴 때만
   if (board.y + board.h > H - vnZone || board.y < 0 || (!narrow && (board.x < 0 || board.x + board.w > W))) {
     close = true;
-    const s = Math.min((W - 2 * m) / (BOARD.w * IMG.w), (H - vnZone - 2 * m) / (BOARD.h * IMG.h));
-    const bw = IMG.w * s, bh = IMG.h * s, ox = (W - BOARD.w * bw) / 2 - BOARD.x * bw, oy = m - BOARD.y * bh;
+    // 배경은 늘 화면을 덮는다(오타 검수 10/9: 낮은 무대에서 그림 양옆이 비던 것) — 최소 높이(minStageH)가 칠판 폭을 지켜 줌
+    const s = Math.max(Math.min((W - 2 * m) / (BOARD.w * IMG.w), (H - vnZone - 2 * m) / (BOARD.h * IMG.h)), W / IMG.w, H / IMG.h);
+    const bw = IMG.w * s, bh = IMG.h * s;
+    const ox = Math.min(0, Math.max(W - bw, (W - BOARD.w * bw) / 2 - BOARD.x * bw)), oy = Math.min(0, Math.max(H - bh, m - BOARD.y * bh));
     f = { s, bw, bh, ox, oy, at: (fx, fy) => ({ x: ox + fx * bw, y: oy + fy * bh }) };
     board = rect(f);
   }
@@ -76,6 +78,13 @@ export function layoutSeat(W, H, vnH0, vnHidden = false) {
   return { narrow, close, f, board, teacher: t, padRight: Math.max(narrow ? 14 : 22, overlap + 16), fs, vn: { l: narrow ? 8 : 16, r: narrow ? 8 : 16, b: vnB, h: vnH } };
 }
 
+// 무대 최소 높이: 칠판이 대사창 위에 폭 55%(폰 = 화면 폭) 이상으로 들어갈 만큼(오타 검수 10/9). 무대가 이보다 낮아지면 방이 스크롤된다
+export function minStageH(W, vnH0, vnHidden = false) {
+  const narrow = W < 640, vnH = vnH0 || (narrow ? 92 : 104), vnB = narrow ? 8 : 14, vnZone = vnHidden ? 8 : vnH + vnB + 8, m = narrow ? 6 : 12;
+  const bw = narrow ? W - 2 * m : W * 0.58;
+  return Math.max(240, Math.ceil(vnZone + 2 * m + bw * (BOARD.h * IMG.h) / (BOARD.w * IMG.w)));
+}
+
 export function setupSeatRoom() {
   const school = document.querySelector('.school'); const stage = document.querySelector('.v3-stage');
   if (!school || !stage) return null;
@@ -84,8 +93,11 @@ export function setupSeatRoom() {
   stage.style.setProperty('--seat-img', `url("${IMG.src}")`);
   const px = (n) => Math.round(n) + 'px';
   function apply() {
-    const W = stage.clientWidth, H = stage.clientHeight; if (!W || !H) return;
-    const vn = stage.querySelector('.vn-box'), hid = !vn || vn.hidden || !vn.getClientRects().length, L = layoutSeat(W, H, hid ? 0 : vn.offsetHeight, hid), v = stage.style;
+    const W = stage.clientWidth; if (!W) return;
+    const vn = stage.querySelector('.vn-box'), hid = !vn || vn.hidden || !vn.getClientRects().length, vh = hid ? 0 : vn.offsetHeight;
+    const need = minStageH(W, vh, hid) + 'px'; if (stage.style.minHeight !== need) stage.style.setProperty('min-height', need, 'important');
+    const H = stage.clientHeight; if (!H) return;
+    const L = layoutSeat(W, H, vh, hid), v = stage.style;
     v.setProperty('--bg-w', px(L.f.bw)); v.setProperty('--bg-h', px(L.f.bh)); v.setProperty('--bg-x', px(L.f.ox)); v.setProperty('--bg-y', px(L.f.oy));
     v.setProperty('--bd-x', px(L.board.x)); v.setProperty('--bd-y', px(L.board.y)); v.setProperty('--bd-w', px(L.board.w)); v.setProperty('--bd-h', px(L.board.h));
     v.setProperty('--bd-pr', px(L.padRight)); v.setProperty('--bd-fs', px(L.fs));
@@ -93,6 +105,7 @@ export function setupSeatRoom() {
     v.setProperty('--vn-l', px(L.vn.l)); v.setProperty('--vn-r', px(L.vn.r)); v.setProperty('--vn-b', px(L.vn.b));
     stage.dataset.seatNarrow = L.narrow ? '1' : ''; stage.dataset.seatClose = L.close ? '1' : '';
   }
-  const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(apply) : null; ro?.observe(stage); const vnBox = stage.querySelector('.vn-box'); if (vnBox) ro?.observe(vnBox); apply();
+  let raf = 0; const later = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; apply(); }); };   // 감시 콜백 안에서 높이를 바꾸면 ResizeObserver loop 오류 → 다음 그리기로
+  const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(later) : null; ro?.observe(stage); const vnBox = stage.querySelector('.vn-box'); if (vnBox) ro?.observe(vnBox); apply();
   return { apply, destroy() { ro?.disconnect(); delete school.dataset.seat; } };
 }
