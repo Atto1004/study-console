@@ -17,6 +17,7 @@ import { createSubjectRail } from "./subject-rail.js";
 import { startSurfaces } from "./surface.js";
 import { createLecture } from "./lecture.js";
 import { loadPack, packRoute, packLines, label as packLabel } from "./lecture-pack.js";
+import { createDialog } from "./vn-dialog.js";
 import { startClassroomV3 } from "./classroom-v3.js";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
@@ -2330,12 +2331,14 @@ const rail = createSubjectRail({subjects:ROOMS,current:()=>course,choose:async n
 new MutationObserver(()=>rail.update()).observe($('roomLabel'),{childList:true,characterData:true,subtree:true});
 startSurfaces();
 const MOOD={smile:'smile',serious:'strict',think:'neutral',neutral:'neutral'};
+// 강의 자막은 연애 시뮬레이션식 대사창으로(vn-dialog.js). 창을 누르면 ⏭ 와 같다.
+const vn = v3?.stage ? createDialog(v3.stage, { onNext: () => advance() }) : null;
 lecture = createLecture({
   ctx:()=>current?{lesson:current,step:current.steps[index],index,course,passed}:null,
   script:step=>curPack()?packLines(curPack(),step.id):null,
   mood:m=>dockSaeng?.setExpr?.(MOOD[m]||'neutral'),
   talk:on=>{space?.saeng?.lecture?.(on);},
-  subtitle:text=>{v3.subtitle(text);if(text)dockSaeng?.speak(text.slice(0,80));},
+  subtitle:text=>{v3.subtitle(text);vn?.say(text);if(text)dockSaeng?.speak(text.slice(0,80));},
   board:f=>v3.board(f),
   voiceOn:()=>{try{return capabilities.voice&&localStorage.getItem('school-voice')==='1';}catch{return false;}},
   voice:(text,signal)=>new Promise(async(resolve,reject)=>{try{const r=await fetch('/api/school/voice',{method:'POST',credentials:'same-origin',signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text.slice(0,600)})});if(!r.ok)throw new Error('voice');const url=URL.createObjectURL(await r.blob());const a=new Audio(url);const end=()=>{URL.revokeObjectURL(url);resolve();};a.onended=end;a.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('voice'));};signal.addEventListener('abort',()=>{a.pause();end();});await a.play();}catch(e){reject(e);}}),
