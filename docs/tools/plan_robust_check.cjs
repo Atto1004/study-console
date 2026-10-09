@@ -43,6 +43,11 @@ const T0 = new Date('2026-10-07T09:00:00+09:00');   // 모의 서버 날짜(10/7
   await p.fill('.pl-add input[name=t]', '쓰는 중');
   await p.fill('.pl-task[data-key="정역학|HW Ch.5"] input[type=number]', '75'); await p.press('.pl-task[data-key="정역학|HW Ch.5"] input[type=number]', 'Tab'); await p.waitForTimeout(800);
   const kept = await p.evaluate(() => document.querySelector('.pl-add input[name=t]')?.value);
+  // 커서·포커스: 할 일 칸에 커서(2번째 글자)를 둔 채 다른 칸 저장으로 다시 그려져도 같은 칸·같은 자리
+  await p.focus('.pl-add input[name=t]'); await p.evaluate(() => document.querySelector('.pl-add input[name=t]').setSelectionRange(2, 2));
+  await p.evaluate(() => { const n = document.querySelector('.pl-task[data-key="정역학|HW Ch.5"] input[type=number]'); n.value = '80'; n.dispatchEvent(new Event('change')); }); await p.waitForTimeout(800);
+  const caret = await p.evaluate(() => ({ name: document.activeElement?.name, inAdd: !!document.activeElement?.closest('.pl-add'), at: document.activeElement?.selectionStart }));
+  expect(caret.name === 't' && caret.inAdd && caret.at === 2, '다시 그리기에 커서 ' + JSON.stringify(caret));
   await p.focus('.pl-add input[name=t]'); await p.click('.pl-add button'); await p.waitForTimeout(800);
   const after = await p.evaluate(() => document.querySelector('.pl-add input[name=t]')?.value);
   expect(kept === '쓰는 중' && after === '' && extras(p).includes('쓰는 중'), '다시 그리기에 입력 글자 ' + JSON.stringify({ kept, after }));
