@@ -64,6 +64,14 @@ const T0 = new Date('2026-10-07T11:00:00+09:00');
   const auto = await p.$('.pl-blk.k-auto');
   if (auto) { await auto.click(); await p.waitForTimeout(300); const pre = await p.evaluate(() => ({ c: document.querySelector('.pl-pop select[aria-label="과목"]')?.value, n: document.querySelector('.pl-pop input[aria-label="할 일"]')?.value })); expect(pre.c && pre.n, '추천 → 계획 미리 채움 ' + JSON.stringify(pre)); await closePop(); }
   else fail.push('추천 블록 없음');
+  // ⑧ (오타 RED) 학기 끝 날짜나 휴일 목록이 없으면 다른 날 수업을 그리지 않음
+  for (const [name, patch] of [['학기 끝 없음', (j) => { j.term = { start: '2026-09-01', end: null }; }], ['휴일 목록 없음', (j) => { j.holidays = null; }]]) {
+    let hits = 0; await p.route('**/api/school/workspace*', async (r) => { if (r.request().method() !== 'GET') return r.continue(); hits++; const res = await r.fetch(); const j = await res.json(); patch(j); return r.fulfill({ response: res, json: j }); });
+    await p.reload(); await p.waitForSelector('.pl-schedule', { timeout: 15000 }); await p.waitForTimeout(600);
+    await p.click('.pl-strip .pl-sday:nth-child(4)'); await p.waitForTimeout(400);
+    expect(hits > 0 && !(await blocks('class')).length, name + `인데 다른 날 수업이 그려짐(가로챔 ${hits})`);
+    await p.unroute('**/api/school/workspace*');
+  }
   expect(!errors.length, '오류 ' + errors.join(' | '));
   console.log(fail.length ? 'FAIL ' + JSON.stringify(fail) : 'plan block: 요일 줄·다른 날 수업·휴일·빈칸 추가·출석·이해도·시작·미래 출석 막힘·캘린더 시각 변경·추천→계획 ok');
   await b.close(); process.exit(fail.length ? 1 : 0);

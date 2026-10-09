@@ -526,7 +526,8 @@ export function createPlan(app) {
   // — 하나라도 없으면 그리지 않는다(모르는 수업을 지어내지 않음, 대표님 10/9)
   function classesOn(date) {
     if (date === ctx.today) return (ctx.scheduled || []).filter((c) => !c.record?.cancelled);
-    if (!ctx.holidays || !ctx.term?.start || !ctx.classSlots) return [];
+    const ymd = /^\d{4}-\d{2}-\d{2}$/;   // 시작·끝·휴일 셋 다 확인된 값일 때만(오타 검수 10/9: 끝 날짜 없으면 학기 뒤에도 그리던 것)
+    if (!Array.isArray(ctx.holidays) || !ymd.test(ctx.term?.start || '') || !ymd.test(ctx.term?.end || '') || !Array.isArray(ctx.classSlots)) return [];
     if (date < ctx.term.start || date > ctx.term.end || ctx.holidays.includes(date)) return [];
     const dow = new Date(date + 'T00:00:00Z').getUTCDay(), out = [];   // 0=일 (서버 slot.d 와 같음)
     for (const c of ctx.classSlots) (c.slots || []).forEach((sl, i) => {
