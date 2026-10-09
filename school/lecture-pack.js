@@ -46,8 +46,9 @@ export function packLines(pack, stepId) {
   const p = place(pack, stepId);
   if (!p) return [];
   if (p.role === 'board') {
+    // 입장 줄(회상·목표)에는 intro 표시 — 화면은 이 표시가 있는 대사 동안만 입장 카드를 띄운다(4부 보완 B)
     const intro = p.opening ? [...(pack.recap || []), { say: `오늘 목표는 ${pack.goals.length}가지예요.`, mood: 'neutral' },
-      ...pack.goals.map((g, i) => ({ say: `${i + 1}. ${g}.`, mood: 'neutral' }))] : [];
+      ...pack.goals.map((g, i) => ({ say: `${i + 1}. ${g}.`, mood: 'neutral' }))].map((l) => ({ ...l, intro: true })) : [];
     return [...intro, ...(p.sec.script[stepId] || [])];
   }
   if (p.role === 'check') return [{ say: `섹션 ${p.n} 확인 문제예요. 방금 본 예제에서 숫자나 조건만 바꿨어요.`, mood: 'smile' }];

@@ -12,7 +12,7 @@ const plain = (s) => s.replace(/\$\$?|\\\(|\\\)|\\\[|\\\]/g, '').replace(/\\[a-z
 
 export function createLecture(app) {
   // app: { ctx(), talk(on), subtitle(text|null), board(fraction), voiceOn(), voice(text, signal) → Promise, onEnd(), onState(state),
-  //        script(step) → [{say, mood}]|null (회차 강의안, lecture-pack.js), mood(name) }
+  //        script(step) → [{say, mood, intro}]|null (회차 강의안, lecture-pack.js), mood(name), line({text, mood, intro}|null) }
   // 줄 하나 = {text, mood}. 강의안이 있으면 그 대본, 없으면 예전처럼 단계 speech·본문으로 만든다.
   let lines = [], i = 0, playing = false, ended = false, gen = 0, run = null;
   const total = () => lines.reduce((n, l) => n + l.text.length, 0) || 1;
@@ -22,7 +22,7 @@ export function createLecture(app) {
   function build() {
     const c = app.ctx(); if (!c) return [];
     const script = app.script?.(c.step);
-    if (script) return script.filter((l) => l && l.say).map((l) => ({ text: l.say, mood: l.mood || 'neutral' }));
+    if (script) return script.filter((l) => l && l.say).map((l) => ({ text: l.say, mood: l.mood || 'neutral', intro: !!l.intro }));
     const intro = splitSentences(c.step.speech);
     const body = splitSentences(c.step.body);
     const head = c.step.title ? [c.step.title + (c.step.options ? ' — 문제부터 볼게요.' : '.')] : [];
@@ -42,6 +42,7 @@ export function createLecture(app) {
       if (!alive()) return;
       i = k; state(); app.board?.(done()); app.subtitle?.(lines[k].text); app.talk?.(true);
       if (lines[k].mood) app.mood?.(lines[k].mood);
+      app.line?.(lines[k]);
       const ms = Math.max(1800, Math.min(9000, plain(lines[k].text).length * 95));
       if (app.voiceOn?.()) {
         try { await app.voice(plain(lines[k].text), r.abort.signal); }
@@ -52,7 +53,7 @@ export function createLecture(app) {
     }
     if (alive()) finish();
   }
-  function finish() { cancel(); playing = false; ended = true; app.talk?.(false); app.board?.(1); app.subtitle?.(null); state(); app.onEnd?.(); }
+  function finish() { cancel(); playing = false; ended = true; app.talk?.(false); app.board?.(1); app.subtitle?.(null); app.line?.(null); state(); app.onEnd?.(); }
   function begin() { const c = app.ctx(); if (!c) return false; cancel(); lines = build(); i = 0; ended = false; if (!lines.length || c.passed) { finish(); return false; } playing = true; app.board?.(0); play(0); return true; }
 
   return {
@@ -69,10 +70,10 @@ export function createLecture(app) {
       if (ended) return false;
       if (i + 1 >= lines.length) { finish(); return true; }
       cancel(); i++;
-      if (playing) play(i); else { state(); app.board?.(done()); app.subtitle?.(lines[i].text); }
+      if (playing) play(i); else { state(); app.board?.(done()); app.subtitle?.(lines[i].text); app.line?.(lines[i]); }
       return true;
     },
-    stop() { cancel(); playing = false; app.talk?.(false); app.subtitle?.(null); },
+    stop() { cancel(); playing = false; app.talk?.(false); app.subtitle?.(null); app.line?.(null); },
     get playing() { return playing; }, get ended() { return ended; },
   };
 }

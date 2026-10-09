@@ -615,10 +615,10 @@
     }
   ],
   "summary": [
-    "i·i = j·j = k·k = 1, 서로 다른 것끼리 0",
-    "U·V = U_xV_x + U_yV_y + U_zV_z, cos θ = U·V / (|U||V|)",
-    "U_p = (U·e)e, U_n = U − U_p, e 는 단위벡터, 검산 U_n·e = 0",
-    "|U×V| = |U||V| sin θ = 평행사변형 넓이, 방향은 오른손, V×U = −U×V",
-    "U×V = |i j k; U; V|, j 항은 −, 검산 (U×V)·U = 0"
+    "\\(\\mathbf i\\cdot\\mathbf i=\\mathbf j\\cdot\\mathbf j=\\mathbf k\\cdot\\mathbf k=1\\), 서로 다른 것끼리 0",
+    "\\(\\mathbf U\\cdot\\mathbf V=U_xV_x+U_yV_y+U_zV_z\\), \\(\\cos\\theta=\\dfrac{\\mathbf U\\cdot\\mathbf V}{|\\mathbf U||\\mathbf V|}\\)",
+    "\\(\\mathbf U_p=(\\mathbf U\\cdot\\mathbf e)\\,\\mathbf e\\), \\(\\mathbf U_n=\\mathbf U-\\mathbf U_p\\) — \\(\\mathbf e\\)는 단위벡터, 검산 \\(\\mathbf U_n\\cdot\\mathbf e=0\\)",
+    "\\(|\\mathbf U\\times\\mathbf V|=|\\mathbf U||\\mathbf V|\\sin\\theta\\) = 평행사변형 넓이, 방향은 오른손, \\(\\mathbf V\\times\\mathbf U=-\\mathbf U\\times\\mathbf V\\)",
+    "\\(\\mathbf U\\times\\mathbf V=\\begin{vmatrix}\\mathbf i&\\mathbf j&\\mathbf k\\U_x&U_y&U_z\\V_x&V_y&V_z\\end{vmatrix}\\), \\(\\mathbf j\\) 항은 −, 검산 \\((\\mathbf U\\times\\mathbf V)\\cdot\\mathbf U=0\\)"
   ]
 }

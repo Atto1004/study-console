@@ -23,13 +23,17 @@ const SHOT = process.env.SHOT_DIR;
       subVisible: !!sub && getComputedStyle(sub).display !== 'none' && !sub.hidden, sub: sub?.textContent || '', covered, hscroll: document.documentElement.scrollWidth > innerWidth + 1,
       box: r && [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)] };
   });
-  await p.waitForTimeout(250);
+  // 대사창이 뜨고 아직 쓰는 중일 때를 기다린다(처음 켜는 브라우저는 느려서 고정 대기로는 이미 다 써진 뒤일 수 있음)
+  await p.waitForFunction(() => { const b = document.querySelector('.vn-box'); const t = b?.querySelector('.vn-text')?.textContent || ''; return b && !b.hidden && t.length > 0 && !b.hasAttribute('data-done'); }, null, { timeout: 15000, polling: 20 });
   const typing = await vn();
   expect(typing.shown, '대사창 안 뜸');
   expect(typing.name === '김주영 스앵님', '이름표 ' + typing.name);
   expect(!typing.subVisible, '넷플릭스형 자막이 여전히 보임');
   expect(typing.text.length > 0 && typing.text.length < typing.sub.length && !typing.done, '한 자씩 써지지 않음 ' + typing.text.length + '/' + typing.sub.length);
-  await p.click('.vn-box'); await p.waitForTimeout(120);   // 캡처는 느려서 그사이 다 써질 수 있으니 누른 뒤에
+  // 쓰는 중인지 확인하고 같은 순간에 누른다(p.click 은 위치 안정 대기로 늦어져 그사이 다 써질 수 있음)
+  const pressedWhileTyping = await p.evaluate(() => { const b = document.querySelector('.vn-box'); const typing = !b.hasAttribute('data-done'); b.click(); return typing; });
+  expect(pressedWhileTyping, '누를 때 이미 다 써져 있었음(검사 시점 문제)');
+  await p.waitForTimeout(120);
   const full = await vn();
   expect(full.done && full.text === full.sub, '누르면 한 줄 다 보이기 안 됨');
   const line1 = full.text;

@@ -18,6 +18,7 @@ import { startSurfaces } from "./surface.js";
 import { createLecture } from "./lecture.js";
 import { loadPack, packRoute, packLines, label as packLabel } from "./lecture-pack.js";
 import { createDialog } from "./vn-dialog.js";
+import { createLectureUi } from "./lecture-ui.js";
 import { startClassroomV3 } from "./classroom-v3.js";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
@@ -41,7 +42,7 @@ let activeSession = null, sessionQueue = Promise.resolve(), setup = null, sessio
 const isBoard = () => document.querySelector('.school')?.dataset.role === 'board';
 let resizeBoard;
 let chatMode = "question";
-let workspace, mission, space, growth, legacyLobbyMode = false, missionIndices = null, pack = null, stepping = false;
+let workspace, mission, space, growth, legacyLobbyMode = false, missionIndices = null, pack = null, stepping = false, autoNextTimer = null, lectureUi = null;
 // 지금 수업의 회차 강의안(lecture-pack.js). 다른 수업으로 바뀌었으면 null.
 const curPack = () => (pack && current && pack.lessonId === current.id ? pack : null);
 const eventId = () => crypto.randomUUID();
@@ -814,6 +815,7 @@ async function renderStep(camera) {
     if (prior.correct) passed = true;
   }
   $("stepLabel").textContent = curPack() ? packLabel(curPack(), step.id) : missionIndices ? `${missionIndices.indexOf(index)+1} / ${missionIndices.length} · 미션` : `${index + 1} / ${current.steps.length}`;
+  lectureUi?.intro(false); lectureUi?.update(packCtx()); document.querySelector(".v3-relisten")?.remove();
   $("choices").replaceChildren();
   const kind =
     {
@@ -824,7 +826,7 @@ async function renderStep(camera) {
       quiz: "직접 확인",
     }[step.kind] || "학습";
   board(
-    step.title,
+    curPack() && step.options ? packLabel(curPack(), step.id) : step.title,   // 강의안 수업 문제는 「섹션 n 확인」·「학습지 n / 5」(4부 C)
     step.body,
     kind,
     current.warnings.length
@@ -972,7 +974,19 @@ function answer(choice) {
   renderMath($("speech"));
   tutor?.onAnswer(correct);
   // 강의안 수업: 확인·학습지 문제를 맞히면 잠깐 뒤 다음 섹션(문항)으로 이어 간다. 그사이 직접 넘겼으면 아무것도 안 함.
-  if (correct && curPack() && !isBoard()) { const at = index, lid = current.id; setTimeout(() => { if (current?.id === lid && index === at && passed) $("next").click(); }, 1800); }
+  if (correct && curPack() && !isBoard()) { const at = index, lid = current.id; clearTimeout(autoNextTimer); autoNextTimer = setTimeout(() => { autoNextTimer = null; if (current?.id === lid && index === at && passed) $("next").click(); }, 1800); }
+  // 강의안 수업의 섹션 확인 문제를 틀리면 「다시 듣기」 아이콘(그 섹션 첫 판서로). 학습지 오답에는 두지 않음(4부 보완 C)
+  if (!correct && curPack() && !isBoard()) {
+    const sec = curPack().sections.find(x => x.check === step.id);
+    const pos = sec ? missionIndices.indexOf(current.steps.findIndex(x => x.id === Object.keys(sec.script)[0])) : -1;
+    if (pos >= 0 && !document.querySelector(".v3-relisten") && v3?.stage) {
+      const b = document.createElement("button"); b.type = "button"; b.className = "v3-relisten"; b.setAttribute("aria-label", "이 섹션 강의 다시 듣기"); b.title = "다시 듣기";
+      b.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>';
+      b.onclick = () => goRoute(pos);
+      v3.stage.append(b);   // 칠판 위 오른쪽 위 — 보기 칸 아래는 작업 칸이 잘려 안 보였다
+    }
+  }
+  lectureUi?.update(packCtx());
 }
 $("hint").onclick = () => {
   assisted = true;
@@ -995,8 +1009,32 @@ $("back").onclick = async () => {
     renderStep();
   }
 };
+// 강의안 수업 화면(lecture-ui.js) 상태 — 기록을 아직 못 읽었으면 events 는 null(칩 「확인 중」)
+function packCtx() {
+  const p = curPack(); if (!p || !missionIndices) return null;
+  return { pack: p, route: missionIndices, index, steps: current.steps, lessonId: current.id, events: state?.events ? [...state.events, ...pending] : null };
+}
+// 수업 순서 안의 위치로 이동하는 단 하나의 길(칩·다시 듣기·결과 줄, 세계 기획 4부 보완). 다음 넘김과 같은 stepping 가드,
+// 이동 전에 강의·대사창·정답 뒤 자동 넘김을 끊고, 위치 기록만 남긴다(답 기록 없음).
+async function goRoute(pos, opts = {}) {
+  if (!current || !curPack() || !missionIndices || stepping || isBoard()) return;
+  const target = missionIndices[pos]; if (target === undefined) return;
+  stepping = true;
+  try {
+    clearTimeout(autoNextTimer); autoNextTimer = null;
+    lecture?.stop(); vn?.say(null); lectureUi?.intro(false);
+    if (opts.closeDialogs) closeDialogs();
+    try { await mission?.save(); } catch { return; }
+    requestGeneration++;
+    try { await saveSession(current, target, { assisted: false }); } catch { return; }
+    index = target;
+    record({ kind: "position", course, lesson: current.id, index });
+    renderStep();
+  } finally { stepping = false; }
+}
 $("next").onclick = async () => {
-  if (!passed || stepping) return;   // 강의 끝 자동 넘김과 Enter 가 겹쳐도 한 칸만(오타 3부 조건 3)
+  if (!passed || stepping) return;
+  clearTimeout(autoNextTimer); autoNextTimer = null;   // 강의 끝 자동 넘김과 Enter 가 겹쳐도 한 칸만(오타 3부 조건 3)
   stepping = true;
   try {
     try { await mission?.save(); } catch { return; }
@@ -1020,6 +1058,7 @@ async function finish() {
   const celebration=node('div',undefined,'mission-result');
   celebration.append(node('span',answers.independent?'도전 성공':'미션 기록 완료','mission-result-tag'),node('h2',answers.independent?`${answers.independent}문제를 혼자 해결했어요.`:'오늘 시도한 풀이를 남겼어요.'),node('p',answers.retry?'막힌 문제를 한 번 더 풀면 다음 도전이 쉬워져요.':'스앵님과 다음 도전으로 이어가볼까요?'));
   host.append(celebration);
+  if (curPack() && missionIndices) { lectureUi?.result(host, packCtx()); renderMath(host); }
   const summary = node("div", undefined, "summary");
   for (const [label, value] of [
     ["확인 문제", answers.tested],
@@ -2333,9 +2372,11 @@ startSurfaces();
 const MOOD={smile:'smile',serious:'strict',think:'neutral',neutral:'neutral'};
 // 강의 자막은 연애 시뮬레이션식 대사창으로(vn-dialog.js). 창을 누르면 ⏭ 와 같다.
 const vn = v3?.stage ? createDialog(v3.stage, { onNext: () => advance() }) : null;
+lectureUi = createLectureUi({ goRoute });
 lecture = createLecture({
   ctx:()=>current?{lesson:current,step:current.steps[index],index,course,passed}:null,
   script:step=>curPack()?packLines(curPack(),step.id):null,
+  line:l=>{const p=curPack();if(p&&l?.intro)lectureUi?.intro(true,{key:current.id,course:p.course,date:p.date,title:current.title,goals:p.goals||[]});else lectureUi?.intro(false);},
   mood:m=>dockSaeng?.setExpr?.(MOOD[m]||'neutral'),
   talk:on=>{space?.saeng?.lecture?.(on);},
   subtitle:text=>{v3.subtitle(text);vn?.say(text);if(text)dockSaeng?.speak(text.slice(0,80));},

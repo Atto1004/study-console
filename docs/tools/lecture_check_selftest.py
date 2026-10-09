@@ -1,7 +1,7 @@
 # lecture_check.py 자기 검사: 견본 강의안(정역학 9/14)의 **임시 사본**을 일부러 망가뜨려(--pack/--verify 로 넘김)
 # 각 규칙이 「그 규칙의 오류 문구」로 잡히는지 본다. 실제 강의안·검산 파일은 읽기만 한다(오타 검수 10/9).
 # 비정상 종료(파이썬 예외)는 잡은 것으로 치지 않는다.
-import json, os, subprocess, sys, copy, tempfile
+import json, os, re, subprocess, sys, copy, tempfile
 sys.stdout.reconfigure(encoding='utf-8')
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.chdir(ROOT)
@@ -76,7 +76,7 @@ r = subprocess.run([sys.executable, '-I', '-O', '-X', 'utf8', 'docs/tools/verify
 ok_fail = r.returncode != 0 and '최적화에서도 실패해야' in r.stderr
 open(OPT, 'w', encoding='utf-8').write("x = 1\nassert x == 1\nif False:\n    assert False\n")
 r2 = subprocess.run([sys.executable, '-I', '-O', '-X', 'utf8', 'docs/tools/verify_runner.py', OPT], capture_output=True, text=True, encoding='utf-8', errors='replace')
-ok_count = r2.returncode == 0 and '@@asserts_run 1' in r2.stderr
+ok_count = r2.returncode == 0 and re.search(r'^@@asserts_run 1$', r2.stderr, re.M) is not None   # 10 이 1 로 통과하지 않게 줄 정확 일치
 print(('잡음 ' if ok_fail else '놓침 ') + '-O 에서 실패 assert'); print(('잡음 ' if ok_count else '놓침 ') + '-O 에서 실행 assert 수')
 if not ok_fail: bad.append('-O 실패 assert')
 if not ok_count: bad.append('-O assert 수')
