@@ -120,6 +120,13 @@ button.db-row{cursor:pointer}button.db-row:hover{border-color:#2e6b52}
 .db-empty{color:#6b7c73;margin:4px 0}
 .school[data-mode=workspace] #workspace{max-width:1160px;margin:0 auto}
 @media (max-width:1280px){.gl-gauge .gl-meter{display:none}.gl-gauge{padding:0 9px}.school > header{gap:10px}}
+/* 아이패드 세로 등 중간 폭: 한 줄에 다 안 들어가 토큰이 장면을 덮었다(10/9) → 두 줄(상호·토큰·대표실·≡ / 탭) */
+@media (min-width:601px) and (max-width:1100px){
+  .school{--gl-top:112px}
+  .school > header{flex-wrap:wrap;row-gap:6px;height:auto!important;min-height:0!important}
+  .school > header nav.rooms{order:3;flex:1 0 100%;margin:0!important;justify-content:center}
+  .school > header .gl-usage{margin-left:auto}
+}
 @media (max-width:760px){.db-grid{grid-template-columns:1fr}.school > header nav.rooms .room-door{padding:0 9px!important}}
 @media (max-width:600px){
   .school{--gl-top:104px}

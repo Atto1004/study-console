@@ -26,7 +26,9 @@ const OUT = 'C:/Users/user/.claude/jobs/a132f963/tmp/';
       const workHidden = view === 'site' && st.work.h === 0;
       expect((workHidden ? st.stage.bottom <= st.dlg.top + 1 : st.stage.bottom <= st.work.top + 1 && st.work.bottom <= st.dlg.top + 1) && st.dlg.bottom <= st.vh + 1, '세 칸 겹침/화면 밖 ' + JSON.stringify(st));
       expect(st.work.h <= 120, '강의 중 가운데 칸이 큼 ' + st.work.h);
-      if (view === 'site') expect(st.boardH >= st.stageH * 0.5, '칠판이 강의 칸의 절반보다 작음 ' + st.boardH + '/' + st.stageH);
+      // 착석 교실(room-seat.js, 10/9): 칠판은 장면 속 칠판 — 폭 55% 이상 · 대사창 위 · 스앵님이 글씨 칸을 안 가림
+      if (view === 'site') { const seat = await p.evaluate(() => { const r = (q) => document.querySelector(q)?.getBoundingClientRect(); const bd = r('#board'), sg = r('#lectureStage'), vn = r('.vn-box'), t = r('.v3-stage .teacher'); const pr = parseFloat(getComputedStyle(document.getElementById('board')).paddingRight); return { bw: bd.width / sg.width, above: !vn || !vn.height || bd.bottom <= vn.top + 1, cover: t && t.width ? Math.max(0, bd.right - pr - t.left) * (Math.min(bd.bottom, t.bottom) > Math.max(bd.top, t.top) ? 1 : 0) : 0 }; });
+        expect(seat.bw >= 0.55 && seat.above && seat.cover <= 1, '착석 교실 칠판 ' + JSON.stringify(seat)); }
       expect(st.subOverBoard < 2000, '자막이 칠판을 덮음 ' + st.subOverBoard);
       expect(!st.hscroll, '가로 스크롤 생김');
       expect(st.minBtn >= 44, '버튼 44px 미만 ' + st.minBtn);

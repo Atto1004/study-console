@@ -17,9 +17,11 @@ const { chromium } = require('C:/Users/user/Desktop/아톰OS/기술실/study-con
   // ── 사이트 보기
   const p = await open('site');
   const g = await p.evaluate(() => { const r = (s) => document.querySelector(s)?.getBoundingClientRect(); const bd = r('#board'), t = r('.v3-stage .teacher'), vn = r('.vn-box');
-    return { ratio: bd.width / bd.height, teacherIn: t.left >= bd.left && t.right <= bd.right && t.left > bd.left + bd.width / 2, vnBelow: vn.top >= bd.bottom, logShown: getComputedStyle(document.getElementById('chatLog')).display !== 'none' }; });
-  expect(Math.abs(g.ratio - 3) < 0.15, '칠판 비율 3:1 아님 ' + g.ratio.toFixed(2));
-  expect(g.teacherIn, '스앵님이 칠판 오른쪽 안에 없음');
+    const st = document.getElementById('lectureStage'); return { ratio: bd.width / bd.height, seat: document.querySelector('.school').dataset.seat === '1' && /classroom-seat/.test(getComputedStyle(st).backgroundImage), teacherIn: t.left > bd.left + bd.width / 2 && t.bottom > bd.bottom && t.top < bd.bottom, vnBelow: vn.top >= bd.bottom, logShown: getComputedStyle(document.getElementById('chatLog')).display !== 'none' }; });
+  // 착석 교실(10/9): 장면 속 와이드 칠판(2.4~3.2:1) · 배경 = 앉은 자리 교실 · 스앵님은 칠판 오른쪽 끝 앞(교탁 앞)에 섬
+  expect(g.ratio > 2.4 && g.ratio < 3.2, '칠판 비율 ' + g.ratio.toFixed(2));
+  expect(g.seat, '착석 교실 배경 없음');
+  expect(g.teacherIn, '스앵님이 칠판 오른쪽 앞에 없음');
   expect(g.vnBelow, '대사창이 칠판 아래가 아님');
   expect(!g.logShown, '서랍이 처음부터 열려 있음');
   const isOpen = () => p.evaluate(() => document.querySelector('.school').dataset.log === 'open' && getComputedStyle(document.getElementById('chatLog')).display !== 'none' && document.getElementById('chatLog').getBoundingClientRect().height > 40);
