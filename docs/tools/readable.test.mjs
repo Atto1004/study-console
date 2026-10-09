@@ -21,6 +21,14 @@ test('결과에 코드처럼 보이는 글자가 남지 않음(견본 전부)', 
   const more = ['\\(\\vec a\\times\\vec b=|\\vec i\\ \\vec j\\ \\vec k;\\ \\vec a;\\ \\vec b|\\) (판서 2) ★', '\\[\\left(\\frac{1}{2}\\right)^{n}\\]', '**굵게** `코드`', '\\(\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}\\)', '\\(\\mathbf{F}=m\\mathbf{a}\\)'];
   for (const s of [...cases.map((c) => c[0]), ...more]) assert.ok(!CODEY.test(readable(s)), `${s} → ${readable(s)}`);
 });
+test('정상 내용은 지우지 않음(오타 검수 10/9)', () => {
+  assert.equal(readable('조건은 $x<y$이고 $y>z$입니다.'), '조건은 x<y이고 y>z입니다.');
+  assert.equal(readable('변수(`x`)에 1을 더하세요.'), '변수(x)에 1을 더하세요.');
+  assert.equal(readable('함수(`sin`, `cos`)를 비교하세요.'), '함수(sin, cos)를 비교하세요.');
+  assert.equal(readable('a < b 이고 c > d'), 'a < b 이고 c > d');
+  assert.equal(readable('<b>굵게</b> 그리고 <br>줄'), '굵게 그리고 줄');
+  assert.equal(readable('그림 (`HW-Ch4.pdf`) 참고'), '그림 참고');
+});
 test('보통 문장은 그대로', () => {
   assert.equal(readable('자, 9/18은 결석 회차라 슬라이드와 교재로 재구성했어요.'), '자, 9/18은 결석 회차라 슬라이드와 교재로 재구성했어요.');
 });
