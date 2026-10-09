@@ -45,6 +45,13 @@ const { chromium } = require('C:/Users/user/Desktop/아톰OS/기술실/study-con
   await p.click('.ib-tab[data-tab="mail"]'); await p.waitForTimeout(2200);
   expect(await p.evaluate(() => document.querySelector('.ib-head h2').textContent === '메일함' && /HW Ch\.5 제출 안내/.test(document.querySelector('.ib-body').textContent) && !/판서 사진/.test(document.querySelector('.ib-body').textContent)), '늦은 확인 응답이 메일함을 덮음');
   await p.unroute('**/_private/asks.json');
+  // ⑦-2 답 저장이 늦게 끝나도 그사이 연 메일함을 덮지 않음
+  await p.unroute('**/api/study/state');
+  await p.route('**/api/study/state', async (r) => { if (r.request().method() === 'POST') { await new Promise((ok) => setTimeout(ok, 1500)); saved = JSON.parse(r.request().postData()).state; return r.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }); } return r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ state: saved }) }); });
+  await p.click('.ib-tab[data-tab="ask"]'); await p.waitForTimeout(800);
+  await p.click('.ib-body .ib-card:not(.done) >> nth=0 >> button:has-text("모르겠어요")'); await p.waitForTimeout(150);
+  await p.click('.ib-tab[data-tab="mail"]'); await p.waitForTimeout(2300);
+  expect(await p.evaluate(() => document.querySelector('.ib-head h2').textContent === '메일함' && /HW Ch\.5 제출 안내/.test(document.querySelector('.ib-body').textContent)) && saved.asks?.q2?.a === '모르겠어요', '늦은 답 저장이 메일함을 덮음 ' + JSON.stringify(saved.asks));
   // ⑧ (오타 RED) 공부 기록을 못 읽으면 답 상태 모름: 안내·답하기 막힘·빨간 점에 안 셈
   await p.unroute('**/api/study/state');
   await p.route('**/api/study/state', (r) => r.fulfill({ status: 500, body: 'x' }));

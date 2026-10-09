@@ -91,12 +91,12 @@ export function createInbox({ status } = {}) {
       const row = el('div', undefined, 'ib-row');
       if (ans[a.id]) {
         row.append(el('span', `답: ${ans[a.id].a}${ans[a.id].note ? ' · ' + ans[a.id].note : ''}`));
-        const re = el('button', '다시 답하기'); re.type = 'button'; re.onclick = async () => { re.disabled = true; try { await saveAnswer(a.id, null); show('ask'); } catch (e) { status?.(e.message, true); re.disabled = false; } }; row.append(re);
+        const re = el('button', '다시 답하기'); re.type = 'button'; re.onclick = async () => { re.disabled = true; const at = seq; try { await saveAnswer(a.id, null); if (fresh(at)) show('ask'); } catch (e) { status?.(e.message, true); re.disabled = false; } }; row.append(re);
       } else {
         const note = el('textarea'); note.placeholder = '메모(선택)'; note.maxLength = 500; note.setAttribute('aria-label', '메모');
         for (const o of [...(a.options?.length ? a.options : ['맞아요', '아니에요']), '모르겠어요']) {
           const b = el('button', o, o === '모르겠어요' ? '' : 'go'); b.type = 'button';
-          b.disabled = !known; b.onclick = async () => { for (const y of row.querySelectorAll('button')) y.disabled = true; try { await saveAnswer(a.id, { a: o, note: note.value.trim(), at: Date.now() }); show('ask'); } catch (e) { status?.('답을 저장하지 못했어요. ' + e.message, true); for (const y of row.querySelectorAll('button')) y.disabled = false; } };
+          b.disabled = !known; b.onclick = async () => { for (const y of row.querySelectorAll('button')) y.disabled = true; const at = seq; try { await saveAnswer(a.id, { a: o, note: note.value.trim(), at: Date.now() }); if (fresh(at)) show('ask'); } catch (e) { status?.('답을 저장하지 못했어요. ' + e.message, true); for (const y of row.querySelectorAll('button')) y.disabled = false; } };
           row.append(b);
         }
         row.append(note);
@@ -150,7 +150,7 @@ export function createInbox({ status } = {}) {
     const decide = async (decision, answer, label) => {
       if (!confirm(`결재 #${a.id} 「${a.title}」 — ${label} 할까요?`)) return;
       for (const y of row.querySelectorAll('button,textarea')) y.disabled = true;
-      try { await post('/api/approvals/decide', { id: a.id, decision, answer: answer || '' }); status?.(`결재 #${a.id} ${label}`); if (tab === 'appr') show('appr'); }
+      const at = seq; try { await post('/api/approvals/decide', { id: a.id, decision, answer: answer || '' }); status?.(`결재 #${a.id} ${label}`); if (fresh(at)) show('appr'); }   // 그사이 다른 탭으로 갔으면 다시 그리지 않음
       catch (e) { status?.('결재를 처리하지 못했어요. ' + e.message, true); for (const y of row.querySelectorAll('button,textarea')) y.disabled = false; }
     };
     if (a.dtype === 'choose' && opts.length) for (const o of opts) { const b = el('button', String(o), 'go'); b.type = 'button'; b.onclick = () => decide('chosen', String(o), `「${o}」 선택`); row.append(b); }
