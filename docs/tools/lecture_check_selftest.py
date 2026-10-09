@@ -55,8 +55,10 @@ cases = [   # (이름, 강의안 바꾸기, 검산 바꾸기, 나와야 하는 �
     ('검산 문항 빠짐', None, lambda v: v.replace(" q3 q4')", "')"), "검산 안 한 문항: ['q3', 'q4']"),
     ('검산 문항 줄 없음', None, lambda v: v.replace("print('검산 문항:", "print('done:"), '마지막 줄이 「검산 문항'),
     ('검산 실행 안 됨', None, lambda v: "if False:\n" + "".join("    assert False\n" for _ in range(12)) + "print('검산 문항: c1 c2 c3 c4 c5 w1 w2 w3 q3 q4')\n", '실제로 실행된 assert 0개'),
-    ('조건과 같은 줄 assert', None, lambda v: "flag = False\n" + "".join(f"if flag: assert False, {i}\n" for i in range(12)) + "print('검산 문항: c1 c2 c3 c4 c5 w1 w2 w3 q3 q4')\n", 'assert 는 자기 줄에 혼자'),
-    ('세미콜론 assert', None, lambda v: v + "\nx = 1; assert x == 1\nprint('검산 문항: c1 c2 c3 c4 c5 w1 w2 w3 q3 q4')\n", 'assert 는 자기 줄에 혼자'),
+    ('조건과 같은 줄 assert', None, lambda v: "flag = False\n" + "".join(f"if flag: assert False, {i}\n" for i in range(12)) + "print('검산 문항: c1 c2 c3 c4 c5 w1 w2 w3 q3 q4')\n", '실제로 실행된 assert 0개'),
+    ('여러 줄 조건 머리 assert', None, lambda v: "flag = False\n" + "".join(f"if (\n    flag): assert False, {i}\n" for i in range(12)) + "print('검산 문항: c1 c2 c3 c4 c5 w1 w2 w3 q3 q4')\n", '실제로 실행된 assert 0개'),
+    ('안 부른 함수 안 assert', None, lambda v: "def f():\n" + "".join(f"    assert False, {i}\n" for i in range(12)) + "print('검산 문항: c1 c2 c3 c4 c5 w1 w2 w3 q3 q4')\n", '실제로 실행된 assert 0개'),
+    ('assert 모자람', None, lambda v: "assert 1 == 1\nassert 2 == 2\nassert 3 == 3\nprint('검산 문항: c1 c2 c3 c4 c5 w1 w2 w3 q3 q4')\n", '실제로 실행된 assert 3개'),
     ('문항 줄 뒤 출력', None, lambda v: v + "\nprint('끝')\n", '마지막 줄이 「검산 문항'),
 ]
 bad = []
