@@ -49,13 +49,16 @@ function tex(s) {
 // 내부 파일 표시: 백틱 안이 「판서_…·사진_…·녹음_…」 이름이거나 파일 이름(….pdf 등)일 때만 — 보통 코드 표기(`x`, `sin`)는 내용을 남긴다(오타 검수 10/9)
 const REF = /^(?:판서|사진|녹음|자료|강의자료|클로바|칠판|필기)_[^`]*$|\.(?:pdf|png|jpe?g|webp|md|html?|txt|json|m4a|mp3|mp4)$/i;
 const dropRefGroups = (s) => s.replace(/\s*\(((?:\s*`[^`]*`\s*,?)+)\)/g, (m, inner) => ([...inner.matchAll(/`([^`]*)`/g)].every((x) => REF.test(x[1].trim())) ? '' : m));
-const TAG = /<\/?(?:b|i|u|em|strong|small|mark|code|span|div|p|br|sup|sub|a|font|li|ul|ol|hr)\b[^<>]*>/gi;   // 실제 HTML 태그만(수식의 x<y 는 그대로)
+const TAG = /<\/?(?:b|i|u|em|strong|small|mark|code|span|div|p|br|sup|sub|a|font|li|ul|ol|hr)(?=[\s/>])[^<>]*>/gi;   // 이름 뒤가 공백·/·> 일 때만(「<b이고」 는 태그 아님)   // 실제 HTML 태그만(수식의 x<y 는 그대로)
 export function readable(text) {
   let s = String(text ?? '');
-  s = s.replace(/\$\$([\s\S]+?)\$\$|\\\[([\s\S]+?)\\\]|\\\(([\s\S]+?)\\\)|\$([^$\n]+?)\$/g, (m, a, b, c, d) => tex(a ?? b ?? c ?? d));   // 수식 먼저
+  // 수식 구간은 자리표로 빼 두고 나머지만 정리한 뒤 변환해 되돌린다 — 수식 안 x<b·b>z 가 태그로 지워지지 않게(오타 검수 10/9)
+  const math = [];
+  s = s.replace(/\$\$([\s\S]+?)\$\$|\\\[([\s\S]+?)\\\]|\\\(([\s\S]+?)\\\)|\$([^$\n]+?)\$/g, (m, a, b, c, d) => `\u0000${math.push(a ?? b ?? c ?? d) - 1}\u0000`);
   s = s.replace(TAG, '');
   s = dropRefGroups(s);
   s = s.replace(/`([^`]*)`/g, '$1').replace(/\*\*([^*]+)\*\*/g, '$1');        // 남은 백틱·굵게는 표시만 빼고 내용은 둠
+  s = s.replace(/\u0000(\d+)\u0000/g, (m, n) => tex(math[+n]));
   s = s.replace(/([\^_])\{([^{}]*)\}/g, (m, op, a) => tex(op + '{' + a + '}'));   // 수식 표시 없이 쓴 x^{iq}·y_{12}
   s = s.replace(/\[\[/g, '[').replace(/\]\]/g, ']');
   return s.replace(/[ \t]{2,}/g, ' ').replace(/\s+([,.)])/g, '$1').trim();

@@ -28,6 +28,14 @@ test('정상 내용은 지우지 않음(오타 검수 10/9)', () => {
   assert.equal(readable('a < b 이고 c > d'), 'a < b 이고 c > d');
   assert.equal(readable('<b>굵게</b> 그리고 <br>줄'), '굵게 그리고 줄');
   assert.equal(readable('그림 (`HW-Ch4.pdf`) 참고'), '그림 참고');
+  assert.equal(readable('조건은 $x<b$이고 $b>z$입니다.'), '조건은 x<b이고 b>z입니다.');   // 수식 안 글자가 태그 이름과 같아도
+  assert.equal(readable('x<b이고 b>z'), 'x<b이고 b>z');
+});
+test('칠판 제목: 파일 표시만 빼고 보통 백틱 괄호는 내용 유지', () => {
+  assert.equal(cleanTitle('론스키안 (`판서_Wronskian공식`, `판서_특성방정식Wronskian`)'), '론스키안');
+  assert.equal(cleanTitle('변수(`x`) 정리'), '변수(x) 정리');
+  assert.equal(cleanTitle('함수(`sin`, `cos`)'), '함수(sin, cos)');
+  assert.equal(cleanTitle('혼합(`판서_A`, `x`)'), '혼합(판서_A, x)');
 });
 test('보통 문장은 그대로', () => {
   assert.equal(readable('자, 9/18은 결석 회차라 슬라이드와 교재로 재구성했어요.'), '자, 9/18은 결석 회차라 슬라이드와 교재로 재구성했어요.');
