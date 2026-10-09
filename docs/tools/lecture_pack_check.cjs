@@ -75,7 +75,7 @@ const SHOT = process.env.SHOT_DIR;
   // ⑧ 끝까지: 판서는 넘기고 문제는 정답(보기 순서 = 문항 순서)으로 → 학습지 → 결과 창
   let done = false;
   for (let i = 0; i < 2500 && !done; i++) {
-    done = await p.evaluate(() => !!document.getElementById('panel')?.open && /수업 완료/.test(document.getElementById('panel').textContent));
+    done = await p.evaluate(() => !!document.getElementById('panel')?.open && /수업 완료 · 학습지 결과/.test(document.getElementById('panel').textContent));
     if (done) break;
     const at = positions().at(-1) ?? route[0], step = lesson.steps[at];
     const bs = await p.$$('#choices button[data-opt]');
@@ -85,7 +85,7 @@ const SHOT = process.env.SHOT_DIR;
   expect(done, '학습지 끝 결과 창(수업 완료) 안 뜸');
   const all = positions();
   expect(JSON.stringify(all) === JSON.stringify(route.slice(1, all.length + 1)) && all.length === route.length - 1, '전체 위치가 수업 순서와 다름 ' + all.length + '/' + (route.length - 1));
-  const answered = new Set(posts.filter((x) => x.b.kind === 'answer' && x.b.correct !== false).map((x) => x.b.step));
+  const answered = new Set(posts.filter((x) => x.b.kind === 'answer' && x.b.correct === true).map((x) => x.b.step));
   for (const id of [...pack.sections.map((s) => s.check), ...pack.worksheet]) expect(answered.has(id), '답 기록 없음 ' + id);
   expect(!posts.some((x) => x.k === 'event' && x.b.kind === 'read'), '끝까지 가는 동안 「읽음」 기록이 남음');
   if (SHOT) await p.screenshot({ path: SHOT + '/pack-finish.png' });
