@@ -1,6 +1,7 @@
 import { courseMetrics, sourceKind, pickQuest, KINDS } from "./metrics.js";
 import { attachSaeng } from "./saeng.js";
 import { officeHref } from "./worldmap.js";
+import { inFocus, focusCourses } from "./focus.js";
 const el = (tag, text, cls) => { const e=document.createElement(tag); if(text!==undefined)e.textContent=text; if(cls)e.className=cls; return e; };
 const btn = (text, action, cls='') => { const b=el('button',text,cls); b.type='button'; b.onclick=action; return b; };
 const minutes = s => Number(s.slice(0,2))*60+Number(s.slice(3));
@@ -49,13 +50,13 @@ export function recommendPlans(data, calendar, now=new Date(), budget, preferred
   return planned.slice(0,3);
 }
 
-const ROOM={main:'lobby',learning:'class',materials:'library',progress:'library',attendance:'library',assignments:'homework'};
+const ROOM={main:'lobby',learning:'class',materials:'library',progress:'library',attendance:'library',assignments:'homework',counsel:'counsel'};
 const pct=x=>Math.round(x*100);
 export function createWorkspace(app){
   let corridorSaeng=null, corridorGen=0;
   let data=null, calendar=null, assignments=null, assignmentError='', area='main', generation=0, navigation=0, consultBusy=false, proposal=[], filter='', kindFilter='', timer=null;
   const root=el('section',undefined,'workspace');root.id='workspace';document.getElementById('scene').append(root);
-  const navIds=['mainArea','learningArea','progressArea','materialsArea','attendanceArea','assignmentArea'];
+  const navIds=['mainArea','learningArea','progressArea','materialsArea','attendanceArea','assignmentArea','counselArea'];
   async function activate(which,token){
     corridorSaeng?.destroy();corridorSaeng=null;++corridorGen;
     await app.leave();
@@ -64,7 +65,7 @@ export function createWorkspace(app){
     for(const id of ['lobby','room','dialogue','progress','assignments','integratedWorkspace']){const e=document.getElementById(id);if(e)e.hidden=true;}
     root.hidden=false;document.getElementById('scene').className='scene workspace-scene';
     const school=document.querySelector('.school');school.dataset.mode='workspace';school.dataset.room=ROOM[which]||'lobby';
-    const door={lobby:'mainArea',class:'learningArea',library:'materialsArea',homework:'assignmentArea'}[ROOM[which]];
+    const door={lobby:'mainArea',class:'learningArea',library:'materialsArea',homework:'assignmentArea',counsel:'counselArea'}[ROOM[which]];
     navIds.forEach(id=>document.getElementById(id)?.setAttribute('aria-pressed',String(id===door||id===({progress:'progressArea',attendance:'attendanceArea'})[which])));
     app.screen?.({room:which});return true;
   }
@@ -98,6 +99,7 @@ export function createWorkspace(app){
     const session=app.session?.();
     if(session&&area!=='main')root.append(btn(`${session.course} · 수업 이어가기`,()=>app.resume(),'session-return'));
     if(area==='main')renderMain();
+    else if(area==='counsel')renderCounsel();
     else if(area==='assignments'){root.hidden=true;app.assignments();}
     else renderManagement();
   }
@@ -195,41 +197,46 @@ export function createWorkspace(app){
   function practiceIn(course){
     return app.practice?app.practice(course):startCourse(course);
   }
-  // 메인 = 시험 대비 대시보드(대표님 10/9 「초심으로 — 디데이·남은 공부량·오늘 일정·공부 계획」). 스앵님 대화는 화면 아래 고정 바(shell.js).
+  // 메인 = 위 요약 한 줄(시험 D-day·남은 회차) + 공부 계획(plan.js — 예전 관제탑 공부계획 기능을 학교 화면으로 다시 만든 것, 대표님 10/9).
+  let routine=null;
+  async function loadRoutine(){
+    if(routine)return routine;
+    for(const u of ['/api/routine','../knowledge/routine-week.json']){try{const r=await fetch(u,{credentials:'same-origin',cache:'no-store'});if(r.ok){const j=await r.json();routine=j.routine||j;if(routine?.grid)return routine;}}catch{}}
+    return routine={grid:{},holidays:[]};
+  }
   function renderDashboard(){
-    const rows=examMetrics(), grid=el('div',undefined,'db-grid');
-    const go=name=>()=>startCourse(name);
-    // ① 시험 D-day
-    const dday=card('시험 D-day','db-card db-dday');
-    const exams=rows.filter(r=>r.exam);
-    if(!exams.length)dday.append(el('p','등록된 시험이 없어요.','db-empty'));
-    for(const r of exams){const b=btn('',go(r.name),'db-row db-exam'+(r.exam.dday<=3?' soon':''));
-      const left=el('span',undefined,'db-l');left.append(el('b',r.name),el('small',`${r.exam.date}${r.exam.time?' '+r.exam.time:''}${r.exam.assumed?' · 예정':''}`));
-      b.append(el('strong',ddayLabel(r.exam.dday),'db-d'),left,el('span',`준비도 ${r.m.readiness}`,'db-ready'));dday.append(b);}
-    // ② 남은 공부량
-    const remain=card('남은 공부량','db-card db-remain');
-    const total=rows.reduce((n,r)=>n+r.m.remaining,0);
-    remain.append(el('p',`시험 범위 수업 ${total}회차 남음`,'db-total'));
-    const PACE={ok:'여유',tight:'빠듯',behind:'밀림',none:''};
-    for(const r of rows){if(!r.m.scope)continue;const b=btn('',go(r.name),'db-row db-course pace-'+r.m.pace);
-      const bar=el('span',undefined,'db-bar'),fill=el('i');fill.style.width=Math.round(r.m.progress*100)+'%';bar.append(fill);
-      const left=el('span',undefined,'db-l');left.append(el('b',r.name),bar);
-      const right=el('span',undefined,'db-r');right.append(el('b',`${r.m.remaining}회차`),el('small',r.m.daysLeft>0&&r.m.remaining?`하루 ${Number.isFinite(r.m.perDay)?Math.round(r.m.perDay*10)/10:r.m.remaining}회차${PACE[r.m.pace]?' · '+PACE[r.m.pace]:''}`:(r.m.remaining?'오늘까지':'다 했어요')));
-      b.append(left,right);remain.append(b);}
-    // ③ 오늘 일정(수업·캘린더·오늘 마감, 시간순) + 다가오는 마감
-    const today=card('오늘 일정','db-card db-today'),items=[];
-    for(const c of data.scheduled.filter(x=>!x.record?.cancelled))items.push({t:c.s,e:c.e,title:c.course+' 수업',kind:'class'});
-    for(const ev of (calendar?.events||[])){const title=/^\s*운선/.test(ev.title||'')?'개인 일정':(ev.title||'일정');items.push({t:ev.allDay?'':(ev.start||''),e:ev.end||'',title,kind:'cal'});}
-    const due=assignments?pendingDeadlines(assignments.rows||[],data.date):[];
-    for(const d of due.filter(r=>r.deadlineDays===0))items.push({t:d.deadlineTime||'',title:`${d.course} · ${d.title} 마감`,kind:'due'});
-    items.sort((a,b)=>(a.t||'00:00').localeCompare(b.t||'00:00'));
-    if(!items.length)today.append(el('p',calendar?.verified?'오늘 일정이 없어요.':'캘린더를 확인하지 못했어요. 수업 시간표만 보여요.','db-empty'));
-    for(const it of items){const row=el('div',undefined,'db-row db-item kind-'+it.kind);row.append(el('span',it.t?(it.e?`${it.t}–${it.e}`:it.t):'종일','db-time'),el('span',it.title,'db-title'));today.append(row);}
-    const soon=due.filter(r=>r.deadlineDays>0&&r.deadlineDays<=3);
-    if(soon.length){today.append(el('h3','다가오는 마감','db-sub'));for(const d of soon){const b=btn('',()=>open('assignments'),'db-row db-item kind-due');b.append(el('span',`D-${d.deadlineDays}`,'db-time'),el('span',`${d.course} · ${d.title}`,'db-title'));today.append(b);}}
-    // ④ 공부 계획
-    const plan=card('공부 계획','db-card db-plan');renderPlans(plan);
-    grid.append(dday,remain,today,plan);root.append(grid);
+    const rows=examMetrics(), top=el('div',undefined,'db-strip');
+    const exams=rows.filter(r=>r.exam&&inFocus(r.name));   // 집중 4과목만(focus.js)
+    for(const r of exams){const b=btn('',()=>startCourse(r.name),'db-chip'+(r.exam.dday<=3?' soon':''));b.append(el('strong',ddayLabel(r.exam.dday)),el('span',r.name),el('small',`${r.m.remaining}회차 남음`));b.title=`${r.name} · ${r.exam.date}${r.exam.time?' '+r.exam.time:''} · 준비도 ${r.m.readiness}`;top.append(b);}
+    if(!exams.length)top.append(el('p','등록된 시험이 없어요.','db-empty'));
+    const host=el('div',undefined,'db-plan');root.append(top,host);
+    const deadlines=assignments?pendingDeadlines(assignments.rows||[],data.date):[];
+    loadRoutine().then(rt=>{if(!host.isConnected)return;app.plan?.render(host,{today:data.date,courses:focusCourses().filter(n=>data.courses.some(c=>c.name===n)),focus:inFocus,scheduled:data.scheduled,plans:data.plans,deadlines,calendar:calendar?.events||[],routine:rt,courseName:id=>data.courses.find(c=>c.id===id)?.name||'',courseId:name=>data.courses.find(c=>c.name===name)?.id,exams:data.exams.filter(e=>e.written&&inFocus(e.course)&&e.date>=data.date).map(e=>({course:e.course,date:e.date,time:e.time||'',assumed:!!e.assumed})),addPlan:item=>change({op:'plan-add',plans:[item]})});});
+  }
+  // 상담실(대표님 10/9): 김주영 스앵님과 면담하며 학습자료 고치기·시험 범위·일정·공부 계획을 조율하는 공간.
+  // 대화는 상담 모드(coach consultation, 서버에 상담 기록), 진단·계획 세우기는 기존 상담 흐름(app.consult)을 그대로.
+  function renderCounsel(){
+    const room=el('div',undefined,'counsel-room'),side=el('div',undefined,'counsel-side'),main=el('div',undefined,'counsel-main');
+    const face=el('div',undefined,'counsel-face');side.append(face,el('b','김주영 스앵님','counsel-name'),el('p','시험·자료·계획, 뭐든 같이 정해요.','counsel-sub'));
+    const rig=app.rig?.(face);rig?.setExpr('smile');
+    const topics=el('div',undefined,'counsel-topics');topics.setAttribute('aria-label','상담 주제');
+    const log=el('div',undefined,'counsel-log');log.setAttribute('aria-live','polite');
+    const form=el('form',undefined,'counsel-form'),input=el('textarea');input.rows=2;input.maxLength=1500;input.placeholder='예) 정역학 9/21 강의 설명이 너무 짧아요 · 공수1 시험 범위가 바뀌었어요';input.setAttribute('aria-label','스앵님께 말하기');
+    const send=btn('보내기',()=>{},'primary');send.type='submit';form.append(input,send);
+    for(const [label,text] of [['학습자료 고치기','이 강의 자료에서 고쳐야 할 부분이 있어요: '],['시험 범위·일정','시험 범위·일정을 다시 맞춰요: '],['공부 계획 조정','오늘·이번 주 공부 계획을 조정하고 싶어요: '],['오늘 상태','오늘 컨디션이랑 쓸 수 있는 시간은요: ']]){
+      topics.append(btn(label,()=>{input.value=text;input.focus();input.setSelectionRange(text.length,text.length);},'counsel-topic'));}
+    const msg=(me,t)=>{const m=el('div',t,'counsel-msg '+(me?'from-me':'from-saeng'));   /* 'saeng' 클래스는 saeng.js 초상 규칙(aspect-ratio)과 겹침 */log.append(m);log.scrollTop=log.scrollHeight;return m;};
+    for(const e of (app.history?.()||[]).slice(-12)){msg(true,e.question);msg(false,e.answer);}
+    if(!log.children.length)msg(false,'어서 와요. 고치고 싶은 자료나 바뀐 시험 범위, 계획 이야기 뭐든 말해 줘요.');
+    let busy=false;
+    form.onsubmit=async e=>{e.preventDefault();const q=input.value.trim();if(!q||busy)return;busy=true;send.disabled=true;input.value='';msg(true,q);const wait=msg(false,'음… 확인해 볼게요.');rig?.setExpr('think');
+      try{const r=await app.api('coach',{course:'',question:q,mode:'consultation',id:crypto.randomUUID()});wait.textContent=String(r?.answer||'').trim()||'지금은 답을 정리하지 못했어요.';rig?.speak(wait.textContent);rig?.setExpr('smile');}
+      catch(err){wait.textContent='지금은 답을 못 가져왔어요. '+(err?.message||'');rig?.setExpr('sad');}
+      finally{busy=false;send.disabled=false;}};
+    const tools=el('div',undefined,'counsel-tools');
+    tools.append(btn('진단하고 오늘 계획 세우기',()=>app.consult?.(),'counsel-tool'),btn('공부 계획 열기',()=>app.integrated?.('공부 계획','plan',{area:'learningArea'}),'counsel-tool'),btn('과제실',()=>open('assignments'),'counsel-tool'),btn('자료실',()=>open('materials'),'counsel-tool'));
+    main.append(el('h1','상담실','counsel-title'),topics,log,form,tools);room.append(side,main);root.append(room);
+    new MutationObserver((_,o)=>{if(!room.isConnected){rig?.destroy();o.disconnect();}}).observe(root,{childList:true});
   }
   function renderMain(){
     renderDashboard();
@@ -319,7 +326,17 @@ export function createWorkspace(app){
     const tools=el('div',undefined,'management-tools'),select=el('select');select.setAttribute('aria-label','과목 선택');select.append(Object.assign(el('option','모든 과목'),{value:''}));for(const c of data.courses){const o=el('option',c.name);o.value=c.name;select.append(o);}select.value=filter;select.onchange=()=>{filter=select.value;render();};tools.append(select,btn('새로 불러오기',()=>open(area)),btn('시간표',()=>app.integrated('시간표','cal',{mode:'week'})),btn('성적·학점',()=>app.integrated('성적·학점','grade')));root.append(tools);
     if(area==='materials'){renderMaterials();renderChecks();}else if(area==='attendance')renderAttendance();else renderProgress();
   }
+  // 자료실 맨 위 = 과목별 묶음(대표님 10/9 「과목별로 나눠놓은 구성은 자료실로」). 카드를 누르면 그 과목 모든 수업·암기노트·혼자풀기
+  function renderCourseShelf(){
+    const shelf=card('과목별','course-shelf'),grid=el('div',undefined,'shelf-grid');
+    for(const c of app.catalog().courses){
+      const exam=data.exams.find(e=>e.course===c.name&&e.written&&e.dday>=0);
+      const b=btn('',()=>app.course(c.name),'shelf-card');b.append(el('b',c.name),el('small',`${c.lessons.length}회 수업${exam?' · '+ddayLabel(exam.dday):''}`));grid.append(b);
+    }
+    shelf.append(grid);root.append(shelf);
+  }
   function renderMaterials(){
+    if(!filter)renderCourseShelf();
     const sources=data.sources.filter(s=>!filter||s.course===filter).map(s=>{const k=sourceKind(s);return {...s,cls:k.kind,sure:k.sure};});
     const lmsItems=(data.lmsMaterials||[]).filter(i=>!filter||i.course===filter).map(i=>({...i,cls:sourceKind({...i,lms:true}).kind,sure:true}));
     const homework=(assignments?.rows||[]).filter(r=>!filter||r.course===filter).flatMap(r=>(r.files||[]).map(f=>({course:r.course,title:r.title,file:f.label||f.file||f.href,href:f.href,cls:/혼자\s*풀기|스앵님|코칭/.test(f.label||'')?'tutor':'assignment',sure:true})));

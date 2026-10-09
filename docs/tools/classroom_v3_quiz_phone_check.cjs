@@ -31,7 +31,7 @@ const BASE = process.argv[2] || 'http://127.0.0.1:8797';
     if (r.workBottom > r.dlgTop + 1) fail.push(k + ': 문제 칸이 대화 칸과 겹침');
     if (r.hscroll) fail.push(k + ': 가로 스크롤');
     if (!r.mathD) fail.push(k + ': 수식 보기가 .opt-body 안에 렌더 안 됨');
-    if (!r.rail || r.rail.n < 5) fail.push(k + ': 과목 레일 없음');
+    if (!r.rail || r.rail.n < 4) fail.push(k + ': 과목 레일 없음');   // 시험 기간 집중 4과목(focus.js)
     else if (k <= 640 && (r.rail.top < r.rail.headerBottom - 1 || r.rail.bottom > r.rail.sceneTop + 1)) fail.push(k + ': 폰 과목 레일이 머리줄·교실과 겹침 ' + JSON.stringify(r.rail));
     if (r.overflowCards) fail.push(k + ': 보기 카드 넘침 ' + r.overflowCards);
     if (k <= 640 && (r.header > 90 || r.board < r.stage * 0.85)) fail.push(k + ': 폰 머리줄/칠판 폭 ' + r.header + '/' + r.board);

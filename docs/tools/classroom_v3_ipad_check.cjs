@@ -5,7 +5,7 @@ const OUT = 'C:/Users/user/.claude/jobs/a132f963/tmp/';
   const b = await webkit.launch();
   const all = {};
   for (const [name, dev] of [['land', devices['iPad Pro 11 landscape']], ['port', devices['iPad Pro 11']]]) {
-    for (const view of ['site', 'game']) {
+    for (const view of ['site']) {   // 3D 보기 전환 없앰(10/9)
       const ctx = await b.newContext({ ...dev }); const p = await ctx.newPage();
       const errors = []; p.on('pageerror', (e) => errors.push(e.message));
       const fail = []; const expect = (ok, m) => { if (!ok) fail.push(m); };

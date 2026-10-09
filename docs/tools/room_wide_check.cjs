@@ -34,16 +34,13 @@ const { chromium } = require('C:/Users/user/Desktop/아톰OS/기술실/study-con
   expect(await isOpen() && await p.evaluate(() => document.activeElement?.id === 'chatInput'), 'Q 로 서랍·입력 칸 안 열림');
   expect(!p.errors.length, '사이트 오류 ' + p.errors.join('|'));
   await p.close();
-  // ── 게임 보기: 기존 대화창·버튼 그대로
-  const q = await open('game');
-  const gg = await q.evaluate(() => ({ btn: (() => { const e = document.querySelector('.rw-log'); return e ? getComputedStyle(e).display : 'none'; })(),
-    log: getComputedStyle(document.getElementById('chatLog')).display, chat: getComputedStyle(document.querySelector('.v3-chat')).display, dlgOverflow: getComputedStyle(document.getElementById('dialogue')).overflow }));
-  expect(gg.btn === 'none', '게임 보기에 💬 버튼이 보임');
-  expect(gg.log !== 'none' && gg.chat !== 'none', '게임 보기 대화 기록·입력이 숨겨짐 ' + JSON.stringify(gg));
-  await q.evaluate(() => document.activeElement?.blur()); await q.keyboard.press('KeyQ'); await q.waitForTimeout(250);
-  expect(await q.evaluate(() => !document.querySelector('.school').dataset.log && document.activeElement?.id === 'chatInput'), '게임 보기 Q 가 서랍을 열거나 입력 칸으로 안 감');
-  expect(!q.errors.length, '게임 오류 ' + q.errors.join('|'));
+  // ── 3D 보기 전환은 없앰(10/9): 게임으로 저장돼 있어도 사이트 보기로 열리고 전환 버튼은 안 보임
+  const q = await open('site');
+  await q.evaluate(() => localStorage.setItem('school-view', 'game')); await q.reload(); await q.waitForFunction(() => document.querySelector('.school').dataset.mode === 'classroom', null, { timeout: 20000 }); await q.waitForTimeout(1500);
+  const gg = await q.evaluate(() => ({ view: document.querySelector('.school').dataset.view3, toggle: (() => { const t = document.querySelector('.view-toggle'); return t ? getComputedStyle(t).display : 'none'; })() }));
+  expect(gg.view === 'site' && gg.toggle === 'none', '게임 저장값이 사이트로 안 바뀜·전환 버튼 보임 ' + JSON.stringify(gg));
+  expect(!q.errors.length, '오류 ' + q.errors.join('|'));
   await q.close(); await b.close();
-  console.log(fail.length ? 'FAIL ' + JSON.stringify(fail) : 'room wide: 칠판 3:1·스앵님·대사창·서랍(💬·바깥·Esc 초점·Q)·게임 보기 그대로 ok');
+  console.log(fail.length ? 'FAIL ' + JSON.stringify(fail) : 'room wide: 칠판 3:1·스앵님·대사창·서랍(💬·바깥·Esc 초점·Q)·3D 저장값→사이트·전환 버튼 없음 ok');
   process.exit(fail.length ? 1 : 0);
 })();

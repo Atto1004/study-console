@@ -21,6 +21,9 @@ import { createDialog } from "./vn-dialog.js";
 import { createLectureUi } from "./lecture-ui.js";
 import { setupWideRoom } from "./room-wide.js";
 import { setupShell } from "./shell.js";
+import { createRig } from "./rig.js";
+import { createPlan } from "./plan.js";
+import { inFocus } from "./focus.js";
 import { startClassroomV3 } from "./classroom-v3.js";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
@@ -2301,7 +2304,7 @@ async function retest(id){
 }
 mission = createMission({api,forcedMode:()=>setup?.solveMode(),context:()=>current?{lesson:current,step:current.steps[index],index,assisted,total:missionIndices?.length,number:missionIndices?missionIndices.indexOf(index)+1:undefined}:null,feedback:(text,kind)=>{$('speech').textContent=text;mission.feedback(kind);renderMath($('speech'));},retest,remedial:supplementWork,helped:()=>{assisted=true;saveSession(current,index,{assisted:true}).catch(()=>{});},allowNext:()=>{status('풀이 피드백은 관찰 기록입니다. 확인 문제의 정답 검증은 별도로 진행합니다.');}});
 growth = createGrowth({api,status,panel,start:startLesson,retest,courses:()=>workspace?.data?.courses||[],home:()=>workspace.open('main')});
-workspace = createWorkspace({api,status,panel,record,screen:rememberScreen,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],walk:name=>space&&ROOMS.some(r=>r.name===name)?space.walk(name):showCourse(name),practice,rooms:()=>ROOMS.map(r=>r.name),evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,tutorPlan:(host,data,refresh)=>growth.tutorPlan(host,data,refresh),leave:async()=>{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);space?.hide();stopVoice();closeDialogs();++requestGeneration;}   /* 저장이 다 된 뒤에 3D 를 닫는다 — 실패하면 수업·3D 그대로(오타 10/8) */,lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode)});
+workspace = createWorkspace({api,status,panel,record,screen:rememberScreen,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],walk:name=>space&&ROOMS.some(r=>r.name===name)?space.walk(name):showCourse(name),practice,rooms:()=>ROOMS.map(r=>r.name),evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,tutorPlan:(host,data,refresh)=>growth.tutorPlan(host,data,refresh),leave:async()=>{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);space?.hide();stopVoice();closeDialogs();++requestGeneration;}   /* 저장이 다 된 뒤에 3D 를 닫는다 — 실패하면 수업·3D 그대로(오타 10/8) */,lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode),rig:host=>createRig(host,{label:'김주영 스앵님'}),plan:createPlan({status}),consult:()=>consult(course||ROOMS[0]?.name)});
 space = createSpace({fixedView:()=>setup?.fixedView(),leaveTo:async url=>{try{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);}catch(e){status('저장하지 못해 이동하지 않았습니다. '+(e.message||''),true);return false;}stopVoice();location.href=url;return true;},status,panel,screen:rememberScreen,view:camera=>{if(current)rememberScreen({lesson:current.id,step:current.steps[index].id,camera});},home:()=>workspace.open('main'),pause:async()=>{await mission.save();await growth.stop('pause');},ask:()=>openChat('','hint'),select:sitDown});
 // 교실 v3(대표님 10/8): 위 강의 · 가운데 문제 · 아래 대화, 게임↔사이트
 // 교실 v3 3D 무대(오타 검수 10/8 P2): 게임 보기 + 시험 대비가 아님 → 강의 칸에 앉힘(같은 과목이면 다시 앉히지 않음), 아니면 3D 를 내린다
@@ -2369,7 +2372,7 @@ tutor = createTutor({api,eventId,record,inPack:()=>!!curPack(),
    else if(e.code==='Escape'&&sc.dataset.world==='seated'){e.preventDefault();document.querySelector('.seat-controls [data-icon=stand]')?.click();}
  });}
 // 과목 레일: 수업 중 과목을 바꾸면 그 과목의 약한 회차로 바로(강의실 하나, 교실 v2)
-const rail = createSubjectRail({subjects:ROOMS,current:()=>course,choose:async name=>{try{await mission?.save();}catch{return;}const seated=document.querySelector('.school').dataset.world==='seated';await sitDown(name);space?.setSubject?.(name);rail.update();if(seated)await space?.seated(name);}});
+const rail = createSubjectRail({subjects:ROOMS.filter(r=>inFocus(r.name)),   /* 시험 기간 집중 4과목(focus.js) */current:()=>course,choose:async name=>{try{await mission?.save();}catch{return;}const seated=document.querySelector('.school').dataset.world==='seated';await sitDown(name);space?.setSubject?.(name);rail.update();if(seated)await space?.seated(name);}});
 new MutationObserver(()=>rail.update()).observe($('roomLabel'),{childList:true,characterData:true,subtree:true});
 startSurfaces();
 const MOOD={smile:'smile',serious:'strict',think:'neutral',neutral:'neutral'};
@@ -2378,7 +2381,7 @@ const vn = v3?.stage ? createDialog(v3.stage, { onNext: () => advance() }) : nul
 lectureUi = createLectureUi({ goRoute });
 setupWideRoom(v3);   // 강의실 배치 A: 와이드 칠판·대사창·버튼 한 줄·대화 서랍(대표님 10/9)
 // 화면 틀(10/9 「초심으로」): 위 고정 줄(GREENLIGHT | SCHOOL·탭·비서 토큰·대표실) + 아래 고정 스앵님·채팅 바
-const shell = setupShell({ api, eventId, course: () => course || '', history: () => (state?.events || []).filter(e => e.kind === 'question' && e.mode === 'consultation') });
+const shell = setupShell({ api, eventId, openArea: a => workspace.open(a), course: () => course || '', history: () => (state?.events || []).filter(e => e.kind === 'question' && e.mode === 'consultation') });
 lecture = createLecture({
   ctx:()=>current?{lesson:current,step:current.steps[index],index,course,passed}:null,
   script:step=>curPack()?packLines(curPack(),step.id):null,
@@ -2456,7 +2459,8 @@ new MutationObserver(()=>{const t=$('speech').textContent.trim();if(t&&!$('dialo
 $('dockTalk').onclick=()=>{if(document.querySelector('.school').dataset.mode==='classroom'){$('askToggle').click();return;}workspace.open('main').then(()=>document.querySelector('.main-tutor textarea')?.focus());};
 $('home').onclick=()=>workspace.open('main');
 $('mainArea').onclick=()=>workspace.open('main');
-$('learningArea').onclick=()=>workspace.open('learning');
+// 교실 = 스앵님이 칠판에서 강의하는 공간으로 바로(대표님 10/9). 하던 수업이 있으면 이어서, 없으면 지난 과목(없으면 첫 과목)의 약한 회차. 과목은 왼쪽 레일에서 바꿈
+$('learningArea').onclick=async()=>{try{await mission?.save();}catch{return;}if(activeSession)return resumeSession();await sitDown(inFocus(course)?course:ROOMS.find(r=>inFocus(r.name))?.name);};
 $('progressArea').onclick=()=>workspace.open('progress');
 $('materialsArea').onclick=()=>workspace.open('materials');
 $('attendanceArea').onclick=()=>workspace.open('attendance');
