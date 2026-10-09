@@ -7,7 +7,7 @@ const source=fs.readFileSync(path.join(root,'school/school.js'),'utf8').replace(
 new vm.Script(source);
 let state={version:1,revision:0,plans:{},events:[],rules:{},progress:{},drafts:{},settings:{engine:'auto',voice:false}}, prerequisiteMode=false;
 const errors=[];
-const assignments={asOf:'2026-10-06',notice:'풀이 완료와 제출 완료',rows:[{id:'a',course:'공업수학1',title:'풀이 과제',due:'2099-10-07',submission:'미제출',workDone:false,submitted:false,files:[],source:'판서'},{id:'b',course:'정역학',title:'제출 과제',due:'2026-10-05',submission:'제출',workDone:false,submitted:true,files:[]}]};
+const assignments={asOf:'2026-10-06',notice:'풀이 완료와 제출 완료',rows:[{id:'a',course:'공업수학1',title:'풀이 과제',due:'2099-10-07',submission:'미제출',workDone:false,submitted:false,files:[],source:'판서'},{id:'b',course:'정역학',title:'제출 과제',due:'2099-10-05',submission:'제출',workDone:false,submitted:true,files:[]},{id:'old',course:'공업수학1',title:'지난 마감 과제',due:'2026-10-01',submission:'미제출',workDone:false,submitted:false,files:[]}]};
 const dom=new JSDOM(html,{url:'https://school.invalid/kingdom/study/school/index.html?test=1',runScripts:'outside-only',pretendToBeVisual:true});
 const w=dom.window,d=w.document;
 w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};
@@ -75,7 +75,7 @@ const byText=text=>[...d.querySelectorAll('button')].find(b=>b.textContent===tex
  w.__smokeAssignments();await settle();assert.equal(check('풀이 완료').checked,true,'다시 조회해도 완료 표시 유지');
  check('풀이 완료').click();await settle();assert.equal(assignments.rows[0].workDone,false);
  check('제출 완료').click();await settle();assert.equal(assignments.rows[0].submitted,true);assert.equal(assignments.rows[0].workDone,false);assert.ok(!d.querySelector('#assignments').textContent.includes('풀이 과제'));
- byText('제출 완료').click();assert.ok(d.querySelector('#assignments').textContent.includes('제출 과제'));check('제출 완료').click();await settle();assert.equal(assignments.rows[0].submitted,false);
+ byText('제출 완료').click();assert.ok(d.querySelector('#assignments').textContent.includes('제출 과제'));byText('전체').click();assert.ok(!d.querySelector('#assignments').textContent.includes('지난 마감 과제'),'지난 과제가 보임');assert.ok(!d.querySelector('#assignments').textContent.includes('지난 기록'));byText('제출 완료').click();check('제출 완료').click();await settle();assert.equal(assignments.rows[0].submitted,false);
  w.__smokeLobby();assert.equal(d.querySelector('#assignments').hidden,true);assert.equal(d.querySelector('#lobby').hidden,false);
  d.querySelector('#consult').click();assert.equal(d.querySelector('#panel').open,true);
  {const p=d.querySelector('#panel'),fire=(t,x)=>p.dispatchEvent(new w.MouseEvent(t,{bubbles:true,clientX:x,clientY:5}));p.getBoundingClientRect=()=>({left:100,right:500,top:0,bottom:400});

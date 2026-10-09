@@ -22,6 +22,7 @@ import { createDialog } from "./vn-dialog.js";
 import { createLectureUi } from "./lecture-ui.js";
 import { setupWideRoom } from "./room-wide.js";
 import { setupSeatRoom } from "./room-seat.js";
+import { pastDue } from "./workspace.js";
 import { setupShell } from "./shell.js";
 import { createRig } from "./rig.js";
 import { createPlan } from "./plan.js";
@@ -461,7 +462,8 @@ let assignmentFilter = "전체", assignmentStatus = "진행";
       if (!select.value) assignmentFilter = select.value = "전체";
       select.onchange = () => { assignmentFilter = select.value; draw(); };
       tools.append(select);
-        for (const label of ["진행", "지난 기록", "제출 완료", "전체"]){
+        if (assignmentStatus === "지난 기록") assignmentStatus = "진행";   // 지난 과제는 안 보임(대표님 10/9 「지난 일정인 건 다 안 뜨게」)
+        for (const label of ["진행", "제출 완료", "전체"]){
         const b = button(label, () => { assignmentStatus = label; draw(); });
         b.setAttribute("aria-pressed", String(assignmentStatus === label)); tools.append(b);
       }
@@ -469,11 +471,10 @@ let assignmentFilter = "전체", assignmentStatus = "진행";
         if(activeSession)tools.append(button("수업 이어가기",resumeSession));
         host.append(tools);
         const today = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-        const isPast = r => /^\d{4}-\d{2}-\d{2}/.test(r.due||'') && r.due.slice(0,10)<today;
+        const isPast = r => pastDue(r, today);
         const groupRank = new Map([["assignment", 0]]); for (const r of data.rows) { const g = r.category || "assignment"; if (!groupRank.has(g)) groupRank.set(g, groupRank.size); }
-        const rows = data.rows.filter(r => (assignmentFilter === "전체" || r.course === assignmentFilter) &&
-          (assignmentStatus === "전체" || assignmentStatus === "지난 기록" && isPast(r) ||
-           assignmentStatus === "제출 완료" && r.submitted || assignmentStatus === "진행" && !r.submitted && (!isPast(r)||r.continueActive)))
+        const rows = data.rows.filter(r => !isPast(r) && (assignmentFilter === "전체" || r.course === assignmentFilter) &&
+          (assignmentStatus === "전체" || assignmentStatus === "제출 완료" && r.submitted || assignmentStatus === "진행" && !r.submitted))
           // 마감순(묶음 안에서): 진행·전체는 가까운 마감 먼저, 지난 기록·제출 완료는 최근 것 먼저, 마감 미확인은 맨 뒤
           .map((r, i) => [r, i]).sort(([a, ai], [b, bi]) => {
             // 묶음 순위는 고정(수업 과제 0, 나머지는 처음 나온 순서) — 비교가 순환하지 않게(오타 검수 10/8)

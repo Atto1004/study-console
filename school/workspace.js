@@ -8,9 +8,18 @@ const minutes = s => Number(s.slice(0,2))*60+Number(s.slice(3));
 const hm = n => `${String(Math.floor(n/60)).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;
 export const ddayLabel = n => n===0?'D-day':`D-${n}`;
 export const hiddenDeadline = task => !!(task.hiddenFromMain&&task.workDone&&task.deadlineDays!==0);
+// 마감이 지난 과제: 마감 날짜가 오늘 전이거나, 오늘인데 마감 시각이 이미 지남(한국 시각). 마감 날짜를 모르면 지난 것으로 보지 않음
+export function pastDue(r, today) {
+  const m=/^(\d{4}-\d{2}-\d{2})(?:T(\d{2}:\d{2}))?/.exec(r.due||''); if(!m)return false;
+  if(m[1]<today)return true;
+  if(m[1]>today||!m[2])return false;
+  const now=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date());
+  const kstToday=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul'}).format(new Date());
+  return kstToday===today&&m[2]<now;
+}
 export function pendingDeadlines(rows, today) {
   const day=Date.parse(today+'T00:00:00Z');
-  return rows.filter(r=>!r.submitted).map(r=>{
+  return rows.filter(r=>!r.submitted&&!pastDue(r,today)).map(r=>{   // 지난 과제는 아예 안 보임(대표님 10/9)
     const match=/^(\d{4}-\d{2}-\d{2})(?:T(\d{2}:\d{2})(?::\d{2})?)?$/.exec(r.due||'');
     const stamp=match?Date.parse(match[1]+'T'+(match[2]||'23:59')+':00Z'):NaN;
     const valid=match&&Number.isFinite(stamp)&&new Date(stamp).toISOString().slice(0,10)===match[1];
@@ -211,7 +220,13 @@ export function createWorkspace(app){
     if(!exams.length)top.append(el('p','등록된 시험이 없어요.','db-empty'));
     const host=el('div',undefined,'db-plan');root.append(top,host);
     const deadlines=assignments?pendingDeadlines(assignments.rows||[],data.date):[];
-    loadRoutine().then(rt=>{if(!host.isConnected)return;app.plan?.render(host,{today:data.date,courses:focusCourses().filter(n=>data.courses.some(c=>c.name===n)),focus:inFocus,inClass:isInClass,scheduled:data.scheduled,plans:data.plans,deadlines,calendar:calendar?.events||[],calendarOk:!!calendar?.verified,reload:()=>open('main'),routine:rt,courseName:id=>data.courses.find(c=>c.id===id)?.name||'',courseId:name=>data.courses.find(c=>c.name===name)?.id,exams:data.exams.filter(e=>e.written&&inFocus(e.course)&&e.date>=data.date).map(e=>({course:e.course,date:e.date,time:e.time||'',assumed:!!e.assumed})),addPlan:(item,many)=>change({op:'plan-add',plans:many?item:[item]}),dailyCap:Number(data.profile?.dailyCap)||4,updatePlan:item=>change({op:'plan-update',plan:item}),deletePlan:id=>change({op:'plan-delete',id})});});
+    loadRoutine().then(rt=>{if(!host.isConnected)return;app.plan?.render(host,{today:data.date,courses:focusCourses().filter(n=>data.courses.some(c=>c.name===n)),focus:inFocus,inClass:isInClass,scheduled:data.scheduled,classSlots:data.courses.filter(c=>Array.isArray(c.slots)),holidays:Array.isArray(data.holidays)?data.holidays:null,term:data.term||null,sessions:data.sessions||[],plans:data.plans,deadlines,calendar:calendar?.events||[],calendarOk:!!calendar?.verified,reload:()=>open('main'),routine:rt,courseName:id=>data.courses.find(c=>c.id===id)?.name||'',courseId:name=>data.courses.find(c=>c.name===name)?.id,exams:data.exams.filter(e=>e.written&&inFocus(e.course)&&e.date>=data.date).map(e=>({course:e.course,date:e.date,time:e.time||'',assumed:!!e.assumed})),addPlan:(item,many)=>change({op:'plan-add',plans:many?item:[item]}),dailyCap:Number(data.profile?.dailyCap)||4,updatePlan:item=>change({op:'plan-update',plan:item}),deletePlan:id=>change({op:'plan-delete',id}),attend:(courseId,date,status)=>change({op:'attendance',courseId,date,status}),calChange:async({ev,date,start,end})=>{/* 구글 캘린더 시각 바꾸기(대표님 10/9): 그날 캘린더를 새로 읽고 → 최신 원본 버전으로 변경 대기열에 넣는다. 원본이 바뀌었으면 서버가 409 로 막음 */
+  try{const j=(u)=>fetch(u,{credentials:'same-origin',cache:'no-store'}).then(r=>r.json());await j(`/api/cal?from=${date}&to=${date}&force=1`);const cx=await j(`/api/aliveweek/context?from=${date}&to=${date}`);
+    const cur=(cx.calendar?.[date]||[]).find(e=>e.id===ev.id);if(!cur){app.status('원본 일정을 다시 찾지 못했어요. 잠시 뒤 다시 해 주세요.',true);return false;}
+    const body={operationId:crypto.randomUUID(),action:'reschedule',source:'calendar',calendarId:cur.calendarId||cur.cal,eventId:cur.id,date,after:{title:cur.title||'',location:cur.location||'',start:`${date}T${start}:00+09:00`,end:`${date}T${end}:00+09:00`},expectedSourceVersion:cur.sourceVersion};
+    const w=await fetch('/api/aliveweek/changes',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const x=await w.json().catch(()=>({}));
+    if(!w.ok){app.status(x.error||`캘린더를 바꾸지 못했어요(${w.status})`,true);return false;}
+    app.status('구글 캘린더에 반영하는 중이에요. 잠시 뒤 시간표에 보여요.');return true;}catch(e){app.status('캘린더를 바꾸지 못했어요. '+(e.message||''),true);return false;}}});});
   }
   // 상담실(대표님 10/9): 김주영 스앵님과 면담하며 학습자료 고치기·시험 범위·일정·공부 계획을 조율하는 공간.
   // 대화는 상담 모드(coach consultation, 서버에 상담 기록), 진단·계획 세우기는 기존 상담 흐름(app.consult)을 그대로.
