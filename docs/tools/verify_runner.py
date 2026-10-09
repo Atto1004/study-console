@@ -3,7 +3,14 @@
 import sys, ast
 path = sys.argv[1]
 src = open(path, encoding='utf-8').read()
-want = {n.lineno for n in ast.walk(ast.parse(src)) if isinstance(n, ast.Assert)}
+tree = ast.parse(src)
+want = {n.lineno for n in ast.walk(tree) if isinstance(n, ast.Assert)}
+# assert 는 자기 줄에 혼자 있어야 한다: `if x: assert …`·`a = 1; assert …` 처럼 다른 문장과 같은 줄이면
+# 그 줄이 실행돼도 assert 가 실행됐다는 뜻이 아니라 셀 수 없다 → 거부(오타 검수 10/9)
+shared = sorted(n.lineno for n in ast.walk(tree) if isinstance(n, ast.stmt) and not isinstance(n, ast.Assert) and n.lineno in want)
+if shared:
+    sys.stderr.write(f'assert 는 자기 줄에 혼자 써야 함(다른 문장과 같은 줄: {shared})\n@@asserts_run 0\n')
+    sys.exit(2)
 hit = set()
 code = compile(src, path, 'exec')
 
