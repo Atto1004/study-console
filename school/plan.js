@@ -261,8 +261,8 @@ export function createPlan(app) {
     const due = el('input'); due.name = 'due'; due.type = 'date'; due.value = ctx.today; due.setAttribute('aria-label', '마감 날짜');
     const est = el('input'); est.name = 'est'; est.type = 'number'; est.min = 5; est.max = 600; est.step = 5; est.value = 30; est.setAttribute('aria-label', '예상 분');
     const go = el('button', '추가'); go.type = 'submit'; add.append(kindSel, sel, t, due, est, go);
-    add.onsubmit = (e) => { e.preventDefault(); const text = t.value.trim(); if (!text) return; const item = { id: 'x' + Date.now().toString(36), kind: kindSel.value, c: sel.value, t: text, due: due.value, time: '', est: Math.max(5, Number(est.value) || 30) };
-      if (v60.extra.some((x) => x.c === item.c && x.t === item.t)) { app.status?.('같은 할 일이 이미 있어요.', true); return; } save((s) => { if (!s.extra.some((x) => x.id === item.id)) s.extra.push(item); }); };
+    add.onsubmit = (e) => { e.preventDefault(); const text = t.value.trim(); if (!text) return; const item = { id: 'x' + opId(), kind: kindSel.value, c: sel.value, t: text, due: due.value, time: '', est: Math.max(5, Number(est.value) || 30) };
+      if (v60.extra.some((x) => x.c === item.c && x.t === item.t)) { app.status?.('같은 할 일이 이미 있어요.', true); return; } t.value = ''; save((s) => { if (!s.extra.some((x) => x.id === item.id)) s.extra.push(item); }); };
     card.append(add);
     return card;
   }
@@ -536,6 +536,16 @@ export function createPlan(app) {
     const all = tasks();
     const sched = dayCard(all);
     const wrap = el('div', undefined, 'pl'); wrap.append(taskCard(all), nums(all, sched.fixed), sched.card);
+    // 저장이 끝날 때마다 다시 그리면 입력 중이던 글자·커서가 날아갔다(10/9) → 할 일 넣기 칸 값과 지금 커서 칸을 새 화면에 옮긴다
+    const keyOfField = (f) => `${f.closest('[data-key]')?.dataset.key || ''}|${f.closest('form')?.className || ''}|${f.name || ''}|${f.getAttribute('aria-label') || ''}`;
+    const fields = (root) => [...root.querySelectorAll('input:not([type=checkbox]),select,textarea')];
+    const active = host.contains(document.activeElement) && document.activeElement.matches('input,select,textarea') ? document.activeElement : null;
+    const keep = new Map(fields(host).filter((f) => f === active || f.closest('.pl-add')).map((f) => [keyOfField(f), f]));
+    for (const f of fields(wrap)) {
+      const old = keep.get(keyOfField(f)); if (!old) continue;
+      if (old.closest('.pl-add') || old === active) f.value = old.value;
+      if (old === active) queueMicrotask(() => { f.focus({ preventScroll: true }); try { f.setSelectionRange(old.selectionStart, old.selectionEnd); } catch {} });
+    }
     host.replaceChildren(wrap);
   }
   // 캘린더: 보이는 날(하루 = 그날, 한 주 = 월~일)을 한 번에 받아 날짜별로 기억

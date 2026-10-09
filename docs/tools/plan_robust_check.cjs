@@ -39,6 +39,13 @@ const T0 = new Date('2026-10-07T09:00:00+09:00');   // 모의 서버 날짜(10/7
   await add(p, 'A 문제'); await add(p, 'B 문제'); await p.waitForTimeout(1500);
   const ex1 = extras(p);
   expect(ex1.includes('A 문제') && ex1.includes('B 문제') && ex1.includes('다른 화면에서 넣은 것'), '409 뒤 저장 누락 ' + JSON.stringify(ex1));
+  // ①-2 입력 중 다른 저장이 끝나 다시 그려져도 할 일 칸 글자·커서 유지, 추가 누르면 비움
+  await p.fill('.pl-add input[name=t]', '쓰는 중');
+  await p.fill('.pl-task[data-key="정역학|HW Ch.5"] input[type=number]', '75'); await p.press('.pl-task[data-key="정역학|HW Ch.5"] input[type=number]', 'Tab'); await p.waitForTimeout(800);
+  const kept = await p.evaluate(() => document.querySelector('.pl-add input[name=t]')?.value);
+  await p.focus('.pl-add input[name=t]'); await p.click('.pl-add button'); await p.waitForTimeout(800);
+  const after = await p.evaluate(() => document.querySelector('.pl-add input[name=t]')?.value);
+  expect(kept === '쓰는 중' && after === '' && extras(p).includes('쓰는 중'), '다시 그리기에 입력 글자 ' + JSON.stringify({ kept, after }));
   // ②
   p.server.mode.push('500');
   await add(p, 'C 문제'); await p.waitForTimeout(800);

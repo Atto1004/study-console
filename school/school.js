@@ -1,3 +1,4 @@
+import "./uuid-polyfill.js";   // 보안 컨텍스트 아닌 주소(tailscale http)에서 crypto.randomUUID 대체 — 맨 먼저
 import {
   evidenceSummary,
   reviewQueue,
