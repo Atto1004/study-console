@@ -43,7 +43,8 @@ export function createInbox({ status } = {}) {
   const tabs = el('div', undefined, 'ib-tabs'); tabs.setAttribute('role', 'tablist');
   const body = el('div', undefined, 'ib-body');
   panel.append(head, tabs, body); document.body.append(panel);
-  let tab = 'ask', counts = {}, opener = null;
+  let tab = 'ask', counts = {}, opener = null, seq = 0;   // seq: 탭 전환·다시 읽기마다 번호 — 늦게 온 이전 응답이 본문을 덮지 않게(오타 검수 10/9)
+  const fresh = (my) => my === seq;
   const tabBtns = TABS.map(([k, n]) => { const b = el('button', undefined, 'ib-tab'); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.tab = k; b.append(el('span', n)); b.onclick = () => show(k); tabs.append(b); return b; });
   function paintTabs() { for (const b of tabBtns) { const k = b.dataset.tab; b.setAttribute('aria-selected', String(k === tab)); b.querySelector('b')?.remove(); if (counts[k]) b.append(el('b', String(counts[k]))); } }
   const close = () => { panel.hidden = true; opener?.focus?.(); };
@@ -71,14 +72,16 @@ export function createInbox({ status } = {}) {
     if (a.cap && a.type !== 'text') box.append(el('small', a.cap));
     return box;
   }
-  async function renderAsk() {
-    let asks, st;
+  async function renderAsk(my) {
+    let asks, st = null;
     try { const j = await get(new URL('../_private/asks.json', document.baseURI).href); asks = Array.isArray(j?.asks) ? j.asks : []; }
-    catch { body.replaceChildren(el('p', '확인할 목록(asks.json)을 불러오지 못했어요.', 'ib-empty')); return; }
-    try { st = await loadState(); } catch { st = {}; }
-    const ans = st.asks || {}, open = asks.filter((a) => !ans[a.id]), done = asks.filter((a) => ans[a.id]);
-    counts.ask = open.length; paintTabs();
+    catch { if (fresh(my)) body.replaceChildren(el('p', '확인할 목록(asks.json)을 불러오지 못했어요.', 'ib-empty')); return; }
+    try { st = await loadState(); } catch { st = null; }   // 못 읽으면 답한 건지 모름 — 미답변으로 세지 않고 답하기도 막음(오타 검수 10/9)
+    if (!fresh(my)) return;
+    const known = !!st, ans = st?.asks || {}, open = asks.filter((a) => !ans[a.id]), done = asks.filter((a) => ans[a.id]);
+    if (known) counts.ask = open.length; else delete counts.ask; paintTabs();
     const out = [];
+    if (!known) out.push(el('p', '답한 기록을 불러오지 못해 답변 상태를 확인 못 했어요. 잠시 뒤 다시 열어 주세요.', 'ib-empty'));
     if (!asks.length) out.push(el('p', '지금 확인할 것이 없어요.', 'ib-empty'));
     for (const a of [...open.sort((p, q) => (q.urgent ? 1 : 0) - (p.urgent ? 1 : 0)), ...done]) {
       const card = el('div', undefined, 'ib-card' + (a.urgent && !ans[a.id] ? ' urgent' : '') + (ans[a.id] ? ' done' : ''));
@@ -88,12 +91,12 @@ export function createInbox({ status } = {}) {
       const row = el('div', undefined, 'ib-row');
       if (ans[a.id]) {
         row.append(el('span', `답: ${ans[a.id].a}${ans[a.id].note ? ' · ' + ans[a.id].note : ''}`));
-        const re = el('button', '다시 답하기'); re.type = 'button'; re.onclick = async () => { re.disabled = true; try { await saveAnswer(a.id, null); renderAsk(); } catch (e) { status?.(e.message, true); re.disabled = false; } }; row.append(re);
+        const re = el('button', '다시 답하기'); re.type = 'button'; re.onclick = async () => { re.disabled = true; try { await saveAnswer(a.id, null); show('ask'); } catch (e) { status?.(e.message, true); re.disabled = false; } }; row.append(re);
       } else {
         const note = el('textarea'); note.placeholder = '메모(선택)'; note.maxLength = 500; note.setAttribute('aria-label', '메모');
         for (const o of [...(a.options?.length ? a.options : ['맞아요', '아니에요']), '모르겠어요']) {
           const b = el('button', o, o === '모르겠어요' ? '' : 'go'); b.type = 'button';
-          b.onclick = async () => { for (const y of row.querySelectorAll('button')) y.disabled = true; try { await saveAnswer(a.id, { a: o, note: note.value.trim(), at: Date.now() }); renderAsk(); } catch (e) { status?.('답을 저장하지 못했어요. ' + e.message, true); for (const y of row.querySelectorAll('button')) y.disabled = false; } };
+          b.disabled = !known; b.onclick = async () => { for (const y of row.querySelectorAll('button')) y.disabled = true; try { await saveAnswer(a.id, { a: o, note: note.value.trim(), at: Date.now() }); show('ask'); } catch (e) { status?.('답을 저장하지 못했어요. ' + e.message, true); for (const y of row.querySelectorAll('button')) y.disabled = false; } };
           row.append(b);
         }
         row.append(note);
@@ -103,11 +106,12 @@ export function createInbox({ status } = {}) {
     body.replaceChildren(...out);
   }
   // ── 메일함
-  async function renderMail(refresh) {
+  async function renderMail(my, refresh) {
     let d;
     try { if (refresh) await post('/api/mailbox/refresh'); d = await get('/api/mailbox'); }
-    catch (e) { body.replaceChildren(el('p', `메일함을 불러오지 못했어요(${e.message}).`, 'ib-empty')); return; }
-    const out = [], tools = el('div', undefined, 'ib-row'), re = el('button', d.mail?.busy ? '읽는 중…' : '다시 읽기'); re.type = 'button'; re.disabled = !!d.mail?.busy; re.onclick = () => renderMail(true);
+    catch (e) { if (fresh(my)) body.replaceChildren(el('p', `메일함을 불러오지 못했어요(${e.message}).`, 'ib-empty')); return; }
+    if (!fresh(my)) return;
+    const out = [], tools = el('div', undefined, 'ib-row'), re = el('button', d.mail?.busy ? '읽는 중…' : '다시 읽기'); re.type = 'button'; re.disabled = !!d.mail?.busy; re.onclick = () => show('mail', true);
     tools.append(re, el('small', d.mail?.ts ? `메일 ${when(d.mail.ts)} 기준` : '메일 읽은 시각 확인 못 함')); out.push(tools);
     out.push(el('div', '확인할 메일', 'ib-sec'));
     if (!d.mail?.ok) out.push(el('p', d.mail?.err ? `메일을 읽지 못했어요: ${d.mail.err}` : '메일을 아직 읽지 못했어요.', 'ib-empty'));
@@ -124,8 +128,9 @@ export function createInbox({ status } = {}) {
     body.replaceChildren(...out);
   }
   // ── 결재함
-  async function renderAppr() {
-    let d; try { d = await get('/api/approvals'); } catch (e) { body.replaceChildren(el('p', `결재함을 불러오지 못했어요(${e.message}).`, 'ib-empty')); return; }
+  async function renderAppr(my) {
+    let d; try { d = await get('/api/approvals'); } catch (e) { if (fresh(my)) body.replaceChildren(el('p', `결재함을 불러오지 못했어요(${e.message}).`, 'ib-empty')); return; }
+    if (!fresh(my)) return;
     counts.appr = d.count || 0; paintTabs();
     const out = [];
     if (d.attention?.length) { out.push(el('div', '캘린더 확인 필요', 'ib-sec')); for (const a of d.attention) out.push(apprCard(a, false)); }
@@ -145,7 +150,7 @@ export function createInbox({ status } = {}) {
     const decide = async (decision, answer, label) => {
       if (!confirm(`결재 #${a.id} 「${a.title}」 — ${label} 할까요?`)) return;
       for (const y of row.querySelectorAll('button,textarea')) y.disabled = true;
-      try { await post('/api/approvals/decide', { id: a.id, decision, answer: answer || '' }); status?.(`결재 #${a.id} ${label}`); renderAppr(); }
+      try { await post('/api/approvals/decide', { id: a.id, decision, answer: answer || '' }); status?.(`결재 #${a.id} ${label}`); if (tab === 'appr') show('appr'); }
       catch (e) { status?.('결재를 처리하지 못했어요. ' + e.message, true); for (const y of row.querySelectorAll('button,textarea')) y.disabled = false; }
     };
     if (a.dtype === 'choose' && opts.length) for (const o of opts) { const b = el('button', String(o), 'go'); b.type = 'button'; b.onclick = () => decide('chosen', String(o), `「${o}」 선택`); row.append(b); }
@@ -154,7 +159,7 @@ export function createInbox({ status } = {}) {
     c.append(row); return c;
   }
   // ── 연동
-  async function renderLink() {
+  async function renderLink(my) {
     const out = [], card = el('div', undefined, 'ib-card'), grid = el('div', undefined, 'ib-st'); card.append(grid); out.push(card);
     const line = (name, state, msg) => { grid.append(el('span', state === true ? '연결' : state === false ? '끊김' : '모름', state === true ? 'ib-ok' : state === false ? 'ib-bad' : 'ib-unk')); const d = el('div'); d.append(el('b', name)); if (msg) d.append(el('small', ' · ' + msg)); grid.append(d); };
     let bad = 0;
@@ -168,17 +173,18 @@ export function createInbox({ status } = {}) {
     catch (e) { line('구글 캘린더', false, `받지 못함(${e.message})`); bad++; }
     try { const l = await get('/api/kingdom/limits'); for (const [k, n] of [['atom', '토큰 · 아톰'], ['otta', '토큰 · 오타']]) { const v = l[k]; line(n, v ? !!v.ok : null, v ? (v.ok ? `현재 세션 ${v.session?.used ?? '?'}%` : v.usage_err || '읽지 못함') : '값 없음'); if (v && !v.ok) bad++; } }
     catch (e) { line('토큰 한도', null, `불러오지 못함(${e.message})`); }
+    if (!fresh(my)) return;
     counts.link = bad; paintTabs();
     body.replaceChildren(...out);
   }
-  async function show(k) {
-    tab = k; title.textContent = TABS.find((t) => t[0] === k)[1]; paintTabs();
+  async function show(k, refresh) {
+    const my = ++seq; tab = k; title.textContent = TABS.find((t) => t[0] === k)[1]; paintTabs();
     body.replaceChildren(el('p', '불러오는 중…', 'ib-empty'));
-    await ({ ask: renderAsk, mail: () => renderMail(false), appr: renderAppr, link: renderLink })[k]();
+    await ({ ask: () => renderAsk(my), mail: () => renderMail(my, !!refresh), appr: () => renderAppr(my), link: () => renderLink(my) })[k]();
   }
   // 숫자(빨간 점)만 미리: 확인 안 한 질문·결재 대기
   async function peek() {
-    try { const j = await get(new URL('../_private/asks.json', document.baseURI).href); const st = await loadState().catch(() => ({})); counts.ask = (j.asks || []).filter((a) => !(st.asks || {})[a.id]).length; } catch {}
+    try { const j = await get(new URL('../_private/asks.json', document.baseURI).href); const st = await loadState(); counts.ask = (j.asks || []).filter((a) => !(st.asks || {})[a.id]).length; } catch { delete counts.ask; }   // 못 읽으면 세지 않음
     try { counts.appr = (await get('/api/approvals')).count || 0; } catch {}
     paintTabs(); return counts;
   }

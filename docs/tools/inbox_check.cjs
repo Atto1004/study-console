@@ -39,6 +39,18 @@ const { chromium } = require('C:/Users/user/Desktop/아톰OS/기술실/study-con
   // ⑥
   await p.mouse.click(200, 400); await p.waitForTimeout(200);
   expect(await p.evaluate(() => document.querySelector('.ib-panel').hidden), '바깥 눌러도 안 닫힘');
+  // ⑦ (오타 RED) 늦게 온 확인 응답이 메일함을 덮지 않음
+  await p.route('**/_private/asks.json', async (r) => { await new Promise((ok) => setTimeout(ok, 1500)); return r.continue(); });
+  await p.click('.gl-menu'); await p.click('.gl-pop button:has-text("확인")'); await p.waitForTimeout(150);
+  await p.click('.ib-tab[data-tab="mail"]'); await p.waitForTimeout(2200);
+  expect(await p.evaluate(() => document.querySelector('.ib-head h2').textContent === '메일함' && /HW Ch\.5 제출 안내/.test(document.querySelector('.ib-body').textContent) && !/판서 사진/.test(document.querySelector('.ib-body').textContent)), '늦은 확인 응답이 메일함을 덮음');
+  await p.unroute('**/_private/asks.json');
+  // ⑧ (오타 RED) 공부 기록을 못 읽으면 답 상태 모름: 안내·답하기 막힘·빨간 점에 안 셈
+  await p.unroute('**/api/study/state');
+  await p.route('**/api/study/state', (r) => r.fulfill({ status: 500, body: 'x' }));
+  await p.click('.ib-tab[data-tab="ask"]'); await p.waitForTimeout(900);
+  const unk = await p.evaluate(() => ({ note: /답변 상태를 확인 못/.test(document.querySelector('.ib-body').textContent), live: [...document.querySelectorAll('.ib-body .ib-card button')].filter((x) => !x.disabled && /맞아요|아니에요|모르겠어요/.test(x.textContent)).length, badge: document.querySelector('.ib-tab[data-tab="ask"] b')?.textContent || '' }));
+  expect(unk.note && unk.live === 0 && unk.badge === '', '공부 기록 실패 시 ' + JSON.stringify(unk));
   expect(!errors.length, '오류 ' + errors.join(' | '));
   console.log(fail.length ? 'FAIL ' + JSON.stringify(fail) : 'inbox: ≡ 빨간 점·네 항목·확인 답 저장·메일함·결재 승인·연동 상태·바깥 닫힘 ok');
   await b.close(); process.exit(fail.length ? 1 : 0);
