@@ -46,6 +46,7 @@ cases = [   # (이름, 강의안 바꾸기, 검산 바꾸기, 나와야 하는 �
     ('mood 틀림', setk(L0, 'mood', 'angry'), None, 'mood 는'),
     ('판서 빠짐', lambda d: S0(d)['script'].pop('s1-3:0'), None, '대사 없는 판서 단계'),
     ('구간 끊김', lambda d: d['sections'][1]['script'].__setitem__('s1-3:0', S0(d)['script'].pop('s1-3:0')), None, '이어진 구간이 아님'),
+    ('짧은 섹션', lambda d: [v.__setitem__(slice(1, None), []) for v in S0(d)['script'].values()], None, '1,000자'),
     ('없는 판서', lambda d: S0(d)['script'].__setitem__('s9-9:0', [{'say': '가', 'mood': 'neutral'}]), None, '없는 판서 단계'),
     ('근거 없는 강조', setk(S0, 'exam', '시험에 꼭 나와요'), None, 'exam(교수님 강조)에는 근거'),
     ('sources 없음', lambda d: d.pop('sources'), None, 'sources: [{label, href}]'),

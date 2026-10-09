@@ -42,5 +42,8 @@ assert close(math.degrees(math.acos(1 / math.sqrt(2))), 45) and close(math.degre
 e = (1 / math.sqrt(2), -1 / math.sqrt(2), 0); s = dot((3, 1, 0), e)
 assert close(s, math.sqrt(2), 1e-12) and close(s * e[0], 1, 1e-9) and close(s * e[1], -1, 1e-9)
 assert close(dot((2, 2, 0), e), 0, 1e-12) and dot((3, 1, 0), (1, -1, 0)) == 2
+# 보강 대사 숫자(10/9): s2-1:1 「1,2,3 과 4,5,6 → 32」 · s4-3:0 「크기 2·3 직각 → 넓이 6」
+assert dot((1, 2, 3), (4, 5, 6)) == 32
+assert close(2 * 3 * math.sin(math.radians(90)), 6, 1e-12)
 print('검산 문항: c1 c2 c3 c4 c5 w1 w2 w3 q3 q4')   # q3·q4 는 개념 문항(식 고르기)이라 위 assert 로 정답 식을 확인
 

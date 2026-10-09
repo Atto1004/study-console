@@ -134,6 +134,8 @@ for k, sec in enumerate(secs):
         if sid in seen: err(f'{name}: 판서 단계 {sid} 가 두 섹션에 들어감')
         seen.add(sid); order.append(sid); mine.append(pos[sid])
         check_lines(f'{name}/{sid}', says)
+    sec_chars = sum(len(x.get('say', '')) for v in script.values() if isinstance(v, list) for x in v if isinstance(x, dict) and isinstance(x.get('say'), str))
+    if sec_chars < 1000: err(f'{name}: 섹션 대사 {sec_chars}자 — 1,000자(약 1분 40초) 이상으로 더 자세히(대표님 10/9 「설명을 더 길고 자세하게」)')
     if mine and mine != list(range(mine[0], mine[0] + len(mine))):
         err(f'{name}: 판서 단계가 판서 순서대로 이어진 구간이 아님(빠지거나 순서가 바뀜)')
     c = sec.get('check')
