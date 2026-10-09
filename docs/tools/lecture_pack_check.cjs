@@ -64,6 +64,31 @@ const SHOT = process.env.SHOT_DIR;
   if (SHOT) await p.screenshot({ path: SHOT + '/pack-s2.png' });
   const sess = posts.filter((x) => x.k === 'session').at(-1);
   expect(sess && /^s2-1:0$/.test(sess.b.stepId), '세션 저장 위치 ' + sess?.b?.stepId);
+  const positions = () => posts.filter((x) => x.k === 'event' && x.b.kind === 'position').map((x) => x.b.index);
+  // ⑥ 자연 재생: 건너뛰지 않고 기다리면 강의가 끝나고 저절로 다음 판서로(오타 검수 10/9)
+  const n0 = positions().length;
+  for (let i = 0; i < 40 && positions().length === n0; i++) await p.waitForTimeout(500);
+  expect(positions().length === n0 + 1, '자연 재생 뒤 저절로 다음 판서로 안 감 ' + (positions().length - n0));
+  // ⑦ 넘김 겹침: ⏭ 를 쉬지 않고 연타해도 수업 순서를 건너뛰지 않음
+  for (let k = 0; k < 8; k++) await p.click('.v3-skip').catch(() => {});
+  await p.waitForTimeout(1500);
+  // ⑧ 끝까지: 판서는 넘기고 문제는 정답(보기 순서 = 문항 순서)으로 → 학습지 → 결과 창
+  let done = false;
+  for (let i = 0; i < 2500 && !done; i++) {
+    done = await p.evaluate(() => !!document.getElementById('panel')?.open && /수업 완료/.test(document.getElementById('panel').textContent));
+    if (done) break;
+    const at = positions().at(-1) ?? route[0], step = lesson.steps[at];
+    const bs = await p.$$('#choices button[data-opt]');
+    if (step?.options && bs.length === step.options.length && (await st()).lecture !== 'playing') { await bs[step.answer].click(); await p.waitForTimeout(2600); }
+    else { await p.click('.v3-skip').catch(() => {}); await p.waitForTimeout(80); }
+  }
+  expect(done, '학습지 끝 결과 창(수업 완료) 안 뜸');
+  const all = positions();
+  expect(JSON.stringify(all) === JSON.stringify(route.slice(1, all.length + 1)) && all.length === route.length - 1, '전체 위치가 수업 순서와 다름 ' + all.length + '/' + (route.length - 1));
+  const answered = new Set(posts.filter((x) => x.b.kind === 'answer' && x.b.correct !== false).map((x) => x.b.step));
+  for (const id of [...pack.sections.map((s) => s.check), ...pack.worksheet]) expect(answered.has(id), '답 기록 없음 ' + id);
+  expect(!posts.some((x) => x.k === 'event' && x.b.kind === 'read'), '끝까지 가는 동안 「읽음」 기록이 남음');
+  if (SHOT) await p.screenshot({ path: SHOT + '/pack-finish.png' });
   expect(!errors.length, '페이지 오류 ' + errors.join(' | '));
   console.log(JSON.stringify({ labels: [...seen], s2: s2.label, positions: pos.length, answers: posts.filter((x) => x.b.kind === 'answer').map((x) => x.b.step) }));
   console.log(fail.length ? 'FAIL ' + JSON.stringify(fail) : 'lecture pack: 입장 회상·판서 무질문·섹션 확인·읽음 없음·순서 ok');
