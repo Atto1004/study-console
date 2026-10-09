@@ -20,6 +20,7 @@ import { loadPack, packRoute, packLines, label as packLabel } from "./lecture-pa
 import { createDialog } from "./vn-dialog.js";
 import { createLectureUi } from "./lecture-ui.js";
 import { setupWideRoom } from "./room-wide.js";
+import { setupShell } from "./shell.js";
 import { startClassroomV3 } from "./classroom-v3.js";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
@@ -2376,6 +2377,8 @@ const MOOD={smile:'smile',serious:'strict',think:'neutral',neutral:'neutral'};
 const vn = v3?.stage ? createDialog(v3.stage, { onNext: () => advance() }) : null;
 lectureUi = createLectureUi({ goRoute });
 setupWideRoom(v3);   // 강의실 배치 A: 와이드 칠판·대사창·버튼 한 줄·대화 서랍(대표님 10/9)
+// 화면 틀(10/9 「초심으로」): 위 고정 줄(GREENLIGHT | SCHOOL·탭·비서 토큰·대표실) + 아래 고정 스앵님·채팅 바
+const shell = setupShell({ api, eventId, course: () => course || '', history: () => (state?.events || []).filter(e => e.kind === 'question' && e.mode === 'consultation') });
 lecture = createLecture({
   ctx:()=>current?{lesson:current,step:current.steps[index],index,course,passed}:null,
   script:step=>curPack()?packLines(curPack(),step.id):null,

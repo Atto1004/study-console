@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>기본 캐릭터 뼈대</title>
+<style>
+:root{color-scheme:light}
+body{margin:0;padding:20px;background:#f4f6f3;font:500 14px/1.5 "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#1f3d33}
+h1{font-size:18px;margin:0 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+.cell{background:#fff;border-radius:14px;padding:8px;text-align:center;box-shadow:0 1px 0 #d9e1d8}
+.cell .stage{height:190px}
+</style></head><body>
+<h1>기본 캐릭터 뼈대 — 표정 7 · 동작 4 · 스킨 교체</h1>
+<div class="grid" id="g"></div>
+<script type="module">
+import { createRig } from '../../school/rig.js';
+const g = document.getElementById('g');
+const cell = (label) => { const c = document.createElement('div'); c.className = 'cell'; const s = document.createElement('div'); s.className = 'stage'; c.append(s, label); g.append(c); return s; };
+for (const e of ['neutral', 'smile', 'laugh', 'think', 'serious', 'surprise', 'sad']) createRig(cell('표정 ' + e)).setExpr(e);
+for (const m of ['talk', 'wave', 'point', 'nod']) { const r = createRig(cell('동작 ' + m)); r.setExpr('smile'); if (m === 'talk') r.speak('설명을 하고 있어요 계속 말하는 중이에요'); else r.play(m, 60000); }
+const r = createRig(cell('스킨 색 바꿈'), { skin: { colors: { hair: '#7a4b2a', top: '#2e6b52', bottom: '#1f2a33', skin: '#f6dcc8' } } }); r.setExpr('smile');
+</script></body></html>

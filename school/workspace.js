@@ -195,7 +195,45 @@ export function createWorkspace(app){
   function practiceIn(course){
     return app.practice?app.practice(course):startCourse(course);
   }
+  // 메인 = 시험 대비 대시보드(대표님 10/9 「초심으로 — 디데이·남은 공부량·오늘 일정·공부 계획」). 스앵님 대화는 화면 아래 고정 바(shell.js).
+  function renderDashboard(){
+    const rows=examMetrics(), grid=el('div',undefined,'db-grid');
+    const go=name=>()=>startCourse(name);
+    // ① 시험 D-day
+    const dday=card('시험 D-day','db-card db-dday');
+    const exams=rows.filter(r=>r.exam);
+    if(!exams.length)dday.append(el('p','등록된 시험이 없어요.','db-empty'));
+    for(const r of exams){const b=btn('',go(r.name),'db-row db-exam'+(r.exam.dday<=3?' soon':''));
+      const left=el('span',undefined,'db-l');left.append(el('b',r.name),el('small',`${r.exam.date}${r.exam.time?' '+r.exam.time:''}${r.exam.assumed?' · 예정':''}`));
+      b.append(el('strong',ddayLabel(r.exam.dday),'db-d'),left,el('span',`준비도 ${r.m.readiness}`,'db-ready'));dday.append(b);}
+    // ② 남은 공부량
+    const remain=card('남은 공부량','db-card db-remain');
+    const total=rows.reduce((n,r)=>n+r.m.remaining,0);
+    remain.append(el('p',`시험 범위 수업 ${total}회차 남음`,'db-total'));
+    const PACE={ok:'여유',tight:'빠듯',behind:'밀림',none:''};
+    for(const r of rows){if(!r.m.scope)continue;const b=btn('',go(r.name),'db-row db-course pace-'+r.m.pace);
+      const bar=el('span',undefined,'db-bar'),fill=el('i');fill.style.width=Math.round(r.m.progress*100)+'%';bar.append(fill);
+      const left=el('span',undefined,'db-l');left.append(el('b',r.name),bar);
+      const right=el('span',undefined,'db-r');right.append(el('b',`${r.m.remaining}회차`),el('small',r.m.daysLeft>0&&r.m.remaining?`하루 ${Number.isFinite(r.m.perDay)?Math.round(r.m.perDay*10)/10:r.m.remaining}회차${PACE[r.m.pace]?' · '+PACE[r.m.pace]:''}`:(r.m.remaining?'오늘까지':'다 했어요')));
+      b.append(left,right);remain.append(b);}
+    // ③ 오늘 일정(수업·캘린더·오늘 마감, 시간순) + 다가오는 마감
+    const today=card('오늘 일정','db-card db-today'),items=[];
+    for(const c of data.scheduled.filter(x=>!x.record?.cancelled))items.push({t:c.s,e:c.e,title:c.course+' 수업',kind:'class'});
+    for(const ev of (calendar?.events||[])){const title=/^\s*운선/.test(ev.title||'')?'개인 일정':(ev.title||'일정');items.push({t:ev.allDay?'':(ev.start||''),e:ev.end||'',title,kind:'cal'});}
+    const due=assignments?pendingDeadlines(assignments.rows||[],data.date):[];
+    for(const d of due.filter(r=>r.deadlineDays===0))items.push({t:d.deadlineTime||'',title:`${d.course} · ${d.title} 마감`,kind:'due'});
+    items.sort((a,b)=>(a.t||'00:00').localeCompare(b.t||'00:00'));
+    if(!items.length)today.append(el('p',calendar?.verified?'오늘 일정이 없어요.':'캘린더를 확인하지 못했어요. 수업 시간표만 보여요.','db-empty'));
+    for(const it of items){const row=el('div',undefined,'db-row db-item kind-'+it.kind);row.append(el('span',it.t?(it.e?`${it.t}–${it.e}`:it.t):'종일','db-time'),el('span',it.title,'db-title'));today.append(row);}
+    const soon=due.filter(r=>r.deadlineDays>0&&r.deadlineDays<=3);
+    if(soon.length){today.append(el('h3','다가오는 마감','db-sub'));for(const d of soon){const b=btn('',()=>open('assignments'),'db-row db-item kind-due');b.append(el('span',`D-${d.deadlineDays}`,'db-time'),el('span',`${d.course} · ${d.title}`,'db-title'));today.append(b);}}
+    // ④ 공부 계획
+    const plan=card('공부 계획','db-card db-plan');renderPlans(plan);
+    grid.append(dday,remain,today,plan);root.append(grid);
+  }
   function renderMain(){
+    renderDashboard();
+    if(true)return;   // 옛 복도 화면(renderCorridor)·상담 카드는 대시보드로 대체(10/9). 아래는 되돌릴 때를 위해 남김
     renderCorridor();
     const written=data.exams.filter(e=>e.written&&e.kind==='중간');
     const exams=card('','exam-board other-exams');
