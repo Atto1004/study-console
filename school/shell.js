@@ -137,8 +137,9 @@ export function setupShell({ api, eventId, course = () => '', history = () => []
     } catch { setGauge(gAtom, null, '—', '사용량을 못 읽었어요'); setGauge(gOtta, null, '—', '사용량을 못 읽었어요'); }
     try {
       const r = await fetch('/api/toto/budget', { credentials: 'same-origin', cache: 'no-store' }); if (!r.ok) throw new Error(r.status);
-      const j = await r.json(); const spent = Number(j?.spent), budget = Number(j?.budget);
-      if (!Number.isFinite(spent) || spent < 0 || !Number.isFinite(budget) || budget <= 0) throw new Error('예산 응답 이상');   // 빈 응답을 $0 으로 보이지 않게(오타 검수 10/9)
+      const j = await r.json(); const spent = j?.spent, budget = j?.budget;
+      // 숫자 자료형만(null·"" 가 Number() 로 0 이 되지 않게, 오타 검수 10/9)
+      if (typeof spent !== 'number' || typeof budget !== 'number' || !Number.isFinite(spent) || spent < 0 || !Number.isFinite(budget) || budget <= 0) throw new Error('예산 응답 이상');   // 빈 응답을 $0 으로 보이지 않게(오타 검수 10/9)
       setGauge(gToto, spent / budget * 100, '$' + spent.toFixed(2), `토토 이번 달 $${spent.toFixed(2)} / $${budget}`);
     } catch { setGauge(gToto, null, '—', '토토 예산을 못 읽었어요'); }
   }

@@ -122,7 +122,7 @@ export function createRig(host, { skin, label = '캐릭터' } = {}) {
     const b = shape.getBBox(); shape.style.visibility = 'hidden';
     el('image', { 'data-skin': kind, 'data-of': part, href: url, x: b.x, y: b.y, width: b.width, height: b.height, preserveAspectRatio: 'xMidYMid meet' }, shape.parentNode);
   });
-  const clear = (kind) => { svg.querySelectorAll(`image[data-skin${kind ? `="${kind}"` : ''}]`).forEach((x) => { svg.querySelectorAll(`[data-part="${x.dataset.of}"]`).forEach((sh) => { sh.style.visibility = ''; }); x.remove(); }); };
+  const clear = (kind) => { svg.querySelectorAll(`image[data-skin${kind ? `="${kind}"` : ''}]`).forEach((x) => { svg.querySelectorAll(`[data-part="${x.dataset.of}"]`).forEach((sh) => { sh.style.visibility = ''; }); if (x === talkImg) talkImg = null; x.remove(); }); };   // 말하기 그림을 걷으면 참조도 비워 다음 입 프레임에 새 스킨으로 다시(오타 검수 10/9)
   function applyExprSkin() {   // 지금 표정(말하는 중이면 입은 talk 그림)에 맞는 표정 부위 그림
     clear('expr');
     const set = skinNow.expr?.[expr] || {};

@@ -23,6 +23,10 @@ const { chromium } = require('C:/Users/user/Desktop/아톰OS/기술실/study-con
     rig.speak('말하는 중이에요'); await new Promise((res) => setTimeout(res, 300)); out.talking = imgs('talk') === 1 && !vis('mouth');
     await new Promise((res) => setTimeout(res, 1600)); out.talkDone = imgs('talk') === 0 && vis('mouth');
     rig.setSkin({ parts: { face: img('red') } }); rig.setSkin({ parts: { face: img('blue') } }); out.noStack = imgs('part') === 1;
+    // 말하는 중 스킨 교체 → 다음 입 프레임에 새 말하기 그림 1개
+    rig.setSkin({ talk: { mouth: [img('#111'), img('#999')] } }); rig.speak('말하는 중에 스킨을 바꿔 봐요 계속 말해요');
+    await new Promise((res) => setTimeout(res, 250)); rig.setSkin({ talk: { mouth: [img('#f00'), img('#0f0')] } });
+    await new Promise((res) => setTimeout(res, 250)); out.talkAfterSkin = imgs('talk') === 1 && /f00|0f0/.test(decodeURIComponent(rig.el.querySelector('image[data-skin=talk]')?.getAttribute('href') || ''));
     return out;
   });
   const fail = Object.entries(r).filter(([, v]) => !v).map(([k]) => k);

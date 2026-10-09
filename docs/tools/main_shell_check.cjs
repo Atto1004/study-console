@@ -53,13 +53,15 @@ const [W, H] = [+process.argv[2] || 1194, +process.argv[3] || 834];
   await p.keyboard.press('Escape'); await p.waitForTimeout(150);
   expect(await p.evaluate(() => document.querySelector('.sb-bubble').hidden), 'Esc 로 말풍선 안 닫힘');
   // 예산 응답이 비면 $0 이 아니라 「—」
+  for (const body of ['{}', '{"spent":null,"budget":10}', '{"spent":"","budget":10}']) {
   const q = await b.newPage({ viewport: { width: W, height: H } });
-  await q.route('**/api/toto/budget', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{}' }));
+  await q.route('**/api/toto/budget', (r) => r.fulfill({ status: 200, contentType: 'application/json', body }));
   await q.addInitScript(() => { localStorage.setItem('school-setup', 'solo'); localStorage.setItem('school-view', 'site'); });
   await q.goto('http://127.0.0.1:8797/school/index.html'); await q.waitForSelector('.db-grid', { timeout: 15000 }); await q.waitForTimeout(1200);
   const toto = await q.evaluate(() => document.querySelectorAll('.gl-gauge')[2].textContent.replace(/\s+/g, ''));
-  expect(toto === '토토—', '빈 예산 응답 표시 ' + toto);
+  expect(toto === '토토—', '빈 예산 응답 표시 ' + body + ' → ' + toto);
   await q.close();
+  }
   // 교실 들어가면 아래 바 숨김
   await p.goto('http://127.0.0.1:8797/school/index.html?lesson=statics-2026-09-14');
   await p.waitForFunction(() => document.querySelector('.school').dataset.mode === 'classroom', null, { timeout: 15000 }); await p.waitForTimeout(500);
