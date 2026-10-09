@@ -50,10 +50,12 @@ cases = [   # (이름, 강의안 바꾸기, 검산 바꾸기, 나와야 하는 �
     ('근거 없는 강조', setk(S0, 'exam', '시험에 꼭 나와요'), None, 'exam(교수님 강조)에는 근거'),
     ('sources 없음', lambda d: d.pop('sources'), None, 'sources: [{label, href}]'),
     ('summary 없음', lambda d: d.pop('summary'), None, 'summary: 한 장 요약'),
-    ('검산 주석뿐', None, lambda v: "# assert\nprint('검산 문항: c1 c2 c3 c4 c5 w1 w2 w3 q3 q4')\n", '실행되는 assert 0개'),
+    ('검산 주석뿐', None, lambda v: "# assert\nprint('검산 문항: c1 c2 c3 c4 c5 w1 w2 w3 q3 q4')\n", '실제로 실행된 assert 0개'),
     ('검산 실패', None, lambda v: v + '\nassert 1 == 2\n', '검산 실패'),
     ('검산 문항 빠짐', None, lambda v: v.replace(" q3 q4')", "')"), "검산 안 한 문항: ['q3', 'q4']"),
-    ('검산 문항 줄 없음', None, lambda v: v.replace("print('검산 문항:", "print('done:"), '검산 문항: c1 c2 …」 를 출력'),
+    ('검산 문항 줄 없음', None, lambda v: v.replace("print('검산 문항:", "print('done:"), '마지막 줄이 「검산 문항'),
+    ('검산 실행 안 됨', None, lambda v: "if False:\n" + "".join("    assert False\n" for _ in range(12)) + "print('검산 문항: c1 c2 c3 c4 c5 w1 w2 w3 q3 q4')\n", '실제로 실행된 assert 0개'),
+    ('문항 줄 뒤 출력', None, lambda v: v + "\nprint('끝')\n", '마지막 줄이 「검산 문항'),
 ]
 bad = []
 code, out, errout = run()

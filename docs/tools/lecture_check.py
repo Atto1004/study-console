@@ -4,7 +4,7 @@
 # 규격의 필수 조건은 전부 「오류」. 「주의」는 사람이 보고 판단할 것.
 # 이 도구가 확인하는 것은 형식·연결·검산 스크립트 통과까지다. 대본이 근거와 맞는지, 오답이 정말 그 실수에서 나오는지,
 # 정답이 유일한지, 확인 문제가 그 예제의 변형인지는 오타 내용 검수가 본다.
-import json, re, sys, os, subprocess, ast
+import json, re, sys, os, subprocess
 sys.stdout.reconfigure(encoding='utf-8')
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.chdir(ROOT)
@@ -161,28 +161,26 @@ if ws and kinds != KINDS: err(f'학습지 구성 {kinds} — 개념 2 · 변형 
 for dup in sorted({x for x in wids if wids.count(x) > 1}): err(f'학습지 문항 중복: {dup}')
 for x in sorted(set(wids) & set(checks)): err(f'{x}: 확인 문제와 학습지에 같은 문항')
 
-# ── 검산 스크립트: 실행해 종료 0 + 마지막에 「검산 문항: c1 c2 …」 줄로 검산한 문항을 밝히고,
-#    확인·학습지 문항이 전부 그 줄에 있어야 하며, 실행되는 assert 문(주석 아님)이 문항 수 이상이어야 한다.
+# ── 검산 스크립트: verify_runner.py 로 실행해 종료 0, **실제로 실행된** assert(줄 기준) 수가 확인+학습지 문항 수 이상,
+#    표준 출력의 **마지막 비어 있지 않은 줄**이 「검산 문항: c1 c2 …」 이고 확인·학습지 문항 id 가 전부 있어야 한다(오타 검수 10/9).
 vpath = sys.argv[sys.argv.index('--verify') + 1] if '--verify' in sys.argv else f'knowledge/lectures/{lesson_id}.verify.py'
 if not os.path.exists(vpath):
     err(f'검산 스크립트 없음: {vpath} (예제·확인·학습지 정답과 오답 해설 숫자를 assert 로)')
 else:
-    code = open(vpath, encoding='utf-8').read()
-    try:
-        asserts = sum(isinstance(n, ast.Assert) for n in ast.walk(ast.parse(code)))
-    except SyntaxError as e:
-        asserts = 0; err(f'검산 스크립트 문법 오류: {e}')
-    r = subprocess.run([sys.executable, '-I', '-X', 'utf8', vpath], capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=60)   # -X utf8: 파이프로 받을 때 한글이 cp949 로 깨지지 않게
-    out = (r.stdout or '') + (r.stderr or '')
+    runner = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'verify_runner.py')
+    r = subprocess.run([sys.executable, '-I', '-X', 'utf8', runner, os.path.abspath(vpath)], capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=60)   # -X utf8: 파이프로 받을 때 한글이 cp949 로 깨지지 않게
+    ran = re.search(r'@@asserts_run (\d+)\s*$', r.stderr or '')
     if r.returncode != 0:
-        err(f'검산 실패: {out.strip().splitlines()[-1] if out.strip() else r.returncode}')
+        msg = [x for x in (r.stderr or r.stdout or '').strip().splitlines() if not x.startswith('@@')]
+        err(f'검산 실패: {msg[-1] if msg else r.returncode}')
     else:
-        m = re.search(r'검산 문항:[ \t]*([^\r\n]+)', r.stdout or '')
-        done = set(m.group(1).split()) if m else set()
+        last = next((x.strip() for x in reversed((r.stdout or '').splitlines()) if x.strip()), '')
+        m = re.fullmatch(r'검산 문항:\s*(.+)', last)
         need = set(checks) | set(wids)
-        if not m: err('검산 스크립트가 마지막에 「검산 문항: c1 c2 …」 를 출력해야 함')
-        elif need - done: err(f'검산 안 한 문항: {sorted(need - done)}')
-        if asserts < len(need): err(f'실행되는 assert {asserts}개 — 확인·학습지 문항 수({len(need)}) 이상이어야 함')
+        if not m: err('검산 스크립트 표준 출력의 마지막 줄이 「검산 문항: c1 c2 …」 이어야 함')
+        elif need - set(m.group(1).split()): err(f'검산 안 한 문항: {sorted(need - set(m.group(1).split()))}')
+        n = int(ran.group(1)) if ran else 0
+        if n < len(need): err(f'실제로 실행된 assert {n}개 — 확인·학습지 문항 수({len(need)}) 이상이어야 함')
 
 chars = sum(len(x) for x in lines)
 print(f'{lesson_id}: 섹션 {len(secs)} · 판서 {len(seen)}/{len(ids)} · 대사 {len(lines)}줄 · 약 {round(chars * 0.095 / 60, 1)}분 · 학습지 {len(ws)}')
