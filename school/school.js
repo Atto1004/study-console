@@ -2385,7 +2385,7 @@ lectureUi = createLectureUi({ goRoute });
 setupWideRoom(v3);   // 강의실 배치 A: 와이드 칠판·대사창·버튼 한 줄·대화 서랍(대표님 10/9)
 setupSeatRoom();   // 교실 = 내 자리에서 본 장면: 칠판·교탁 앞 스앵님·책상 위 대사창(대표님 10/9 「착석 시점, 연애 시뮬 느낌」)
 // 화면 틀(10/9 「초심으로」): 위 고정 줄(GREENLIGHT | SCHOOL·탭·비서 토큰·대표실) + 아래 고정 스앵님·채팅 바
-const shell = setupShell({ api, eventId, openArea: a => workspace.open(a), course: () => course || '', history: () => (state?.events || []).filter(e => e.kind === 'question' && e.mode === 'consultation') });
+const shell = setupShell({ api, eventId, openArea: a => workspace.open(a), course: () => course || '', history: () => (state?.events || []).filter(e => e.kind === 'question' && e.mode === 'consultation'), status });
 lecture = createLecture({
   ctx:()=>current?{lesson:current,step:current.steps[index],index,course,passed}:null,
   script:step=>curPack()?packLines(curPack(),step.id):null,

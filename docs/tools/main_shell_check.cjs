@@ -35,10 +35,10 @@ const [W, H] = [+process.argv[2] || 1194, +process.argv[3] || 834];
   expect(top.plan.has, '공부 계획(오늘 할 과제)이 안 뜸');
   expect(top.countdown.length === 3 && top.countdown.every((t) => t && t !== '곧'), '재설정 카운트다운 ' + JSON.stringify(top.countdown));
   expect(top.mapHidden, '지도 아이콘이 아직 보임');
-  // ≡ 목록: 열면 학교 지도 + 기존 더보기 항목, 바깥 누르면 닫힘
+  // ≡ 목록: 열면 확인·메일함·결재함·연동 상태 + 학교 지도 + 기존 더보기 항목, 바깥 누르면 닫힘
   await p.click('.gl-menu'); await p.waitForTimeout(200);
   const menu = await p.evaluate(() => ({ open: !document.querySelector('.gl-pop').hidden, items: [...document.querySelectorAll('.gl-pop button')].map((b) => b.textContent) }));
-  expect(menu.open && menu.items[0] === '학교 지도' && menu.items.length >= 2, '≡ 목록 ' + JSON.stringify(menu));
+  expect(menu.open && /^확인/.test(menu.items[0]) && menu.items[1] === '메일함' && /^결재함/.test(menu.items[2]) && menu.items[3] === '연동 상태' && menu.items.includes('학교 지도'), '≡ 목록 ' + JSON.stringify(menu));   // 맨 위 확인·메일함·결재함·연동(10/9)
   await p.mouse.click(40, Math.round(H / 2)); await p.waitForTimeout(200);
   expect(await p.evaluate(() => document.querySelector('.gl-pop').hidden), '≡ 목록이 바깥 눌러도 안 닫힘');
   expect(!top.hscroll, '가로 스크롤');

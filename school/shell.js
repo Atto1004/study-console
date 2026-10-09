@@ -3,6 +3,7 @@
 // 수업(교실) 화면에서는 아래 줄을 숨긴다(교실은 자기 조작 줄이 있음). index.html·v3.css 는 건드리지 않고 이 모듈이 덮는다.
 import { createRig } from './rig.js';
 import { officeHref } from './worldmap.js';
+import { createInbox } from './inbox.js';
 
 const CSS = `
 .school{--gl-top:64px;--gl-bottom:96px}
@@ -34,6 +35,7 @@ const CSS = `
 .gl-mock{font:600 11px/1 "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#b07a1a;background:#fff6e5;border:1px solid #f0d9a8;border-radius:999px;padding:4px 8px;white-space:nowrap}
 .gl-mock[hidden]{display:none}
 .gl-menu{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:10px;border:1px solid #dde5e0;background:#fff;color:#1f3d33;cursor:pointer;padding:0}
+.gl-menu{position:relative}.gl-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:4px;background:#c9603a}.gl-dot[hidden]{display:none}
 .gl-menu[aria-expanded=true]{background:#e6f2ec;border-color:#2e6b52}
 .gl-menu:focus-visible{outline:3px solid #f2c94c;outline-offset:2px}
 .gl-pop{position:fixed;z-index:60;top:calc(var(--gl-top) + 4px);right:12px;min-width:220px;max-width:calc(100vw - 24px);padding:8px;border-radius:14px;background:#fff;box-shadow:0 14px 40px #0003;display:flex;flex-direction:column;gap:2px}
@@ -152,7 +154,7 @@ const ICON = {
   log: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',
 };
 
-export function setupShell({ api, eventId, openArea, course = () => '', history = () => [] } = {}) {
+export function setupShell({ api, eventId, openArea, course = () => '', history = () => [], status = () => {} } = {}) {
   const school = document.querySelector('.school'); if (!school) return null;
   if (!document.getElementById('shell-css')) { const s = document.createElement('style'); s.id = 'shell-css'; s.textContent = CSS; document.head.append(s); }
   const header = school.querySelector(':scope > header');
@@ -178,8 +180,14 @@ export function setupShell({ api, eventId, openArea, course = () => '', history 
   menuBtn.setAttribute('aria-label', '목록'); menuBtn.setAttribute('aria-expanded', 'false'); menuBtn.setAttribute('aria-haspopup', 'true'); menuBtn.title = '목록';
   const pop = document.createElement('div'); pop.className = 'gl-pop'; pop.hidden = true; pop.setAttribute('role', 'menu'); pop.setAttribute('aria-label', '목록');
   right.append(menuBtn); school.append(pop);
+  // 확인 · 메일함 · 결재함 · 연동(대표님 10/9) — 오른쪽 패널, 숫자는 실제 서버 값만
+  const inbox = createInbox({ status });
+  const dot = document.createElement('span'); dot.className = 'gl-dot'; dot.hidden = true; menuBtn.append(dot);
+  const paintDot = () => { const c = inbox.counts, n = (c.ask || 0) + (c.appr || 0); dot.hidden = !n; menuBtn.setAttribute('aria-label', n ? `목록 · 확인할 것 ${n}` : '목록'); };
+  inbox.peek().then(paintDot); setInterval(() => { if (!document.hidden) inbox.peek().then(paintDot); }, 5 * 60 * 1000);
   const fillMenu = () => {
-    const items = [];
+    const items = [], c = inbox.counts;
+    for (const [k, n] of [['ask', '확인'], ['mail', '메일함'], ['appr', '결재함'], ['link', '연동 상태']]) items.push([n + (c[k] ? ` · ${c[k]}` : ''), { click: () => { inbox.open(k, menuBtn); setTimeout(paintDot, 1500); } }]);
     const map = header?.querySelector('.map-trigger'); if (map) items.push(['학교 지도', map]);
     for (const b of header?.querySelectorAll('details.secondary-menu button') || []) items.push([b.textContent.trim(), b]);
     pop.replaceChildren(...items.map(([label, target]) => { const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.textContent = label; b.disabled = !!target.disabled; b.onclick = () => { setMenu(false); target.click(); }; return b; }));
