@@ -15,7 +15,7 @@ class Mark(ast.NodeTransformer):
         return [ast.copy_location(call, node), node]
 
 tree = ast.fix_missing_locations(Mark().visit(ast.parse(src)))
-code = compile(tree, path, 'exec')
+code = compile(tree, path, 'exec', optimize=0)   # python -O·PYTHONOPTIMIZE 에서도 assert 를 지우지 않게(오타 검수 10/9)
 try:
     exec(code, {'__name__': '__main__', '__file__': path, '__hit': hit.add})
 finally:

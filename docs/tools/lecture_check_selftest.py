@@ -69,5 +69,16 @@ for name, mut, vmut, want in cases:
     caught = code == 1 and 'Traceback' not in errout and want in out
     print(('잡음 ' if caught else '놓침 ') + name + ('' if caught else f'  (종료 {code}, 원하는 문구 「{want}」, 받은 것 {out.strip()[-200:]} {errout.strip()[-200:]})'))
     if not caught: bad.append(name)
+# 최적화 모드(-O)로 실행기를 돌려도 실패하는 assert 는 실패해야 하고, 건너뛴 assert 는 세지 않아야 함
+OPT = os.path.join(tmp, 'opt.py')
+open(OPT, 'w', encoding='utf-8').write("assert False, '최적화에서도 실패해야'\n")
+r = subprocess.run([sys.executable, '-I', '-O', '-X', 'utf8', 'docs/tools/verify_runner.py', OPT], capture_output=True, text=True, encoding='utf-8', errors='replace')
+ok_fail = r.returncode != 0 and '최적화에서도 실패해야' in r.stderr
+open(OPT, 'w', encoding='utf-8').write("x = 1\nassert x == 1\nif False:\n    assert False\n")
+r2 = subprocess.run([sys.executable, '-I', '-O', '-X', 'utf8', 'docs/tools/verify_runner.py', OPT], capture_output=True, text=True, encoding='utf-8', errors='replace')
+ok_count = r2.returncode == 0 and '@@asserts_run 1' in r2.stderr
+print(('잡음 ' if ok_fail else '놓침 ') + '-O 에서 실패 assert'); print(('잡음 ' if ok_count else '놓침 ') + '-O 에서 실행 assert 수')
+if not ok_fail: bad.append('-O 실패 assert')
+if not ok_count: bad.append('-O assert 수')
 print('lecture_check 자기 검사 ok' if not bad else 'FAIL 놓친 규칙: ' + ', '.join(bad))
 sys.exit(1 if bad else 0)
