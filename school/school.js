@@ -22,7 +22,7 @@ import { createDialog } from "./vn-dialog.js";
 import { createLectureUi } from "./lecture-ui.js";
 import { setupWideRoom } from "./room-wide.js";
 import { setupSeatRoom } from "./room-seat.js";
-import { pastDue } from "./workspace.js";
+import { pastDue, nextRoundOnly } from "./workspace.js";
 import { setupShell } from "./shell.js";
 import { createRig } from "./rig.js";
 import { createFace } from "./face.js";
@@ -475,7 +475,7 @@ let assignmentFilter = "전체", assignmentStatus = "진행";
         const today = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
         const isPast = r => pastDue(r, today);
         const groupRank = new Map([["assignment", 0]]); for (const r of data.rows) { const g = r.category || "assignment"; if (!groupRank.has(g)) groupRank.set(g, groupRank.size); }
-        const rows = data.rows.filter(r => !isPast(r) && (assignmentFilter === "전체" || r.course === assignmentFilter) &&
+        const rows = nextRoundOnly(data.rows, today).filter(r => !isPast(r) && (assignmentFilter === "전체" || r.course === assignmentFilter) &&
           (assignmentStatus === "전체" || assignmentStatus === "제출 완료" && r.submitted || assignmentStatus === "진행" && !r.submitted))
           // 마감순(묶음 안에서): 진행·전체는 가까운 마감 먼저, 지난 기록·제출 완료는 최근 것 먼저, 마감 미확인은 맨 뒤
           .map((r, i) => [r, i]).sort(([a, ai], [b, bi]) => {
