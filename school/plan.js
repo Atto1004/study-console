@@ -20,6 +20,7 @@ const wd = (date) => WD[new Date(date + 'T00:00:00Z').getUTCDay()];
 const keyOf = (c, t) => `${c}|${t}`;
 const DAY = { start: 0, end: 24 * 60, wake: 8 * 60, bed: 24 * 60 };   // 시간표 0~24시, 자동 배치는 08~24시
 const BREAK = 10, MIN_SLOT = 25, DEFAULT_EST = 60;
+const LAST = 24 * 60 - 1;   // 계획 끝은 23:59 까지(서버 시간 규격 HH:MM 은 24:00 이 없고 hm(1440) 은 00:00 이 된다 — 오타 검수 10/9)
 
 const CSS = `
 .pl{display:flex;flex-direction:column;gap:14px;max-width:1120px;margin:12px auto 0}
@@ -180,9 +181,12 @@ export function createPlan(app) {
     return { min: DEFAULT_EST, src: '기본값' };
   }
   // 실제 분 기록: ■ 와 완료 체크 둘 다 이 한 길로 — 이전 기록에 더한다(덮어쓰지 않음). 날짜는 화면 날짜(ctx.today)
-  function finishAct(s, t, add, now) {
+  // 저장 응답만 끊긴 뒤 409 → 서버 기록 위에 다시 적용될 수 있으므로, 더하기마다 고유 id(op)를 남기고 이미 있으면 건너뜀(오타 검수 10/9)
+  const opId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  function finishAct(s, t, add, now, op) {
     const prev = s.act[t.key];
-    s.act[t.key] = { c: t.c, t: t.t, kind: t.kind, min: (prev?.min || 0) + add, at: now, date: ctx.today, days: { ...(prev?.days || {}), [ctx.today]: ((prev?.days || {})[ctx.today] || 0) + add } };
+    if (op && (prev?.ops || []).includes(op)) return;
+    s.act[t.key] = { c: t.c, t: t.t, kind: t.kind, min: (prev?.min || 0) + add, at: now, date: ctx.today, days: { ...(prev?.days || {}), [ctx.today]: ((prev?.days || {})[ctx.today] || 0) + add }, ops: [...(prev?.ops || []), op].filter(Boolean).slice(-30) };
   }
   const running = (key) => v60.run[key];
   const elapsed = (key) => { const r = running(key); if (!r) return 0; return (r.acc || 0) + (r.t0 ? Date.now() - r.t0 : 0); };
@@ -206,12 +210,12 @@ export function createPlan(app) {
       // 값(시각·누적)은 누르는 순간 밖에서 정해 두고 바꾸기 함수는 그 값만 쓴다 — 충돌 뒤 다시 적용해도 같은 결과(오타 검수 10/9)
       if (!r || !r.t0) { const b = ib('play', r ? '이어서' : '시작', 'go'); b.onclick = () => { const now = Date.now(), acc = r?.acc || 0; save((s) => { s.run[t.key] = { t0: now, acc, c: t.c, t: t.t, kind: t.kind, day: ctx.today }; }); }; row.append(b); }
       else { const b = ib('pause', '잠깐 멈춤'); b.onclick = () => { const acc = elapsed(t.key); save((s) => { const x = s.run[t.key]; if (x) { x.acc = acc; x.t0 = null; } }); }; row.append(b); }
-      if (r) { const b = ib('stop', '끝내고 실제 시간 기록'); b.onclick = () => { const add = Math.round(elapsed(t.key) / 60000), now = Date.now(); save((s) => { delete s.run[t.key]; finishAct(s, t, add, now); }); }; row.append(b); }
+      if (r) { const b = ib('stop', '끝내고 실제 시간 기록'); b.onclick = () => { const add = Math.round(elapsed(t.key) / 60000), now = Date.now(), op = opId(); save((s) => { delete s.run[t.key]; finishAct(s, t, add, now, op); }); }; row.append(b); }
     }
     const ck = el('input', undefined, 'pl-check'); ck.type = 'checkbox'; ck.checked = !!done; ck.setAttribute('aria-label', done ? `${t.t} 완료 되돌리기` : `${t.t} 완료`);
     ck.onchange = () => {
-      if (ck.checked) { const now = Date.now(), add = running(t.key) ? Math.round(elapsed(t.key) / 60000) : 0;
-        save((s) => { s.done[t.key] = now; (s.doneDate = s.doneDate || {})[t.key] = ctx.today; if (s.run[t.key]) { delete s.run[t.key]; if (add > 0) finishAct(s, t, add, now); } }); }
+      if (ck.checked) { const now = Date.now(), op = opId(), add = running(t.key) ? Math.round(elapsed(t.key) / 60000) : 0;
+        save((s) => { s.done[t.key] = now; (s.doneDate = s.doneDate || {})[t.key] = ctx.today; if (s.run[t.key]) { delete s.run[t.key]; if (add > 0) finishAct(s, t, add, now, op); } }); }
       else save((s) => { delete s.done[t.key]; if (s.doneDate) delete s.doneDate[t.key]; });
     };
     row.append(ck);
@@ -258,7 +262,7 @@ export function createPlan(app) {
     const est = el('input'); est.name = 'est'; est.type = 'number'; est.min = 5; est.max = 600; est.step = 5; est.value = 30; est.setAttribute('aria-label', '예상 분');
     const go = el('button', '추가'); go.type = 'submit'; add.append(kindSel, sel, t, due, est, go);
     add.onsubmit = (e) => { e.preventDefault(); const text = t.value.trim(); if (!text) return; const item = { id: 'x' + Date.now().toString(36), kind: kindSel.value, c: sel.value, t: text, due: due.value, time: '', est: Math.max(5, Number(est.value) || 30) };
-      if (v60.extra.some((x) => x.c === item.c && x.t === item.t)) { app.status?.('같은 할 일이 이미 있어요.', true); return; } save((s) => { s.extra.push(item); }); };
+      if (v60.extra.some((x) => x.c === item.c && x.t === item.t)) { app.status?.('같은 할 일이 이미 있어요.', true); return; } save((s) => { if (!s.extra.some((x) => x.id === item.id)) s.extra.push(item); }); };
     card.append(add);
     return card;
   }
@@ -282,7 +286,7 @@ export function createPlan(app) {
     let from = DAY.wake; if (date === ctx.today) from = Math.max(from, Math.ceil(nowMin() / 5) * 5);
     const slots = []; let cur = from;
     for (const b of fixed) { if (b.e <= cur) continue; if (b.s - BREAK > cur) slots.push([cur, b.s - BREAK]); cur = Math.max(cur, b.e + BREAK); }
-    if (DAY.bed > cur) slots.push([cur, DAY.bed]);
+    const bed = Math.min(DAY.bed, LAST); if (bed > cur) slots.push([cur, bed]);
     return slots.filter(([a, b]) => b - a >= MIN_SLOT);
   }
 
@@ -418,7 +422,7 @@ export function createPlan(app) {
       pop.append(del); }
     pop.append(no);
     if (pickDate) pop.append(el('small', existing ? '구글 캘린더 일정은 캘린더에서 고쳐 주세요.' : '구글 캘린더 일정(약속 등)은 캘린더에서 넣으면 여기 시간표에 같이 보여요.', 'pl-popnote'));
-    pop.onsubmit = async (e) => { e.preventDefault(); const s = mins(st.value), end = s + Number(len.value); if (end > 24 * 60) { app.status?.('자정을 넘겨요. 시작을 앞당겨 주세요.', true); return; }
+    pop.onsubmit = async (e) => { e.preventDefault(); const s = mins(st.value), end = s + Number(len.value); if (end > LAST) { app.status?.('자정을 넘겨요. 시작을 앞당겨 주세요.', true); return; }
       ok.disabled = true; const item = { date: pickDate ? dIn.value || date : date, s: hm(s), e: hm(end), courseId: ctx.courseId?.(sel.value), note: note.value.trim(), kind: existing?.kind || '시험 대비' };
       const done = existing ? await ctx.updatePlan?.({ ...existing, ...item, id: existing.id }) : await ctx.addPlan?.(item); if (done === false) ok.disabled = false; else close(); };
     document.body.append(pop);
