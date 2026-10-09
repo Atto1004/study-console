@@ -28,6 +28,10 @@ assert close(2 * 3 * math.sin(math.radians(30)), 3, 1e-9) and close(2 * 3 * math
 # c5: (2,0,1)×(1,3,0) = (−3,1,6) · 오답 (−3,−1,6) = j 부호 누락 · (3,−1,−6) = V×U
 assert cross((2, 0, 1), (1, 3, 0)) == (-3, 1, 6) and cross((1, 3, 0), (2, 0, 1)) == (3, -1, -6) and dot((2, 0, 1), (-3, 1, 6)) == 0
 
+# q3(개념): U 의 L 평행 성분 = (U·e)e — 위 s3 예제에서 (U·e)e 가 3.5i+3.5j 로 맞고, 스칼라 U·e 만으로는 벡터가 아님
+assert close(dot((4, 3, 0), e3 := (1 / math.sqrt(2), 1 / math.sqrt(2), 0)) * e3[0], 3.5, 1e-9)
+# q4(개념): V×U = −(U×V), 평행이면 0 — 교환법칙 불성립
+assert cross((4, 5, 6), (1, 2, 3)) == tuple(-x for x in cross((1, 2, 3), (4, 5, 6))) and cross((1, 2, 3), (2, 4, 6)) == (0, 0, 0)
 # w1(도전): A(1,0,0) B(0,2,0) C(0,0,3) → AB×AC=(6,3,2), |·|=7 → 넓이 7/2 · 오답 7 = 절반 안 함 · 11/2 = 성분 합/2
 assert cross((-1, 2, 0), (-1, 0, 3)) == (6, 3, 2) and norm((6, 3, 2)) == 7 and (6 + 3 + 2) / 2 == 5.5
 # w2(변형, s2): (1,1,0),(0,1,1) → U·V=1, |U|=|V|=√2 → 60° · 오답 45° = 크기 하나만 나눔(1/√2) · 30° = 1/2 을 사인으로 역산 · 90° = y 성분 곱 1 누락(U·V=0)
@@ -38,4 +42,5 @@ assert close(math.degrees(math.acos(1 / math.sqrt(2))), 45) and close(math.degre
 e = (1 / math.sqrt(2), -1 / math.sqrt(2), 0); s = dot((3, 1, 0), e)
 assert close(s, math.sqrt(2), 1e-12) and close(s * e[0], 1, 1e-9) and close(s * e[1], -1, 1e-9)
 assert close(dot((2, 2, 0), e), 0, 1e-12) and dot((3, 1, 0), (1, -1, 0)) == 2
-print('9/14 검산 ok')
+print('검산 문항: c1 c2 c3 c4 c5 w1 w2 w3 q3 q4')   # q3·q4 는 개념 문항(식 고르기)이라 위 assert 로 정답 식을 확인
+

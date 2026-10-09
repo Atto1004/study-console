@@ -4,7 +4,7 @@
 # 규격의 필수 조건은 전부 「오류」. 「주의」는 사람이 보고 판단할 것.
 # 이 도구가 확인하는 것은 형식·연결·검산 스크립트 통과까지다. 대본이 근거와 맞는지, 오답이 정말 그 실수에서 나오는지,
 # 정답이 유일한지, 확인 문제가 그 예제의 변형인지는 오타 내용 검수가 본다.
-import json, re, sys, os, subprocess
+import json, re, sys, os, subprocess, ast
 sys.stdout.reconfigure(encoding='utf-8')
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.chdir(ROOT)
@@ -49,7 +49,8 @@ if '--steps' in sys.argv:
 
 errors, warns = [], []
 err = errors.append
-path = f'knowledge/lectures/{lesson_id}.json'
+# --pack <파일>: 다른 경로의 강의안을 검사(자기 검사가 실제 파일을 건드리지 않게)
+path = sys.argv[sys.argv.index('--pack') + 1] if '--pack' in sys.argv else f'knowledge/lectures/{lesson_id}.json'
 if not os.path.exists(path):
     sys.exit(f'강의안 파일 없음: {path}')
 try:
@@ -117,8 +118,10 @@ pos = {s: i for i, s in enumerate(ids)}
 sec_ids, checks, seen, order = [], [], set(), []
 for k, sec in enumerate(secs):
     if not isinstance(sec, dict): err(f'섹션 {k+1}: 객체가 아님'); continue
-    name = sec.get('id') if isinstance(sec.get('id'), str) else f'섹션{k+1}'
-    sec_ids.append(name)
+    name = sec.get('id')
+    if not isinstance(name, str) or not re.fullmatch(r's\d{1,2}', name):
+        err(f'섹션 {k+1}: id 는 s1·s2 꼴 문자열 (지금 {name!r})'); name = f'섹션{k+1}'
+    else: sec_ids.append(name)
     for f in ('title', 'goal'):
         if not isinstance(sec.get(f), str) or not sec[f].strip(): err(f'{name}: {f} 없음')
     if 'exam' in sec and (not isinstance(sec['exam'], str) or not EVIDENCE.search(sec['exam'])):
@@ -149,22 +152,37 @@ if len(ws) != 5: err(f'학습지 {len(ws)}문항 — 5문항')
 wids, kinds = [], {}
 for w in ws:
     if not isinstance(w, dict) or not isinstance(w.get('id'), str): err('학습지 칸은 {"id", "kind": 개념|변형|도전, "section"}'); continue
-    wids.append(w['id']); kinds[w.get('kind')] = kinds.get(w.get('kind'), 0) + 1
-    if w.get('kind') not in KINDS: err(f'{w["id"]}: kind 는 개념·변형·도전 중 하나')
+    kind = w.get('kind') if isinstance(w.get('kind'), str) else repr(w.get('kind'))
+    wids.append(w['id']); kinds[kind] = kinds.get(kind, 0) + 1
+    if kind not in KINDS: err(f'{w["id"]}: kind 는 개념·변형·도전 중 하나')
     if w.get('section') not in sec_ids: err(f'{w["id"]}: section 은 이 강의안의 섹션 id')
     check_item(w['id'], '학습지')
 if ws and kinds != KINDS: err(f'학습지 구성 {kinds} — 개념 2 · 변형 2 · 도전 1')
 for dup in sorted({x for x in wids if wids.count(x) > 1}): err(f'학습지 문항 중복: {dup}')
 for x in sorted(set(wids) & set(checks)): err(f'{x}: 확인 문제와 학습지에 같은 문항')
 
-# ── 검산 스크립트
-vpath = f'knowledge/lectures/{lesson_id}.verify.py'
+# ── 검산 스크립트: 실행해 종료 0 + 마지막에 「검산 문항: c1 c2 …」 줄로 검산한 문항을 밝히고,
+#    확인·학습지 문항이 전부 그 줄에 있어야 하며, 실행되는 assert 문(주석 아님)이 문항 수 이상이어야 한다.
+vpath = sys.argv[sys.argv.index('--verify') + 1] if '--verify' in sys.argv else f'knowledge/lectures/{lesson_id}.verify.py'
 if not os.path.exists(vpath):
     err(f'검산 스크립트 없음: {vpath} (예제·확인·학습지 정답과 오답 해설 숫자를 assert 로)')
 else:
-    r = subprocess.run([sys.executable, '-I', vpath], capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=60)
-    if r.returncode != 0: err(f'검산 실패: {(r.stderr or r.stdout).strip().splitlines()[-1] if (r.stderr or r.stdout).strip() else r.returncode}')
-    elif 'assert' not in open(vpath, encoding='utf-8').read(): err('검산 스크립트에 assert 가 없음')
+    code = open(vpath, encoding='utf-8').read()
+    try:
+        asserts = sum(isinstance(n, ast.Assert) for n in ast.walk(ast.parse(code)))
+    except SyntaxError as e:
+        asserts = 0; err(f'검산 스크립트 문법 오류: {e}')
+    r = subprocess.run([sys.executable, '-I', '-X', 'utf8', vpath], capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=60)   # -X utf8: 파이프로 받을 때 한글이 cp949 로 깨지지 않게
+    out = (r.stdout or '') + (r.stderr or '')
+    if r.returncode != 0:
+        err(f'검산 실패: {out.strip().splitlines()[-1] if out.strip() else r.returncode}')
+    else:
+        m = re.search(r'검산 문항:[ \t]*([^\r\n]+)', r.stdout or '')
+        done = set(m.group(1).split()) if m else set()
+        need = set(checks) | set(wids)
+        if not m: err('검산 스크립트가 마지막에 「검산 문항: c1 c2 …」 를 출력해야 함')
+        elif need - done: err(f'검산 안 한 문항: {sorted(need - done)}')
+        if asserts < len(need): err(f'실행되는 assert {asserts}개 — 확인·학습지 문항 수({len(need)}) 이상이어야 함')
 
 chars = sum(len(x) for x in lines)
 print(f'{lesson_id}: 섹션 {len(secs)} · 판서 {len(seen)}/{len(ids)} · 대사 {len(lines)}줄 · 약 {round(chars * 0.095 / 60, 1)}분 · 학습지 {len(ws)}')
