@@ -9,6 +9,7 @@ const CSS = `
   box-shadow:inset 0 0 0 3px #16291f,inset 0 0 0 4px #eadfbd55,0 12px 28px #00000059;
   font:500 17px/1.65 "Pretendard Variable",Pretendard,system-ui,sans-serif;letter-spacing:-.005em;-webkit-tap-highlight-color:transparent;user-select:none}
 .vn-box[hidden]{display:none}
+.vn-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 .vn-box:focus-visible{outline:3px solid #f2c94c;outline-offset:3px}
 .vn-name{position:absolute;top:-15px;left:16px;padding:3px 14px 4px;border-radius:8px;background:#eadfbd;color:#16291f;border:2px solid #16291f;
   font:700 14px/1.4 "Pretendard Variable",Pretendard,system-ui,sans-serif}
@@ -25,9 +26,10 @@ export function createDialog(stage, { name = '김주영 스앵님', onNext } = {
   if (!document.getElementById('vn-dialog-css')) { const s = document.createElement('style'); s.id = 'vn-dialog-css'; s.textContent = CSS; document.head.append(s); }
   const box = document.createElement('div'); box.className = 'vn-box'; box.hidden = true; box.tabIndex = 0; box.setAttribute('role', 'button'); box.setAttribute('aria-label', '대사 넘기기');
   const tag = document.createElement('div'); tag.className = 'vn-name'; tag.textContent = name;
-  const text = document.createElement('div'); text.className = 'vn-text'; text.setAttribute('aria-live', 'polite');
+  const text = document.createElement('div'); text.className = 'vn-text'; text.setAttribute('aria-hidden', 'true');   // 한 자씩 바뀌는 칸은 읽지 않고
+  const sr = document.createElement('div'); sr.className = 'vn-sr'; sr.setAttribute('aria-live', 'polite');               // 문장 전체를 한 번만 알린다(오타 검수 10/9)
   const next = document.createElement('span'); next.className = 'vn-next'; next.setAttribute('aria-hidden', 'true');
-  box.append(tag, text, next); stage.append(box);
+  box.append(tag, text, next); stage.append(box, sr);
   document.querySelector('.school')?.setAttribute('data-vn', '1');
   const reduced = !!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
   let full = '', shown = 0, timer = null;
@@ -39,15 +41,20 @@ export function createDialog(stage, { name = '김주영 스앵님', onNext } = {
   };
   const press = (e) => { e.stopPropagation(); if (timer) finish(); else onNext?.(); };
   box.addEventListener('click', press);
-  box.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); press(e); } });
+  box.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault(); e.stopPropagation();
+    if (!e.repeat) press(e);   // 키를 누르고 있어도 한 번만 넘긴다(오타 검수 10/9)
+  });
   return {
     say(line) {
       clearTimeout(timer); timer = null; delete box.dataset.done;
-      if (!line) { box.hidden = true; full = ''; text.textContent = ''; return; }
-      box.hidden = false; full = String(line); shown = 0; text.textContent = '';
+      if (!line) { box.hidden = true; full = ''; text.textContent = ''; sr.textContent = ''; return; }
+      box.hidden = false; full = String(line); shown = 0; text.textContent = ''; sr.textContent = full;
       if (reduced) finish(); else tick();
     },
     setName(n) { tag.textContent = n; },
     get el() { return box; },
+    destroy() { clearTimeout(timer); timer = null; box.remove(); sr.remove(); document.querySelector('.school')?.removeAttribute('data-vn'); },
   };
 }

@@ -37,6 +37,20 @@ const SHOT = process.env.SHOT_DIR;
   const nextLine = await vn();
   expect(nextLine.sub !== line1, '다 쓴 뒤 눌러도 다음 대사로 안 감');
   for (let i = 0; i < 80 && !(await vn()).done; i++) await p.waitForTimeout(100);
+  // ⑦ 키를 누르고 있어도(반복 입력) 한 번만 넘김 · ⑧ 화면 읽기용 칸에는 문장 전체가 한 번에
+  const srOk = await p.evaluate(() => { const sr = document.querySelector('.vn-sr'); return !!sr && sr.getAttribute('aria-live') === 'polite' && sr.textContent === document.getElementById('subtitle').textContent && document.querySelector('.vn-text').getAttribute('aria-hidden') === 'true'; });
+  expect(srOk, '화면 읽기 칸에 문장 전체가 없음');
+  // 강의를 멈춰 두고(저절로 넘어가는 것과 구분) 대사 바뀐 횟수를 센다
+  await p.evaluate(() => document.activeElement?.blur());
+  await p.keyboard.press('Space'); await p.waitForTimeout(200);
+  await p.evaluate(() => { window.__subChanges = 0; new MutationObserver(() => window.__subChanges++).observe(document.getElementById('subtitle'), { childList: true, characterData: true, subtree: true }); });
+  await p.focus('.vn-box');
+  await p.keyboard.down('Enter'); await p.waitForTimeout(120);   // 쓰는 중이 아니면 다음 대사 1번
+  await p.keyboard.down('Enter'); await p.keyboard.down('Enter'); await p.keyboard.down('Enter');   // 누르고 있음(repeat)
+  await p.waitForTimeout(300); await p.keyboard.up('Enter');
+  const changes = await p.evaluate(() => window.__subChanges);
+  expect(changes === 1, 'Enter 를 누르고 있을 때 대사가 ' + changes + '번 넘어감(1번이어야)');
+  for (let i = 0; i < 80 && !(await vn()).done; i++) await p.waitForTimeout(100);
   const settled = await vn();
   expect(settled.covered === 0, '칠판 글자를 가림 ' + settled.covered);
   expect(!settled.hscroll, '가로 스크롤 생김');
