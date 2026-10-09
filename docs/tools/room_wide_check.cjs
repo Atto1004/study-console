@@ -33,7 +33,8 @@ const { chromium } = require('C:/Users/user/Desktop/아톰OS/기술실/study-con
   expect(!(await isOpen()), 'Esc 로 안 닫힘');
   expect(await p.evaluate(() => document.activeElement?.classList.contains('rw-log')), 'Esc 뒤 초점이 💬 로 안 돌아옴');
   await p.evaluate(() => document.activeElement?.blur()); await p.keyboard.press('KeyQ'); await p.waitForTimeout(250);
-  expect(await isOpen() && await p.evaluate(() => document.activeElement?.id === 'chatInput'), 'Q 로 서랍·입력 칸 안 열림');
+  expect(!(await isOpen()) && await p.evaluate(() => document.activeElement?.id === 'chatInput'), 'Q 로 아래 질문 칸에 안 감(서랍은 닫힌 채)');   // 10/9: 질문 칸은 늘 아래에
+  expect(await p.evaluate(() => { const c = document.querySelector('#dialogue .v3-chat'); return !!c && getComputedStyle(c).display !== 'none' && c.getBoundingClientRect().bottom <= innerHeight + 1; }), '아래 질문 칸이 늘 보이지 않음');
   expect(!p.errors.length, '사이트 오류 ' + p.errors.join('|'));
   await p.close();
   // ── 3D 보기 전환은 없앰(10/9): 게임으로 저장돼 있어도 사이트 보기로 열리고 전환 버튼은 안 보임

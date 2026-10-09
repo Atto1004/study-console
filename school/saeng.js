@@ -136,7 +136,7 @@ export async function mountSaeng(host, { dir = "../docs/demo/saeng/layers2/" } =
   function react(kind) {
     const seq = REACT[kind] || REACT.idle;
     setExpr(seq[0]);
-    if (kind === "correct" && !reduced) { el.classList.remove("hop"); void el.offsetWidth; el.classList.add("hop"); }
+    // 폴짝 뛰기 없음 — 스앵님은 제자리에 서 있는다(대표님 10/9 「공중에 안 뜨고」). 칭찬은 표정으로만
     if (seq[1]) later(() => setExpr(seq[1]), 1400);
   }
 

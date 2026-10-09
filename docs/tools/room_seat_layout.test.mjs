@@ -16,6 +16,7 @@ test('착석 교실 배치: 크기·높이·대사창 조합 전부', () => {
     if (b.x < -0.5 || b.x + b.w > W + 0.5 || b.y < -0.5) bad.push(`${tag} 칠판이 무대 밖`);
     if (!hid && b.y + b.h > H - (vh + L.vn.b) + 0.5) bad.push(`${tag} 칠판이 대사창에 걸림`);
     if (t.w && t.y < b.y + b.h && t.x < b.x + b.w - L.padRight - 0.5) bad.push(`${tag} 스앵님이 글씨 칸 가림`);
+    if (t.w && Math.abs(t.y + t.h - H) > 0.5) bad.push(`${tag} 스앵님이 바닥에 안 붙음(공중) ${Math.round(H - t.y - t.h)}px`);   // 10/9 「공중에 안 뜨고」
   }
   assert.deepEqual(bad.slice(0, 12), []);
 });

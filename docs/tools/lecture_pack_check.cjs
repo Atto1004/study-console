@@ -52,7 +52,8 @@ const SHOT = process.env.SHOT_DIR;
   const pos = posts.filter((x) => x.k === 'event' && x.b.kind === 'position').map((x) => x.b.index);
   expect(JSON.stringify(pos) === JSON.stringify(route.slice(1, pos.length + 1)), '위치가 수업 순서와 다름 ' + JSON.stringify(pos));
   // 오답 → 같은 문제 / 정답 → 다음 섹션
-  const pick = async (text) => { const bs = await p.$$('#choices button[data-opt]'); for (const x of bs) if ((await x.$eval('.opt-body', (e) => e.textContent.trim())) === text) { await x.click(); return true; } return false; };
+  const pick = async (text) => {   // 풀이 방법 설명(10/9)이 재생 중이면 보기를 못 누르므로 먼저 끝까지 넘김
+    for (let k = 0; k < 40 && (await p.evaluate(() => document.querySelector('.school').dataset.lecture)) === 'playing'; k++) { await p.locator('.v3-skip').click().catch(() => {}); await p.waitForTimeout(80); } const bs = await p.$$('#choices button[data-opt]'); for (const x of bs) if ((await x.$eval('.opt-body', (e) => e.textContent.trim())) === text) { await x.click(); return true; } return false; };
   expect(await pick('4'), '오답 보기 못 찾음'); await p.waitForTimeout(900);
   const wrong = await st(); expect(wrong.label === '섹션 1 확인', '오답 뒤 문제를 떠남 ' + wrong.label);
   const ansW = posts.filter((x) => x.k === 'event' && x.b.kind === 'answer').at(-1);

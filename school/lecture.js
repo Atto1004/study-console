@@ -8,6 +8,7 @@
 const splitSentences = (text) => String(text || '')
   .replace(/\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]/g, (m) => m.replace(/[.!?。]/g, '․'))   // 수식 안 마침표로 자르지 않게
   .split(/(?<=[.!?。…])\s+|\n{1,}/).map((s) => s.replace(/․/g, '.').trim()).filter((s) => s.length > 1);
+import { readable } from './readable.js';
 const plain = (s) => s.replace(/\$\$?|\\\(|\\\)|\\\[|\\\]/g, '').replace(/\\[a-zA-Z]+/g, ' ').replace(/[{}_^]/g, '').replace(/\s+/g, ' ').trim();
 
 export function createLecture(app) {
@@ -21,15 +22,21 @@ export function createLecture(app) {
 
   function build() {
     const c = app.ctx(); if (!c) return [];
+    // 자막으로 가는 줄은 전부 읽기 쉬운 글자로(수식 원문·내부 파일 표시가 「코드」처럼 뜨던 것, 대표님 10/9). 칠판 원문은 그대로
+    // 문제 단계는 풀기 전에 푸는 방법(개념 카드의 예제 풀이) — app.howto(step) → [{say, mood}] (대표님 10/9 「어떻게 푸는지 설명은 해줘야」)
+    // 풀이 방법은 자리만 잡아 두고(lazy), 그 줄에 닿을 때 채운다 — 카드가 늦게 와도 강의는 바로 시작(단계 들어가면 바로 강의)
+    const how = c.step.options ? [{ text: '…', mood: null, lazy: true }] : [];
+    const fix = (arr) => arr.map((l) => (l.lazy ? l : { ...l, text: readable(l.text) })).filter((l) => l.lazy || l.text.length > 1);
     const script = app.script?.(c.step);
-    if (script) return script.filter((l) => l && l.say).map((l) => ({ text: l.say, mood: l.mood || 'neutral', intro: !!l.intro }));
+    if (script) return fix([...script.filter((l) => l && l.say).map((l) => ({ text: l.say, mood: l.mood || 'neutral', intro: !!l.intro })), ...how]);
     const intro = splitSentences(c.step.speech);
     const body = splitSentences(c.step.body);
     const head = c.step.title ? [c.step.title + (c.step.options ? ' — 문제부터 볼게요.' : '.')] : [];
     const seen = new Set(); const out = [];
     for (const s of [...intro, ...head, ...body]) { const k = plain(s); if (k && !seen.has(k)) { seen.add(k); out.push(s); } }
-    if (c.step.options) out.push('보기 중에서 직접 골라 보세요.');
-    return out.slice(0, 24).map((text) => ({ text, mood: null }));
+    const lines = out.slice(0, 24).map((text) => ({ text, mood: null }));
+    if (c.step.options) lines.push(...how);
+    return fix(lines);
   }
   // 지금 재생을 끊는다: 세대를 올리고, 그 재생이 가진 타이머·음성을 취소(대기 Promise 도 끝낸다)
   function cancel() { gen++; if (run) { clearTimeout(run.timer); run.abort.abort(); run.resolve?.(); run = null; } }
@@ -40,6 +47,7 @@ export function createLecture(app) {
     const wait = (ms) => new Promise((res) => { r.resolve = res; r.timer = setTimeout(res, ms); });
     for (let k = idx; k < lines.length; k++) {
       if (!alive()) return;
+      if (lines[k].lazy) { expand(k); if (k >= lines.length) break; }
       i = k; state(); app.board?.(done()); app.subtitle?.(lines[k].text); app.talk?.(true);
       if (lines[k].mood) app.mood?.(lines[k].mood);
       app.line?.(lines[k]);
@@ -52,6 +60,12 @@ export function createLecture(app) {
       app.talk?.(false);
     }
     if (alive()) finish();
+  }
+  // 자리표(lazy)를 그 단계의 풀이 방법 줄로 바꾼다. 카드가 아직 없으면 howto 가 「준비된 예제 없음」 줄을 준다(지어내지 않음)
+  function expand(k) {
+    const c = app.ctx(); const add = (c && app.howto?.(c.step)) || [];
+    const got = add.map((l) => ({ text: readable(l.say), mood: l.mood || null })).filter((l) => l.text.length > 1);
+    lines.splice(k, 1, ...(got.length ? got : [{ text: '보기 중에서 직접 골라 보세요.', mood: null }]));
   }
   function finish() { cancel(); playing = false; ended = true; app.talk?.(false); app.board?.(1); app.subtitle?.(null); app.line?.(null); state(); app.onEnd?.(); }
   function begin() { const c = app.ctx(); if (!c) return false; cancel(); lines = build(); i = 0; ended = false; if (!lines.length || c.passed) { finish(); return false; } playing = true; app.board?.(0); play(0); return true; }
@@ -70,6 +84,7 @@ export function createLecture(app) {
       if (ended) return false;
       if (i + 1 >= lines.length) { finish(); return true; }
       cancel(); i++;
+      if (lines[i]?.lazy) expand(i);
       if (playing) play(i); else { state(); app.board?.(done()); app.subtitle?.(lines[i].text); app.line?.(lines[i]); }
       return true;
     },

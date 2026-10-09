@@ -26,6 +26,7 @@ import { pastDue } from "./workspace.js";
 import { setupShell } from "./shell.js";
 import { createRig } from "./rig.js";
 import { createFace } from "./face.js";
+import { readable, cleanTitle } from "./readable.js";
 import { createPlan } from "./plan.js";
 import { inFocus } from "./focus.js";
 import { startClassroomV3 } from "./classroom-v3.js";
@@ -810,6 +811,25 @@ function currentEvidence() {
     )
     .at(-1);
 }
+// 문제 전에 푸는 방법(대표님 10/9): 문제와 이어진 개념 카드(knowledge/cards)의 「예제 + 단계 풀이 + 자주 하는 실수」를 스앵님이 먼저 풀어 보인다.
+// 같은 방법의 다른 문제라 정답을 알려 주지 않는다. 카드·예제가 없으면 지어내지 않고 그렇다고 말한다.
+const cardCache = new Map();
+function loadCards(ids) {
+  return Promise.all(ids.filter((id) => /^[\w.-]{1,80}$/.test(id)).map((id) => {
+    if (!cardCache.has(id)) cardCache.set(id, fetch(new URL(`../knowledge/cards/${id}.json`, document.baseURI), { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null)).catch(() => null).then((c) => { cardCache.set(id, c); return c; }));
+    return cardCache.get(id);
+  }));
+}
+function howtoLines(step) {
+  const card = (step.nodes || []).map((id) => cardCache.get(id)).find((c) => c && !(c instanceof Promise) && c.example?.steps?.length);
+  if (!card && (step.nodes || []).some((id) => cardCache.get(id) instanceof Promise)) return [];   // 아직 받는 중 — 「없다」고 하지 않고 넘어감
+  if (!card) return [{ say: "이 문제는 아직 준비된 풀이 예제가 없어요. 막히면 힌트나 아래 채팅으로 바로 물어보세요.", mood: "neutral" }];
+  const ex = card.example, out = [{ say: "풀기 전에, 같은 방법으로 예제 하나 먼저 풀어 볼게요.", mood: "smile" }, { say: `예제: ${ex.q}`, mood: "neutral" }];
+  ex.steps.slice(0, 8).forEach((s, i) => out.push({ say: `${i + 1}단계: ${s}`, mood: "neutral" }));
+  if (card.pitfall) out.push({ say: `조심할 것: ${card.pitfall}`, mood: "serious" });
+  out.push({ say: "이제 칠판 문제를 방금 순서대로 직접 풀어 보세요.", mood: "smile" });
+  return out;
+}
 async function renderStep(camera) {
   if (!current) return;
   stopVoice();
@@ -836,7 +856,7 @@ async function renderStep(camera) {
       quiz: "직접 확인",
     }[step.kind] || "학습";
   board(
-    curPack() && step.options ? packLabel(curPack(), step.id) : step.title,   // 강의안 수업 문제는 「섹션 n 확인」·「학습지 n / 5」(4부 C)
+    curPack() && step.options ? packLabel(curPack(), step.id) : cleanTitle(step.title),   // 강의안 수업 문제는 「섹션 n 확인」·「학습지 n / 5」(4부 C)
     step.body,
     kind,
     current.warnings.length
@@ -884,6 +904,7 @@ async function renderStep(camera) {
     $("choices").append(button("원래 문제로 돌아가기", returnToQuestion));
   await mission?.mount();
   tutor?.onStep();
+  if (step.options) loadCards(step.nodes || []);   // 풀이 예제 카드 — 기다리지 않음(문제를 읽는 동안 받아 두고 풀이 차례에 씀)
   lecture?.start();
   // 교실 v3: 게임 보기면 3D 교실을 위 강의 칸에 앉혀 붙이고, 사이트 보기면 3D 를 쓰지 않는다
   await stage3d(step.kind,camera);
@@ -2390,6 +2411,7 @@ const shell = setupShell({ api, eventId, openArea: a => workspace.open(a), cours
 lecture = createLecture({
   ctx:()=>current?{lesson:current,step:current.steps[index],index,course,passed}:null,
   script:step=>curPack()?packLines(curPack(),step.id):null,
+  howto:step=>howtoLines(step),
   line:l=>{const p=curPack();if(p&&l?.intro)lectureUi?.intro(true,{key:current.id,course:p.course,date:p.date,title:current.title,goals:p.goals||[]});else lectureUi?.intro(false);},
   mood:m=>dockSaeng?.setExpr?.(MOOD[m]||'neutral'),
   talk:on=>{space?.saeng?.lecture?.(on);},

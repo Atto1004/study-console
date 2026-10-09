@@ -12,6 +12,7 @@ const { chromium } = require('C:/Users/user/Desktop/아톰OS/기술실/study-con
     if (r.request().method() === 'POST') { saved = JSON.parse(r.request().postData()).state; saves++; return r.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"workspaceRevision":1}' }); }
     return r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ state: saved || { terms: [], v60: {} } }) });
   });
+  await p.clock.install({ time: new Date('2026-10-07T11:00:00+09:00') });   // 모의 날짜 낮 — 밤에 돌리면 오늘 빈 시간이 없어 자동 배치가 비던 것
   await fetch('http://127.0.0.1:8797/api/_reset', { method: 'POST' });
   await p.goto('http://127.0.0.1:8797/school/index.html'); await p.waitForSelector('.pl-tasks', { timeout: 15000 }); await p.waitForTimeout(600);
   const groups = await p.evaluate(() => [...document.querySelectorAll('.pl-tasks .pl-group')].map((g) => (g.classList.contains('urgent') ? '!' : '') + g.querySelector('.pl-gname b').textContent));

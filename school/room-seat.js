@@ -71,8 +71,9 @@ export function layoutSeat(W, H, vnH0, vnHidden = false) {
   if (narrow) { board.x = Math.max(m, board.x); board.w = Math.min(W - 2 * m, board.w); }
   // 스앵님: 넓은 화면은 칠판 오른쪽 끝 앞(교탁 앞) 상반신, 좁은 화면은 칠판 아래 오른쪽(자리 없으면 대사창 이름표로만)
   let t;
-  if (!narrow) { const th = Math.max(0, Math.min(H * 0.7, H - vnB - vnH * 0.45 - Math.max(8, board.y))), tw = th * 0.76; const tx = Math.min(W - tw - 6, board.x + board.w - tw * 0.42); t = { x: tx, y: H - vnB - vnH * 0.45 - th, w: tw, h: th }; }
-  else { const top0 = board.y + board.h + 4, th = Math.max(0, Math.min(H * 0.42, 460, H - vnB - vnH * 0.4 - top0)), top = H - vnB - vnH * 0.4 - th, tw = th * 0.76; t = { x: W - tw - 6, y: top, w: th < 70 ? 0 : tw, h: th < 70 ? 0 : th }; }
+  // 스앵님은 늘 무대 바닥에 발을 딛고 선다(대표님 10/9 「공중에 안 뜨고 고정적으로 서 있어야」) — 아래 끝 = 무대 바닥, 대사창이 있으면 그 뒤로 가려짐
+  if (!narrow) { const th = Math.max(0, Math.min(H * 0.78, H - 6)), tw = th * 0.76; const tx = Math.min(W - tw - 6, board.x + board.w - tw * 0.42); t = { x: tx, y: H - th, w: tw, h: th }; }
+  else { const top0 = board.y + board.h + 4, th = Math.max(0, Math.min(H * 0.42, 460, H - top0)), top = H - th, tw = th * 0.76; t = { x: W - tw - 6, y: top, w: th < 70 ? 0 : tw, h: th < 70 ? 0 : th }; }
   const overlap = narrow ? 0 : Math.max(0, board.x + board.w - t.x);   // 칠판 글씨가 스앵님에 가리지 않게 오른쪽 여백(폰은 스앵님이 칠판 아래라 안 가림)
   const fs = Math.max(13, Math.min(22, board.w / (narrow ? 24 : 34)));
   return { narrow, close, f, board, teacher: t, padRight: Math.max(narrow ? 14 : 22, overlap + 16), fs, vn: { l: narrow ? 8 : 16, r: narrow ? 8 : 16, b: vnB, h: vnH } };

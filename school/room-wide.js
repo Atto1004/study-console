@@ -24,10 +24,14 @@ const CSS = `
 /* 아래: 대화 기록 서랍 + 버튼 한 줄 */
 .school[data-wide][data-view3=site][data-mode=classroom] #dialogue{position:relative;overflow:visible!important;z-index:15}   /* 서랍이 위로 뜨게(overflow:auto 가 잘랐다) */
 .school[data-wide][data-view3=site][data-mode=classroom] #room{justify-content:center}
-.school[data-wide][data-view3=site][data-mode=classroom] #dialogue .v3-log,.school[data-wide][data-view3=site][data-mode=classroom] #dialogue .v3-chat{display:none!important}
+.school[data-wide][data-view3=site][data-mode=classroom] #dialogue .v3-log{display:none!important}
+/* 질문 칸은 늘 아래에(대표님 10/9 「강의실 들어가도 하단에 고정적으로 텍스트 칠 수 있는 채팅」) — 💬 는 기록 서랍만 */
+.school[data-wide][data-view3=site][data-mode=classroom] #dialogue{display:flex!important;flex-direction:column}
+.school[data-wide][data-view3=site][data-mode=classroom] #dialogue .v3-bar{order:1}
+.school[data-wide][data-view3=site][data-mode=classroom] #dialogue .v3-chat{display:flex!important;order:2;position:static!important;gap:8px;margin:8px 0 0;align-items:center}
+.school[data-wide][data-view3=site][data-mode=classroom] #dialogue .v3-chat input{flex:1;min-height:44px;border-radius:22px;border:1px solid #d5ded8;padding:0 16px;font:500 15px "Pretendard Variable",Pretendard,system-ui,sans-serif;background:#fff}
 .school[data-wide][data-view3=site][data-log=open][data-mode=classroom] #dialogue .v3-log{display:flex!important;position:absolute;left:0;right:0;bottom:calc(100% + 8px);max-height:min(46dvh,420px);overflow:auto;z-index:20;
-  background:#fff;border-radius:16px;box-shadow:0 14px 40px #0003;padding:12px 14px 70px}
-.school[data-wide][data-view3=site][data-log=open][data-mode=classroom] #dialogue .v3-chat{display:flex!important;position:absolute;left:12px;right:12px;bottom:calc(100% + 18px);z-index:21}
+  background:#fff;border-radius:16px;box-shadow:0 14px 40px #0003;padding:12px 14px}
 .school[data-wide][data-view3=site] .v3-bar{flex-wrap:nowrap}
 .school:not([data-view3=site]) .rw-log{display:none!important}   /* 게임 보기는 기존 대화창 그대로(오타 검수 10/9) */
 .school[data-wide][data-view3=site] .v3-bar > details{display:flex;align-items:center;margin:0}
@@ -61,11 +65,11 @@ export function setupWideRoom(v3) {
   const more = bar?.querySelector('.v3-more'); if (more) bar.insertBefore(btn, more); else bar?.append(btn);
   const site = () => school.dataset.view3 === 'site';
   const set = (open) => { if (open) school.dataset.log = 'open'; else delete school.dataset.log; btn.setAttribute('aria-pressed', String(!!open)); if (open) { const log = document.getElementById('chatLog'); if (log) log.scrollTop = log.scrollHeight; } };
-  btn.onclick = (e) => { e.stopPropagation(); set(school.dataset.log !== 'open'); if (school.dataset.log === 'open') document.getElementById('chatInput')?.focus(); };
+  btn.onclick = (e) => { e.stopPropagation(); set(school.dataset.log !== 'open'); };
   // 바깥을 누르면 닫힘(팝업 규칙). 서랍·입력·버튼 안은 제외
   document.addEventListener('pointerdown', (e) => {
     if (school.dataset.log !== 'open') return;
-    if (e.target.closest('#chatLog, .v3-chat, .rw-log')) return;
+    if (e.target.closest('#chatLog, .rw-log')) return;   // 아래 질문 칸을 눌러도 기록 서랍은 닫힘(칸은 늘 보이므로)
     set(false);
   }, true);
   // Esc 로 닫으면 키보드 초점을 💬 버튼으로 돌려준다(오타 검수 10/9). 서랍이 먼저 닫히고 다른 Esc 처리(일어나기 등)는 이번엔 안 함
@@ -73,6 +77,6 @@ export function setupWideRoom(v3) {
   // 게임 보기로 바뀌면 서랍 상태를 지운다(게임 보기는 기존 대화창)
   new MutationObserver(() => { if (!site() && school.dataset.log) set(false); }).observe(school, { attributes: true, attributeFilter: ['data-view3'] });
   // Q(말하기)는 서랍을 열고 입력 칸으로
-  if (v3 && typeof v3.focusChat === 'function') { const f = v3.focusChat; v3.focusChat = () => { if (site()) set(true); f(); }; }
+  // Q(말하기)는 늘 보이는 아래 질문 칸으로 바로(서랍은 열지 않음, 10/9)
   return { open: () => set(true), close: () => set(false), get el() { return btn; }, dialogue };
 }
