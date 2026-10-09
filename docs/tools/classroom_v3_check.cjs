@@ -15,7 +15,8 @@ const OUT = 'C:/Users/user/.claude/jobs/a132f963/tmp/';
   expect(out.start.lecture === 'playing', '시작하자마자 강의 재생 아님 ' + out.start.lecture);
   expect(!!out.start.sub, '자막 없음');
   out.zones = await p.evaluate(() => ['lectureStage', 'workZone', 'dialogue'].map((id) => { const r = document.getElementById(id).getBoundingClientRect(); return [id, Math.round(r.top), Math.round(r.height)]; }));
-  expect(out.zones[0][1] < out.zones[1][1] && out.zones[1][1] < out.zones[2][1], '세 칸 순서 틀림');
+  // 와이드 배치(10/9): 판서 강의 중엔 가운데 문제 칸을 숨김(높이 0) — 그때는 강의 칸이 아래 줄보다 위면 됨
+  expect(out.zones[1][2] === 0 ? out.zones[0][1] < out.zones[2][1] : out.zones[0][1] < out.zones[1][1] && out.zones[1][1] < out.zones[2][1], '세 칸 순서 틀림');
   await p.screenshot({ path: OUT + 'v3-playing.png' });
   await p.keyboard.press('Space'); await p.waitForTimeout(300); out.paused = await st();
   expect(out.paused.lecture === 'paused', 'Space 멈춤 안 됨');
@@ -32,6 +33,7 @@ const OUT = 'C:/Users/user/.claude/jobs/a132f963/tmp/';
   expect(out.ended.log >= 1, '채팅 기록 비어 있음');
   await p.screenshot({ path: OUT + 'v3-ended.png' });
   // 아래 채팅으로 질문
+  if (await p.$('.rw-log')) { await p.click('.rw-log'); await p.waitForTimeout(200); }   // 와이드 배치: 대화는 💬 서랍 안(10/9)
   await p.fill('#chatInput', '이건 왜 그런가요?'); await p.press('#chatInput', 'Enter'); await p.waitForTimeout(900);
   out.chat = await p.evaluate(() => [...document.querySelectorAll('#chatLog .v3-msg')].slice(-4).map((m) => m.className + ':' + m.textContent.slice(0, 30)));
   expect(out.chat.some((c) => /v3-me:/.test(c)), '내 질문이 기록에 없음');

@@ -19,6 +19,7 @@ import { createLecture } from "./lecture.js";
 import { loadPack, packRoute, packLines, label as packLabel } from "./lecture-pack.js";
 import { createDialog } from "./vn-dialog.js";
 import { createLectureUi } from "./lecture-ui.js";
+import { setupWideRoom } from "./room-wide.js";
 import { startClassroomV3 } from "./classroom-v3.js";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
@@ -816,6 +817,7 @@ async function renderStep(camera) {
   }
   $("stepLabel").textContent = curPack() ? packLabel(curPack(), step.id) : missionIndices ? `${missionIndices.indexOf(index)+1} / ${missionIndices.length} · 미션` : `${index + 1} / ${current.steps.length}`;
   lectureUi?.intro(false); lectureUi?.update(packCtx()); document.querySelector(".v3-relisten")?.remove();
+  document.querySelector(".school").dataset.step = step.options ? "quiz" : "board";   // room-wide.js: 판서 강의 중에만 문제 칸 숨김
   $("choices").replaceChildren();
   const kind =
     {
@@ -2373,6 +2375,7 @@ const MOOD={smile:'smile',serious:'strict',think:'neutral',neutral:'neutral'};
 // 강의 자막은 연애 시뮬레이션식 대사창으로(vn-dialog.js). 창을 누르면 ⏭ 와 같다.
 const vn = v3?.stage ? createDialog(v3.stage, { onNext: () => advance() }) : null;
 lectureUi = createLectureUi({ goRoute });
+setupWideRoom(v3);   // 강의실 배치 A: 와이드 칠판·대사창·버튼 한 줄·대화 서랍(대표님 10/9)
 lecture = createLecture({
   ctx:()=>current?{lesson:current,step:current.steps[index],index,course,passed}:null,
   script:step=>curPack()?packLines(curPack(),step.id):null,
