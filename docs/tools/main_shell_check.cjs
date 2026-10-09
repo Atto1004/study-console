@@ -43,14 +43,14 @@ const [W, H] = [+process.argv[2] || 1194, +process.argv[3] || 834];
   expect(await p.evaluate(() => document.querySelector('.gl-pop').hidden), '≡ 목록이 바깥 눌러도 안 닫힘');
   expect(!top.hscroll, '가로 스크롤');
   // 스크롤해도 위·아래 제자리
-  const pos = () => p.evaluate(() => ({ head: Math.round(document.querySelector('.school > header').getBoundingClientRect().top), bar: Math.round(document.querySelector('.sb').getBoundingClientRect().bottom), who: !!document.querySelector('.sb-who svg') }));
+  const pos = () => p.evaluate(() => ({ head: Math.round(document.querySelector('.school > header').getBoundingClientRect().top), bar: Math.round(document.querySelector('.sb').getBoundingClientRect().bottom), who: !!document.querySelector('.sb-who[data-face=saeng] .saeng') }));   // 강의실과 같은 웹툰 그림(10/9)
   const before = await pos();
   await p.evaluate(() => { const s = [document.scrollingElement, document.getElementById('scene'), document.querySelector('.school')].find((e) => e && e.scrollHeight > e.clientHeight + 5); if (s) s.scrollTop = 600; window.__scroller = s ? (s.id || s.className || 'root') : 'none'; });
   await p.waitForTimeout(300);
   const after = await pos();
   expect(after.head === before.head && after.head <= 1, '스크롤 뒤 위 줄이 움직임 ' + JSON.stringify([before, after]));
   expect(after.bar === before.bar && Math.abs(after.bar - H) <= 1, '스크롤 뒤 아래 바가 움직임 ' + JSON.stringify([before, after]));
-  expect(after.who, '아래 바에 스앵님 없음');
+  expect(after.who, '아래 바에 웹툰 스앵님 없음');
   // 채팅 → 답
   await p.fill('.sb input', '오늘 뭐부터 할까요?'); await p.press('.sb input', 'Enter');
   await p.waitForFunction(() => /모의|질문/.test(document.querySelector('.sb-bubble')?.textContent || ''), null, { timeout: 8000 }).catch(() => {});

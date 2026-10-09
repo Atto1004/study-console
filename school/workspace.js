@@ -184,7 +184,7 @@ export function createWorkspace(app){
     scene.append(left,right);
 
     // 스앵님 + 대사창
-    const face=el('div',undefined,'corridor-saeng');face.append(Object.assign(el('img'),{src:'../notes/classroom/assets/tutor/neutral.png',alt:''}));
+    const face=el('div',undefined,'corridor-saeng');face.append(Object.assign(el('img'),{src:'../docs/demo/saeng/layers2/base.png',alt:''}));app.rig?.(face);   /* 강의실과 같은 웹툰 그림체(10/9) — 움직이는 그림이 오면 바뀜 */
     scene.append(face);
     corridorSaeng?.destroy();corridorSaeng=null;const gen=++corridorGen;
     attachSaeng(face).then(s=>{if(!s)return;if(gen!==corridorGen||!face.isConnected){s.destroy();return;}corridorSaeng=s;s.react(react);s.speak(line);});

@@ -1,7 +1,7 @@
 // 학교 화면 틀(대표님 10/9): 위 고정 줄 = 「GREENLIGHT | SCHOOL」 · 탭 · 비서별 토큰 사용량 · 대표실 버튼,
 // 아래 고정 줄 = 김주영 스앵님(기본 캐릭터 rig.js) + 채팅 바(대화·질문). 스크롤해도 위·아래는 그대로.
 // 수업(교실) 화면에서는 아래 줄을 숨긴다(교실은 자기 조작 줄이 있음). index.html·v3.css 는 건드리지 않고 이 모듈이 덮는다.
-import { createRig } from './rig.js';
+import { createFace } from './face.js';
 import { officeHref } from './worldmap.js';
 import { createInbox } from './inbox.js';
 
@@ -48,7 +48,8 @@ const CSS = `
 /* ── 아래 고정 줄: 스앵님 + 채팅 */
 .sb{position:fixed;z-index:45;left:0;right:0;bottom:0;height:var(--gl-bottom);display:flex;align-items:center;gap:12px;padding:10px 16px max(10px,env(safe-area-inset-bottom)) 116px;box-sizing:border-box;
   background:#fffffff5;backdrop-filter:blur(8px);border-top:1px solid #e3e8e4}
-.sb-who{position:absolute;left:18px;bottom:4px;width:84px;height:122px;pointer-events:none}   /* 바 위로는 30px 남짓만 나오게 */
+.sb-who{position:absolute;left:18px;bottom:4px;width:84px;height:122px;pointer-events:none}
+.sb-who[data-face=saeng]{display:flex;align-items:flex-end;filter:drop-shadow(0 6px 10px #0003)}.sb-who[data-face=saeng] .saeng{width:100%}   /* 바 위로는 30px 남짓만 나오게 */
 .sb-bubble{position:absolute;left:112px;cursor:pointer;right:16px;bottom:calc(100% + 8px);max-width:640px;padding:10px 14px;border-radius:14px 14px 14px 4px;background:#16291f;color:#f6f2e6;
   font:500 15px/1.55 "Pretendard Variable",Pretendard,system-ui,sans-serif;box-shadow:0 8px 20px #0003;max-height:30dvh;overflow:auto}
 .sb-bubble[hidden]{display:none}
@@ -69,7 +70,7 @@ const CSS = `
 /* ── 상담실 */
 .counsel-room{display:grid;grid-template-columns:240px minmax(0,1fr);gap:18px;max-width:1120px;margin:14px auto 0;align-items:start}
 .counsel-side{position:sticky;top:calc(var(--gl-top) + 14px);background:#fff;border:1px solid #e3e8e4;border-radius:18px;padding:16px;text-align:center}
-.counsel-face{height:260px}
+.counsel-face{height:260px}.counsel-face[data-face=saeng]{display:flex;justify-content:center;align-items:flex-end;overflow:hidden}.counsel-face[data-face=saeng] .saeng{height:100%;width:auto;max-width:100%}
 .counsel-name{white-space:nowrap;display:block;margin-top:8px;font:700 16px/1.3 "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#14261f}
 .counsel-sub{margin:4px 0 0;color:#6b7c73;font:500 13px/1.5 "Pretendard Variable",Pretendard,system-ui,sans-serif}
 .counsel-main{background:#fff;border:1px solid #e3e8e4;border-radius:18px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
@@ -251,7 +252,7 @@ export function setupShell({ api, eventId, openArea, course = () => '', history 
   form.append(input, send, logBtn); bar.append(who, bubble, form);
   const log = document.createElement('div'); log.className = 'sb-log'; log.hidden = true; log.setAttribute('aria-label', '스앵님 대화 기록');
   school.append(bar, log);
-  const rig = createRig(who, { label: '김주영 스앵님' }); rig.setExpr('smile');
+  const rig = createFace(who, { label: '김주영 스앵님' }); rig.setExpr('smile');   // 강의실과 같은 스앵님 그림(10/9)
   bubble.onclick = () => { bubble.hidden = true; };   // 말풍선은 누르면 닫힘
   const messages = [];   // 이 화면에서 오간 말(서버 기록 상담 이력 뒤에 붙음)
   const say = (text, react) => {
