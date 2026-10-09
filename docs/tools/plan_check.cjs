@@ -16,7 +16,7 @@ const { chromium } = require('C:/Users/user/Desktop/아톰OS/기술실/study-con
   await p.goto('http://127.0.0.1:8797/school/index.html'); await p.waitForSelector('.pl-tasks', { timeout: 15000 }); await p.waitForTimeout(600);
   const groups = await p.evaluate(() => [...document.querySelectorAll('.pl-tasks .pl-group')].map((g) => (g.classList.contains('urgent') ? '!' : '') + g.querySelector('.pl-gname b').textContent));
   expect(groups[0] === '!정역학', '마감 임박 묶음이 맨 위가 아님 ' + JSON.stringify(groups));
-  expect(await p.evaluate(() => /그 밖 과목/.test(document.querySelector('.pl-tasks').textContent)), 'CADD 가 「그 밖 과목」으로 안 감');
+  expect(await p.evaluate(() => [...document.querySelectorAll('.pl-inclass')].some((x) => /CADD/.test(x.textContent)) && ![...document.querySelectorAll('.pl-gname b')].some((x) => x.textContent === 'CADD')), 'CADD(수업 당일 과제)가 「수업 중에 할 과제」로 안 감');
   expect(await p.evaluate(() => document.querySelector('.pl-tasks h2')?.textContent === '오늘 할 일' && !!document.querySelector('.pl-sub-hw') && !!document.querySelector('.pl-sub-st')), '「오늘 할 일」 아래 과제·공부 구분 없음');
   const row = '.pl-task[data-key="정역학|HW Ch.5"]';
   await p.fill(`${row} input[type=number]`, '90'); await p.press(`${row} input[type=number]`, 'Tab'); await p.waitForTimeout(400);
@@ -45,6 +45,11 @@ const { chromium } = require('C:/Users/user/Desktop/아톰OS/기술실/study-con
   expect(!/오늘/.test(next.head) && !next.now, '다음 날로 안 넘어감 ' + next.head);
   await p.click('.pl-schedule .pl-today'); await p.waitForTimeout(400);
   expect(/오늘/.test(await p.evaluate(() => document.querySelector('.pl-schedule .pl-head small')?.textContent)), '「오늘」로 안 돌아옴');
+  // ⑦-2 + 일정 추가: 날짜·과목·할 일 → 공부 계획 저장 → 하루 시간표에 표시
+  await p.click('.pl-schedule button[aria-label="일정 추가"]'); await p.waitForTimeout(300);
+  expect(await p.evaluate(() => !!document.querySelector('.pl-pop input[type=date]')), '+ 창에 날짜 칸 없음');
+  await p.fill('.pl-pop input[aria-label="할 일"]', '미적 12.4 복습'); await p.fill('.pl-pop input[aria-label="시작"]', '22:00'); await p.click('.pl-pop button[type=submit]'); await p.waitForTimeout(1500);
+  expect(await p.evaluate(() => [...document.querySelectorAll('.pl-blk.k-plan')].some((b) => /미적 12\.4 복습/.test(b.textContent))), '+ 로 넣은 일정이 시간표에 없음');
   // ⑧ 위치 기록: 칩 → place 저장·오른쪽 줄 표시
   await p.click('.pl-placebar .pl-chip:has-text("도서관")'); await p.waitForTimeout(400);
   expect((Object.values(saved?.v60?.place || {})[0] || []).some((r) => r.p === '도서관') && await p.evaluate(() => [...document.querySelectorAll('.pl-place')].some((x) => x.textContent === '도서관')), '위치 기록 안 됨');

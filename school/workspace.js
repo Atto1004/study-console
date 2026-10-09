@@ -1,7 +1,7 @@
 import { courseMetrics, sourceKind, pickQuest, KINDS } from "./metrics.js";
 import { attachSaeng } from "./saeng.js";
 import { officeHref } from "./worldmap.js";
-import { inFocus, focusCourses } from "./focus.js";
+import { inFocus, focusCourses, isInClass } from "./focus.js";
 const el = (tag, text, cls) => { const e=document.createElement(tag); if(text!==undefined)e.textContent=text; if(cls)e.className=cls; return e; };
 const btn = (text, action, cls='') => { const b=el('button',text,cls); b.type='button'; b.onclick=action; return b; };
 const minutes = s => Number(s.slice(0,2))*60+Number(s.slice(3));
@@ -211,7 +211,7 @@ export function createWorkspace(app){
     if(!exams.length)top.append(el('p','등록된 시험이 없어요.','db-empty'));
     const host=el('div',undefined,'db-plan');root.append(top,host);
     const deadlines=assignments?pendingDeadlines(assignments.rows||[],data.date):[];
-    loadRoutine().then(rt=>{if(!host.isConnected)return;app.plan?.render(host,{today:data.date,courses:focusCourses().filter(n=>data.courses.some(c=>c.name===n)),focus:inFocus,scheduled:data.scheduled,plans:data.plans,deadlines,calendar:calendar?.events||[],routine:rt,courseName:id=>data.courses.find(c=>c.id===id)?.name||'',courseId:name=>data.courses.find(c=>c.name===name)?.id,exams:data.exams.filter(e=>e.written&&inFocus(e.course)&&e.date>=data.date).map(e=>({course:e.course,date:e.date,time:e.time||'',assumed:!!e.assumed})),addPlan:item=>change({op:'plan-add',plans:[item]})});});
+    loadRoutine().then(rt=>{if(!host.isConnected)return;app.plan?.render(host,{today:data.date,courses:focusCourses().filter(n=>data.courses.some(c=>c.name===n)),focus:inFocus,inClass:isInClass,scheduled:data.scheduled,plans:data.plans,deadlines,calendar:calendar?.events||[],calendarOk:!!calendar?.verified,reload:()=>open('main'),routine:rt,courseName:id=>data.courses.find(c=>c.id===id)?.name||'',courseId:name=>data.courses.find(c=>c.name===name)?.id,exams:data.exams.filter(e=>e.written&&inFocus(e.course)&&e.date>=data.date).map(e=>({course:e.course,date:e.date,time:e.time||'',assumed:!!e.assumed})),addPlan:(item,many)=>change({op:'plan-add',plans:many?item:[item]}),dailyCap:Number(data.profile?.dailyCap)||4,updatePlan:item=>change({op:'plan-update',plan:item}),deletePlan:id=>change({op:'plan-delete',id})});});
   }
   // 상담실(대표님 10/9): 김주영 스앵님과 면담하며 학습자료 고치기·시험 범위·일정·공부 계획을 조율하는 공간.
   // 대화는 상담 모드(coach consultation, 서버에 상담 기록), 진단·계획 세우기는 기존 상담 흐름(app.consult)을 그대로.
