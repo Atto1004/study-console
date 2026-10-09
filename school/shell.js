@@ -120,7 +120,13 @@ export function setupShell({ api, eventId, course = () => '', history = () => []
     else { v.textContent = text || Math.round(pct) + '%'; i.style.width = Math.max(0, Math.min(100, pct)) + '%'; delete g.dataset.wait; if (pct >= 80) g.dataset.warn = ''; else delete g.dataset.warn; }
     g.title = tip || '';
   };
+  let polling = false;
   async function poll() {
+    if (polling || document.hidden) return;   // 숨은 탭·느린 요청 중첩 없이
+    polling = true;
+    try { await pollOnce(); } finally { polling = false; }
+  }
+  async function pollOnce() {
     try {
       const r = await fetch('/api/kingdom/limits', { credentials: 'same-origin', cache: 'no-store' }); if (!r.ok) throw new Error(r.status);
       const j = await r.json();
@@ -131,11 +137,13 @@ export function setupShell({ api, eventId, course = () => '', history = () => []
     } catch { setGauge(gAtom, null, '—', '사용량을 못 읽었어요'); setGauge(gOtta, null, '—', '사용량을 못 읽었어요'); }
     try {
       const r = await fetch('/api/toto/budget', { credentials: 'same-origin', cache: 'no-store' }); if (!r.ok) throw new Error(r.status);
-      const j = await r.json(); const spent = Number(j.spent) || 0, budget = Number(j.budget) || 10;
+      const j = await r.json(); const spent = Number(j?.spent), budget = Number(j?.budget);
+      if (!Number.isFinite(spent) || spent < 0 || !Number.isFinite(budget) || budget <= 0) throw new Error('예산 응답 이상');   // 빈 응답을 $0 으로 보이지 않게(오타 검수 10/9)
       setGauge(gToto, spent / budget * 100, '$' + spent.toFixed(2), `토토 이번 달 $${spent.toFixed(2)} / $${budget}`);
     } catch { setGauge(gToto, null, '—', '토토 예산을 못 읽었어요'); }
   }
-  poll(); const pollTimer = setInterval(() => { if (!document.hidden) poll(); }, 60000);
+  poll(); const pollTimer = setInterval(poll, 60000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
 
   // ── 아래 고정 줄: 스앵님 + 채팅
   const bar = document.createElement('div'); bar.className = 'sb'; bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', '김주영 스앵님과 대화');
@@ -165,7 +173,10 @@ export function setupShell({ api, eventId, course = () => '', history = () => []
   const setLog = (open) => { log.hidden = !open; logBtn.setAttribute('aria-pressed', String(open)); if (open) drawLog(); };
   logBtn.onclick = (e) => { e.stopPropagation(); setLog(log.hidden); };
   document.addEventListener('pointerdown', (e) => { if (!log.hidden && !e.target.closest('.sb-log, .sb')) setLog(false); }, true);   // 바깥 누르면 닫힘
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !log.hidden) { setLog(false); logBtn.focus(); } });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape' || school.dataset.mode === 'classroom') return;
+    if (!log.hidden) { setLog(false); logBtn.focus(); } else if (!bubble.hidden) { bubble.hidden = true; }   // 말풍선도 키보드(Esc)로 닫힘
+  });
   let busy = false;
   form.onsubmit = async (e) => {
     e.preventDefault(); const q = input.value.trim(); if (!q || busy) return;
