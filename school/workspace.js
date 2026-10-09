@@ -20,14 +20,14 @@ export function pastDue(r, today) {
 // 사회봉사는 다음 회차 것만(대표님 10/10 「사회봉사는 다음 회차 거 해야 할 거만 표시」): 회차 번호(sv-r3… 또는 「3회차」)를 읽어
 // 아직 안 끝난 회차 중 가장 가까운 회차만 남긴다. 회차 번호가 없는 항목은 근거가 없어 그대로 둔다.
 export function roundOf(r) {
-  const m = /^sv-r(\d+)/.exec(r.id || '') || /(\d+)\s*회차/.exec(r.title || r.t || '');
+  const m = /^sv-r(\d+)/.exec(r.id || '') || /(?<![\d.])(\d+)\s*회차/.exec(r.title || r.t || '');   // 「1.5회차」 를 5회차로 읽지 않게
   return m ? Number(m[1]) : null;
 }
 export function nextRoundOnly(rows, today) {
   const open = rows.filter((r) => r.course === '사회봉사' && !r.submitted && !pastDue(r, today) && roundOf(r) !== null);
   if (!open.length) return rows;
   const next = Math.min(...open.map(roundOf));
-  return rows.filter((r) => r.course !== '사회봉사' || roundOf(r) === null || roundOf(r) === next);
+  return rows.filter((r) => r.course !== '사회봉사' || r.submitted || roundOf(r) === null || roundOf(r) === next);   // 낸 것은 제한 없이(제출 완료 목록 그대로, 오타 검수 10/10)
 }
 export function pendingDeadlines(rows, today) {
   const day=Date.parse(today+'T00:00:00Z');

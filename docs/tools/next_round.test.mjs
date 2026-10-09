@@ -25,3 +25,18 @@ test('3회차를 다 내면 4회차가 다음 회차', () => {
 test('홈·과제실 공통 함수에서도 다음 회차만', () => {
   assert.deepEqual(pendingDeadlines(rows, '2026-10-10').map((r) => r.id).sort(), ['hw5', 'sv-ot', 'sv-r3-cards'].sort());
 });
+test('낸 회차는 다음 회차 제한과 무관하게 남음(제출 완료 목록), 다 내도 다시 생기지 않음', () => {
+  const r3done = rows.map((r) => (r.id === 'sv-r3-cards' ? { ...r, submitted: true } : r));
+  assert.ok(nextRoundOnly(r3done, '2026-10-10').some((r) => r.id === 'sv-r3-cards'), '3회차 제출본이 사라짐');
+  const all = rows.map((r) => (r.course === '사회봉사' ? { ...r, submitted: true } : r));
+  assert.deepEqual(nextRoundOnly(all, '2026-10-10').map((r) => r.id), rows.map((r) => r.id));
+});
+test('회차 숫자 경계', () => {
+  assert.equal(roundOf({ title: '1.5회차 안내' }), null);
+  assert.equal(roundOf({ title: '2026년 12회차' }), 12);
+  assert.equal(roundOf({ title: '3회차' }), 3);
+});
+test('빈 목록·사회봉사 없음', () => {
+  assert.deepEqual(nextRoundOnly([], '2026-10-10'), []);
+  assert.deepEqual(nextRoundOnly([rows[5]], '2026-10-10'), [rows[5]]);
+});
