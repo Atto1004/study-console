@@ -2,6 +2,8 @@
 // 강의안은 대본·판서 순서·섹션만 갖는다. 확인 문제·학습지 문항은 교실 데이터 quiz(문항 원본 하나)를 id 로 가리킬 뿐이다.
 // 수업 순서 = 섹션마다 [판서 단계들 → 그 섹션 확인 문제] → 끝에 학습지. 강의안이 없거나 레슨과 안 맞으면 null(기존 경로 그대로).
 const cache = new Map();
+// 학습지 칸은 문항 id 문자열 또는 {id, kind: 개념|변형|도전, section} (규격 v1.1)
+export const sheetIds = (pack) => (pack.worksheet || []).map((w) => (typeof w === 'string' ? w : w?.id));
 
 export function loadPack(lessonId) {
   if (!/^[\w-]{1,80}$/.test(String(lessonId || ''))) return Promise.resolve(null);
@@ -17,7 +19,7 @@ export function loadPack(lessonId) {
 // 레슨 단계 번호 순서. 강의안이 가리키는 id 가 레슨에 하나라도 없으면(판서가 바뀜) 강의안을 쓰지 않는다.
 export function packRoute(pack, steps) {
   const at = new Map(steps.map((s, i) => [s.id, i]));
-  const ids = [...pack.sections.flatMap((sec) => [...Object.keys(sec.script || {}), sec.check]), ...(pack.worksheet || [])];
+  const ids = [...pack.sections.flatMap((sec) => [...Object.keys(sec.script || {}), sec.check]), ...sheetIds(pack)];
   const out = ids.map((id) => at.get(id));
   return out.length && out.every((i) => i !== undefined) && new Set(out).size === out.length ? out : null;
 }
@@ -29,8 +31,8 @@ export function place(pack, stepId) {
     if (ids.includes(stepId)) return { role: 'board', n: k + 1, of: pack.sections.length, sec, opening: k === 0 && ids[0] === stepId };
     if (sec.check === stepId) return { role: 'check', n: k + 1, of: pack.sections.length, sec };
   }
-  const w = (pack.worksheet || []).indexOf(stepId);
-  return w >= 0 ? { role: 'sheet', n: w + 1, of: pack.worksheet.length } : null;
+  const ws = sheetIds(pack), w = ws.indexOf(stepId);
+  return w >= 0 ? { role: 'sheet', n: w + 1, of: ws.length } : null;
 }
 
 export function label(pack, stepId) {

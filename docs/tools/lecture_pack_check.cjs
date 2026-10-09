@@ -48,7 +48,7 @@ const SHOT = process.env.SHOT_DIR;
   const lesson = await p.evaluate(() => fetch('/api/study/lesson?id=statics-2026-09-14').then((r) => r.json()));
   const pack = require('../../knowledge/lectures/statics-2026-09-14.json');
   const at = new Map(lesson.steps.map((s, i) => [s.id, i]));
-  const route = pack.sections.flatMap((sec) => [...Object.keys(sec.script), sec.check]).concat(pack.worksheet).map((id) => at.get(id));
+  const route = pack.sections.flatMap((sec) => [...Object.keys(sec.script), sec.check]).concat(pack.worksheet.map((w) => (typeof w === 'string' ? w : w.id))).map((id) => at.get(id));
   const pos = posts.filter((x) => x.k === 'event' && x.b.kind === 'position').map((x) => x.b.index);
   expect(JSON.stringify(pos) === JSON.stringify(route.slice(1, pos.length + 1)), '위치가 수업 순서와 다름 ' + JSON.stringify(pos));
   // 오답 → 같은 문제 / 정답 → 다음 섹션
@@ -86,7 +86,7 @@ const SHOT = process.env.SHOT_DIR;
   const all = positions();
   expect(JSON.stringify(all) === JSON.stringify(route.slice(1, all.length + 1)) && all.length === route.length - 1, '전체 위치가 수업 순서와 다름 ' + all.length + '/' + (route.length - 1));
   const answered = new Set(posts.filter((x) => x.b.kind === 'answer' && x.b.correct === true).map((x) => x.b.step));
-  for (const id of [...pack.sections.map((s) => s.check), ...pack.worksheet]) expect(answered.has(id), '답 기록 없음 ' + id);
+  for (const id of [...pack.sections.map((s) => s.check), ...pack.worksheet.map((w) => (typeof w === 'string' ? w : w.id))]) expect(answered.has(id), '답 기록 없음 ' + id);
   expect(!posts.some((x) => x.k === 'event' && x.b.kind === 'read'), '끝까지 가는 동안 「읽음」 기록이 남음');
   if (SHOT) await p.screenshot({ path: SHOT + '/pack-finish.png' });
   expect(!errors.length, '페이지 오류 ' + errors.join(' | '));
