@@ -34,7 +34,11 @@ export function startClassroomV3(app) {
   const subtitle = el('div', 'v3-subtitle'); subtitle.id = 'subtitle'; subtitle.setAttribute('aria-live', 'polite'); subtitle.hidden = true;
   const mount3d = el('div', 'v3-3d'); mount3d.id = 'stage3d';
   stage.append(mount3d, teaching, subtitle);
-  room.append(stage, work);
+  const guide = el('aside', 'v3-guide');
+  guide.setAttribute('aria-label', '김주영 스앵님');
+  const teacher = teaching.querySelector('.teacher');
+  if (teacher) guide.append(teacher);
+  room.append(stage, guide, work);
   school.append(dialogue);
   const choices = document.getElementById('choices'); (document.getElementById('board') || teaching).append(choices);
   const moveWork = () => { const w = document.getElementById('missionWork'); if (w && w.parentElement !== work) work.append(w); };
@@ -49,9 +53,25 @@ export function startClassroomV3(app) {
   const earlier = el('button', '', '이전 대화'), later = el('button', '', '다음 대화'), pageLabel = el('span');
   earlier.type = later.type = 'button';
   let messagePage = 0;
+  const visualDialogue = el('section', 'v3-vn');
+  visualDialogue.setAttribute('aria-label', '수업 대화');
+  const speakerName = el('strong', 'v3-vn-name', '김주영 스앵님');
   function showMessage() {
-    const rows = [...log.children]; messagePage = Math.max(0, Math.min(messagePage, rows.length - 1));
+    let rows = [...log.children]; messagePage = Math.max(0, Math.min(messagePage, rows.length - 1));
     rows.forEach((row, i) => { row.hidden = i !== messagePage; });
+    // 실제 글꼴과 창 너비로 확인해서 긴 대사는 더 작은 페이지로 보존한다.
+    let row = rows[messagePage], body = row?.querySelector('p');
+    while (log.clientHeight && body && body.getBoundingClientRect().height > log.clientHeight && body.textContent.length > 1) {
+      const parts = splitText(body.textContent, Math.ceil(body.textContent.length / 2));
+      if (parts.length < 2) break;
+      body.textContent = parts[0];
+      let tail = row;
+      for (const part of parts.slice(1)) {
+        const next = el('div', row.className); next.hidden = true; next.append(el('p', undefined, part)); tail.after(next); tail = next;
+      }
+      rows = [...log.children];
+    }
+    speakerName.textContent = rows[messagePage]?.classList.contains('v3-me') ? '대표님' : '김주영 스앵님';
     earlier.disabled = messagePage === 0; later.disabled = messagePage >= rows.length - 1;
     pageLabel.textContent = rows.length ? `${messagePage + 1} / ${rows.length}` : '';
     logPages.hidden = !rows.length;
@@ -77,7 +97,8 @@ export function startClassroomV3(app) {
   ]) { const b = el('button', 'v3-menu-item'); b.type = 'button'; b.innerHTML = svg(icon); b.append(label); b.onclick = () => { more.open = false; go(); }; menu.append(b); }
   more.append(sum, menu);
   bar.append(restart, play, skip, progress, track, hint, simpler, more);
-  dialogue.prepend(log, logPages); dialogue.append(chat, bar);
+  visualDialogue.append(speakerName, log, logPages);
+  dialogue.prepend(visualDialogue); dialogue.append(chat, bar);
   const placeDialogue = () => {
     if (school.dataset.mode !== 'classroom' || dialogue.hidden) return;
     const rect = room.getBoundingClientRect();
@@ -92,6 +113,7 @@ export function startClassroomV3(app) {
     observer.observe(room); observer.observe(stage); observer.observe(dialogue);
   }
   window.addEventListener('resize', placeDialogue);
+  if (globalThis.ResizeObserver) new ResizeObserver(showMessage).observe(log);
   new MutationObserver(placeDialogue).observe(school, { attributes: true, attributeFilter: ['data-mode'] });
 
   restart.onclick = () => app.onRestart?.();

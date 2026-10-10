@@ -92,3 +92,37 @@
 @media(max-width:900px) and (orientation:portrait),(max-width:640px){
  .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-work{height:100%!important}
 }
+
+/* .210: 칠판 밖 스앵님 자리와 이름표가 있는 수업 대화창. */
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{grid-template-columns:minmax(0,2fr) 136px minmax(0,1fr)!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-work{grid-column:3!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide{grid-column:2;grid-row:1;align-self:start;height:var(--class-board-height,100%);display:flex;align-items:flex-end;justify-content:center;min-width:0;overflow:hidden;pointer-events:none}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide .teacher{position:relative!important;inset:auto!important;display:block!important;width:100%!important;height:auto!important;background:none!important;padding:0!important;transform:none!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide #dock{display:block!important;position:relative!important;inset:auto!important;width:100%!important;max-width:none!important;padding:0!important;border:0!important;background:none!important;box-shadow:none!important;transform:none!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide #dockFace{width:100%!important;height:auto!important;aspect-ratio:440/584;margin:0!important;border:0!important;background:none!important;overflow:hidden!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide #dockFace .saeng{width:100%!important;height:auto!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide #dockLine,
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide #dockTalk,
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide .teacher:has(#dock) > #teacher{display:none!important}
+.school[data-shared-chat][data-mode=classroom] .sb-who{display:none!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #dialogue{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;gap:8px!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .v3-vn{position:relative;box-sizing:border-box;flex:none;height:110px;padding:32px 20px 12px;border:1px solid #b9cabe;border-radius:16px;background:linear-gradient(135deg,#f8fbf7,#ecf3ec);box-shadow:0 4px 14px #1f3d3310}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .v3-vn-name{position:absolute;top:-10px;left:20px;padding:5px 16px;border-radius:8px;background:#315b49;color:#fff;font:600 14px/1.4 Pretendard,system-ui,sans-serif}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .v3-vn .v3-log{height:64px!important;min-height:64px!important;max-height:64px!important;padding:0 220px 0 0!important;overflow:hidden!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .v3-vn .v3-msg p{display:block!important;max-width:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:none!important;color:#1f3d33!important;font-size:16px!important;line-height:1.55!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .v3-vn .v3-log-pages{top:auto;bottom:12px;right:14px}
+.school[data-board-only][data-layout=v3][data-mode=classroom] #dialogue .v3-bar{background:#fff;border:1px solid #dce5dc;border-radius:12px;padding:8px 14px!important;margin:0!important;box-sizing:border-box}
+@media(max-width:900px) and (orientation:portrait),(max-width:640px){
+ .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{grid-template-columns:minmax(0,1fr) 84px!important}
+ .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-work{grid-column:1/-1!important}
+ .school[data-board-only][data-layout=v3][data-mode=classroom] .v3-vn{height:132px;padding:26px 12px 8px}
+ .school[data-board-only][data-layout=v3][data-mode=classroom] .v3-vn .v3-log{padding:0!important}
+ .school[data-board-only][data-layout=v3][data-mode=classroom] .v3-vn .v3-log-pages{position:absolute;bottom:8px;right:8px}
+}
+
+/* Character layers keep their original absolute positions inside the portrait. */
+.school[data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide #dockFace{display:block!important}
+.school[data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide #dockFace .saeng{position:relative!important;display:block!important;aspect-ratio:440/584!important;min-height:0!important;max-width:100%!important}
+.school[data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide #dockFace .saeng img{position:absolute!important;height:auto!important;max-height:none!important;max-width:none!important;margin:0!important}
+.school[data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide #dockFace .saeng img.base{left:0!important;top:0!important;width:100%!important}
+.school[data-layout=v3][data-view3=game] .v3-guide{display:none}
