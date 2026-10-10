@@ -19,6 +19,8 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
   const contents = node('nav', 'lesson-textbook-contents');
   contents.setAttribute('aria-label', '교재 목차');
   const title = node('h3', 'lesson-textbook-title');
+  const readingGuide = node('p', 'lesson-textbook-guide');
+  const illustration = node('figure', 'lesson-textbook-figure'); illustration.hidden = true;
   const body = node('div', 'lesson-textbook-body');
   body.setAttribute('aria-live', 'polite');
   const pages = node('div', 'lesson-textbook-pages');
@@ -27,7 +29,7 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
   const next = node('button', '', '다음 쪽');
   previous.type = next.type = 'button';
   pages.append(previous, position, next);
-  el.append(header, contents, title, body, pages);
+  el.append(header, contents, title, readingGuide, illustration, body, pages);
   let material = [], page = 0, sourceText = '', pageLimit = 300, renderVersion = 0;
   function paginate() {
     material = [];
@@ -40,7 +42,9 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
   }
 
   function showPage() {
-    body.textContent = material[page] || '이 수업 단계에 연결된 개념·예제 자료가 없습니다.';
+    body.replaceChildren();
+    const text = material[page] || '이 수업 단계에 연결된 개념·예제 자료가 없습니다.';
+    for (const paragraph of text.split(/\n\s*\n/)) body.append(node('p', 'textbook-paragraph', paragraph));
     position.textContent = material.length ? `${page + 1} / ${material.length}쪽` : '자료 없음';
     previous.disabled = page <= 0;
     next.disabled = page >= material.length - 1;
@@ -102,7 +106,21 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
     contents.hidden = !entries.length;
     showContents();
     title.textContent = selected?.step.title || '연결 자료';
-    const text = selected?.parts.filter(part => typeof part === 'string' && part.trim()).join('\n\n') || '';
+    const example = /예제|Ex\d|계산/i.test(selected?.step.title || '');
+    const sourceLabel = String(lesson?.id || '').startsWith('draft:') ? 'AI 보충 자료' : lesson?.generated || String(lesson?.id || '').startsWith('exam-') ? '자체 제작 시험 대비' : '연결된 수업 자료';
+    readingGuide.textContent = (example ? '예제 풀이' : '개념 이해') + ' · ' + sourceLabel + ' · ' + (selected?.parts.length || 0) + '개 단계';
+    illustration.replaceChildren(); illustration.hidden = true;
+    if (/곱셈|행렬곱/.test(selected?.step.title || '')) {
+      illustration.hidden = false;
+      const diagram = node('div');
+      diagram.innerHTML = '<svg viewBox="0 0 360 68" role="img" aria-label="행렬곱의 크기: 앞의 열 수와 뒤의 행 수가 같으면 결과는 앞의 행 수와 뒤의 열 수"><rect x="5" y="8" width="96" height="45" rx="7" fill="#edf1e9"/><text x="53" y="36" text-anchor="middle" fill="#263c2c" font-size="20">m × n</text><text x="119" y="36" fill="#5c705a" font-size="20">·</text><rect x="144" y="8" width="96" height="45" rx="7" fill="#edf1e9"/><text x="192" y="36" text-anchor="middle" fill="#263c2c" font-size="20">n × r</text><text x="255" y="36" fill="#5c705a" font-size="20">→</text><text x="320" y="36" text-anchor="middle" fill="#263c2c" font-size="20">m × r</text><path d="M78 54 Q140 75 174 54" fill="none" stroke="#ad9058" stroke-width="2"/></svg>';
+      illustration.append(diagram,node('figcaption','','안쪽 크기 n이 같아야 곱할 수 있습니다.'));
+    }
+    const unique = new Set();
+    const text = selected?.parts.filter(part => {
+      if (typeof part !== 'string' || !part.trim() || unique.has(part.trim())) return false;
+      unique.add(part.trim()); return true;
+    }).join('\n\n') || '';
     sourceText = text; pageLimit = 300; renderVersion++; page = 0; paginate();
     showPage();
   }

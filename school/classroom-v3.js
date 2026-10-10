@@ -2,6 +2,7 @@
 // 기존 요소(#board·.teacher·#choices·#missionWork·#dialogue)를 세 칸으로 옮겨 담고, 쓰지 않는 것(시점 아이콘 줄·학습 기록 띠·
 // 중복 진행 표시·도구 줄)은 숨긴다. 버튼 동작은 기존 것을 그대로 부른다.
 import { splitText } from './learning.js';
+import { groupLessonTopics } from './course-scope.js';
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
 const ICON = {
   game: 'M12 2 3 7v10l9 5 9-5V7zM3 7l9 5 9-5M12 12v10',
@@ -40,8 +41,18 @@ export function startClassroomV3(app) {
   if (teacher) guide.append(teacher);
   room.append(stage, guide, work);
   school.append(dialogue);
-  const choices = document.getElementById('choices'); (document.getElementById('board') || teaching).append(choices);
-  const moveWork = () => { const w = document.getElementById('missionWork'); if (w && w.parentElement !== work) work.append(w); };
+  const response = el('section', 'v3-response'); response.setAttribute('aria-label', '수업 답변');
+  response.append(el('h3', '', '직접 확인하기'));
+  const choices = document.getElementById('choices'); response.append(choices);
+  const reply = el('form', 'v3-response-form'), replyText = el('textarea');
+  replyText.placeholder = '이해한 내용이나 답을 적어주세요'; replyText.setAttribute('aria-label', '수업 답변 적기'); replyText.maxLength = 600;
+  const replySend = el('button', '', '답변 보내기'); replySend.type = 'submit'; reply.append(replyText, replySend); response.append(reply); room.append(response);
+  reply.onsubmit = e => { e.preventDefault(); const text = replyText.value.trim(); if (!text) return; replyText.value = ''; addMine(text); app.onChat?.(text); };
+  const pointer = el('div', 'v3-pointer'); pointer.setAttribute('aria-hidden', 'true');
+  pointer.innerHTML = '<svg viewBox="0 0 160 90"><path d="M150 70Q117 77 105 52L70 37 76 18 120 34Q146 45 150 70" fill="#eee9e7" stroke="#b8ada7" stroke-width="2"/><path d="M77 19L61 13 33 19Q25 24 31 28L55 25 43 35Q40 42 48 42L72 37Z" fill="#e6beb0" stroke="#b39185" stroke-width="1.5"/><path d="M34 24L5 3" stroke="#d9c695" stroke-width="3" stroke-linecap="round"/></svg>';
+  guide.append(pointer);
+  const focusLine = el('div', 'v3-board-focus'); focusLine.hidden = true; stage.append(focusLine);
+  const moveWork = () => { const w = room.ownerDocument.getElementById('missionWork'); if (w && w.parentElement !== work) work.append(w); };
   // 게임 보기에서 앉아 있을 때: 「자리에서 일어나기」 하나(기존 시점 줄의 같은 버튼을 누른다 — 줄 자체는 오타 A3 대로 숨김)
   const stand = iconBtn('stand', '자리에서 일어나기 (Esc)', 'v3-stand');
   stand.onclick = () => document.querySelector('.seat-controls [data-icon=stand]')?.click(); stage.append(stand);
@@ -83,7 +94,12 @@ export function startClassroomV3(app) {
   const send = iconBtn('send', '보내기', 'v3-send'); send.type = 'submit'; chat.append(input, send);
   const bar = el('div', 'v3-bar');
   const restart = iconBtn('restart', '이 단계 강의 처음부터'), play = iconBtn('pause', '강의 멈춤 (Space)', 'v3-play'), skip = iconBtn('skip', '다음 (Enter)', 'v3-skip');
-  const progress = el('span', 'v3-progress'); const track = el('span', 'v3-track'); const fill = el('i'); track.append(fill);
+  const progress = el('span', 'v3-progress');
+  const journey = el('div', 'v3-journey'); journey.setAttribute('aria-label', '세부단원별 수업 진행');
+  const route = el('nav', 'v3-route'); route.setAttribute('aria-label', '세부단원 바로 가기');
+  const runner = el('span', 'v3-runner'); runner.setAttribute('aria-hidden', 'true'); runner.innerHTML = '<img src="../docs/demo/saeng/layers2/base.png" alt="">';
+  const finish = el('span', 'v3-finish', '⚑'); finish.setAttribute('aria-label', '수업 도착점');
+  journey.append(route, runner, finish); let journeyLesson = '', topics = [];
   const hint = document.getElementById('hint'), simpler = document.getElementById('simpler');
   const more = el('details', 'v3-more'); const sum = el('summary'); sum.innerHTML = svg(ICON.more); sum.setAttribute('aria-label', '더보기'); sum.dataset.tip = '근거·보충·공부 종료';
   const menu = el('div', 'v3-menu');
@@ -96,21 +112,21 @@ export function startClassroomV3(app) {
     ['M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z', '내 스킬', () => strip(/내 스킬/)?.click()],
   ]) { const b = el('button', 'v3-menu-item'); b.type = 'button'; b.innerHTML = svg(icon); b.append(label); b.onclick = () => { more.open = false; go(); }; menu.append(b); }
   more.append(sum, menu);
-  bar.append(restart, play, skip, progress, track, hint, simpler, more);
+  bar.append(journey, progress, restart, play, skip, hint, simpler, more);
   visualDialogue.append(speakerName, log, logPages);
-  dialogue.prepend(visualDialogue); dialogue.append(chat, bar);
+  dialogue.prepend(visualDialogue); dialogue.append(chat, bar); room.append(dialogue);
   const placeDialogue = () => {
     if (school.dataset.mode !== 'classroom' || dialogue.hidden) return;
     const rect = room.getBoundingClientRect();
     if (!rect.width) return;
     school.style.setProperty('--class-chat-left', `${rect.left}px`);
     school.style.setProperty('--class-chat-width', `${rect.width}px`);
-    school.style.setProperty('--class-chat-height', `${dialogue.offsetHeight}px`);
+    school.style.setProperty('--class-chat-height', `${visualDialogue.offsetHeight + bar.offsetHeight}px`);
     school.style.setProperty('--class-board-height', `${stage.getBoundingClientRect().height}px`);
   };
   if (globalThis.ResizeObserver) {
     const observer = new ResizeObserver(placeDialogue);
-    observer.observe(room); observer.observe(stage); observer.observe(dialogue);
+    observer.observe(room); observer.observe(stage); observer.observe(visualDialogue); observer.observe(bar);
   }
   window.addEventListener('resize', placeDialogue);
   if (globalThis.ResizeObserver) new ResizeObserver(showMessage).observe(log);
@@ -128,10 +144,11 @@ export function startClassroomV3(app) {
   new MutationObserver(() => { const t = speech.textContent.trim(); if (t && t !== lastLine) { lastLine = t; addLine('saeng', t); } }).observe(speech, { childList: true, characterData: true, subtree: true });
   function addLine(who, text) {
     text = String(text).replace(/[ \t]*\n\s*/g, '\n').replace(/[ \t]{2,}/g, ' ').trim(); if (!text) return;
+    const first = log.children.length;
     for (const part of splitText(text, 140)) {
       const row = el('div', 'v3-msg v3-' + who); /* 'saeng' 그대로 쓰면 기존 초상 스타일과 겹친다 */ const b = el('p', undefined, part); row.append(b); log.append(row);
     }
-    messagePage = log.children.length - 1; showMessage();
+    messagePage = first; showMessage();
   }
   function addMine(text) { addLine('me', text); }
   // 가운데 답 칸에서 낸 답도 내 말로 남김
@@ -150,15 +167,39 @@ export function startClassroomV3(app) {
   if (!place() && header) { const mo = new MutationObserver(() => { if (place()) mo.disconnect(); }); mo.observe(header, { childList: true, subtree: true }); }
 
   return {
-    stage, mount3d, work,
+    stage, mount3d, work, response,
     get view() { return view; },
     subtitle(text) { subtitle.hidden = !text; subtitle.textContent = text || ''; },
     head(point) { if (!point) { subtitle.style.removeProperty('--hx'); subtitle.style.removeProperty('--hy'); return; } const r = stage.getBoundingClientRect(); subtitle.style.setProperty('--hx', (point.x - r.left) + 'px'); subtitle.style.setProperty('--hy', (point.y - r.top) + 'px'); },
     // 본문은 즉시 읽을 수 있게 두고, 강의 진행은 자막과 진행 표시로 안내한다.
-    board() { document.querySelector('#board .content')?.style.setProperty('--reveal', '1'); },
+    board(fraction) { stage.style.setProperty('--lecture-fraction', String(fraction)); document.querySelector('#board .content')?.style.setProperty('--reveal', '1'); },
+    line(text) {
+      if (!text) { focusLine.hidden = true; return; }
+      addLine('saeng', text); focusLine.textContent = text; focusLine.hidden = school.dataset.step === 'quiz';
+      focusLine.classList.remove('enter'); void focusLine.offsetWidth; focusLine.classList.add('enter');
+      const context = app.context?.(), step = context?.lesson?.steps[context.index];
+      focusLine.hidden = !!step?.options || step?.kind === 'quiz';
+      const kind = step?.kind;
+      guide.dataset.gesture = kind === 'example' ? 'point' : kind === 'remember' ? 'emphasize' : 'explain';
+      app.onMood?.(kind === 'example' ? 'smile' : kind === 'remember' ? 'strict' : 'neutral');
+    },
     state({ playing, index, count, ended }) {
       play.innerHTML = svg(ICON[playing ? 'pause' : 'play']); play.setAttribute('aria-label', playing ? '강의 멈춤 (Space)' : ended ? '강의 다시 듣기 (Space)' : '강의 계속 (Space)'); play.dataset.tip = play.getAttribute('aria-label');
-      const p = app.progress?.() || ''; progress.textContent = p; fill.style.width = count ? Math.round(((ended ? count : index) / count) * 100) + '%' : '0';
+      const context = app.context?.();
+      const currentStep = context?.lesson?.steps[context.index];
+      school.dataset.step = currentStep?.options || currentStep?.kind === 'quiz' ? 'quiz' : 'board';
+      if (context?.lesson) {
+        if (journeyLesson !== context.lesson.id) {
+          journeyLesson = context.lesson.id; topics = groupLessonTopics(context.lesson.steps); route.replaceChildren();
+          topics.forEach(topic => { const button = el('button', '', topic.title.split(' — ')[0]); button.type = 'button'; button.title = topic.title; button.onclick = () => app.onStep?.(topic.stepId); route.append(button); });
+        }
+        const step = context.index || 0, total = context.lesson.steps.length;
+        const fraction = count ? (ended ? 1 : index / count) : 0;
+        const pct = Math.min(100, Math.round((step + fraction) / Math.max(1,total) * 100));
+        progress.textContent = `수업 진행 ${pct}%`; journey.style.setProperty('--journey-position', pct + '%');
+        [...route.children].forEach((button, at) => { const active = step >= topics[at].index && step < (topics[at+1]?.index ?? total); button.classList.toggle('done', step >= (topics[at+1]?.index ?? total)); button.setAttribute('aria-current',active?'step':'false'); });
+        journey.dataset.playing = String(playing);
+      } else progress.textContent = app.progress?.() || '';
       school.dataset.lecture = ended ? 'ended' : playing ? 'playing' : 'paused';
     },
     focusChat() { (school.dataset.sharedChat ? school.querySelector('.sb input') : input)?.focus(); },

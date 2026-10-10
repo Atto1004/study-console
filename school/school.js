@@ -30,8 +30,8 @@ import { createFace } from "./face.js";
 import { readable, cleanTitle } from "./readable.js";
 import { createPlan } from "./plan.js";
 import { inFocus } from "./focus.js";
-import { createLessonTextbook } from "./lesson-textbook.js?v=202";
-import { startClassroomV3 } from "./classroom-v3.js?v=211";
+import { createLessonTextbook } from "./lesson-textbook.js?v=217";
+import { startClassroomV3 } from "./classroom-v3.js?v=217";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
@@ -814,7 +814,7 @@ function board(title, body, kind, annotation) {
       );
       host.append(controls);
     }
-    if (v3 && choices) host.append(choices);
+    if (v3 && choices) v3.response.append(choices);
     renderMath(host);
     requestAnimationFrame(() => {
       if (
@@ -2416,6 +2416,9 @@ v3 = startClassroomV3({
     tutor?.submitMessage(text);
   },
   progress:()=>$('stepLabel')?.textContent||'',
+  context:()=>current?{lesson:current,index}:null,
+  onMood:mood=>dockSaeng?.setExpr?.(mood),
+  onStep:stepId=>current&&startLesson(current.id,{stepId}),
   onViewChange:async view=>{if(current&&document.querySelector('.school').dataset.mode==='classroom'){stagedCourse=null;await stage3d(current.steps[index].kind);}else if(view==='site'){space?.mount?.(null);space?.hide();}},
 });
 textbook = createLessonTextbook({math:renderMath,onStep:stepId=>current && startLesson(current.id,{stepId})});
@@ -2467,7 +2470,7 @@ lecture = createLecture({
   line:l=>{const p=curPack();if(p&&l?.intro)lectureUi?.intro(true,{key:current.id,course:p.course,date:p.date,title:current.title,goals:p.goals||[]});else lectureUi?.intro(false);},
   mood:m=>dockSaeng?.setExpr?.(MOOD[m]||'neutral'),
   talk:on=>{space?.saeng?.lecture?.(on);},
-  subtitle:text=>{v3.subtitle(text);vn?.say(text);if(text)dockSaeng?.speak(text.slice(0,80));},
+  subtitle:text=>{v3.subtitle(text);v3.line(text);vn?.say(text);if(text)dockSaeng?.speak(text.slice(0,80));},
   board:f=>v3.board(f),
   voiceOn:()=>{try{return capabilities.voice&&localStorage.getItem('school-voice')==='1';}catch{return false;}},
   voice:(text,signal)=>new Promise(async(resolve,reject)=>{try{const r=await fetch('/api/school/voice',{method:'POST',credentials:'same-origin',signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text.slice(0,600)})});if(!r.ok)throw new Error('voice');const url=URL.createObjectURL(await r.blob());const a=new Audio(url);const end=()=>{URL.revokeObjectURL(url);resolve();};a.onended=end;a.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('voice'));};signal.addEventListener('abort',()=>{a.pause();end();});await a.play();}catch(e){reject(e);}}),
