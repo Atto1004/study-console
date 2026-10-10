@@ -251,6 +251,7 @@ export function setupShell({ api, eventId, openArea, course = () => '', history 
   const logBtn = document.createElement('button'); logBtn.type = 'button'; logBtn.innerHTML = svg(ICON.log); logBtn.setAttribute('aria-label', '대화 기록'); logBtn.setAttribute('aria-pressed', 'false');
   form.append(input, send, logBtn); bar.append(who, bubble, form);
   const log = document.createElement('div'); log.className = 'sb-log'; log.hidden = true; log.setAttribute('aria-label', '스앵님 대화 기록');
+  school.dataset.sharedChat = '1';
   school.append(bar, log);
   const rig = createFace(who, { label: '김주영 스앵님' }); rig.setExpr('smile');   // 강의실과 같은 스앵님 그림(10/9)
   bubble.onclick = () => { bubble.hidden = true; };   // 말풍선은 누르면 닫힘
@@ -262,7 +263,7 @@ export function setupShell({ api, eventId, openArea, course = () => '', history 
   };
   const drawLog = () => {
     const past = (history() || []).slice(-10).flatMap((e) => [{ me: true, t: e.question }, { me: false, t: e.answer }]);
-    const all = [...past, ...messages];
+    const all = school.dataset.mode === 'classroom' ? [...school.querySelectorAll('.v3-log .v3-msg')].map(row => ({ me: row.classList.contains('v3-me'), t: row.textContent })) : [...past, ...messages];
     log.replaceChildren(...(all.length ? all.map((m) => Object.assign(document.createElement('div'), { className: 'sb-msg ' + (m.me ? 'from-me' : 'from-saeng'), textContent: m.t })) : [Object.assign(document.createElement('p'), { className: 'sb-empty', textContent: '아직 나눈 대화가 없어요.' })]));
     log.scrollTop = log.scrollHeight;
   };
@@ -276,6 +277,7 @@ export function setupShell({ api, eventId, openArea, course = () => '', history 
   let busy = false;
   form.onsubmit = async (e) => {
     e.preventDefault(); const q = input.value.trim(); if (!q || busy) return;
+    if (school.dataset.mode === 'classroom') { input.value = ''; window.dispatchEvent(new CustomEvent('school:classroom-chat', { detail: { text: q } })); return; }
     busy = true; send.disabled = true; input.value = ''; messages.push({ me: true, t: q }); if (!log.hidden) drawLog();
     say('음… 잠깐만요. 시험이랑 오늘 계획 보고 말해 줄게요.'); rig.setExpr('think');
     try {

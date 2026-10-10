@@ -77,3 +77,12 @@
  .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{grid-template-rows:auto minmax(0,1fr)!important}
  .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-work{grid-row:2!important}
 }
+
+/* .206: 홈 입력바 DOM 하나를 강의실에서도 그대로 쓴다. */
+.school[data-shared-chat][data-mode=classroom] .sb{display:flex!important}
+.school[data-shared-chat][data-mode=classroom] .sb-bubble{display:none!important}
+.school[data-shared-chat][data-board-only][data-layout=v3][data-mode=classroom] #dialogue .v3-chat{display:none!important}
+.school[data-shared-chat][data-layout=v3][data-mode=classroom][data-view3=site] #dialogue{bottom:calc(var(--gl-bottom,96px) + 8px)!important}
+.school[data-shared-chat][data-layout=v3][data-mode=classroom][data-view3=site] #scene{padding-bottom:calc(var(--class-chat-height,120px) + var(--gl-bottom,96px) + 20px)!important}
+
+.school[data-shared-chat][data-mode=classroom] .sb-log:not([hidden]){display:flex!important}

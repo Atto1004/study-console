@@ -98,6 +98,8 @@ export function startClassroomV3(app) {
   skip.onclick = () => app.onSkip?.();
   chat.addEventListener('submit', (e) => { e.preventDefault(); const t = input.value.trim(); if (!t) return; input.value = ''; addMine(t); app.onChat?.(t); });
 
+  window.addEventListener('school:classroom-chat', (event) => { const text = String(event.detail?.text || '').trim(); if (school.dataset.mode !== 'classroom' || !text) return; addMine(text); app.onChat?.(text); });
+
   // 스앵님 말(#speech)이 바뀔 때마다 대화 기록에 한 줄
   const speech = document.getElementById('speech'); let lastLine = '';
   new MutationObserver(() => { const t = speech.textContent.trim(); if (t && t !== lastLine) { lastLine = t; addLine('saeng', t); } }).observe(speech, { childList: true, characterData: true, subtree: true });
@@ -136,7 +138,7 @@ export function startClassroomV3(app) {
       const p = app.progress?.() || ''; progress.textContent = p; fill.style.width = count ? Math.round(((ended ? count : index) / count) * 100) + '%' : '0';
       school.dataset.lecture = ended ? 'ended' : playing ? 'playing' : 'paused';
     },
-    focusChat() { input.focus(); },
+    focusChat() { (school.dataset.sharedChat ? school.querySelector('.sb input') : input)?.focus(); },
     say: addLine,
   };
 }
