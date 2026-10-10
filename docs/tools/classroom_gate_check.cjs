@@ -40,7 +40,7 @@ const ok = (cond, msg) => { out.push((cond ? "ok   " : "FAIL ") + msg); if (!con
   btn(d, "정답 보기").click();
   const judgeBtn = btn(d, "맞았어요"); judgeBtn.focus();
   judgeBtn.dispatchEvent(new d.defaultView.KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
-  ok(gateOn(d) && X.S.mode === "intro" && d.querySelector("#gProg").textContent.startsWith("1 / 6"), "포커스된 「맞았어요」에서 Enter 로 통과 안 됨");
+  ok(gateOn(d) && X.S.mode === "intro" && d.querySelector("#gProg").textContent.startsWith("1 / " + X.D.gate.cards.length), "포커스된 「맞았어요」에서 Enter 로 통과 안 됨");
   key(d, "Escape");
   ok(!gateOn(d) && X.S.mode === "intro", "Esc 는 게이트만 닫고 시작하지 않는다");
   ok(X.L.pos === null || X.L.pos === undefined, "닫기 뒤에도 L.pos 불변");
@@ -48,7 +48,7 @@ const ok = (cond, msg) => { out.push((cond ? "ok   " : "FAIL ") + msg); if (!con
   // 2) 다시 열고 1번째 카드를 틀림 → 틀린 카드만 다시 출제 → 맞음 → 통과
   X.boot();
   ok(gateOn(d), "다시 열면 게이트가 다시 열린다(열 때마다)");
-  const total = 6;
+  const total = X.D.gate.cards.length;
   for (let i = 0; i < total; i++) {
     btn(d, "정답 보기").click();
     btn(d, i === 0 ? "틀렸어요" : "맞았어요").click();
@@ -69,7 +69,7 @@ const ok = (cond, msg) => { out.push((cond ? "ok   " : "FAIL ") + msg); if (!con
 
   // 4) 9/14 는 1강(내적·외적 카드 포함)에 연결됨: 게이트 적용, 카드 9장(공통 3 + 1강 6)
   r = await open("notes/classroom/statics/2026-09-14.html", "#ch=1");
-  ok(gateOn(r.doc) && r.w.__cr.D.gate.cards.length === 9, "9/14 게이트 적용, 카드 9장 (공통 3 + 1강 6)");
+  ok(gateOn(r.doc) && r.w.__cr.D.gate.cards.length === 11, "9/14 게이트 적용, 카드 11장 (공통 3 + 1강 8)");
   ok(r.doc.querySelector("#gBody").textContent.includes("sin30"), "9/14 첫 카드는 공통 카드");
 
   // 5) 확인 문제 진입(#quiz)도 같은 게이트를 거친다
