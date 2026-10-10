@@ -138,7 +138,7 @@ def gate_for(slug, date):
     if is_free: return {"state": "free", "note": g["free"][date]}
     k = hit[0]; lec = g["lectures"][k]["cards"]
     if len(g["common"]) != g["expect"]["common"] or len(lec) != g["expect"][k]: raise SystemExit(f"정역학 {date}: 카드 수 불일치 (공통 {len(g['common'])}/{g['expect']['common']}, {k}강 {len(lec)}/{g['expect'][k]})")
-    cards = [{"id": c["id"], "q": c["q"], "a": c["a"]} for c in g["common"] + lec]
+    cards = [{"id": c["id"], "q": c["q"], "a": c["a"], "why": c.get("why")} for c in g["common"] + lec]
     ids = [c["id"] for c in cards]
     if len(set(ids)) != len(ids): raise SystemExit(f"정역학 {date}: 카드 ID 중복")
     return {"state": "gate", "lecture": k, "cards": cards}

@@ -997,9 +997,10 @@ function gateView(){ const G=GATE, body=$("#gBody"), row=$("#gRow"), prog=$("#gP
   const c=G.todo[G.i]; prog.textContent=(G.i+1)+" / "+G.todo.length+(G.round>1?" · "+G.round+"차":"");
   body.innerHTML='<div class="gq">'+esc(c.q)+'</div>'+(G.shown?'<div class="ga"><i>정답</i>'+esc(c.a)+'</div><p class="gp">답을 적은 것과 비교해서 판정하세요. 핵심 식·방향·조건을 모두 썼으면 맞음.</p>':'<p class="gp">답을 종이나 화면에 먼저 적고, 정답을 보세요.</p>');
   if(!G.shown){ gateBtn(row,"정답 보기",()=>{ G.shown=true; gateView(); },"p"); }
-  else { gateBtn(row,"틀렸어요",()=>gateJudge(false),"r"); gateBtn(row,"맞았어요",()=>gateJudge(true),"g"); }
+  else { gateBtn(row,"틀렸어요",()=>gateJudge(false),"r"); gateBtn(row,"맞았어요",()=>gateJudge(true),"g"); gateBtn(row,"왜 외우나?",()=>{ G.why=!G.why; gateView(); },"g"); }
+  if(G.shown&&G.why&&c.why){ body.insertAdjacentHTML('beforeend','<div class="ga"><i>과제</i>'+esc(c.why.hw)+'</div><div class="ga"><i>흐름</i>'+esc(c.why.flow)+'</div>'); }
   gateBtn(row,"닫기",gateClose,"g"); }
-function gateJudge(ok){ const G=GATE; if(!G) return; const c=G.todo[G.i]; if(!ok) G.wrong.push(c); G.i++; G.shown=false; gateView(); }
+function gateJudge(ok){ const G=GATE; if(!G) return; const c=G.todo[G.i]; if(!ok) G.wrong.push(c); G.i++; G.shown=false; G.why=false; gateView(); }
 function gatePass(){ const G=GATE, fn=G.fn; GATE=null; $("#gate").classList.remove("on");
   try{ L.gateLog=(Array.isArray(L.gateLog)?L.gateLog:[]).concat([{t:Date.now(),n:G.n,r:G.round}]).slice(-60); save(); }catch(e){}   /* 통과 이력만 — 면제 조건으로 쓰지 않는다 */
   fn(); }
