@@ -1,3 +1,5 @@
+import { mountLectureActor } from './lecture-actor.js?v224';
+import { decorateChalk, chalkBoardText, chalkPages } from './lecture-chalk.js?v228';
 import { groupCourseLessons, groupLessonTopics } from './course-scope.js?v=212';
 import "./uuid-polyfill.js";   // 보안 컨텍스트 아닌 주소(tailscale http)에서 crypto.randomUUID 대체 — 맨 먼저
 import {
@@ -9,13 +11,13 @@ import {
 } from "./learning.js";
 import { createWorkspace } from "./workspace.js?v=215";
 import { createMission } from "./mission.js?v=199";
-import { attachSaeng } from "./saeng.js";
+import { attachSaeng } from "./saeng.js?v224";
 import { createSpace, ROOMS } from "./space.js";
 import { pickLesson, pickQuestions } from "./metrics.js";
 import { createSetup } from "./setup.js";
 import { createWorldMap } from "./worldmap.js";
 import { createTutor } from "./tutor.js";
-import { createSubjectRail } from "./subject-rail.js?v=202";
+import { createSubjectRail } from "./subject-rail.js?v=227";
 import { startSurfaces } from "./surface.js";
 import { createLecture } from "./lecture.js";
 import { loadPack, packRoute, packLines, label as packLabel } from "./lecture-pack.js";
@@ -31,7 +33,7 @@ import { readable, cleanTitle } from "./readable.js";
 import { createPlan } from "./plan.js";
 import { inFocus } from "./focus.js";
 import { createLessonTextbook } from "./lesson-textbook.js?v=217";
-import { startClassroomV3 } from "./classroom-v3.js?v=217";
+import { startClassroomV3 } from "./classroom-v3.js?v=227";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
@@ -785,7 +787,7 @@ function closeDialogs() {
 function board(title, body, kind, annotation) {
   const host = $("board");
   let limit = innerHeight < 760 ? 260 : 440,
-    pages = splitText(body, limit),
+    pages = chalkPages(body, limit),
     page = 0;
   function draw() {
     const choices = $("choices");
@@ -815,6 +817,7 @@ function board(title, body, kind, annotation) {
       host.append(controls);
     }
     if (v3 && choices) v3.response.append(choices);
+    decorateChalk(host, current?.steps[index]);
     renderMath(host);
     requestAnimationFrame(() => {
       if (
@@ -823,8 +826,8 @@ function board(title, body, kind, annotation) {
         limit > 100
       ) {
         limit = Math.floor(limit * 0.7);
-        const smaller = splitText(body, limit);
-        if (smaller.length > pages.length) {
+        const smaller = chalkPages(body, limit);
+        if (smaller.length >= pages.length) {
           pages = smaller;
           page = 0;
           draw();
@@ -838,7 +841,7 @@ function board(title, body, kind, annotation) {
     clearTimeout(resizeBoard);
     resizeBoard = setTimeout(() => {
       limit = innerHeight < 760 ? 260 : 440;
-      pages = splitText(body, limit);
+      pages = chalkPages(body, limit);
       page = Math.min(page, pages.length - 1);
       draw();
     }, 150);
@@ -902,7 +905,7 @@ async function renderStep(camera) {
     }[step.kind] || "학습";
   board(
     curPack() && step.options ? packLabel(curPack(), step.id) : cleanTitle(step.title),   // 강의안 수업 문제는 「섹션 n 확인」·「학습지 n / 5」(4부 C)
-    step.body,
+    chalkBoardText(current.steps, index),
     kind,
     current.warnings.length
       ? "자료 주의사항 있음 · 이 수업의 근거에서 확인"
@@ -2418,6 +2421,7 @@ v3 = startClassroomV3({
   progress:()=>$('stepLabel')?.textContent||'',
   context:()=>current?{lesson:current,index}:null,
   onMood:mood=>dockSaeng?.setExpr?.(mood),
+  math:renderMath,
   onStep:stepId=>current&&startLesson(current.id,{stepId}),
   onViewChange:async view=>{if(current&&document.querySelector('.school').dataset.mode==='classroom'){stagedCourse=null;await stage3d(current.steps[index].kind);}else if(view==='site'){space?.mount?.(null);space?.hide();}},
 });
@@ -2452,8 +2456,16 @@ tutor = createTutor({api,eventId,record,inPack:()=>!!curPack(),
    else if(e.code==='Escape'&&sc.dataset.world==='seated'){e.preventDefault();document.querySelector('.seat-controls [data-icon=stand]')?.click();}
  });}
 // 과목 레일: 수업 중 과목을 바꾸면 그 과목의 약한 회차로 바로(강의실 하나, 교실 v2)
-const rail = createSubjectRail({subjects:ROOMS.filter(r=>inFocus(r.name)),   /* 시험 기간 집중 4과목(focus.js) */current:()=>course,openScope:name=>showCourse(name,true),choose:async name=>{try{await mission?.save();}catch{return;}const seated=document.querySelector('.school').dataset.world==='seated';await sitDown(name);space?.setSubject?.(name);rail.update();if(seated)await space?.seated(name);}});
+function lecturePosition(){
+  if(!current)return null;
+  const lessons=(catalog?.courses?.find(c=>c.name===current.course)?.lessons||[]).filter(l=>!l.generated&&!String(l.id).startsWith('exam-')).sort((a,b)=>a.date.localeCompare(b.date));
+  const ordinal=lessons.findIndex(l=>l.id===current.id);
+  const topics=groupLessonTopics(current.steps),part=topics.findLast(t=>t.index<=index);
+  return {course:current.course,date:current.date,lecture:ordinal>=0?`${ordinal+1}강 · 등록 수업 ${lessons.length}강`:current.generated?'자체 제작 수업':'수업 회차',part:part?`${topics.indexOf(part)+1}파트 · ${part.title}`:current.steps[index]?.title};
+}
+const rail = createSubjectRail({subjects:ROOMS,available:name=>inFocus(name)&&!!catalog?.courses?.find(c=>c.name===name)?.lessons?.length,position:lecturePosition,current:()=>course,openScope:name=>showCourse(name,true),choose:async name=>{try{await mission?.save();}catch{return;}const seated=document.querySelector('.school').dataset.world==='seated';await sitDown(name);space?.setSubject?.(name);rail.update();if(seated)await space?.seated(name);}});
 new MutationObserver(()=>rail.update()).observe($('roomLabel'),{childList:true,characterData:true,subtree:true});
+new MutationObserver(()=>rail.update()).observe($('stepLabel'),{childList:true,characterData:true,subtree:true});
 startSurfaces();
 const MOOD={smile:'smile',serious:'strict',think:'neutral',neutral:'neutral'};
 // 강의 자막은 연애 시뮬레이션식 대사창으로(vn-dialog.js). 창을 누르면 ⏭ 와 같다.
@@ -2528,7 +2540,7 @@ function hideDockEmotionLabels(){
 hideDockEmotionLabels();
 new MutationObserver(hideDockEmotionLabels).observe($('dock'),{childList:true,characterData:true,subtree:true});
 let dockSaeng=null;
-attachSaeng($('dockFace')).then(s=>{dockSaeng=s;});
+attachSaeng($('dockFace')).then(s=>{dockSaeng=s;mountLectureActor($('dockFace'),document.querySelector('.v3-guide'));});
 window.addEventListener('saeng',e=>{
   const {react,line}=e.detail||{};
   if(react)dockSaeng?.react(react);

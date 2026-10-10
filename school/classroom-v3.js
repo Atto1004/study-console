@@ -3,6 +3,7 @@
 // 중복 진행 표시·도구 줄)은 숨긴다. 버튼 동작은 기존 것을 그대로 부른다.
 import { splitText } from './learning.js';
 import { groupLessonTopics } from './course-scope.js';
+import { chalkNote, chalkBoardText } from './lecture-chalk.js';
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
 const ICON = {
   game: 'M12 2 3 7v10l9 5 9-5V7zM3 7l9 5 9-5M12 12v10',
@@ -47,6 +48,14 @@ export function startClassroomV3(app) {
   const reply = el('form', 'v3-response-form'), replyText = el('textarea');
   replyText.placeholder = '이해한 내용이나 답을 적어주세요'; replyText.setAttribute('aria-label', '수업 답변 적기'); replyText.maxLength = 600;
   const replySend = el('button', '', '답변 보내기'); replySend.type = 'submit'; reply.append(replyText, replySend); response.append(reply); room.append(response);
+  const syncResponse = () => {
+    const c=app.context?.(),step=c?.lesson?.steps[c.index];
+    const quiz=!!step?.options || step?.kind==='quiz';
+    const asked=school.dataset.lecture!=='playing' && (dialogue.dataset.tutor==='check' || dialogue.dataset.tutor==='retry');
+    response.hidden=!(quiz || asked);reply.hidden=quiz || !asked;
+  };
+  response.hidden=true;
+  new MutationObserver(syncResponse).observe(dialogue,{attributes:true,attributeFilter:['data-tutor']});
   reply.onsubmit = e => { e.preventDefault(); const text = replyText.value.trim(); if (!text) return; replyText.value = ''; addMine(text); app.onChat?.(text); };
   const pointer = el('div', 'v3-pointer'); pointer.setAttribute('aria-hidden', 'true');
   pointer.innerHTML = '<svg viewBox="0 0 160 90"><path d="M150 70Q117 77 105 52L70 37 76 18 120 34Q146 45 150 70" fill="#eee9e7" stroke="#b8ada7" stroke-width="2"/><path d="M77 19L61 13 33 19Q25 24 31 28L55 25 43 35Q40 42 48 42L72 37Z" fill="#e6beb0" stroke="#b39185" stroke-width="1.5"/><path d="M34 24L5 3" stroke="#d9c695" stroke-width="3" stroke-linecap="round"/></svg>';
@@ -144,6 +153,8 @@ export function startClassroomV3(app) {
   new MutationObserver(() => { const t = speech.textContent.trim(); if (t && t !== lastLine) { lastLine = t; addLine('saeng', t); } }).observe(speech, { childList: true, characterData: true, subtree: true });
   function addLine(who, text) {
     text = String(text).replace(/[ \t]*\n\s*/g, '\n').replace(/[ \t]{2,}/g, ' ').trim(); if (!text) return;
+    if (who === 'me') { guide.dataset.pose='listen'; guide.dataset.direction='student'; }
+    else { guide.dataset.pose='explain'; guide.dataset.direction='student'; }
     const first = log.children.length;
     for (const part of splitText(text, 140)) {
       const row = el('div', 'v3-msg v3-' + who); /* 'saeng' 그대로 쓰면 기존 초상 스타일과 겹친다 */ const b = el('p', undefined, part); row.append(b); log.append(row);
@@ -169,18 +180,24 @@ export function startClassroomV3(app) {
   return {
     stage, mount3d, work, response,
     get view() { return view; },
-    subtitle(text) { subtitle.hidden = !text; subtitle.textContent = text || ''; },
+    subtitle(text) { subtitle.hidden = !text || school.dataset.view3 === 'site'; subtitle.textContent = text || ''; },
     head(point) { if (!point) { subtitle.style.removeProperty('--hx'); subtitle.style.removeProperty('--hy'); return; } const r = stage.getBoundingClientRect(); subtitle.style.setProperty('--hx', (point.x - r.left) + 'px'); subtitle.style.setProperty('--hy', (point.y - r.top) + 'px'); },
     // 본문은 즉시 읽을 수 있게 두고, 강의 진행은 자막과 진행 표시로 안내한다.
     board(fraction) { stage.style.setProperty('--lecture-fraction', String(fraction)); document.querySelector('#board .content')?.style.setProperty('--reveal', '1'); },
     line(text) {
-      if (!text) { focusLine.hidden = true; return; }
-      addLine('saeng', text); focusLine.textContent = text; focusLine.hidden = school.dataset.step === 'quiz';
-      focusLine.classList.remove('enter'); void focusLine.offsetWidth; focusLine.classList.add('enter');
+      if (!text) return;
+      addLine('saeng', text);
       const context = app.context?.(), step = context?.lesson?.steps[context.index];
-      focusLine.hidden = !!step?.options || step?.kind === 'quiz';
+      const note = chalkNote(step ? {...step,body:chalkBoardText(context.lesson.steps,context.index)} : null, text);
+      focusLine.hidden = !note;
+      focusLine.textContent = note ? note.label + ' · ' + note.text : '';
+      focusLine.dataset.kind = note?.kind || '';
+      if (note) app.math?.(focusLine);
+      focusLine.classList.remove('enter'); void focusLine.offsetWidth; focusLine.classList.add('enter');
       const kind = step?.kind;
       guide.dataset.gesture = kind === 'example' ? 'point' : kind === 'remember' ? 'emphasize' : 'explain';
+      guide.dataset.pose = /보세요|칠판|행렬|공식|여기|조건/.test(text) || kind === 'example' || kind === 'remember' ? 'point' : 'explain';
+      guide.dataset.direction = 'board';
       app.onMood?.(kind === 'example' ? 'smile' : kind === 'remember' ? 'strict' : 'neutral');
     },
     state({ playing, index, count, ended }) {
@@ -188,6 +205,7 @@ export function startClassroomV3(app) {
       const context = app.context?.();
       const currentStep = context?.lesson?.steps[context.index];
       school.dataset.step = currentStep?.options || currentStep?.kind === 'quiz' ? 'quiz' : 'board';
+      if (school.dataset.step === 'quiz') focusLine.hidden = true;
       if (context?.lesson) {
         if (journeyLesson !== context.lesson.id) {
           journeyLesson = context.lesson.id; topics = groupLessonTopics(context.lesson.steps); route.replaceChildren();
@@ -201,6 +219,7 @@ export function startClassroomV3(app) {
         journey.dataset.playing = String(playing);
       } else progress.textContent = app.progress?.() || '';
       school.dataset.lecture = ended ? 'ended' : playing ? 'playing' : 'paused';
+      syncResponse();
     },
     focusChat() { (school.dataset.sharedChat ? school.querySelector('.sb input') : input)?.focus(); },
     say: addLine,

@@ -232,3 +232,44 @@
 }.school[data-layout=v3] .lesson-textbook-contents{height:56px;overflow:hidden}
 .school[data-layout=v3] .lesson-textbook-contents button{min-height:0!important;max-height:56px;font-size:11px!important;line-height:1.25!important;padding:4px!important;overflow:hidden}
 .school[data-layout=v3] .lesson-textbook-figure svg{max-height:44px}
+/* .224 web lecture: source emphasis and an actual articulated arm cutout. */
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide{width:280px!important;left:calc((100% - 16px)*2/3 - 248px)!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide #dockFace.has-lecture-actor{width:264px!important;height:352px!important;position:relative}
+.school[data-layout=v3][data-mode=classroom] #dockFace.has-lecture-actor>.saeng{display:none!important}
+.lecture-actor{display:none;position:relative;width:100%;height:100%;transform-origin:50% 100%;transition:transform .45s ease}
+.school[data-mode=classroom] .lecture-actor{display:block}
+.lecture-actor svg{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .3s ease;overflow:visible}
+.v3-guide[data-pose=point] .lecture-actor svg[data-pose=point],.v3-guide[data-pose=explain] .lecture-actor svg[data-pose=explain],.v3-guide[data-pose=listen] .lecture-actor svg[data-pose=listen],.v3-guide:not([data-pose]) .lecture-actor svg[data-pose=explain]{opacity:1}
+.v3-guide[data-direction=student] .lecture-actor{transform:scaleX(-1)}
+.lecture-arm{transform-origin:430px 640px;transform-box:view-box}
+.v3-guide[data-pose=point] svg[data-pose=point] .lecture-arm{animation:lecturer-point 3.5s ease-in-out infinite}
+.v3-guide[data-pose=explain] svg[data-pose=explain] .lecture-arm{animation:lecturer-present 4s ease-in-out infinite}
+@keyframes lecturer-point{0%,100%{transform:rotate(-3deg)}35%{transform:rotate(5deg)}70%{transform:rotate(0deg)}}
+@keyframes lecturer-present{0%,100%{transform:rotate(2deg)}50%{transform:rotate(-6deg)}}
+.school[data-layout=v3] .v3-pointer{display:none!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-stage #board{padding-right:248px!important}
+.school[data-layout=v3] .v3-board-focus{right:248px;max-height:76px;color:#f3df9b;border-left-color:#ead177;background:#274939;font-size:14px}
+.school[data-layout=v3] .v3-board-focus[data-kind=warning]{color:#ffb7a8;border-left-color:#ff9184}
+.school[data-layout=v3] .v3-board-focus[data-kind=condition]{color:#c8e9b0;border-left-color:#b3dd93}
+.school[data-layout=v3] #board .chalk-row{margin:10px 0;line-height:1.55;color:#f2f3e9;text-shadow:0 0 1px #fff5;animation:chalk-write .5s ease-out both}
+.school[data-layout=v3] #board .chalk-row:nth-child(2){animation-delay:.12s}
+.school[data-layout=v3] #board .chalk-row:nth-child(3){animation-delay:.24s}
+.school[data-layout=v3] #board .chalk-row:nth-child(4){animation-delay:.36s}
+.school[data-layout=v3] #board .chalk-warning{color:#ffb0a0;text-decoration:underline;text-decoration-color:#f38e80;text-underline-offset:6px}
+.school[data-layout=v3] #board .chalk-memory{color:#f2d88a;text-decoration:underline wavy #d7bd74;text-underline-offset:6px}
+.school[data-layout=v3] #board .chalk-condition{color:#c5e7ad;border:1px solid #a7d19199;border-radius:12px 18px 11px 15px;padding:7px 12px}
+.school[data-layout=v3] #board .chalk-example{color:#b5d9f5;border-left:3px solid #90bee2;padding-left:12px}
+.school[data-layout=v3] #board .chalk-star{color:#efcf7c}
+.school[data-layout=v3] #board .chalk-key{margin-left:16px;border-bottom:1px dashed #b4cfa0;font-size:12px;color:#cbddbc}
+.school[data-layout=v3] #board[data-emphasis=key] h1{color:#f2d88a;text-decoration:underline;text-underline-offset:9px}
+@keyframes chalk-write{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.lecture-arm,.school[data-layout=v3] #board .chalk-row{animation:none!important}.lecture-actor,.lecture-actor svg{transition:none!important}}.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide #dockFace.has-lecture-actor>.saeng{display:none!important}
+.school[data-mode=classroom] .lecture-actor{position:absolute;inset:0}.school[data-layout=v3] .v3-response[hidden],.school[data-layout=v3] .v3-response-form[hidden]{display:none!important}
+.school[data-mode=classroom] .subject-rail{width:188px;left:16px;align-items:flex-start;background:none;box-shadow:none;backdrop-filter:none;padding:0;gap:12px}
+.school[data-mode=classroom] .subject-context{width:188px;box-sizing:border-box;padding:12px;background:#fffdf5;border:1px solid #d9dfd4;border-radius:12px;box-shadow:0 5px 15px #263f3010}
+.subject-context strong,.subject-context span,.subject-context small{display:block;line-height:1.5}
+.subject-context strong{font-size:15px;color:#2b4a3a}.subject-context span{font-size:12px;color:#52654f}.subject-context small{font-size:11px;color:#7b8476}.subject-context p{margin:7px 0 0;font-size:12px;line-height:1.5;color:#385e46;overflow-wrap:anywhere}
+.subject-list{display:flex;flex-direction:column;gap:12px;padding:10px 8px;background:#ffffffe6;border-radius:18px;box-shadow:0 8px 20px #24412d15}
+.subject-list button[hidden]{display:none!important}.subject-chip:disabled{background:#969c96!important;opacity:.55!important;filter:grayscale(1);cursor:default}.subject-chip:disabled::after{opacity:1;transform:none;font-size:11px}
+.subject-pages{display:flex;gap:5px;width:64px}.subject-pages[hidden]{display:none!important}.subject-pages button{flex:1;width:28px;min-height:30px;border:1px solid #d4ddd0;border-radius:8px;background:#fff;color:#49624b}
+@media(max-width:1500px){.school[data-mode=classroom] .subject-rail,.school[data-mode=classroom] .subject-context{width:116px}.subject-context{padding:8px!important}.subject-context strong{font-size:12px}.subject-context p{font-size:11px}}
