@@ -69,7 +69,7 @@ const ok = (cond, msg) => { out.push((cond ? "ok   " : "FAIL ") + msg); if (!con
 
   // 4) 9/14 는 1강(내적·외적 카드 포함)에 연결됨: 게이트 적용, 카드 9장(공통 3 + 1강 6)
   r = await open("notes/classroom/statics/2026-09-14.html", "#ch=1");
-  ok(gateOn(r.doc) && r.w.__cr.D.gate.cards.length === 11, "9/14 게이트 적용, 카드 11장 (공통 3 + 1강 8)");
+  ok(gateOn(r.doc) && r.w.__cr.D.gate.cards.length === 10, "9/14 게이트 적용, 카드 10장 (공통 3 + 1강 7)");
   ok(r.doc.querySelector("#gBody").textContent.includes("sin30"), "9/14 첫 카드는 공통 카드");
 
   // 5) 확인 문제 진입(#quiz)도 같은 게이트를 거친다
