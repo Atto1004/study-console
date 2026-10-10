@@ -80,15 +80,16 @@ export function startClassroomV3(app) {
   dialogue.prepend(log, logPages); dialogue.append(chat, bar);
   const placeDialogue = () => {
     if (school.dataset.mode !== 'classroom' || dialogue.hidden) return;
-    const rect = stage.getBoundingClientRect();
+    const rect = room.getBoundingClientRect();
     if (!rect.width) return;
     school.style.setProperty('--class-chat-left', `${rect.left}px`);
     school.style.setProperty('--class-chat-width', `${rect.width}px`);
     school.style.setProperty('--class-chat-height', `${dialogue.offsetHeight}px`);
+    school.style.setProperty('--class-board-height', `${stage.getBoundingClientRect().height}px`);
   };
   if (globalThis.ResizeObserver) {
     const observer = new ResizeObserver(placeDialogue);
-    observer.observe(stage); observer.observe(dialogue);
+    observer.observe(room); observer.observe(stage); observer.observe(dialogue);
   }
   window.addEventListener('resize', placeDialogue);
   new MutationObserver(placeDialogue).observe(school, { attributes: true, attributeFilter: ['data-mode'] });

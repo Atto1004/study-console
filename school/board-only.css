@@ -86,3 +86,9 @@
 .school[data-shared-chat][data-layout=v3][data-mode=classroom][data-view3=site] #scene{padding-bottom:calc(var(--class-chat-height,120px) + var(--gl-bottom,96px) + 20px)!important}
 
 .school[data-shared-chat][data-mode=classroom] .sb-log:not([hidden]){display:flex!important}
+
+/* .209: 교재는 칠판 높이, 아래 조작 영역은 두 패널 전체 폭. */
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-work{height:var(--class-board-height,100%)!important;align-self:start!important}
+@media(max-width:900px) and (orientation:portrait),(max-width:640px){
+ .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-work{height:100%!important}
+}
