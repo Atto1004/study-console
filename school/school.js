@@ -1,3 +1,4 @@
+import { groupCourseLessons, groupLessonTopics } from './course-scope.js?v=212';
 import "./uuid-polyfill.js";   // 보안 컨텍스트 아닌 주소(tailscale http)에서 crypto.randomUUID 대체 — 맨 먼저
 import {
   evidenceSummary,
@@ -6,7 +7,7 @@ import {
   splitText,
   learningPath,
 } from "./learning.js";
-import { createWorkspace } from "./workspace.js";
+import { createWorkspace } from "./workspace.js?v=215";
 import { createMission } from "./mission.js?v=199";
 import { attachSaeng } from "./saeng.js";
 import { createSpace, ROOMS } from "./space.js";
@@ -22,7 +23,7 @@ import { createDialog } from "./vn-dialog.js";
 import { createLectureUi } from "./lecture-ui.js";
 import { setupWideRoom } from "./room-wide.js";
 import { setupSeatRoom } from "./room-seat.js";
-import { pastDue, nextRoundOnly } from "./workspace.js";
+import { pastDue, nextRoundOnly } from "./workspace.js?v=215";
 import { setupShell } from "./shell.js?v=207";
 import { createRig } from "./rig.js";
 import { createFace } from "./face.js";
@@ -558,7 +559,19 @@ $("courses").onclick = () => {
   course = name;
   const c = catalog.courses.find((c) => c.name === name);
     const host = panel(selectScope ? name + ' · 수업 범위 선택' : name);
-    if (selectScope) host.append(node('p', '수업 날짜를 고른 뒤 시작할 세부 주제를 선택하세요. 선택한 주제부터 수업을 이어갑니다.', 'notice'));
+    if (selectScope) {
+      host.append(node('p', '단원을 펼치고 수업을 고르세요. 실제 자료가 연결된 수업만 표시합니다.', 'notice'));
+      for (const unit of groupCourseLessons(c)) {
+        const section = node('details', undefined, 'scope-unit');
+        const title = unit.title.split(' — ')[0].replace(/\s*\(12\.1~12\.6\)/, '');
+        section.append(node('summary', title + ' · ' + unit.lessons.length + '회 수업'));
+        section.open = unit.lessons.some(l => l.id === current?.id);
+        for (const lesson of unit.lessons) row(section, lesson.title, lesson.date + ' · ' + (lesson.week || '?') + '주차', () => showLessonScope(lesson, name), '수업 목차');
+        host.append(section);
+      }
+      if (!c.lessons.length) host.append(node('p', '연결된 수업 자료가 아직 없습니다.'));
+      return;
+    }
     const assets = node("div", undefined, "assignment-filters");
     const slug = {"공업수학1":"em1", "미분적분학2":"calc2", "일반물리학2":"phys2", "정역학":"statics"}[name];
     if (slug) assets.append(button("암기노트", () => openStudyAsset(name + " · 암기노트", "notes/memo/" + slug + ".html")));
@@ -640,8 +653,8 @@ async function showLessonScope(summary, name) {
     if (!loading.isConnected || !$("panel").open) return;
     host.replaceChildren(node('h2', lesson.title), node('p', '시작할 주제를 선택하세요. 이후 주제는 수업 순서대로 이어집니다.', 'notice'));
     host.append(button('처음부터 학습', () => startLesson(summary.id, {index:0})));
-    lesson.steps.forEach((step, at) => row(host, `${at + 1}. ${step.title || '수업 주제'}`, {understand:'개념 이해',remember:'개념 정리',example:'예제',quiz:'직접 문제'}[step.kind] || '수업', () => startLesson(summary.id, {stepId:step.id}), '여기부터 학습'));
-    host.append(button('다른 수업 날짜 선택', () => showCourse(name, true)));
+    groupLessonTopics(lesson.steps).forEach((topic, at) => row(host, (at + 1) + '. ' + topic.title, topic.count + '개 학습 단계 · ' + ({understand:'개념 이해',remember:'개념 정리',example:'예제',quiz:'직접 문제'}[topic.kind] || '수업'), () => startLesson(summary.id, {stepId:topic.stepId}), '여기부터 학습'));
+    host.append(button('다른 단원·수업 선택', () => showCourse(name, true)));
     host.querySelector('button')?.focus();
   } catch (error) {
     if (loading.isConnected && $("panel").open) { host.replaceChildren(node('h2', '수업 범위'), node('p', error.message, 'error'), button('다시 선택', () => showCourse(name, true))); }
@@ -2217,9 +2230,8 @@ async function showVisual(name, date) {
     host.append(node("p", error.message, "error"));
   }
 }
-$("generate").onclick = async () => {
-  if (!current) return;
-  const base = current.id,
+function openMaterialGeneration(base, sourceCourse = course) {
+  const
     host = panel("맞춤 보충 수업");
   host.append(
     node(
@@ -2236,7 +2248,7 @@ $("generate").onclick = async () => {
       host.append(progress);
       try {
         await flush();
-        const draft = await api("generate", { lesson: base, course });
+        const draft = await api("generate", { lesson: base, course: sourceCourse });
         state = await api("state");
         progress.textContent = "생성 완료 · " + draft.engine;
         host.append(node("h3", draft.title));
@@ -2277,6 +2289,7 @@ $("generate").onclick = async () => {
   );
   host.append(create);
 };
+$("generate").onclick = () => current && openMaterialGeneration(current.id, course);
 $("listen").onclick = async () => {
   if (audio || voiceRequest) return stopVoice();
   const step = current?.steps[index];
@@ -2362,7 +2375,7 @@ async function retest(id){
 }
 mission = createMission({api,forcedMode:()=>setup?.solveMode(),context:()=>current?{lesson:current,step:current.steps[index],index,assisted,total:missionIndices?.length,number:missionIndices?missionIndices.indexOf(index)+1:undefined}:null,feedback:(text,kind)=>{$('speech').textContent=text;mission.feedback(kind);renderMath($('speech'));},retest,remedial:supplementWork,helped:()=>{assisted=true;saveSession(current,index,{assisted:true}).catch(()=>{});},allowNext:()=>{status('풀이 피드백은 관찰 기록입니다. 확인 문제의 정답 검증은 별도로 진행합니다.');}});
 growth = createGrowth({api,status,panel,start:startLesson,retest,courses:()=>workspace?.data?.courses||[],home:()=>workspace.open('main')});
-workspace = createWorkspace({api,status,panel,record,screen:rememberScreen,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],walk:name=>space&&ROOMS.some(r=>r.name===name)?space.walk(name):showCourse(name),practice,rooms:()=>ROOMS.map(r=>r.name),evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,tutorPlan:(host,data,refresh)=>growth.tutorPlan(host,data,refresh),leave:async()=>{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);space?.hide();stopVoice();closeDialogs();++requestGeneration;}   /* 저장이 다 된 뒤에 3D 를 닫는다 — 실패하면 수업·3D 그대로(오타 10/8) */,lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode),rig:host=>createFace(host,{label:'김주영 스앵님'}),plan:createPlan({status}),consult:()=>consult(course||ROOMS[0]?.name)});
+workspace = createWorkspace({api,status,panel,record,screen:rememberScreen,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],walk:name=>space&&ROOMS.some(r=>r.name===name)?space.walk(name):showCourse(name),practice,rooms:()=>ROOMS.map(r=>r.name),evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,tutorPlan:(host,data,refresh)=>growth.tutorPlan(host,data,refresh),leave:async()=>{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);space?.hide();stopVoice();closeDialogs();++requestGeneration;}   /* 저장이 다 된 뒤에 3D 를 닫는다 — 실패하면 수업·3D 그대로(오타 10/8) */,lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),formatMaterial:renderMath,materialSources:name=>showSources(name),generateMaterial:(id,name)=>openMaterialGeneration(id,name),materialDrafts:()=>Object.values(state.drafts||{}),mode:mode=>mission.setMode(mode),rig:host=>createFace(host,{label:'김주영 스앵님'}),plan:createPlan({status}),consult:()=>consult(course||ROOMS[0]?.name)});
 space = createSpace({fixedView:()=>setup?.fixedView(),leaveTo:async url=>{try{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);}catch(e){status('저장하지 못해 이동하지 않았습니다. '+(e.message||''),true);return false;}stopVoice();location.href=url;return true;},status,panel,screen:rememberScreen,view:camera=>{if(current)rememberScreen({lesson:current.id,step:current.steps[index].id,camera});},home:()=>workspace.open('main'),pause:async()=>{await mission.save();await growth.stop('pause');},ask:()=>openChat('','hint'),select:sitDown});
 // 교실 v3(대표님 10/8): 위 강의 · 가운데 문제 · 아래 대화, 게임↔사이트
 // 교실 v3 3D 무대(오타 검수 10/8 P2): 게임 보기 + 시험 대비가 아님 → 강의 칸에 앉힘(같은 과목이면 다시 앉히지 않음), 아니면 3D 를 내린다

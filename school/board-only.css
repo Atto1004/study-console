@@ -126,3 +126,8 @@
 .school[data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide #dockFace .saeng img{position:absolute!important;height:auto!important;max-height:none!important;max-width:none!important;margin:0!important}
 .school[data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide #dockFace .saeng img.base{left:0!important;top:0!important;width:100%!important}
 .school[data-layout=v3][data-view3=game] .v3-guide{display:none}
+.scope-unit,.material-studio{border:1px solid #dce6dd;border-radius:14px;background:#fff;padding:14px 18px;margin:12px 0;color:#1f3d33}
+.scope-unit>summary,.material-studio summary{font-weight:650;cursor:pointer;line-height:1.5}
+.material-studio .material-group{margin:10px 0;padding:12px;background:#f7f9f7;border:1px solid #e2e9e2;border-radius:10px}
+.material-studio button{margin:4px 8px 4px 0;min-height:40px}
+.material-studio p{line-height:1.6;overflow-wrap:anywhere}

@@ -1,3 +1,4 @@
+import { renderMaterialStudio } from './material-studio.js?v=215';
 import { courseMetrics, sourceKind, pickQuest, KINDS } from "./metrics.js";
 import { attachSaeng } from "./saeng.js";
 import { officeHref } from "./worldmap.js";
@@ -358,16 +359,19 @@ export function createWorkspace(app){
     const shelf=card('과목별','course-shelf'),grid=el('div',undefined,'shelf-grid');
     for(const c of app.catalog().courses){
       const exam=data.exams.find(e=>e.course===c.name&&e.written&&e.dday>=0);
-      const b=btn('',()=>app.course(c.name),'shelf-card');b.append(el('b',c.name),el('small',`${c.lessons.length}회 수업${exam?' · '+ddayLabel(exam.dday):''}`));grid.append(b);
+      const sources=data.sources.filter(s=>s.course===c.name); const b=btn('',()=>{filter=c.name;kindFilter='';render();},'shelf-card');b.append(el('b',c.name),el('small',sources.length+'개 확보 자료 · '+c.lessons.filter(l=>!l.generated).length+'회 수업'));grid.append(b);
     }
     shelf.append(grid);root.append(shelf);
   }
   function renderMaterials(){
+    if(filter)renderMaterialStudio(root,app,data,filter,render);
     if(!filter)renderCourseShelf();
     const sources=data.sources.filter(s=>!filter||s.course===filter).map(s=>{const k=sourceKind(s);return {...s,cls:k.kind,sure:k.sure};});
     const lmsItems=(data.lmsMaterials||[]).filter(i=>!filter||i.course===filter).map(i=>({...i,cls:sourceKind({...i,lms:true}).kind,sure:true}));
     const homework=(assignments?.rows||[]).filter(r=>!filter||r.course===filter).flatMap(r=>(r.files||[]).map(f=>({course:r.course,title:r.title,file:f.label||f.file||f.href,href:f.href,cls:/혼자\s*풀기|스앵님|코칭/.test(f.label||'')?'tutor':'assignment',sure:true})));
-    const all=[...sources,...lmsItems,...homework];
+    const generatedMaterials=[...(app.materialDrafts?.()||[]),...app.catalog().courses.flatMap(c=>c.lessons.filter(l=>l.generated).map(l=>({...l,course:c.name})))].filter(d=>!filter||d.course===filter);
+    const all=[...sources,...lmsItems,...homework,...generatedMaterials.map(d=>({...d,cls:'generated'}))];
+    if(kindFilter==='generated'){const group=card('생성 교재','material-group');for(const draft of generatedMaterials){const open=btn(draft.course+' · '+draft.title,()=>app.start(draft.id));open.disabled=['pending','rejected'].includes(draft.review?.status);group.append(open);}root.append(group);}
     const kinds=el('div',undefined,'kind-filter');kinds.setAttribute('role','group');kinds.setAttribute('aria-label','자료 종류');
     for(const [key,{label}] of [['',{label:'전체'}],...Object.entries(KINDS).sort((a,b)=>a[1].order-b[1].order)]){
       const n=key?all.filter(x=>x.cls===key).length:all.length;
