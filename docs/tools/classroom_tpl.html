@@ -317,6 +317,19 @@ main{max-width:1040px;margin:0 auto;padding:14px 20px 18px}
   </div>
   <aside id="side"><div id="prog"><div class="k">이 챕터</div><div class="v" id="pV"></div><div class="bar"><i id="pBar"></i></div></div></aside>
 </div></main>
+<style>
+#gate{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(8,14,10,.72)}
+#gate.on{display:flex}
+#gate .gbx{width:100%;max-width:460px;background:#16231B;color:#EAF2EC;border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:18px 18px 16px;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+#gate .gh{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px;color:#A9BDB0;margin-bottom:10px}
+#gate .gh b{font-size:16px;color:#EAF2EC}
+#gate .gq{font-size:18px;font-weight:700;line-height:1.5;margin:6px 0 12px;word-break:keep-all}
+#gate .ga{font-size:16px;line-height:1.6;background:rgba(255,255,255,.06);border-radius:12px;padding:12px 14px;margin:8px 0 14px}
+#gate .ga i{font-style:normal;font-size:13px;color:#FFE27A;margin-right:6px}
+#gate .gp{font-size:14.5px;color:#B9CABF;line-height:1.6;margin:8px 0 14px}
+#gate .row{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+</style>
+<div id="gate" role="dialog" aria-modal="true" aria-labelledby="gTitle"><div class="gbx"><div class="gh"><b id="gTitle">암기카드 확인</b><span id="gProg"></span></div><div id="gBody"></div><div class="row" id="gRow"></div></div></div>
 <div id="ov"><div class="pn"><h2>목차</h2><div class="mt" id="ovMeta"></div><ul id="ovList"></ul><div class="row"><button class="cbt g" id="ovClose" type="button">닫기</button><span style="flex:1"></span><button class="cbt g" id="ovMemo" type="button">암기노트</button><button class="cbt g" id="ovBook" type="button">교재 보기</button><button class="cbt g" id="ovReset" type="button">이 회차 기록 지우기</button></div></div></div>
 <div id="figov" hidden role="dialog" aria-modal="true" aria-label="그림 크게 보기"><div class="fzh"><span>그림 크게 보기</span><button type="button" id="figovX" aria-keyshortcuts="Escape">닫기</button></div><div class="fz"></div></div>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
@@ -583,8 +596,8 @@ function renderIntro(){
   const line= L.done? pick("done_intro","i") : resume? pick("again_intro","i") : pick("intro","i",{n:CH.length,min:D.minutes||18});
   say(line, L.done?"proud":"neutral");
   const cs=[];
-  if(resume) cs.push({t:"이어서 하기",cls:"p",primary:1,key:"Enter",f:()=>resumeTo(posOf())});
-  cs.push({t:resume?"처음부터":"시작하기",cls:resume?"g":"p",primary:resume?0:1,key:resume?"":"Enter",f:()=>{ S=Object.assign(S,{mode:"step",ci:0,si:0,rev:false,again:0,resume:false}); render(); }});
+  if(resume) cs.push({t:"이어서 하기",cls:"p",primary:1,key:"Enter",f:()=>gateGo(()=>resumeTo(posOf()))});
+  cs.push({t:resume?"처음부터":"시작하기",cls:resume?"g":"p",primary:resume?0:1,key:resume?"":"Enter",f:()=>gateGo(()=>{ S=Object.assign(S,{mode:"step",ci:0,si:0,rev:false,again:0,resume:false}); render(); })});
   cs.push({t:"교재 보기",cls:"g",f:()=>openBook((CH[0]||{}).id)}); cs.push({t:"암기노트",cls:"g",f:openMemo});
   choices(cs);
 }
@@ -794,8 +807,8 @@ function renderResult(){
 function openToc(){ const ov=$("#ov"); $("#ovMeta").textContent=D.course+" · "+D.sess;
   $("#ovList").innerHTML=CH.map((c,i)=>'<li class="'+(L.ch[c.id]?"done":"")+(S.mode==="step"&&S.ci===i?" cur":"")+'"><button type="button" data-ci="'+i+'"><span class="st">'+(L.ch[c.id]?"✓":i+1)+'</span><span>'+esc(c.title)+'</span><small>'+c.steps.length+'단계</small></button></li>').join("")
     +(QZ.length?'<li class="'+(QZ.every(q=>ST.done[q.id])?"done":"")+(S.mode==="quiz"?" cur":"")+'"><button type="button" data-q="1"><span class="st">?</span><span>확인 문제</span><small>'+QZ.filter(q=>ST.done[q.id]).length+'/'+QZ.length+'</small></button></li>':"");
-  $$("#ovList [data-ci]").forEach(b=>{ b.onclick=()=>{ ov.classList.remove("on"); cancelAll(); S=Object.assign(S,{mode:"step",ci:+b.dataset.ci,si:0,rev:false,again:0,resume:false}); render(); }; });
-  const qb=$("#ovList [data-q]"); if(qb) qb.onclick=()=>{ ov.classList.remove("on"); cancelAll(); if(T.hearts<=0&&QZ.some(q=>!ST.done[q.id])){ S.mode="nohearts"; return render(); } S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; render(); };
+  $$("#ovList [data-ci]").forEach(b=>{ b.onclick=()=>{ ov.classList.remove("on"); gateGo(()=>{ cancelAll(); S=Object.assign(S,{mode:"step",ci:+b.dataset.ci,si:0,rev:false,again:0,resume:false}); render(); }); }; });
+  const qb=$("#ovList [data-q]"); if(qb) qb.onclick=()=>{ ov.classList.remove("on"); gateGo(()=>{ cancelAll(); if(T.hearts<=0&&QZ.some(q=>!ST.done[q.id])){ S.mode="nohearts"; return render(); } S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; render(); }); };
   ov.classList.add("on"); }
 $("#hToc").onclick=openToc; $("#ovClose").onclick=()=>$("#ov").classList.remove("on"); $("#ov").onclick=e=>{ if(e.target.id==="ov") $("#ov").classList.remove("on"); };
 $("#ovBook").onclick=()=>openBook(S.mode==="step"?(CH[S.ci]||{}).id:null);
@@ -826,6 +839,32 @@ function stageFx(){ try{ const bc=$("#bc"); if(!bc) return;
 $("#bwrap")&&$("#bwrap").addEventListener("scroll",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,80); },{passive:true});
 window.addEventListener("resize",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,120); });
 setInterval(()=>{ const t=$("#tutor"); if(t) t.classList.toggle("talking",!!typing||ASKING); },300);
+/* ---------- 암기카드 게이트 (정역학 · 최종본.md §20 설계 v3 · 오타 GREEN 2026-10-10) ----------
+   수업을 열기 전에 그 날짜의 카드를 본인이 맞혀야 열린다. 목적지(fn)는 통과 전까지 보관만 하고 S·L.pos 는 건드리지 않는다.
+   판정은 본인이 한다(정답 공개 뒤 맞았어요/틀렸어요). 틀린 카드 ID만 다시 출제, 전부 맞으면 목적지로 한 번만 간다. */
+let GATE=null;
+function gateNeeded(){ return !!(D.gate&&D.gate.state==="gate"); }
+function gateGo(fn){ if(!gateNeeded()) return fn(); openGate(fn); }
+function openGate(fn){ const el=$("#gate"); if(!el) return fn(); const all=(D.gate&&D.gate.cards)||[];
+  GATE={fn:fn, todo:all.slice(), wrong:[], i:0, shown:false, n:all.length, round:1, err:!all.length};
+  el.classList.add("on"); gateView(); }
+function gateBtn(row,label,f,cls){ const b=document.createElement("button"); b.type="button"; b.className="cbt "+cls; b.textContent=label; b.style.width="auto"; b.onclick=f; row.appendChild(b); return b; }
+function gateView(){ const G=GATE, body=$("#gBody"), row=$("#gRow"), prog=$("#gProg"); if(!G||!body) return;
+  row.innerHTML=""; prog.textContent="";
+  if(G.err){ body.innerHTML='<p class="gp">이 날짜의 암기카드를 불러오지 못해 수업을 열 수 없어요. 아톰에게 알려 주세요.</p>'; gateBtn(row,"닫기",gateClose,"g"); return; }
+  if(G.i>=G.todo.length){
+    if(G.wrong.length){ G.todo=G.wrong; G.wrong=[]; G.i=0; G.shown=false; G.round++; body.innerHTML='<p class="gp">틀린 카드 '+G.todo.length+'개만 다시 봅니다.</p>'; gateBtn(row,"다시 보기",gateView,"p"); gateBtn(row,"닫기",gateClose,"g"); return; }
+    return gatePass(); }
+  const c=G.todo[G.i]; prog.textContent=(G.i+1)+" / "+G.todo.length+(G.round>1?" · "+G.round+"차":"");
+  body.innerHTML='<div class="gq">'+esc(c.q)+'</div>'+(G.shown?'<div class="ga"><i>정답</i>'+esc(c.a)+'</div><p class="gp">답을 적은 것과 비교해서 판정하세요. 핵심 식·방향·조건을 모두 썼으면 맞음.</p>':'<p class="gp">답을 종이나 화면에 먼저 적고, 정답을 보세요.</p>');
+  if(!G.shown){ gateBtn(row,"정답 보기",()=>{ G.shown=true; gateView(); },"p"); }
+  else { gateBtn(row,"틀렸어요",()=>gateJudge(false),"r"); gateBtn(row,"맞았어요",()=>gateJudge(true),"g"); }
+  gateBtn(row,"닫기",gateClose,"g"); }
+function gateJudge(ok){ const G=GATE; if(!G) return; const c=G.todo[G.i]; if(!ok) G.wrong.push(c); G.i++; G.shown=false; gateView(); }
+function gatePass(){ const G=GATE, fn=G.fn; GATE=null; $("#gate").classList.remove("on");
+  try{ L.gateLog=(Array.isArray(L.gateLog)?L.gateLog:[]).concat([{t:Date.now(),n:G.n,r:G.round}]).slice(-60); save(); }catch(e){}   /* 통과 이력만 — 면제 조건으로 쓰지 않는다 */
+  fn(); }
+function gateClose(){ GATE=null; $("#gate").classList.remove("on"); }   /* 닫기·Esc: 목적지 폐기, S·L.pos 는 그대로 */
 /* ---------- 키보드 ---------- */
 /* 질문: 앱(atom) 스앵님 대화로 보내고, 답을 자막으로 흘려 보여 준다. 앱 밖에서 열면 안내 대사 */
 let ASKING=false;
@@ -840,20 +879,25 @@ window.addEventListener("message",e=>{ if(e.origin!==location.origin||e.source!=
 $("#askbar").addEventListener("submit",e=>{ e.preventDefault(); if(ASKING) return; askSend($("#askIn").value); });
 { const _ch1=choices; choices=function(list){ _ch1((list||[]).filter(c=>c.t!=="질문할게요")); }; }
 function canPrev(){ if(S.mode==="step") return S.si>0||S.ci>0; if(S.mode==="quiz") return CH.length>0; return false; }
-function prevStep(){ if(!canPrev()) return; if(anim||typing){ finishNow(); if(typing) skipTyping(); } cancelAll(); S.again=0; S.rev=false; S.pre=""; S.preFace="";
+function prevStep(){ if(GATE||!canPrev()) return; if(anim||typing){ finishNow(); if(typing) skipTyping(); } cancelAll(); S.again=0; S.rev=false; S.pre=""; S.preFace="";
   if(S.mode==="quiz"){ S.mode="step"; S.ci=CH.length-1; S.si=Math.max(0,CH[S.ci].steps.length-1); }
   else if(S.si>0) S.si--; else { S.ci--; S.si=Math.max(0,CH[S.ci].steps.length-1); }
   S.resume=true; render(); save(); }
 { const _ch0=choices; choices=function(list){ _ch0(list); if((S.mode==="step"||S.mode==="quiz")&&canPrev()){ const box=$("#dCh"); const b=document.createElement("button"); b.type="button"; b.className="cbt g prev"; b.textContent="이전"; b.onclick=prevStep; box.insertBefore(b,box.firstChild); } }; }
 { let sx=null, sy=null; const bw=$("#bwrap"); if(bw){ bw.addEventListener("touchstart",e=>{ const t=e.touches[0]; sx=t.clientX; sy=t.clientY; },{passive:true});
   bw.addEventListener("touchend",e=>{ if(sx==null) return; const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; sx=null; if(dx>80&&Math.abs(dy)<50&&$("#figov").hidden) prevStep(); },{passive:true}); } }
-document.addEventListener("keydown",e=>{ if(e.target&&/TEXTAREA|INPUT/.test(e.target.tagName)) return; if(e.key==="ArrowLeft"&&$("#figov").hidden&&!$("#ov").classList.contains("on")){ e.preventDefault(); prevStep(); return; } if($("#ov").classList.contains("on")){ if(e.key==="Escape") $("#ov").classList.remove("on"); return; }
+document.addEventListener("keydown",e=>{ if(GATE){ if(e.key==="Escape"){ e.preventDefault(); gateClose(); } else if(e.key==="Enter"||e.key===" "||(e.key!=="Tab"&&!(e.target&&e.target.closest&&e.target.closest("#gate")))) e.preventDefault(); return; }   /* 게이트 중 Enter·Space 는 버튼을 눌러도 통과시키지 않는다(마우스·터치로만 판정) */
+  if(e.target&&/TEXTAREA|INPUT/.test(e.target.tagName)) return; if(e.key==="ArrowLeft"&&$("#figov").hidden&&!$("#ov").classList.contains("on")){ e.preventDefault(); prevStep(); return; } if($("#ov").classList.contains("on")){ if(e.key==="Escape") $("#ov").classList.remove("on"); return; }
   if(!$("#figov").hidden){ if(e.key==="Escape"){ e.preventDefault(); closeFig(); } else if(e.key==="Tab"){ e.preventDefault(); $("#figovX").focus(); } else if(e.key==="Enter"||e.key===" "){ e.preventDefault(); } return; }   /* 그림 확대창이 열려 있으면 뒤 교실 단축키(Enter·Space·숫자) 차단, 닫기는 Esc·닫기 버튼 — 오타 디자인 2차 */
   if(e.key==="Enter"||e.key===" "){ e.preventDefault(); if(e.repeat) return; enter(); }
   else if(/^[1-6]$/.test(e.key)&&S.mode==="quiz"){ const b=$$("#bc .cb")[+e.key-1]; if(b&&!b.disabled) b.click(); } });
 /* ---------- 시작 ---------- */
 /* 해시: #resume(저장 위치) · #ch=N(챕터 N) · #ch=N.M(챕터 N 의 M 단계) · #quiz · #result */
 function boot(){ const m=/^#(resume|ch=(\d+)(?:\.(\d+))?|quiz|result)$/.exec(location.hash||"");
+  const lesson=!!(m&&((m[1]==="resume"&&L.pos&&!L.done)||m[2]||(m[1]==="quiz"&&QZ.length)));
+  if(lesson&&gateNeeded()){ render(); return gateGo(()=>bootTo(m)); }   /* 목차를 먼저 보여 주고 그 위에 게이트 — 통과 전에는 S·L.pos 를 바꾸지 않는다 */
+  return bootTo(m); }
+function bootTo(m){
   if(m&&m[1]==="resume"&&L.pos&&!L.done){ return resumeTo(posOf()); }
   else if(m&&m[2]){ const ci=Math.max(0,Math.min(CH.length-1,+m[2]-1)); const si=m[3]?Math.max(0,Math.min(CH[ci].steps.length-1,+m[3]-1)):0; S=Object.assign(S,{mode:"step",ci:ci,si:si,rev:(CH[ci].steps[si]||{}).t==="ex"&&/\.\d+r$/.test(location.hash),resume:!!m[3]}); }
   else if(m&&m[1]==="quiz"&&QZ.length){ S.mode="quiz"; const k=QZ.findIndex(q=>!ST.done[q.id]); S.qi=k<0?0:k; }

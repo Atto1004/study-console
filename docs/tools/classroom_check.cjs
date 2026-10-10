@@ -39,6 +39,8 @@ async function check(file) {
   const dom = new JSDOM(html, { runScripts: "dangerously", pretendToBeVisual: true, virtualConsole: vc, url: "http://localhost/study/" + file, beforeParse(w) { w.renderMathInElement = () => {}; w.confirm = () => true; w.HTMLElement.prototype.scrollIntoView = function () {}; } });
   const w = dom.window, doc = w.document; const problems = [];
   const X = w.__cr; const D = X && X.D; if (!D || !Array.isArray(D.chapters)) { console.log("FAIL " + file + " · 자료(D) 없음 " + errs.join(" | ")); fail++; return; }
+  /* 암기카드 게이트는 이 검사의 대상이 아니다 — 이어하기·위치 검사 중 게이트에 막히지 않도록 통과 상태로 둔다 (게이트 자체는 classroom_gate_check.cjs) */
+  if (D.gate && D.gate.state === "gate") D.gate = { state: "free", note: "검사용 통과" };
   const V2 = D.v === 2; if (V2) total.v2++;
   const m = /classroom\/(\w+)\/(\d{4}-\d{2}-\d{2})\.html$/.exec(file); const slug = m[1], date = m[2];
   const bc = () => norm(doc.querySelector("#bc").textContent);

@@ -127,6 +127,22 @@ def build_v2(doc, chapters, v2, slug, date):
         out.append({"id": sid, "title": c["title"], "steps": steps, "figs": figs, "say": c.get("say")})
     return out
 
+def gate_for(slug, date):
+    """암기카드 게이트 (정역학 · 최종본.md §20 · 오타 GREEN 2026-10-10). 날짜마다 gate / free / 빌드 중단(연결 오류).
+    gate = 공통 + 해당 강 카드를 ID 병합. 병합 전에 중복·카드 수를 검사한다. 연결 없는 정역학 날짜는 빌드를 멈춘다(무게이트로 조용히 열지 않는다)."""
+    if slug != "statics": return {"state": "none"}
+    g = json.load(io.open(os.path.join(HERE, "lessons", "cards", "statics.json"), encoding="utf-8"))
+    is_free = date in g.get("free", {})
+    hit = [k for k, v in g["lectures"].items() if date in v.get("dates", [])]
+    if int(is_free) + len(hit) != 1: raise SystemExit(f"정역학 {date}: 날짜 분류 충돌 또는 연결 누락 — lectures.dates 또는 free 에 정확히 한 번 넣어라")
+    if is_free: return {"state": "free", "note": g["free"][date]}
+    k = hit[0]; lec = g["lectures"][k]["cards"]
+    if len(g["common"]) != g["expect"]["common"] or len(lec) != g["expect"][k]: raise SystemExit(f"정역학 {date}: 카드 수 불일치 (공통 {len(g['common'])}/{g['expect']['common']}, {k}강 {len(lec)}/{g['expect'][k]})")
+    cards = [{"id": c["id"], "q": c["q"], "a": c["a"]} for c in g["common"] + lec]
+    ids = [c["id"] for c in cards]
+    if len(set(ids)) != len(ids): raise SystemExit(f"정역학 {date}: 카드 ID 중복")
+    return {"state": "gate", "lecture": k, "cards": cards}
+
 def build(src, slug, date, minutes=18):
     course = COURSE[slug]; lesson_id = f"{slug}-{date}"
     doc = LH.fromstring(io.open(src, encoding="utf-8").read())
@@ -211,7 +227,7 @@ def build(src, slug, date, minutes=18):
     # 스앵님 판정용 노드 연결(knowledge/lesson_nodes.json — build_lesson_nodes.py 가 만든다). 없으면 빈 연결(기록만 안 남는다)
     ln_path = os.path.join(ROOT, "knowledge", "lesson_nodes.json")
     lnodes = (json.load(io.open(ln_path, encoding="utf-8")).get("lessons") or {}).get(lesson_id) if os.path.exists(ln_path) else None
-    data = {"id": lesson_id, "slug": slug, "course": course, "date": date, "sess": sess, "title": title, "lead": lead_html, "minutes": minutes, "chapters": chapters, "quiz": quiz,
+    data = {"id": lesson_id, "gate": gate_for(slug, date), "slug": slug, "course": course, "date": date, "sess": sess, "title": title, "lead": lead_html, "minutes": minutes, "chapters": chapters, "quiz": quiz,
             "v": 2 if v2 else 1, "ver": v2["VERSION"] if v2 else "", "nodes": {"sec": (lnodes or {}).get("sec") or {}, "q": (lnodes or {}).get("q") or {}}}
     js = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
     tpl = io.open(os.path.join(HERE, "classroom_tpl.html"), encoding="utf-8").read()
