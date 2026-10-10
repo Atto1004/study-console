@@ -66,3 +66,14 @@
   .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #dialogue{grid-column:1;grid-row:2}
   .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-work{grid-column:1;grid-row:3}
 }
+
+/* .205: 채팅은 콘텐츠 흐름과 분리해 화면 하단에 고정한다. */
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #dialogue{position:fixed!important;inset:auto!important;left:var(--class-chat-left,80px)!important;bottom:max(8px,env(safe-area-inset-bottom))!important;width:var(--class-chat-width,calc(100% - 160px))!important;z-index:70!important;margin:0!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #scene{padding-bottom:calc(var(--class-chat-height,196px) + 20px)!important;box-sizing:border-box!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{grid-template-rows:minmax(0,1fr)!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-work{grid-row:1!important}
+.school .sb{position:fixed!important;bottom:0!important;z-index:70!important}
+@media(max-width:900px) and (orientation:portrait),(max-width:640px){
+ .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{grid-template-rows:auto minmax(0,1fr)!important}
+ .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-work{grid-row:2!important}
+}

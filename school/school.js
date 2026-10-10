@@ -30,7 +30,7 @@ import { readable, cleanTitle } from "./readable.js";
 import { createPlan } from "./plan.js";
 import { inFocus } from "./focus.js";
 import { createLessonTextbook } from "./lesson-textbook.js?v=202";
-import { startClassroomV3 } from "./classroom-v3.js?v=202";
+import { startClassroomV3 } from "./classroom-v3.js?v=205";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
