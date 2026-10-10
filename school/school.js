@@ -1,5 +1,7 @@
+import { createLectureQuests } from './lecture-quests.js?v=233';
+import { mountSchoolRefresh } from './refresh.js?v=237';
 import { mountLectureActor } from './lecture-actor.js?v224';
-import { decorateChalk, chalkBoardText, chalkPages } from './lecture-chalk.js?v228';
+import { decorateChalk, chalkBoardText, chalkPages } from './lecture-chalk.js?v235';
 import { groupCourseLessons, groupLessonTopics } from './course-scope.js?v=212';
 import "./uuid-polyfill.js";   // 보안 컨텍스트 아닌 주소(tailscale http)에서 crypto.randomUUID 대체 — 맨 먼저
 import {
@@ -17,7 +19,9 @@ import { pickLesson, pickQuestions } from "./metrics.js";
 import { createSetup } from "./setup.js";
 import { createWorldMap } from "./worldmap.js";
 import { createTutor } from "./tutor.js";
-import { createSubjectRail } from "./subject-rail.js?v=227";
+import { createSubjectRail } from "./subject-rail.js?v=236";
+import { createSubjectScope } from "./subject-scope.js?v=240";
+import { boardHierarchy,createBoardHierarchy } from "./board-hierarchy.js?v=240";
 import { startSurfaces } from "./surface.js";
 import { createLecture } from "./lecture.js";
 import { loadPack, packRoute, packLines, label as packLabel } from "./lecture-pack.js";
@@ -26,13 +30,13 @@ import { createLectureUi } from "./lecture-ui.js";
 import { setupWideRoom } from "./room-wide.js";
 import { setupSeatRoom } from "./room-seat.js";
 import { pastDue, nextRoundOnly } from "./workspace.js?v=215";
-import { setupShell } from "./shell.js?v=207";
+import { setupShell } from "./shell.js?v=232";
 import { createRig } from "./rig.js";
 import { createFace } from "./face.js";
 import { readable, cleanTitle } from "./readable.js";
 import { createPlan } from "./plan.js";
 import { inFocus } from "./focus.js";
-import { createLessonTextbook } from "./lesson-textbook.js?v=229";
+import { createLessonTextbook } from "./lesson-textbook.js?v=235";
 import { startClassroomV3 } from "./classroom-v3.js?v=227";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
@@ -792,8 +796,7 @@ function board(title, body, kind, annotation) {
   function draw() {
     const choices = $("choices");
     host.replaceChildren(
-      node("div", kind, "caption"),
-      node("h1", title),
+      ...(current?.steps[index]?.title===title?[createBoardHierarchy(document,boardHierarchy(current,current.steps[index],catalog?.courses.find(c=>c.name===current.course)),kind)]:[node("div",kind,"caption"),node("h1",title)]),
       node("div", pages[page], "content"),
     );
     if (annotation) host.append(node("div", annotation, "annotation"));
@@ -958,6 +961,7 @@ async function renderStep(camera) {
   await stage3d(step.kind,camera);
   if (!isBoard()) await growth?.step(activeSession);
   textbook?.render(current, index);
+  quests?.render(current,[...state.events,...pending]);
 }
 async function returnToQuestion() {
   const saved = pausedLesson;
@@ -1053,6 +1057,7 @@ function answer(choice) {
   }
   renderMath($("speech"));
   tutor?.onAnswer(correct);
+  quests?.render(current,[...state.events,...pending]);
   // 강의안 수업: 확인·학습지 문제를 맞히면 잠깐 뒤 다음 섹션(문항)으로 이어 간다. 그사이 직접 넘겼으면 아무것도 안 함.
   if (correct && curPack() && !isBoard()) { const at = index, lid = current.id; clearTimeout(autoNextTimer); autoNextTimer = setTimeout(() => { autoNextTimer = null; if (current?.id === lid && index === at && passed) $("next").click(); }, 1800); }
   // 강의안 수업의 섹션 확인 문제를 틀리면 「다시 듣기」 아이콘(그 섹션 첫 판서로). 학습지 오답에는 두지 않음(4부 보완 C)
@@ -1129,6 +1134,8 @@ $("next").onclick = async () => {
   } finally { stepping = false; }
 };
 async function finish() {
+  const seen=[...state.events,...pending];
+  if(!missionIndices && current.steps.every((s,i)=>seen.some(e=>e.lesson===current.id&&((e.kind==='position'&&e.index===i)||(['read','answer'].includes(e.kind)&&e.step===s.id)))) && !seen.some(e=>e.lesson===current.id&&e.kind==='review'&&e.action==='lecture-complete'))record({kind:'review',action:'lecture-complete',course,lesson:current.id});
   try{await growth?.stop('finish');}catch(e){status(e.message,true);}
   const host = panel(curPack() ? "수업 완료 · 학습지 결과" : "미션 완료 · 다음 도전");
   const answers = evidenceSummary(
@@ -2364,7 +2371,8 @@ async function boot() {
     if(entry.get('spawn')){await workspace.open('main');await space.walk(undefined,{spawn:entry.get('spawn')});}   // 대표실에서 걸어 들어옴(3D 2단계)
     else if(entry.get('world')==='walking'){await workspace.open('main');await space.walk(entry.get('subject')||undefined);}
     else if(lessonId){const resume=activeSession?.lessonId===lessonId&&(!stepId||activeSession.stepId===stepId)?activeSession:null;await startLesson(lessonId,{stepId:stepId||undefined,resume,purpose:resume?.purpose,returnTo:resume?.returnTo,camera:entry.get('camera')});}
-    else await workspace.open(['main','learning','materials','progress','attendance','assignments'].includes(room)?room:'main');
+    else await workspace.open(['main','learning','materials','progress','attendance','assignments','counsel'].includes(room)?room:'main');
+    schoolRefresh?.restore();
     status("학교 연결 완료");
   } catch (error) {
     $("today").textContent =
@@ -2461,9 +2469,10 @@ function lecturePosition(){
   const lessons=(catalog?.courses?.find(c=>c.name===current.course)?.lessons||[]).filter(l=>!l.generated&&!String(l.id).startsWith('exam-')).sort((a,b)=>a.date.localeCompare(b.date));
   const ordinal=lessons.findIndex(l=>l.id===current.id);
   const topics=groupLessonTopics(current.steps),part=topics.findLast(t=>t.index<=index);
-  return {course:current.course,date:current.date,lecture:ordinal>=0?`${ordinal+1}강 · 등록 수업 ${lessons.length}강`:current.generated?'자체 제작 수업':'수업 회차',part:part?`${topics.indexOf(part)+1}파트 · ${part.title}`:current.steps[index]?.title};
+  return {course:current.course,lecture:ordinal>=0?`${ordinal+1}강`:current.generated?'자체 제작 수업':'수업 회차',part:part?.title||current.steps[index]?.title};
 }
-const rail = createSubjectRail({subjects:ROOMS,available:name=>inFocus(name)&&!!catalog?.courses?.find(c=>c.name===name)?.lessons?.length,position:lecturePosition,current:()=>course,openScope:name=>showCourse(name,true),choose:async name=>{try{await mission?.save();}catch{return;}const seated=document.querySelector('.school').dataset.world==='seated';await sitDown(name);space?.setSubject?.(name);rail.update();if(seated)await space?.seated(name);}});
+const subjectScope=createSubjectScope({fallback:name=>showCourse(name,true),lessons:name=>(catalog?.courses.find(c=>c.name===name)?.lessons||[]).filter(l=>!l.generated&&!String(l.id).startsWith('exam-')).sort((a,b)=>a.date.localeCompare(b.date)),current:()=>current?{lesson:current.id,index}:null,events:()=>[...state.events,...pending],topics:async summary=>{const lesson=summary.id===current?.id?current:await api('lesson?id='+encodeURIComponent(summary.id));return groupLessonTopics(lesson.steps).map((t,i,all)=>({...t,current:summary.id===current?.id&&t.index<=index&&(!all[i+1]||all[i+1].index>index)}));},select:(id,stepId)=>startLesson(id,{stepId}),onOpen:()=>{scopePause={lesson:current,index,playing:!!lecture?.playing};if(scopePause.playing)lecture.toggle();},onClose:()=>{const paused=scopePause;scopePause=null;if(paused?.playing&&current===paused.lesson&&index===paused.index&&!lecture?.playing&&!lecture?.ended)lecture?.toggle();}});
+const rail = createSubjectRail({subjects:ROOMS,available:name=>inFocus(name)&&!!catalog?.courses?.find(c=>c.name===name)?.lessons?.length,position:lecturePosition,current:()=>course,openScope:(name,anchor)=>subjectScope.open(name,anchor),choose:async name=>{try{await mission?.save();}catch{return;}const seated=document.querySelector('.school').dataset.world==='seated';await sitDown(name);space?.setSubject?.(name);rail.update();if(seated)await space?.seated(name);}});
 new MutationObserver(()=>rail.update()).observe($('roomLabel'),{childList:true,characterData:true,subtree:true});
 new MutationObserver(()=>rail.update()).observe($('stepLabel'),{childList:true,characterData:true,subtree:true});
 startSurfaces();
@@ -2559,4 +2568,6 @@ $('progressArea').onclick=()=>workspace.open('progress');
 $('materialsArea').onclick=()=>workspace.open('materials');
 $('attendanceArea').onclick=()=>workspace.open('attendance');
 $('assignmentArea').onclick=()=>workspace.open('assignments');
+const quests=createLectureQuests({onStep:stepId=>current&&startLesson(current.id,{stepId})});
+const schoolRefresh=mountSchoolRefresh({status,beforeReload:async()=>{await mission?.save();await flush();if(pending.length)throw new Error("학습 기록 저장을 확인해 주세요.");if(current && !isBoard())await saveSession(current,index);}});
 boot();

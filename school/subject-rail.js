@@ -3,7 +3,7 @@
 const short = (name) => (/^[A-Za-z]/.test(name) ? name.slice(0, 1) : [...name][0]);
 export function createSubjectRail({ subjects, current, choose, openScope, available = () => true, position }) {
   const rail = document.createElement('nav'); rail.className = 'subject-rail'; rail.setAttribute('aria-label', '과목 바꾸기');
-  const context=document.createElement('section');context.className='subject-context';context.setAttribute('aria-label','현재 수업 위치');context.hidden=true;rail.append(context);
+  const context=document.createElement('section');context.className='subject-context';context.setAttribute('aria-label','현재 수업 위치');context.hidden=true;document.querySelector('.school')?.append(context);
   const list=document.createElement('div');list.className='subject-list';rail.append(list);
   let page=0,lastCurrent;const pageSize=4;
   const buttons = subjects.map((s, i) => {
@@ -11,7 +11,7 @@ export function createSubjectRail({ subjects, current, choose, openScope, availa
     b.style.setProperty('--c', '#' + (s.color ?? 0x5c6f65).toString(16).padStart(6, '0'));
     b.setAttribute('aria-label', `${s.name} (${i + 1})`); b.dataset.tip = `${s.name} · ${i + 1}`; b.dataset.subject = s.name;
     b.innerHTML = `<span aria-hidden="true"></span><kbd aria-hidden="true">${i + 1}</kbd>`; b.querySelector('span').textContent = short(s.name);
-    b.onclick = () => { if (b.dataset.subject === current()) openScope?.(s.name); else choose(s.name); };
+    b.onclick = () => { if (b.dataset.subject === current()) openScope?.(s.name,b); else choose(s.name); };
     list.append(b); return b;
   });
   const controls=document.createElement('div');controls.className='subject-pages';
@@ -29,10 +29,13 @@ export function createSubjectRail({ subjects, current, choose, openScope, availa
     if (active && openScope) b.setAttribute('aria-haspopup', 'dialog'); else b.removeAttribute('aria-haspopup');
   }
     const info=position?.();context.hidden=!info;
-    if(info){context.replaceChildren();for(const [tag,text] of [['strong',info.course],['span',info.lecture],['small',info.date],['p',info.part]]){if(!text)continue;const e=document.createElement(tag);e.textContent=text;context.append(e);}}
+    if(info){context.replaceChildren();for(const [tag,text] of [['strong',info.course],['span',info.lecture],['p',info.part]]){if(!text)continue;const e=document.createElement(tag);e.textContent=text;context.append(e);}placeContext();}
     const activeIndex=subjects.findIndex(s=>s.name===now);if(activeIndex>=0 && now!==lastCurrent)page=Math.floor(activeIndex/pageSize);lastCurrent=now;paintPage();
   }
   document.querySelector('.school')?.append(rail);
+  function placeContext(){const board=document.querySelector('#board')?.getBoundingClientRect();if(!board)return;context.style.left='16px';context.style.top=board.top+'px';context.style.width=Math.max(0,board.left-32)+'px';}
+  window.addEventListener('resize',placeContext);
+  if(document.querySelector('#room'))new ResizeObserver(placeContext).observe(document.querySelector('#room'));
   window.addEventListener('keydown', (e) => {
     const sc = document.querySelector('.school');
     if (sc.dataset.mode !== 'classroom' || sc.dataset.world === 'walking' || e.ctrlKey || e.metaKey || e.altKey) return;

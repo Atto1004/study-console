@@ -1,0 +1,6 @@
+.school[data-layout=v3] .lesson-textbook-body .textbook-paragraph[data-emphasis=memory]{background:linear-gradient(transparent 35%,#fff0a1aa 35%,#fff0a1aa 91%,transparent 91%);text-decoration:underline;text-decoration-style:wavy;text-decoration-color:#b79439;text-underline-offset:4px}
+.school[data-layout=v3] .lesson-textbook-body .textbook-paragraph[data-emphasis=warning]{color:#ac3b32;text-decoration:underline;text-decoration-color:#cb6359;text-decoration-thickness:2px;text-underline-offset:4px;border-left:2px solid #d57668;padding-left:8px}
+.school[data-layout=v3] .lesson-textbook-body .textbook-paragraph[data-emphasis=condition]{background:#eaf2dd9c;border-left:3px solid #9eb880;padding:5px 8px;border-radius:4px}
+.school[data-layout=v3] .lesson-textbook-body .textbook-paragraph[data-emphasis=example]{color:#315e86}
+.school[data-layout=v3] .lesson-textbook-body .textbook-paragraph[data-star=true]::before{content:'★ ';color:#b38a28;font-size:.85em}
+.school[data-layout=v3] .lesson-textbook-title[data-emphasis=key]{text-decoration:underline;text-decoration-color:#e0c361;text-decoration-thickness:4px;text-underline-offset:4px;color:#65502e}

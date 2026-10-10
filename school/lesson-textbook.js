@@ -1,4 +1,5 @@
 import { splitText } from './learning.js';
+import { textbookEmphasis } from './lecture-chalk.js?v=235';
 
 // 수업 원자료 중 읽기 단계만 사용한다. 문제·정답·피드백은 이 패널의 자료가 아니다.
 const readableKinds = new Set(['understand', 'remember', 'concept', 'visual', 'example']);
@@ -44,7 +45,10 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
   function showPage() {
     body.replaceChildren();
     const text = material[page] || '이 수업 단계에 연결된 개념·예제 자료가 없습니다.';
-    for (const paragraph of text.split(/\n\s*\n/)) body.append(node('p', 'textbook-paragraph', paragraph));
+    for (const paragraph of text.split(/\n\s*\n/)) {
+      const row=node('p','textbook-paragraph',paragraph),emphasis=textbookEmphasis(paragraph);
+      row.dataset.emphasis=emphasis.kind;row.dataset.star=String(emphasis.star&&!text.includes('★'));body.append(row);
+    }
     position.textContent = material.length ? `${page + 1} / ${material.length}쪽` : '자료 없음';
     previous.disabled = page <= 0;
     next.disabled = page >= material.length - 1;
@@ -110,6 +114,7 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
     contents.hidden = !entries.length;
     showContents();
     title.textContent = selected?.step.title || '연결 자료';
+    title.dataset.emphasis=textbookEmphasis(title.textContent).star?'key':'normal';
     const example = /예제|Ex\d|계산/i.test(selected?.step.title || '');
     const sourceLabel = String(lesson?.id || '').startsWith('draft:') ? 'AI 보충 자료' : lesson?.generated || String(lesson?.id || '').startsWith('exam-') ? '자체 제작 시험 대비' : '연결된 수업 자료';
     readingGuide.textContent = (example ? '예제 풀이' : '개념 이해') + ' · ' + sourceLabel + ' · ' + (selected?.parts.length || 0) + '개 단계';

@@ -1,10 +1,15 @@
 // Emphasis describes the supplied lesson text. It never estimates exam odds.
 const clean = value => String(value || '').replace(/\s+/g, ' ').trim();
-const classify = text => /주의|안 된다|않는다|불가능|혼동|반례|틀리|주의점/.test(text) ? 'warning'
+const classify = text => /주의|안 된다|않는다|불가능|혼동|반례|틀리|주의점|금지/.test(text) ? 'warning'
   : /암기|기억|외우|반드시/.test(text) ? 'memory'
   : /조건|정의|일 때|같아야|성립|가능/.test(text) ? 'condition'
   : /예제|예시|Ex\s*\d|풀이|계산/.test(text) ? 'example' : 'concept';
 const LABEL = {warning:'주의',memory:'기억할 것',condition:'성립 조건',example:'풀이 포인트',concept:'핵심 개념'};
+export function textbookEmphasis(text) {
+  const cues=String(text||'').replace(/(?:암기|기억|외우)[^.!?\n]{0,18}(?:필요\s*(?:없|가 없)|하지\s*않|하지\s*말|안\s*해도)/g,'');
+  const key=/★|암기|기억|외우|반드시|중요|핵심|키 포인트/.test(cues);
+  const kind=classify(cues);return {kind:kind==='concept'&&key?'memory':kind,star:key};
+}
 export function chalkLines(value) {
   const formulas=[];
   const protectedText=String(value || '').replace(/\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|(?<!\$)\$(?!\$)[^$]*\$/g, text=>{formulas.push(text);return '\uE000'+(formulas.length-1)+'\uE001';});

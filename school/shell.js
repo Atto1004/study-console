@@ -1,3 +1,4 @@
+import { menuIcon } from './menu-settings.js?v=232';
 // 학교 화면 틀(대표님 10/9): 위 고정 줄 = 「GREENLIGHT | SCHOOL」 · 탭 · 비서별 토큰 사용량 · 대표실 버튼,
 // 아래 고정 줄 = 김주영 스앵님(기본 캐릭터 rig.js) + 채팅 바(대화·질문). 스크롤해도 위·아래는 그대로.
 // 수업(교실) 화면에서는 아래 줄을 숨긴다(교실은 자기 조작 줄이 있음). index.html·v3.css 는 건드리지 않고 이 모듈이 덮는다.
@@ -191,7 +192,7 @@ export function setupShell({ api, eventId, openArea, course = () => '', history 
     for (const [k, n] of [['ask', '확인'], ['mail', '메일함'], ['appr', '결재함'], ['link', '연동 상태']]) items.push([n + (c[k] ? ` · ${c[k]}` : ''), { click: () => { inbox.open(k, menuBtn); setTimeout(paintDot, 1500); } }]);
     const map = header?.querySelector('.map-trigger'); if (map) items.push(['학교 지도', map]);
     for (const b of header?.querySelectorAll('details.secondary-menu button') || []) items.push([b.textContent.trim(), b]);
-    pop.replaceChildren(...items.map(([label, target]) => { const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.textContent = label; b.disabled = !!target.disabled; b.onclick = () => { setMenu(false); target.click(); }; return b; }));
+    pop.replaceChildren(...items.map(([label, target]) => { const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.innerHTML = menuIcon(label); const text=document.createElement('span');text.textContent=label;b.append(text); b.disabled = !!target.disabled; b.onclick = () => { setMenu(false); target.click(); }; return b; }));
   };
   const setMenu = (open) => { if (open) fillMenu(); pop.hidden = !open; menuBtn.setAttribute('aria-expanded', String(open)); if (open) pop.querySelector('button:not(:disabled)')?.focus(); };
   menuBtn.onclick = (e) => { e.stopPropagation(); setMenu(pop.hidden); };
