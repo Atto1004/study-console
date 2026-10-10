@@ -32,7 +32,7 @@ import { createFace } from "./face.js";
 import { readable, cleanTitle } from "./readable.js";
 import { createPlan } from "./plan.js";
 import { inFocus } from "./focus.js";
-import { createLessonTextbook } from "./lesson-textbook.js?v=217";
+import { createLessonTextbook } from "./lesson-textbook.js?v=229";
 import { startClassroomV3 } from "./classroom-v3.js?v=227";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);

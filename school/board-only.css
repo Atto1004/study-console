@@ -273,3 +273,8 @@
 .subject-list button[hidden]{display:none!important}.subject-chip:disabled{background:#969c96!important;opacity:.55!important;filter:grayscale(1);cursor:default}.subject-chip:disabled::after{opacity:1;transform:none;font-size:11px}
 .subject-pages{display:flex;gap:5px;width:64px}.subject-pages[hidden]{display:none!important}.subject-pages button{flex:1;width:28px;min-height:30px;border:1px solid #d4ddd0;border-radius:8px;background:#fff;color:#49624b}
 @media(max-width:1500px){.school[data-mode=classroom] .subject-rail,.school[data-mode=classroom] .subject-context{width:116px}.subject-context{padding:8px!important}.subject-context strong{font-size:12px}.subject-context p{font-size:11px}}
+/* The reading panel occupies the answer row while no response is requested. */
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{--class-response-height:120px}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room:has(>.v3-response[hidden]) .v3-work{grid-row:1/3!important;height:calc(var(--class-board-height) + var(--class-response-height))!important;border-radius:12px}
+@media(max-width:1200px){.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{--class-response-height:150px}}
+@media(min-width:901px) and (max-width:1200px){.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{--class-response-height:165px}}

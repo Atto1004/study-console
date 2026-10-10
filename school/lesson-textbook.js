@@ -64,6 +64,10 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
       const size = `${body.clientWidth}:${body.clientHeight}`;
       if (size === lastSize || body.clientHeight <= 30) return;
       lastSize = size;
+      const anchor = material[page]?.slice(0, 32);
+      pageLimit = 300; paginate();
+      const matchingPage = anchor ? material.findIndex(text => text.includes(anchor)) : -1;
+      if (matchingPage >= 0) page = matchingPage;
       showPage();
     }).observe(body);
   }
