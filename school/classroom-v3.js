@@ -34,7 +34,7 @@ export function startClassroomV3(app) {
   const subtitle = el('div', 'v3-subtitle'); subtitle.id = 'subtitle'; subtitle.setAttribute('aria-live', 'polite'); subtitle.hidden = true;
   const mount3d = el('div', 'v3-3d'); mount3d.id = 'stage3d';
   stage.append(mount3d, teaching, subtitle);
-  room.append(stage, work);
+  room.append(stage, work, dialogue);
   const choices = document.getElementById('choices'); (document.getElementById('board') || teaching).append(choices);
   const moveWork = () => { const w = document.getElementById('missionWork'); if (w && w.parentElement !== work) work.append(w); };
   // 게임 보기에서 앉아 있을 때: 「자리에서 일어나기」 하나(기존 시점 줄의 같은 버튼을 누른다 — 줄 자체는 오타 A3 대로 숨김)

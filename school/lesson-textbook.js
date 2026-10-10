@@ -54,6 +54,15 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
   }
   previous.addEventListener('click', () => { if (page > 0) { page--; showPage(); } });
   next.addEventListener('click', () => { if (page < material.length - 1) { page++; showPage(); } });
+  if (globalThis.ResizeObserver) {
+    let lastSize = '';
+    new ResizeObserver(() => {
+      const size = `${body.clientWidth}:${body.clientHeight}`;
+      if (size === lastSize || body.clientHeight <= 30) return;
+      lastSize = size;
+      showPage();
+    }).observe(body);
+  }
 
   function render(lesson, index = 0) {
     const steps = Array.isArray(lesson?.steps) ? lesson.steps : [];

@@ -30,6 +30,7 @@
 @media(min-width:641px){
   .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:12px;align-items:stretch}
 }
+
 @media(max-width:900px){
   .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #scene{padding:8px 72px!important}
   .school[data-board-only][data-layout=v3][data-mode=classroom] #dialogue{width:calc(100% - 144px)!important}
@@ -48,4 +49,20 @@
   .school[data-board-only][data-layout=v3][data-mode=classroom] .v3-bar{gap:4px!important}
   .school[data-board-only][data-layout=v3][data-mode=classroom] .v3-track{min-width:24px}
   .school[data-board-only][data-layout=v3][data-mode=classroom] .v3-chat{flex-shrink:0}
+}
+
+/* .204: 칠판과 대화창을 같은 열에 두고, 칠판 외곽은 16:9로 고정한다. */
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{width:min(1440px,100%,calc((100dvh - 330px) * 2.6))!important;display:grid!important;grid-template-columns:minmax(0,2fr) minmax(0,1fr)!important;grid-template-rows:auto minmax(0,1fr)!important;align-content:start!important;align-items:start!important;gap:12px!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-stage{grid-column:1;grid-row:1;width:100%!important;height:auto!important;aspect-ratio:16/9!important;min-height:0!important;align-self:start!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-work{grid-column:2;grid-row:1/3;height:100%!important;box-sizing:border-box}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #dialogue{grid-column:1;grid-row:2;width:100%!important;max-width:100%!important;margin:0!important;align-self:start!important;min-width:0}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .v3-chat,
+.school[data-board-only][data-layout=v3][data-mode=classroom] .v3-bar{max-width:none!important;width:100%!important;box-sizing:border-box}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .v3-bar{flex-wrap:wrap!important;gap:6px!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .v3-track{min-width:48px}
+@media(max-width:900px) and (orientation:portrait),(max-width:640px){
+  .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{width:100%!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto auto minmax(0,1fr)!important;gap:8px!important}
+  .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-stage{grid-column:1;grid-row:1}
+  .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #dialogue{grid-column:1;grid-row:2}
+  .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-work{grid-column:1;grid-row:3}
 }
