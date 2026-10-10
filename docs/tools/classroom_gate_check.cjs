@@ -67,9 +67,10 @@ const ok = (cond, msg) => { out.push((cond ? "ok   " : "FAIL ") + msg); if (!con
   r = await open("notes/classroom/statics/2026-10-10.html", "#ch=1");
   ok(!gateOn(r.doc) && r.w.__cr.S.mode === "step", "10/10(무게이트)은 게이트 없이 바로 열린다");
 
-  // 4) 무게이트 날짜: 9/14 (명시 무게이트)
+  // 4) 9/14 는 1강(내적·외적 카드 포함)에 연결됨: 게이트 적용, 카드 9장(공통 3 + 1강 6)
   r = await open("notes/classroom/statics/2026-09-14.html", "#ch=1");
-  ok(!gateOn(r.doc) && r.w.__cr.S.mode === "step", "9/14(명시 무게이트)는 게이트 없이 바로 열린다");
+  ok(gateOn(r.doc) && r.w.__cr.D.gate.cards.length === 9, "9/14 게이트 적용, 카드 9장 (공통 3 + 1강 6)");
+  ok(r.doc.querySelector("#gBody").textContent.includes("sin30"), "9/14 첫 카드는 공통 카드");
 
   // 5) 확인 문제 진입(#quiz)도 같은 게이트를 거친다
   r = await open("notes/classroom/statics/2026-09-30.html", "#quiz");
