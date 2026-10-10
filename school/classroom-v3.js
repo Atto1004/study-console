@@ -1,6 +1,7 @@
 // 교실 v3 화면(설계 docs/classroom-v3-1008.md, 대표님 10/8): 위 강의 · 가운데 문제 · 아래 대화, 헤더에 게임↔사이트 전환.
 // 기존 요소(#board·.teacher·#choices·#missionWork·#dialogue)를 세 칸으로 옮겨 담고, 쓰지 않는 것(시점 아이콘 줄·학습 기록 띠·
 // 중복 진행 표시·도구 줄)은 숨긴다. 버튼 동작은 기존 것을 그대로 부른다.
+import { splitText } from './learning.js';
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
 const ICON = {
   game: 'M12 2 3 7v10l9 5 9-5V7zM3 7l9 5 9-5M12 12v10',
@@ -33,7 +34,7 @@ export function startClassroomV3(app) {
   const mount3d = el('div', 'v3-3d'); mount3d.id = 'stage3d';
   stage.append(mount3d, teaching, subtitle);
   room.append(stage, work);
-  const choices = document.getElementById('choices'); work.append(choices);
+  const choices = document.getElementById('choices'); (document.getElementById('board') || teaching).append(choices);
   const moveWork = () => { const w = document.getElementById('missionWork'); if (w && w.parentElement !== work) work.append(w); };
   // 게임 보기에서 앉아 있을 때: 「자리에서 일어나기」 하나(기존 시점 줄의 같은 버튼을 누른다 — 줄 자체는 오타 A3 대로 숨김)
   const stand = iconBtn('stand', '자리에서 일어나기 (Esc)', 'v3-stand');
@@ -42,7 +43,21 @@ export function startClassroomV3(app) {
 
   // ── 아래: 대화 기록 + 입력 + 진행 조작
   const log = el('div', 'v3-log'); log.id = 'chatLog'; log.setAttribute('aria-live', 'polite');
-  const chat = el('form', 'v3-chat'); const input = el('input'); input.id = 'chatInput'; input.placeholder = '스앵님께 말하기 · 질문은 ?로 끝내기 (Q)'; input.autocomplete = 'off'; input.maxLength = 600; input.setAttribute('aria-label', '스앵님께 말하기');
+  const logPages = el('nav', 'v3-log-pages'); logPages.setAttribute('aria-label', '대화 내용 넘기기');
+  const earlier = el('button', '', '이전 대화'), later = el('button', '', '다음 대화'), pageLabel = el('span');
+  earlier.type = later.type = 'button';
+  let messagePage = 0;
+  function showMessage() {
+    const rows = [...log.children]; messagePage = Math.max(0, Math.min(messagePage, rows.length - 1));
+    rows.forEach((row, i) => { row.hidden = i !== messagePage; });
+    earlier.disabled = messagePage === 0; later.disabled = messagePage >= rows.length - 1;
+    pageLabel.textContent = rows.length ? `${messagePage + 1} / ${rows.length}` : '';
+    logPages.hidden = !rows.length;
+  }
+  earlier.onclick = () => { messagePage--; showMessage(); };
+  later.onclick = () => { messagePage++; showMessage(); };
+  logPages.append(earlier, pageLabel, later); logPages.hidden = true;
+  const chat = el('form', 'v3-chat'); const input = el('input'); input.id = 'chatInput'; input.placeholder = '답변·질문을 여기에 입력 · 질문은 ?로 끝내기 (Q)'; input.autocomplete = 'off'; input.maxLength = 600; input.setAttribute('aria-label', '스앵님께 답변·질문 보내기');
   const send = iconBtn('send', '보내기', 'v3-send'); send.type = 'submit'; chat.append(input, send);
   const bar = el('div', 'v3-bar');
   const restart = iconBtn('restart', '이 단계 강의 처음부터'), play = iconBtn('pause', '강의 멈춤 (Space)', 'v3-play'), skip = iconBtn('skip', '다음 (Enter)', 'v3-skip');
@@ -60,7 +75,7 @@ export function startClassroomV3(app) {
   ]) { const b = el('button', 'v3-menu-item'); b.type = 'button'; b.innerHTML = svg(icon); b.append(label); b.onclick = () => { more.open = false; go(); }; menu.append(b); }
   more.append(sum, menu);
   bar.append(restart, play, skip, progress, track, hint, simpler, more);
-  dialogue.prepend(log); dialogue.append(chat, bar);
+  dialogue.prepend(log, logPages); dialogue.append(chat, bar);
 
   restart.onclick = () => app.onRestart?.();
   play.onclick = () => app.onToggle?.();
@@ -72,9 +87,10 @@ export function startClassroomV3(app) {
   new MutationObserver(() => { const t = speech.textContent.trim(); if (t && t !== lastLine) { lastLine = t; addLine('saeng', t); } }).observe(speech, { childList: true, characterData: true, subtree: true });
   function addLine(who, text) {
     text = String(text).replace(/[ \t]*\n\s*/g, '\n').replace(/[ \t]{2,}/g, ' ').trim(); if (!text) return;
-    const row = el('div', 'v3-msg v3-' + who); /* 'saeng' 그대로 쓰면 기존 초상 스타일과 겹친다 */ const b = el('p', undefined, text); row.append(b); log.append(row);
-    while (log.children.length > 40) log.firstChild.remove();
-    log.scrollTop = log.scrollHeight;
+    for (const part of splitText(text, 140)) {
+      const row = el('div', 'v3-msg v3-' + who); /* 'saeng' 그대로 쓰면 기존 초상 스타일과 겹친다 */ const b = el('p', undefined, part); row.append(b); log.append(row);
+    }
+    messagePage = log.children.length - 1; showMessage();
   }
   function addMine(text) { addLine('me', text); }
   // 가운데 답 칸에서 낸 답도 내 말로 남김
@@ -97,7 +113,8 @@ export function startClassroomV3(app) {
     get view() { return view; },
     subtitle(text) { subtitle.hidden = !text; subtitle.textContent = text || ''; },
     head(point) { if (!point) { subtitle.style.removeProperty('--hx'); subtitle.style.removeProperty('--hy'); return; } const r = stage.getBoundingClientRect(); subtitle.style.setProperty('--hx', (point.x - r.left) + 'px'); subtitle.style.setProperty('--hy', (point.y - r.top) + 'px'); },
-    board(f) { document.querySelector('#board .content')?.style.setProperty('--reveal', String(Math.max(0, Math.min(1, f)))); },
+    // 본문은 즉시 읽을 수 있게 두고, 강의 진행은 자막과 진행 표시로 안내한다.
+    board() { document.querySelector('#board .content')?.style.setProperty('--reveal', '1'); },
     state({ playing, index, count, ended }) {
       play.innerHTML = svg(ICON[playing ? 'pause' : 'play']); play.setAttribute('aria-label', playing ? '강의 멈춤 (Space)' : ended ? '강의 다시 듣기 (Space)' : '강의 계속 (Space)'); play.dataset.tip = play.getAttribute('aria-label');
       const p = app.progress?.() || ''; progress.textContent = p; fill.style.width = count ? Math.round(((ended ? count : index) / count) * 100) + '%' : '0';

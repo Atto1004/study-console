@@ -14,7 +14,7 @@ import { pickLesson, pickQuestions } from "./metrics.js";
 import { createSetup } from "./setup.js";
 import { createWorldMap } from "./worldmap.js";
 import { createTutor } from "./tutor.js";
-import { createSubjectRail } from "./subject-rail.js";
+import { createSubjectRail } from "./subject-rail.js?v=202";
 import { startSurfaces } from "./surface.js";
 import { createLecture } from "./lecture.js";
 import { loadPack, packRoute, packLines, label as packLabel } from "./lecture-pack.js";
@@ -29,7 +29,8 @@ import { createFace } from "./face.js";
 import { readable, cleanTitle } from "./readable.js";
 import { createPlan } from "./plan.js";
 import { inFocus } from "./focus.js";
-import { startClassroomV3 } from "./classroom-v3.js";
+import { createLessonTextbook } from "./lesson-textbook.js?v=202";
+import { startClassroomV3 } from "./classroom-v3.js?v=202";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
@@ -47,7 +48,7 @@ let pending = [],
   chatBusy = false,
   lastLesson = null;
 let pausedLesson = null;
-let activeSession = null, sessionQueue = Promise.resolve(), setup = null, sessionEpoch = 0, tutor = null, lecture = null, v3 = null, userPaused = false;
+let activeSession = null, sessionQueue = Promise.resolve(), setup = null, sessionEpoch = 0, tutor = null, lecture = null, v3 = null, textbook = null, userPaused = false, scopePause = null;
 // 두 기기 학습의 칠판(모니터)은 받기만 한다: 수업 위치·학습 활동 기록을 쓰지 않는다(오타 10/8 RED).
 const isBoard = () => document.querySelector('.school')?.dataset.role === 'board';
 let resizeBoard;
@@ -268,6 +269,10 @@ function panel(title) {
   return $("panelBody");
 }
 $("closePanel").onclick = () => $("panel").close();
+$("panel").addEventListener('close', () => {
+  const paused = scopePause; scopePause = null;
+  if (paused?.playing && current === paused.lesson && index === paused.index && !lecture?.playing && !lecture?.ended) lecture?.toggle();
+});
 // 팝업은 바깥을 누르면 닫는다(모든 dialog 공통). 창 안에서 누르기 시작해 바깥에서 뗀 경우(글자 끌어 선택)는 닫지 않는다.
 const outside = (d, e) => { const r = d.getBoundingClientRect(); return e.target === d && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom); };
 let backdropDown = null;
@@ -545,10 +550,15 @@ $("courses").onclick = () => {
   for (const c of catalog.courses)
     row(host, c.name, c.strategy, () => showCourse(c.name), "들어가기");
 };
-  function showCourse(name) {
+  function showCourse(name, selectScope = false) {
+  if (selectScope && !scopePause) {
+    scopePause = {lesson:current,index,playing:!!lecture?.playing};
+    if (scopePause.playing) lecture.toggle();
+  }
   course = name;
   const c = catalog.courses.find((c) => c.name === name);
-    const host = panel(name);
+    const host = panel(selectScope ? name + ' · 수업 범위 선택' : name);
+    if (selectScope) host.append(node('p', '수업 날짜를 고른 뒤 시작할 세부 주제를 선택하세요. 선택한 주제부터 수업을 이어갑니다.', 'notice'));
     const assets = node("div", undefined, "assignment-filters");
     const slug = {"공업수학1":"em1", "미분적분학2":"calc2", "일반물리학2":"phys2", "정역학":"statics"}[name];
     if (slug) assets.append(button("암기노트", () => openStudyAsset(name + " · 암기노트", "notes/memo/" + slug + ".html")));
@@ -578,8 +588,8 @@ $("courses").onclick = () => {
       host,
       `${l.date} · ${l.title}`,
       `${l.week || "?"}주차 · 원문 수업 연결`,
-      () => startLesson(l.id),
-      "학습",
+      () => selectScope ? showLessonScope(l, name) : startLesson(l.id),
+      selectScope ? "세부 주제 선택" : "학습",
     );
   host.append(node("h3", "필요 개념"));
   const courseConcepts = node("div", undefined, "concept-list");
@@ -621,6 +631,22 @@ $("courses").onclick = () => {
     })
     .catch(error => { if (practice.isConnected) practice.append(node("p", error.message)); });
 }
+async function showLessonScope(summary, name) {
+  const host = panel(name + ' · ' + summary.date);
+  const loading = node('p', '세부 주제를 불러오는 중입니다.');
+  host.append(loading);
+  try {
+    const lesson = await api('lesson?id=' + encodeURIComponent(summary.id));
+    if (!loading.isConnected || !$("panel").open) return;
+    host.replaceChildren(node('h2', lesson.title), node('p', '시작할 주제를 선택하세요. 이후 주제는 수업 순서대로 이어집니다.', 'notice'));
+    host.append(button('처음부터 학습', () => startLesson(summary.id, {index:0})));
+    lesson.steps.forEach((step, at) => row(host, `${at + 1}. ${step.title || '수업 주제'}`, {understand:'개념 이해',remember:'개념 정리',example:'예제',quiz:'직접 문제'}[step.kind] || '수업', () => startLesson(summary.id, {stepId:step.id}), '여기부터 학습'));
+    host.append(button('다른 수업 날짜 선택', () => showCourse(name, true)));
+    host.querySelector('button')?.focus();
+  } catch (error) {
+    if (loading.isConnected && $("panel").open) { host.replaceChildren(node('h2', '수업 범위'), node('p', error.message, 'error'), button('다시 선택', () => showCourse(name, true))); }
+  }
+}
 $("resume").onclick = () => {
   const plan = state.plans[course];
   if (lastLesson) startLesson(lastLesson);
@@ -648,6 +674,10 @@ async function startLesson(id, options = {}) {
     const lp = options.purpose === "exam" ? null : await loadPack(lesson.id);
     if (generation !== requestGeneration || stale()) return;
     const lr = lp && packRoute(lp, lesson.steps);
+    if (lr && options.stepId && !lr.includes(targetIndex)) {
+      const next = lr.findIndex(at => at > targetIndex);
+      lr.splice(next < 0 ? lr.length : next, 0, targetIndex);
+    }
     if (lr) { missionIndices = lr; if (!lr.includes(targetIndex)) targetIndex = lr.find(i => i >= targetIndex) ?? lr[0]; }
     if (options.follow) activeSession = options.resume;
     else await saveSession(lesson, targetIndex, {newSession: !options.resume, purpose: options.purpose || 'tutoring', assisted: options.assisted ?? !!options.resume?.assisted, returnTo: options.returnTo || null});
@@ -745,6 +775,7 @@ function board(title, body, kind, annotation) {
     pages = splitText(body, limit),
     page = 0;
   function draw() {
+    const choices = $("choices");
     host.replaceChildren(
       node("div", kind, "caption"),
       node("h1", title),
@@ -770,6 +801,7 @@ function board(title, body, kind, annotation) {
       );
       host.append(controls);
     }
+    if (v3 && choices) host.append(choices);
     renderMath(host);
     requestAnimationFrame(() => {
       if (
@@ -909,6 +941,7 @@ async function renderStep(camera) {
   // 교실 v3: 게임 보기면 3D 교실을 위 강의 칸에 앉혀 붙이고, 사이트 보기면 3D 를 쓰지 않는다
   await stage3d(step.kind,camera);
   if (!isBoard()) await growth?.step(activeSession);
+  textbook?.render(current, index);
 }
 async function returnToQuestion() {
   const saved = pausedLesson;
@@ -2365,10 +2398,16 @@ v3 = startClassroomV3({
   onToggle:()=>{if(!lecture)return;lecture.toggle();},
   onRestart:()=>lecture?.restart(),
   onSkip:advance,
-  onChat:text=>tutor?.question(text),
+  onChat:text=>{
+    if (!/[?？]\s*$/.test(text) && current && !current.steps[index].options && lecture?.playing) { lecture.stop(); tutor?.afterLecture(); }
+    tutor?.submitMessage(text);
+  },
   progress:()=>$('stepLabel')?.textContent||'',
   onViewChange:async view=>{if(current&&document.querySelector('.school').dataset.mode==='classroom'){stagedCourse=null;await stage3d(current.steps[index].kind);}else if(view==='site'){space?.mount?.(null);space?.hide();}},
 });
+textbook = createLessonTextbook({math:renderMath,onStep:stepId=>current && startLesson(current.id,{stepId})});
+v3.work.setAttribute('aria-label','수업교재');
+v3.work.append(textbook.el);
 tutor = createTutor({api,eventId,record,inPack:()=>!!curPack(),
   ctx:()=>current?{lesson:current,step:current.steps[index],index,course,passed,blocked:['rejected','pending'].includes(current.review?.status)}:null,
   pass:()=>{passed=true;$('next').disabled=false;},
@@ -2397,7 +2436,7 @@ tutor = createTutor({api,eventId,record,inPack:()=>!!curPack(),
    else if(e.code==='Escape'&&sc.dataset.world==='seated'){e.preventDefault();document.querySelector('.seat-controls [data-icon=stand]')?.click();}
  });}
 // 과목 레일: 수업 중 과목을 바꾸면 그 과목의 약한 회차로 바로(강의실 하나, 교실 v2)
-const rail = createSubjectRail({subjects:ROOMS.filter(r=>inFocus(r.name)),   /* 시험 기간 집중 4과목(focus.js) */current:()=>course,choose:async name=>{try{await mission?.save();}catch{return;}const seated=document.querySelector('.school').dataset.world==='seated';await sitDown(name);space?.setSubject?.(name);rail.update();if(seated)await space?.seated(name);}});
+const rail = createSubjectRail({subjects:ROOMS.filter(r=>inFocus(r.name)),   /* 시험 기간 집중 4과목(focus.js) */current:()=>course,openScope:name=>showCourse(name,true),choose:async name=>{try{await mission?.save();}catch{return;}const seated=document.querySelector('.school').dataset.world==='seated';await sitDown(name);space?.setSubject?.(name);rail.update();if(seated)await space?.seated(name);}});
 new MutationObserver(()=>rail.update()).observe($('roomLabel'),{childList:true,characterData:true,subtree:true});
 startSurfaces();
 const MOOD={smile:'smile',serious:'strict',think:'neutral',neutral:'neutral'};
@@ -2434,14 +2473,14 @@ $('learnSettings').onclick=()=>{closeDialogs();setup.open();};
 // 모니터 + 아이패드: 두 기기가 서버의 같은 수업 위치(activeSession)를 따라간다. 어느 쪽에서 넘겨도 다른 쪽이 2초 안에 맞춘다.
 let following=false;
 async function follow(){
-  if(following||document.hidden||setup?.get()!=='dual'||!current||document.querySelector('.school').dataset.mode!=='classroom')return;
+  if(following||document.hidden||scopePause||setup?.get()!=='dual'||!current||document.querySelector('.school').dataset.mode!=='classroom')return;
   following=true;
   try{
     await sessionQueue.catch(()=>{});
     const epoch=sessionEpoch;
     const s=await api('session');
     // 읽는 동안 이 기기에서 이동했으면, 또는 이미 더 최신을 갖고 있으면 응답을 버린다.
-    if(epoch!==sessionEpoch||!s||!current)return;
+    if(epoch!==sessionEpoch||scopePause||!s||!current)return;
     if(s.id===activeSession?.id&&s.revision<=activeSession.revision)return;
     // 다른 수업이거나 목적(수업↔시험 대비)이 바뀌면 문제 목록까지 다시 구성한다.
     if(s.lessonId!==current.id||s.purpose!==activeSession?.purpose){await startLesson(s.lessonId,{resume:s,purpose:s.purpose,returnTo:s.returnTo,follow:true,epoch});return;}

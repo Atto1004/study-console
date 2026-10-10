@@ -127,17 +127,19 @@ export function createTutor(app) {
     }
   }
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault(); if (waiting || app.busy?.() || readOnly()) return;
-    const text = input.value.trim(); if (!text) return; input.value = '';
+  function submitMessage(value) {
+    if (waiting || app.busy?.() || readOnly() || app.ctx()?.blocked) return;
+    const text = String(value || '').trim(); if (!text) return;
     // 답을 기다릴 때도 「?」로 끝나면 끼어들기 질문으로 받는다
-    if (form.dataset.mode === 'answer' && phase === 'check' && !/[?？]\s*$/.test(text)) evaluate(text); else question(text);
-  });
+    if (((form.dataset.mode === 'answer' && phase === 'check') || (app.inPack?.() && !app.ctx()?.step.options)) && !/[?？]\s*$/.test(text)) evaluate(text); else question(text);
+  }
+  form.addEventListener('submit', (e) => { e.preventDefault(); const text = input.value; input.value = ''; submitMessage(text); });
   dunno.addEventListener('click', () => { if (!waiting && !readOnly()) together(); });
 
   return {
     onStep,
     afterLecture,
+    submitMessage,
     question(text) { if (!waiting && !readOnly() && String(text || '').trim()) question(String(text).trim()); },
     // answer()(선택지)가 판정한 뒤 부른다
     onAnswer(correct) {
