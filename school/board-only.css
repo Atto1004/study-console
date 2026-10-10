@@ -1,0 +1,51 @@
+/* .203: 칠판 전체 면 + 홈과 같은 중앙 채팅바. */
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #scene{padding:10px 80px 8px!important;margin:0!important;width:100%!important;min-height:0!important;overflow:hidden!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{width:100%;height:100%;min-height:0;max-width:1440px;justify-content:stretch!important;overflow:hidden}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-stage{position:relative!important;flex:1 1 0!important;height:100%!important;min-height:0!important;padding:0!important;overflow:hidden!important;background:#173b2d!important;border:6px solid #77583c;border-radius:12px!important;box-sizing:border-box;box-shadow:0 3px 14px #1a30201a!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-stage::after,
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .teaching-space::after,
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-stage .teacher,
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-stage .vn-box,
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-subtitle{display:none!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-stage .teaching-space{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;padding:0!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-stage #board{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;aspect-ratio:auto!important;max-height:none!important;border:0!important;border-radius:0!important;background:#173b2d!important;padding:clamp(14px,2vw,28px)!important;overflow:hidden!important;box-shadow:none!important;box-sizing:border-box}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #board .content{font-size:clamp(16px,1.4vw,22px)!important;line-height:1.65!important;overflow-wrap:anywhere}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #board h1{font-size:clamp(18px,1.8vw,28px)!important;margin:6px 0 12px!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #board .caption,
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #board .annotation{font-size:13px!important;margin:6px 0!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .lc-intro{inset:0!important;width:100%!important;height:100%!important;aspect-ratio:auto!important;max-height:none!important;padding:20px!important;box-sizing:border-box;overflow:hidden!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-work{min-height:0!important;overflow:hidden!important;max-height:none!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom] #dialogue{align-self:center;margin:0 auto 8px!important;width:min(1440px,calc(100% - 160px))!important;max-width:none!important;padding:10px 14px!important;box-sizing:border-box;gap:6px;flex:none}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .v3-chat{width:100%;max-width:1120px;align-self:center;align-items:center;justify-content:center;gap:8px;margin:0!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .v3-chat input{height:46px!important;border-radius:23px!important;border:1px solid #d5ddd8!important;background:#fff!important;padding:0 16px!important;font:500 15px "Pretendard Variable",Pretendard,system-ui,sans-serif}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .v3-chat input:focus{outline:2px solid #2e6b52;outline-offset:1px}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .v3-chat .v3-send{width:46px!important;height:46px!important;border-radius:50%!important;background:#2e6b52!important;border:1px solid #2e6b52!important;color:#fff!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .v3-bar{justify-content:center;align-self:center;width:100%;max-width:1120px;margin:auto}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .v3-log{height:52px!important;min-height:52px!important;max-height:52px!important;padding-right:220px!important;box-sizing:border-box}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .v3-log-pages{position:absolute;right:14px;top:8px;justify-content:center!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .lesson-textbook-header{display:block!important;position:static!important;height:auto!important;min-height:0!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .lesson-textbook-meta{line-height:1.35}
+.school[data-board-only][data-layout=v3][data-mode=classroom] .lesson-textbook-body{white-space:pre-line;line-height:1.45}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-stage #board{padding:14px!important;gap:8px!important}
+@media(min-width:641px){
+  .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:12px;align-items:stretch}
+}
+@media(max-width:900px){
+  .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #scene{padding:8px 72px!important}
+  .school[data-board-only][data-layout=v3][data-mode=classroom] #dialogue{width:calc(100% - 144px)!important}
+}
+@media(min-width:641px) and (max-width:900px) and (orientation:portrait){
+  .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1.15fr) minmax(0,1fr)!important}
+}
+@media(max-width:640px){
+  .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #scene{padding:6px 8px!important}
+  .school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{display:grid!important;grid-template-rows:minmax(0,1.1fr) minmax(0,1fr);grid-template-columns:minmax(0,1fr);gap:6px}
+  .school[data-board-only][data-layout=v3][data-mode=classroom] #dialogue{width:calc(100% - 16px)!important;padding:6px 8px!important}
+  .school[data-board-only][data-layout=v3][data-mode=classroom] .v3-log{height:44px!important;min-height:44px!important;max-height:44px!important}
+  .school[data-board-only][data-layout=v3][data-mode=classroom] .v3-log{padding-right:0!important}
+  .school[data-board-only][data-layout=v3][data-mode=classroom] .v3-log-pages{position:static}
+  .school[data-board-only][data-layout=v3][data-mode=classroom] .v3-chat input{font-size:16px!important}
+  .school[data-board-only][data-layout=v3][data-mode=classroom] .v3-bar{gap:4px!important}
+  .school[data-board-only][data-layout=v3][data-mode=classroom] .v3-track{min-width:24px}
+  .school[data-board-only][data-layout=v3][data-mode=classroom] .v3-chat{flex-shrink:0}
+}

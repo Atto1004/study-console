@@ -88,7 +88,7 @@ export function minStageH(W, vnH0, vnHidden = false) {
 
 export function setupSeatRoom() {
   const school = document.querySelector('.school'); const stage = document.querySelector('.v3-stage');
-  if (!school || !stage) return null;
+  if (!school || !stage || school.dataset.boardOnly) return null;
   if (!document.getElementById('room-seat-css')) { const s = document.createElement('style'); s.id = 'room-seat-css'; s.textContent = CSS; document.head.append(s); }
   school.dataset.seat = '1';
   stage.style.setProperty('--seat-img', `url("${IMG.src}")`);

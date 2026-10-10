@@ -47,8 +47,8 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
     math(body);
     const version = renderVersion;
     globalThis.requestAnimationFrame?.(() => {
-      if (version === renderVersion && body.clientHeight > 80 && body.scrollHeight > body.clientHeight + 2 && pageLimit > 90) {
-        pageLimit = Math.max(90, Math.floor(pageLimit * .65)); paginate(); showPage();
+      if (version === renderVersion && body.clientHeight > 30 && body.scrollHeight > body.clientHeight + 2 && pageLimit > 45) {
+        pageLimit = Math.max(45, Math.floor(pageLimit * .65)); paginate(); showPage();
       }
     });
   }

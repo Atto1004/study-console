@@ -22,7 +22,8 @@ export function startClassroomV3(app) {
   // app: { onToggle(), onRestart(), onSkip(), onChat(text), onViewChange(view), progress() }
   const school = document.querySelector('.school');
   school.dataset.layout = 'v3';
-  let view = read('school-view') === 'game' ? 'game' : 'site';
+  school.dataset.boardOnly = '1';
+  let view = 'site';
   school.dataset.view3 = view;
 
   // ── 세 칸
@@ -57,7 +58,7 @@ export function startClassroomV3(app) {
   earlier.onclick = () => { messagePage--; showMessage(); };
   later.onclick = () => { messagePage++; showMessage(); };
   logPages.append(earlier, pageLabel, later); logPages.hidden = true;
-  const chat = el('form', 'v3-chat'); const input = el('input'); input.id = 'chatInput'; input.placeholder = '답변·질문을 여기에 입력 · 질문은 ?로 끝내기 (Q)'; input.autocomplete = 'off'; input.maxLength = 600; input.setAttribute('aria-label', '스앵님께 답변·질문 보내기');
+  const chat = el('form', 'v3-chat'); const input = el('input'); input.id = 'chatInput'; input.placeholder = '스앵님께 말하기 · 답변이나 질문을 적어주세요'; input.autocomplete = 'off'; input.maxLength = 600; input.setAttribute('aria-label', '스앵님께 답변·질문 보내기');
   const send = iconBtn('send', '보내기', 'v3-send'); send.type = 'submit'; chat.append(input, send);
   const bar = el('div', 'v3-bar');
   const restart = iconBtn('restart', '이 단계 강의 처음부터'), play = iconBtn('pause', '강의 멈춤 (Space)', 'v3-play'), skip = iconBtn('skip', '다음 (Enter)', 'v3-skip');
