@@ -1,3 +1,4 @@
+import { presentNotebookPage } from './notebook-page.js?v=265';
 import { splitText } from './learning.js';
 import { textbookEmphasis } from './lecture-chalk.js?v=235';
 
@@ -53,6 +54,7 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
     previous.disabled = page <= 0;
     next.disabled = page >= material.length - 1;
     math(body);
+    presentNotebookPage(body, title.textContent);
     const version = renderVersion;
     globalThis.setTimeout?.(() => {
       if (version === renderVersion && body.clientHeight > 30 && body.scrollHeight > body.clientHeight + 2 && pageLimit > 45) {
@@ -133,6 +135,7 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
     }
     const unique = new Set();
     const text = selected?.parts.filter(part => {
+      if (part?.trim() === selected?.step.title?.trim()) return false;
       if (typeof part !== 'string' || !part.trim() || unique.has(part.trim())) return false;
       unique.add(part.trim()); return true;
     }).join('\n\n') || '';

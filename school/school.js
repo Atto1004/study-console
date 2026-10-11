@@ -1,5 +1,5 @@
-import { renderClassroomDirectory } from './classroom-directory.js?v=264';
-import { fitBoard } from './board-fit.js?v=264';
+import { renderClassroomDirectory } from './classroom-directory.js?v=265';
+import { fitBoard } from './board-fit.js?v=265';
 import { createLectureQuests } from './lecture-quests.js?v=233';
 import { mountSchoolRefresh } from './refresh.js?v=237';
 import { mountLectureActor } from './lecture-actor.js?v224';
@@ -38,7 +38,7 @@ import { createFace } from "./face.js";
 import { readable, cleanTitle } from "./readable.js";
 import { createPlan } from "./plan.js";
 import { inFocus } from "./focus.js";
-import { createLessonTextbook } from "./lesson-textbook.js?v=264";
+import { createLessonTextbook } from "./lesson-textbook.js?v=265";
 import { startClassroomV3 } from "./classroom-v3.js?v=241";
 import { createGrowth } from "./growth.js?v=199";
 import { cardGate } from './card-gate.js?v=1';
@@ -814,10 +814,10 @@ function board(title, body, kind, annotation) {
     if (v3 && choices) v3.response.append(choices);
     decorateChalk(host, current?.steps[index]);
     renderMath(host);
-    fitBoard(host);
+    const boardFits = fitBoard(host);
     setTimeout(() => {
       if (
-        (host.scrollHeight > host.clientHeight + 2 || host.querySelector(".content").scrollHeight > host.querySelector(".content").clientHeight + 2) &&
+        (!boardFits || host.scrollHeight > host.clientHeight + 2 || host.querySelector(".content").scrollHeight > host.querySelector(".content").clientHeight + 2) &&
         innerWidth > 650 &&
         limit > 40
       ) {
