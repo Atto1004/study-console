@@ -13,25 +13,25 @@ import {
   splitText,
   learningPath,
 } from "./learning.js";
-import { createWorkspace } from "./workspace.js?v=215";
+import { createWorkspace } from "./workspace.js?v=216";
 import { createMission } from "./mission.js?v=199";
 import { attachSaeng } from "./saeng.js?v224";
 import { createSpace, ROOMS } from "./space.js";
 import { pickLesson, pickQuestions } from "./metrics.js";
 import { createSetup } from "./setup.js";
 import { createWorldMap } from "./worldmap.js";
-import { createTutor } from "./tutor.js?v=3";
+import { createTutor } from "./tutor.js?v=4";
 import { createSubjectRail } from "./subject-rail.js?v=251";
 import { createSubjectScope } from "./subject-scope.js?v=240";
 import { boardHierarchy,createBoardHierarchy } from "./board-hierarchy.js?v=240";
 import { startSurfaces } from "./surface.js";
-import { createLecture } from "./lecture.js?v=3";
+import { createLecture } from "./lecture.js?v=4";
 import { loadPack, packRoute, packLines, label as packLabel } from "./lecture-pack.js";
 import { createDialog } from "./vn-dialog.js";
 import { createLectureUi } from "./lecture-ui.js";
 import { setupWideRoom } from "./room-wide.js";
 import { setupSeatRoom } from "./room-seat.js";
-import { pastDue, nextRoundOnly } from "./workspace.js?v=215";
+import { pastDue, nextRoundOnly } from "./workspace.js?v=216";
 import { setupShell } from "./shell.js?v=232";
 import { createRig } from "./rig.js";
 import { createFace } from "./face.js";
@@ -43,7 +43,7 @@ import { startClassroomV3 } from "./classroom-v3.js?v=241";
 import { createGrowth } from "./growth.js?v=199";
 import { cardGate } from './card-gate.js?v=2';
 /* 정역학 9/2 오리엔테이션과 2장 선수 수업(9/7·9/9·9/14)은 시험 범위 밖 — 강 목록과 강 번호에서 뺀다 (대표님 10/11) */
-const STATICS_HIDE = ["2026-09-02", "2026-09-07", "2026-09-09", "2026-09-14"];   /* 9/2 오리엔테이션 · 2장 선수 */
+const STATICS_HIDE = ["2026-09-02", "2026-09-07", "2026-09-09", "2026-09-14", "2026-10-10"];   /* 9/2 오리엔테이션 · 2장 선수 · 10/10 복습(벼락치기와 같은 과제 풀이 중복, 10/11 「꼭 필요한 구성만」) */
 const hideLesson = (course, l) => course === "정역학" && STATICS_HIDE.includes(l.date);
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";

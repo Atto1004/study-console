@@ -17,11 +17,15 @@ export function boardPage(c) {
   const nextStep = steps[last + 1];
   const speech = String(step.speech || '').trim();
   const itemBodies = steps.slice(first, last + 1).map((s) => s.body || '').join('\n');
+  // 바로 앞 칸이 「직접 풀기」 칸(벼락치기 문제 칸)이면 이미 멈췄으니 이 칸의 물음에서는 다시 멈추지 않는다(오타 설계 10/11 · 이중 멈춤 방지)
+  const prevBase = first > 0 ? PAGE.exec(String(steps[first - 1].id || ''))?.[1] : null;
+  let prevStart = first - 1; while (prevBase && prevStart > 0 && PAGE.exec(String(steps[prevStart - 1].id || ''))?.[1] === prevBase) prevStart--;
+  const afterPractice = !!prevBase && PRACTICE.test(steps.slice(prevStart, first).map((s) => s.body || '').join('\n'));
   return {
     base, k, n, first: i === first, itemEnd: i === last,
     sectionEnd: i === last && (!nextStep || nextStep.title !== step.title || !!nextStep.options),
     practice: PRACTICE.test(itemBodies) || PRACTICE.test(speech),
-    asks: /[?？]\s*$/.test(speech),
+    asks: /[?？]\s*$/.test(speech) && !afterPractice,
   };
 }
 

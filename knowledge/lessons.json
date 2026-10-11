@@ -282,7 +282,7 @@
     "week": 3,
     "classroom": "notes/classroom/statics/2026-09-16.html",
     "chapters": 5,
-    "steps": 34
+    "steps": 24
    },
    "2026-09-28": {
     "id": "statics-2026-09-28",
@@ -308,8 +308,8 @@
     ],
     "week": 5,
     "classroom": "notes/classroom/statics/2026-09-28.html",
-    "chapters": 6,
-    "steps": 40
+    "chapters": 2,
+    "steps": 9
    },
    "2026-09-21": {
     "id": "statics-2026-09-21",
@@ -336,8 +336,8 @@
     ],
     "week": 4,
     "classroom": "notes/classroom/statics/2026-09-21.html",
-    "chapters": 6,
-    "steps": 36
+    "chapters": 5,
+    "steps": 23
    },
    "2026-09-30": {
     "id": "statics-2026-09-30",
@@ -366,8 +366,8 @@
     ],
     "week": 5,
     "classroom": "notes/classroom/statics/2026-09-30.html",
-    "chapters": 7,
-    "steps": 45
+    "chapters": 6,
+    "steps": 32
    },
    "2026-09-23": {
     "id": "statics-2026-09-23",
@@ -397,14 +397,14 @@
     ],
     "week": 4,
     "classroom": "notes/classroom/statics/2026-09-23.html",
-    "chapters": 8,
-    "steps": 43
+    "chapters": 2,
+    "steps": 10
    },
    "2026-10-07": {
     "id": "statics-2026-10-07",
     "classroom": "notes/classroom/statics/2026-10-07.html",
-    "chapters": 7,
-    "steps": 22
+    "chapters": 4,
+    "steps": 10
    },
    "2026-10-10": {
     "id": "statics-2026-10-10",
@@ -415,8 +415,8 @@
    "2026-10-11": {
     "id": "statics-2026-10-11",
     "classroom": "notes/classroom/statics/2026-10-11.html",
-    "chapters": 11,
-    "steps": 94,
+    "chapters": 9,
+    "steps": 76,
     "generated": true,
     "title": "정역학 벼락치기 — 과제 20문제로 시험 범위 끝내기",
     "minutes": 120
@@ -872,5 +872,5 @@
    }
   }
  },
- "generated": "2026-10-11T20:34:05"
+ "generated": "2026-10-12T00:03:45"
 }

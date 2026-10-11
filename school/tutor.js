@@ -3,7 +3,7 @@
 // → ④ 판정과 되받기(맞음: 이유 짚고 다음 / 틀림: 더 쉽게 다시 + 비슷한 질문 / 모르겠어요: 한 단계 같이 → 선수 개념).
 // 언제든 Q 로 끼어들어 질문 → 그 단계 근거 안에서 답 → 하던 질문으로 돌아온다.
 // 판정·기록은 서버 코치(coach: teachback·together·question)와 지금 기록(event)을 그대로 쓴다. 정답·전체 풀이를 먼저 주지 않는다.
-import { boardPage } from './board-page.js?v=2';
+import { boardPage } from './board-page.js?v=3';
 const el = (tag, text, cls) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (cls) e.className = cls; return e; };
 const clean = (t) => String(t || '').replace(/\*\*([^*]+)\*\*/g, '$1').replace(/^#{1,6}\s+/gm, '').trim();
 

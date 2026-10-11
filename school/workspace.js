@@ -3,6 +3,8 @@ import { courseMetrics, sourceKind, pickQuest, KINDS } from "./metrics.js";
 import { attachSaeng } from "./saeng.js";
 import { officeHref } from "./worldmap.js";
 import { inFocus, focusCourses, isInClass } from "./focus.js";
+// 수업 선택 창에서 숨길 수업 — 정역학 10/10 복습·10/9 문제집은 벼락치기와 같은 과제 풀이 중복(10/11 「꼭 필요한 구성만」, 파일은 그대로)
+const PICK_HIDE=new Set(['statics-2026-10-10','exam-statics-2026-10-09','statics-2026-09-02','statics-2026-09-07','statics-2026-09-09','statics-2026-09-14']);
 const el = (tag, text, cls) => { const e=document.createElement(tag); if(text!==undefined)e.textContent=text; if(cls)e.className=cls; return e; };
 const btn = (text, action, cls='') => { const b=el('button',text,cls); b.type='button'; b.onclick=action; return b; };
 const minutes = s => Number(s.slice(0,2))*60+Number(s.slice(3));
@@ -339,7 +341,7 @@ export function createWorkspace(app){
     for(const [mode,label] of [['pencil','펜슬'],['notebook','공책'],['screen','화면만']])controls.append(btn(label,()=>{app.mode(mode);controls.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.textContent===label)));}));modal.append(controls);
     if(plan)modal.append(btn('기록하는 공부 타이머 열기',()=>startTimer(plan), 'subtle'));
     const units=(c.nodes||[]).filter(n=>/전공/.test(n.level||'')||n.subject===name).slice();
-    const recent=c.lessons.filter(l=>l.date<=data.date).slice().reverse();
+    const recent=c.lessons.filter(l=>l.date<=data.date&&!PICK_HIDE.has(l.id)).slice().reverse();
     for(const l of recent.slice(0,4))modal.append(btn(`스앵님과 수업 · ${l.date} ${l.title}`,()=>{root.hidden=true;app.start(l.id,{purpose:"tutoring"});},'mission-launch'));
     const concepts=el('details');concepts.append(el('summary','개념 미션·기초부터 공부'));
     for(const n of units.slice(0,16)){const row=el('div',undefined,'concept-mission');row.append(el('span',n.name),btn('문제 도전',()=>{root.hidden=true;app.start('node:'+n.id,{purpose:'exam'});}),btn('개념부터',()=>{root.hidden=true;app.start('node:'+n.id,{concept:true});}));concepts.append(row);}modal.append(concepts);

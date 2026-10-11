@@ -114,6 +114,7 @@ def build_v2(doc, chapters, v2, slug, date):
             figs[name] = {"svg": chalkify(html_, f"{slug}-{date}-{sid}-{name}"), "max": max(steps_n) if steps_n else 1}
         steps = []
         for n, st in enumerate(BOARD[sid], 1):
+            if st.get("drop"): continue   # 교실에서 뺀 칸("drop": 사유 — 표시만 지우면 되돌아온다, 10/11 「꼭 필요한 구성만」). 번호는 그대로 둬서 다른 칸 id 가 밀리지 않게
             stid = str(st.get("id") or f"{sid}-{n}")
             b = st.get("b") or []; s = str(st.get("s") or "")
             if not b or not s.strip(): raise SystemExit(f"{stid}: 판서(b)와 대사(s)가 비면 안 됨")
@@ -124,7 +125,48 @@ def build_v2(doc, chapters, v2, slug, date):
             if stid in ids_all: raise SystemExit(f"{stid}: 단계 id 중복")
             ids_all.add(stid)
             steps.append({"id": stid, "t": "v2", "b": [board_line(x) for x in b], "braw": [str(x) for x in b], "s": s, "fig": fig or None, "fs": int(fs) if fig else 0})
+        if not steps: continue   # 칸을 전부 뺀 섹션은 챕터도 뺀다
         out.append({"id": sid, "title": c["title"], "steps": steps, "figs": figs, "say": c.get("say")})
+    return out
+
+# ---- 교실 계획(교실 전용, 수업 노트 원문은 그대로): lessons/classroom_plan.json (대표님 10/11 「중간고사 대비 핵심만」, 오타 설계 GREEN) ----
+#  {"statics_2026-09-16": {"skip": ["s1"], "skipq": [1, 2], "title": {"s3": "…"}, "add": [{"id": "k0", "title": "…", "before": "s2" | "after": "s7", "items": [{"b": [...], "s": "…"}]}]}}
+#  skip = 교실에서 뺄 원문 섹션 · skipq = 뺄 확인 문제 번호(1부터) · title = 챕터 제목 바꾸기 · add = 교실 전용 새 챕터(판서 칸). 판서 파일 없는 회차는 skip 만.
+PLAN_PATH = os.path.join(HERE, "lessons", "classroom_plan.json")
+def load_plan(slug, date, sec_ids, nq, has_board):
+    if not os.path.exists(PLAN_PATH): return {}
+    allp = json.load(io.open(PLAN_PATH, encoding="utf-8"))
+    plan = allp.get(f"{slug}_{date}") or {}
+    bad = sorted(set(plan) - {"skip", "skipq", "title", "add", "why"})
+    if bad: raise SystemExit(f"교실 계획 {slug}_{date}: 모르는 키 {bad}")
+    if not has_board and any(plan.get(k) for k in ("add", "title", "skipq")): raise SystemExit(f"교실 계획 {slug}_{date}: 판서 파일 없는 회차는 skip 만")
+    for sid in plan.get("skip", []) + list((plan.get("title") or {}).keys()):
+        if sid not in sec_ids: raise SystemExit(f"교실 계획 {slug}_{date}: 없는 섹션 {sid}")
+    for k in plan.get("skipq", []):
+        if not isinstance(k, int) or isinstance(k, bool) or not 1 <= k <= nq: raise SystemExit(f"교실 계획 {slug}_{date}: 없는 확인 문제 번호 {k!r} (1~{nq})")
+    keep = [s for s in sec_ids if s not in plan.get("skip", [])]
+    ids = set(sec_ids)
+    for a in plan.get("add", []):
+        if a.get("id") in ids: raise SystemExit(f"교실 계획 {slug}_{date}: 새 챕터 id 중복 {a.get('id')}")
+        ids.add(a.get("id"))
+        at = a.get("before") or a.get("after")
+        if bool(a.get("before")) == bool(a.get("after")) or at not in keep: raise SystemExit(f"교실 계획 {slug}_{date}: 새 챕터 {a.get('id')} 위치(before/after 중 하나, 남는 섹션) 오류 {at!r}")
+        if not a.get("title") or not a.get("items"): raise SystemExit(f"교실 계획 {slug}_{date}: 새 챕터 {a.get('id')} 제목·칸 필요")
+    return plan
+
+def apply_plan(chapters, plan, slug, date):
+    if not plan: return chapters
+    skip = set(plan.get("skip", []))
+    out = [dict(c, title=(plan.get("title") or {}).get(c["id"], c["title"])) for c in chapters if c["id"] not in skip]
+    for a in plan.get("add", []):
+        steps = []
+        for n, st in enumerate(a["items"], 1):
+            b = st.get("b") or []; s = str(st.get("s") or "")
+            if not b or not s.strip(): raise SystemExit(f"{a['id']}-{n}: 판서(b)와 대사(s)가 비면 안 됨")
+            steps.append({"id": f"{a['id']}-{n}", "t": "v2", "b": [board_line(x) for x in b], "braw": [str(x) for x in b], "s": s, "fig": None, "fs": 0})
+        ch = {"id": a["id"], "title": a["title"], "steps": steps, "figs": {}, "say": None}
+        pos = [c["id"] for c in out].index(a.get("before") or a.get("after")) + (0 if a.get("before") else 1)
+        out.insert(pos, ch)
     return out
 
 def gate_for(slug, date):
@@ -204,13 +246,15 @@ def build(src, slug, date, minutes=18):
     # ---- 교실 v2: 판서 파일이 있으면 그것으로 챕터 단계를 만든다 (없으면 v1 = 원문 문단 그대로, 화면에 「구버전 판서」 표시) ----
     v2 = None
     bpath = os.path.join(BOARD_DIR, f"{slug}_{date}.py")
+    plan = load_plan(slug, date, [c["id"] for c in chapters], len(doc.xpath('//div[contains(concat(" ",normalize-space(@class)," ")," q ")]')), os.path.exists(bpath))
     if os.path.exists(bpath):
         v2 = load_board(bpath)
-        chapters = build_v2(doc, chapters, v2, slug, date)
+        chapters = build_v2(doc, chapters, v2, slug, date)   # 원문 ↔ 판서 1:1 검사는 교실 계획 적용 전 원본 섹션 기준
         os.makedirs(FIGCHK_DIR, exist_ok=True)   # 분필 그림 검사용 하네스 파일(저장소 밖) — node fig_check.cjs <이 파일> 로 겹침 검사
         figs_html = "".join(f["svg"] for c in chapters for f in c["figs"].values())
         io.open(os.path.join(FIGCHK_DIR, f"classroom_{slug}_{date}.html"), "w", encoding="utf-8", newline="\n").write(
             '<!doctype html><meta charset="utf-8"><body style="background:#fff">' + figs_html)
+    chapters = apply_plan(chapters, plan, slug, date)
     quiz = []; mixer = Mixer(lesson_id)
     for k, q in enumerate(doc.xpath('//div[contains(concat(" ",normalize-space(@class)," ")," q ")]'), 1):
         qid = q.get("data-qid") or f"q{k}"
@@ -224,6 +268,7 @@ def build(src, slug, date, minutes=18):
         ans = q.xpath('./div[@class="ans"]'); ans_html = inner(ans[0]) if ans else ""
         if newpos: ans_html = renum(ans_html, newpos)
         quiz.append({"id": qid, "qn": qn, "html": qhtml, "choices": choices, "ans": ans_html})
+    if plan.get("skipq"): quiz = [q for k, q in enumerate(quiz, 1) if k not in plan["skipq"]]   # 보기 섞기 순서가 그대로이도록 다 만든 뒤 뺀다
     # 스앵님 판정용 노드 연결(knowledge/lesson_nodes.json — build_lesson_nodes.py 가 만든다). 없으면 빈 연결(기록만 안 남는다)
     ln_path = os.path.join(ROOT, "knowledge", "lesson_nodes.json")
     lnodes = (json.load(io.open(ln_path, encoding="utf-8")).get("lessons") or {}).get(lesson_id) if os.path.exists(ln_path) else None

@@ -28,4 +28,15 @@ assert.equal(at(2).sectionEnd, false);
 assert.equal(at(4).practice, true); assert.equal(at(4).sectionEnd, true);   // 다음 칸 제목이 다르면 단원 끝
 assert.equal(at(5).sectionEnd, true);   // 다음이 문제(보기) 단계여도 단원 끝
 assert.equal(at(6), null);             // 「칸:줄」 id 가 아니면 판서 쪽 아님
+// 문제 칸(직접 풀기) 바로 뒤 풀이 첫 칸의 물음에서는 다시 멈추지 않는다
+const cram = { steps: [
+  step('s3-1:0', 'Ch.3', '과제 3.11 · 조건', '먼저 풀어 보세요.'), step('s3-1:1', 'Ch.3', '연습 : 노트에 직접 풀기 — 끝까지 풀면 다음(Enter)', '먼저 풀어 보세요.'),
+  step('s3-2:0', 'Ch.3', '과제 3.11', 'sin일까요?'), step('s3-2:1', 'Ch.3', '축', 'sin일까요?'),
+  step('s3-3:0', 'Ch.3', 'W', '답이에요.'),
+  step('s3-4:0', 'Ch.3', '과제 3.26', '어느 쪽일까요?'),
+] };
+const at2 = (index) => boardPage({ lesson: cram, index });
+assert.equal(at2(1).practice, true); assert.equal(at2(1).itemEnd, true);
+assert.equal(at2(3).asks, false);   // 문제 칸 바로 뒤 → 물음이어도 안 멈춤
+assert.equal(at2(5).asks, true);    // 앞 칸이 풀이 칸이면 물음에서 멈춤
 console.log('board-page 전부 통과');
