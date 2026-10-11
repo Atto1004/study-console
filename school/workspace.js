@@ -1,14 +1,13 @@
-import { renderMaterialStudio } from './material-studio.js?v=215';
+import { renderMaterialStudio } from './material-studio.js?v=216';
 import { courseMetrics, sourceKind, pickQuest, KINDS } from "./metrics.js";
 import { attachSaeng } from "./saeng.js";
 import { officeHref } from "./worldmap.js";
 import { inFocus, focusCourses, isInClass } from "./focus.js";
+import { lessonHidden, orderedLessons, orderedTitle, sourceHidden, lmsHidden } from "./lesson-order.js";
 // 수업 선택 창에서 숨길 수업 — 정역학 10/10 복습·10/9 문제집은 벼락치기와 같은 과제 풀이 중복(10/11 「꼭 필요한 구성만」, 파일은 그대로)
 // 과목별 수업 선택 창 순서 — 정역학은 강 번호(아이패드 기준: 9/16 = 1강) 순서, 벼락치기 마지막(10/12 「1강이 첫 진입점에 없다」)
-const COURSE_ORDER={'정역학':[['statics-2026-09-16','1강'],['statics-2026-09-21','2강'],['statics-2026-09-23','3강'],['statics-2026-09-28','4강'],['statics-2026-09-30','5강'],['statics-2026-10-07','6강'],['statics-2026-10-11','벼락치기']]};
 // 시험 범위 문구에서 제작 경위 괄호(「(대표님 전달 …)」)는 빼고, 시험 조건은 짧게
 const cleanScope=(s)=>String(s||'').replace(/\s*\((?:대표님|아토)[^)]*\)/g,'').replace(/영어 답안/g,'답안은 영어로');
-const PICK_HIDE=new Set(['statics-2026-10-10','exam-statics-2026-10-09','statics-2026-09-02','statics-2026-09-07','statics-2026-09-09','statics-2026-09-14']);
 const el = (tag, text, cls) => { const e=document.createElement(tag); if(text!==undefined)e.textContent=text; if(cls)e.className=cls; return e; };
 const btn = (text, action, cls='') => { const b=el('button',text,cls); b.type='button'; b.onclick=action; return b; };
 const minutes = s => Number(s.slice(0,2))*60+Number(s.slice(3));
@@ -345,9 +344,9 @@ export function createWorkspace(app){
     for(const [mode,label] of [['pencil','펜슬'],['notebook','공책'],['screen','화면만']])controls.append(btn(label,()=>{app.mode(mode);controls.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.textContent===label)));}));modal.append(controls);
     if(plan)modal.append(btn('기록하는 공부 타이머 열기',()=>startTimer(plan), 'subtle'));
     const units=(c.nodes||[]).filter(n=>/전공/.test(n.level||'')||n.subject===name).slice();
-    const recent=c.lessons.filter(l=>l.date<=data.date&&!PICK_HIDE.has(l.id)).slice().reverse();
-    const order=COURSE_ORDER[name]?COURSE_ORDER[name].map(([id,label])=>{const l=c.lessons.find(x=>x.id===id);return l&&{...l,label};}).filter(Boolean):null;   // 정역학: 1강부터 학습 순서로 전부(최근 4개만 보이던 것, 10/12)
-    if(order)for(const l of order)modal.append(btn(`${l.label} · ${+l.date.slice(5,7)}/${+l.date.slice(8)} · ${l.title}`,()=>{root.hidden=true;app.start(l.id,{purpose:"tutoring"});},'mission-launch'));
+    const recent=c.lessons.filter(l=>l.date<=data.date&&!lessonHidden(name,l)).slice().reverse();
+    const order=orderedLessons(c);   // 정역학: 1강부터 학습 순서로 전부(10/12)
+    if(order)for(const l of order)modal.append(btn(orderedTitle(l),()=>{root.hidden=true;app.start(l.id,{purpose:"tutoring"});},'mission-launch'));
     else for(const l of recent.slice(0,4))modal.append(btn(`스앵님과 수업 · ${l.date} ${l.title}`,()=>{root.hidden=true;app.start(l.id,{purpose:"tutoring"});},'mission-launch'));
     const concepts=el('details');concepts.append(el('summary','개념 미션·기초부터 공부'));
     for(const n of units.slice(0,16)){const row=el('div',undefined,'concept-mission');row.append(el('span',n.name),btn('문제 도전',()=>{root.hidden=true;app.start('node:'+n.id,{purpose:'exam'});}),btn('개념부터',()=>{root.hidden=true;app.start('node:'+n.id,{concept:true});}));concepts.append(row);}modal.append(concepts);
@@ -367,15 +366,15 @@ export function createWorkspace(app){
     const shelf=card('과목별','course-shelf'),grid=el('div',undefined,'shelf-grid');
     for(const c of app.catalog().courses){
       const exam=data.exams.find(e=>e.course===c.name&&e.written&&e.dday>=0);
-      const sources=data.sources.filter(s=>s.course===c.name); const b=btn('',()=>{filter=c.name;kindFilter='';render();},'shelf-card');b.append(el('b',c.name),el('small',sources.length+'개 확보 자료 · '+c.lessons.filter(l=>!l.generated).length+'회 수업'));grid.append(b);
+      const sources=data.sources.filter(s=>s.course===c.name&&!sourceHidden(s)); const b=btn('',()=>{filter=c.name;kindFilter='';render();},'shelf-card');b.append(el('b',c.name),el('small',sources.length+'개 확보 자료 · '+c.lessons.filter(l=>!l.generated).length+'회 수업'));grid.append(b);
     }
     shelf.append(grid);root.append(shelf);
   }
   function renderMaterials(){
     if(filter)renderMaterialStudio(root,app,data,filter,render);
     if(!filter)renderCourseShelf();
-    const sources=data.sources.filter(s=>!filter||s.course===filter).map(s=>{const k=sourceKind(s);return {...s,cls:k.kind,sure:k.sure};});
-    const lmsItems=(data.lmsMaterials||[]).filter(i=>!filter||i.course===filter).map(i=>({...i,cls:sourceKind({...i,lms:true}).kind,sure:true}));
+    const sources=data.sources.filter(s=>(!filter||s.course===filter)&&!sourceHidden(s)).map(s=>{const k=sourceKind(s);return {...s,cls:k.kind,sure:k.sure};});
+    const lmsItems=(data.lmsMaterials||[]).filter(i=>(!filter||i.course===filter)&&!lmsHidden(i)).map(i=>({...i,cls:sourceKind({...i,lms:true}).kind,sure:true}));
     const homework=(assignments?.rows||[]).filter(r=>!filter||r.course===filter).flatMap(r=>(r.files||[]).map(f=>({course:r.course,title:r.title,file:f.label||f.file||f.href,href:f.href,cls:/혼자\s*풀기|스앵님|코칭/.test(f.label||'')?'tutor':'assignment',sure:true})));
     const generatedMaterials=[...(app.materialDrafts?.()||[]),...app.catalog().courses.flatMap(c=>c.lessons.filter(l=>l.generated).map(l=>({...l,course:c.name})))].filter(d=>!filter||d.course===filter);
     const all=[...sources,...lmsItems,...homework,...generatedMaterials.map(d=>({...d,cls:'generated'}))];

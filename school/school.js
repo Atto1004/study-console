@@ -1,4 +1,5 @@
-import { renderClassroomDirectory } from './classroom-directory.js?v=265';
+import { renderClassroomDirectory } from './classroom-directory.js?v=266';
+import { visibleCatalog, orderedLessons, orderedTitle } from './lesson-order.js';
 import { fitBoard } from './board-fit.js?v=266';
 import { createLectureQuests } from './lecture-quests.js?v=233';
 import { mountSchoolRefresh } from './refresh.js?v=237';
@@ -13,7 +14,7 @@ import {
   splitText,
   learningPath,
 } from "./learning.js";
-import { createWorkspace } from "./workspace.js?v=217";
+import { createWorkspace } from "./workspace.js?v=218";
 import { createMission } from "./mission.js?v=199";
 import { attachSaeng } from "./saeng.js?v224";
 import { createSpace, ROOMS } from "./space.js";
@@ -31,7 +32,7 @@ import { createDialog } from "./vn-dialog.js";
 import { createLectureUi } from "./lecture-ui.js";
 import { setupWideRoom } from "./room-wide.js";
 import { setupSeatRoom } from "./room-seat.js";
-import { pastDue, nextRoundOnly } from "./workspace.js?v=217";
+import { pastDue, nextRoundOnly } from "./workspace.js?v=218";
 import { setupShell } from "./shell.js?v=232";
 import { createRig } from "./rig.js";
 import { createFace } from "./face.js";
@@ -556,8 +557,10 @@ $("courses").onclick = () => {
   const c = catalog.courses.find((c) => c.name === name);
     const host = panel(selectScope ? name + ' · 수업 범위 선택' : name);
     if (selectScope) {
-      host.append(node('p', '단원을 펼치고 수업을 고르세요. 실제 자료가 연결된 수업만 표시합니다.', 'notice'));
-      for (const unit of groupCourseLessons(c)) {
+      const ord = orderedLessons(c);
+      host.append(node('p', (ord ? '수업을 고르세요.' : '단원을 펼치고 수업을 고르세요.') + ' 실제 자료가 연결된 수업만 표시합니다.', 'notice'));   // 정역학: 장 묶음 없이 1강~벼락치기 학습 순서
+      if (ord) for (const lesson of ord) row(host, orderedTitle(lesson), (lesson.week || '?') + '주차', () => showLessonScope(lesson, name), '수업 목차');
+      else for (const unit of groupCourseLessons(c)) {
         const section = node('details', undefined, 'scope-unit');
         const title = unit.title.split(' — ')[0].replace(/\s*\(12\.1~12\.6\)/, '');
         section.append(node('summary', title + ' · ' + unit.lessons.length + '회 수업'));
@@ -2329,6 +2332,7 @@ async function boot() {
       api("capabilities"),
       api("session"),
     ]);
+    catalog = visibleCatalog(catalog);   // 정역학 범위 밖 수업(9/2~9/14·10/9 문제집·10/10 복습)은 화면 전체에서 뺀다
     if (TEST && !capabilities.testMode)
       throw new Error("검증 모드 서버 적용이 필요합니다.");
     if(activeSession?.returnTo){const base=await api('lesson?id='+encodeURIComponent(activeSession.returnTo.lessonId));const at=base.steps.findIndex(s=>s.id===activeSession.returnTo.stepId);if(at>=0)pausedLesson={lesson:base.id,index:at,course:base.course};}

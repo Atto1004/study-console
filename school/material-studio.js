@@ -1,9 +1,10 @@
+import { sourceHidden } from './lesson-order.js';
 const el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
 const btn=(text,go)=>{const b=el('button',text);b.type='button';b.onclick=go;return b;};
 const sourceLink=(source)=>{const a=el('a',source.label||source.file);a.href=source.href?'../'+source.href:'/api/school/source-file?id='+source.id;a.target='_blank';a.rel='noopener';return a;};
 
 export function renderMaterialStudio(root,app,data,name,refresh){
-  const course=app.catalog().courses.find(c=>c.name===name),files=data.sources.filter(s=>s.course===name),lessons=course?.lessons||[];
+  const course=app.catalog().courses.find(c=>c.name===name),files=data.sources.filter(s=>s.course===name&&!sourceHidden(s)),lessons=course?.lessons||[];
   const studio=el('section',undefined,'material-studio');studio.append(el('h2',name+' · 자료 정리·생성'),el('p','원자료 확보 → 회차 정리 → 수업 화면 변환 → 보충 교재 생성. 현재 색인으로 확인한 결과입니다.'));
   const dates=[...new Set([...files.map(s=>s.date),...lessons.filter(l=>!l.generated).map(l=>l.date)])].filter(Boolean).sort().reverse();
   for(const date of dates){

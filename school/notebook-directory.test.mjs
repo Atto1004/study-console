@@ -16,13 +16,13 @@ test('노트 분류는 원문과 수식을 유지하고 같은 제목만 숨긴�
 });
 test('교실 시험 과목 선택과 원본 수강 상태 및 강의 선택 연결',()=>{
  const dom=new JSDOM('<section class="class-directory"><h2></h2><div id="courseDoors"></div></section>');
- const courses=['정역학','미분적분학2','공업수학1','일반물리학2','CADD'].map((name,i)=>({name,units:[],lessons:[{id:String(i),title:name+' 첫 수업',date:'2026-09-01'}]}));
+ const courses=['정역학','미분적분학2','공업수학1','일반물리학2','CADD'].map((name,i)=>({name,units:[],lessons:[{id:i===0?'statics-2026-09-16':String(i),title:name+' 첫 수업',date:'2026-09-01'}]}));
  const doors=dom.window.document.querySelector('#courseDoors');let selected;
- renderClassroomDirectory({doors,courses,events:[{lesson:'0',kind:'review',action:'lecture-complete'}],onLesson:(lesson,name)=>selected=[lesson.id,name],onOther:()=>{}});
+ renderClassroomDirectory({doors,courses,events:[{lesson:'statics-2026-09-16',kind:'review',action:'lecture-complete'}],onLesson:(lesson,name)=>selected=[lesson.id,name],onOther:()=>{}});
  assert.equal(doors.querySelectorAll('button').length,4);
  assert.doesNotMatch(doors.textContent,/CADD/);
  const row=dom.window.document.querySelector('.classroom-progress-lesson');
- assert.equal(row.dataset.status,'complete');row.click();assert.deepEqual(selected,['0','정역학']);
+ assert.equal(row.dataset.status,'complete');row.click();assert.deepEqual(selected,['statics-2026-09-16','정역학']);
  doors.querySelector('[data-course="일반물리학2"]').click();
  assert.equal(dom.window.document.querySelector('.classroom-progress-lesson').dataset.status,'unheard');
  assert.match(dom.window.document.querySelector('.classroom-other-courses').textContent,/CADD/);
