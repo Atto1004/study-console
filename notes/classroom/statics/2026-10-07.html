@@ -412,6 +412,18 @@ main{max-width:1040px;margin:0 auto;padding:14px 20px 18px}
 #gate .ga i{font-style:normal;font-size:13px;color:#FFE27A;margin-right:6px}
 #gate .gp{font-size:14.5px;color:#B9CABF;line-height:1.6;margin:8px 0 14px}
 #gate .row{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+#gate .gopts{display:flex;flex-direction:column;gap:8px;margin:6px 0 4px}
+#gate .gopt{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:52px;padding:12px 14px;text-align:left;font-family:inherit;font-size:16px;font-weight:500;line-height:1.45;color:#EAF2EC;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.22);border-radius:12px;cursor:pointer;word-break:keep-all;touch-action:manipulation}
+#gate .gopt[aria-disabled=true]{cursor:default}
+#gate .gopt.ok{background:rgba(88,196,140,.18);border-color:#58C48C;color:#D5F5E3}
+#gate .gopt.bad{background:rgba(226,104,84,.18);border-color:#E26854;color:#FFD9D1}
+#gate .gopt.dim{opacity:.55}
+#gate .gtag{flex:none;font-size:12px;font-weight:700}
+#gate .gunk{display:block;width:100%;min-height:48px;margin-top:2px;padding:10px 14px;font-family:inherit;font-size:15px;font-weight:600;color:#A9BDB0;background:transparent;border:1.5px dashed rgba(255,255,255,.3);border-radius:12px;cursor:pointer;touch-action:manipulation}
+#gate .gres{font-size:15px;font-weight:700;margin:12px 0 2px}
+#gate .gres.ok{color:#7ADBA8}#gate .gres.bad{color:#FF9C8A}#gate .gres.unk{color:#FFE27A}
+#gate .gsum{font-size:18px;font-weight:700;margin:6px 0}
+#gate .gbx:focus{outline:none}
 </style>
 <div id="gate" role="dialog" aria-modal="true" aria-labelledby="gTitle"><div class="gbx"><div class="gh"><b id="gTitle">암기카드 확인</b><span id="gProg"></span></div><div id="gBody"></div><div class="row" id="gRow"></div></div></div>
 <div id="ov"><div class="pn"><h2>목차</h2><div class="mt" id="ovMeta"></div><ul id="ovList"></ul><div class="row"><button class="cbt g" id="ovClose" type="button">닫기</button><span style="flex:1"></span><button class="cbt g" id="ovMemo" type="button">암기노트</button><button class="cbt g" id="ovBook" type="button">교재 보기</button><button class="cbt g" id="ovReset" type="button">이 회차 기록 지우기</button></div></div></div>
@@ -475,7 +487,7 @@ main{max-width:1040px;margin:0 auto;padding:14px 20px 18px}
 })(typeof window!=="undefined"?window:this);
 </script>
 <script>
-const D={"id": "statics-2026-10-07", "gate": {"state": "gate", "lecture": "3", "cards": [{"id": "c1", "q": "sin30°, cos30°, sin60°, cos60°, sin45° 값?", "a": "0.5 · 0.866 · 0.866 · 0.5 · 0.707", "why": {"hw": "K3 (삼각비)", "flow": "삼각비(K3)는 힘을 x·y 성분으로 나눌 때 쓴다."}}, {"id": "c2", "q": "3-4-5 삼각형이면?", "a": "직각 (3²+4²=5²)", "why": {"hw": "확인 중 (보류)", "flow": "3:4:5 비율이 과제 수치에 적용되는지는 원문 확인 전까지 보류."}}, {"id": "c3", "q": "중력 W = ? (g)", "a": "W = mg, g = 9.81 m/s²", "why": {"hw": "확인 중 (보류)", "flow": "W = mg는 중력 계산의 기본 원리. 과제 연결은 원문 확인 전까지 보류."}}, {"id": "4a", "q": "2D 평형 식 세 개?", "a": "ΣFx = 0, ΣFy = 0, ΣM = 0", "why": {"hw": "5.3 (K6)", "flow": "힘 성분 식과 모멘트 식을 세워 미지수를 연립한다."}}, {"id": "4b", "q": "지지대 반력 개수: 핀 · 롤러 · 고정?", "a": "핀 2 (Ax, Ay) · 롤러 1 (면에 수직) · 고정 3 (Ax, Ay, MA)", "why": {"hw": "확인 중 (보류)", "flow": "지지 조건에 따라 반력 방향과 미지수 개수를 정한다는 원리. 5.3·5.126 적용 여부는 원문 확인 전까지 보류."}}, {"id": "4c", "q": "매끈한 면 · 거친 면 반력?", "a": "수직력 1 · 수직력 + 마찰력 2", "why": {"hw": "확인 중 (보류)", "flow": "매끈한 면과 거친 면의 반력 차이는 원리로 맞다. 과제 면 조건은 원문 확인 전까지 보류."}}, {"id": "4d", "q": "모멘트 식은 어느 점에서 세우나?", "a": "미지 반력이 많이 지나는 점 (반력 팔 0)", "why": {"hw": "확인 중 (보류)", "flow": "미지 반력이 지나는 점을 모멘트 기준점으로 잡으면 그 반력의 팔이 0이 된다는 원리. 5.3 적용은 원문 확인 전까지 보류."}}, {"id": "4e", "q": "롤러가 줄 수 있는 힘은?", "a": "받치는 면에 수직인 힘 1개뿐", "why": {"hw": "확인 중 (보류)", "flow": "롤러는 접촉면에 수직인 힘 한 방향만 준다. 과제 적용 여부는 원문 확인 전까지 보류."}}, {"id": "4f", "q": "우력이란?", "a": "크기 같고 방향 반대, 작용선이 다른 두 힘", "why": {"hw": "확인 중 (4.108·4.123 원문 확인)", "flow": "크기가 같고 방향이 반대이며 작용선이 다른 두 힘이 우력. 합력은 0이고 모멘트는 기준점과 무관."}}]}, "slug": "statics", "course": "정역학", "date": "2026-10-07", "sess": "10/7(수) · 6주차", "title": "식보다 미지수가 많으면, 또는 지지가 잘못 놓이면 풀리지 않는다", "lead": "2D 평형 식은 3개뿐이라 구할 수 있는 반력도 3개까지다. 반력이 더 많으면 <b>부정정<\/b>, 지지 배치가 잘못되면 <b>부적절한 지지<\/b>. 이번 회차는 고정보에 롤러를 하나 더했을 때 왜 풀리지 않는지 직접 계산해 보고, 마지막에 3D 평형 식 6개와 볼소켓·3D 롤러를 본다.", "minutes": 18, "chapters": [{"id": "s1", "title": "정역학적 부정정 — 평형 방정식만으로는 반력을 다 못 구한다", "steps": [{"id": "s1-4", "t": "v2", "b": [{"k": "h", "h": "정역학적 부정정"}, {"k": "f", "h": "\\[\\text{미지 반력 수} &gt; \\text{독립 평형식 수}\\]"}, {"k": "li", "h": "2D 독립 평형식 = 3개 (ΣF_x, ΣF_y, ΣM)"}], "braw": ["# 정역학적 부정정", "= \\text{미지 반력 수} > \\text{독립 평형식 수}", "• 2D 독립 평형식 = 3개 (ΣF_x, ΣF_y, ΣM)"], "s": "오늘은 식이 모자라는 경우예요. 2D 평형식은 세 개뿐이라 반력 미지수가 그보다 많으면 평형식만으로는 다 못 구해요. 그걸 정역학적 부정정이라고 해요.", "fig": null, "fs": 0}, {"id": "s1-5", "t": "v2", "b": [{"k": "li", "h": "외적 부정정 차수 = 반력 미지수 수 − 3"}, {"k": "li", "h": "(안정적으로 지지된 2D 강체 하나일 때)"}, {"k": "f", "h": "\\[\\text{고정 }3+\\text{ 끝 롤러 }1-3=1\\text{차}\\]"}, {"k": "li", "h": "과제 5.69 : 핀 2 + 핀 2 − 3 = 1차"}], "braw": ["• 외적 부정정 차수 = 반력 미지수 수 − 3", "• (안정적으로 지지된 2D 강체 하나일 때)", "= \\text{고정 }3+\\text{ 끝 롤러 }1-3=1\\text{차}", "• 과제 5.69 : 핀 2 + 핀 2 − 3 = 1차"], "s": "차수는 평형식만으로 결정하지 못하는 반력 미지수가 몇 개 남는지예요. 먼저 지지가 안정적인지 확인하고 세요. 고정단에 롤러 하나를 더하면 3 더하기 1 빼기 3, 1차. 과제 5.69도 핀 두 개라 4 빼기 3, 1차예요.", "fig": null, "fs": 0}, {"id": "s1-6", "t": "v2", "b": [{"k": "li", "h": "부정정이 잘못된 구조는 아니다"}, {"k": "li", "h": "여분의 지지를 잘 설계하면 일부가 손상돼도 버티게 만들 수 있다"}, {"k": "memo", "h": "부정정 = 반력 미지수 &gt; 독립 평형식 · 2D 식 3개 · 차수 = 미지수 − 3", "tg": "am"}], "braw": ["• 부정정이 잘못된 구조는 아니다", "• 여분의 지지를 잘 설계하면 일부가 손상돼도 버티게 만들 수 있다", "■ 외울 것 : 부정정 = 반력 미지수 > 독립 평형식 · 2D 식 3개 · 차수 = 미지수 − 3"], "s": "교수님 말씀이에요. 부정정이라고 잘못된 구조는 아니에요. 여분의 지지를 적절히 설계하면 일부 지지가 손상돼도 안정성을 유지하게 만들 수 있어요. 외울 것은 이 한 줄이에요.", "fig": null, "fs": 0}], "figs": {}, "say": null}, {"id": "s2", "title": "지지의 수와 배치 — 과잉 지지와 부적절한 지지", "steps": [{"id": "s2-3", "t": "v2", "b": [{"k": "h", "h": "지지의 수와 배치"}, {"k": "li", "h": "과잉 지지 : 반력 미지수가 평형식으로 정할 수 있는 수보다 많음"}, {"k": "li", "h": "부적절한 지지 : 개수가 맞아도 배치 때문에 이동·회전을 다 못 막음"}], "braw": ["# 지지의 수와 배치", "• 과잉 지지 : 반력 미지수가 평형식으로 정할 수 있는 수보다 많음", "• 부적절한 지지 : 개수가 맞아도 배치 때문에 이동·회전을 다 못 막음"], "s": "반력 개수만 세면 끝이 아니에요. 과잉 지지는 반력이 평형식으로 정할 수 있는 수보다 많은 것이고, 부적절한 지지는 개수가 맞아도 배치가 잘못돼 어떤 이동이나 회전을 못 막는 거예요.", "fig": null, "fs": 0}, {"id": "s2-4", "t": "v2", "b": [{"k": "li", "h": "2D 에서 별도의 모멘트 반력이 없을 때"}, {"k": "li", "h": "힘 반력 작용선이 모두 평행 → 반력에 수직인 방향 이동을 못 막음"}, {"k": "li", "h": "힘 반력 작용선이 모두 한 점에 모임 → 그 점 둘레 회전을 못 막음"}, {"k": "li", "h": "과잉 지지는 일부러 쓰기도 한다 — 강도와 안전성"}], "braw": ["• 2D 에서 별도의 모멘트 반력이 없을 때", "• 힘 반력 작용선이 모두 평행 → 반력에 수직인 방향 이동을 못 막음", "• 힘 반력 작용선이 모두 한 점에 모임 → 그 점 둘레 회전을 못 막음", "• 과잉 지지는 일부러 쓰기도 한다 — 강도와 안전성"], "s": "2D에서 별도의 모멘트 반력이 없는 경우를 볼게요. 힘 반력의 작용선이 모두 평행하면 그에 수직인 방향의 이동을 막지 못해요. 모두 한 점에 모이면 그 점 둘레의 회전을 막지 못해요. 반대로 과잉 지지는 강도와 안전성 때문에 일부러 쓰기도 해요. 서술형에서 이 답이 나와요.", "fig": null, "fs": 0}], "figs": {}, "say": null}, {"id": "s5", "title": "3D 평형 — 식 6개, 볼소켓, 3D 롤러", "steps": [{"id": "s5-5", "t": "v2", "b": [{"k": "h", "h": "3D 평형 — 식 6개"}, {"k": "f", "h": "\\[\\sum F_x=\\sum F_y=\\sum F_z=0\\]"}, {"k": "f", "h": "\\[\\sum M_x=\\sum M_y=\\sum M_z=0\\]"}], "braw": ["# 3D 평형 — 식 6개", "= \\sum F_x=\\sum F_y=\\sum F_z=0", "= \\sum M_x=\\sum M_y=\\sum M_z=0"], "s": "3D에서는 식이 여섯 개예요. 힘 셋, 모멘트 셋. 5.86과 5.103은 모멘트 식까지 써야 풀려요.", "fig": null, "fs": 0}, {"id": "s5-6", "t": "v2", "b": [{"k": "li", "h": "볼소켓 : 이동 막음, 회전 자유"}, {"k": "res", "h": "힘 3개 (A_x, A_y, A_z) · 모멘트 0"}], "braw": ["• 볼소켓 : 이동 막음, 회전 자유", "→ 힘 3개 (A_x, A_y, A_z) · 모멘트 0"], "s": "볼소켓은 모든 방향으로 돌지만 이동은 막아요. 그래서 힘 세 성분, 모멘트는 0이에요. 5.86의 A가 이거예요.", "fig": "sup3d", "fs": 1}, {"id": "s5-7", "t": "v2", "b": [{"k": "li", "h": "매끈한 지지면 위 3D 롤러 : 접촉이 유지되면 면에 수직인 힘 1개"}, {"k": "pit", "h": "반력이 음수 → 접촉이 떨어지는지 확인하고 평형 다시 검토"}], "braw": ["• 매끈한 지지면 위 3D 롤러 : 접촉이 유지되면 면에 수직인 힘 1개", "! 반력이 음수 → 접촉이 떨어지는지 확인하고 평형 다시 검토"], "s": "매끈한 면 위의 3D 롤러는 접촉이 유지된다고 보고 면이 밀어 받치는 힘 하나를 넣어요. 면이 미는 방향을 양으로 잡았는데 반력이 음수라면, 접촉이 떨어지는지 확인하고 평형을 다시 봐요. 5.103이 롤러 셋이에요.", "fig": "sup3d", "fs": 2}, {"id": "s5-8", "t": "v2", "b": [{"k": "memo", "h": "3D 식 6개 · 볼소켓 힘 3 · 3D 롤러 면에 수직인 힘 1", "tg": "am"}], "braw": ["■ 외울 것 : 3D 식 6개 · 볼소켓 힘 3 · 3D 롤러 면에 수직인 힘 1"], "s": "외울 것은 이 셋이에요.", "fig": null, "fs": 0}], "figs": {"sup3d": {"svg": "<figure class=\"fig lite\" data-fig=\"sup3d\"><svg width=\"520\" height=\"130\" viewbox=\"0 0 520 130\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\" id=\"fig-statics-2026-10-07-s5-sup3d\"><defs><marker id=\"fc\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><g data-step=\"1\"><circle cx=\"110\" cy=\"60\" r=\"22\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/circle><circle cx=\"110\" cy=\"60\" r=\"5\" fill=\"#1F2A44\"><\/circle><text x=\"110\" y=\"110\" font-size=\"13\" text-anchor=\"middle\" font-weight=\"700\">볼소켓<\/text><text x=\"110\" y=\"126\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\">힘 3 · 모멘트 0<\/text><\/g><g data-step=\"2\"><circle cx=\"330\" cy=\"60\" r=\"22\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/circle><line x1=\"300\" y1=\"92\" x2=\"360\" y2=\"92\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/line><line x1=\"330\" y1=\"82\" x2=\"330\" y2=\"96\" stroke=\"none\"><\/line><line x1=\"330\" y1=\"118\" x2=\"330\" y2=\"92\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#fc)\"><\/line><text x=\"340\" y=\"112\" font-size=\"13\" fill=\"#2F9E44\" font-weight=\"700\">A<tspan baseline-shift=\"sub\" font-size=\"72%\">z<\/tspan><\/text><text x=\"330\" y=\"126\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\">3D 롤러 · 힘 1<\/text><\/g><\/svg><figcaption>3D 지지 두 가지. 볼소켓은 힘 3, 3D 롤러는 수직 힘 1.<\/figcaption><\/figure>", "max": 2}}, "say": null}, {"id": "s7", "title": "개념 확인", "steps": [{"id": "s7-1", "t": "v2", "b": [{"k": "h", "h": "개념 확인"}], "braw": ["# 개념 확인"], "s": "마지막으로 세 문제만 확인해요.", "fig": null, "fs": 0}], "figs": {}, "say": null}], "quiz": [{"id": "w62-q1", "qn": "문제 1", "html": "2D 정역학에서 독립인 평형 방정식은 몇 개인가?", "choices": [{"html": "2개", "ok": false, "k": 0}, {"html": "4개", "ok": false, "k": 2}, {"html": "3개", "ok": true, "k": 1}, {"html": "6개", "ok": false, "k": 3}], "ans": "2D에서는 \\(\\sum F_x=0,\\ \\sum F_y=0,\\ \\sum M=0\\) 세 개다."}, {"id": "w62-q2", "qn": "문제 2", "html": "끝 롤러 하나를 더한 고정보의 부정정 차수는?", "choices": [{"html": "2", "ok": false, "k": 2}, {"html": "0 (정정)", "ok": false, "k": 0}, {"html": "3", "ok": false, "k": 3}, {"html": "1", "ok": true, "k": 1}], "ans": "미지 반력 4 − 독립 식 3 = 1차."}, {"id": "w62-q3", "qn": "문제 3", "html": "3D 볼소켓 지지에서 힘의 성분은 몇 개이고, 모멘트는?", "choices": [{"html": "힘 3 · 모멘트 3", "ok": false, "k": 3}, {"html": "힘 3 · 모멘트 0", "ok": true, "k": 1}, {"html": "힘 1 · 모멘트 3", "ok": false, "k": 0}, {"html": "힘 2 · 모멘트 1", "ok": false, "k": 2}], "ans": "볼소켓은 이동만 막고 회전은 자유 → 힘 3, 모멘트 0."}], "v": 2, "ver": "2026-10-11b", "nodes": {"sec": {}, "q": {}}};
+const D={"id": "statics-2026-10-07", "gate": {"state": "gate", "lecture": "3", "cards": [{"id": "c1", "q": "sin30°, cos30°, sin60°, cos60°, sin45° 값?", "a": "0.5 · 0.866 · 0.866 · 0.5 · 0.707", "why": {"hw": "K3 (삼각비)", "flow": "삼각비(K3)는 힘을 x·y 성분으로 나눌 때 쓴다."}, "mc": {"right": "0.5 · 0.866 · 0.866 · 0.5 · 0.707", "wrong": ["0.866 · 0.5 · 0.5 · 0.866 · 0.707", "0.5 · 0.707 · 0.866 · 0.5 · 0.866", "0.5 · 0.866 · 0.866 · 0.5 · 1"]}, "tip": "각이 작을수록 sin 은 작고 cos 은 크다. 30°와 60°는 sin 과 cos 이 서로 바뀐다. 45°는 둘 다 0.707."}, {"id": "c2", "q": "3-4-5 삼각형이면?", "a": "직각 (3²+4²=5²)", "why": {"hw": "확인 중 (보류)", "flow": "3:4:5 비율이 과제 수치에 적용되는지는 원문 확인 전까지 보류."}, "mc": {"right": "직각삼각형 (3²+4²=5²)", "wrong": ["예각삼각형 (3²+4² > 5²)", "둔각삼각형 (3²+4² < 5²)", "이등변삼각형 (두 변이 같다)"]}, "tip": "9 + 16 = 25. 세 변이 3:4:5 비율이면 직각삼각형."}, {"id": "c3", "q": "중력 W = ? (g)", "a": "W = mg, g = 9.81 m/s²", "why": {"hw": "확인 중 (보류)", "flow": "W = mg는 중력 계산의 기본 원리. 과제 연결은 원문 확인 전까지 보류."}, "mc": {"right": "W = mg, g = 9.81 m/s²", "wrong": ["W = m/g, g = 9.81 m/s²", "W = mg, g = 98.1 m/s²", "W = mg², g = 9.81 m/s²"]}, "tip": "무게(N) = 질량(kg) × 9.81. 1 kg 이 약 9.81 N."}, {"id": "4a", "q": "2D 평형 식 세 개?", "a": "ΣFx = 0, ΣFy = 0, ΣM = 0", "why": {"hw": "5.3 (K6)", "flow": "힘 성분 식과 모멘트 식을 세워 미지수를 연립한다."}, "mc": {"right": "ΣFx = 0, ΣFy = 0, ΣM = 0", "wrong": ["ΣFx = 0, ΣFy = 0 (두 식)", "ΣFx = 0, ΣFy = 0, ΣFz = 0", "ΣFx = 0, ΣFy = 0, ΣM = ΣF"], "q": "2D 강체 평형 식 세 개?"}, "tip": "평면 강체는 x 힘, y 힘, 모멘트 세 식. 미지수가 3개까지 풀린다."}, {"id": "4b", "q": "지지대 반력 개수: 핀 · 롤러 · 고정?", "a": "핀 2 (Ax, Ay) · 롤러 1 (면에 수직) · 고정 3 (Ax, Ay, MA)", "why": {"hw": "확인 중 (보류)", "flow": "지지 조건에 따라 반력 방향과 미지수 개수를 정한다는 원리. 5.3·5.126 적용 여부는 원문 확인 전까지 보류."}, "mc": {"right": "핀 2 · 롤러 1 · 고정 3", "wrong": ["핀 1 · 롤러 2 · 고정 3", "핀 2 · 롤러 2 · 고정 3", "핀 3 · 롤러 1 · 고정 2"]}, "tip": "막는 움직임 수 = 반력 수. 핀은 위치 x·y, 롤러는 면에 수직 하나, 고정은 위치 둘 + 회전."}, {"id": "4c", "q": "매끈한 면 · 거친 면 반력?", "a": "수직력 1 · 수직력 + 마찰력 2", "why": {"hw": "확인 중 (보류)", "flow": "매끈한 면과 거친 면의 반력 차이는 원리로 맞다. 과제 면 조건은 원문 확인 전까지 보류."}, "mc": {"right": "매끈한 면 수직력 1 · 거친 면 수직력 + 마찰력 2", "wrong": ["매끈한 면 수직력 + 마찰력 2 · 거친 면 수직력 1", "매끈한 면 수직력 1 · 거친 면 수직력 1", "매끈한 면 마찰력 1 · 거친 면 수직력 + 마찰력 2"]}, "tip": "매끈하면 마찰이 없으니 면에 수직인 힘 하나. 거칠면 마찰이 더해져 둘."}, {"id": "4d", "q": "모멘트 식은 어느 점에서 세우나?", "a": "미지 반력이 많이 지나는 점 (반력 팔 0)", "why": {"hw": "확인 중 (보류)", "flow": "미지 반력이 지나는 점을 모멘트 기준점으로 잡으면 그 반력의 팔이 0이 된다는 원리. 5.3 적용은 원문 확인 전까지 보류."}, "mc": {"right": "미지 반력이 많이 지나는 점 (반력 팔 0)", "wrong": ["하중이 가장 큰 곳 (그 하중의 팔 0)", "지지대에서 가장 먼 점", "항상 원점 (0, 0)"], "q": "미지 반력을 소거하려면 모멘트 기준점을 어디에 잡는 게 유리한가?"}, "tip": "팔이 0 이면 그 힘의 모멘트가 사라진다. 모르는 힘을 한꺼번에 지워 식이 쉬워진다."}, {"id": "4e", "q": "롤러가 줄 수 있는 힘은?", "a": "받치는 면에 수직인 힘 1개뿐", "why": {"hw": "확인 중 (보류)", "flow": "롤러는 접촉면에 수직인 힘 한 방향만 준다. 과제 적용 여부는 원문 확인 전까지 보류."}, "mc": {"right": "받치는 면에 수직인 힘 1개뿐", "wrong": ["수직력과 마찰력 2개", "수직력과 모멘트 2개", "면과 나란한 힘 1개뿐"]}, "tip": "롤러는 굴러가니 면 방향 힘은 못 준다. 수직 하나."}, {"id": "4f", "q": "우력이란?", "a": "크기 같고 방향 반대, 작용선이 다른 두 힘", "why": {"hw": "확인 중 (4.108·4.123 원문 확인)", "flow": "크기가 같고 방향이 반대이며 작용선이 다른 두 힘이 우력. 합력은 0이고 모멘트는 기준점과 무관."}, "mc": {"right": "크기 같고 방향 반대, 작용선이 다른 두 힘", "wrong": ["크기 같고 방향 반대, 작용선이 같은 두 힘", "크기가 다르고 방향 반대인 두 힘", "크기 같고 방향 같은 평행한 두 힘"]}, "tip": "작용선이 어긋나야 돌림이 생긴다. 합력은 0, 회전만 남는다."}]}, "slug": "statics", "course": "정역학", "date": "2026-10-07", "sess": "10/7(수) · 6주차", "title": "식보다 미지수가 많으면, 또는 지지가 잘못 놓이면 풀리지 않는다", "lead": "2D 평형 식은 3개뿐이라 구할 수 있는 반력도 3개까지다. 반력이 더 많으면 <b>부정정<\/b>, 지지 배치가 잘못되면 <b>부적절한 지지<\/b>. 이번 회차는 고정보에 롤러를 하나 더했을 때 왜 풀리지 않는지 직접 계산해 보고, 마지막에 3D 평형 식 6개와 볼소켓·3D 롤러를 본다.", "minutes": 18, "chapters": [{"id": "s1", "title": "정역학적 부정정 — 평형 방정식만으로는 반력을 다 못 구한다", "steps": [{"id": "s1-4", "t": "v2", "b": [{"k": "h", "h": "정역학적 부정정"}, {"k": "f", "h": "\\[\\text{미지 반력 수} &gt; \\text{독립 평형식 수}\\]"}, {"k": "li", "h": "2D 독립 평형식 = 3개 (ΣF_x, ΣF_y, ΣM)"}], "braw": ["# 정역학적 부정정", "= \\text{미지 반력 수} > \\text{독립 평형식 수}", "• 2D 독립 평형식 = 3개 (ΣF_x, ΣF_y, ΣM)"], "s": "오늘은 식이 모자라는 경우예요. 2D 평형식은 세 개뿐이라 반력 미지수가 그보다 많으면 평형식만으로는 다 못 구해요. 그걸 정역학적 부정정이라고 해요.", "fig": null, "fs": 0}, {"id": "s1-5", "t": "v2", "b": [{"k": "li", "h": "외적 부정정 차수 = 반력 미지수 수 − 3"}, {"k": "li", "h": "(안정적으로 지지된 2D 강체 하나일 때)"}, {"k": "f", "h": "\\[\\text{고정 }3+\\text{ 끝 롤러 }1-3=1\\text{차}\\]"}, {"k": "li", "h": "과제 5.69 : 핀 2 + 핀 2 − 3 = 1차"}], "braw": ["• 외적 부정정 차수 = 반력 미지수 수 − 3", "• (안정적으로 지지된 2D 강체 하나일 때)", "= \\text{고정 }3+\\text{ 끝 롤러 }1-3=1\\text{차}", "• 과제 5.69 : 핀 2 + 핀 2 − 3 = 1차"], "s": "차수는 평형식만으로 결정하지 못하는 반력 미지수가 몇 개 남는지예요. 먼저 지지가 안정적인지 확인하고 세요. 고정단에 롤러 하나를 더하면 3 더하기 1 빼기 3, 1차. 과제 5.69도 핀 두 개라 4 빼기 3, 1차예요.", "fig": null, "fs": 0}, {"id": "s1-6", "t": "v2", "b": [{"k": "li", "h": "부정정이 잘못된 구조는 아니다"}, {"k": "li", "h": "여분의 지지를 잘 설계하면 일부가 손상돼도 버티게 만들 수 있다"}, {"k": "memo", "h": "부정정 = 반력 미지수 &gt; 독립 평형식 · 2D 식 3개 · 차수 = 미지수 − 3", "tg": "am"}], "braw": ["• 부정정이 잘못된 구조는 아니다", "• 여분의 지지를 잘 설계하면 일부가 손상돼도 버티게 만들 수 있다", "■ 외울 것 : 부정정 = 반력 미지수 > 독립 평형식 · 2D 식 3개 · 차수 = 미지수 − 3"], "s": "교수님 말씀이에요. 부정정이라고 잘못된 구조는 아니에요. 여분의 지지를 적절히 설계하면 일부 지지가 손상돼도 안정성을 유지하게 만들 수 있어요. 외울 것은 이 한 줄이에요.", "fig": null, "fs": 0}], "figs": {}, "say": null}, {"id": "s2", "title": "지지의 수와 배치 — 과잉 지지와 부적절한 지지", "steps": [{"id": "s2-3", "t": "v2", "b": [{"k": "h", "h": "지지의 수와 배치"}, {"k": "li", "h": "과잉 지지 : 반력 미지수가 평형식으로 정할 수 있는 수보다 많음"}, {"k": "li", "h": "부적절한 지지 : 개수가 맞아도 배치 때문에 이동·회전을 다 못 막음"}], "braw": ["# 지지의 수와 배치", "• 과잉 지지 : 반력 미지수가 평형식으로 정할 수 있는 수보다 많음", "• 부적절한 지지 : 개수가 맞아도 배치 때문에 이동·회전을 다 못 막음"], "s": "반력 개수만 세면 끝이 아니에요. 과잉 지지는 반력이 평형식으로 정할 수 있는 수보다 많은 것이고, 부적절한 지지는 개수가 맞아도 배치가 잘못돼 어떤 이동이나 회전을 못 막는 거예요.", "fig": null, "fs": 0}, {"id": "s2-4", "t": "v2", "b": [{"k": "li", "h": "2D 에서 별도의 모멘트 반력이 없을 때"}, {"k": "li", "h": "힘 반력 작용선이 모두 평행 → 반력에 수직인 방향 이동을 못 막음"}, {"k": "li", "h": "힘 반력 작용선이 모두 한 점에 모임 → 그 점 둘레 회전을 못 막음"}, {"k": "li", "h": "과잉 지지는 일부러 쓰기도 한다 — 강도와 안전성"}], "braw": ["• 2D 에서 별도의 모멘트 반력이 없을 때", "• 힘 반력 작용선이 모두 평행 → 반력에 수직인 방향 이동을 못 막음", "• 힘 반력 작용선이 모두 한 점에 모임 → 그 점 둘레 회전을 못 막음", "• 과잉 지지는 일부러 쓰기도 한다 — 강도와 안전성"], "s": "2D에서 별도의 모멘트 반력이 없는 경우를 볼게요. 힘 반력의 작용선이 모두 평행하면 그에 수직인 방향의 이동을 막지 못해요. 모두 한 점에 모이면 그 점 둘레의 회전을 막지 못해요. 반대로 과잉 지지는 강도와 안전성 때문에 일부러 쓰기도 해요. 서술형에서 이 답이 나와요.", "fig": null, "fs": 0}], "figs": {}, "say": null}, {"id": "s5", "title": "3D 평형 — 식 6개, 볼소켓, 3D 롤러", "steps": [{"id": "s5-5", "t": "v2", "b": [{"k": "h", "h": "3D 평형 — 식 6개"}, {"k": "f", "h": "\\[\\sum F_x=\\sum F_y=\\sum F_z=0\\]"}, {"k": "f", "h": "\\[\\sum M_x=\\sum M_y=\\sum M_z=0\\]"}], "braw": ["# 3D 평형 — 식 6개", "= \\sum F_x=\\sum F_y=\\sum F_z=0", "= \\sum M_x=\\sum M_y=\\sum M_z=0"], "s": "3D에서는 식이 여섯 개예요. 힘 셋, 모멘트 셋. 5.86과 5.103은 모멘트 식까지 써야 풀려요.", "fig": null, "fs": 0}, {"id": "s5-6", "t": "v2", "b": [{"k": "li", "h": "볼소켓 : 이동 막음, 회전 자유"}, {"k": "res", "h": "힘 3개 (A_x, A_y, A_z) · 모멘트 0"}], "braw": ["• 볼소켓 : 이동 막음, 회전 자유", "→ 힘 3개 (A_x, A_y, A_z) · 모멘트 0"], "s": "볼소켓은 모든 방향으로 돌지만 이동은 막아요. 그래서 힘 세 성분, 모멘트는 0이에요. 5.86의 A가 이거예요.", "fig": "sup3d", "fs": 1}, {"id": "s5-7", "t": "v2", "b": [{"k": "li", "h": "매끈한 지지면 위 3D 롤러 : 접촉이 유지되면 면에 수직인 힘 1개"}, {"k": "pit", "h": "반력이 음수 → 접촉이 떨어지는지 확인하고 평형 다시 검토"}], "braw": ["• 매끈한 지지면 위 3D 롤러 : 접촉이 유지되면 면에 수직인 힘 1개", "! 반력이 음수 → 접촉이 떨어지는지 확인하고 평형 다시 검토"], "s": "매끈한 면 위의 3D 롤러는 접촉이 유지된다고 보고 면이 밀어 받치는 힘 하나를 넣어요. 면이 미는 방향을 양으로 잡았는데 반력이 음수라면, 접촉이 떨어지는지 확인하고 평형을 다시 봐요. 5.103이 롤러 셋이에요.", "fig": "sup3d", "fs": 2}, {"id": "s5-8", "t": "v2", "b": [{"k": "memo", "h": "3D 식 6개 · 볼소켓 힘 3 · 3D 롤러 면에 수직인 힘 1", "tg": "am"}], "braw": ["■ 외울 것 : 3D 식 6개 · 볼소켓 힘 3 · 3D 롤러 면에 수직인 힘 1"], "s": "외울 것은 이 셋이에요.", "fig": null, "fs": 0}], "figs": {"sup3d": {"svg": "<figure class=\"fig lite\" data-fig=\"sup3d\"><svg width=\"520\" height=\"130\" viewbox=\"0 0 520 130\" role=\"img\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"Pretendard,-apple-system,sans-serif\" font-size=\"14\" fill=\"#1F2A44\" id=\"fig-statics-2026-10-07-s5-sup3d\"><defs><marker id=\"fc\" viewbox=\"0 0 10 10\" refx=\"9\" refy=\"5\" markerwidth=\"7\" markerheight=\"7\" orient=\"auto-start-reverse\"><path d=\"M0 0 L10 5 L0 10 z\" fill=\"context-stroke\"><\/path><\/marker><\/defs><g data-step=\"1\"><circle cx=\"110\" cy=\"60\" r=\"22\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/circle><circle cx=\"110\" cy=\"60\" r=\"5\" fill=\"#1F2A44\"><\/circle><text x=\"110\" y=\"110\" font-size=\"13\" text-anchor=\"middle\" font-weight=\"700\">볼소켓<\/text><text x=\"110\" y=\"126\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\">힘 3 · 모멘트 0<\/text><\/g><g data-step=\"2\"><circle cx=\"330\" cy=\"60\" r=\"22\" fill=\"#F1F3F5\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/circle><line x1=\"300\" y1=\"92\" x2=\"360\" y2=\"92\" stroke=\"#1F2A44\" stroke-width=\"2\"><\/line><line x1=\"330\" y1=\"82\" x2=\"330\" y2=\"96\" stroke=\"none\"><\/line><line x1=\"330\" y1=\"118\" x2=\"330\" y2=\"92\" stroke=\"#2F9E44\" stroke-width=\"2.4\" marker-end=\"url(#fc)\"><\/line><text x=\"340\" y=\"112\" font-size=\"13\" fill=\"#2F9E44\" font-weight=\"700\">A<tspan baseline-shift=\"sub\" font-size=\"72%\">z<\/tspan><\/text><text x=\"330\" y=\"126\" font-size=\"12\" fill=\"#8A97A6\" text-anchor=\"middle\">3D 롤러 · 힘 1<\/text><\/g><\/svg><figcaption>3D 지지 두 가지. 볼소켓은 힘 3, 3D 롤러는 수직 힘 1.<\/figcaption><\/figure>", "max": 2}}, "say": null}, {"id": "s7", "title": "개념 확인", "steps": [{"id": "s7-1", "t": "v2", "b": [{"k": "h", "h": "개념 확인"}], "braw": ["# 개념 확인"], "s": "마지막으로 세 문제만 확인해요.", "fig": null, "fs": 0}], "figs": {}, "say": null}], "quiz": [{"id": "w62-q1", "qn": "문제 1", "html": "2D 정역학에서 독립인 평형 방정식은 몇 개인가?", "choices": [{"html": "2개", "ok": false, "k": 0}, {"html": "4개", "ok": false, "k": 2}, {"html": "3개", "ok": true, "k": 1}, {"html": "6개", "ok": false, "k": 3}], "ans": "2D에서는 \\(\\sum F_x=0,\\ \\sum F_y=0,\\ \\sum M=0\\) 세 개다."}, {"id": "w62-q2", "qn": "문제 2", "html": "끝 롤러 하나를 더한 고정보의 부정정 차수는?", "choices": [{"html": "2", "ok": false, "k": 2}, {"html": "0 (정정)", "ok": false, "k": 0}, {"html": "3", "ok": false, "k": 3}, {"html": "1", "ok": true, "k": 1}], "ans": "미지 반력 4 − 독립 식 3 = 1차."}, {"id": "w62-q3", "qn": "문제 3", "html": "3D 볼소켓 지지에서 힘의 성분은 몇 개이고, 모멘트는?", "choices": [{"html": "힘 3 · 모멘트 3", "ok": false, "k": 3}, {"html": "힘 3 · 모멘트 0", "ok": true, "k": 1}, {"html": "힘 1 · 모멘트 3", "ok": false, "k": 0}, {"html": "힘 2 · 모멘트 1", "ok": false, "k": 2}], "ans": "볼소켓은 이동만 막고 회전은 자유 → 힘 3, 모멘트 0."}], "v": 2, "ver": "2026-10-11b", "nodes": {"sec": {}, "q": {}}};
 const V2=D.v===2, VER=String(D.ver||"");
 const LESSON_REL="../../lessons/statics/2026-10-07.html", LESSON_APP="notes/lessons/statics/2026-10-07.html";
 const $=s=>document.querySelector(s), $$=(s,el)=>Array.from((el||document).querySelectorAll(s));
@@ -978,33 +990,132 @@ function stageFx(){ try{ const bc=$("#bc"); if(!bc) return;
 $("#bwrap")&&$("#bwrap").addEventListener("scroll",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,80); },{passive:true});
 window.addEventListener("resize",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,120); });
 setInterval(()=>{ const t=$("#tutor"); if(t) t.classList.toggle("talking",!!typing||ASKING); },300);
-/* ---------- 암기카드 게이트 (정역학 · 최종본.md §20 설계 v3 · 오타 GREEN 2026-10-10) ----------
-   수업을 열기 전에 그 날짜의 카드를 본인이 맞혀야 열린다. 목적지(fn)는 통과 전까지 보관만 하고 S·L.pos 는 건드리지 않는다.
-   판정은 본인이 한다(정답 공개 뒤 맞았어요/틀렸어요). 틀린 카드 ID만 다시 출제, 전부 맞으면 목적지로 한 번만 간다. */
+/* ---------- 암기카드 게이트 (정역학 · 최종본.md §20) ----------
+   수업을 열기 전에 그 날짜의 카드를 통과해야 열린다. 목적지(fn)는 통과 전까지 보관만 하고 S·L.pos 는 건드리지 않는다.
+   흐름: 객관식 4지선다 + 「몰라요」 → 틀림·몰라요만 외우기 → 그 카드만 다시 → 못 맞힌 적 있는 카드는 「써서 확인」 → 끝 화면에서 「수업 열기」.
+   로직은 school/card-engine.js 와 같은 소스(빌드가 아래 마커에 끼워 넣는다) — 학교 화면 게이트와 규칙이 한 벌이다. */
+// 암기카드 객관식 게이트 엔진 (화면 없음, 순수 로직)
+//  · 학교 화면(school/card-gate.js)은 import 하고, 교실 페이지는 build_classroom.py 가 줄머리 `export ` 를 떼어 통째로 끼워 넣는다.
+//  · 흐름: 객관식(보기 4 + 몰라요) → 틀림·몰라요만 외우기 → 그 카드만 다시 객관식 → 전부 맞히면
+//          한 번이라도 못 맞힌 카드는 「써서 확인」 → 그것까지 통과하면 끝.
+//  · 보기 순서는 (seed, 카드 id, 판 번호)로 정해져 시험에서 재현된다. 같은 카드가 다시 나오면 직전 순서와 다르게 바꾼다.
+
+function hashSeed(s) { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function shuffle(arr, rand) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+// 카드 한 장의 보기: [{text, ok}] 4개. mc 가 없으면 null.
+function optionsOf(card, seed, round, last) {
+  const m = card && card.mc; if (!m || !m.right || !Array.isArray(m.wrong) || m.wrong.length !== 3) return null;
+  const all = [{ text: m.right, ok: true }, ...m.wrong.map((t) => ({ text: t, ok: false }))];
+  let out = shuffle(all, rng(hashSeed(seed + '|' + card.id + '|' + round)));
+  if (last && out.map((o) => o.text).join('\u0001') === last) out = out.slice(1).concat(out[0]);
+  return out;
+}
+
+function createEngine(cards, opts = {}) {
+  const seed = opts.seed != null ? String(opts.seed) : String(Date.now());
+  const order = cards.map((c) => c.id);
+  const E = {
+    phase: cards.length ? 'quiz' : 'done', queue: cards.slice(), i: 0, round: 1,
+    miss: [],                   // 이번 판에서 틀림·몰라요 낸 카드
+    first: {},                  // 카드 id → 처음 낸 결과 ok | wrong | unknown
+    ever: new Set(),            // 한 번이라도 못 맞힌 카드 id
+    wrote: new Set(),           // 써서 확인을 통과한 카드 id
+    writeFail: [], shown: false, answered: null, opts: null, lastOrder: {},
+  };
+  const rand = rng(hashSeed(seed + '|q'));
+  function prepare() { E.answered = null; E.shown = false; E.opts = null;
+    if (E.phase === 'quiz') { const c = E.queue[E.i]; E.opts = optionsOf(c, seed, E.round, E.lastOrder[c.id]); if (!E.opts) throw new Error('보기 없는 카드: ' + c.id); E.lastOrder[c.id] = E.opts.map((o) => o.text).join('\u0001'); } }
+  function afterQuiz() {
+    if (E.miss.length) { E.phase = 'study'; E.queue = E.miss; E.miss = []; E.i = 0; return; }
+    const need = cards.filter((c) => E.ever.has(c.id) && !E.wrote.has(c.id));
+    if (need.length) { E.phase = 'write'; E.queue = need; E.i = 0; E.writeFail = []; return; }
+    E.phase = 'done';
+  }
+  prepare();
+  const E2 = {
+    seed,
+    view() {
+      const c = E.queue[E.i], total = E.queue.length;
+      if (E.phase === 'quiz') return { kind: 'quiz', card: c, q: (c.mc && c.mc.q) || c.q, options: E.opts.map((o) => o.text), pos: E.i + 1, total, round: E.round, answered: E.answered };
+      if (E.phase === 'study') return { kind: 'study', card: c, pos: E.i + 1, total, last: E.i === total - 1 };
+      if (E.phase === 'write') return { kind: 'write', card: c, pos: E.i + 1, total, shown: E.shown };
+      return { kind: 'done', summary: E2.summary() };
+    },
+    // 보기 번호(0~3)로 답하기. 이미 답했으면 무시.
+    pick(n) { if (E.phase !== 'quiz' || E.answered || !E.opts[n]) return null; return record(E.opts[n].ok ? 'ok' : 'wrong', n); },
+    unknown() { if (E.phase !== 'quiz' || E.answered) return null; return record('unknown', -1); },
+    // 답한 뒤 다음 카드로
+    next() { if (E.phase !== 'quiz' || !E.answered) return; E.i++; if (E.i >= E.queue.length) { E.round++; afterQuiz(); } prepare(); },
+    // 외우기 화면 다음
+    studied() { if (E.phase !== 'study') return; E.i++; if (E.i >= E.queue.length) { E.phase = 'quiz'; E.queue = shuffle(E.queue, rand); E.i = 0; } prepare(); },
+    reveal() { if (E.phase === 'write') E.shown = true; },
+    // 써서 확인: 본인 판정
+    judge(ok) { if (E.phase !== 'write' || !E.shown) return;
+      const c = E.queue[E.i]; if (ok) E.wrote.add(c.id); else E.writeFail.push(c);
+      E.i++; E.shown = false;
+      if (E.i >= E.queue.length) { if (E.writeFail.length) { E.phase = 'study'; E.queue = E.writeFail; E.writeFail = []; E.i = 0; } else E.phase = 'done'; }
+      prepare(); },
+    summary() { const f = Object.values(E.first); return { total: cards.length, ok: f.filter((x) => x === 'ok').length, wrong: f.filter((x) => x === 'wrong').length, unknown: f.filter((x) => x === 'unknown').length, missed: E.ever.size }; },
+    state() { return E; },
+  };
+  function record(result, n) {
+    const c = E.queue[E.i];
+    if (!(c.id in E.first)) E.first[c.id] = result;
+    if (result !== 'ok') { E.miss.push(c); E.ever.add(c.id); }
+    const right = E.opts.findIndex((o) => o.ok);
+    E.answered = { pick: n, result, right };
+    return E.answered;
+  }
+  return E2;
+}
+
 let GATE=null;
 function gateNeeded(){ return !!(D.gate&&D.gate.state==="gate"); }
 function gateGo(fn){ if(!gateNeeded()) return fn(); openGate(fn); }
-function openGate(fn){ const el=$("#gate"); if(!el) return fn(); const all=(D.gate&&D.gate.cards)||[];
-  GATE={fn:fn, todo:all.slice(), wrong:[], i:0, shown:false, n:all.length, round:1, err:!all.length};
-  el.classList.add("on"); gateView(); }
+function openGate(fn){ const el=$("#gate"); if(!el) return fn(); if(GATE) return; const all=(D.gate&&D.gate.cards)||[]; let eng=null;
+  try{ if(all.length&&all.every(c=>optionsOf(c,"x",1))) eng=createEngine(all,{seed:String(Date.now())}); }catch(e){ eng=null; }
+  GATE={fn:fn, eng:eng, n:all.length, err:!eng};
+  el.classList.add("on"); gateView(); const bx=el.querySelector(".gbx"); if(bx){ bx.tabIndex=-1; bx.focus({preventScroll:true}); } }
 function gateBtn(row,label,f,cls){ const b=document.createElement("button"); b.type="button"; b.className="cbt "+cls; b.textContent=label; b.style.width="auto"; b.onclick=f; row.appendChild(b); return b; }
-function gateView(){ const G=GATE, body=$("#gBody"), row=$("#gRow"), prog=$("#gProg"); if(!G||!body) return;
+function gateBox(label,text){ return '<div class="ga"><i>'+label+'</i>'+esc(text)+'</div>'; }
+function gateWhy(c){ const w=c.why; if(!w) return ""; return (w.hw&&!/^확인 중/.test(w.hw)?gateBox("과제",w.hw):"")+(w.flow?gateBox("왜",w.flow):""); }
+function gateView(){ const G=GATE, body=$("#gBody"), row=$("#gRow"), prog=$("#gProg"), ttl=$("#gTitle"); if(!G||!body) return;
   row.innerHTML=""; prog.textContent="";
   if(G.err){ body.innerHTML='<p class="gp">이 날짜의 암기카드를 불러오지 못해 수업을 열 수 없어요. 아톰에게 알려 주세요.</p>'; gateBtn(row,"닫기",gateClose,"g"); return; }
-  if(G.i>=G.todo.length){
-    if(G.wrong.length){ G.todo=G.wrong; G.wrong=[]; G.i=0; G.shown=false; G.round++; body.innerHTML='<p class="gp">틀린 카드 '+G.todo.length+'개만 다시 봅니다.</p>'; gateBtn(row,"다시 보기",gateView,"p"); gateBtn(row,"닫기",gateClose,"g"); return; }
-    return gatePass(); }
-  const c=G.todo[G.i]; prog.textContent=(G.i+1)+" / "+G.todo.length+(G.round>1?" · "+G.round+"차":"");
-  body.innerHTML='<div class="gq">'+esc(c.q)+'</div>'+(G.shown?'<div class="ga"><i>정답</i>'+esc(c.a)+'</div><p class="gp">답을 적은 것과 비교해서 판정하세요. 핵심 식·방향·조건을 모두 썼으면 맞음.</p>':'<p class="gp">답을 종이나 화면에 먼저 적고, 정답을 보세요.</p>');
-  if(!G.shown){ gateBtn(row,"정답 보기",()=>{ G.shown=true; gateView(); },"p"); }
-  else { gateBtn(row,"틀렸어요",()=>gateJudge(false),"r"); gateBtn(row,"맞았어요",()=>gateJudge(true),"g"); gateBtn(row,"왜 외우나?",()=>{ G.why=!G.why; gateView(); },"g"); }
-  if(G.shown&&G.why&&c.why){ body.insertAdjacentHTML('beforeend','<div class="ga"><i>과제</i>'+esc(c.why.hw)+'</div><div class="ga"><i>흐름</i>'+esc(c.why.flow)+'</div>'); }
+  const E=G.eng, v=E.view();
+  ttl.textContent=v.kind==="study"?"외우기":v.kind==="write"?"써서 확인":"암기카드 확인";
+  if(v.kind==="done"){ const s=v.summary;
+    body.innerHTML='<div class="gq">암기카드 끝</div><p class="gsum">'+(s.missed?'모르던 카드 '+s.missed+'개 · 다시 맞힘':'카드 '+s.total+'장을 처음부터 다 맞혔어요')+'</p>'+(s.missed?'<p class="gp">처음 결과: 맞음 '+s.ok+' · 틀림 '+s.wrong+' · 몰라요 '+s.unknown+'</p>':'');
+    gateBtn(row,"수업 열기",gatePass,"p"); return; }
+  if(v.kind==="quiz"){ prog.textContent=v.pos+" / "+v.total+(v.round>1?" · "+v.round+"차":""); const a=v.answered;
+    body.innerHTML='<div class="gq">'+esc(v.q)+'</div>';
+    const list=document.createElement("div"); list.className="gopts";
+    v.options.forEach((t,n)=>{ const b=document.createElement("button"); b.type="button"; b.className="gopt"; b.textContent=t;
+      if(a){ b.setAttribute("aria-disabled","true"); if(n===a.right){ b.classList.add("ok"); b.insertAdjacentHTML("beforeend",'<span class="gtag">정답</span>'); } else if(n===a.pick){ b.classList.add("bad"); b.insertAdjacentHTML("beforeend",'<span class="gtag">내 선택</span>'); } else b.classList.add("dim"); }
+      else b.onclick=()=>{ E.pick(n); gateView(); };
+      list.appendChild(b); });
+    body.appendChild(list);
+    if(!a){ body.insertAdjacentHTML("beforeend",'<p class="gp">모르면 찍지 말고 몰라요. 틀린 것과 똑같이 복습만 하면 돼요.</p>');
+      const u=document.createElement("button"); u.type="button"; u.className="gunk"; u.textContent="몰라요"; u.onclick=()=>{ E.unknown(); gateView(); }; body.appendChild(u); }
+    else { body.insertAdjacentHTML("beforeend",'<div class="gres '+(a.result==="ok"?"ok":a.result==="wrong"?"bad":"unk")+'">'+(a.result==="ok"?"맞았어요":a.result==="wrong"?"틀렸어요":"몰라요")+'</div>'+(a.result!=="ok"?gateBox("정답",v.card.mc.right):"")+gateWhy(v.card));
+      gateBtn(row,"다음",()=>{ E.next(); gateView(); },"p"); }
+  } else if(v.kind==="study"){ prog.textContent=v.pos+" / "+v.total;
+    body.innerHTML='<div class="gq">'+esc(v.card.q)+'</div>'+gateBox("정답",v.card.a)+gateWhy(v.card)+(v.card.tip?gateBox("요령",v.card.tip):"");
+    gateBtn(row,v.last?"다시 풀기":"다음 카드",()=>{ E.studied(); gateView(); },"p");
+  } else if(v.kind==="write"){ prog.textContent=v.pos+" / "+v.total;
+    body.innerHTML='<div class="gq">'+esc(v.card.q)+'</div>';
+    if(!v.shown){ body.insertAdjacentHTML("beforeend",'<p class="gp">보기 없이 종이나 화면에 답을 먼저 적은 뒤 정답을 보세요.</p>'); gateBtn(row,"적었어요 · 정답 보기",()=>{ E.reveal(); gateView(); },"p"); }
+    else { body.insertAdjacentHTML("beforeend",gateBox("정답",v.card.a)+'<p class="gp">적은 답과 비교해서 판정하세요. 핵심 식·방향·조건을 모두 썼으면 맞음.</p>');
+      gateBtn(row,"틀렸어요",()=>{ E.judge(false); gateView(); },"r"); gateBtn(row,"맞았어요",()=>{ E.judge(true); gateView(); },"g"); } }
   gateBtn(row,"닫기",gateClose,"g"); }
-function gateJudge(ok){ const G=GATE; if(!G) return; const c=G.todo[G.i]; if(!ok) G.wrong.push(c); G.i++; G.shown=false; G.why=false; gateView(); }
-function gatePass(){ const G=GATE, fn=G.fn; GATE=null; $("#gate").classList.remove("on");
-  try{ L.gateLog=(Array.isArray(L.gateLog)?L.gateLog:[]).concat([{t:Date.now(),n:G.n,r:G.round}]).slice(-60); save(); }catch(e){}   /* 통과 이력만 — 면제 조건으로 쓰지 않는다 */
+function gatePass(){ const G=GATE, fn=G.fn, rd=G.eng.state().round; GATE=null; $("#gate").classList.remove("on");
+  try{ L.gateLog=(Array.isArray(L.gateLog)?L.gateLog:[]).concat([{t:Date.now(),n:G.n,r:Math.max(1,rd-1)}]).slice(-60); save(); }catch(e){}   /* 통과 이력만 — 면제 조건으로 쓰지 않는다 */
   fn(); }
 function gateClose(){ GATE=null; $("#gate").classList.remove("on"); }   /* 닫기·Esc: 목적지 폐기, S·L.pos 는 그대로 */
+function gateTab(e){ const bs=[...$$("#gate button")]; if(!bs.length) return; const a=document.activeElement, i=bs.indexOf(a);   /* 포커스를 팝업 안에 가둔다 */
+  if(i<0){ e.preventDefault(); bs[e.shiftKey?bs.length-1:0].focus(); } else if(e.shiftKey&&i===0){ e.preventDefault(); bs[bs.length-1].focus(); } else if(!e.shiftKey&&i===bs.length-1){ e.preventDefault(); bs[0].focus(); } }
 /* ---------- 키보드 ---------- */
 /* 질문: 앱(atom) 스앵님 대화로 보내고, 답을 자막으로 흘려 보여 준다. 앱 밖에서 열면 안내 대사 */
 let ASKING=false;
@@ -1026,7 +1137,7 @@ function prevStep(){ if(GATE||!canPrev()) return; if(anim||typing){ finishNow();
 { const _ch0=choices; choices=function(list){ _ch0(list); if((S.mode==="step"||S.mode==="quiz")&&canPrev()){ const box=$("#dCh"); const b=document.createElement("button"); b.type="button"; b.className="cbt g prev"; b.textContent="이전"; b.onclick=prevStep; box.insertBefore(b,box.firstChild); } }; }
 { let sx=null, sy=null; const bw=$("#bwrap"); if(bw){ bw.addEventListener("touchstart",e=>{ const t=e.touches[0]; sx=t.clientX; sy=t.clientY; },{passive:true});
   bw.addEventListener("touchend",e=>{ if(sx==null) return; const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; sx=null; if(dx>80&&Math.abs(dy)<50&&$("#figov").hidden) prevStep(); },{passive:true}); } }
-document.addEventListener("keydown",e=>{ if(GATE){ if(e.key==="Escape"){ e.preventDefault(); gateClose(); } else if(e.key==="Enter"||e.key===" "||(e.key!=="Tab"&&!(e.target&&e.target.closest&&e.target.closest("#gate")))) e.preventDefault(); return; }   /* 게이트 중 Enter·Space 는 버튼을 눌러도 통과시키지 않는다(마우스·터치로만 판정) */
+document.addEventListener("keydown",e=>{ if(GATE){ if(e.key==="Escape"){ e.preventDefault(); gateClose(); } else if(e.key==="Tab"){ gateTab(e); } else if(e.key==="Enter"||e.key===" "||(e.key!=="Tab"&&!(e.target&&e.target.closest&&e.target.closest("#gate")))) e.preventDefault(); return; }   /* 게이트 중 Enter·Space 는 버튼을 눌러도 통과시키지 않는다(마우스·터치로만 판정) */
   if(e.target&&/TEXTAREA|INPUT/.test(e.target.tagName)) return; if(e.key==="ArrowLeft"&&$("#figov").hidden&&!$("#ov").classList.contains("on")){ e.preventDefault(); prevStep(); return; } if($("#ov").classList.contains("on")){ if(e.key==="Escape") $("#ov").classList.remove("on"); return; }
   if(!$("#figov").hidden){ if(e.key==="Escape"){ e.preventDefault(); closeFig(); } else if(e.key==="Tab"){ e.preventDefault(); $("#figovX").focus(); } else if(e.key==="Enter"||e.key===" "){ e.preventDefault(); } return; }   /* 그림 확대창이 열려 있으면 뒤 교실 단축키(Enter·Space·숫자) 차단, 닫기는 Esc·닫기 버튼 — 오타 디자인 2차 */
   if(e.key==="Enter"||e.key===" "){ e.preventDefault(); if(e.repeat) return; enter(); }

@@ -35,30 +35,46 @@ const ok = (cond, msg) => { out.push((cond ? "ok   " : "FAIL ") + msg); if (!con
   key(d, "Enter");
   ok(gateOn(d) && X.S.mode === "intro", "Enter 는 게이트를 통과시키지 않는다");
   key(d, "Escape");
-  // (추가) 게이트를 연 뒤 포커스된 「맞았어요」에서 Enter 를 눌러도 통과하지 않는다
+  // (추가) 게이트를 연 뒤 포커스된 보기·몰라요 버튼에서 Enter·Space 를 눌러도 판정되지 않는다
   X.boot();
-  btn(d, "정답 보기").click();
-  const judgeBtn = btn(d, "맞았어요"); judgeBtn.focus();
-  judgeBtn.dispatchEvent(new d.defaultView.KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
-  ok(gateOn(d) && X.S.mode === "intro" && d.querySelector("#gProg").textContent.startsWith("1 / " + X.D.gate.cards.length), "포커스된 「맞았어요」에서 Enter 로 통과 안 됨");
+  ok(d.querySelectorAll("#gBody .gopt").length === 4 && !!d.querySelector("#gBody .gunk"), "보기 4개 + 몰라요 버튼");
+  for (const k of ["Enter", " "]) for (const sel of ["#gBody .gopt", "#gBody .gunk"]) {
+    const t = d.querySelector(sel); t.focus();
+    t.dispatchEvent(new d.defaultView.KeyboardEvent("keydown", { key: k, bubbles: true, cancelable: true }));
+  }
+  ok(gateOn(d) && X.S.mode === "intro" && !d.querySelector("#gBody .gres") && d.querySelector("#gProg").textContent.startsWith("1 / " + X.D.gate.cards.length), "포커스된 보기·몰라요에서 Enter·Space 로 판정 안 됨");
+  {
+    const bs = [...d.querySelectorAll("#gate button")]; bs[bs.length - 1].focus();
+    const t = new d.defaultView.KeyboardEvent("keydown", { key: "Tab", bubbles: true, cancelable: true }); bs[bs.length - 1].dispatchEvent(t);
+    ok(t.defaultPrevented && d.activeElement === bs[0], "Tab 은 팝업 안에서 돈다 (마지막 → 첫 버튼)");
+    X.boot(); ok(d.querySelectorAll("#gate.on").length === 1 && d.querySelector("#gProg").textContent.startsWith("1 / "), "열려 있는 동안 다시 열어도 처음 상태 유지(재진입 무시)");
+  }
   key(d, "Escape");
   ok(!gateOn(d) && X.S.mode === "intro", "Esc 는 게이트만 닫고 시작하지 않는다");
   ok(X.L.pos === null || X.L.pos === undefined, "닫기 뒤에도 L.pos 불변");
 
-  // 2) 다시 열고 1번째 카드를 틀림 → 틀린 카드만 다시 출제 → 맞음 → 통과
+  // 2) 다시 열고 1번째 카드를 몰라요 → 그 카드만 외우기 → 다시 객관식 → 써서 확인 → 끝 화면 → 수업 열기
   X.boot();
   ok(gateOn(d), "다시 열면 게이트가 다시 열린다(열 때마다)");
   const total = X.D.gate.cards.length;
+  const cardOf = () => X.D.gate.cards.find(c => (c.mc.q || c.q) === d.querySelector("#gBody .gq").textContent);
+  const pickRight = () => { const c = cardOf(); [...d.querySelectorAll("#gBody .gopt")].find(b => b.textContent.startsWith(c.mc.right)).click(); };
+  const gbtn = t => btn(d, t);
   for (let i = 0; i < total; i++) {
-    btn(d, "정답 보기").click();
-    btn(d, i === 0 ? "틀렸어요" : "맞았어요").click();
+    if (i === 0) d.querySelector("#gBody .gunk").click(); else pickRight();
+    gbtn("다음").click();
   }
-  ok(d.querySelector("#gBody").textContent.includes("틀린 카드 1개만"), "틀린 1개만 다시 출제");
-  btn(d, "다시 보기").click();
-  ok(d.querySelector("#gProg").textContent.startsWith("1 / 1"), "다시 출제는 1장");
-  btn(d, "정답 보기").click();
-  btn(d, "맞았어요").click();
-  ok(!gateOn(d), "전부 맞히면 게이트가 닫힌다");
+  ok(d.querySelector("#gTitle").textContent === "외우기" && d.querySelector("#gProg").textContent === "1 / 1", "몰라요 낸 1장만 외우기 화면");
+  ok(d.querySelector("#gBody").textContent.includes("요령"), "외우기: 기억 요령이 보인다");
+  gbtn("다시 풀기").click();
+  ok(d.querySelector("#gProg").textContent.startsWith("1 / 1"), "그 1장만 다시 객관식");
+  pickRight(); gbtn("다음").click();
+  ok(d.querySelector("#gTitle").textContent === "써서 확인", "못 맞힌 적 있는 카드는 써서 확인");
+  gbtn("적었어요 · 정답 보기").click(); gbtn("맞았어요").click();
+  ok(gateOn(d) && d.querySelector("#gBody").textContent.includes("모르던 카드 1개 · 다시 맞힘"), "끝 화면: 모르던 카드 1개 · 다시 맞힘 (아직 안 열림)");
+  ok(X.S.mode === "intro", "끝 화면에서도 S 불변");
+  gbtn("수업 열기").click();
+  ok(!gateOn(d), "수업 열기를 누르면 게이트가 닫힌다");
   ok(X.S.mode === "step" && X.S.ci === 0, "통과 뒤 목적지(1강)로 한 번 진입");
   ok(Array.isArray(X.L.gateLog) && X.L.gateLog.length === 1, "통과 이력이 L.gateLog 에 1건");
   ok(r.errs.length === 0, "페이지 오류 0 (" + r.errs.join(" | ") + ")");
@@ -77,10 +93,20 @@ const ok = (cond, msg) => { out.push((cond ? "ok   " : "FAIL ") + msg); if (!con
 
   // 6) 카드 데이터 손상: 카드가 없으면 수업을 열지 않고 오류를 보인다
   r = await open("notes/classroom/statics/2026-09-16.html", "#ch=1");
+  key(r.doc, "Escape");
   r.w.__cr.D.gate.cards = [];
   r.w.__cr.boot();
   ok(gateOn(r.doc) && r.doc.querySelector("#gBody").textContent.includes("불러오지 못해"), "카드 0개면 오류 화면, 수업 미진입");
   ok(r.w.__cr.S.mode === "intro", "오류 상태에서도 S 불변");
+
+  // 7) 정역학 교실 페이지 전부: 페이지 오류 0, 게이트 날짜는 카드마다 보기 4개(정답 1) + 엔진이 들어 있다
+  const dir = path.join(ROOT, "notes/classroom/statics");
+  for (const f of fs.readdirSync(dir).filter(n => /^\d{4}-\d{2}-\d{2}\.html$/.test(n)).sort()) {
+    const q = await open("notes/classroom/statics/" + f, "");
+    const g = q.w.__cr.D.gate;
+    ok(q.errs.length === 0, f + " 페이지 오류 0");
+    if (g.state === "gate") ok(g.cards.every(c => c.mc && c.mc.wrong.length === 3 && c.mc.right && c.tip) && typeof q.w.eval("createEngine") === "function", f + " 게이트 카드 " + g.cards.length + "장: 보기 4개·요령, 엔진 포함");
+  }
 
   console.log(out.join("\n"));
   console.log(fail ? "\n실패 " + fail : "\n전부 통과");

@@ -11,3 +11,16 @@
 .card-gate-btn{min-height:46px;min-width:88px;padding:10px 16px;border-radius:12px;font:600 15px inherit;cursor:pointer;border:1px solid #cfd8cf;background:#fff;color:#21302a}
 .card-gate-btn.primary{background:#21745a;border-color:#21745a;color:#fff}
 .card-gate-btn.wrong{background:#c9583f;border-color:#c9583f;color:#fff}
+/* 객관식 보기 · 몰라요 · 결과 */
+.card-gate-opts{display:flex;flex-direction:column;gap:8px;margin:6px 0 4px}
+.card-gate-opt{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:52px;padding:12px 14px;text-align:left;font-family:inherit;font-size:16px;font-weight:500;line-height:1.45;color:#21302a;background:#fff;border:1.5px solid #cfd8cf;border-radius:12px;cursor:pointer;word-break:keep-all;touch-action:manipulation}
+.card-gate-opt[aria-disabled=true]{cursor:default}
+.card-gate-opt.ok{background:#e6f2ea;border-color:#21745a;color:#16513e}
+.card-gate-opt.bad{background:#fbebe6;border-color:#c9583f;color:#8f3322}
+.card-gate-opt.dim{opacity:.55}
+.card-gate-tag{flex:none;font-size:12px;font-weight:700;letter-spacing:0}
+.card-gate-unknown{display:block;width:100%;min-height:48px;margin-top:4px;padding:10px 14px;font-family:inherit;font-size:15px;font-weight:600;color:#68725f;background:transparent;border:1.5px dashed #b9bfae;border-radius:12px;cursor:pointer;touch-action:manipulation}
+.card-gate-res{font-size:15px;font-weight:700;margin:12px 0 2px}
+.card-gate-res.ok{color:#21745a}.card-gate-res.bad{color:#c9583f}.card-gate-res.unk{color:#8a6d1f}
+.card-gate-sum{font-size:18px;font-weight:700;margin:6px 0}
+.card-gate-box:focus{outline:none}

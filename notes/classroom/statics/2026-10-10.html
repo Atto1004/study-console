@@ -412,6 +412,18 @@ main{max-width:1040px;margin:0 auto;padding:14px 20px 18px}
 #gate .ga i{font-style:normal;font-size:13px;color:#FFE27A;margin-right:6px}
 #gate .gp{font-size:14.5px;color:#B9CABF;line-height:1.6;margin:8px 0 14px}
 #gate .row{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+#gate .gopts{display:flex;flex-direction:column;gap:8px;margin:6px 0 4px}
+#gate .gopt{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:52px;padding:12px 14px;text-align:left;font-family:inherit;font-size:16px;font-weight:500;line-height:1.45;color:#EAF2EC;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.22);border-radius:12px;cursor:pointer;word-break:keep-all;touch-action:manipulation}
+#gate .gopt[aria-disabled=true]{cursor:default}
+#gate .gopt.ok{background:rgba(88,196,140,.18);border-color:#58C48C;color:#D5F5E3}
+#gate .gopt.bad{background:rgba(226,104,84,.18);border-color:#E26854;color:#FFD9D1}
+#gate .gopt.dim{opacity:.55}
+#gate .gtag{flex:none;font-size:12px;font-weight:700}
+#gate .gunk{display:block;width:100%;min-height:48px;margin-top:2px;padding:10px 14px;font-family:inherit;font-size:15px;font-weight:600;color:#A9BDB0;background:transparent;border:1.5px dashed rgba(255,255,255,.3);border-radius:12px;cursor:pointer;touch-action:manipulation}
+#gate .gres{font-size:15px;font-weight:700;margin:12px 0 2px}
+#gate .gres.ok{color:#7ADBA8}#gate .gres.bad{color:#FF9C8A}#gate .gres.unk{color:#FFE27A}
+#gate .gsum{font-size:18px;font-weight:700;margin:6px 0}
+#gate .gbx:focus{outline:none}
 </style>
 <div id="gate" role="dialog" aria-modal="true" aria-labelledby="gTitle"><div class="gbx"><div class="gh"><b id="gTitle">암기카드 확인</b><span id="gProg"></span></div><div id="gBody"></div><div class="row" id="gRow"></div></div></div>
 <div id="ov"><div class="pn"><h2>목차</h2><div class="mt" id="ovMeta"></div><ul id="ovList"></ul><div class="row"><button class="cbt g" id="ovClose" type="button">닫기</button><span style="flex:1"></span><button class="cbt g" id="ovMemo" type="button">암기노트</button><button class="cbt g" id="ovBook" type="button">교재 보기</button><button class="cbt g" id="ovReset" type="button">이 회차 기록 지우기</button></div></div></div>
@@ -978,33 +990,132 @@ function stageFx(){ try{ const bc=$("#bc"); if(!bc) return;
 $("#bwrap")&&$("#bwrap").addEventListener("scroll",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,80); },{passive:true});
 window.addEventListener("resize",()=>{ clearTimeout(stageFx._t); stageFx._t=setTimeout(stageFx,120); });
 setInterval(()=>{ const t=$("#tutor"); if(t) t.classList.toggle("talking",!!typing||ASKING); },300);
-/* ---------- 암기카드 게이트 (정역학 · 최종본.md §20 설계 v3 · 오타 GREEN 2026-10-10) ----------
-   수업을 열기 전에 그 날짜의 카드를 본인이 맞혀야 열린다. 목적지(fn)는 통과 전까지 보관만 하고 S·L.pos 는 건드리지 않는다.
-   판정은 본인이 한다(정답 공개 뒤 맞았어요/틀렸어요). 틀린 카드 ID만 다시 출제, 전부 맞으면 목적지로 한 번만 간다. */
+/* ---------- 암기카드 게이트 (정역학 · 최종본.md §20) ----------
+   수업을 열기 전에 그 날짜의 카드를 통과해야 열린다. 목적지(fn)는 통과 전까지 보관만 하고 S·L.pos 는 건드리지 않는다.
+   흐름: 객관식 4지선다 + 「몰라요」 → 틀림·몰라요만 외우기 → 그 카드만 다시 → 못 맞힌 적 있는 카드는 「써서 확인」 → 끝 화면에서 「수업 열기」.
+   로직은 school/card-engine.js 와 같은 소스(빌드가 아래 마커에 끼워 넣는다) — 학교 화면 게이트와 규칙이 한 벌이다. */
+// 암기카드 객관식 게이트 엔진 (화면 없음, 순수 로직)
+//  · 학교 화면(school/card-gate.js)은 import 하고, 교실 페이지는 build_classroom.py 가 줄머리 `export ` 를 떼어 통째로 끼워 넣는다.
+//  · 흐름: 객관식(보기 4 + 몰라요) → 틀림·몰라요만 외우기 → 그 카드만 다시 객관식 → 전부 맞히면
+//          한 번이라도 못 맞힌 카드는 「써서 확인」 → 그것까지 통과하면 끝.
+//  · 보기 순서는 (seed, 카드 id, 판 번호)로 정해져 시험에서 재현된다. 같은 카드가 다시 나오면 직전 순서와 다르게 바꾼다.
+
+function hashSeed(s) { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function shuffle(arr, rand) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+// 카드 한 장의 보기: [{text, ok}] 4개. mc 가 없으면 null.
+function optionsOf(card, seed, round, last) {
+  const m = card && card.mc; if (!m || !m.right || !Array.isArray(m.wrong) || m.wrong.length !== 3) return null;
+  const all = [{ text: m.right, ok: true }, ...m.wrong.map((t) => ({ text: t, ok: false }))];
+  let out = shuffle(all, rng(hashSeed(seed + '|' + card.id + '|' + round)));
+  if (last && out.map((o) => o.text).join('\u0001') === last) out = out.slice(1).concat(out[0]);
+  return out;
+}
+
+function createEngine(cards, opts = {}) {
+  const seed = opts.seed != null ? String(opts.seed) : String(Date.now());
+  const order = cards.map((c) => c.id);
+  const E = {
+    phase: cards.length ? 'quiz' : 'done', queue: cards.slice(), i: 0, round: 1,
+    miss: [],                   // 이번 판에서 틀림·몰라요 낸 카드
+    first: {},                  // 카드 id → 처음 낸 결과 ok | wrong | unknown
+    ever: new Set(),            // 한 번이라도 못 맞힌 카드 id
+    wrote: new Set(),           // 써서 확인을 통과한 카드 id
+    writeFail: [], shown: false, answered: null, opts: null, lastOrder: {},
+  };
+  const rand = rng(hashSeed(seed + '|q'));
+  function prepare() { E.answered = null; E.shown = false; E.opts = null;
+    if (E.phase === 'quiz') { const c = E.queue[E.i]; E.opts = optionsOf(c, seed, E.round, E.lastOrder[c.id]); if (!E.opts) throw new Error('보기 없는 카드: ' + c.id); E.lastOrder[c.id] = E.opts.map((o) => o.text).join('\u0001'); } }
+  function afterQuiz() {
+    if (E.miss.length) { E.phase = 'study'; E.queue = E.miss; E.miss = []; E.i = 0; return; }
+    const need = cards.filter((c) => E.ever.has(c.id) && !E.wrote.has(c.id));
+    if (need.length) { E.phase = 'write'; E.queue = need; E.i = 0; E.writeFail = []; return; }
+    E.phase = 'done';
+  }
+  prepare();
+  const E2 = {
+    seed,
+    view() {
+      const c = E.queue[E.i], total = E.queue.length;
+      if (E.phase === 'quiz') return { kind: 'quiz', card: c, q: (c.mc && c.mc.q) || c.q, options: E.opts.map((o) => o.text), pos: E.i + 1, total, round: E.round, answered: E.answered };
+      if (E.phase === 'study') return { kind: 'study', card: c, pos: E.i + 1, total, last: E.i === total - 1 };
+      if (E.phase === 'write') return { kind: 'write', card: c, pos: E.i + 1, total, shown: E.shown };
+      return { kind: 'done', summary: E2.summary() };
+    },
+    // 보기 번호(0~3)로 답하기. 이미 답했으면 무시.
+    pick(n) { if (E.phase !== 'quiz' || E.answered || !E.opts[n]) return null; return record(E.opts[n].ok ? 'ok' : 'wrong', n); },
+    unknown() { if (E.phase !== 'quiz' || E.answered) return null; return record('unknown', -1); },
+    // 답한 뒤 다음 카드로
+    next() { if (E.phase !== 'quiz' || !E.answered) return; E.i++; if (E.i >= E.queue.length) { E.round++; afterQuiz(); } prepare(); },
+    // 외우기 화면 다음
+    studied() { if (E.phase !== 'study') return; E.i++; if (E.i >= E.queue.length) { E.phase = 'quiz'; E.queue = shuffle(E.queue, rand); E.i = 0; } prepare(); },
+    reveal() { if (E.phase === 'write') E.shown = true; },
+    // 써서 확인: 본인 판정
+    judge(ok) { if (E.phase !== 'write' || !E.shown) return;
+      const c = E.queue[E.i]; if (ok) E.wrote.add(c.id); else E.writeFail.push(c);
+      E.i++; E.shown = false;
+      if (E.i >= E.queue.length) { if (E.writeFail.length) { E.phase = 'study'; E.queue = E.writeFail; E.writeFail = []; E.i = 0; } else E.phase = 'done'; }
+      prepare(); },
+    summary() { const f = Object.values(E.first); return { total: cards.length, ok: f.filter((x) => x === 'ok').length, wrong: f.filter((x) => x === 'wrong').length, unknown: f.filter((x) => x === 'unknown').length, missed: E.ever.size }; },
+    state() { return E; },
+  };
+  function record(result, n) {
+    const c = E.queue[E.i];
+    if (!(c.id in E.first)) E.first[c.id] = result;
+    if (result !== 'ok') { E.miss.push(c); E.ever.add(c.id); }
+    const right = E.opts.findIndex((o) => o.ok);
+    E.answered = { pick: n, result, right };
+    return E.answered;
+  }
+  return E2;
+}
+
 let GATE=null;
 function gateNeeded(){ return !!(D.gate&&D.gate.state==="gate"); }
 function gateGo(fn){ if(!gateNeeded()) return fn(); openGate(fn); }
-function openGate(fn){ const el=$("#gate"); if(!el) return fn(); const all=(D.gate&&D.gate.cards)||[];
-  GATE={fn:fn, todo:all.slice(), wrong:[], i:0, shown:false, n:all.length, round:1, err:!all.length};
-  el.classList.add("on"); gateView(); }
+function openGate(fn){ const el=$("#gate"); if(!el) return fn(); if(GATE) return; const all=(D.gate&&D.gate.cards)||[]; let eng=null;
+  try{ if(all.length&&all.every(c=>optionsOf(c,"x",1))) eng=createEngine(all,{seed:String(Date.now())}); }catch(e){ eng=null; }
+  GATE={fn:fn, eng:eng, n:all.length, err:!eng};
+  el.classList.add("on"); gateView(); const bx=el.querySelector(".gbx"); if(bx){ bx.tabIndex=-1; bx.focus({preventScroll:true}); } }
 function gateBtn(row,label,f,cls){ const b=document.createElement("button"); b.type="button"; b.className="cbt "+cls; b.textContent=label; b.style.width="auto"; b.onclick=f; row.appendChild(b); return b; }
-function gateView(){ const G=GATE, body=$("#gBody"), row=$("#gRow"), prog=$("#gProg"); if(!G||!body) return;
+function gateBox(label,text){ return '<div class="ga"><i>'+label+'</i>'+esc(text)+'</div>'; }
+function gateWhy(c){ const w=c.why; if(!w) return ""; return (w.hw&&!/^확인 중/.test(w.hw)?gateBox("과제",w.hw):"")+(w.flow?gateBox("왜",w.flow):""); }
+function gateView(){ const G=GATE, body=$("#gBody"), row=$("#gRow"), prog=$("#gProg"), ttl=$("#gTitle"); if(!G||!body) return;
   row.innerHTML=""; prog.textContent="";
   if(G.err){ body.innerHTML='<p class="gp">이 날짜의 암기카드를 불러오지 못해 수업을 열 수 없어요. 아톰에게 알려 주세요.</p>'; gateBtn(row,"닫기",gateClose,"g"); return; }
-  if(G.i>=G.todo.length){
-    if(G.wrong.length){ G.todo=G.wrong; G.wrong=[]; G.i=0; G.shown=false; G.round++; body.innerHTML='<p class="gp">틀린 카드 '+G.todo.length+'개만 다시 봅니다.</p>'; gateBtn(row,"다시 보기",gateView,"p"); gateBtn(row,"닫기",gateClose,"g"); return; }
-    return gatePass(); }
-  const c=G.todo[G.i]; prog.textContent=(G.i+1)+" / "+G.todo.length+(G.round>1?" · "+G.round+"차":"");
-  body.innerHTML='<div class="gq">'+esc(c.q)+'</div>'+(G.shown?'<div class="ga"><i>정답</i>'+esc(c.a)+'</div><p class="gp">답을 적은 것과 비교해서 판정하세요. 핵심 식·방향·조건을 모두 썼으면 맞음.</p>':'<p class="gp">답을 종이나 화면에 먼저 적고, 정답을 보세요.</p>');
-  if(!G.shown){ gateBtn(row,"정답 보기",()=>{ G.shown=true; gateView(); },"p"); }
-  else { gateBtn(row,"틀렸어요",()=>gateJudge(false),"r"); gateBtn(row,"맞았어요",()=>gateJudge(true),"g"); gateBtn(row,"왜 외우나?",()=>{ G.why=!G.why; gateView(); },"g"); }
-  if(G.shown&&G.why&&c.why){ body.insertAdjacentHTML('beforeend','<div class="ga"><i>과제</i>'+esc(c.why.hw)+'</div><div class="ga"><i>흐름</i>'+esc(c.why.flow)+'</div>'); }
+  const E=G.eng, v=E.view();
+  ttl.textContent=v.kind==="study"?"외우기":v.kind==="write"?"써서 확인":"암기카드 확인";
+  if(v.kind==="done"){ const s=v.summary;
+    body.innerHTML='<div class="gq">암기카드 끝</div><p class="gsum">'+(s.missed?'모르던 카드 '+s.missed+'개 · 다시 맞힘':'카드 '+s.total+'장을 처음부터 다 맞혔어요')+'</p>'+(s.missed?'<p class="gp">처음 결과: 맞음 '+s.ok+' · 틀림 '+s.wrong+' · 몰라요 '+s.unknown+'</p>':'');
+    gateBtn(row,"수업 열기",gatePass,"p"); return; }
+  if(v.kind==="quiz"){ prog.textContent=v.pos+" / "+v.total+(v.round>1?" · "+v.round+"차":""); const a=v.answered;
+    body.innerHTML='<div class="gq">'+esc(v.q)+'</div>';
+    const list=document.createElement("div"); list.className="gopts";
+    v.options.forEach((t,n)=>{ const b=document.createElement("button"); b.type="button"; b.className="gopt"; b.textContent=t;
+      if(a){ b.setAttribute("aria-disabled","true"); if(n===a.right){ b.classList.add("ok"); b.insertAdjacentHTML("beforeend",'<span class="gtag">정답</span>'); } else if(n===a.pick){ b.classList.add("bad"); b.insertAdjacentHTML("beforeend",'<span class="gtag">내 선택</span>'); } else b.classList.add("dim"); }
+      else b.onclick=()=>{ E.pick(n); gateView(); };
+      list.appendChild(b); });
+    body.appendChild(list);
+    if(!a){ body.insertAdjacentHTML("beforeend",'<p class="gp">모르면 찍지 말고 몰라요. 틀린 것과 똑같이 복습만 하면 돼요.</p>');
+      const u=document.createElement("button"); u.type="button"; u.className="gunk"; u.textContent="몰라요"; u.onclick=()=>{ E.unknown(); gateView(); }; body.appendChild(u); }
+    else { body.insertAdjacentHTML("beforeend",'<div class="gres '+(a.result==="ok"?"ok":a.result==="wrong"?"bad":"unk")+'">'+(a.result==="ok"?"맞았어요":a.result==="wrong"?"틀렸어요":"몰라요")+'</div>'+(a.result!=="ok"?gateBox("정답",v.card.mc.right):"")+gateWhy(v.card));
+      gateBtn(row,"다음",()=>{ E.next(); gateView(); },"p"); }
+  } else if(v.kind==="study"){ prog.textContent=v.pos+" / "+v.total;
+    body.innerHTML='<div class="gq">'+esc(v.card.q)+'</div>'+gateBox("정답",v.card.a)+gateWhy(v.card)+(v.card.tip?gateBox("요령",v.card.tip):"");
+    gateBtn(row,v.last?"다시 풀기":"다음 카드",()=>{ E.studied(); gateView(); },"p");
+  } else if(v.kind==="write"){ prog.textContent=v.pos+" / "+v.total;
+    body.innerHTML='<div class="gq">'+esc(v.card.q)+'</div>';
+    if(!v.shown){ body.insertAdjacentHTML("beforeend",'<p class="gp">보기 없이 종이나 화면에 답을 먼저 적은 뒤 정답을 보세요.</p>'); gateBtn(row,"적었어요 · 정답 보기",()=>{ E.reveal(); gateView(); },"p"); }
+    else { body.insertAdjacentHTML("beforeend",gateBox("정답",v.card.a)+'<p class="gp">적은 답과 비교해서 판정하세요. 핵심 식·방향·조건을 모두 썼으면 맞음.</p>');
+      gateBtn(row,"틀렸어요",()=>{ E.judge(false); gateView(); },"r"); gateBtn(row,"맞았어요",()=>{ E.judge(true); gateView(); },"g"); } }
   gateBtn(row,"닫기",gateClose,"g"); }
-function gateJudge(ok){ const G=GATE; if(!G) return; const c=G.todo[G.i]; if(!ok) G.wrong.push(c); G.i++; G.shown=false; G.why=false; gateView(); }
-function gatePass(){ const G=GATE, fn=G.fn; GATE=null; $("#gate").classList.remove("on");
-  try{ L.gateLog=(Array.isArray(L.gateLog)?L.gateLog:[]).concat([{t:Date.now(),n:G.n,r:G.round}]).slice(-60); save(); }catch(e){}   /* 통과 이력만 — 면제 조건으로 쓰지 않는다 */
+function gatePass(){ const G=GATE, fn=G.fn, rd=G.eng.state().round; GATE=null; $("#gate").classList.remove("on");
+  try{ L.gateLog=(Array.isArray(L.gateLog)?L.gateLog:[]).concat([{t:Date.now(),n:G.n,r:Math.max(1,rd-1)}]).slice(-60); save(); }catch(e){}   /* 통과 이력만 — 면제 조건으로 쓰지 않는다 */
   fn(); }
 function gateClose(){ GATE=null; $("#gate").classList.remove("on"); }   /* 닫기·Esc: 목적지 폐기, S·L.pos 는 그대로 */
+function gateTab(e){ const bs=[...$$("#gate button")]; if(!bs.length) return; const a=document.activeElement, i=bs.indexOf(a);   /* 포커스를 팝업 안에 가둔다 */
+  if(i<0){ e.preventDefault(); bs[e.shiftKey?bs.length-1:0].focus(); } else if(e.shiftKey&&i===0){ e.preventDefault(); bs[bs.length-1].focus(); } else if(!e.shiftKey&&i===bs.length-1){ e.preventDefault(); bs[0].focus(); } }
 /* ---------- 키보드 ---------- */
 /* 질문: 앱(atom) 스앵님 대화로 보내고, 답을 자막으로 흘려 보여 준다. 앱 밖에서 열면 안내 대사 */
 let ASKING=false;
@@ -1026,7 +1137,7 @@ function prevStep(){ if(GATE||!canPrev()) return; if(anim||typing){ finishNow();
 { const _ch0=choices; choices=function(list){ _ch0(list); if((S.mode==="step"||S.mode==="quiz")&&canPrev()){ const box=$("#dCh"); const b=document.createElement("button"); b.type="button"; b.className="cbt g prev"; b.textContent="이전"; b.onclick=prevStep; box.insertBefore(b,box.firstChild); } }; }
 { let sx=null, sy=null; const bw=$("#bwrap"); if(bw){ bw.addEventListener("touchstart",e=>{ const t=e.touches[0]; sx=t.clientX; sy=t.clientY; },{passive:true});
   bw.addEventListener("touchend",e=>{ if(sx==null) return; const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; sx=null; if(dx>80&&Math.abs(dy)<50&&$("#figov").hidden) prevStep(); },{passive:true}); } }
-document.addEventListener("keydown",e=>{ if(GATE){ if(e.key==="Escape"){ e.preventDefault(); gateClose(); } else if(e.key==="Enter"||e.key===" "||(e.key!=="Tab"&&!(e.target&&e.target.closest&&e.target.closest("#gate")))) e.preventDefault(); return; }   /* 게이트 중 Enter·Space 는 버튼을 눌러도 통과시키지 않는다(마우스·터치로만 판정) */
+document.addEventListener("keydown",e=>{ if(GATE){ if(e.key==="Escape"){ e.preventDefault(); gateClose(); } else if(e.key==="Tab"){ gateTab(e); } else if(e.key==="Enter"||e.key===" "||(e.key!=="Tab"&&!(e.target&&e.target.closest&&e.target.closest("#gate")))) e.preventDefault(); return; }   /* 게이트 중 Enter·Space 는 버튼을 눌러도 통과시키지 않는다(마우스·터치로만 판정) */
   if(e.target&&/TEXTAREA|INPUT/.test(e.target.tagName)) return; if(e.key==="ArrowLeft"&&$("#figov").hidden&&!$("#ov").classList.contains("on")){ e.preventDefault(); prevStep(); return; } if($("#ov").classList.contains("on")){ if(e.key==="Escape") $("#ov").classList.remove("on"); return; }
   if(!$("#figov").hidden){ if(e.key==="Escape"){ e.preventDefault(); closeFig(); } else if(e.key==="Tab"){ e.preventDefault(); $("#figovX").focus(); } else if(e.key==="Enter"||e.key===" "){ e.preventDefault(); } return; }   /* 그림 확대창이 열려 있으면 뒤 교실 단축키(Enter·Space·숫자) 차단, 닫기는 Esc·닫기 버튼 — 오타 디자인 2차 */
   if(e.key==="Enter"||e.key===" "){ e.preventDefault(); if(e.repeat) return; enter(); }

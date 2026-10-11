@@ -13,6 +13,7 @@ from xml.sax.saxutils import escape
 from lxml import html as LH
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from quizmix import Mixer, renum
+import check_cards
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -169,6 +170,17 @@ def apply_plan(chapters, plan, slug, date):
         out.insert(pos, ch)
     return out
 
+def card_engine_inline():
+    """학교 화면 게이트(school/card-engine.js)와 같은 엔진 소스를 교실 페이지에 끼워 넣는다 — 규칙이 한 벌. 줄머리 `export function|const` 만 떼고, 그 밖의 export·import 가 있으면 빌드를 멈춘다."""
+    src = io.open(os.path.join(ROOT, "school", "card-engine.js"), encoding="utf-8").read().replace("\r\n", "\n")
+    for n, ln in enumerate(src.split("\n"), 1):
+        t = ln.strip()
+        if t.startswith("//"): continue
+        if re.match(r"import\b", t) or (re.search(r"\bexport\b", ln) and not re.match(r"export (function|const) ", ln)):
+            raise SystemExit(f"card-engine.js {n}행: 교실에 인라인할 수 없는 문법 (줄머리 `export function|const` 만 허용, import 금지): {ln.strip()[:60]}")
+    if "</script" in src.lower(): raise SystemExit("card-engine.js 에 </script 가 있다")
+    return re.sub(r"^export ", "", src, flags=re.M)
+
 def gate_for(slug, date):
     """암기카드 게이트 (정역학 · 최종본.md §20 · 오타 GREEN 2026-10-10). 날짜마다 gate / free / 빌드 중단(연결 오류).
     gate = 공통 + 해당 강 카드를 ID 병합. 병합 전에 중복·카드 수를 검사한다. 연결 없는 정역학 날짜는 빌드를 멈춘다(무게이트로 조용히 열지 않는다)."""
@@ -180,7 +192,9 @@ def gate_for(slug, date):
     if is_free: return {"state": "free", "note": g["free"][date]}
     k = hit[0]; lec = g["lectures"][k]["cards"]
     if len(g["common"]) != g["expect"]["common"] or len(lec) != g["expect"][k]: raise SystemExit(f"정역학 {date}: 카드 수 불일치 (공통 {len(g['common'])}/{g['expect']['common']}, {k}강 {len(lec)}/{g['expect'][k]})")
-    cards = [{"id": c["id"], "q": c["q"], "a": c["a"], "why": c.get("why")} for c in g["common"] + lec]
+    err, _warn = check_cards.check(g)   # 객관식 보기 검사(정답 1·오답 3·중복 없음·tip) — 위반이면 빌드 중단
+    if err: raise SystemExit("정역학 암기카드 검사 실패:\n  " + "\n  ".join(err))
+    cards = [{"id": c["id"], "q": c["q"], "a": c["a"], "why": c.get("why"), "mc": c["mc"], "tip": c["tip"]} for c in g["common"] + lec]
     ids = [c["id"] for c in cards]
     if len(set(ids)) != len(ids): raise SystemExit(f"정역학 {date}: 카드 ID 중복")
     return {"state": "gate", "lecture": k, "cards": cards}
@@ -278,7 +292,7 @@ def build(src, slug, date, minutes=18):
     js = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
     tpl = io.open(os.path.join(HERE, "classroom_tpl.html"), encoding="utf-8").read()
     judge = io.open(os.path.join(HERE, "tutor_judge.js"), encoding="utf-8").read().replace("</", "<\\/")
-    tpl = tpl.replace("__JUDGE__", judge)
+    tpl = tpl.replace("__JUDGE__", judge).replace("/*__CARDENGINE__*/", card_engine_inline())
     # 김주영 스앵님 캐릭터: 원본 docs/tools/tutor.svg 하나 → 교실 페이지에 인라인 + notes/classroom/assets/tutor.svg (앱이 fetch)
     # 폴더 이름에 _ 를 쓰면 GitHub Pages(Jekyll)가 올리지 않는다(2026-09-27 _assets 404) — assets 로.
     tutor = io.open(os.path.join(HERE, "tutor.svg"), encoding="utf-8").read()
