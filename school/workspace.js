@@ -54,7 +54,7 @@ export function recommendPlans(data, calendar, now=new Date(), budget, preferred
   const candidates=[...new Map([...(data.examMode?priorities:[...priorities,...others])].map(c=>[c.id,c])).values()].filter(c=>!preferredId||c.id===preferredId);
   const result=[];
   for(const c of candidates){
-    if(data.plans.some(p=>p.date===today&&p.courseId===c.id&&p.kind==='시험 대비'))continue;
+    if(data.plans.some(p=>!p.activity&&p.date===today&&p.courseId===c.id&&p.kind==='시험 대비'))continue;
     const exam=data.exams.find(e=>e.courseId===c.id&&e.written);
     const unresolved=data.sessions.filter(s=>s.courseId===c.id&&!s.reviewed&&s.progress&&s.date<=today).sort((a,b)=>a.date.localeCompare(b.date))[0];
     const range=exam?.scope||unresolved?.progress||'확보된 수업 자료';

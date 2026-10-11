@@ -87,6 +87,7 @@ export function layoutColumns(blocks) {
 // 같은 수업이 학교 시간표(class)·구글 캘린더(cal)·얼라이브위크 기본 시간표(work)에 한꺼번에 있는 경우가 많다 — 예전엔 같은 자리에 겹쳐 그려 맨 위 하나만 보였다.
 // 열로 나누면 한 수업이 3칸이 되므로, 출처가 서로 다른(class·cal·work 중 다른 종류) 블록이 시작·끝이 같고 이름도 정확히 같으면(「수업」 꼬리·공백만 무시) 한 칸으로 합친다: 수업 > 캘린더 > 기본 시간표.
 // 합쳐진 원본은 남은 블록의 also 에 담아 두고 창에서 눌러 열 수 있게 한다(정보를 숨기지 않음). 같은 출처끼리·이름이 조금이라도 다른 것은 합치지 않는다.
+const canon = (o) => JSON.stringify(Object.keys(o || {}).sort().map((k) => [k, o[k]]));
 const normTitle = (t) => String(t || '').replace(/\s*수업\s*$/, '').replace(/\s+/g, '').toLowerCase();
 export function dedupeBlocks(list) {
   const rank = { class: 0, cal: 1, work: 2 }, kept = [];
@@ -563,7 +564,11 @@ export function createPlan(app) {
     exam: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
   };
   const VIEW_NAME = { day: '하루', week: '한 주', exam: '시험까지' };
-  let planMode = false;   // 계획 모드(한 주·시험까지): 빈 칸을 누르면 그 시각에 공부 계획 넣기
+  let planMode = false;   // 계획 모드(대표님 10/12): 켜면 새로 넣는 일정이 「계획」(미확정), 끄면 「확정 일정」. 하루·한 주·시험까지 모두에서 켜고 끄며 보기를 바꿔도 유지. 한 주·시험까지에서는 켠 채로 빈 칸을 눌러 넣는다
+  let modeBtn = null;   // 툴바의 계획 모드 버튼 — 일정 창의 스위치가 모드를 바꾸면 같이 맞춘다
+  const syncModeBtn = () => { if (modeBtn?.isConnected) modeBtn.setAttribute('aria-pressed', String(planMode)); for (const n of host?.querySelectorAll('.pl-modenote') || []) n.textContent = noteText(n); };
+  const noteText = (n) => modeText() + (n.dataset.week ? (planMode ? ' 빈 칸을 누르면 그 시각에 넣어요. ' : ' 빈 칸 누르기는 계획 모드에서만 돼요. 확정 일정은 + 버튼으로 넣어요. ') + n.dataset.tail : '');
+  const modeText = () => planMode ? '계획 모드 켜짐 — 새로 넣는 일정은 계획(미확정)이에요.' : '계획 모드 꺼짐 — 새로 넣는 일정은 확정 일정이에요.';
   const examEnd = () => { const ds = (ctx.exams || []).map((e) => e.date).filter(Boolean).sort(); return ds.length ? ds[ds.length - 1] : addDays(ctx.today, 13); };
   // 위치 기록(오늘 하루 보기 오른쪽 줄): v60.place[날짜] = [{t:'HH:MM', p:'학교'}] — 기록한 때부터 다음 기록까지 그곳
   const PLACES = ['집', '학교', '도서관', '카페', '이동 중'];
@@ -698,34 +703,52 @@ export function createPlan(app) {
     const r = anchor.getBoundingClientRect(); placePop(pop, (ev?.clientX || r.left) - 240, (ev?.clientY || r.bottom) + 16);
     erase.focus();
   }
+  // 일정 넣기·고치기 창. 새로 넣을 때는 「계획 | 확정」 스위치 하나(대표님 10/12 「플랜모드 켜고 일정 추가하면 계획블럭으로, 끄고 추가하면 확정일정으로」):
+  // 스위치 처음 값 = 계획 모드(켜짐 → 계획, 꺼짐 → 확정 — 추천에서 넣을 때도 같다), 스위치를 바꾸면 계획 모드도 같이 바뀐다. 계획은 점선 블록(미확정), 확정은 종류(고정·공부·과제)를 골라 그 모양으로.
+  // 이미 있는 계획(미확정)은 [확정] 버튼으로 확정 일정이 된다 — 확정하면 채우기·다시 짜기가 건드리지 않는다.
   function planPopup(card, date, startMin, anchor, at, pickDate, existing, preset) {
     const tentativeNow = existing && planState(existing) === 'tentative';
-    const { pop, close } = mkPop('form', '', existing ? '계획 고치기' : `${date} 계획 넣기`, anchor);
-    const title = existing ? (tentativeNow ? '계획 고치기·확정' : '일정 고치기') : preset ? '추천을 계획으로 넣기' : pickDate ? '일정 추가 — 공부 계획' : `${date.slice(5).replace('-', '/')}(${wd(date)}) 계획 넣기`;
-    pop.append(el('b', title));
-    if (existing) {   // 지금 어떤 종류인지 한눈에: 글자표식 + 이름 + 뜻
-      const cat = blockCat({ k: 'plan', plan: existing }), line = el('div', undefined, 'pl-tagline');
-      line.append(el('span', cat, 'pl-tag'), el('small', `${CAT_NAME[cat]} — ${CAT_MEANS[cat]}`, 'pl-popnote')); pop.append(line);
-    }
+    const { pop, close } = mkPop('form', '', existing ? '일정 고치기' : `${date} 일정 넣기`, anchor);
+    let isTent = existing ? !!tentativeNow : planMode;   // 이 창에서 넣는 방식(새 일정만 바꿀 수 있음). 추천에서 넣을 때도 모드를 따른다(꺼짐 = 확정, 켜짐 = 계획)
+    let bk = existing ? planBk(existing) : '공부';
+    const titleEl = el('b'); pop.append(titleEl);
+    const snap = existing ? canon(existing) : '';   // 열 때의 모습(고치는 사이 다른 곳에서 바뀌었는지 확인용)
+    const catLine = el('div', undefined, 'pl-tagline'), catTag = el('span', '', 'pl-tag'), catTxt = el('small', '', 'pl-popnote'); catLine.append(catTag, catTxt);
+    if (existing) pop.append(catLine);
     const dIn = el('input'); dIn.type = 'date'; dIn.value = date; if (!existing) dIn.min = ctx.today; dIn.setAttribute('aria-label', '날짜'); if (pickDate) pop.append(dIn);
+    // 넣는 방식 스위치(새 일정만)
+    const swRow = el('div', undefined, 'pl-prow'), swPick = el('div', undefined, 'pl-pick'), swBtns = [];
+    swPick.setAttribute('role', 'group'); swPick.setAttribute('aria-label', '넣는 방식');
+    for (const k of ['계획', '확정']) { const b = el('button', k); b.type = 'button'; b.dataset.mode = k; b.onclick = () => { isTent = k === '계획'; planMode = isTent; syncModeBtn(); paint(); }; swBtns.push(b); swPick.append(b); }
+    swRow.append(el('span', '방식'), swPick); if (!existing) pop.append(swRow);
     const sel = el('select'); sel.setAttribute('aria-label', '과목'); for (const c of ctx.courses || []) sel.append(Object.assign(el('option', c), { value: c }));
-    const note = el('input'); note.placeholder = '할 일(예: 12.3 연습문제)'; note.maxLength = 80; note.required = true; note.setAttribute('aria-label', '할 일');
+    const note = el('input'); note.maxLength = 80; note.setAttribute('aria-label', '할 일');
     const st = el('input'); st.type = 'time'; st.step = 600; st.value = hm(startMin); st.setAttribute('aria-label', '시작');
     const len = el('select'); len.setAttribute('aria-label', '길이'); const lens = [30, 45, 60, 90, 120]; const curLen = existing ? mins(existing.e) - mins(existing.s) : 60; if (!lens.includes(curLen) && curLen > 0) lens.push(curLen); for (const m of lens.sort((a, b) => a - b)) len.append(Object.assign(el('option', dur(m)), { value: m })); len.value = String(curLen);
     if (preset) { if (preset.course && [...sel.options].some((o) => o.value === preset.course)) sel.value = preset.course; note.value = preset.note || ''; if (preset.len > 0) { if (![...len.options].some((o) => +o.value === preset.len)) len.append(Object.assign(el('option', dur(preset.len)), { value: preset.len })); len.value = String(preset.len); } }
-    if (existing) { const cn = ctx.courseName?.(existing.courseId); if (cn && ![...sel.options].some((o) => o.value === cn)) sel.append(Object.assign(el('option', cn), { value: cn })); if (cn) sel.value = cn; note.value = existing.note || ''; note.required = false; st.value = existing.s; }
+    if (existing) { const cn = ctx.courseName?.(existing.courseId); if (cn && ![...sel.options].some((o) => o.value === cn)) sel.append(Object.assign(el('option', cn), { value: cn })); if (cn) sel.value = cn; note.value = existing.note || ''; st.value = existing.s; }
     // 종류(고정·공부·과제): 확정할 때와 고칠 때 고른다. 고정 일정은 과목이 없어도 된다(약속 등)
-    let bk = existing ? planBk(existing) : '공부';
     const none = Object.assign(el('option', '(과목 없음)'), { value: '' });
-    const bkRow = el('div', undefined, 'pl-prow'), bkBtns = [];
-    const bkPick = el('div', undefined, 'pl-pick'); bkPick.setAttribute('role', 'group'); bkPick.setAttribute('aria-label', '일정 종류');
-    const paintBk = () => { for (const b of bkBtns) b.setAttribute('aria-pressed', String(b.dataset.bk === bk)); if (bk === '고정') { if (!none.isConnected) sel.prepend(none); if (existing && !existing.courseId) sel.value = ''; } else { if (none.isConnected) { const was = sel.value; none.remove(); if (!was) sel.selectedIndex = 0; } } note.placeholder = bk === '고정' ? '이름(예: 병원 예약)' : '할 일(예: 12.3 연습문제)'; note.required = !existing || bk === '고정'; };
-    for (const k of ['고정', '공부', '과제']) { const b = el('button', k); b.type = 'button'; b.dataset.bk = k; b.onclick = () => { bk = k; paintBk(); }; bkBtns.push(b); bkPick.append(b); }
-    if (existing) { bkRow.append(el('span', tentativeNow ? '확정할 종류' : '종류'), bkPick); pop.append(bkRow); }
-    paintBk();
+    const bkRow = el('div', undefined, 'pl-prow'), bkBtns = [], bkPick = el('div', undefined, 'pl-pick'), bkLabel = el('span');
+    bkPick.setAttribute('role', 'group'); bkPick.setAttribute('aria-label', '일정 종류');
+    for (const k of ['고정', '공부', '과제']) { const b = el('button', k); b.type = 'button'; b.dataset.bk = k; b.onclick = () => { bk = k; paint(); }; bkBtns.push(b); bkPick.append(b); }
+    bkRow.append(bkLabel, bkPick); pop.append(bkRow);
+    const hint = el('small', '', 'pl-popnote'); hint.setAttribute('role', 'status'); hint.setAttribute('aria-live', 'polite');   // 스위치를 바꾸면 안내가 바뀐다 — 화면낭독도 읽게
+    const paint = () => {
+      const showBk = existing ? true : !isTent, fixed = showBk && bk === '고정';
+      for (const b of swBtns) b.setAttribute('aria-pressed', String((b.dataset.mode === '계획') === isTent));
+      for (const b of bkBtns) b.setAttribute('aria-pressed', String(b.dataset.bk === bk));
+      bkRow.hidden = !showBk; bkLabel.textContent = isTent ? '확정할 종류' : '종류';
+      if (fixed) { if (!none.isConnected) sel.prepend(none); if (existing && !existing.courseId) sel.value = ''; } else if (none.isConnected) { const was = sel.value; none.remove(); if (!was) sel.selectedIndex = 0; }
+      note.placeholder = fixed ? '이름(예: 병원 예약)' : '할 일(예: 12.3 연습문제)'; note.required = !existing || fixed;
+      const cat = isTent ? '계획' : bk;
+      titleEl.textContent = existing ? (isTent ? '계획 고치기·확정' : '일정 고치기') : preset ? `추천을 ${isTent ? '계획' : '확정 ' + bk}으로 넣기` : pickDate ? `일정 추가 — ${isTent ? '계획' : '확정 ' + bk}` : `${date.slice(5).replace('-', '/')}(${wd(date)}) ${isTent ? '계획' : '확정 ' + bk} 넣기`;
+      catTag.textContent = cat; catTag.className = 'pl-tag'; catTxt.textContent = `${CAT_NAME[cat]} — ${CAT_MEANS[cat]}`;
+      hint.textContent = isTent ? '계획이에요 — 점선으로 보이고 눌러서 확정할 수 있어요. 채우기·다시 짜기는 이 자리를 피해서 짜요. 지우려면 삭제.' : `확정 ${bk} 일정이에요 — 채우기·다시 짜기가 건드리지 않아요.`;
+      if (ok) ok.textContent = existing ? '저장' : isTent ? '계획으로 넣기' : '확정으로 넣기';
+    };
     const ok = el('button', existing ? '저장' : '넣기'); ok.type = 'submit'; const no = el('button', '닫기', 'ghost'); no.type = 'button'; no.onclick = close;
-    pop.append(sel, note, st, len);
-    if (tentativeNow) pop.append(el('small', '아직 확정하지 않은 계획이에요. 채우기·다시 짜기는 이 자리를 피해서 짜요. 지우려면 아래 삭제.', 'pl-popnote'));
+    pop.append(sel, note, st, len, hint);
     const act = el('div', undefined, 'pl-act');
     let confirmBtn = null;
     if (tentativeNow) { confirmBtn = el('button'); confirmBtn.type = 'button'; confirmBtn.innerHTML = svg(ICON.check); confirmBtn.append(el('span', '확정')); act.append(confirmBtn); ok.classList.add('ghost'); }
@@ -736,16 +759,20 @@ export function createPlan(app) {
     if (preset?.key) { const hide = el('button', '이 추천 숨기기(오늘)', 'ghost'); hide.type = 'button'; hide.onclick = async () => { hide.disabled = true; const r = await hideRec(preset.date || date, preset.key, preset.label || ''); if (r === false) hide.disabled = false; else close(); }; pop.append(hide); }
     pop.append(no);
     if (pickDate) pop.append(el('small', existing ? '구글 캘린더 일정은 캘린더에서 고쳐 주세요.' : '구글 캘린더 일정(약속 등)은 캘린더에서 넣으면 여기 시간표에 같이 보여요.', 'pl-popnote'));
+    paint();
     const send = async (confirming) => {
       const s = mins(st.value), end = s + Number(len.value); if (end > LAST) { app.status?.('자정을 넘겨요. 시작을 앞당겨 주세요.', true); return; }
-      const fixed = bk === '고정'; if (fixed && !note.value.trim()) { app.status?.('고정 일정은 이름을 적어 주세요.', true); note.focus(); return; }
+      const fixed = (existing ? (!isTent || confirming) : !isTent) && bk === '고정'; if (fixed && !note.value.trim()) { app.status?.('고정 일정은 이름을 적어 주세요.', true); note.focus(); return; }
       ok.disabled = true; if (confirmBtn) confirmBtn.disabled = true; keepDay();
-      const item = { date: pickDate ? dIn.value || date : date, s: hm(s), e: hm(end), courseId: ctx.courseId?.(sel.value) || '', note: note.value.trim(), kind: existing?.kind || '시험 대비' };
+      const item = { date: pickDate ? dIn.value || date : date, s: hm(s), e: hm(end), courseId: ctx.courseId?.(sel.value) || '', note: note.value.trim(), kind: existing?.kind || (fixed ? '고정 일정' : '시험 대비') };   // 고정 일정은 공부 계획 종류(시험 대비)로 세지 않게 따로 이름 붙임
       let done;
       if (existing) {
+        // 창을 연 뒤 다른 곳에서 이 일정이 바뀌었으면(최신 목록과 열 때 모습이 다르면) 덮어쓰지 않고 멈춘다
+        const cur = (ctx.plans || []).find((q) => q.id === existing.id);
+        if (!cur || canon(cur) !== snap) { app.status?.(cur ? '그 사이 다른 화면에서 이 일정이 바뀌었어요. 창을 닫고 다시 열어 주세요.' : '이 일정이 이미 없어졌어요.', true); ok.disabled = false; if (confirmBtn) confirmBtn.disabled = false; return; }
         const meta = {}; if (planState(existing) === 'confirmed') { meta.bk = bk; if (existing.state) meta.state = 'confirmed'; } else if (confirming) { meta.state = 'confirmed'; meta.bk = bk; }
-        done = await ctx.updatePlan?.({ ...existing, ...item, ...meta, id: existing.id });
-      } else done = await ctx.addPlan?.({ ...item, src: 'manual', ...(preset ? { state: 'tentative' } : { state: 'confirmed', bk }) });
+        try { done = await ctx.updatePlan?.({ ...existing, ...item, ...meta, id: existing.id }); } catch { done = false; }   // 통신 오류도 실패로: 창과 입력은 그대로, 버튼은 다시 활성
+      } else { try { done = await ctx.addPlan?.({ ...item, src: 'manual', ...(isTent ? { state: 'tentative' } : { state: 'confirmed', bk }) }); } catch { done = false; } }
       if (done === false) { ok.disabled = false; if (confirmBtn) confirmBtn.disabled = false; } else close();
     };
     pop.onsubmit = (e) => { e.preventDefault(); send(false); };
@@ -903,7 +930,7 @@ export function createPlan(app) {
     const seg = el('div', undefined, 'pl-seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', '보기');
     for (const v of ['day', 'week', 'exam']) {
       const b = el('button', undefined, 'pl-ib'); b.type = 'button'; b.innerHTML = svg(ICON_VIEW[v]); b.setAttribute('aria-label', VIEW_NAME[v]); b.title = VIEW_NAME[v]; b.setAttribute('aria-pressed', String(view === v));
-      b.onclick = () => { view = v; if (v === 'day') planMode = false; try { localStorage.setItem('school-plan-view', v); } catch {} draw(); }; seg.append(b);
+      b.onclick = () => { view = v; try { localStorage.setItem('school-plan-view', v); } catch {} draw(); }; seg.append(b);
     }
     const replan = ib('replan', '다시 짜기 — 과제를 빈 시간에 다시 배치', 'go');
     prev.onclick = () => { day = addDays(day, isWeek ? -7 : -1); draw(); }; next.onclick = () => { day = addDays(day, isWeek ? 7 : 1); draw(); };
@@ -912,10 +939,10 @@ export function createPlan(app) {
     const plus = ib('plus', '일정 추가', 'go'); plus.onclick = (e) => { const d = isWeek || isExam ? (day >= ctx.today ? day : ctx.today) : day; const m = d === ctx.today ? Math.ceil((nowMin() + 10) / 30) * 30 : 9 * 60; planPopup(card, d, Math.min(m, 23 * 60), plus, { x: e.clientX - 260, y: e.clientY + 24 }, true); };
     const fill = el('button', '채우기', 'pl-mode pl-fill'); fill.type = 'button'; fill.title = '고정 일정은 그대로, 빈 시간에만 공부 계획 자동 계산해 넣기';
     fill.onclick = () => { const ds = []; if (isExam) { for (let d = ctx.today; d <= end; d = addDays(d, 1)) ds.push(d); } else if (isWeek) { for (let i = 0; i < 7; i++) ds.push(addDays(ws, i)); } else ds.push(day); runFill(ds, all); };
-    const pm = el('button', '계획 모드', 'pl-mode'); pm.type = 'button'; pm.setAttribute('aria-pressed', String(planMode)); pm.title = '빈 칸을 눌러 그 시각에 공부 계획 넣기';
-    pm.onclick = () => { planMode = !planMode; draw(); };
+    const pm = el('button', '계획 모드', 'pl-mode'); pm.type = 'button'; pm.setAttribute('aria-pressed', String(planMode)); pm.title = '켜면 새로 넣는 일정이 계획(미확정, 점선)이 되고 끄면 확정 일정이 돼요. 한 주·시험까지 보기에서는 켠 채로 빈 칸을 눌러 넣어요.';
+    pm.onclick = () => { planMode = !planMode; modeBtn = pm; draw(); }; modeBtn = pm;
     const more = ib('more', '시간표 메뉴 — 채운 것 지우기·숨긴 추천'); more.setAttribute('aria-haspopup', 'dialog'); more.onclick = (e) => menuPopup(more, ws, e);
-    if (isExam) bar.append(today, seg, pm, fill, plus, replan, more); else bar.append(prev, today, next, seg, ...(isWeek ? [pm] : []), fill, plus, replan, more);
+    bar.append(...(isExam ? [today, seg] : [prev, today, next, seg]), pm, fill, plus, replan, more);
     head.append(bar); card.append(head);
     if (!isWeek && !isExam) card.append(weekStrip());
     card.append(legend());
@@ -939,6 +966,7 @@ export function createPlan(app) {
       if (day === ctx.today) card.append(placeBar(day));
       box.append(grid); card.append(box);
       if (dayBlocks.length) card.append(blockList(dayBlocks));
+      { const mn = el('p', modeText(), 'pl-note pl-modenote'); mn.setAttribute('role', 'status'); mn.setAttribute('aria-live', 'polite'); card.append(mn); }
       box.addEventListener('scroll', () => { if (!programmatic) userScroll = Date.now(); }, { passive: true });
       followBox = now >= 0 ? { box, PX, line: grid.querySelector('.pl-now') } : null;
       requestAnimationFrame(() => { if (now >= 0) scrollToNow(box, PX, true); else setScroll(box, DAY.wake * PX); });
@@ -961,7 +989,7 @@ export function createPlan(app) {
       const h = el('button', undefined, 'pl-wkday' + (isToday ? ' today' : '') + (exams.length ? ' exam' : '')); h.type = 'button';
       h.append(el('b', isExam ? `${Number(date.slice(5, 7))}/${Number(date.slice(8))}` : String(Number(date.slice(8)))), el('small', name + (exams.length ? ' · 시험' : '')));
       h.setAttribute('aria-label', `${date} ${name}요일${exams.length ? ' 시험 ' + exams.map((e) => e.course).join(', ') : ''} 하루 보기`);
-      h.onclick = () => { day = date; view = 'day'; planMode = false; try { localStorage.setItem('school-plan-view', 'day'); } catch {} draw(); };
+      h.onclick = () => { day = date; view = 'day'; try { localStorage.setItem('school-plan-view', 'day'); } catch {} draw(); };
       headRow.append(h);
       const col = el('div', undefined, 'pl-wkcol' + (isToday ? ' today' : '') + (exams.length ? ' exam' : '')); col.style.height = 24 * 60 * PX + 'px'; col.dataset.date = date;
       for (let hh = 1; hh < 24; hh++) { const l = el('div', undefined, 'pl-wkline'); l.style.top = hh * 60 * PX + 'px'; col.append(l); }
@@ -978,7 +1006,7 @@ export function createPlan(app) {
     box.append(headRow, body); card.append(box);
     followBox = null;
     requestAnimationFrame(() => setScroll(box, ((isExam || ws === weekStart(ctx.today)) ? nowM - 120 : DAY.wake) * PX));
-    card.append(el('p', (planMode ? '계획 모드 — 빈 칸을 누르면 그 시각에 공부 계획을 넣어요. ' : '') + (ctx.holidays ? '수업은 학교 시간표(휴일·휴강 빼고)에서 가져와요.' : '수업은 오늘 칸만 학교 시간표에서 가져와요(휴일 정보가 없어 다른 날은 안 그려요).'), 'pl-note'));
+    const wn = el('p', '', 'pl-note pl-modenote'); wn.setAttribute('role', 'status'); wn.setAttribute('aria-live', 'polite'); wn.dataset.week = '1'; wn.dataset.tail = ctx.holidays ? '수업은 학교 시간표(휴일·휴강 빼고)에서 가져와요.' : '수업은 오늘 칸만 학교 시간표에서 가져와요(휴일 정보가 없어 다른 날은 안 그려요).'; wn.textContent = noteText(wn); card.append(wn);
     return { card, fixed: todayFixed };
   }
 

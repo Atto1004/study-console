@@ -96,7 +96,7 @@ failDelete = false; document.querySelector('.pl-pop').remove();
 // 5. 계획(미확정) 창: 확정 버튼 + 종류 + 안내. 확정하면 state/bk 를 보냄
 calls.length = 0;
 click(blk('HW5')); await flush();
-assert.ok(popBtn('확정'), '확정 버튼'); assert.ok(document.querySelector('.pl-pop').textContent.includes('아직 확정하지 않은 계획'));
+assert.ok(popBtn('확정'), '확정 버튼'); assert.ok(document.querySelector('.pl-pop').textContent.includes('눌러서 확정할 수 있어요'));
 click([...document.querySelectorAll('.pl-pop [data-bk]')].find((b) => b.dataset.bk === '과제'));
 click(popBtn('확정')); await flush();
 const upd = calls.find((c) => c[0] === 'update'); assert.ok(upd);
