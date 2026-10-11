@@ -39,6 +39,9 @@ import { inFocus } from "./focus.js";
 import { createLessonTextbook } from "./lesson-textbook.js?v=256";
 import { startClassroomV3 } from "./classroom-v3.js?v=241";
 import { createGrowth } from "./growth.js?v=199";
+/* 정역학 2장 선수 수업(9/7·9/9·9/14)은 시험 범위 밖 — 강 목록과 강 번호에서 뺀다 (대표님 10/11) */
+const STATICS_HIDE = ["2026-09-07", "2026-09-09", "2026-09-14"];
+const hideLesson = (course, l) => course === "정역학" && STATICS_HIDE.includes(l.date);
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
 let catalog,
@@ -602,7 +605,7 @@ $("courses").onclick = () => {
         "학교 화면으로 변환된 수업은 아직 없습니다. 선수 개념이나 기존 관제탑의 원자료부터 확인해주세요.",
       ),
     );
-  for (const l of c.lessons)
+  for (const l of c.lessons.filter((l) => !hideLesson(name, l)))
     row(
       host,
       `${l.date} · ${l.title}`,
@@ -2466,7 +2469,7 @@ tutor = createTutor({api,eventId,record,inPack:()=>!!curPack(),
 // 과목 레일: 수업 중 과목을 바꾸면 그 과목의 약한 회차로 바로(강의실 하나, 교실 v2)
 function lecturePosition(){
   if(!current)return null;
-  const lessons=(catalog?.courses?.find(c=>c.name===current.course)?.lessons||[]).filter(l=>!l.generated&&!String(l.id).startsWith('exam-')).sort((a,b)=>a.date.localeCompare(b.date));
+  const lessons=(catalog?.courses?.find(c=>c.name===current.course)?.lessons||[]).filter(l=>!l.generated&&!String(l.id).startsWith('exam-')&&!hideLesson(current.course,l)).sort((a,b)=>a.date.localeCompare(b.date));
   const ordinal=lessons.findIndex(l=>l.id===current.id);
   const topics=groupLessonTopics(current.steps),part=topics.findLast(t=>t.index<=index);
   return {course:current.course,lecture:ordinal>=0?`${ordinal+1}강`:current.generated?'자체 제작 수업':'수업 회차',part:part?.title||current.steps[index]?.title};
