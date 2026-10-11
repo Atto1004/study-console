@@ -606,7 +606,7 @@ $("courses").onclick = () => {
         "학교 화면으로 변환된 수업은 아직 없습니다. 선수 개념이나 기존 관제탑의 원자료부터 확인해주세요.",
       ),
     );
-  for (const l of c.lessons.filter((l) => !hideLesson(name, l)))
+  for (const l of c.lessons.filter((l) => !hideLesson(name, l)).sort((x, y) => (y.id === 'statics-2026-10-11') - (x.id === 'statics-2026-10-11')))   /* 정역학 벼락치기를 맨 위에 */
     row(
       host,
       `${l.date} · ${l.title}`,
