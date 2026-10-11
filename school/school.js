@@ -560,8 +560,9 @@ $("courses").onclick = () => {
     );
   /* 정역학 학습 순서(최종본 §17 채택 (나)): 기초 1강(짧게) → 3장(2강) → 4장(3강) → 5장(4강) → 우력·3D. 날짜 자체는 바꾸지 않는다 */
   const EXAM_ORDER = {"2026-09-07":0,"2026-09-09":0,"2026-09-14":0,"2026-09-16":1,"2026-09-21":1,"2026-09-23":2,"2026-09-28":2,"2026-09-30":3,"2026-10-07":3,"2026-10-10":4};
-  const examView = name === "정역학" ? [...c.lessons].sort((a, b) => (EXAM_ORDER[a.date] ?? 5) - (EXAM_ORDER[b.date] ?? 5)) : c.lessons;
-  if (name === "정역학") host.append(node("p", "학습 순서: 기초 1강(짧게) → 3장 2강 → 4장 3강 → 5장 4강. 1강은 훑고 바로 3장으로.", "notice"));
+  const HIDE_2 = ["2026-09-07", "2026-09-09", "2026-09-14"]; /* 2장 선수 내용 — 강 목록에서 숨김 */
+  const examView = name === "정역학" ? c.lessons.filter((l) => !HIDE_2.includes(l.date)).sort((x, y) => (EXAM_ORDER[x.date] ?? 5) - (EXAM_ORDER[y.date] ?? 5)) : c.lessons;
+  if (name === "정역학") host.append(node("p", "학습 순서: 1강 3장 → 2강 4장(점 모멘트) → 3강 5장 → 4강 우력 → 5강 3D 케이블 → 6강 3D 축 → 7강 세 힘 부재.", "notice"));
   for (const l of examView)
     row(
       host,
