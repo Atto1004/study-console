@@ -1,0 +1,30 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { JSDOM } from '../.test-tools/node_modules/jsdom/lib/api.js';
+import { presentNotebookPage } from './notebook-page.js';
+import { renderClassroomDirectory } from './classroom-directory.js';
+test('노트 분류는 원문과 수식을 유지하고 같은 제목만 숨긴다',()=>{
+ const dom=new JSDOM('<div id="body"><p class="textbook-paragraph">2차원 성분</p><p class="textbook-paragraph">벡터 U를 직교좌표에 놓으면 x·y 성분으로 갈린다</p><p class="textbook-paragraph">i, j = 축 방향 단위벡터</p><p class="textbook-paragraph">주의: 방향을 혼동하지 않는다</p></div>');
+ const body=dom.window.document.querySelector('#body');const original=[...body.querySelectorAll('p')].map(p=>p.textContent);
+ presentNotebookPage(body,'2차원 성분');
+ assert.deepEqual([...body.querySelectorAll('p')].map(p=>p.textContent),original);
+ assert.equal(body.querySelector('p').dataset.noteDuplicate,'true');
+ assert.equal(body.querySelectorAll('p')[2].dataset.noteKind,'symbols');
+ assert.equal(body.querySelectorAll('p')[3].dataset.noteKind,'warning');
+ assert.equal(body.querySelectorAll('svg').length,1);
+ dom.window.close();
+});
+test('교실 시험 과목 선택과 원본 수강 상태 및 강의 선택 연결',()=>{
+ const dom=new JSDOM('<section class="class-directory"><h2></h2><div id="courseDoors"></div></section>');
+ const courses=['정역학','미분적분학2','공업수학1','일반물리학2','CADD'].map((name,i)=>({name,units:[],lessons:[{id:String(i),title:name+' 첫 수업',date:'2026-09-01'}]}));
+ const doors=dom.window.document.querySelector('#courseDoors');let selected;
+ renderClassroomDirectory({doors,courses,events:[{lesson:'0',kind:'review',action:'lecture-complete'}],onLesson:(lesson,name)=>selected=[lesson.id,name],onOther:()=>{}});
+ assert.equal(doors.querySelectorAll('button').length,4);
+ assert.doesNotMatch(doors.textContent,/CADD/);
+ const row=dom.window.document.querySelector('.classroom-progress-lesson');
+ assert.equal(row.dataset.status,'complete');row.click();assert.deepEqual(selected,['0','정역학']);
+ doors.querySelector('[data-course="일반물리학2"]').click();
+ assert.equal(dom.window.document.querySelector('.classroom-progress-lesson').dataset.status,'unheard');
+ assert.match(dom.window.document.querySelector('.classroom-other-courses').textContent,/CADD/);
+ dom.window.close();
+});

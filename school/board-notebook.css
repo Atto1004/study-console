@@ -1,0 +1,44 @@
+/* The board is a fixed teaching surface. Fit content; never make it scroll. */
+.school[data-layout=v3][data-mode=classroom] #board,
+.school[data-layout=v3][data-mode=classroom] #board .content,
+.school[data-layout=v3][data-mode=classroom] #board .katex-display{overflow:hidden!important;scrollbar-width:none!important}
+.school[data-layout=v3][data-mode=classroom] #board::-webkit-scrollbar,
+.school[data-layout=v3][data-mode=classroom] #board .content::-webkit-scrollbar,
+.school[data-layout=v3][data-mode=classroom] #board .katex-display::-webkit-scrollbar{display:none!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #board .content{font-size:var(--board-text-size,22px)!important;line-height:1.48!important}
+.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #board .board-hierarchy h1{font-size:var(--board-title-size,26px)!important;line-height:1.28!important}
+.school[data-layout=v3][data-mode=classroom] #board .katex-display{display:block;max-width:100%;box-sizing:border-box}
+.school[data-layout=v3][data-mode=classroom] #board .katex-display>.katex{display:block;width:max-content;max-width:none;transform-origin:0 0}
+.school[data-layout=v3] .lesson-textbook{background:#fffef8!important;border:1px solid #dcd9c9!important;box-shadow:inset 4px 0 #aaba9c;padding:14px 16px!important}
+.school[data-layout=v3] .lesson-textbook-header{border-bottom:1px solid #dce2d6;padding-bottom:7px}
+.school[data-layout=v3] .lesson-textbook-title{font-weight:800!important;color:#243e31!important;border-bottom:3px solid #e9d880;padding-bottom:5px}
+.school[data-layout=v3] .lesson-textbook-guide{background:transparent!important;color:#6e796a!important;font-size:11px!important;padding:0!important;min-height:0!important}
+.school[data-layout=v3] .lesson-textbook-body{white-space:normal;line-height:1.65!important;overflow:hidden!important}
+.school[data-layout=v3] .lesson-textbook-body .textbook-paragraph{white-space:pre-wrap;position:relative;margin:0 0 10px!important;padding:0 0 7px!important;border-bottom:1px solid #e8eadd;border-radius:0!important;background:none!important}
+.school[data-layout=v3] .textbook-paragraph[data-note-duplicate=true]{display:none!important}
+.school[data-layout=v3] .lesson-textbook-body .textbook-paragraph[data-note-label]:not([data-note-label=''])::before{content:attr(data-note-label);display:block;font-size:10px;font-weight:800;letter-spacing:.03em;color:#687c65;margin:0 0 5px}
+.school[data-layout=v3] .lesson-textbook-body .textbook-paragraph[data-star=true]::after{content:'★';color:#bd8e2e;position:absolute;right:2px;top:0}
+.school[data-layout=v3][data-mode=classroom] #board#board{overflow:hidden!important}
+.school[data-layout=v3] .textbook-paragraph[data-note-kind=formula]{border-left:3px solid #a6b79b!important;padding-left:8px!important;background:#f2f5ed!important}
+.school[data-layout=v3] .textbook-paragraph[data-note-kind=memory]{background:linear-gradient(transparent 45%,#ffe99b99 45%,#ffe99b99 90%,transparent 90%)!important}
+.school[data-layout=v3] .textbook-paragraph[data-note-kind=warning]{border-left:3px solid #c86e61!important;padding-left:8px!important;color:#a34639!important}
+.school[data-layout=v3] .textbook-paragraph[data-note-kind=symbols]{color:#426b8b!important;font-size:.92em}
+.school[data-layout=v3] .textbook-paragraph[data-note-kind=condition]{border-left:3px solid #7fa88b!important;padding-left:8px!important}
+.school[data-layout=v3] .notebook-diagram{margin:6px 0 10px;padding:6px;background:#f6f8f2;border:1px solid #dbe3d4;border-radius:8px}
+.school[data-layout=v3] .notebook-diagram svg{display:block;width:100%;height:100px}
+.school[data-layout=v3] .lesson-textbook-pages{padding-top:5px;border-top:1px solid #e4e7dc}
+.classroom-progress-list{margin-top:22px;text-align:left}
+.classroom-progress-list h3{font-size:18px;color:#254839;margin:0 0 12px}
+.classroom-progress-unit{border:1px solid #d6dfd2;border-radius:12px;margin-bottom:9px;background:#fffef9;overflow:hidden}
+.classroom-progress-unit summary{padding:14px;cursor:pointer;font-weight:700;color:#36533f}
+.classroom-progress-lesson{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;border-top:1px solid #e6eadd;border-radius:0;background:transparent;color:#6b756b;padding:14px;min-height:64px;cursor:pointer}
+.classroom-progress-lesson>span:nth-child(2){flex:1;min-width:0}.classroom-progress-lesson strong,.classroom-progress-lesson small{display:block;overflow-wrap:anywhere}
+.classroom-progress-lesson small{font-size:12px;margin-top:5px}.classroom-progress-state{font-size:24px}.classroom-progress-lesson[data-status=complete]{color:#3c7952;background:#edf5e9}.classroom-progress-lesson[data-status=started]{color:#85692b;background:#fcf6e4}
+.classroom-other-courses{margin-top:16px;color:#617161}.classroom-other-courses summary{padding:10px;cursor:pointer}.classroom-other-courses button{margin:8px;padding:10px 16px}
+#courseDoors .door[aria-pressed=true]{border-color:#4b7b55;background:#e8f0e2}
+.school[data-mode=lobby] #lobby:not([hidden]){display:block!important;width:100%;max-width:1100px;margin:0 auto}
+.school[data-mode=lobby] #lobby:not([hidden]) .welcome{display:none}
+.school[data-mode=lobby] #lobby .class-directory{width:100%;box-sizing:border-box}
+.school[data-mode=lobby] #courseDoors{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.school[data-mode=lobby] #courseDoors .door{min-width:0;min-height:92px}
+@media(max-width:900px){.school[data-mode=lobby] #courseDoors{grid-template-columns:repeat(2,minmax(0,1fr))}}

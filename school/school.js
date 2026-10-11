@@ -1,3 +1,5 @@
+import { renderClassroomDirectory } from './classroom-directory.js?v=265';
+import { fitBoard } from './board-fit.js?v=265';
 import { createLectureQuests } from './lecture-quests.js?v=233';
 import { mountSchoolRefresh } from './refresh.js?v=237';
 import { mountLectureActor } from './lecture-actor.js?v224';
@@ -36,7 +38,7 @@ import { createFace } from "./face.js";
 import { readable, cleanTitle } from "./readable.js";
 import { createPlan } from "./plan.js";
 import { inFocus } from "./focus.js";
-import { createLessonTextbook } from "./lesson-textbook.js?v=256";
+import { createLessonTextbook } from "./lesson-textbook.js?v=265";
 import { startClassroomV3 } from "./classroom-v3.js?v=241";
 import { createGrowth } from "./growth.js?v=199";
 import { cardGate } from './card-gate.js?v=1';
@@ -329,23 +331,7 @@ function showLobby() {
     "기호부터 교수님 수업 문제까지, 한 단계씩 확인합니다.";
   drawStudyOverview();
   const doors = $("courseDoors");
-  doors.replaceChildren();
-  for (const [position, c] of catalog.courses
-    .filter((c) => c.name !== "사회봉사")
-    .entries()) {
-    const b = button("", () => showCourse(c.name, true), "door");
-    const info = node("span", undefined, "door-info");
-    info.append(
-      node("b", c.name),
-      node("small", `${c.lessons.length}회 수업 · ${c.nodes.length}개 개념`),
-    );
-    b.append(
-      node("span", String(position + 1).padStart(2, "0"), "door-number"),
-      info,
-      node("span", "›", "door-arrow"),
-    );
-    doors.append(b);
-  }
+  renderClassroomDirectory({doors,courses:catalog.courses,events:[...state.events,...pending],session:activeSession,onLesson:showLessonScope,onOther:name=>showCourse(name,true)});
   const plan = state.plans[course];
   $("resumeText").textContent = plan
     ? `${course} · ${plan.minutes}분씩 · ${plan.goal}`
@@ -831,9 +817,10 @@ function board(title, body, kind, annotation) {
     if (v3 && choices) v3.response.append(choices);
     decorateChalk(host, current?.steps[index]);
     renderMath(host);
+    const boardFits = fitBoard(host);
     setTimeout(() => {
       if (
-        (host.scrollHeight > host.clientHeight + 2 || host.querySelector(".content").scrollHeight > host.querySelector(".content").clientHeight + 2) &&
+        (!boardFits || host.scrollHeight > host.clientHeight + 2 || host.querySelector(".content").scrollHeight > host.querySelector(".content").clientHeight + 2) &&
         innerWidth > 650 &&
         limit > 40
       ) {
