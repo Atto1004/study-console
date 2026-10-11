@@ -79,8 +79,14 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
   function render(lesson, index = 0) {
     const steps = Array.isArray(lesson?.steps) ? lesson.steps : [];
     const entries = [];
+    /* 유사 문제 답은 그 쪽에 도착하기 전까지 교재에 보이지 않게 한다(먼저 풀어 보게) */
+    let inAnswer = false, answerHidden = false;
     steps.forEach((step, stepIndex) => {
       if (!readableKinds.has(step.kind)) return;
+      const text = String(step.body || '');
+      if (/^유사 문제 \S+ 답/.test(text)) { inAnswer = true; answerHidden = false; }
+      else if (/^(유사 문제 \S+ ←|과제 \d)/.test(text)) inAnswer = false;
+      if (inAnswer && stepIndex > index) { if (answerHidden) return; answerHidden = true; step = {...step, body: '유사 문제 답은 직접 푼 뒤 넘겨서 확인하세요.'}; }
       const prior = entries.at(-1);
       if (prior && prior.endIndex === stepIndex - 1 && prior.step.title === step.title) {
         prior.parts.push(step.body || step.speech || ''); prior.endIndex = stepIndex;
