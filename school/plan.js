@@ -49,7 +49,7 @@ const CSS = `
 .pl-sday{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:12px;border:1px solid #e3e8e4;background:#fff;cursor:pointer;color:#1f3d33;font:600 15px/1.1 "Pretendard Variable",Pretendard,system-ui,sans-serif}
 .pl-sday small{font-size:11.5px;color:#6b7c73;font-weight:600}
 .pl-sday.today b{color:#2e6b52}.pl-sday.exam{border-color:#e7b9a8}
-.pl-sday.on{background:#2e6b52;border-color:#2e6b52;color:#fff}.pl-sday.on small{color:#d7ebe1}
+.pl-sday.on{background:#2e6b52;border-color:#2e6b52;color:#fff}.pl-sday.on small{color:#d7ebe1}.pl-sday.on b,.pl-sday.on.today b{color:#fff}
 .pl-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px}
 .pl-head h2{margin:0;font:700 17px/1.3 "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#14261f}
 .pl-head small{color:#6b7c73;font:500 13px "Pretendard Variable",Pretendard,system-ui,sans-serif}
