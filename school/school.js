@@ -606,7 +606,10 @@ $("courses").onclick = () => {
         "학교 화면으로 변환된 수업은 아직 없습니다. 선수 개념이나 기존 관제탑의 원자료부터 확인해주세요.",
       ),
     );
-  for (const l of c.lessons.filter((l) => !hideLesson(name, l)).sort((x, y) => (y.id === 'statics-2026-10-11') - (x.id === 'statics-2026-10-11')))   /* 정역학 벼락치기를 맨 위에 */
+  /* 정역학: 벼락치기 맨 위, 나머지는 학습 순서(최종본 §17) — 범위 밖(STATICS_HIDE)은 숨김 */
+  const EXAM_ORDER = {"2026-09-16":1,"2026-09-21":1,"2026-09-23":2,"2026-09-28":2,"2026-09-30":3,"2026-10-07":3,"2026-10-10":4};
+  const rank = (l) => (name === "정역학" ? (l.id === 'statics-2026-10-11' ? -1 : (EXAM_ORDER[l.date] ?? 5)) : 0);
+  for (const l of c.lessons.filter((l) => !hideLesson(name, l)).sort((x, y) => rank(x) - rank(y)))
     row(
       host,
       `${l.date} · ${l.title}`,
