@@ -399,6 +399,18 @@
     "classroom": "notes/classroom/statics/2026-09-23.html",
     "chapters": 8,
     "steps": 43
+   },
+   "2026-10-07": {
+    "id": "statics-2026-10-07",
+    "classroom": "notes/classroom/statics/2026-10-07.html",
+    "chapters": 7,
+    "steps": 22
+   },
+   "2026-10-10": {
+    "id": "statics-2026-10-10",
+    "classroom": "notes/classroom/statics/2026-10-10.html",
+    "chapters": 4,
+    "steps": 14
    }
   },
   "공업수학1": {
@@ -851,5 +863,5 @@
    }
   }
  },
- "generated": "2026-10-04T16:13:18"
+ "generated": "2026-10-10T16:46:28"
 }
