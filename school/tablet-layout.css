@@ -1,7 +1,7 @@
 /* Tablet classroom uses the available viewport, not a height-derived width. */
 @media (min-width:641px) and (max-width:1366px) {
   .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #scene{padding:10px 14px calc(var(--tablet-bottom,var(--gl-bottom,96px)) + 10px) 128px!important;overflow:hidden!important}
-  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{width:100%!important;max-width:none!important;margin:0!important;height:calc(100dvh - var(--tablet-top,var(--gl-top,64px)) - var(--tablet-bottom,var(--gl-bottom,96px)) - 20px)!important;grid-template-columns:minmax(0,1.8fr) minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) 96px 88px 100px!important;gap:8px 12px!important;--class-response-height:96px}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{width:100%!important;max-width:none!important;margin:0!important;height:calc(var(--tablet-viewport-height,100dvh) - var(--tablet-top,var(--gl-top,64px)) - var(--tablet-bottom,var(--gl-bottom,96px)) - 20px)!important;grid-template-columns:minmax(0,1.8fr) minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) 96px 88px 100px!important;gap:8px 12px!important;--class-response-height:96px}
   .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-stage{height:100%!important;min-height:0!important;aspect-ratio:auto!important}
   .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-stage #board{padding:14px 116px 64px 16px!important;gap:6px!important}
   .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #board h1{font-size:20px!important;line-height:1.35!important;margin:4px 0 8px!important}
@@ -63,12 +63,12 @@
 @media(min-width:641px) and (max-width:1366px){.school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #board{grid-template-columns:minmax(0,1fr)!important}.school.tablet-layout .v3-bar .v3-more>summary::marker{content:''}.school.tablet-layout .v3-bar .v3-more>summary{display:flex!important;align-items:center;justify-content:center}.school.tablet-layout .lecture-quests{align-content:start}.school.tablet-layout .lecture-quests .quest-item label{align-items:center}.school.tablet-layout .lecture-quests .quest-text strong{margin:0!important}}
 
 @media(min-width:641px) and (max-width:1366px){
-.school.tablet-layout[data-mode=classroom]>header{flex-wrap:nowrap!important;min-height:64px!important;padding:8px 12px!important;gap:8px!important;box-sizing:border-box}
-.school.tablet-layout[data-mode=classroom]>header [aria-label='비서별 토큰 사용량']{display:none!important}
-.school.tablet-layout[data-mode=classroom]>header .rooms{width:auto!important;flex:none;margin:0!important;padding:4px!important}
-.school.tablet-layout[data-mode=classroom]>header .rooms button{padding:8px!important;min-height:36px!important;font-size:12px!important}
-.school.tablet-layout[data-mode=classroom]>header .brand{font-size:16px!important;flex-shrink:0}
-.school.tablet-layout[data-mode=classroom]>header .room-sub{display:none!important}
+.school.tablet-layout>header{flex-wrap:nowrap!important;min-height:64px!important;padding:8px 12px!important;gap:8px!important;box-sizing:border-box}
+.school.tablet-layout>header [aria-label='비서별 토큰 사용량']{display:none!important}
+.school.tablet-layout>header .rooms{width:auto!important;flex:none;margin:0!important;padding:4px!important}
+.school.tablet-layout>header .rooms button{padding:8px!important;min-height:36px!important;font-size:12px!important}
+.school.tablet-layout>header .brand{font-size:16px!important;flex-shrink:0}
+.school.tablet-layout>header .room-sub{display:none!important}
 .school.tablet-layout #board .board-hierarchy{margin-bottom:4px!important;padding-bottom:4px!important}
 .school.tablet-layout #board .board-hierarchy h1{font-size:20px!important;line-height:1.25!important;margin:4px 0!important}
 .school.tablet-layout .v3-bar .rw-log{width:32px!important;height:32px!important;min-height:32px!important;padding:4px!important;font-size:12px!important}
@@ -83,3 +83,12 @@
 }
 
 @media(min-width:641px) and (max-width:1366px) and (orientation:portrait){.school.tablet-layout[data-mode=classroom]>.tablet-toc-toggle{left:auto;right:28px;top:var(--tablet-toc-top);bottom:auto;min-height:32px;padding:5px 10px;font-size:12px}.school.tablet-layout .lesson-textbook-header{padding-right:100px}.school.tablet-layout[data-mode=classroom]>.subject-rail-toggle{top:var(--tablet-book-middle)!important;bottom:auto}}
+
+@media(min-width:641px) and (max-width:1366px){.school.tablet-layout #room .v3-work{max-height:none!important}.school.tablet-layout [aria-label='김주영 스앵님과 대화']{bottom:var(--tablet-viewport-bottom,0px)!important}}
+
+@media(min-width:641px) and (max-width:1366px){
+.school.tablet-layout[data-tablet-shared-chat=false][data-mode=classroom] #dialogue .v3-chat{position:fixed!important;left:128px;right:14px;bottom:calc(var(--tablet-viewport-bottom,0px) + 16px);z-index:80;margin:0!important;height:56px;padding:8px 12px;box-sizing:border-box;background:#fff;border-radius:16px;box-shadow:0 0 0 1px #dbe3de;max-width:none!important}
+.school.tablet-layout[data-tablet-shared-chat=false][data-mode=classroom] #dialogue .v3-chat input{min-width:0;flex:1}
+}
+@media(min-width:641px) and (max-width:1366px) and (orientation:portrait){.school.tablet-layout[data-tablet-shared-chat=false][data-mode=classroom] #dialogue .v3-chat{left:14px}}
+@media(min-width:641px) and (max-width:1366px){.school.tablet-layout #board .content p{margin-top:0!important;margin-bottom:6px!important}}
