@@ -33,6 +33,8 @@ const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls)
 
 function showGate(info) {
   return new Promise((resolve) => {
+    // 수업 선택 창(showModal = 최상위 층)이 열려 있으면 z-index 로는 못 덮어 카드가 뒤에 숨는다 → 먼저 닫는다
+    document.querySelectorAll('dialog[open]').forEach((d) => { try { d.close(); } catch {} });
     const wrap = el('div', 'card-gate'); wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true');
     const box = el('div', 'card-gate-box');
     const head = el('div', 'card-gate-head'); const title = el('b', null, '암기카드 확인'); const prog = el('span', 'card-gate-prog');
