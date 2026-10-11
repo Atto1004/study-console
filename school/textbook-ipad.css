@@ -1,0 +1,4 @@
+/* 2026-10-11 아이패드 조정: 교재 수식이 오른쪽 끝에서 잘리던 것 → 수식 블록 안에서 가로 스크롤, 남는 세로 공간은 칠판에 준다 */
+.school[data-layout=v3] .lesson-textbook-body{min-width:0;overflow-wrap:anywhere}
+.school[data-layout=v3] .lesson-textbook-body .katex-display{max-width:100%;box-sizing:border-box;overflow-x:auto;overflow-y:hidden}
+.school[data-layout=v3]:not([data-lecture=playing]) .v3-stage{height:clamp(200px,56dvh,640px)}
