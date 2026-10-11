@@ -3,6 +3,7 @@
 // → ④ 판정과 되받기(맞음: 이유 짚고 다음 / 틀림: 더 쉽게 다시 + 비슷한 질문 / 모르겠어요: 한 단계 같이 → 선수 개념).
 // 언제든 Q 로 끼어들어 질문 → 그 단계 근거 안에서 답 → 하던 질문으로 돌아온다.
 // 판정·기록은 서버 코치(coach: teachback·together·question)와 지금 기록(event)을 그대로 쓴다. 정답·전체 풀이를 먼저 주지 않는다.
+import { boardPage } from './board-page.js?v=2';
 const el = (tag, text, cls) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (cls) e.className = cls; return e; };
 const clean = (t) => String(t || '').replace(/\*\*([^*]+)\*\*/g, '$1').replace(/^#{1,6}\s+/gm, '').trim();
 
@@ -67,6 +68,17 @@ export function createTutor(app) {
   function afterLecture() {
     const c = app.ctx(); if (!c || c.blocked) return;
     if (app.inPack?.() && !c.step.options) { setPhase('lecture'); form.hidden = true; return 'next'; }
+    const page = !c.step.options && boardPage(c);
+    if (page) {
+      // 판서 쪽(칠판 한 줄 = 한 단계)은 줄마다 묻지 않고 강의처럼 이어 간다(대표님 10/11 「같은 말 반복·같은 질문만」).
+      // 멈추는 곳: 「직접 풀기」 칸 끝(풀 시간) · 스앵님이 물음으로 끝낸 칸 끝(생각할 시간)
+      if (!page.itemEnd) { setPhase('lecture'); form.hidden = true; return 'next'; }
+      if (page.practice) { app.pass(); setPhase('done'); ask('노트에 끝까지 풀었으면 다음(Enter)을 누르세요. 바로 답을 맞춰 봐요.', 'question'); return; }
+      if (page.asks) { app.pass(); setPhase('done'); ask('노트에 먼저 적어 보고 다음(Enter)을 누르세요. 바로 이어서 풀어 볼게요.', 'question'); return; }
+    }
+    // 개념 단계는 확인 질문 없이 이어 간다 — 「방금 내용을 한 문장으로」는 대표님 10/11 「필요 없는 과정」. 문제(보기) 단계만 멈춘다
+    if (!c.step.options && (c.step.referenceAnswer || /직접 풀이/.test(c.step.title || ''))) { app.pass(); setPhase('check'); ask('노트에 직접 풀어 보세요. 풀이를 적어 보내면 봐 드리고, 바로 넘어가려면 다음(Enter).', 'answer'); return; }
+    if (!c.step.options) { setPhase('lecture'); form.hidden = true; return 'next'; }
     if (c.passed) { setPhase('done'); ask('이건 전에 해결했어요. ⏭ 로 다음, 다시 풀어도 돼요.', 'question'); return; }
     if (c.step.options) { setPhase('quiz'); ask(tries ? '다시 골라 볼까요? 조건부터 하나씩요.' : '이제 직접 골라 보세요. 틀려도 어디서 막혔는지 같이 볼게요.', 'question'); form.hidden = true; }
     else { setPhase('check'); ask(pick(ASK[c.step.kind] || ASK.understand, tries), 'answer'); }

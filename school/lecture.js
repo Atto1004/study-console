@@ -9,6 +9,7 @@ const splitSentences = (text) => String(text || '')
   .replace(/\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]/g, (m) => m.replace(/[.!?。]/g, '․'))   // 수식 안 마침표로 자르지 않게
   .split(/(?<=[.!?。…])\s+|\n{1,}/).map((s) => s.replace(/․/g, '.').trim()).filter((s) => s.length > 1);
 import { readable } from './readable.js';
+import { boardPage, speechShare } from './board-page.js?v=2';
 const plain = (s) => s.replace(/\$\$?|\\\(|\\\)|\\\[|\\\]/g, '').replace(/\\[a-zA-Z]+/g, ' ').replace(/[{}_^]/g, '').replace(/\s+/g, ' ').trim();
 
 export function createLecture(app) {
@@ -30,6 +31,9 @@ export function createLecture(app) {
     const script = app.script?.(c.step);
     if (script) return fix([...script.filter((l) => l && l.say).map((l) => ({ text: l.say, mood: l.mood || 'neutral', intro: !!l.intro })), ...how]);
     const intro = splitSentences(c.step.speech);
+    // 판서 쪽: 칸의 말을 줄마다 나눠 한 번씩만. 칠판 줄·단원 제목은 칠판에 보이니 다시 읽지 않는다(대표님 10/11 「같은 말 반복」)
+    const page = !c.step.options && intro.length ? boardPage(c) : null;
+    if (page) return fix(speechShare(intro, page.k, page.n).map((text) => ({ text, mood: null })));
     const body = splitSentences(c.step.body);
     const head = c.step.title ? [c.step.title + (c.step.options ? ' — 문제부터 볼게요.' : '.')] : [];
     const seen = new Set(); const out = [];

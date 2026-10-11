@@ -333,3 +333,5 @@
 .school[data-mode=classroom] .subject-pages button{width:100%;min-height:32px;flex:none;font-size:18px}
 .school[data-mode=classroom] .subject-pages button:first-child{grid-row:1}
 .school[data-mode=classroom] .subject-pages button:last-child{grid-row:3}
+.school[data-layout=v3] .lesson-textbook-figure.is-fbd svg{max-height:210px;width:auto;max-width:100%;margin:0 auto}   /* 정역학 과제 FBD — 작은 도식(64px)보다 크게 */
+.school[data-layout=v3] .lesson-textbook-figure.is-fbd .cap{font-size:11px;color:#77694c;text-align:center}

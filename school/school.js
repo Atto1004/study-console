@@ -3,7 +3,7 @@ import { fitBoard } from './board-fit.js?v=265';
 import { createLectureQuests } from './lecture-quests.js?v=233';
 import { mountSchoolRefresh } from './refresh.js?v=237';
 import { mountLectureActor } from './lecture-actor.js?v224';
-import { decorateChalk, chalkBoardText, chalkPages } from './lecture-chalk.js?v235';
+import { decorateChalk, chalkBoardText, chalkPages } from './lecture-chalk.js?v236';
 import { groupCourseLessons, groupLessonTopics } from './course-scope.js?v=212';
 import "./uuid-polyfill.js";   // 보안 컨텍스트 아닌 주소(tailscale http)에서 crypto.randomUUID 대체 — 맨 먼저
 import {
@@ -20,12 +20,12 @@ import { createSpace, ROOMS } from "./space.js";
 import { pickLesson, pickQuestions } from "./metrics.js";
 import { createSetup } from "./setup.js";
 import { createWorldMap } from "./worldmap.js";
-import { createTutor } from "./tutor.js";
+import { createTutor } from "./tutor.js?v=3";
 import { createSubjectRail } from "./subject-rail.js?v=251";
 import { createSubjectScope } from "./subject-scope.js?v=240";
 import { boardHierarchy,createBoardHierarchy } from "./board-hierarchy.js?v=240";
 import { startSurfaces } from "./surface.js";
-import { createLecture } from "./lecture.js";
+import { createLecture } from "./lecture.js?v=3";
 import { loadPack, packRoute, packLines, label as packLabel } from "./lecture-pack.js";
 import { createDialog } from "./vn-dialog.js";
 import { createLectureUi } from "./lecture-ui.js";
@@ -38,7 +38,7 @@ import { createFace } from "./face.js";
 import { readable, cleanTitle } from "./readable.js";
 import { createPlan } from "./plan.js";
 import { inFocus } from "./focus.js";
-import { createLessonTextbook } from "./lesson-textbook.js?v=265";
+import { createLessonTextbook } from "./lesson-textbook.js?v=267";
 import { startClassroomV3 } from "./classroom-v3.js?v=241";
 import { createGrowth } from "./growth.js?v=199";
 import { cardGate } from './card-gate.js?v=2';
@@ -783,10 +783,10 @@ function closeDialogs() {
   $("chat").hidden = true;
   $("dialogue").classList.remove("chatting");
 }
-function board(title, body, kind, annotation) {
+function board(title, body, kind, annotation, whole = false) {   // whole: 판서 칸 하나를 한 화면에(나누지 않고 글자만 줄여 맞춤)
   const host = $("board");
   let limit = innerHeight < 760 ? 260 : 440,
-    pages = chalkPages(body, limit),
+    pages = whole ? [body] : chalkPages(body, limit),
     page = 0;
   function draw() {
     const choices = $("choices");
@@ -820,6 +820,7 @@ function board(title, body, kind, annotation) {
     const boardFits = fitBoard(host);
     setTimeout(() => {
       if (
+        !whole &&
         (!boardFits || host.scrollHeight > host.clientHeight + 2 || host.querySelector(".content").scrollHeight > host.querySelector(".content").clientHeight + 2) &&
         innerWidth > 650 &&
         limit > 40
@@ -840,7 +841,7 @@ function board(title, body, kind, annotation) {
     clearTimeout(resizeBoard);
     resizeBoard = setTimeout(() => {
       limit = innerHeight < 760 ? 260 : 440;
-      pages = chalkPages(body, limit);
+      pages = whole ? [body] : chalkPages(body, limit);
       page = Math.min(page, pages.length - 1);
       draw();
     }, 150);
@@ -909,12 +910,15 @@ async function renderStep(camera) {
     current.warnings.length
       ? "자료 주의사항 있음 · 이 수업의 근거에서 확인"
       : "",
+    !step.options && /:\d+$/.test(String(step.id || "")),
   );
   $("speech").textContent =
     step.kind === "quiz"
       ? "직접 골라주세요. 틀리면 어디서 막혔는지 짚고 다시 풀어볼게요."
       : step.kind === "example" ? "판서를 한 단계씩 보면서 같이 풀어봅시다. 지금 식 다음에 무엇을 해야 할지 설명해보세요. 막히면 ‘더 쉽게’로 한 단계만 같이 볼 수 있어요." : step.speech ||
         "읽은 뒤 이 내용을 자신의 말로 설명해보세요. 모르는 부분은 바로 질문해주세요.";
+  // 판서 쪽(칸:줄)은 칸 대사 전체를 줄마다 대화 기록에 다시 넣지 않는다 — 강의(lecture.js)가 그 줄 몫만 말하며 남긴다(대표님 10/11 「같은 말 반복」)
+  if (!step.options && /:\d+$/.test(String(step.id || "")) && step.speech) $("speech").textContent = "";
   // 강의안 수업의 판서는 대화 기록에도 옛 요약 대신 그 단계 강의 대본을 남긴다(자막과 다른 설명이 겹치지 않게).
   if (curPack() && !step.options) { const said = packLines(curPack(), step.id).map(l => l.say).join(" "); if (said) $("speech").textContent = said; }
   if (step.options) {
@@ -2465,7 +2469,19 @@ function lecturePosition(){
   const lessons=(catalog?.courses?.find(c=>c.name===current.course)?.lessons||[]).filter(l=>!l.generated&&!String(l.id).startsWith('exam-')&&!hideLesson(current.course,l)).sort((a,b)=>a.date.localeCompare(b.date));
   const ordinal=lessons.findIndex(l=>l.id===current.id);
   const topics=groupLessonTopics(current.steps),part=topics.findLast(t=>t.index<=index);
-  return {course:current.course,lecture:ordinal>=0?`${ordinal+1}강`:current.generated?'자체 제작 수업':'수업 회차',part:part?.title||current.steps[index]?.title};
+  const partTitle=part?.title||current.steps[index]?.title;
+  if(current.course==='정역학')return {course:current.course,lecture:staticsWhere(current,partTitle),part:partTitle};
+  return {course:current.course,lecture:ordinal>=0?`${ordinal+1}강`:'수업 회차',part:partTitle};
+}
+// 정역학 위치 = 교재 장 + 학교 진도(장 기준 강 번호, 정역학 최종본 §16). 대표님 10/11 「몇 장인지·학교 진도 몇 강인지가 안 적혀 있어」
+const STATICS_LECTURE={'2026-09-16':[3,1],'2026-09-21':[3,2],'2026-09-23':[4,1],'2026-09-28':[4,2],'2026-09-30':[5,1],'2026-10-07':[5,2],'2026-10-12':[5,3],'2026-10-14':[5,4]};
+const STATICS_CHAPTER={3:'3장 1·2강 (9/16·9/21)',4:'4장 1·2강 (9/23·9/28)',5:'5장 1~4강 (9/30~10/14)'};
+function staticsWhere(lesson,title){
+  const at=STATICS_LECTURE[lesson.date];
+  if(at&&!lesson.generated&&!String(lesson.id).startsWith('exam-'))return `Ch.${at[0]} · 학교 진도 ${at[0]}장 ${at[1]}강 (${+lesson.date.slice(5,7)}/${+lesson.date.slice(8)})`;
+  const t=String(title||''),m=/Ch\.?\s*([345])/.exec(t)||/([345])장/.exec(t),memo=/외울 것\s*([①②③])/.exec(t);
+  const ch=m?+m[1]:memo?{'①':3,'②':4,'③':5}[memo[1]]:0;
+  return ch?`Ch.${ch} · 학교 진도 ${STATICS_CHAPTER[ch]}`:'시험 범위 Ch.3·4·5 공통';
 }
 const subjectScope=createSubjectScope({fallback:name=>showCourse(name,true),lessons:name=>(catalog?.courses.find(c=>c.name===name)?.lessons||[]).filter(l=>!l.generated&&!String(l.id).startsWith('exam-')).sort((a,b)=>a.date.localeCompare(b.date)),current:()=>current?{lesson:current.id,index}:null,events:()=>[...state.events,...pending],topics:async summary=>{const lesson=summary.id===current?.id?current:await api('lesson?id='+encodeURIComponent(summary.id));return groupLessonTopics(lesson.steps).map((t,i,all)=>({...t,current:summary.id===current?.id&&t.index<=index&&(!all[i+1]||all[i+1].index>index)}));},select:(id,stepId)=>startLesson(id,{stepId}),onOpen:()=>{scopePause={lesson:current,index,playing:!!lecture?.playing};if(scopePause.playing)lecture.toggle();},onClose:()=>{const paused=scopePause;scopePause=null;if(paused?.playing&&current===paused.lesson&&index===paused.index&&!lecture?.playing&&!lecture?.ended)lecture?.toggle();}});
 const rail = createSubjectRail({subjects:ROOMS,available:name=>inFocus(name)&&!!catalog?.courses?.find(c=>c.name===name)?.lessons?.length,position:lecturePosition,current:()=>course,openScope:(name,anchor)=>subjectScope.open(name,anchor),choose:async name=>{try{await mission?.save();}catch{return;}const seated=document.querySelector('.school').dataset.world==='seated';await sitDown(name);space?.setSubject?.(name);rail.update();if(seated)await space?.seated(name);}});
@@ -2492,7 +2508,7 @@ lecture = createLecture({
   voiceOn:()=>{try{return capabilities.voice&&localStorage.getItem('school-voice')==='1';}catch{return false;}},
   voice:(text,signal)=>new Promise(async(resolve,reject)=>{try{const r=await fetch('/api/school/voice',{method:'POST',credentials:'same-origin',signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text.slice(0,600)})});if(!r.ok)throw new Error('voice');const url=URL.createObjectURL(await r.blob());const a=new Audio(url);const end=()=>{URL.revokeObjectURL(url);resolve();};a.onended=end;a.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('voice'));};signal.addEventListener('abort',()=>{a.pause();end();});await a.play();}catch(e){reject(e);}}),
   // 강의안 수업의 판서 단계는 강의가 끝나면 묻지 않고 다음 판서로(기록 없음). 칠판 역할 기기는 따라가기만.
-  onEnd:()=>{const at=index;if(tutor?.afterLecture()==='next'&&!isBoard()&&current&&index===at&&!blockedStep()){passed=true;$('next').disabled=false;$('next').click();}},
+  onEnd:()=>{const at=index;if(tutor?.afterLecture()==='next'&&!isBoard()&&current&&index===at&&!blockedStep()){if(!curPack()){const st=current.steps[index];record({kind:'read',course,lesson:current.id,step:st.id,nodes:st.nodes||[]});}passed=true;$('next').disabled=false;$('next').click();}},   /* 판서 쪽 이어 강의는 끝까지 들은 것이라 「읽음」 기록(강의안 수업은 예전대로 기록 없음) */
   onState:st=>{v3.state(st);
     // 학습 시간 기록은 강의 ▶/⏸ 를 따라간다(위쪽 따로 있던 ▶·⏹ 대신)
     if(isBoard())return;

@@ -33,6 +33,15 @@ export function chalkPages(value, limit=440) {
 export function chalkBoardText(steps, index) {
   const step=steps[index]; if(!step) return '';
   if(step.options || ['quiz','reflection'].includes(step.kind)) return step.body || '';
+  // 판서 쪽(id 「칸:줄」): 칠판 = 지금 칸 하나를 한 화면에, 지금 줄까지만(뒤 줄·다음 문제 답을 미리 안 보여 줌). 대표님 10/11 「칠판도 분할이 아니라 한 화면 안에」
+  const item=/^(.*):\d+$/.exec(String(step.id||''))?.[1];
+  if(item){
+    let start=index;const same=s=>/^(.*):\d+$/.exec(String(s?.id||''))?.[1]===item;
+    while(start>0&&same(steps[start-1]))start--;
+    const seen=new Set(),parts=[];
+    for(const it of steps.slice(start,index+1))for(const line of chalkLines(it.body)){const key=clean(line);if(key&&key!==clean(step.title)&&!seen.has(key)){seen.add(key);parts.push(line);}}
+    return parts.join('\n\n');
+  }
   let first=index,last=index;
   while(first>0 && steps[first-1].title===step.title && !steps[first-1].options && !['quiz','reflection'].includes(steps[first-1].kind))first--;
   while(last+1<steps.length && steps[last+1].title===step.title && !steps[last+1].options && !['quiz','reflection'].includes(steps[last+1].kind))last++;

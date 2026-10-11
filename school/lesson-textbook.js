@@ -1,9 +1,27 @@
 import { presentNotebookPage } from './notebook-page.js?v=265';
 import { splitText } from './learning.js';
 import { textbookEmphasis } from './lecture-chalk.js?v=235';
+import { STATICS_FBD } from './statics-fbd.js?v=2';
 
 // 수업 원자료 중 읽기 단계만 사용한다. 문제·정답·피드백은 이 패널의 자료가 아니다.
 const readableKinds = new Set(['understand', 'remember', 'concept', 'visual', 'example']);
+const WARN = /함정|틀리면|아님|반대로|빠뜨리|빼먹|실수|거꾸로/;
+const ITEM = (id) => /^(.*):\d+$/.exec(String(id || ''))?.[1];
+// 지금 단계가 속한 과제(같은 단원 안에서 가장 가까운 「과제 N.NN」 머리 칸)와 그 FBD. 유사 문제 칸이면 없음
+function staticsFbd(steps, index) {
+  const here = steps[index]; if (!here || here.options) return null;
+  for (let i = index; i >= 0 && steps[i].title === here.title; i--) {
+    const body = String(steps[i].body || '');
+    if (/^유사 문제/.test(body)) return null;
+    const m = /^과제 (\d\.\d+)/.exec(body);
+    if (!m) continue;
+    const html = STATICS_FBD[m[1]]; if (!html) return null;
+    const head = ITEM(steps[i].id), asks = /[?？]\s*$/.test(String(steps[i].speech || '').trim());
+    if (ITEM(here.id) === head && asks) return null;
+    return { num: m[1], html };
+  }
+  return null;
+}
 const node = (tag, className, text) => {
   const element = document.createElement(tag);
   if (className) element.className = className;
@@ -90,9 +108,10 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
       else if (/^(유사 문제 \S+ ←|과제 \d)/.test(text)) inAnswer = false;
       if (inAnswer && stepIndex > index) { if (answerHidden) return; answerHidden = true; step = {...step, body: '유사 문제 답은 직접 푼 뒤 넘겨서 확인하세요.'}; }
       const prior = entries.at(-1);
+      const part = { i: stepIndex, kind: step.kind, text: step.body || step.speech || '' };
       if (prior && prior.endIndex === stepIndex - 1 && prior.step.title === step.title) {
-        prior.parts.push(step.body || step.speech || ''); prior.endIndex = stepIndex;
-      } else entries.push({step,stepIndex,endIndex:stepIndex,parts:[step.body || step.speech || '']});
+        prior.parts.push(part); prior.endIndex = stepIndex;
+      } else entries.push({step,stepIndex,endIndex:stepIndex,parts:[part]});
     });
     const selected = entries.find(entry => entry.stepIndex <= index && entry.endIndex >= index)
       || entries.filter(entry => entry.stepIndex <= index).at(-1);
@@ -125,7 +144,12 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
     title.dataset.emphasis=textbookEmphasis(title.textContent).star?'key':'normal';
     const example = /예제|Ex\d|계산/i.test(selected?.step.title || '');
     const sourceLabel = String(lesson?.id || '').startsWith('draft:') ? 'AI 보충 자료' : lesson?.generated || String(lesson?.id || '').startsWith('exam-') ? '자체 제작 시험 대비' : '연결된 수업 자료';
-    readingGuide.textContent = (example ? '예제 풀이' : '개념 이해') + ' · ' + sourceLabel + ' · ' + (selected?.parts.length || 0) + '개 단계';
+    // 교재 = 칠판이 지나간 줄까지의 누적 정리(칠판보다 앞서 답을 보여 주지 않는다). 외울 것은 맨 위로 모은다(대표님 10/11)
+    const seen = (selected?.parts || []).filter(part => part.i <= index);
+    const memoCount = seen.filter(part => part.kind === 'remember').length;
+    readingGuide.textContent = selected && lesson?.course === '정역학'
+      ? `지금까지 정리 ${seen.length} / ${selected.parts.length}줄` + (memoCount ? ` · 외울 것 ${memoCount}개` : '') + (seen.length < selected.parts.length ? ' · 나머지는 칠판에서 같이' : '')
+      : (example ? '예제 풀이' : '개념 이해') + ' · ' + sourceLabel + ' · ' + (selected?.parts.length || 0) + '개 단계';
     illustration.replaceChildren(); illustration.hidden = true;
     if (/곱셈|행렬곱/.test(selected?.step.title || '')) {
       illustration.hidden = false;
@@ -133,12 +157,24 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
       diagram.innerHTML = '<svg viewBox="0 0 360 68" role="img" aria-label="행렬곱의 크기: 앞의 열 수와 뒤의 행 수가 같으면 결과는 앞의 행 수와 뒤의 열 수"><rect x="5" y="8" width="96" height="45" rx="7" fill="#edf1e9"/><text x="53" y="36" text-anchor="middle" fill="#263c2c" font-size="20">m × n</text><text x="119" y="36" fill="#5c705a" font-size="20">·</text><rect x="144" y="8" width="96" height="45" rx="7" fill="#edf1e9"/><text x="192" y="36" text-anchor="middle" fill="#263c2c" font-size="20">n × r</text><text x="255" y="36" fill="#5c705a" font-size="20">→</text><text x="320" y="36" text-anchor="middle" fill="#263c2c" font-size="20">m × r</text><path d="M78 54 Q140 75 174 54" fill="none" stroke="#ad9058" stroke-width="2"/></svg>';
       illustration.append(diagram,node('figcaption','','안쪽 크기 n이 같아야 곱할 수 있습니다.'));
     }
+    // 정역학 과제 풀이 쪽이면 그 과제의 FBD 그림을 교재 칸에(칠판은 글, 교재는 그림). 스앵님이 물음으로 멈추는 첫 칸에서는 아직 안 보여 준다(답이 그림에 있어서)
+    const fbd = lesson?.course === '정역학' && staticsFbd(steps, index);
+    if (fbd) {
+      illustration.hidden = false; illustration.classList.add('is-fbd');
+      const holder = node('div'); holder.innerHTML = fbd.html;
+      illustration.append(holder);
+    } else illustration.classList.remove('is-fbd');
     const unique = new Set();
-    const text = selected?.parts.filter(part => {
+    const keep = list => list.map(part => part.text).filter(part => {
       if (part?.trim() === selected?.step.title?.trim()) return false;
       if (typeof part !== 'string' || !part.trim() || unique.has(part.trim())) return false;
       unique.add(part.trim()); return true;
-    }).join('\n\n') || '';
+    });
+    const statics = lesson?.course === '정역학';
+    const gated = statics ? seen : (selected?.parts || []);
+    const memo = statics ? keep(gated.filter(part => part.kind === 'remember')).map(part => '★ 외울 것 · ' + part) : [];
+    const rest = keep(gated).map(part => statics && WARN.test(part) ? '주의 · ' + part : part);
+    const text = [...memo, ...rest].join('\n\n');
     sourceText = text; pageLimit = 300; renderVersion++; page = 0; paginate();
     showPage();
   }
