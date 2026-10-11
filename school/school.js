@@ -39,6 +39,7 @@ import { inFocus } from "./focus.js";
 import { createLessonTextbook } from "./lesson-textbook.js?v=256";
 import { startClassroomV3 } from "./classroom-v3.js?v=241";
 import { createGrowth } from "./growth.js?v=199";
+import { cardGate } from './card-gate.js?v=1';
 /* 정역학 2장 선수 수업(9/7·9/9·9/14)은 시험 범위 밖 — 강 목록과 강 번호에서 뺀다 (대표님 10/11) */
 const STATICS_HIDE = ["2026-09-07", "2026-09-09", "2026-09-14"];
 const hideLesson = (course, l) => course === "정역학" && STATICS_HIDE.includes(l.date);
@@ -676,6 +677,8 @@ $("resume").onclick = () => {
   else consult(course);
 };
 async function startLesson(id, options = {}) {
+  /* 정역학 강 시작 암기카드: 새 수업을 열 때만(같은 수업 안 이동·다른 기기 따라가기는 제외) */
+  if (!options.follow && id !== current?.id && !(await cardGate(id))) { status('암기카드를 통과해야 수업이 열립니다.'); return; }
   try { await mission?.save(); if (!options.follow && !isBoard()) await growth?.stop('pause'); } catch (error) { status(error.message, true); return; }
   // 받기 경로: 기다리는 동안 이 기기에서 이동했으면 받은(이제 오래된) 세션을 적용하지 않는다.
   const stale = () => options.follow && options.epoch !== sessionEpoch;

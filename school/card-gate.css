@@ -1,0 +1,13 @@
+/* 정역학 강 시작 암기카드 팝업 */
+.card-gate{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(14,22,17,.62)}
+.card-gate-box{width:100%;max-width:520px;max-height:calc(100dvh - 32px);overflow:auto;background:#fffdf7;color:#21302a;border:1px solid #d9d2bd;border-radius:16px;padding:18px;box-shadow:0 18px 50px rgba(0,0,0,.3)}
+.card-gate-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;font-size:14px;color:#68725f}
+.card-gate-head b{font-size:16px;color:#243e30}
+.card-gate-q{font-size:19px;font-weight:700;line-height:1.5;margin:4px 0 12px;word-break:keep-all}
+.card-gate-a{font-size:16px;line-height:1.6;background:#f2f2e9;border-left:3px solid #b7a776;border-radius:8px;padding:10px 12px;margin:8px 0}
+.card-gate-a i{font-style:normal;font-size:13px;color:#8a6d1f;margin-right:8px}
+.card-gate-note{font-size:14px;line-height:1.6;color:#5c6f65;margin:8px 0 12px}
+.card-gate-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.card-gate-btn{min-height:46px;min-width:88px;padding:10px 16px;border-radius:12px;font:600 15px inherit;cursor:pointer;border:1px solid #cfd8cf;background:#fff;color:#21302a}
+.card-gate-btn.primary{background:#21745a;border-color:#21745a;color:#fff}
+.card-gate-btn.wrong{background:#c9583f;border-color:#c9583f;color:#fff}
