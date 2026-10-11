@@ -3622,7 +3622,8 @@ function routineDefaults(name){
     default: return [];
   }
 }
-function rtSkipped(r,mon){ return Array.isArray(r.skip)&&r.skip.indexOf(mon)>=0; }
+/* 루틴을 끈 것(r.off, 대표님 10/12 사회봉사)도 「이번 주 없음」과 같이 — 생성·표시 모두 건너뜀 */
+function rtSkipped(r,mon){ return !!r.off || (Array.isArray(r.skip)&&r.skip.indexOf(mon)>=0); }
 function rtToggleSkip(c,r,mon){
   r.skip=Array.isArray(r.skip)?r.skip:[];
   var i=r.skip.indexOf(mon);

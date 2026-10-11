@@ -18,6 +18,26 @@ const addDays = (date, n) => { const d = new Date(date + 'T00:00:00Z'); d.setUTC
 const WD = ['일', '월', '화', '수', '목', '금', '토'];
 const wd = (date) => WD[new Date(date + 'T00:00:00Z').getUTCDay()];
 const keyOf = (c, t) => `${c}|${t}`;
+// 할 일 종류 = 공부 · 과제 · 공모전(대표님 10/12). 예전 값은 그대로 읽는다: kind study·prep·cat review → 공부, cat hw → 과제, contest → 공모전, 그 밖 → 과제
+export const KINDS = ['공부', '과제', '공모전'];
+export const kindOf = (x) => (x.kind === '공모전' || x.kind === 'contest' || x.cat === 'contest') ? '공모전' : (x.kind === '공부' || x.kind === 'study' || x.kind === 'prep' || (!x.kind && (x.cat === 'review' || x.cat === 'study'))) ? '공부' : '과제';   // 어느 쪽도 아니면 과제(대표님 10/12)
+// 끈 것(off)·다른 할 일로 합친 것(mergedInto)·보일 날(showFrom) 전인 것은 안 보임 — 서버 과제 목록(school_assignments.hidden)과 같은 규칙
+// 할 일 이름(키)을 바꿀 때 기록(예상 분·완료·실제·타이머)을 통째로 새 키로 옮긴다. 새 키에 이미 기록이 있거나 다른 목록에 같은 키가 있으면
+// 기록이 갈라지므로 막는다(오타 검수 10/12)
+export const RECORD_KEYS = ['est', 'done', 'act', 'run', 'doneDate'];
+export const renameBlocked = (s, from, to, otherKeys = []) => from !== to && (RECORD_KEYS.some((k) => s[k] && s[k][to] !== undefined) || otherKeys.includes(to));
+export function moveRecords(s, from, to) { if (from === to) return; for (const k of RECORD_KEYS) if (s[k] && s[k][from] !== undefined) { s[k][to] = s[k][from]; delete s[k][from]; } }
+// 직접 넣은 할 일 고치기 한 번(저장 충돌 뒤 다시 적용돼도 같은 결과). 고치기 창을 연 뒤 다른 화면에서 그 할 일 이름이 바뀌었으면('changed')
+// 새 키가 막혀 있으면('blocked') 없어졌으면('gone') 아무것도 안 바꾼다. 'ok' 일 때만 값과 기록을 함께 옮긴다
+export function applyEdit(s, id, fromKey, patch, otherKeys = []) {
+  const x = (s.extra || []).find((y) => y.id === id); if (!x) return 'gone';
+  const cur = keyOf(x.c, x.t), to = keyOf(patch.c, patch.t);
+  if (cur !== fromKey) return 'changed';
+  if (renameBlocked(s, cur, to, otherKeys)) return 'blocked';
+  if ((s.extra || []).some((y) => y.id !== id && !y.off && keyOf(y.c, y.t) === to)) return 'blocked';   // 다른 할 일과 같은 이름(그 사이 추가된 것 포함)
+  Object.assign(x, patch); moveRecords(s, cur, to); return 'ok';
+}
+export const hiddenTask = (x, today) => !!(x.off || x.mergedInto || (x.showFrom && String(x.showFrom).slice(0, 10) > today));
 const DAY = { start: 0, end: 24 * 60, wake: 8 * 60, bed: 24 * 60 };   // 시간표 0~24시, 자동 배치는 08~24시
 const BREAK = 10, MIN_SLOT = 25, DEFAULT_EST = 60;
 const LAST = 24 * 60 - 1;   // 계획 끝은 23:59 까지(서버 시간 규격 HH:MM 은 24:00 이 없고 hm(1440) 은 00:00 이 된다 — 오타 검수 10/9)
@@ -52,7 +72,12 @@ const CSS = `
 .pl-ib:focus-visible{outline:3px solid #f2c94c;outline-offset:2px}
 .pl-check{flex:none;width:24px;height:24px;accent-color:#2e6b52;cursor:pointer}
 .pl-done .pl-title{text-decoration:line-through;color:#8a9a92}
-.pl-sub-hw{color:#b0581f!important}.pl-sub-st{color:#2e6b52!important}
+.pl-sub-hw{color:#b0581f!important}.pl-sub-st{color:#2e6b52!important}.pl-sub-ct{color:#3d5a8a!important}
+button.pl-title.pl-edit{display:block;width:100%;text-align:left;background:none;border:0;padding:0;margin:0;cursor:pointer}
+button.pl-title.pl-edit:hover,button.pl-title.pl-edit:focus-visible{text-decoration:underline;text-underline-offset:3px;outline:none}
+.pl-tnote{color:#4b6358}
+.pl-add input[name=contest]{flex:0 0 150px}
+.pl-add [hidden],.pl-pop [hidden]{display:none!important}
 .pl-sub{margin:12px 0 6px;font:700 13px/1.3 "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#4b6358}
 .pl-add{display:flex!important;flex-wrap:wrap;gap:6px;margin-top:12px;padding-top:12px;border-top:1px solid #edf1ee}
 .pl-add > *{width:auto!important;margin:0!important;min-height:0!important}
@@ -173,15 +198,20 @@ export function createPlan(app) {
       out.push({ key: keyOf(r.course, r.title), c: r.course, t, due: r.deadlineDate || '', time: r.deadlineTime || '', days: r.deadlineDays, kind: '과제', files: r.files || [] });
     }
     for (const x of v60.extra) {
+      if (hiddenTask(x, today)) continue;
       if (x.due && x.due < today && !v60.done[keyOf(x.c, x.t)]) continue;   // 마감 지난 할 일은 안 보임(대표님 10/9)
       const days = x.due ? Math.round((Date.parse(x.due) - Date.parse(today)) / 864e5) : null;
-      out.push({ key: keyOf(x.c, x.t), c: x.c, t: x.t, due: x.due || '', time: x.time || '', days, kind: x.kind === '과제' ? '과제' : '공부', extraId: x.id, estDefault: x.est });   // 직접 넣은 것: 공부(기본) 또는 과제
+      const item = { key: keyOf(x.c, x.t), c: x.c, t: x.t, due: x.due || '', time: x.time || '', days, kind: kindOf(x), extraId: x.id, estDefault: x.est, note: x.note || '', event: !!x.event };   // 직접 넣은 것: 공부(기본)·과제·공모전
+      const same = out.find((o) => o.key === item.key);   // 과제 목록에도 같은 할 일이 있으면 두 줄로 만들지 않고 종류·메모만 넣은 값으로
+      if (same) Object.assign(same, { kind: item.kind, extraId: item.extraId, estDefault: item.estDefault, note: item.note, event: item.event });
+      else out.push(item);
     }
-    for (const t of out) { t.est = estimate(t); t.inClass = !!ctx.inClass?.(t.c); }   // 수업 당일 과제(CADD 등)
+    for (const t of out) { t.est = estimate(t); t.inClass = t.kind !== '공모전' && !!ctx.inClass?.(t.c); }   // 수업 당일 과제(CADD 등)
     return out;
   }
   // 예상 분: 직접 고친 값 > 같은 과목·종류 실제 평균 > 넣을 때 적은 값 > 60
   function estimate(t) {
+    if (t.event) return { min: 0, src: '일정' };   // 날짜만 보는 일정(워크숍·발표 등): 타이머·예상 분·자동 채우기 없음
     if (Number.isFinite(v60.est[t.key])) return { min: v60.est[t.key], src: '직접' };
     const same = Object.values(v60.act).filter((a) => a && a.c === t.c && (a.kind || '과제') === t.kind && a.min > 0);
     if (same.length) return { min: Math.round(same.reduce((n, a) => n + a.min, 0) / same.length), src: `실제 평균 ${same.length}건` };
@@ -202,9 +232,18 @@ export function createPlan(app) {
 
   function taskRow(t, done) {
     const row = el('div', undefined, 'pl-task' + (done ? ' pl-done' : '')); row.dataset.key = t.key;
-    const body = el('div', undefined, 'pl-body'); body.append(el('div', t.t, 'pl-title'));
+    const body = el('div', undefined, 'pl-body');
+    if (t.extraId && !done) { const b = el('button', t.t, 'pl-title pl-edit'); b.type = 'button'; b.title = '고치기'; b.onclick = () => editPopup(t, b); body.append(b); }   // 직접 넣은 할 일은 제목을 눌러 고친다
+    else body.append(el('div', t.t, 'pl-title'));
     const meta = el('div', undefined, 'pl-meta');
-    if (t.due) { const soon = t.days !== null && t.days <= 1; meta.append(el('span', t.days === 0 ? `오늘 ${t.time || ''}`.trim() : t.days === 1 ? `내일 ${t.time || ''}`.trim() : t.days < 0 ? `${-t.days}일 지남` : `${t.due.slice(5).replace('-', '/')}(${wd(t.due)}) · D-${t.days}`, 'due' + (soon ? ' soon' : ''))); }
+    if (t.due) { const soon = t.days !== null && t.days <= 1; meta.append(el('span', t.days === 0 ? `오늘 ${t.time || ''}`.trim() : t.days === 1 ? `내일 ${t.time || ''}`.trim() : t.days < 0 ? `${-t.days}일 지남` : `${t.due.slice(5).replace('-', '/')}(${wd(t.due)})${t.time ? ' ' + t.time : ''} · D-${t.days}`, 'due' + (soon ? ' soon' : ''))); }
+    if (t.note) meta.append(el('span', t.note, 'pl-tnote'));
+    if (t.event) {   // 일정: 날짜·메모와 끝남 체크만
+      body.append(meta); row.append(body);
+      const ck = el('input', undefined, 'pl-check'); ck.type = 'checkbox'; ck.checked = !!done; ck.setAttribute('aria-label', done ? `${t.t} 끝남 되돌리기` : `${t.t} 끝남`);
+      ck.onchange = () => { if (ck.checked) { const now = Date.now(); save((s) => { s.done[t.key] = now; (s.doneDate = s.doneDate || {})[t.key] = ctx.today; }); } else save((s) => { delete s.done[t.key]; if (s.doneDate) delete s.doneDate[t.key]; }); };
+      row.append(ck); return row;
+    }
     if (!done) {
       const inp = el('input'); inp.type = 'number'; inp.min = 5; inp.max = 600; inp.step = 5; inp.value = t.est.min; inp.setAttribute('aria-label', `${t.t} 예상 분`);
       inp.onchange = () => { const v = Math.max(5, Math.min(600, Math.round(Number(inp.value) || DEFAULT_EST))); save((s) => { s.est[t.key] = v; }); };
@@ -240,18 +279,17 @@ export function createPlan(app) {
     head.append(el('small', `${open.length}개 · 예상 합계 ${dur(open.reduce((n, t) => n + t.est.min, 0))}`)); card.append(head);
     if (pend.length && saveErr) { const bar = el('div', `저장 안 된 변경 ${pend.length}개 — ${saveErr} `, 'pl-unsaved'); bar.setAttribute('role', 'alert'); const re = el('button', '다시 저장', 'pl-today'); re.type = 'button'; re.onclick = () => { saveErr = ''; flush(); }; bar.append(re); card.append(bar); }
     if (!open.length) card.append(el('p', '오늘 남은 일이 없어요.', 'pl-empty'));
-    const focus = (t) => !ctx.focus || ctx.focus(t.c);
-    // 과제(제출하는 것)와 공부(시험 준비)를 나눠서(대표님 10/9 「과제랑 공부 구분」), 집중 과목 밖은 맨 아래
-    for (const kind of ['과제', '공부', '그 밖']) {
-      const list = kind === '그 밖' ? open.filter((t) => !focus(t)) : open.filter((t) => t.kind === kind && focus(t));
+    // 홈 할 일은 종류별 세 묶음만(대표님 10/12 「공부 / 과제 / 공모전」): 공부 = 시험 공부·복습, 과제 = 과목 과제·제출물(사회봉사 포함), 공모전 = 대회 일정·마감. 과목은 묶음 안에서 나눈다
+    for (const kind of KINDS) {
+      const list = open.filter((t) => t.kind === kind);
       if (!list.length) { if (kind === '공부') card.append(el('div', '공부', 'pl-sub pl-sub-st'), el('p', '오늘 할 공부가 아직 없어요. 아래에서 넣거나 스앵님께 계획을 부탁하세요.', 'pl-empty')); continue; }
-      card.append(el('div', kind === '그 밖' ? '그 밖 과목 — 시험 기간엔 자동 배치 안 함' : kind, 'pl-sub pl-sub-' + (kind === '과제' ? 'hw' : kind === '공부' ? 'st' : 'etc')));
+      card.append(el('div', kind, 'pl-sub pl-sub-' + (kind === '과제' ? 'hw' : kind === '공부' ? 'st' : 'ct')));
       const groups = new Map(); for (const t of list) { if (!groups.has(t.c)) groups.set(t.c, []); groups.get(t.c).push(t); }
       const order = [...groups.entries()].sort((a, b) => Math.min(...a[1].map((t) => t.days ?? 999)) - Math.min(...b[1].map((t) => t.days ?? 999)));
       for (const [c, ts] of order) {
         ts.sort((a, b) => (a.days ?? 999) - (b.days ?? 999));
         const g = el('div', undefined, 'pl-group' + (ts.some((t) => t.days !== null && t.days <= 1) ? ' urgent' : ''));
-        const n = el('div', undefined, 'pl-gname'); n.append(el('b', c), el('small', `${ts.length}개 · 약 ${dur(ts.reduce((s, t) => s + t.est.min, 0))}`)); g.append(n);
+        const n = el('div', undefined, 'pl-gname'), sum = ts.reduce((s, t) => s + t.est.min, 0); n.append(el('b', c), el('small', `${ts.length}개${sum ? ' · 약 ' + dur(sum) : ''}`)); g.append(n);
         for (const t of ts) g.append(taskRow(t, false));
         card.append(g);
       }
@@ -263,13 +301,17 @@ export function createPlan(app) {
     if (finished.length) { card.append(el('div', '오늘 끝낸 것', 'pl-sub')); for (const t of finished) card.append(taskRow(t, true)); }
     // 할 일 넣기: 과목 · 할 일 · 마감 날짜 · 예상 분
     const add = el('form', undefined, 'pl-add'); add.setAttribute('aria-label', '할 일 넣기');
-    const kindSel = el('select'); kindSel.name = 'kind'; kindSel.setAttribute('aria-label', '종류'); for (const k of ['공부', '과제']) kindSel.append(Object.assign(el('option', k), { value: k }));
+    const kindSel = el('select'); kindSel.name = 'kind'; kindSel.setAttribute('aria-label', '종류'); for (const k of KINDS) kindSel.append(Object.assign(el('option', k), { value: k }));
     const sel = el('select'); sel.name = 'c'; sel.setAttribute('aria-label', '과목'); for (const c of ctx.courses || []) sel.append(Object.assign(el('option', c), { value: c }));
+    const contest = contestInput('contest');   // 공모전을 고르면 과목 대신 대회 이름
+    const swap = () => { const on = kindSel.value === '공모전'; sel.hidden = on; contest.hidden = !on; contest.required = on; };
+    kindSel.onchange = swap;
     const t = el('input'); t.name = 't'; t.placeholder = '할 일'; t.required = true; t.maxLength = 120; t.setAttribute('aria-label', '할 일');
     const due = el('input'); due.name = 'due'; due.type = 'date'; due.value = ctx.today; due.setAttribute('aria-label', '마감 날짜');
     const est = el('input'); est.name = 'est'; est.type = 'number'; est.min = 5; est.max = 600; est.step = 5; est.value = 30; est.setAttribute('aria-label', '예상 분');
-    const go = el('button', '추가'); go.type = 'submit'; add.append(kindSel, sel, t, due, est, go);
-    add.onsubmit = (e) => { e.preventDefault(); const text = t.value.trim(); if (!text) return; const item = { id: 'x' + opId(), kind: kindSel.value, c: sel.value, t: text, due: due.value, time: '', est: Math.max(5, Number(est.value) || 30) };
+    const go = el('button', '추가'); go.type = 'submit'; add.append(kindSel, sel, contest, t, due, est, go); swap();
+    add.onsubmit = (e) => { e.preventDefault(); const text = t.value.trim(); if (!text) return; const c = kindSel.value === '공모전' ? contest.value.trim() : sel.value; if (!c) return;
+      const item = { id: 'x' + opId(), kind: kindSel.value, c, t: text, due: due.value, time: '', est: Math.max(5, Number(est.value) || 30) };
       if (v60.extra.some((x) => x.c === item.c && x.t === item.t)) { app.status?.('같은 할 일이 이미 있어요.', true); return; } t.value = ''; save((s) => { if (!s.extra.some((x) => x.id === item.id)) s.extra.push(item); }); };
     card.append(add);
     return card;
@@ -414,6 +456,53 @@ export function createPlan(app) {
     const w = pop.offsetWidth || 300, h = pop.offsetHeight || 300;
     pop.style.left = Math.max(8, Math.min(x - 20, innerWidth - w - 8)) + 'px';
     pop.style.top = Math.max(8, Math.min(y - 20, innerHeight - h - 8)) + 'px';
+  }
+  // 대회 이름 입력(이미 넣은 대회 이름을 고를 수 있게)
+  function contestInput(name) {
+    const i = el('input'); i.name = name; i.placeholder = '대회 이름'; i.maxLength = 40; i.setAttribute('aria-label', '대회 이름');
+    const id = 'pl-contests'; let list = document.getElementById(id); if (!list) { list = el('datalist'); list.id = id; document.body.append(list); }
+    list.replaceChildren(...[...new Set(v60.extra.filter((x) => kindOf(x) === '공모전' && x.c).map((x) => x.c))].map((c) => Object.assign(el('option'), { value: c })));
+    i.setAttribute('list', id); return i;
+  }
+  // 직접 넣은 할 일 고치기: 종류·과목(대회)·할 일·마감 날짜·시각, 그리고 숨기기(off — 지우지 않음).
+  // 제목·과목이 바뀌면 예상 분·완료·실제 기록·타이머 키도 새 키로 옮긴다. 메모·일정 표시·보일 날 같은 다른 값은 그대로 둔다.
+  function editPopup(t, anchor) {
+    const x0 = v60.extra.find((x) => x.id === t.extraId); if (!x0) return;
+    document.querySelector('.pl-pop')?.remove();
+    const pop = el('form', undefined, 'pl-pop'); pop.setAttribute('aria-label', '할 일 고치기');
+    const close = () => { pop.remove(); document.removeEventListener('pointerdown', outside, true); document.removeEventListener('keydown', esc, true); };
+    const outside = (e) => { if (!pop.contains(e.target)) close(); };
+    const esc = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
+    setTimeout(() => { document.addEventListener('pointerdown', outside, true); document.addEventListener('keydown', esc, true); });
+    const kindSel = el('select'); kindSel.setAttribute('aria-label', '종류'); for (const k of KINDS) kindSel.append(Object.assign(el('option', k), { value: k })); kindSel.value = kindOf(x0);
+    const sel = el('select'); sel.setAttribute('aria-label', '과목'); for (const c of ctx.courses || []) sel.append(Object.assign(el('option', c), { value: c }));
+    if (x0.c && ![...sel.options].some((o) => o.value === x0.c)) sel.append(Object.assign(el('option', x0.c), { value: x0.c }));
+    const contest = contestInput('contest');
+    if (kindOf(x0) === '공모전') contest.value = x0.c || ''; else sel.value = x0.c;
+    const swap = () => { const on = kindSel.value === '공모전'; sel.hidden = on; contest.hidden = !on; contest.required = on; }; kindSel.onchange = swap; swap();
+    const text = el('input'); text.value = x0.t; text.required = true; text.maxLength = 120; text.setAttribute('aria-label', '할 일');
+    const due = el('input'); due.type = 'date'; due.value = x0.due || ''; due.setAttribute('aria-label', '마감 날짜');
+    const time = el('input'); time.type = 'time'; time.value = x0.time || ''; time.setAttribute('aria-label', '마감 시각');
+    const ok = el('button', '저장'); ok.type = 'submit';
+    const hide = el('button', '숨기기', 'danger'); hide.type = 'button';
+    const no = el('button', '닫기', 'ghost'); no.type = 'button'; no.onclick = close;
+    pop.append(el('b', '할 일 고치기'), kindSel, sel, contest, text, due, time, ok, hide, no, el('small', '숨긴 할 일은 지워지지 않고 목록에서만 빠져요.', 'pl-popnote'));
+    hide.onclick = () => { const id = x0.id, at = Date.now(); save((s) => { const x = s.extra.find((y) => y.id === id); if (x) { x.off = true; x.offAt = at; } }); close(); };
+    pop.onsubmit = (e) => {
+      e.preventDefault(); const kind = kindSel.value, c = kind === '공모전' ? contest.value.trim() : sel.value, tt = text.value.trim(); if (!c || !tt) return;
+      if (v60.extra.some((y) => y.id !== x0.id && !y.off && y.c === c && y.t === tt)) { app.status?.('같은 할 일이 이미 있어요.', true); return; }
+      const id = x0.id, from = keyOf(x0.c, x0.t), to = keyOf(c, tt), d = due.value, tm = time.value;
+      // 제목·과목을 바꾸면 기록(예상 분·완료·실제·타이머)을 새 키로 통째로 옮긴다. 새 키에 이미 기록이 있거나 과제 목록에 같은 할 일이 있으면
+      // 기록이 갈라지므로 바꾸지 않는다(오타 검수 10/12). 저장 충돌 뒤 다시 적용할 때도 같은 검사를 해서 반만 옮기는 일이 없게
+      const others = (ctx.deadlines || []).map((r) => keyOf(r.course, r.title));
+      if (renameBlocked(v60, from, to, others)) { app.status?.('같은 이름의 할 일 기록이 이미 있어요. 다른 이름으로 해 주세요.', true); return; }
+      const MSG = { changed: '그 사이 다른 화면에서 이 할 일이 바뀌어 고치지 않았어요. 다시 열어 고쳐 주세요.', blocked: '같은 이름의 할 일 기록이 이미 있어 고치지 않았어요.', gone: '이 할 일이 없어져 고치지 않았어요.' };
+      save((s) => { const r = applyEdit(s, id, from, { kind, c, t: tt, due: d, time: tm }, others); if (r !== 'ok') app.status?.(MSG[r], true); });
+      close();
+    };
+    document.body.append(pop);
+    const r = anchor.getBoundingClientRect(); placePop(pop, r.left, r.bottom + 4);
+    text.focus();
   }
   function planPopup(card, date, startMin, anchor, at, pickDate, existing, preset) {
     document.querySelector('.pl-pop')?.remove();
@@ -677,7 +766,7 @@ export function createPlan(app) {
 
   return {
     // host 에 그리기. c = { today, courses[](집중 과목), focus(name)→bool, scheduled[], plans[], deadlines[](pendingDeadlines 결과), calendar[](오늘), routine, courseName(id) }
-    // 집중 과목 밖 과제는 목록 아래 「그 밖 과목」으로, 자동 배치는 마감 오늘·내일일 때만
+    // 할 일 목록은 공부·과제·공모전 세 묶음, 자동 배치는 집중 과목 밖이면 마감 오늘·내일일 때만
     async render(target, c) {
       host = target; ctx = c; day = c.today; bootDay = kst(); if (c.calendarOk) cache.set(c.today, c.calendar || []); else cache.delete(c.today);   // 확인 못 한 오늘 캘린더는 다시 받기
       host.replaceChildren(el('p', '공부 계획을 불러오는 중…', 'pl-empty'));
