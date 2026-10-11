@@ -2725,7 +2725,6 @@ function seedWriting(){
 
 /* 정역학 — 수강정정 기간에 확보 예정 (일단 확정으로 잡아 둠) */
 var ST_NOTE=
-"[상태] 수강정정으로 확보 예정 — 앱에는 확정으로 잡아 둠\n"+
 "강의계획서를 아직 못 받아서 평가 구성이 비어 있다. 학습모드 M1은 과목 성격만으로 잡은 가설.\n"+
 "시험 일정도 다른 과목의 8주차/16주차을 따라 추정해 넣었으니, 정정 후 계획서로 확인할 것.\n\n"+
 "[왜 이 과목이 최우선인가]\n"+
@@ -2733,18 +2732,6 @@ var ST_NOTE=
 "  정역학 → 고체역학 → 기계요소설계 → 캡스톤\n"+
 "  정역학 → 동역학 → 기계진동 · 자동제어\n"+
 "한 학기 밀리면 3~4학년 전공 배치가 통째로 흔들린다.\n\n"+
-"[수강정정 — 실전 요령]\n"+
-"1. 정정기간은 보통 개강 첫 주 며칠뿐이다. 정확한 날짜·시각을 포털에서 먼저 확인할 것.\n"+
-"2. 정정은 선착순이다. 서버가 열리는 시각에 미리 로그인해서 대기.\n"+
-"3. 빈자리는 다른 학생이 버릴 때 순간적으로 생긴다. 정정기간 내내 수시로 새로고침할 것.\n"+
-"   특히 정정 첫날 오전, 마감 직전에 많이 나온다.\n"+
-"4. 미리 장바구니/관심과목에 등록해 두면 클릭 수를 줄일 수 있다.\n"+
-"5. 정정 기간에도 첫 주 수업은 들어갈 것. 진도를 놓치면 잡고 나서 따라잡기 힘들다.\n\n"+
-"[정정도 실패하면 — 대안 순서]\n"+
-"1순위: 같은 학기 다른 분반 (시간표 충돌 여부는 앱에서 바로 확인 가능)\n"+
-"2순위: 교수님께 증원 요청 — 첫 수업 직후 직접, 학과 사무실에도 병행\n"+
-"3순위: 겨울 계절학기 개설 여부 확인\n"+
-"4순위: 다음 학기 1순위 신청 + 겨울방학에 선수지식 독학\n\n"+
 "[선수지식 — 지금 미리 볼 것]\n"+
 "벡터(고교) · 뉴턴 운동 3법칙(고교) · 자유물체도 · 평형방정식 · 도심과 단면 2차 모멘트\n"+
 "★ 미분적분학2 4~6주차(벡터와 공간 · 내적 · 벡터곱)이 정확히 정역학의 선수지식이다.\n"+
@@ -7823,7 +7810,7 @@ function boot(){
       var s=t.sessions.filter(function(x){return x.courseId===st.id&&x.date==="2026-09-02";})[0];
       if(!s){ s={id:uid(),courseId:st.id,date:"2026-09-02",week:1,status:null,progress:"",und:null,reviewed:false,memo:"",
                slots:{pre:"",note:"",rec:"",notice:""},startedAt:"",endedAt:"",knew:"",stuck:"",learned:"",missedFrom:"",timeline:[]}; t.sessions.push(s); }
-      if(!s.status){ s.cancelled=true; s.status=null; if(!s.memo) s.memo="수강정정 전(9/3 신청) — 출결 계산에서 제외. 내용은 오리엔테이션(OT 슬라이드로 대체)"; if(!s.progress) s.progress="오리엔테이션 (Lecture Orientation)"; }
+      if(!s.status){ s.cancelled=true; s.status=null; if(!s.memo) s.memo="내용은 오리엔테이션(OT 슬라이드로 대체)"; if(!s.progress) s.progress="오리엔테이션 (Lecture Orientation)"; }
     }
     t.patchWeekNotesV3=true;
     try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
@@ -7946,7 +7933,7 @@ function boot(){
     /* 정역학 9/2(수): 수강정정 전이라 제외했던 회차 → 교수 답변(9/7) "출석 인정 어렵다" → 결석으로 계산 */
     var _st2=term().courses.filter(function(c){return c.name==="정역학";})[0];
     if(_st2){ var _ss=term().sessions.filter(function(x){return x.courseId===_st2.id&&x.date==="2026-09-02";})[0];
-      if(_ss&&_ss.cancelled&&!_ss.status){ _ss.cancelled=false; _ss.status="absent"; _ss.memo="결석 — 수강정정 전(9/3 신청)이라 출석 인정 요청했으나 9/7 「인정 어렵다」 답변. 내용은 오리엔테이션(OT 슬라이드로 대체)"; } }
+      if(_ss&&_ss.cancelled&&!_ss.status){ _ss.cancelled=false; _ss.status="absent"; _ss.memo="내용은 오리엔테이션(OT 슬라이드로 대체)"; } }
     S.patchStaticsAttV1=true; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
   }
   if(!S.patchSvStepsV1){
