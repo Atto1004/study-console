@@ -303,7 +303,7 @@ function showLobby() {
   for (const [position, c] of catalog.courses
     .filter((c) => c.name !== "사회봉사")
     .entries()) {
-    const b = button("", () => showCourse(c.name), "door");
+    const b = button("", () => showCourse(c.name, true), "door");
     const info = node("span", undefined, "door-info");
     info.append(
       node("b", c.name),
