@@ -50,7 +50,7 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
   previous.type = next.type = 'button';
   pages.append(previous, position, next);
   el.append(header, contents, title, readingGuide, illustration, body, pages);
-  let material = [], page = 0, sourceText = '', pageLimit = 300, renderVersion = 0;
+  let material = [], page = 0, sourceText = '', pageLimit = 300, renderVersion = 0, stickEnd = false;   // stickEnd: 정역학 누적 정리는 늘 맨 끝 쪽(지금 칠판 자리)에 붙어 있게 — 손으로 넘기면 풀림
   function paginate() {
     material = [];
     for (const part of sourceText.trim() ? splitText(sourceText, pageLimit) : []) {
@@ -58,7 +58,7 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
       if (previous && previous.length + part.length + 2 <= pageLimit) material[material.length - 1] += '\n\n' + part;
       else material.push(part);
     }
-    page = Math.min(page, Math.max(0, material.length - 1));
+    page = stickEnd ? Math.max(0, material.length - 1) : Math.min(page, Math.max(0, material.length - 1));
   }
 
   function showPage() {
@@ -80,8 +80,8 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
       }
     });
   }
-  previous.addEventListener('click', () => { if (page > 0) { page--; showPage(); } });
-  next.addEventListener('click', () => { if (page < material.length - 1) { page++; showPage(); } });
+  previous.addEventListener('click', () => { if (page > 0) { stickEnd = false; page--; showPage(); } });
+  next.addEventListener('click', () => { if (page < material.length - 1) { stickEnd = false; page++; showPage(); } });
   if (globalThis.ResizeObserver) {
     let lastSize = '';
     new ResizeObserver(() => {
@@ -175,7 +175,7 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
     const memo = statics ? keep(gated.filter(part => part.kind === 'remember')).map(part => '★ 외울 것 · ' + part) : [];
     const rest = keep(gated).map(part => statics && WARN.test(part) ? '주의 · ' + part : part);
     const text = [...memo, ...rest].join('\n\n');
-    sourceText = text; pageLimit = 300; renderVersion++; page = 0; paginate();
+    sourceText = text; pageLimit = 300; renderVersion++; page = 0; stickEnd = statics; paginate();   // 정역학 누적 정리는 맨 끝 쪽(지금 칠판 자리)부터 보여 준다(10/12)
     showPage();
   }
   render(null);

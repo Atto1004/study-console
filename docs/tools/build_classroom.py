@@ -137,9 +137,9 @@ def load_plan(slug, date, sec_ids, nq, has_board):
     if not os.path.exists(PLAN_PATH): return {}
     allp = json.load(io.open(PLAN_PATH, encoding="utf-8"))
     plan = allp.get(f"{slug}_{date}") or {}
-    bad = sorted(set(plan) - {"skip", "skipq", "title", "add", "why"})
+    bad = sorted(set(plan) - {"skip", "skipq", "title", "add", "why", "ltitle"})
     if bad: raise SystemExit(f"교실 계획 {slug}_{date}: 모르는 키 {bad}")
-    if not has_board and any(plan.get(k) for k in ("add", "title", "skipq")): raise SystemExit(f"교실 계획 {slug}_{date}: 판서 파일 없는 회차는 skip 만")
+    if not has_board and any(plan.get(k) for k in ("add", "title", "skipq", "ltitle")): raise SystemExit(f"교실 계획 {slug}_{date}: 판서 파일 없는 회차는 skip 만")
     for sid in plan.get("skip", []) + list((plan.get("title") or {}).keys()):
         if sid not in sec_ids: raise SystemExit(f"교실 계획 {slug}_{date}: 없는 섹션 {sid}")
     for k in plan.get("skipq", []):
@@ -255,6 +255,7 @@ def build(src, slug, date, minutes=18):
         io.open(os.path.join(FIGCHK_DIR, f"classroom_{slug}_{date}.html"), "w", encoding="utf-8", newline="\n").write(
             '<!doctype html><meta charset="utf-8"><body style="background:#fff">' + figs_html)
     chapters = apply_plan(chapters, plan, slug, date)
+    if plan.get("ltitle"): title = plan["ltitle"]   # 교실에서 줄인 내용에 맞춘 수업 제목(수업 노트 원문 제목은 그대로)
     quiz = []; mixer = Mixer(lesson_id)
     for k, q in enumerate(doc.xpath('//div[contains(concat(" ",normalize-space(@class)," ")," q ")]'), 1):
         qid = q.get("data-qid") or f"q{k}"
@@ -293,6 +294,7 @@ def build(src, slug, date, minutes=18):
     lp = os.path.join(ROOT, "knowledge", "lessons.json")
     reg = json.load(io.open(lp, encoding="utf-8")) if os.path.exists(lp) else {"courses": {}}
     rec = reg.setdefault("courses", {}).setdefault(course, {}).setdefault(date, {"id": lesson_id})
+    if plan.get("ltitle"): rec["title"] = plan["ltitle"]
     rec["classroom"] = f"notes/classroom/{slug}/{date}.html"; rec["chapters"] = len(chapters); rec["steps"] = sum(len(c["steps"]) for c in chapters)
     reg["generated"] = datetime.datetime.now().isoformat(timespec="seconds")
     io.open(lp, "w", encoding="utf-8", newline="\n").write(json.dumps(reg, ensure_ascii=False, indent=1))
