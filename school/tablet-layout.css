@@ -81,3 +81,5 @@
 .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-stage #board{padding-bottom:56px!important}
 .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site][data-step=quiz] .v3-stage #board{padding:14px!important}
 }
+
+@media(min-width:641px) and (max-width:1366px) and (orientation:portrait){.school.tablet-layout[data-mode=classroom]>.tablet-toc-toggle{left:auto;right:28px;top:var(--tablet-toc-top);bottom:auto;min-height:32px;padding:5px 10px;font-size:12px}.school.tablet-layout .lesson-textbook-header{padding-right:100px}.school.tablet-layout[data-mode=classroom]>.subject-rail-toggle{top:var(--tablet-book-middle)!important;bottom:auto}}

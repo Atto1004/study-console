@@ -19,6 +19,11 @@ const measure = () => {
   const chatHeight = document.querySelector('[aria-label="김주영 스앵님과 대화"]')?.getBoundingClientRect().height;
   if (headerHeight) school.style.setProperty('--tablet-top', `${headerHeight}px`);
   if (chatHeight) school.style.setProperty('--tablet-bottom', `${chatHeight}px`);
+  const book = document.getElementById('workZone')?.getBoundingClientRect();
+  if (book?.height) {
+    school.style.setProperty('--tablet-toc-top', `${book.top + 14}px`);
+    school.style.setProperty('--tablet-book-middle', `${book.top + book.height / 2 - 24}px`);
+  }
 };
 const reflow = () => {
   if (!matchMedia('(min-width:641px) and (max-width:1366px)').matches) return;
