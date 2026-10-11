@@ -4,6 +4,13 @@ const short = (name) => (/^[A-Za-z]/.test(name) ? name.slice(0, 1) : [...name][0
 export function createSubjectRail({ subjects, current, choose, openScope, available = () => true, position }) {
   const rail = document.createElement('nav'); rail.className = 'subject-rail'; rail.setAttribute('aria-label', '과목 바꾸기');
   const context=document.createElement('section');context.className='subject-context';context.setAttribute('aria-label','현재 수업 위치');context.hidden=true;document.querySelector('.school')?.append(context);
+  const infoBox=document.createElement('div');context.append(infoBox);
+  const toc=document.querySelector('.lesson-textbook-contents');
+  if(toc){toc.parentElement.dataset.externalToc='true';const group=document.createElement('section');group.className='subject-textbook-toc';const label=document.createElement('h2');label.textContent='교재 목차';group.append(label,toc);context.append(group);}
+  const toggle=document.createElement('button');toggle.type='button';toggle.className='subject-rail-toggle';toggle.setAttribute('aria-controls','subjectRail');document.querySelector('.school')?.append(toggle);
+  rail.id='subjectRail';rail.hidden=true;
+  const syncToggle=()=>{toggle.textContent=rail.hidden?'>':'<';toggle.setAttribute('aria-expanded',String(!rail.hidden));toggle.setAttribute('aria-label',rail.hidden?'과목 탭 펼치기':'과목 탭 접기');};
+  toggle.onclick=()=>{rail.hidden=!rail.hidden;syncToggle();placeContext();};syncToggle();
   const list=document.createElement('div');list.className='subject-list';rail.append(list);
   let page=0,lastCurrent;const pageSize=4;
   const buttons = subjects.map((s, i) => {
@@ -29,13 +36,13 @@ export function createSubjectRail({ subjects, current, choose, openScope, availa
     if (active && openScope) b.setAttribute('aria-haspopup', 'dialog'); else b.removeAttribute('aria-haspopup');
   }
     const info=position?.();context.hidden=!info;
-    if(info){context.replaceChildren();for(const [tag,text] of [['strong',info.course],['span',info.lecture],['p',info.part]]){if(!text)continue;const e=document.createElement(tag);e.textContent=text;context.append(e);}placeContext();}
+    if(info){infoBox.replaceChildren();for(const [tag,text] of [['strong',info.course],['span',info.lecture],['p',info.part]]){if(!text)continue;const e=document.createElement(tag);e.textContent=text;infoBox.append(e);}placeContext();}
     const activeIndex=subjects.findIndex(s=>s.name===now);if(activeIndex>=0 && now!==lastCurrent)page=Math.floor(activeIndex/pageSize);lastCurrent=now;paintPage();
   }
   document.querySelector('.school')?.append(rail);
-  function placeContext(){const board=document.querySelector('#board')?.getBoundingClientRect();if(!board)return;context.style.left='16px';context.style.top=board.top+'px';context.style.width=Math.max(0,board.left-32)+'px';}
+  function placeContext(){const board=document.querySelector('#board')?.getBoundingClientRect();if(!board)return;context.style.left='16px';context.style.top=board.top+'px';context.style.width=Math.max(0,board.left-32)+'px';rail.style.top=board.top+'px';rail.style.left='36px';rail.style.maxHeight='none';const chatTop=document.querySelector('[aria-label="김주영 스앵님과 대화"]')?.getBoundingClientRect().top;const bottomLimit=chatTop>board.top?chatTop-64:window.innerHeight-120;toggle.style.top=Math.max(board.top,Math.min(context.getBoundingClientRect().bottom+16,bottomLimit))+'px';}
   window.addEventListener('resize',placeContext);
-  if(document.querySelector('#room'))new ResizeObserver(placeContext).observe(document.querySelector('#room'));
+  if(document.querySelector('#room')){const layoutObserver=new ResizeObserver(placeContext);layoutObserver.observe(document.querySelector('#room'));layoutObserver.observe(context);}
   window.addEventListener('keydown', (e) => {
     const sc = document.querySelector('.school');
     if (sc.dataset.mode !== 'classroom' || sc.dataset.world === 'walking' || e.ctrlKey || e.metaKey || e.altKey) return;

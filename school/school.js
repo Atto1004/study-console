@@ -19,7 +19,7 @@ import { pickLesson, pickQuestions } from "./metrics.js";
 import { createSetup } from "./setup.js";
 import { createWorldMap } from "./worldmap.js";
 import { createTutor } from "./tutor.js";
-import { createSubjectRail } from "./subject-rail.js?v=236";
+import { createSubjectRail } from "./subject-rail.js?v=251";
 import { createSubjectScope } from "./subject-scope.js?v=240";
 import { boardHierarchy,createBoardHierarchy } from "./board-hierarchy.js?v=240";
 import { startSurfaces } from "./surface.js";
@@ -36,8 +36,8 @@ import { createFace } from "./face.js";
 import { readable, cleanTitle } from "./readable.js";
 import { createPlan } from "./plan.js";
 import { inFocus } from "./focus.js";
-import { createLessonTextbook } from "./lesson-textbook.js?v=235";
-import { startClassroomV3 } from "./classroom-v3.js?v=227";
+import { createLessonTextbook } from "./lesson-textbook.js?v=256";
+import { startClassroomV3 } from "./classroom-v3.js?v=241";
 import { createGrowth } from "./growth.js?v=199";
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
@@ -822,11 +822,11 @@ function board(title, body, kind, annotation) {
     if (v3 && choices) v3.response.append(choices);
     decorateChalk(host, current?.steps[index]);
     renderMath(host);
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       if (
-        host.scrollHeight > host.clientHeight + 2 &&
+        (host.scrollHeight > host.clientHeight + 2 || host.querySelector(".content").scrollHeight > host.querySelector(".content").clientHeight + 2) &&
         innerWidth > 650 &&
-        limit > 100
+        limit > 40
       ) {
         limit = Math.floor(limit * 0.7);
         const smaller = chalkPages(body, limit);

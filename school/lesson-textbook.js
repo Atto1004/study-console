@@ -54,7 +54,7 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
     next.disabled = page >= material.length - 1;
     math(body);
     const version = renderVersion;
-    globalThis.requestAnimationFrame?.(() => {
+    globalThis.setTimeout?.(() => {
       if (version === renderVersion && body.clientHeight > 30 && body.scrollHeight > body.clientHeight + 2 && pageLimit > 45) {
         pageLimit = Math.max(45, Math.floor(pageLimit * .65)); paginate(); showPage();
       }

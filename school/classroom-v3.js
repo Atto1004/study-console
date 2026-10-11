@@ -42,21 +42,9 @@ export function startClassroomV3(app) {
   if (teacher) guide.append(teacher);
   room.append(stage, guide, work);
   school.append(dialogue);
-  const response = el('section', 'v3-response'); response.setAttribute('aria-label', '수업 답변');
-  response.append(el('h3', '', '직접 확인하기'));
-  const choices = document.getElementById('choices'); response.append(choices);
-  const reply = el('form', 'v3-response-form'), replyText = el('textarea');
-  replyText.placeholder = '이해한 내용이나 답을 적어주세요'; replyText.setAttribute('aria-label', '수업 답변 적기'); replyText.maxLength = 600;
-  const replySend = el('button', '', '답변 보내기'); replySend.type = 'submit'; reply.append(replyText, replySend); response.append(reply); room.append(response);
-  const syncResponse = () => {
-    const c=app.context?.(),step=c?.lesson?.steps[c.index];
-    const quiz=!!step?.options || step?.kind==='quiz';
-    const asked=school.dataset.lecture!=='playing' && (dialogue.dataset.tutor==='check' || dialogue.dataset.tutor==='retry');
-    response.hidden=!(quiz || asked);reply.hidden=quiz || !asked;
-  };
-  response.hidden=true;
-  new MutationObserver(syncResponse).observe(dialogue,{attributes:true,attributeFilter:['data-tutor']});
-  reply.onsubmit = e => { e.preventDefault(); const text = replyText.value.trim(); if (!text) return; replyText.value = ''; addMine(text); app.onChat?.(text); };
+  // Quiz choices stay on the board; written replies use the shared chat.
+  const response = document.getElementById('board');
+  response.append(document.getElementById('choices'));
   const pointer = el('div', 'v3-pointer'); pointer.setAttribute('aria-hidden', 'true');
   pointer.innerHTML = '<svg viewBox="0 0 160 90"><path d="M150 70Q117 77 105 52L70 37 76 18 120 34Q146 45 150 70" fill="#eee9e7" stroke="#b8ada7" stroke-width="2"/><path d="M77 19L61 13 33 19Q25 24 31 28L55 25 43 35Q40 42 48 42L72 37Z" fill="#e6beb0" stroke="#b39185" stroke-width="1.5"/><path d="M34 24L5 3" stroke="#d9c695" stroke-width="3" stroke-linecap="round"/></svg>';
   guide.append(pointer);
@@ -219,7 +207,6 @@ export function startClassroomV3(app) {
         journey.dataset.playing = String(playing);
       } else progress.textContent = app.progress?.() || '';
       school.dataset.lecture = ended ? 'ended' : playing ? 'playing' : 'paused';
-      syncResponse();
     },
     focusChat() { (school.dataset.sharedChat ? school.querySelector('.sb input') : input)?.focus(); },
     say: addLine,
