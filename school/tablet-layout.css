@@ -1,0 +1,118 @@
+/* Tablet classroom uses the available viewport, not a height-derived width. */
+@media (min-width:641px) {
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #scene{padding:10px 14px calc(var(--tablet-bottom,var(--gl-bottom,96px)) + 10px) 128px!important;overflow:hidden!important}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{width:100%!important;max-width:none!important;margin:0!important;height:calc(var(--tablet-viewport-height,100dvh) - var(--tablet-top,var(--gl-top,64px)) - var(--tablet-bottom,var(--gl-bottom,96px)) - 20px)!important;grid-template-columns:minmax(0,1.8fr) minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) 96px 88px 100px!important;gap:8px 12px!important;--class-response-height:96px}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-stage{height:100%!important;min-height:0!important;aspect-ratio:auto!important}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-stage #board{padding:14px 116px 64px 16px!important;gap:6px!important}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #board h1{font-size:20px!important;line-height:1.35!important;margin:4px 0 8px!important}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #board .content{font-size:17px!important;line-height:1.45!important}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room .v3-work{grid-column:2!important;grid-row:1/3!important;height:100%!important;min-height:0!important;padding:8px!important}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide{left:calc((100% - 12px)*1.8/2.8 - 108px)!important;width:108px!important;height:var(--class-board-height)!important;padding:0!important}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide #dockFace.has-lecture-actor{width:108px!important;height:144px!important}
+  .school.tablet-layout[data-layout=v3] .v3-board-focus{left:16px;right:116px;bottom:10px;max-height:44px;font-size:12px;line-height:1.4}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-vn{height:96px!important;padding:28px 12px 8px!important}
+  .school.tablet-layout[data-layout=v3] .v3-vn .v3-log{height:56px!important;min-height:56px!important;max-height:56px!important;padding-right:0!important}
+  .school.tablet-layout[data-layout=v3] .v3-vn .v3-log-pages{bottom:6px;right:8px}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom] .v3-vn .v3-msg p{font-size:14px!important;padding-right:150px}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #dialogue .v3-bar{grid-row:3;min-height:0!important;height:88px;box-sizing:border-box;padding:6px 10px!important;margin:0!important;gap:4px!important}
+  .school.tablet-layout[data-layout=v3] .v3-journey{height:42px}
+  .school.tablet-layout[data-layout=v3] .v3-route button{padding-top:26px!important;font-size:10px!important;max-height:42px}
+  .school.tablet-layout[data-layout=v3] .v3-bar>.v3-btn{min-height:32px!important;width:36px;height:32px;padding:5px!important}
+  .school.tablet-layout[data-layout=v3] .lesson-textbook{padding:10px!important;gap:5px!important}
+  .school.tablet-layout[data-layout=v3] .lesson-textbook-title{font-size:15px!important}
+  .school.tablet-layout[data-layout=v3] .lesson-textbook-body{font-size:15px!important;line-height:1.5!important}
+  .school.tablet-layout[data-mode=classroom][data-view3=site] .lecture-quests{position:static!important;grid-column:1/-1!important;grid-row:4!important;width:100%!important;height:100px;padding:8px 10px;margin:0;overflow:hidden}
+  .school.tablet-layout .lecture-quests h2{display:inline;font-size:13px}.school.tablet-layout .lecture-quests .quest-count{display:inline;margin-left:12px}.school.tablet-layout .lecture-quests .quest-lesson,.school.tablet-layout .lecture-quests .quest-topic,.school.tablet-layout .lecture-quests .quest-notice{display:none}
+  .school.tablet-layout .lecture-quests ol{display:flex;gap:10px;margin:8px 0 0}.school.tablet-layout .lecture-quests .quest-item{flex:1;padding:0}.school.tablet-layout .lecture-quests .quest-item::after{display:none}.school.tablet-layout .lecture-quests .quest-text{gap:2px}.school.tablet-layout .lecture-quests .quest-text strong{font-size:12px}.school.tablet-layout .lecture-quests .quest-text small{display:none}.school.tablet-layout .lecture-quests .quest-circle{width:24px;height:24px}
+  .school.tablet-layout[data-layout=v3][data-step=quiz] .v3-stage #board{padding:14px!important}
+  .school.tablet-layout[data-layout=v3][data-step=quiz] #board #choices button{font-size:13px!important;min-height:42px}
+  .school.tablet-layout[data-mode=classroom] .subject-context strong{font-size:18px!important}
+}
+/* Portrait keeps the board wide and puts the textbook below the teacher dialogue. */
+@media (min-width:641px) and (orientation:portrait) {
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #scene{padding-left:14px!important}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1.35fr) 88px minmax(0,1fr) 88px 92px!important}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room .v3-work{grid-column:1!important;grid-row:3!important}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-vn{height:88px!important}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #dialogue .v3-bar{grid-row:4!important}
+  .school.tablet-layout[data-mode=classroom][data-view3=site] .lecture-quests{grid-row:5!important;height:92px}
+  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-guide{left:auto!important;right:8px!important}
+  .school.tablet-layout[data-mode=classroom] .subject-context{display:none!important}
+  .school.tablet-layout[data-mode=classroom][data-tablet-toc=open] .subject-context{display:block!important;left:40px!important;width:240px!important;z-index:70}
+  .school.tablet-layout[data-mode=classroom]>.tablet-toc-toggle{display:block;position:fixed;left:40px;bottom:calc(var(--tablet-bottom,var(--gl-bottom,96px)) + 18px);z-index:72;background:#edf3e9;border:1px solid #cad7cb;border-radius:8px;color:#35553e;padding:8px 12px;min-height:40px}
+  .school.tablet-layout[data-mode=classroom]>.subject-rail-toggle{top:auto!important;bottom:calc(var(--tablet-bottom,var(--gl-bottom,96px)) + 16px)}
+}
+.tablet-toc-toggle{display:none}
+
+@media(min-width:641px){.school.tablet-layout .lecture-quests ol{margin:8px 0 0!important;padding:0!important}.school.tablet-layout .lecture-quests .quest-item{padding:0!important}.school.tablet-layout .lecture-quests .quest-notice,.school.tablet-layout .lecture-quests .quest-lesson,.school.tablet-layout .lecture-quests .quest-topic{display:none!important}.school.tablet-layout .v3-bar .v3-btn{min-width:32px!important;max-height:32px!important}.school.tablet-layout .v3-bar .v3-btn svg{width:20px;height:20px}}
+
+@media(min-width:641px){.school.tablet-layout .v3-bar{align-content:start!important}.school.tablet-layout .lecture-quests .quest-count{display:inline!important}.school.tablet-layout .lecture-quests .quest-text em{display:none}.school.tablet-layout .lecture-quests ol{margin-top:6px!important}.school.tablet-layout .v3-vn-name{left:12px!important}.school.tablet-layout .lesson-textbook-body .textbook-paragraph{margin-bottom:6px}.school.tablet-layout .v3-journey{flex-basis:100%;flex-grow:0}}
+
+@media(min-width:641px){
+.school.tablet-layout #board .content{width:100%!important;max-width:none!important}
+.school.tablet-layout .v3-bar .ico-btn,.school.tablet-layout .v3-bar .v3-more>summary{width:32px!important;height:32px!important;min-height:32px!important;min-width:32px!important;padding:4px!important;box-sizing:border-box;line-height:1!important}
+.school.tablet-layout .v3-bar .v3-more{height:32px;align-self:center}
+.school.tablet-layout .v3-bar .ico-btn svg,.school.tablet-layout .v3-more>summary svg{width:20px;height:20px}
+.school.tablet-layout .lecture-quests{display:grid;grid-template-columns:auto 1fr;grid-template-rows:20px minmax(0,1fr);gap:4px 10px}
+.school.tablet-layout .lecture-quests h2{grid-row:1;grid-column:1;font-size:13px}
+.school.tablet-layout .lecture-quests .quest-count{grid-row:1;grid-column:2;margin:0!important}
+.school.tablet-layout .lecture-quests ol{grid-row:2;grid-column:1/-1;margin:0!important;align-items:center}
+.school.tablet-layout .lecture-quests .quest-text strong{font-size:12px;line-height:1.3}
+}
+
+@media(min-width:641px){.school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #board{grid-template-columns:minmax(0,1fr)!important}.school.tablet-layout .v3-bar .v3-more>summary::marker{content:''}.school.tablet-layout .v3-bar .v3-more>summary{display:flex!important;align-items:center;justify-content:center}.school.tablet-layout .lecture-quests{align-content:start}.school.tablet-layout .lecture-quests .quest-item label{align-items:center}.school.tablet-layout .lecture-quests .quest-text strong{margin:0!important}}
+
+@media(min-width:641px){
+.school.tablet-layout>header{flex-wrap:nowrap!important;min-height:64px!important;padding:8px 12px!important;gap:8px!important;box-sizing:border-box}
+.school.tablet-layout>header [aria-label='비서별 토큰 사용량']{display:none!important}
+.school.tablet-layout>header .rooms{width:auto!important;flex:none;margin:0!important;padding:4px!important}
+.school.tablet-layout>header .rooms button{padding:8px!important;min-height:36px!important;font-size:12px!important}
+.school.tablet-layout>header .brand{font-size:16px!important;flex-shrink:0}
+.school.tablet-layout>header .room-sub{display:none!important}
+.school.tablet-layout #board .board-hierarchy{margin-bottom:4px!important;padding-bottom:4px!important}
+.school.tablet-layout #board .board-hierarchy h1{font-size:20px!important;line-height:1.25!important;margin:4px 0!important}
+.school.tablet-layout .v3-bar .rw-log{width:32px!important;height:32px!important;min-height:32px!important;padding:4px!important;font-size:12px!important}
+.school.tablet-layout .v3-bar .rw-log svg{width:20px;height:20px}
+}
+
+@media(min-width:641px){
+.school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #board .board-hierarchy .caption{font-size:10px!important;line-height:1.25!important;margin:2px 0 0!important}
+.school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #board .board-hierarchy h1{font-size:20px!important;line-height:1.25!important;margin:4px 0!important}
+.school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-stage #board{padding-bottom:56px!important}
+.school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site][data-step=quiz] .v3-stage #board{padding:14px!important}
+}
+
+@media(min-width:641px) and (orientation:portrait){.school.tablet-layout[data-mode=classroom]>.tablet-toc-toggle{left:auto;right:28px;top:var(--tablet-toc-top);bottom:auto;min-height:32px;padding:5px 10px;font-size:12px}.school.tablet-layout .lesson-textbook-header{padding-right:100px}.school.tablet-layout[data-mode=classroom]>.subject-rail-toggle{top:var(--tablet-book-middle)!important;bottom:auto}}
+
+@media(min-width:641px){.school.tablet-layout #room .v3-work{max-height:none!important}.school.tablet-layout [aria-label='김주영 스앵님과 대화']{bottom:var(--tablet-viewport-bottom,0px)!important}}
+
+@media(min-width:641px){
+.school.tablet-layout[data-tablet-shared-chat=false][data-mode=classroom] #dialogue .v3-chat{position:fixed!important;left:128px;right:14px;bottom:calc(var(--tablet-viewport-bottom,0px) + 16px);z-index:80;margin:0!important;height:56px;padding:8px 12px;box-sizing:border-box;background:#fff;border-radius:16px;box-shadow:0 0 0 1px #dbe3de;max-width:none!important}
+.school.tablet-layout[data-tablet-shared-chat=false][data-mode=classroom] #dialogue .v3-chat input{min-width:0;flex:1}
+}
+@media(min-width:641px) and (orientation:portrait){.school.tablet-layout[data-tablet-shared-chat=false][data-mode=classroom] #dialogue .v3-chat{left:14px}}
+@media(min-width:641px){.school.tablet-layout #board .content p{margin-top:0!important;margin-bottom:6px!important}}
+
+@media(min-width:641px){
+.school.tablet-layout .lesson-textbook-body .katex-display{display:block;box-sizing:border-box;width:100%;max-width:100%;overflow:hidden;margin:8px 0!important}
+.school.tablet-layout .lesson-textbook-body .katex-display>.katex{display:block;width:max-content;max-width:none;transform-origin:0 0}
+}
+@media(min-width:641px){
+.school.tablet-layout .lesson-textbook h2,.school.tablet-layout .lesson-textbook-title{color:#263c31!important}
+.school.tablet-layout>header .rooms{background:#f1f5f0!important;color:#25483e!important}
+.school.tablet-layout>header .rooms button{color:#25483e!important}
+.school.tablet-layout>header .rooms button[aria-pressed=true]{background:#deede4!important}
+}
+@media(min-width:641px) and (orientation:landscape){
+.school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{grid-template-rows:minmax(0,1fr) 176px 88px!important;--class-response-height:176px}
+.school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room .v3-work{grid-row:1!important}
+.school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] .v3-vn{height:176px!important}
+.school.tablet-layout[data-layout=v3] .v3-vn .v3-log{height:136px!important;min-height:136px!important;max-height:136px!important}
+.school.tablet-layout[data-mode=classroom][data-view3=site] .lecture-quests{grid-column:2!important;grid-row:2!important;height:176px!important}
+.school.tablet-layout .lecture-quests ol{flex-direction:column;gap:0!important;align-items:stretch!important}
+.school.tablet-layout .lecture-quests .quest-item{flex:none;height:44px;min-height:44px}
+.school.tablet-layout .lecture-quests .quest-item label{min-height:44px;gap:10px}
+.school.tablet-layout .lecture-quests .quest-item input{height:44px;width:44px}
+.school.tablet-layout .lecture-quests .quest-item:not(:last-child)::after{display:block;left:11px;top:34px;bottom:-10px;z-index:0}
+.school.tablet-layout .lecture-quests .quest-circle{position:relative;z-index:1}
+}

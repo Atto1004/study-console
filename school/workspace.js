@@ -1,15 +1,38 @@
+import { renderMaterialStudio } from './material-studio.js?v=215';
 import { courseMetrics, sourceKind, pickQuest, KINDS } from "./metrics.js";
 import { attachSaeng } from "./saeng.js";
 import { officeHref } from "./worldmap.js";
+import { inFocus, focusCourses, isInClass } from "./focus.js";
 const el = (tag, text, cls) => { const e=document.createElement(tag); if(text!==undefined)e.textContent=text; if(cls)e.className=cls; return e; };
 const btn = (text, action, cls='') => { const b=el('button',text,cls); b.type='button'; b.onclick=action; return b; };
 const minutes = s => Number(s.slice(0,2))*60+Number(s.slice(3));
 const hm = n => `${String(Math.floor(n/60)).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`;
 export const ddayLabel = n => n===0?'D-day':`D-${n}`;
 export const hiddenDeadline = task => !!(task.hiddenFromMain&&task.workDone&&task.deadlineDays!==0);
+// 마감이 지난 과제: 마감 날짜가 오늘 전이거나, 오늘인데 마감 시각이 이미 지남(한국 시각). 마감 날짜를 모르면 지난 것으로 보지 않음
+export function pastDue(r, today) {
+  const m=/^(\d{4}-\d{2}-\d{2})(?:T(\d{2}:\d{2}))?/.exec(r.due||''); if(!m)return false;
+  if(m[1]<today)return true;
+  if(m[1]>today||!m[2])return false;
+  const now=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seoul',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date());
+  const kstToday=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul'}).format(new Date());
+  return kstToday===today&&m[2]<now;
+}
+// 사회봉사는 다음 회차 것만(대표님 10/10 「사회봉사는 다음 회차 거 해야 할 거만 표시」): 회차 번호(sv-r3… 또는 「3회차」)를 읽어
+// 아직 안 끝난 회차 중 가장 가까운 회차만 남긴다. 회차 번호가 없는 항목은 근거가 없어 그대로 둔다.
+export function roundOf(r) {
+  const m = /^sv-r(\d+)/.exec(r.id || '') || /(?<![\d.])(\d+)\s*회차/.exec(r.title || r.t || '');   // 「1.5회차」 를 5회차로 읽지 않게
+  return m ? Number(m[1]) : null;
+}
+export function nextRoundOnly(rows, today) {
+  const open = rows.filter((r) => r.course === '사회봉사' && !r.submitted && !pastDue(r, today) && roundOf(r) !== null);
+  if (!open.length) return rows;
+  const next = Math.min(...open.map(roundOf));
+  return rows.filter((r) => r.course !== '사회봉사' || r.submitted || roundOf(r) === null || roundOf(r) === next);   // 낸 것은 제한 없이(제출 완료 목록 그대로, 오타 검수 10/10)
+}
 export function pendingDeadlines(rows, today) {
   const day=Date.parse(today+'T00:00:00Z');
-  return rows.filter(r=>!r.submitted).map(r=>{
+  return nextRoundOnly(rows,today).filter(r=>!r.submitted&&!pastDue(r,today)).map(r=>{   // 지난 과제는 아예 안 보임(대표님 10/9)
     const match=/^(\d{4}-\d{2}-\d{2})(?:T(\d{2}:\d{2})(?::\d{2})?)?$/.exec(r.due||'');
     const stamp=match?Date.parse(match[1]+'T'+(match[2]||'23:59')+':00Z'):NaN;
     const valid=match&&Number.isFinite(stamp)&&new Date(stamp).toISOString().slice(0,10)===match[1];
@@ -49,13 +72,13 @@ export function recommendPlans(data, calendar, now=new Date(), budget, preferred
   return planned.slice(0,3);
 }
 
-const ROOM={main:'lobby',learning:'class',materials:'library',progress:'library',attendance:'library',assignments:'homework'};
+const ROOM={main:'lobby',learning:'class',materials:'library',progress:'library',attendance:'library',assignments:'homework',counsel:'counsel'};
 const pct=x=>Math.round(x*100);
 export function createWorkspace(app){
   let corridorSaeng=null, corridorGen=0;
   let data=null, calendar=null, assignments=null, assignmentError='', area='main', generation=0, navigation=0, consultBusy=false, proposal=[], filter='', kindFilter='', timer=null;
   const root=el('section',undefined,'workspace');root.id='workspace';document.getElementById('scene').append(root);
-  const navIds=['mainArea','learningArea','progressArea','materialsArea','attendanceArea','assignmentArea'];
+  const navIds=['mainArea','learningArea','progressArea','materialsArea','attendanceArea','assignmentArea','counselArea'];
   async function activate(which,token){
     corridorSaeng?.destroy();corridorSaeng=null;++corridorGen;
     await app.leave();
@@ -64,7 +87,7 @@ export function createWorkspace(app){
     for(const id of ['lobby','room','dialogue','progress','assignments','integratedWorkspace']){const e=document.getElementById(id);if(e)e.hidden=true;}
     root.hidden=false;document.getElementById('scene').className='scene workspace-scene';
     const school=document.querySelector('.school');school.dataset.mode='workspace';school.dataset.room=ROOM[which]||'lobby';
-    const door={lobby:'mainArea',class:'learningArea',library:'materialsArea',homework:'assignmentArea'}[ROOM[which]];
+    const door={lobby:'mainArea',class:'learningArea',library:'materialsArea',homework:'assignmentArea',counsel:'counselArea'}[ROOM[which]];
     navIds.forEach(id=>document.getElementById(id)?.setAttribute('aria-pressed',String(id===door||id===({progress:'progressArea',attendance:'attendanceArea'})[which])));
     app.screen?.({room:which});return true;
   }
@@ -98,6 +121,7 @@ export function createWorkspace(app){
     const session=app.session?.();
     if(session&&area!=='main')root.append(btn(`${session.course} · 수업 이어가기`,()=>app.resume(),'session-return'));
     if(area==='main')renderMain();
+    else if(area==='counsel')renderCounsel();
     else if(area==='assignments'){root.hidden=true;app.assignments();}
     else renderManagement();
   }
@@ -173,7 +197,7 @@ export function createWorkspace(app){
     scene.append(left,right);
 
     // 스앵님 + 대사창
-    const face=el('div',undefined,'corridor-saeng');face.append(Object.assign(el('img'),{src:'../notes/classroom/assets/tutor/neutral.png',alt:''}));
+    const face=el('div',undefined,'corridor-saeng');face.append(Object.assign(el('img'),{src:'../docs/demo/saeng/layers2/base.png',alt:''}));   /* 정지 그림도 강의실과 같은 웹툰 그림체(10/9), 움직이는 그림은 아래 attachSaeng 하나만 */
     scene.append(face);
     corridorSaeng?.destroy();corridorSaeng=null;const gen=++corridorGen;
     attachSaeng(face).then(s=>{if(!s)return;if(gen!==corridorGen||!face.isConnected){s.destroy();return;}corridorSaeng=s;s.react(react);s.speak(line);});
@@ -195,7 +219,56 @@ export function createWorkspace(app){
   function practiceIn(course){
     return app.practice?app.practice(course):startCourse(course);
   }
+  // 메인 = 위 요약 한 줄(시험 D-day·남은 회차) + 공부 계획(plan.js — 예전 관제탑 공부계획 기능을 학교 화면으로 다시 만든 것, 대표님 10/9).
+  let routine=null;
+  async function loadRoutine(){
+    if(routine)return routine;
+    for(const u of ['/api/routine','../knowledge/routine-week.json']){try{const r=await fetch(u,{credentials:'same-origin',cache:'no-store'});if(r.ok){const j=await r.json();routine=j.routine||j;if(routine?.grid)return routine;}}catch{}}
+    return routine={grid:{},holidays:[]};
+  }
+  function renderDashboard(){
+    const rows=examMetrics(), top=el('div',undefined,'db-strip');
+    const exams=rows.filter(r=>r.exam&&inFocus(r.name));   // 집중 4과목만(focus.js)
+    for(const r of exams){const b=btn('',()=>startCourse(r.name),'db-chip'+(r.exam.dday<=3?' soon':''));b.append(el('strong',ddayLabel(r.exam.dday)),el('span',r.name),el('small',`${r.m.remaining}회차 남음`));b.title=`${r.name} · ${r.exam.date}${r.exam.time?' '+r.exam.time:''} · 준비도 ${r.m.readiness}`;top.append(b);}
+    if(!exams.length)top.append(el('p','등록된 시험이 없어요.','db-empty'));
+    const host=el('div',undefined,'db-plan');root.append(top,host);
+    const deadlines=assignments?pendingDeadlines(assignments.rows||[],data.date):[];
+    loadRoutine().then(rt=>{if(!host.isConnected)return;app.plan?.render(host,{today:data.date,courses:focusCourses().filter(n=>data.courses.some(c=>c.name===n)),focus:inFocus,inClass:isInClass,scheduled:data.scheduled,classSlots:data.courses.filter(c=>Array.isArray(c.slots)),holidays:Array.isArray(data.holidays)?data.holidays:null,term:data.term||null,sessions:data.sessions||[],plans:data.plans,deadlines,calendar:calendar?.events||[],calendarOk:!!calendar?.verified,reload:()=>open('main'),routine:rt,courseName:id=>data.courses.find(c=>c.id===id)?.name||'',courseId:name=>data.courses.find(c=>c.name===name)?.id,exams:data.exams.filter(e=>e.written&&inFocus(e.course)&&e.date>=data.date).map(e=>({course:e.course,date:e.date,time:e.time||'',assumed:!!e.assumed})),addPlan:(item,many)=>change({op:'plan-add',plans:many?item:[item]}),dailyCap:Number(data.profile?.dailyCap)||4,updatePlan:item=>change({op:'plan-update',plan:item}),deletePlan:id=>change({op:'plan-delete',id}),attend:(courseId,date,status)=>change({op:'attendance',courseId,date,status}),calChange:async({ev,date,start,end})=>{/* 구글 캘린더 시각 바꾸기(대표님 10/9): 그날 캘린더를 새로 읽고 → 최신 원본 버전으로 변경 대기열에 넣는다. 원본이 바뀌었으면 서버가 409 로 막음 */
+  try{const j=(u)=>fetch(u,{credentials:'same-origin',cache:'no-store'}).then(r=>r.json());await j(`/api/cal?from=${date}&to=${date}&force=1`);const cx=await j(`/api/aliveweek/context?from=${date}&to=${date}`);
+    const cur=(cx.calendar?.[date]||[]).find(e=>e.id===ev.id);if(!cur){app.status('원본 일정을 다시 찾지 못했어요. 잠시 뒤 다시 해 주세요.',true);return false;}
+    const body={operationId:crypto.randomUUID(),action:'reschedule',source:'calendar',calendarId:cur.calendarId||cur.cal,eventId:cur.id,date,after:{title:cur.title||'',location:cur.location||'',start:`${date}T${start}:00+09:00`,end:`${date}T${end}:00+09:00`},expectedSourceVersion:cur.sourceVersion};
+    const w=await fetch('/api/aliveweek/changes',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const x=await w.json().catch(()=>({}));
+    if(!w.ok){app.status(x.error||`캘린더를 바꾸지 못했어요(${w.status})`,true);return false;}
+    app.status('구글 캘린더에 반영하는 중이에요. 잠시 뒤 시간표에 보여요.');return true;}catch(e){app.status('캘린더를 바꾸지 못했어요. '+(e.message||''),true);return false;}}});});
+  }
+  // 상담실(대표님 10/9): 김주영 스앵님과 면담하며 학습자료 고치기·시험 범위·일정·공부 계획을 조율하는 공간.
+  // 대화는 상담 모드(coach consultation, 서버에 상담 기록), 진단·계획 세우기는 기존 상담 흐름(app.consult)을 그대로.
+  function renderCounsel(){
+    const room=el('div',undefined,'counsel-room'),side=el('div',undefined,'counsel-side'),main=el('div',undefined,'counsel-main');
+    const face=el('div',undefined,'counsel-face');side.append(face,el('b','김주영 스앵님','counsel-name'),el('p','시험·자료·계획, 뭐든 같이 정해요.','counsel-sub'));
+    const rig=app.rig?.(face);rig?.setExpr('smile');
+    const topics=el('div',undefined,'counsel-topics');topics.setAttribute('aria-label','상담 주제');
+    const log=el('div',undefined,'counsel-log');log.setAttribute('aria-live','polite');
+    const form=el('form',undefined,'counsel-form'),input=el('textarea');input.rows=2;input.maxLength=1500;input.placeholder='예) 정역학 9/21 강의 설명이 너무 짧아요 · 공수1 시험 범위가 바뀌었어요';input.setAttribute('aria-label','스앵님께 말하기');
+    const send=btn('보내기',()=>{},'primary');send.type='submit';form.append(input,send);
+    for(const [label,text] of [['학습자료 고치기','이 강의 자료에서 고쳐야 할 부분이 있어요: '],['시험 범위·일정','시험 범위·일정을 다시 맞춰요: '],['공부 계획 조정','오늘·이번 주 공부 계획을 조정하고 싶어요: '],['오늘 상태','오늘 컨디션이랑 쓸 수 있는 시간은요: ']]){
+      topics.append(btn(label,()=>{input.value=text;input.focus();input.setSelectionRange(text.length,text.length);},'counsel-topic'));}
+    const msg=(me,t)=>{const m=el('div',t,'counsel-msg '+(me?'from-me':'from-saeng'));   /* 'saeng' 클래스는 saeng.js 초상 규칙(aspect-ratio)과 겹침 */log.append(m);log.scrollTop=log.scrollHeight;return m;};
+    for(const e of (app.history?.()||[]).slice(-12)){msg(true,e.question);msg(false,e.answer);}
+    if(!log.children.length)msg(false,'어서 와요. 고치고 싶은 자료나 바뀐 시험 범위, 계획 이야기 뭐든 말해 줘요.');
+    let busy=false;
+    form.onsubmit=async e=>{e.preventDefault();const q=input.value.trim();if(!q||busy)return;busy=true;send.disabled=true;input.value='';msg(true,q);const wait=msg(false,'음… 확인해 볼게요.');rig?.setExpr('think');
+      try{const r=await app.api('coach',{course:'',question:q,mode:'consultation',id:crypto.randomUUID()});wait.textContent=String(r?.answer||'').trim()||'지금은 답을 정리하지 못했어요.';rig?.speak(wait.textContent);rig?.setExpr('smile');}
+      catch(err){wait.textContent='지금은 답을 못 가져왔어요. '+(err?.message||'');rig?.setExpr('sad');}
+      finally{busy=false;send.disabled=false;}};
+    const tools=el('div',undefined,'counsel-tools');
+    tools.append(btn('진단하고 오늘 계획 세우기',()=>app.consult?.(),'counsel-tool'),btn('공부 계획 열기',()=>app.integrated?.('공부 계획','plan',{area:'learningArea'}),'counsel-tool'),btn('과제실',()=>open('assignments'),'counsel-tool'),btn('자료실',()=>open('materials'),'counsel-tool'));
+    main.append(el('h1','상담실','counsel-title'),topics,log,form,tools);room.append(side,main);root.append(room);
+    new MutationObserver((_,o)=>{if(!room.isConnected){rig?.destroy();o.disconnect();}}).observe(root,{childList:true});
+  }
   function renderMain(){
+    renderDashboard();
+    if(true)return;   // 옛 복도 화면(renderCorridor)·상담 카드는 대시보드로 대체(10/9). 아래는 되돌릴 때를 위해 남김
     renderCorridor();
     const written=data.exams.filter(e=>e.written&&e.kind==='중간');
     const exams=card('','exam-board other-exams');
@@ -281,11 +354,24 @@ export function createWorkspace(app){
     const tools=el('div',undefined,'management-tools'),select=el('select');select.setAttribute('aria-label','과목 선택');select.append(Object.assign(el('option','모든 과목'),{value:''}));for(const c of data.courses){const o=el('option',c.name);o.value=c.name;select.append(o);}select.value=filter;select.onchange=()=>{filter=select.value;render();};tools.append(select,btn('새로 불러오기',()=>open(area)),btn('시간표',()=>app.integrated('시간표','cal',{mode:'week'})),btn('성적·학점',()=>app.integrated('성적·학점','grade')));root.append(tools);
     if(area==='materials'){renderMaterials();renderChecks();}else if(area==='attendance')renderAttendance();else renderProgress();
   }
+  // 자료실 맨 위 = 과목별 묶음(대표님 10/9 「과목별로 나눠놓은 구성은 자료실로」). 카드를 누르면 그 과목 모든 수업·암기노트·혼자풀기
+  function renderCourseShelf(){
+    const shelf=card('과목별','course-shelf'),grid=el('div',undefined,'shelf-grid');
+    for(const c of app.catalog().courses){
+      const exam=data.exams.find(e=>e.course===c.name&&e.written&&e.dday>=0);
+      const sources=data.sources.filter(s=>s.course===c.name); const b=btn('',()=>{filter=c.name;kindFilter='';render();},'shelf-card');b.append(el('b',c.name),el('small',sources.length+'개 확보 자료 · '+c.lessons.filter(l=>!l.generated).length+'회 수업'));grid.append(b);
+    }
+    shelf.append(grid);root.append(shelf);
+  }
   function renderMaterials(){
+    if(filter)renderMaterialStudio(root,app,data,filter,render);
+    if(!filter)renderCourseShelf();
     const sources=data.sources.filter(s=>!filter||s.course===filter).map(s=>{const k=sourceKind(s);return {...s,cls:k.kind,sure:k.sure};});
     const lmsItems=(data.lmsMaterials||[]).filter(i=>!filter||i.course===filter).map(i=>({...i,cls:sourceKind({...i,lms:true}).kind,sure:true}));
     const homework=(assignments?.rows||[]).filter(r=>!filter||r.course===filter).flatMap(r=>(r.files||[]).map(f=>({course:r.course,title:r.title,file:f.label||f.file||f.href,href:f.href,cls:/혼자\s*풀기|스앵님|코칭/.test(f.label||'')?'tutor':'assignment',sure:true})));
-    const all=[...sources,...lmsItems,...homework];
+    const generatedMaterials=[...(app.materialDrafts?.()||[]),...app.catalog().courses.flatMap(c=>c.lessons.filter(l=>l.generated).map(l=>({...l,course:c.name})))].filter(d=>!filter||d.course===filter);
+    const all=[...sources,...lmsItems,...homework,...generatedMaterials.map(d=>({...d,cls:'generated'}))];
+    if(kindFilter==='generated'){const group=card('생성 교재','material-group');for(const draft of generatedMaterials){const open=btn(draft.course+' · '+draft.title,()=>app.start(draft.id));open.disabled=['pending','rejected'].includes(draft.review?.status);group.append(open);}root.append(group);}
     const kinds=el('div',undefined,'kind-filter');kinds.setAttribute('role','group');kinds.setAttribute('aria-label','자료 종류');
     for(const [key,{label}] of [['',{label:'전체'}],...Object.entries(KINDS).sort((a,b)=>a[1].order-b[1].order)]){
       const n=key?all.filter(x=>x.cls===key).length:all.length;

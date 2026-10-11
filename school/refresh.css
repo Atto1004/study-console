@@ -1,0 +1,7 @@
+.school>header .school-refresh{position:relative;display:grid;place-items:center;width:36px;height:36px;min-width:36px;padding:0;border:1px solid #dce5dc;border-radius:50%;background:#fff;color:#315b49;cursor:pointer;flex:none}
+.school>header .school-refresh[data-update-available=true]::after{content:'';position:absolute;top:0;right:0;width:9px;height:9px;border-radius:50%;background:#53a946;border:2px solid #fff;box-shadow:0 0 0 1px #cee5c8}
+.school>header .school-refresh:hover{background:#eaf2e8}
+.school>header .school-refresh:focus-visible{outline:2px solid #3a7855;outline-offset:3px}
+.school>header .school-refresh[aria-busy=true] svg{animation:school-refresh-turn 1.1s linear infinite}
+@keyframes school-refresh-turn{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.school>header .school-refresh svg{animation:none!important}}

@@ -1,3 +1,9 @@
+import { createLectureQuests } from './lecture-quests.js?v=233';
+import { mountSchoolRefresh } from './refresh.js?v=237';
+import { mountLectureActor } from './lecture-actor.js?v224';
+import { decorateChalk, chalkBoardText, chalkPages } from './lecture-chalk.js?v235';
+import { groupCourseLessons, groupLessonTopics } from './course-scope.js?v=212';
+import "./uuid-polyfill.js";   // 보안 컨텍스트 아닌 주소(tailscale http)에서 crypto.randomUUID 대체 — 맨 먼저
 import {
   evidenceSummary,
   reviewQueue,
@@ -5,19 +11,38 @@ import {
   splitText,
   learningPath,
 } from "./learning.js";
-import { createWorkspace } from "./workspace.js";
+import { createWorkspace } from "./workspace.js?v=215";
 import { createMission } from "./mission.js?v=199";
-import { attachSaeng } from "./saeng.js";
+import { attachSaeng } from "./saeng.js?v224";
 import { createSpace, ROOMS } from "./space.js";
 import { pickLesson, pickQuestions } from "./metrics.js";
 import { createSetup } from "./setup.js";
 import { createWorldMap } from "./worldmap.js";
 import { createTutor } from "./tutor.js";
-import { createSubjectRail } from "./subject-rail.js";
+import { createSubjectRail } from "./subject-rail.js?v=251";
+import { createSubjectScope } from "./subject-scope.js?v=240";
+import { boardHierarchy,createBoardHierarchy } from "./board-hierarchy.js?v=240";
 import { startSurfaces } from "./surface.js";
 import { createLecture } from "./lecture.js";
-import { startClassroomV3 } from "./classroom-v3.js";
+import { loadPack, packRoute, packLines, label as packLabel } from "./lecture-pack.js";
+import { createDialog } from "./vn-dialog.js";
+import { createLectureUi } from "./lecture-ui.js";
+import { setupWideRoom } from "./room-wide.js";
+import { setupSeatRoom } from "./room-seat.js";
+import { pastDue, nextRoundOnly } from "./workspace.js?v=215";
+import { setupShell } from "./shell.js?v=232";
+import { createRig } from "./rig.js";
+import { createFace } from "./face.js";
+import { readable, cleanTitle } from "./readable.js";
+import { createPlan } from "./plan.js";
+import { inFocus } from "./focus.js";
+import { createLessonTextbook } from "./lesson-textbook.js?v=256";
+import { startClassroomV3 } from "./classroom-v3.js?v=241";
 import { createGrowth } from "./growth.js?v=199";
+import { cardGate } from './card-gate.js?v=1';
+/* 정역학 2장 선수 수업(9/7·9/9·9/14)은 시험 범위 밖 — 강 목록과 강 번호에서 뺀다 (대표님 10/11) */
+const STATICS_HIDE = ["2026-09-07", "2026-09-09", "2026-09-14"];
+const hideLesson = (course, l) => course === "정역학" && STATICS_HIDE.includes(l.date);
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
 let catalog,
@@ -34,12 +59,14 @@ let pending = [],
   chatBusy = false,
   lastLesson = null;
 let pausedLesson = null;
-let activeSession = null, sessionQueue = Promise.resolve(), setup = null, sessionEpoch = 0, tutor = null, lecture = null, v3 = null, userPaused = false;
+let activeSession = null, sessionQueue = Promise.resolve(), setup = null, sessionEpoch = 0, tutor = null, lecture = null, v3 = null, textbook = null, userPaused = false, scopePause = null;
 // 두 기기 학습의 칠판(모니터)은 받기만 한다: 수업 위치·학습 활동 기록을 쓰지 않는다(오타 10/8 RED).
 const isBoard = () => document.querySelector('.school')?.dataset.role === 'board';
 let resizeBoard;
 let chatMode = "question";
-let workspace, mission, space, growth, legacyLobbyMode = false, missionIndices = null;
+let workspace, mission, space, growth, legacyLobbyMode = false, missionIndices = null, pack = null, stepping = false, autoNextTimer = null, lectureUi = null;
+// 지금 수업의 회차 강의안(lecture-pack.js). 다른 수업으로 바뀌었으면 null.
+const curPack = () => (pack && current && pack.lessonId === current.id ? pack : null);
 const eventId = () => crypto.randomUUID();
 function rememberScreen(fields){
   const url=new URL(location.href);
@@ -253,6 +280,10 @@ function panel(title) {
   return $("panelBody");
 }
 $("closePanel").onclick = () => $("panel").close();
+$("panel").addEventListener('close', () => {
+  const paused = scopePause; scopePause = null;
+  if (paused?.playing && current === paused.lesson && index === paused.index && !lecture?.playing && !lecture?.ended) lecture?.toggle();
+});
 // 팝업은 바깥을 누르면 닫는다(모든 dialog 공통). 창 안에서 누르기 시작해 바깥에서 뗀 경우(글자 끌어 선택)는 닫지 않는다.
 const outside = (d, e) => { const r = d.getBoundingClientRect(); return e.target === d && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom); };
 let backdropDown = null;
@@ -302,7 +333,7 @@ function showLobby() {
   for (const [position, c] of catalog.courses
     .filter((c) => c.name !== "사회봉사")
     .entries()) {
-    const b = button("", () => showCourse(c.name), "door");
+    const b = button("", () => showCourse(c.name, true), "door");
     const info = node("span", undefined, "door-info");
     info.append(
       node("b", c.name),
@@ -449,7 +480,8 @@ let assignmentFilter = "전체", assignmentStatus = "진행";
       if (!select.value) assignmentFilter = select.value = "전체";
       select.onchange = () => { assignmentFilter = select.value; draw(); };
       tools.append(select);
-        for (const label of ["진행", "지난 기록", "제출 완료", "전체"]){
+        if (assignmentStatus === "지난 기록") assignmentStatus = "진행";   // 지난 과제는 안 보임(대표님 10/9 「지난 일정인 건 다 안 뜨게」)
+        for (const label of ["진행", "제출 완료", "전체"]){
         const b = button(label, () => { assignmentStatus = label; draw(); });
         b.setAttribute("aria-pressed", String(assignmentStatus === label)); tools.append(b);
       }
@@ -457,11 +489,10 @@ let assignmentFilter = "전체", assignmentStatus = "진행";
         if(activeSession)tools.append(button("수업 이어가기",resumeSession));
         host.append(tools);
         const today = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-        const isPast = r => /^\d{4}-\d{2}-\d{2}/.test(r.due||'') && r.due.slice(0,10)<today;
+        const isPast = r => pastDue(r, today);
         const groupRank = new Map([["assignment", 0]]); for (const r of data.rows) { const g = r.category || "assignment"; if (!groupRank.has(g)) groupRank.set(g, groupRank.size); }
-        const rows = data.rows.filter(r => (assignmentFilter === "전체" || r.course === assignmentFilter) &&
-          (assignmentStatus === "전체" || assignmentStatus === "지난 기록" && isPast(r) ||
-           assignmentStatus === "제출 완료" && r.submitted || assignmentStatus === "진행" && !r.submitted && (!isPast(r)||r.continueActive)))
+        const rows = nextRoundOnly(data.rows, today).filter(r => !isPast(r) && (assignmentFilter === "전체" || r.course === assignmentFilter) &&
+          (assignmentStatus === "전체" || assignmentStatus === "제출 완료" && r.submitted || assignmentStatus === "진행" && !r.submitted))
           // 마감순(묶음 안에서): 진행·전체는 가까운 마감 먼저, 지난 기록·제출 완료는 최근 것 먼저, 마감 미확인은 맨 뒤
           .map((r, i) => [r, i]).sort(([a, ai], [b, bi]) => {
             // 묶음 순위는 고정(수업 과제 0, 나머지는 처음 나온 순서) — 비교가 순환하지 않게(오타 검수 10/8)
@@ -530,10 +561,27 @@ $("courses").onclick = () => {
   for (const c of catalog.courses)
     row(host, c.name, c.strategy, () => showCourse(c.name), "들어가기");
 };
-  function showCourse(name) {
+  function showCourse(name, selectScope = false) {
+  if (selectScope && !scopePause) {
+    scopePause = {lesson:current,index,playing:!!lecture?.playing};
+    if (scopePause.playing) lecture.toggle();
+  }
   course = name;
   const c = catalog.courses.find((c) => c.name === name);
-    const host = panel(name);
+    const host = panel(selectScope ? name + ' · 수업 범위 선택' : name);
+    if (selectScope) {
+      host.append(node('p', '단원을 펼치고 수업을 고르세요. 실제 자료가 연결된 수업만 표시합니다.', 'notice'));
+      for (const unit of groupCourseLessons(c)) {
+        const section = node('details', undefined, 'scope-unit');
+        const title = unit.title.split(' — ')[0].replace(/\s*\(12\.1~12\.6\)/, '');
+        section.append(node('summary', title + ' · ' + unit.lessons.length + '회 수업'));
+        section.open = unit.lessons.some(l => l.id === current?.id);
+        for (const lesson of unit.lessons) row(section, lesson.title, lesson.date + ' · ' + (lesson.week || '?') + '주차', () => showLessonScope(lesson, name), '수업 목차');
+        host.append(section);
+      }
+      if (!c.lessons.length) host.append(node('p', '연결된 수업 자료가 아직 없습니다.'));
+      return;
+    }
     const assets = node("div", undefined, "assignment-filters");
     const slug = {"공업수학1":"em1", "미분적분학2":"calc2", "일반물리학2":"phys2", "정역학":"statics"}[name];
     if (slug) assets.append(button("암기노트", () => openStudyAsset(name + " · 암기노트", "notes/memo/" + slug + ".html")));
@@ -558,18 +606,13 @@ $("courses").onclick = () => {
         "학교 화면으로 변환된 수업은 아직 없습니다. 선수 개념이나 기존 관제탑의 원자료부터 확인해주세요.",
       ),
     );
-  /* 정역학 학습 순서(최종본 §17 채택 (나)): 기초 1강(짧게) → 3장(2강) → 4장(3강) → 5장(4강) → 우력·3D. 날짜 자체는 바꾸지 않는다 */
-  const EXAM_ORDER = {"2026-09-07":0,"2026-09-09":0,"2026-09-14":0,"2026-09-16":1,"2026-09-21":1,"2026-09-23":2,"2026-09-28":2,"2026-09-30":3,"2026-10-07":3,"2026-10-10":4};
-  const HIDE_2 = ["2026-09-07", "2026-09-09", "2026-09-14"]; /* 2장 선수 내용 — 강 목록에서 숨김 */
-  const examView = name === "정역학" ? c.lessons.filter((l) => !HIDE_2.includes(l.date)).sort((x, y) => (EXAM_ORDER[x.date] ?? 5) - (EXAM_ORDER[y.date] ?? 5)) : c.lessons;
-  if (name === "정역학") host.append(node("p", "학습 순서: 1강 3장 → 2강 4장(점 모멘트) → 3강 5장 → 4강 우력 → 5강 3D 케이블 → 6강 3D 축 → 7강 세 힘 부재.", "notice"));
-  for (const l of examView)
+  for (const l of c.lessons.filter((l) => !hideLesson(name, l)).sort((x, y) => (y.id === 'statics-2026-10-11') - (x.id === 'statics-2026-10-11')))   /* 정역학 벼락치기를 맨 위에 */
     row(
       host,
       `${l.date} · ${l.title}`,
       `${l.week || "?"}주차 · 원문 수업 연결`,
-      () => startLesson(l.id),
-      "학습",
+      () => selectScope ? showLessonScope(l, name) : startLesson(l.id),
+      selectScope ? "세부 주제 선택" : "학습",
     );
   host.append(node("h3", "필요 개념"));
   const courseConcepts = node("div", undefined, "concept-list");
@@ -611,6 +654,22 @@ $("courses").onclick = () => {
     })
     .catch(error => { if (practice.isConnected) practice.append(node("p", error.message)); });
 }
+async function showLessonScope(summary, name) {
+  const host = panel(name + ' · ' + summary.date);
+  const loading = node('p', '세부 주제를 불러오는 중입니다.');
+  host.append(loading);
+  try {
+    const lesson = await api('lesson?id=' + encodeURIComponent(summary.id));
+    if (!loading.isConnected || !$("panel").open) return;
+    host.replaceChildren(node('h2', lesson.title), node('p', '시작할 주제를 선택하세요. 이후 주제는 수업 순서대로 이어집니다.', 'notice'));
+    host.append(button('처음부터 학습', () => startLesson(summary.id, {index:0})));
+    groupLessonTopics(lesson.steps).forEach((topic, at) => row(host, (at + 1) + '. ' + topic.title, topic.count + '개 학습 단계 · ' + ({understand:'개념 이해',remember:'개념 정리',example:'예제',quiz:'직접 문제'}[topic.kind] || '수업'), () => startLesson(summary.id, {stepId:topic.stepId}), '여기부터 학습'));
+    host.append(button('다른 단원·수업 선택', () => showCourse(name, true)));
+    host.querySelector('button')?.focus();
+  } catch (error) {
+    if (loading.isConnected && $("panel").open) { host.replaceChildren(node('h2', '수업 범위'), node('p', error.message, 'error'), button('다시 선택', () => showCourse(name, true))); }
+  }
+}
 $("resume").onclick = () => {
   const plan = state.plans[course];
   if (lastLesson) startLesson(lastLesson);
@@ -618,6 +677,8 @@ $("resume").onclick = () => {
   else consult(course);
 };
 async function startLesson(id, options = {}) {
+  /* 정역학 강 시작 암기카드: 새 수업을 열 때만(같은 수업 안 이동·다른 기기 따라가기는 제외) */
+  if (!options.follow && id !== current?.id && !(await cardGate(id))) { status('암기카드를 통과해야 수업이 열립니다.'); return; }
   try { await mission?.save(); if (!options.follow && !isBoard()) await growth?.stop('pause'); } catch (error) { status(error.message, true); return; }
   // 받기 경로: 기다리는 동안 이 기기에서 이동했으면 받은(이제 오래된) 세션을 적용하지 않는다.
   const stale = () => options.follow && options.epoch !== sessionEpoch;
@@ -634,6 +695,15 @@ async function startLesson(id, options = {}) {
     // 시험 대비는 저장된 마지막 위치와 상관없이 고른 첫 문제(가장 약한 문제)부터. 이어 하기·특정 문제 지정은 그대로 둔다.
     if (options.follow) { if (missionIndices && !missionIndices.includes(targetIndex)) missionIndices = [targetIndex, ...missionIndices.filter(i => i !== targetIndex)].slice(0, missionIndices.length); }
     else if (missionIndices && (!missionIndices.includes(targetIndex) || (!options.resume && !options.stepId && options.index === undefined))) targetIndex=missionIndices[0];
+    // 회차 강의안이 있으면(시험 대비 제외) 수업 순서 = 섹션별 판서 → 섹션 확인 → 학습지. 저장 위치가 순서 밖이면 그다음 자리로.
+    const lp = options.purpose === "exam" ? null : await loadPack(lesson.id);
+    if (generation !== requestGeneration || stale()) return;
+    const lr = lp && packRoute(lp, lesson.steps);
+    if (lr && options.stepId && !lr.includes(targetIndex)) {
+      const next = lr.findIndex(at => at > targetIndex);
+      lr.splice(next < 0 ? lr.length : next, 0, targetIndex);
+    }
+    if (lr) { missionIndices = lr; if (!lr.includes(targetIndex)) targetIndex = lr.find(i => i >= targetIndex) ?? lr[0]; }
     if (options.follow) activeSession = options.resume;
     else await saveSession(lesson, targetIndex, {newSession: !options.resume, purpose: options.purpose || 'tutoring', assisted: options.assisted ?? !!options.resume?.assisted, returnTo: options.returnTo || null});
     if (generation !== requestGeneration) return;
@@ -646,6 +716,7 @@ async function startLesson(id, options = {}) {
   $("assignmentArea").setAttribute("aria-pressed", "false");
   $("assignments").hidden = true;
     current = lesson;
+    pack = lr ? lp : null;
     document.querySelector(".school").dataset.mode = "classroom";
     lastLesson = id;
     if (lesson.course !== "공통") course = lesson.course;
@@ -726,12 +797,12 @@ function closeDialogs() {
 function board(title, body, kind, annotation) {
   const host = $("board");
   let limit = innerHeight < 760 ? 260 : 440,
-    pages = splitText(body, limit),
+    pages = chalkPages(body, limit),
     page = 0;
   function draw() {
+    const choices = $("choices");
     host.replaceChildren(
-      node("div", kind, "caption"),
-      node("h1", title),
+      ...(current?.steps[index]?.title===title?[createBoardHierarchy(document,boardHierarchy(current,current.steps[index],catalog?.courses.find(c=>c.name===current.course)),kind)]:[node("div",kind,"caption"),node("h1",title)]),
       node("div", pages[page], "content"),
     );
     if (annotation) host.append(node("div", annotation, "annotation"));
@@ -754,16 +825,18 @@ function board(title, body, kind, annotation) {
       );
       host.append(controls);
     }
+    if (v3 && choices) v3.response.append(choices);
+    decorateChalk(host, current?.steps[index]);
     renderMath(host);
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       if (
-        host.scrollHeight > host.clientHeight + 2 &&
+        (host.scrollHeight > host.clientHeight + 2 || host.querySelector(".content").scrollHeight > host.querySelector(".content").clientHeight + 2) &&
         innerWidth > 650 &&
-        limit > 100
+        limit > 40
       ) {
         limit = Math.floor(limit * 0.7);
-        const smaller = splitText(body, limit);
-        if (smaller.length > pages.length) {
+        const smaller = chalkPages(body, limit);
+        if (smaller.length >= pages.length) {
           pages = smaller;
           page = 0;
           draw();
@@ -777,7 +850,7 @@ function board(title, body, kind, annotation) {
     clearTimeout(resizeBoard);
     resizeBoard = setTimeout(() => {
       limit = innerHeight < 760 ? 260 : 440;
-      pages = splitText(body, limit);
+      pages = chalkPages(body, limit);
       page = Math.min(page, pages.length - 1);
       draw();
     }, 150);
@@ -795,6 +868,25 @@ function currentEvidence() {
     )
     .at(-1);
 }
+// 문제 전에 푸는 방법(대표님 10/9): 문제와 이어진 개념 카드(knowledge/cards)의 「예제 + 단계 풀이 + 자주 하는 실수」를 스앵님이 먼저 풀어 보인다.
+// 같은 방법의 다른 문제라 정답을 알려 주지 않는다. 카드·예제가 없으면 지어내지 않고 그렇다고 말한다.
+const cardCache = new Map();
+function loadCards(ids) {
+  return Promise.all(ids.filter((id) => /^[\w.-]{1,80}$/.test(id)).map((id) => {
+    if (!cardCache.has(id)) cardCache.set(id, fetch(new URL(`../knowledge/cards/${id}.json`, document.baseURI), { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null)).catch(() => null).then((c) => { cardCache.set(id, c); return c; }));
+    return cardCache.get(id);
+  }));
+}
+function howtoLines(step) {
+  const card = (step.nodes || []).map((id) => cardCache.get(id)).find((c) => c && !(c instanceof Promise) && c.example?.steps?.length);
+  if (!card && (step.nodes || []).some((id) => cardCache.get(id) instanceof Promise)) return [];   // 아직 받는 중 — 「없다」고 하지 않고 넘어감
+  if (!card) return [{ say: "이 문제는 아직 준비된 풀이 예제가 없어요. 막히면 힌트나 아래 채팅으로 바로 물어보세요.", mood: "neutral" }];
+  const ex = card.example, out = [{ say: "풀기 전에, 같은 방법으로 예제 하나 먼저 풀어 볼게요.", mood: "smile" }, { say: `예제: ${ex.q}`, mood: "neutral" }];
+  ex.steps.slice(0, 8).forEach((s, i) => out.push({ say: `${i + 1}단계: ${s}`, mood: "neutral" }));
+  if (card.pitfall) out.push({ say: `조심할 것: ${card.pitfall}`, mood: "serious" });
+  out.push({ say: "이제 칠판 문제를 방금 순서대로 직접 풀어 보세요.", mood: "smile" });
+  return out;
+}
 async function renderStep(camera) {
   if (!current) return;
   stopVoice();
@@ -808,7 +900,9 @@ async function renderStep(camera) {
     assisted = assisted || !!prior.assisted || !prior.correct;
     if (prior.correct) passed = true;
   }
-  $("stepLabel").textContent = missionIndices ? `${missionIndices.indexOf(index)+1} / ${missionIndices.length} · 미션` : `${index + 1} / ${current.steps.length}`;
+  $("stepLabel").textContent = curPack() ? packLabel(curPack(), step.id) : missionIndices ? `${missionIndices.indexOf(index)+1} / ${missionIndices.length} · 미션` : `${index + 1} / ${current.steps.length}`;
+  lectureUi?.intro(false); lectureUi?.update(packCtx()); document.querySelector(".v3-relisten")?.remove();
+  document.querySelector(".school").dataset.step = step.options ? "quiz" : "board";   // room-wide.js: 판서 강의 중에만 문제 칸 숨김
   $("choices").replaceChildren();
   const kind =
     {
@@ -819,8 +913,8 @@ async function renderStep(camera) {
       quiz: "직접 확인",
     }[step.kind] || "학습";
   board(
-    step.title,
-    step.body,
+    curPack() && step.options ? packLabel(curPack(), step.id) : cleanTitle(step.title),   // 강의안 수업 문제는 「섹션 n 확인」·「학습지 n / 5」(4부 C)
+    chalkBoardText(current.steps, index),
     kind,
     current.warnings.length
       ? "자료 주의사항 있음 · 이 수업의 근거에서 확인"
@@ -831,6 +925,8 @@ async function renderStep(camera) {
       ? "직접 골라주세요. 틀리면 어디서 막혔는지 짚고 다시 풀어볼게요."
       : step.kind === "example" ? "판서를 한 단계씩 보면서 같이 풀어봅시다. 지금 식 다음에 무엇을 해야 할지 설명해보세요. 막히면 ‘더 쉽게’로 한 단계만 같이 볼 수 있어요." : step.speech ||
         "읽은 뒤 이 내용을 자신의 말로 설명해보세요. 모르는 부분은 바로 질문해주세요.";
+  // 강의안 수업의 판서는 대화 기록에도 옛 요약 대신 그 단계 강의 대본을 남긴다(자막과 다른 설명이 겹치지 않게).
+  if (curPack() && !step.options) { const said = packLines(curPack(), step.id).map(l => l.say).join(" "); if (said) $("speech").textContent = said; }
   if (step.options) {
     step.options.forEach((option, i) => {
       const b = button(option, () => answer(i));
@@ -848,7 +944,7 @@ async function renderStep(camera) {
   // 개념·예제 단계는 스앵님이 먼저 확인 질문을 하고 대화 바에서 답을 받는다(tutor.js, 교실 v2 4절).
   $("next").disabled = !passed;
   $("next").textContent =
-    (missionIndices ? index === missionIndices.at(-1) : index === current.steps.length - 1) ? "미션 결과 보기" : "다음 도전";
+    (missionIndices ? index === missionIndices.at(-1) : index === current.steps.length - 1) ? (curPack() ? "수업 결과 보기" : "미션 결과 보기") : "다음 도전";
   $("back").disabled = index === 0;
   $("hint").disabled = !step.options;
   if (["rejected", "pending"].includes(current.review?.status)) {
@@ -865,10 +961,13 @@ async function renderStep(camera) {
     $("choices").append(button("원래 문제로 돌아가기", returnToQuestion));
   await mission?.mount();
   tutor?.onStep();
+  if (step.options) loadCards(step.nodes || []);   // 풀이 예제 카드 — 기다리지 않음(문제를 읽는 동안 받아 두고 풀이 차례에 씀)
   lecture?.start();
   // 교실 v3: 게임 보기면 3D 교실을 위 강의 칸에 앉혀 붙이고, 사이트 보기면 3D 를 쓰지 않는다
   await stage3d(step.kind,camera);
   if (!isBoard()) await growth?.step(activeSession);
+  textbook?.render(current, index);
+  quests?.render(current,[...state.events,...pending]);
 }
 async function returnToQuestion() {
   const saved = pausedLesson;
@@ -964,6 +1063,21 @@ function answer(choice) {
   }
   renderMath($("speech"));
   tutor?.onAnswer(correct);
+  quests?.render(current,[...state.events,...pending]);
+  // 강의안 수업: 확인·학습지 문제를 맞히면 잠깐 뒤 다음 섹션(문항)으로 이어 간다. 그사이 직접 넘겼으면 아무것도 안 함.
+  if (correct && curPack() && !isBoard()) { const at = index, lid = current.id; clearTimeout(autoNextTimer); autoNextTimer = setTimeout(() => { autoNextTimer = null; if (current?.id === lid && index === at && passed) $("next").click(); }, 1800); }
+  // 강의안 수업의 섹션 확인 문제를 틀리면 「다시 듣기」 아이콘(그 섹션 첫 판서로). 학습지 오답에는 두지 않음(4부 보완 C)
+  if (!correct && curPack() && !isBoard()) {
+    const sec = curPack().sections.find(x => x.check === step.id);
+    const pos = sec ? missionIndices.indexOf(current.steps.findIndex(x => x.id === Object.keys(sec.script)[0])) : -1;
+    if (pos >= 0 && !document.querySelector(".v3-relisten") && v3?.stage) {
+      const b = document.createElement("button"); b.type = "button"; b.className = "v3-relisten"; b.setAttribute("aria-label", "이 섹션 강의 다시 듣기"); b.title = "다시 듣기";
+      b.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>';
+      b.onclick = () => goRoute(pos);
+      v3.stage.append(b);   // 칠판 위 오른쪽 위 — 보기 칸 아래는 작업 칸이 잘려 안 보였다
+    }
+  }
+  lectureUi?.update(packCtx());
 }
 $("hint").onclick = () => {
   assisted = true;
@@ -986,21 +1100,50 @@ $("back").onclick = async () => {
     renderStep();
   }
 };
-$("next").onclick = async () => {
-  if (!passed) return;
-  try { await mission?.save(); } catch { return; }
-  requestGeneration++;
-  if (missionIndices ? index !== missionIndices.at(-1) : index < current.steps.length - 1) {
-    const target=missionIndices ? missionIndices[missionIndices.indexOf(index)+1] : index+1;
-    try { await saveSession(current,target,{assisted:false}); } catch { return; }
-    index=target;
+// 강의안 수업 화면(lecture-ui.js) 상태 — 기록을 아직 못 읽었으면 events 는 null(칩 「확인 중」)
+function packCtx() {
+  const p = curPack(); if (!p || !missionIndices) return null;
+  return { pack: p, route: missionIndices, index, steps: current.steps, lessonId: current.id, events: state?.events ? [...state.events, ...pending] : null };
+}
+// 수업 순서 안의 위치로 이동하는 단 하나의 길(칩·다시 듣기·결과 줄, 세계 기획 4부 보완). 다음 넘김과 같은 stepping 가드,
+// 이동 전에 강의·대사창·정답 뒤 자동 넘김을 끊고, 위치 기록만 남긴다(답 기록 없음).
+async function goRoute(pos, opts = {}) {
+  if (!current || !curPack() || !missionIndices || stepping || isBoard()) return;
+  const target = missionIndices[pos]; if (target === undefined) return;
+  stepping = true;
+  try {
+    clearTimeout(autoNextTimer); autoNextTimer = null;
+    lecture?.stop(); vn?.say(null); lectureUi?.intro(false);
+    if (opts.closeDialogs) closeDialogs();
+    try { await mission?.save(); } catch { return; }
+    requestGeneration++;
+    try { await saveSession(current, target, { assisted: false }); } catch { return; }
+    index = target;
     record({ kind: "position", course, lesson: current.id, index });
     renderStep();
-  } else finish();
+  } finally { stepping = false; }
+}
+$("next").onclick = async () => {
+  if (!passed || stepping) return;
+  clearTimeout(autoNextTimer); autoNextTimer = null;   // 강의 끝 자동 넘김과 Enter 가 겹쳐도 한 칸만(오타 3부 조건 3)
+  stepping = true;
+  try {
+    try { await mission?.save(); } catch { return; }
+    requestGeneration++;
+    if (missionIndices ? index !== missionIndices.at(-1) : index < current.steps.length - 1) {
+      const target=missionIndices ? missionIndices[missionIndices.indexOf(index)+1] : index+1;
+      try { await saveSession(current,target,{assisted:false}); } catch { return; }
+      index=target;
+      record({ kind: "position", course, lesson: current.id, index });
+      renderStep();
+    } else finish();
+  } finally { stepping = false; }
 };
 async function finish() {
+  const seen=[...state.events,...pending];
+  if(!missionIndices && current.steps.every((s,i)=>seen.some(e=>e.lesson===current.id&&((e.kind==='position'&&e.index===i)||(['read','answer'].includes(e.kind)&&e.step===s.id)))) && !seen.some(e=>e.lesson===current.id&&e.kind==='review'&&e.action==='lecture-complete'))record({kind:'review',action:'lecture-complete',course,lesson:current.id});
   try{await growth?.stop('finish');}catch(e){status(e.message,true);}
-  const host = panel("미션 완료 · 다음 도전");
+  const host = panel(curPack() ? "수업 완료 · 학습지 결과" : "미션 완료 · 다음 도전");
   const answers = evidenceSummary(
     [...state.events, ...pending].filter((e) => e.lesson === current.id),
   );
@@ -1008,6 +1151,7 @@ async function finish() {
   const celebration=node('div',undefined,'mission-result');
   celebration.append(node('span',answers.independent?'도전 성공':'미션 기록 완료','mission-result-tag'),node('h2',answers.independent?`${answers.independent}문제를 혼자 해결했어요.`:'오늘 시도한 풀이를 남겼어요.'),node('p',answers.retry?'막힌 문제를 한 번 더 풀면 다음 도전이 쉬워져요.':'스앵님과 다음 도전으로 이어가볼까요?'));
   host.append(celebration);
+  if (curPack() && missionIndices) { lectureUi?.result(host, packCtx()); renderMath(host); }
   const summary = node("div", undefined, "summary");
   for (const [label, value] of [
     ["확인 문제", answers.tested],
@@ -2102,9 +2246,8 @@ async function showVisual(name, date) {
     host.append(node("p", error.message, "error"));
   }
 }
-$("generate").onclick = async () => {
-  if (!current) return;
-  const base = current.id,
+function openMaterialGeneration(base, sourceCourse = course) {
+  const
     host = panel("맞춤 보충 수업");
   host.append(
     node(
@@ -2121,7 +2264,7 @@ $("generate").onclick = async () => {
       host.append(progress);
       try {
         await flush();
-        const draft = await api("generate", { lesson: base, course });
+        const draft = await api("generate", { lesson: base, course: sourceCourse });
         state = await api("state");
         progress.textContent = "생성 완료 · " + draft.engine;
         host.append(node("h3", draft.title));
@@ -2162,6 +2305,7 @@ $("generate").onclick = async () => {
   );
   host.append(create);
 };
+$("generate").onclick = () => current && openMaterialGeneration(current.id, course);
 $("listen").onclick = async () => {
   if (audio || voiceRequest) return stopVoice();
   const step = current?.steps[index];
@@ -2233,7 +2377,8 @@ async function boot() {
     if(entry.get('spawn')){await workspace.open('main');await space.walk(undefined,{spawn:entry.get('spawn')});}   // 대표실에서 걸어 들어옴(3D 2단계)
     else if(entry.get('world')==='walking'){await workspace.open('main');await space.walk(entry.get('subject')||undefined);}
     else if(lessonId){const resume=activeSession?.lessonId===lessonId&&(!stepId||activeSession.stepId===stepId)?activeSession:null;await startLesson(lessonId,{stepId:stepId||undefined,resume,purpose:resume?.purpose,returnTo:resume?.returnTo,camera:entry.get('camera')});}
-    else await workspace.open(['main','learning','materials','progress','attendance','assignments'].includes(room)?room:'main');
+    else await workspace.open(['main','learning','materials','progress','attendance','assignments','counsel'].includes(room)?room:'main');
+    schoolRefresh?.restore();
     status("학교 연결 완료");
   } catch (error) {
     $("today").textContent =
@@ -2247,7 +2392,7 @@ async function retest(id){
 }
 mission = createMission({api,forcedMode:()=>setup?.solveMode(),context:()=>current?{lesson:current,step:current.steps[index],index,assisted,total:missionIndices?.length,number:missionIndices?missionIndices.indexOf(index)+1:undefined}:null,feedback:(text,kind)=>{$('speech').textContent=text;mission.feedback(kind);renderMath($('speech'));},retest,remedial:supplementWork,helped:()=>{assisted=true;saveSession(current,index,{assisted:true}).catch(()=>{});},allowNext:()=>{status('풀이 피드백은 관찰 기록입니다. 확인 문제의 정답 검증은 별도로 진행합니다.');}});
 growth = createGrowth({api,status,panel,start:startLesson,retest,courses:()=>workspace?.data?.courses||[],home:()=>workspace.open('main')});
-workspace = createWorkspace({api,status,panel,record,screen:rememberScreen,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],walk:name=>space&&ROOMS.some(r=>r.name===name)?space.walk(name):showCourse(name),practice,rooms:()=>ROOMS.map(r=>r.name),evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,tutorPlan:(host,data,refresh)=>growth.tutorPlan(host,data,refresh),leave:async()=>{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);space?.hide();stopVoice();closeDialogs();++requestGeneration;}   /* 저장이 다 된 뒤에 3D 를 닫는다 — 실패하면 수업·3D 그대로(오타 10/8) */,lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),mode:mode=>mission.setMode(mode)});
+workspace = createWorkspace({api,status,panel,record,screen:rememberScreen,close:closeDialogs,catalog:()=>catalog,events:()=>[...state.events,...pending],walk:name=>space&&ROOMS.some(r=>r.name===name)?space.walk(name):showCourse(name),practice,rooms:()=>ROOMS.map(r=>r.name),evidence:name=>evidenceSummary([...state.events,...pending],name),history:()=>state.events.filter(e=>e.kind==='question'&&e.mode==='consultation'),refreshLearning:async()=>{state=await api('state');},session:()=>activeSession,resume:resumeSession,tutorPlan:(host,data,refresh)=>growth.tutorPlan(host,data,refresh),leave:async()=>{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);space?.hide();stopVoice();closeDialogs();++requestGeneration;}   /* 저장이 다 된 뒤에 3D 를 닫는다 — 실패하면 수업·3D 그대로(오타 10/8) */,lobby:()=>{legacyLobbyMode=true;showLobby();legacyLobbyMode=false;},assignments:showAssignments,start:startLesson,course:showCourse,integrated:openIntegrated,library:()=>$('library').onclick(),formatMaterial:renderMath,materialSources:name=>showSources(name),generateMaterial:(id,name)=>openMaterialGeneration(id,name),materialDrafts:()=>Object.values(state.drafts||{}),mode:mode=>mission.setMode(mode),rig:host=>createFace(host,{label:'김주영 스앵님'}),plan:createPlan({status}),consult:()=>consult(course||ROOMS[0]?.name)});
 space = createSpace({fixedView:()=>setup?.fixedView(),leaveTo:async url=>{try{await mission.save();await growth.stop('pause');if(current)await saveSession(current,index);}catch(e){status('저장하지 못해 이동하지 않았습니다. '+(e.message||''),true);return false;}stopVoice();location.href=url;return true;},status,panel,screen:rememberScreen,view:camera=>{if(current)rememberScreen({lesson:current.id,step:current.steps[index].id,camera});},home:()=>workspace.open('main'),pause:async()=>{await mission.save();await growth.stop('pause');},ask:()=>openChat('','hint'),select:sitDown});
 // 교실 v3(대표님 10/8): 위 강의 · 가운데 문제 · 아래 대화, 게임↔사이트
 // 교실 v3 3D 무대(오타 검수 10/8 P2): 게임 보기 + 시험 대비가 아님 → 강의 칸에 앉힘(같은 과목이면 다시 앉히지 않음), 아니면 3D 를 내린다
@@ -2276,17 +2421,28 @@ function advance(){   // ⏭ / Enter: 강의 중이면 다음 문장, 끝났으�
   if(passed){$('next').click();return;}
   const step=current.steps[index];
   if(step.options){$('speech').textContent='이 문제는 골라야 넘어가요. 막히면 힌트(H)나 더 쉽게(E)를 눌러요.';return;}
+  if(curPack()){passed=true;$('next').disabled=false;$('next').click();return;}   // 강의안 수업의 판서 건너뛰기는 「읽음」도 남기지 않는다(오타 3부: 건너뜀은 진도·이해도 밖)
   record({kind:'read',course,lesson:current.id,step:step.id,nodes:step.nodes||[]});passed=true;$('next').disabled=false;$('next').click();
 }
 v3 = startClassroomV3({
   onToggle:()=>{if(!lecture)return;lecture.toggle();},
   onRestart:()=>lecture?.restart(),
   onSkip:advance,
-  onChat:text=>tutor?.question(text),
+  onChat:text=>{
+    if (!/[?？]\s*$/.test(text) && current && !current.steps[index].options && lecture?.playing) { lecture.stop(); tutor?.afterLecture(); }
+    tutor?.submitMessage(text);
+  },
   progress:()=>$('stepLabel')?.textContent||'',
+  context:()=>current?{lesson:current,index}:null,
+  onMood:mood=>dockSaeng?.setExpr?.(mood),
+  math:renderMath,
+  onStep:stepId=>current&&startLesson(current.id,{stepId}),
   onViewChange:async view=>{if(current&&document.querySelector('.school').dataset.mode==='classroom'){stagedCourse=null;await stage3d(current.steps[index].kind);}else if(view==='site'){space?.mount?.(null);space?.hide();}},
 });
-tutor = createTutor({api,eventId,record,
+textbook = createLessonTextbook({math:renderMath,onStep:stepId=>current && startLesson(current.id,{stepId})});
+v3.work.setAttribute('aria-label','수업교재');
+v3.work.append(textbook.el);
+tutor = createTutor({api,eventId,record,inPack:()=>!!curPack(),
   ctx:()=>current?{lesson:current,step:current.steps[index],index,course,passed,blocked:['rejected','pending'].includes(current.review?.status)}:null,
   pass:()=>{passed=true;$('next').disabled=false;},
   assist:()=>{if(!assisted){assisted=true;saveSession(current,index,{assisted:true}).catch(()=>{});}},
@@ -2314,17 +2470,39 @@ tutor = createTutor({api,eventId,record,
    else if(e.code==='Escape'&&sc.dataset.world==='seated'){e.preventDefault();document.querySelector('.seat-controls [data-icon=stand]')?.click();}
  });}
 // 과목 레일: 수업 중 과목을 바꾸면 그 과목의 약한 회차로 바로(강의실 하나, 교실 v2)
-const rail = createSubjectRail({subjects:ROOMS,current:()=>course,choose:async name=>{try{await mission?.save();}catch{return;}const seated=document.querySelector('.school').dataset.world==='seated';await sitDown(name);space?.setSubject?.(name);rail.update();if(seated)await space?.seated(name);}});
+function lecturePosition(){
+  if(!current)return null;
+  const lessons=(catalog?.courses?.find(c=>c.name===current.course)?.lessons||[]).filter(l=>!l.generated&&!String(l.id).startsWith('exam-')&&!hideLesson(current.course,l)).sort((a,b)=>a.date.localeCompare(b.date));
+  const ordinal=lessons.findIndex(l=>l.id===current.id);
+  const topics=groupLessonTopics(current.steps),part=topics.findLast(t=>t.index<=index);
+  return {course:current.course,lecture:ordinal>=0?`${ordinal+1}강`:current.generated?'자체 제작 수업':'수업 회차',part:part?.title||current.steps[index]?.title};
+}
+const subjectScope=createSubjectScope({fallback:name=>showCourse(name,true),lessons:name=>(catalog?.courses.find(c=>c.name===name)?.lessons||[]).filter(l=>!l.generated&&!String(l.id).startsWith('exam-')).sort((a,b)=>a.date.localeCompare(b.date)),current:()=>current?{lesson:current.id,index}:null,events:()=>[...state.events,...pending],topics:async summary=>{const lesson=summary.id===current?.id?current:await api('lesson?id='+encodeURIComponent(summary.id));return groupLessonTopics(lesson.steps).map((t,i,all)=>({...t,current:summary.id===current?.id&&t.index<=index&&(!all[i+1]||all[i+1].index>index)}));},select:(id,stepId)=>startLesson(id,{stepId}),onOpen:()=>{scopePause={lesson:current,index,playing:!!lecture?.playing};if(scopePause.playing)lecture.toggle();},onClose:()=>{const paused=scopePause;scopePause=null;if(paused?.playing&&current===paused.lesson&&index===paused.index&&!lecture?.playing&&!lecture?.ended)lecture?.toggle();}});
+const rail = createSubjectRail({subjects:ROOMS,available:name=>inFocus(name)&&!!catalog?.courses?.find(c=>c.name===name)?.lessons?.length,position:lecturePosition,current:()=>course,openScope:(name,anchor)=>subjectScope.open(name,anchor),choose:async name=>{try{await mission?.save();}catch{return;}const seated=document.querySelector('.school').dataset.world==='seated';await sitDown(name);space?.setSubject?.(name);rail.update();if(seated)await space?.seated(name);}});
 new MutationObserver(()=>rail.update()).observe($('roomLabel'),{childList:true,characterData:true,subtree:true});
+new MutationObserver(()=>rail.update()).observe($('stepLabel'),{childList:true,characterData:true,subtree:true});
 startSurfaces();
+const MOOD={smile:'smile',serious:'strict',think:'neutral',neutral:'neutral'};
+// 강의 자막은 연애 시뮬레이션식 대사창으로(vn-dialog.js). 창을 누르면 ⏭ 와 같다.
+const vn = v3?.stage ? createDialog(v3.stage, { onNext: () => advance() }) : null;
+lectureUi = createLectureUi({ goRoute });
+setupWideRoom(v3);   // 강의실 배치 A: 와이드 칠판·대사창·버튼 한 줄·대화 서랍(대표님 10/9)
+setupSeatRoom();   // 교실 = 내 자리에서 본 장면: 칠판·교탁 앞 스앵님·책상 위 대사창(대표님 10/9 「착석 시점, 연애 시뮬 느낌」)
+// 화면 틀(10/9 「초심으로」): 위 고정 줄(GREENLIGHT | SCHOOL·탭·비서 토큰·대표실) + 아래 고정 스앵님·채팅 바
+const shell = setupShell({ api, eventId, openArea: a => workspace.open(a), course: () => course || '', history: () => (state?.events || []).filter(e => e.kind === 'question' && e.mode === 'consultation'), status });
 lecture = createLecture({
   ctx:()=>current?{lesson:current,step:current.steps[index],index,course,passed}:null,
+  script:step=>curPack()?packLines(curPack(),step.id):null,
+  howto:step=>howtoLines(step),
+  line:l=>{const p=curPack();if(p&&l?.intro)lectureUi?.intro(true,{key:current.id,course:p.course,date:p.date,title:current.title,goals:p.goals||[]});else lectureUi?.intro(false);},
+  mood:m=>dockSaeng?.setExpr?.(MOOD[m]||'neutral'),
   talk:on=>{space?.saeng?.lecture?.(on);},
-  subtitle:text=>{v3.subtitle(text);if(text)dockSaeng?.speak(text.slice(0,80));},
+  subtitle:text=>{v3.subtitle(text);v3.line(text);vn?.say(text);if(text)dockSaeng?.speak(text.slice(0,80));},
   board:f=>v3.board(f),
   voiceOn:()=>{try{return capabilities.voice&&localStorage.getItem('school-voice')==='1';}catch{return false;}},
   voice:(text,signal)=>new Promise(async(resolve,reject)=>{try{const r=await fetch('/api/school/voice',{method:'POST',credentials:'same-origin',signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text.slice(0,600)})});if(!r.ok)throw new Error('voice');const url=URL.createObjectURL(await r.blob());const a=new Audio(url);const end=()=>{URL.revokeObjectURL(url);resolve();};a.onended=end;a.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('voice'));};signal.addEventListener('abort',()=>{a.pause();end();});await a.play();}catch(e){reject(e);}}),
-  onEnd:()=>tutor?.afterLecture(),
+  // 강의안 수업의 판서 단계는 강의가 끝나면 묻지 않고 다음 판서로(기록 없음). 칠판 역할 기기는 따라가기만.
+  onEnd:()=>{const at=index;if(tutor?.afterLecture()==='next'&&!isBoard()&&current&&index===at&&!blockedStep()){passed=true;$('next').disabled=false;$('next').click();}},
   onState:st=>{v3.state(st);
     // 학습 시간 기록은 강의 ▶/⏸ 를 따라간다(위쪽 따로 있던 ▶·⏹ 대신)
     if(isBoard())return;
@@ -2338,14 +2516,14 @@ $('learnSettings').onclick=()=>{closeDialogs();setup.open();};
 // 모니터 + 아이패드: 두 기기가 서버의 같은 수업 위치(activeSession)를 따라간다. 어느 쪽에서 넘겨도 다른 쪽이 2초 안에 맞춘다.
 let following=false;
 async function follow(){
-  if(following||document.hidden||setup?.get()!=='dual'||!current||document.querySelector('.school').dataset.mode!=='classroom')return;
+  if(following||document.hidden||scopePause||setup?.get()!=='dual'||!current||document.querySelector('.school').dataset.mode!=='classroom')return;
   following=true;
   try{
     await sessionQueue.catch(()=>{});
     const epoch=sessionEpoch;
     const s=await api('session');
     // 읽는 동안 이 기기에서 이동했으면, 또는 이미 더 최신을 갖고 있으면 응답을 버린다.
-    if(epoch!==sessionEpoch||!s||!current)return;
+    if(epoch!==sessionEpoch||scopePause||!s||!current)return;
     if(s.id===activeSession?.id&&s.revision<=activeSession.revision)return;
     // 다른 수업이거나 목적(수업↔시험 대비)이 바뀌면 문제 목록까지 다시 구성한다.
     if(s.lessonId!==current.id||s.purpose!==activeSession?.purpose){await startLesson(s.lessonId,{resume:s,purpose:s.purpose,returnTo:s.returnTo,follow:true,epoch});return;}
@@ -2377,7 +2555,7 @@ function hideDockEmotionLabels(){
 hideDockEmotionLabels();
 new MutationObserver(hideDockEmotionLabels).observe($('dock'),{childList:true,characterData:true,subtree:true});
 let dockSaeng=null;
-attachSaeng($('dockFace')).then(s=>{dockSaeng=s;});
+attachSaeng($('dockFace')).then(s=>{dockSaeng=s;mountLectureActor($('dockFace'),document.querySelector('.v3-guide'));});
 window.addEventListener('saeng',e=>{
   const {react,line}=e.detail||{};
   if(react)dockSaeng?.react(react);
@@ -2390,9 +2568,12 @@ new MutationObserver(()=>{const t=$('speech').textContent.trim();if(t&&!$('dialo
 $('dockTalk').onclick=()=>{if(document.querySelector('.school').dataset.mode==='classroom'){$('askToggle').click();return;}workspace.open('main').then(()=>document.querySelector('.main-tutor textarea')?.focus());};
 $('home').onclick=()=>workspace.open('main');
 $('mainArea').onclick=()=>workspace.open('main');
+// 교실에서는 과목을 고르고 단원·강의 목차를 확인한 뒤 시작한다. 진행 중인 수업은 이어하기로 복귀한다.
 $('learningArea').onclick=()=>workspace.open('learning');
 $('progressArea').onclick=()=>workspace.open('progress');
 $('materialsArea').onclick=()=>workspace.open('materials');
 $('attendanceArea').onclick=()=>workspace.open('attendance');
 $('assignmentArea').onclick=()=>workspace.open('assignments');
+const quests=createLectureQuests({onStep:stepId=>current&&startLesson(current.id,{stepId})});
+const schoolRefresh=mountSchoolRefresh({status,beforeReload:async()=>{await mission?.save();await flush();if(pending.length)throw new Error("학습 기록 저장을 확인해 주세요.");if(current && !isBoard())await saveSession(current,index);}});
 boot();

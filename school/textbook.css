@@ -1,0 +1,24 @@
+.lesson-textbook { display: grid; grid-template-rows: auto auto auto minmax(0, 1fr) auto; gap: .4rem; min-width: 0; min-height: 0; padding: .7rem .9rem; background: #fffdf5; color: #28312d; border: 1px solid #d6d0bd; border-radius: 12px; }
+.lesson-textbook-header { display: flex; align-items: baseline; gap: .7rem; flex-wrap: wrap; }
+.lesson-textbook h2 { font-size: 1rem; margin: 0; }
+.lesson-textbook-meta { margin: 0; font-size: .8rem; color: #62675d; overflow-wrap: anywhere; }
+.lesson-textbook-contents { display: flex; gap: .3rem; align-items: stretch; min-width: 0; }
+.lesson-textbook-contents[hidden] { display: none; }
+.lesson-textbook button { border: 1px solid #cec8b6; border-radius: 6px; background: #fff; color: inherit; padding: .35rem .5rem; font: inherit; font-size: .8rem; cursor: pointer; }
+.lesson-textbook-contents button { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.lesson-textbook-contents .lesson-textbook-toc-page { flex: 0 0 auto; }
+.lesson-textbook button[aria-current] { background: #e8efdf; border-color: #7c9460; }
+.lesson-textbook button:disabled { opacity: .45; cursor: default; }
+.lesson-textbook button:focus-visible { outline: 2px solid #507c9b; outline-offset: 2px; }
+.lesson-textbook-title { margin: 0; font-size: .95rem; overflow-wrap: anywhere; }
+.lesson-textbook-body { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; font-size: .95rem; min-width: 0; }
+.lesson-textbook-pages { display: flex; gap: .6rem; align-items: center; justify-content: center; font-size: .8rem; }
+.v3-work .lesson-textbook { flex: 1; height: 100%; box-sizing: border-box; }
+@media (max-width: 600px) { .lesson-textbook { padding: .6rem; } .lesson-textbook-contents { flex-wrap: wrap; } }
+.school[data-wide][data-view3=site][data-mode=classroom][data-lecture=playing][data-step=board] .v3-work{display:flex!important}
+.school[data-seat][data-view3=site][data-mode=classroom][data-step=quiz] .v3-stage #board{left:12px!important;top:12px!important;width:calc(100% - 24px)!important;height:calc(100% - 154px)!important;padding:18px!important;overflow:auto!important}
+.school[data-seat][data-view3=site][data-mode=classroom][data-step=quiz] .v3-stage .teacher{display:none!important}
+.school[data-seat][data-view3=site][data-mode=classroom][data-step=quiz] #board .annotation{font-size:12px;margin:6px 0}
+.school[data-wide][data-layout=v3][data-view3=site][data-mode=classroom] #dialogue .v3-log{display:flex!important;position:static!important;height:66px;max-height:66px;overflow:hidden;padding:0;background:transparent;box-shadow:none}
+.lesson-textbook-body{min-height:0;overflow:hidden}
+.lesson-textbook-body .katex-display{margin:.35em 0}

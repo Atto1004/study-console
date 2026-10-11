@@ -20,9 +20,14 @@
     <link rel="stylesheet" href="worldmap.css" />
     <link rel="stylesheet" href="icons.css" />
     <link rel="stylesheet" href="hud.css" />
-    <link rel="stylesheet" href="v3.css" />
+    <link rel="stylesheet" href="v3.css?v=203" />
+    <link rel="stylesheet" href="textbook.css?v=203" />
+    <link rel="stylesheet" href="board-only.css?v=249" />
     <link rel="stylesheet" href="textbook-ipad.css?v=1" />
     <link rel="stylesheet" href="ipad-fit.css?v=1" />
+    <link rel="stylesheet" href="card-gate.css?v=1" />
+    <link rel="stylesheet" href="tablet-layout.css?v=263" />
+    <script type="module" src="tablet-layout.js?v=263"></script>
     <script type="module" src="icons.js"></script>
     <link
       rel="stylesheet"
@@ -47,10 +52,17 @@
       src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
       crossorigin="anonymous"
     ></script>
-    <script type="module" src="school.js?v=199"></script>
+    <script type="module" src="school.js?v=263"></script>
     <script type="module" src="calc.js?v=1"></script>
       <style>.school[data-booting] #scene,.school[data-booting] #dialogue,.school[data-booting] #dock{visibility:hidden}#bootScreen{position:fixed;inset:64px 0 0;z-index:60;background:#f5f6f2;display:grid;place-items:center;color:#315b49}</style>
-  </head>
+      <link rel="stylesheet" href="feature-notes.css?v=230" />
+    <script type="module" src="feature-notes.js?v=230"></script>
+      <link rel="stylesheet" href="refresh.css?v=237" />
+      <link rel="stylesheet" href="menu-settings.css?v=232" />
+    <script type="module" src="menu-settings.js?v=232"></script>
+      <link rel="stylesheet" href="lecture-quests.css?v=233" />
+      <link rel="stylesheet" href="textbook-emphasis.css?v=235" />
+  <link rel="stylesheet" href="./subject-scope.css?v=240" /><link rel="stylesheet" href="./board-hierarchy.css?v=240" /></head>
   <body>
     <div class="school" data-booting="true">
       <div id="bootScreen" role="status">학습 화면을 불러오고 있습니다.</div>
@@ -123,7 +135,7 @@
             <div class="teacher">
               <img
                 id="teacher"
-                src="../notes/classroom/assets/tutor/neutral.png"
+                src="../docs/demo/saeng/layers2/base.png"
                 alt="김주영 스앵님"
                 hidden
               />
@@ -169,7 +181,7 @@
         </div>
       </section>
       <aside id="dock" class="dock" aria-label="김주영 스앵님">
-        <div id="dockFace" class="dock-face"><img src="../notes/classroom/assets/tutor/neutral.png" alt="김주영 스앵님" /></div>
+        <div id="dockFace" class="dock-face"><img src="../docs/demo/saeng/layers2/base.png" alt="김주영 스앵님" /></div>
         <p id="dockLine" class="dock-line" aria-live="polite">오늘은 어디부터 볼까요.</p>
         <button id="dockTalk" type="button" class="dock-talk">상담</button>
       </aside>

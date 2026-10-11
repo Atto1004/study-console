@@ -16,7 +16,7 @@
 .v3-stage .teaching-space{position:absolute!important;top:0!important;left:0!important;right:0!important;bottom:0!important;width:auto!important;height:100%!important;box-sizing:border-box;display:grid!important;grid-template-columns:minmax(0,1fr) 168px!important;grid-template-rows:minmax(0,1fr)!important;gap:14px!important;padding:14px!important;max-width:none!important;margin:0!important}   /* WebKit: inset+height:auto 로는 늘어나지 않아 칠판이 64px 로 줄었다(아이패드 10/8) */
 .v3-stage #board:not(.on-surface){height:100%!important}
 .v3-stage #board{margin:0!important;min-height:0!important;max-height:none!important;overflow:auto;border-radius:12px!important;padding:18px 22px!important}
-.v3-stage #board .content{clip-path:inset(0 0 calc((1 - var(--reveal,1)) * 100%) 0);transition:clip-path .7s ease}
+.v3-stage #board .content{clip-path:none;animation:none}
 @media (prefers-reduced-motion:reduce){.v3-stage #board .content{transition:none}}
 .v3-stage .teacher{display:flex!important;align-items:flex-end;justify-content:center;position:relative!important;width:auto!important;inset:auto!important}
 .v3-subtitle{position:absolute;z-index:6;right:190px;bottom:22px;max-width:min(520px,60%);padding:10px 14px;border-radius:14px 14px 4px 14px;background:#fffffff5;color:#1f3d33;font:500 15.5px/1.5 "Pretendard Variable",Pretendard,sans-serif;box-shadow:0 8px 24px #1f3d3326}
@@ -40,18 +40,18 @@
 /* 가운데: 문제 — 강의 중엔 흐리게, 끝나면 또렷하게 */
 .v3-work{flex:1;min-height:110px;overflow:auto;overscroll-behavior:contain;border-radius:18px;background:#fff;padding:14px 16px;box-shadow:0 1px 0 #d9e1d8}
 /* 보기 = 2×2 카드 + A~D 배지(Manus 시안 10/8에서 가져옴), 폰은 한 줄씩 */
-.school .v3-work #choices{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;margin:8px 0 0;padding:0!important}
-.v3-work #choices:empty{display:none}
-.v3-work #choices > button:not([data-opt]){grid-column:1/-1;justify-self:start}
-.v3-work #choices > button[data-opt]{width:100%!important;max-width:none!important;flex:none!important;display:flex!important;align-items:center;gap:12px;min-height:56px;padding:10px 14px!important;border-radius:14px!important;text-align:left;background:#fff!important;border:1.5px solid #dbe3dc!important;font:500 15.5px/1.4 "Pretendard Variable",Pretendard,sans-serif}
-.v3-work #choices > button[data-opt]::before{content:attr(data-opt);flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;border:1.5px solid #cfdad2;color:#21745a;font:700 13px "Pretendard Variable",Pretendard,sans-serif}
-.v3-work #choices > button[data-opt] > .opt-body{flex:1 1 auto;min-width:0;overflow-x:auto;overflow-y:hidden;overflow-wrap:anywhere;white-space:normal}
-.v3-work #choices > button[data-opt] > .opt-body .katex-display{margin:0}
-.v3-work #choices > button:hover{border-color:#21745a!important}
-.v3-work #choices > button[data-result=correct]{border-color:#21745a!important;background:#e8f3ec!important}
-.v3-work #choices > button[data-result=correct]::before{background:#21745a;border-color:#21745a;color:#fff}
-.v3-work #choices > button[data-result=wrong]{border-color:#c9875f!important;background:#fff4ec!important}
-@media (max-width:640px){.school .v3-work #choices{grid-template-columns:1fr!important}}
+.school .v3-stage #choices{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;margin:8px 0 0;padding:0!important}
+.v3-stage #choices:empty{display:none}
+.v3-stage #choices > button:not([data-opt]){grid-column:1/-1;justify-self:start}
+.v3-stage #choices > button[data-opt]{width:100%!important;max-width:none!important;flex:none!important;display:flex!important;align-items:center;gap:12px;min-height:56px;padding:10px 14px!important;border-radius:14px!important;text-align:left;background:#fff!important;border:1.5px solid #dbe3dc!important;font:500 15.5px/1.4 "Pretendard Variable",Pretendard,sans-serif}
+.v3-stage #choices > button[data-opt]::before{content:attr(data-opt);flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;border:1.5px solid #cfdad2;color:#21745a;font:700 13px "Pretendard Variable",Pretendard,sans-serif}
+.v3-stage #choices > button[data-opt] > .opt-body{flex:1 1 auto;min-width:0;overflow-x:auto;overflow-y:hidden;overflow-wrap:anywhere;white-space:normal}
+.v3-stage #choices > button[data-opt] > .opt-body .katex-display{margin:0}
+.v3-stage #choices > button:hover{border-color:#21745a!important}
+.v3-stage #choices > button[data-result=correct]{border-color:#21745a!important;background:#e8f3ec!important}
+.v3-stage #choices > button[data-result=correct]::before{background:#21745a;border-color:#21745a;color:#fff}
+.v3-stage #choices > button[data-result=wrong]{border-color:#c9875f!important;background:#fff4ec!important}
+@media (max-width:640px){.school .v3-stage #choices{grid-template-columns:1fr!important}}
 /* 채팅 보낸이 표시(Manus 시안) */
 .v3-msg.v3-saeng::before,.v3-msg.v3-me::before{display:block;margin:0 4px 2px;color:#7a8a80;font:600 11.5px "Pretendard Variable",Pretendard,sans-serif}
 .v3-msg.v3-saeng::before{content:"스앵님"}
@@ -126,3 +126,67 @@
   .v3-bar{gap:6px}
   .v3-bar .v3-track{display:none}
 }
+
+/* 대화는 드래그 대신 문장 묶음별 이전/다음으로 읽는다. */
+.v3-msg[hidden],.v3-log-pages[hidden]{display:none!important}
+.v3-log-pages{display:flex;align-items:center;justify-content:flex-end;gap:10px;min-height:28px}
+.v3-log-pages button{padding:4px 10px;border:1px solid #d9e1d8;border-radius:8px;background:#fff;color:#315b49;font-size:13px}
+.v3-log-pages span{font-size:12px;color:#607164}
+.school[data-layout=v3] .v3-log{max-height:none;overflow:visible;min-height:66px}
+.school[data-layout=v3] .v3-msg p{max-width:100%;font-size:15px;line-height:1.5}
+.exam-prep-link{color:#21745a;font-size:14px;font-weight:600;text-decoration:none;white-space:nowrap;padding:8px}
+
+/* PC와 아이패드 가로: 판서와 풀이를 나란히 두어 핵심 조작을 한 화면에 둔다. */
+@media (min-width:900px) and (min-height:650px){
+  .school[data-layout=v3][data-mode=classroom] #scene{padding:8px 12px 8px 84px!important}
+  .school[data-layout=v3][data-mode=classroom] #room{display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:12px;align-items:stretch}
+  .school[data-layout=v3] .v3-stage,.school[data-layout=v3][data-lecture=playing] .v3-stage{height:100%;min-height:0;flex:none}
+  .school[data-layout=v3] .v3-stage .teaching-space{grid-template-columns:minmax(0,1fr) 88px!important;gap:8px!important;padding:10px!important;padding-bottom:76px!important}
+  .school[data-layout=v3] .v3-stage #board{padding:14px!important;overflow:visible}
+  .school[data-layout=v3] .v3-stage #board h1{font-size:20px;margin:8px 0 12px}
+  .school[data-layout=v3] .v3-stage #board .content{font-size:18px;line-height:1.6}
+  .school[data-layout=v3] .v3-stage .teacher img{max-height:150px;object-fit:contain}
+  .school[data-layout=v3] .v3-stage .teacher{min-width:0!important;max-width:88px;width:88px!important}
+  .school[data-layout=v3] .v3-stage .teacher .dock{width:88px;min-width:0;padding:5px}
+  .school[data-layout=v3] .v3-stage .teacher .dock-face{width:76px;height:102px}
+  .school[data-layout=v3][data-view3=site] .v3-subtitle{right:108px;left:10px;bottom:10px;font-size:14px;min-height:54px;padding:6px 10px}
+  .school[data-layout=v3] .v3-work,.school[data-layout=v3][data-lecture=playing] .v3-work{min-height:0;max-height:none;overflow:visible;padding:10px;display:flex;flex-direction:column;gap:6px}
+  .school[data-layout=v3][data-lecture=playing] .v3-work > *{opacity:1;pointer-events:auto}
+  .school[data-layout=v3][data-lecture=playing] .v3-work::before{display:none}
+  .school[data-layout=v3] .v3-stage #choices{gap:6px!important;margin:0}
+  .school[data-layout=v3] .v3-stage #choices > button[data-opt]{min-height:52px;padding:7px!important;gap:6px;font-size:15px}
+  .school[data-layout=v3] .v3-stage #choices > button[data-opt]::before{width:24px;height:24px}
+  .school[data-layout=v3] .v3-work #missionWork{padding:8px!important;margin:0!important;width:100%;align-self:stretch;min-height:0}
+  .school[data-layout=v3] #missionWork h2{font-size:16px;margin:0 0 4px}
+  .school[data-layout=v3] #missionWork > p{font-size:13px;line-height:1.4;margin:4px 0}
+  .school[data-layout=v3] #missionWork textarea{font-size:16px;height:78px;min-height:78px;margin:6px 0;padding:8px;resize:none}
+  .school[data-layout=v3] #missionWork input[type=file]{font-size:12px;margin:0 0 5px}
+  .school[data-layout=v3] #missionWork canvas{height:110px;max-height:110px;aspect-ratio:auto}
+  .school[data-layout=v3] #missionWork .pen-tools{gap:4px;margin:4px 0}
+  .school[data-layout=v3] #missionWork .pen-tools button{font-size:12px;padding:5px;min-height:36px}
+  .school[data-layout=v3] #missionWork .work-actions{gap:6px;display:flex}
+  .school[data-layout=v3] #missionWork .work-actions button{min-height:40px;padding:7px;font-size:14px}
+  .school[data-layout=v3] #missionWork [role=status]{font-size:12px;margin-top:4px}
+  .school[data-layout=v3] #missionWork:has(canvas){display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px;flex-shrink:0}
+  .school[data-layout=v3] #missionWork:has(canvas) h2{display:none}
+  .school[data-layout=v3] #missionWork:has(canvas) .pen-tools{grid-column:1/-1;margin:0}
+  .school[data-layout=v3] #missionWork:has(canvas) canvas{grid-column:1;grid-row:2;width:100%;height:110px;margin:0}
+  .school[data-layout=v3] #missionWork:has(canvas) textarea{grid-column:2;grid-row:2;height:110px;min-height:110px;margin:0}
+  .school[data-layout=v3] #missionWork:has(canvas) input[type=file]{grid-column:1;grid-row:3;width:100%;padding:4px;margin:0;align-self:center}
+  .school[data-layout=v3] #missionWork:has(canvas) .work-actions{grid-column:2;grid-row:3}
+  .school[data-layout=v3] #missionWork:has(canvas) [role=status]{grid-column:1/-1}
+  .school[data-layout=v3] .work-preview{max-height:76px;width:auto;max-width:100%}
+  .school[data-layout=v3][data-mode=classroom] #dialogue{margin:0 12px 8px 84px!important;padding:8px 12px!important;gap:5px}
+  .school[data-layout=v3] .v3-log{height:66px;min-height:66px}
+  .school[data-layout=v3] .v3-msg p{padding:3px 8px;line-height:1.45}
+  .school[data-layout=v3] .v3-msg::before{display:none!important}
+  .school[data-layout=v3] .v3-chat input{height:40px}
+  .school[data-layout=v3] .v3-more{margin:0;padding:0;border:0;background:none}
+}
+
+/* 수업 교재는 강의 중에도 읽고, 답은 하단 채팅에서 받는다. */
+.school[data-layout=v3] #missionWork,.school[data-layout=v3] .tutor-reply{display:none!important}
+.school[data-layout=v3] .v3-work{opacity:1;pointer-events:auto}
+.school[data-layout=v3][data-lecture=playing] .v3-work > *{opacity:1;pointer-events:auto}
+.school[data-layout=v3][data-lecture=playing] .v3-work::before{display:none}
+.school[data-layout=v3][data-lecture=playing] .v3-work{flex:1 1 auto;max-height:none}

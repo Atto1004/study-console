@@ -1,0 +1,11 @@
+.school-menu-icon{flex:none;color:#487259}
+.secondary-menu>div>button{display:flex;align-items:center;gap:10px}
+.school-settings{width:min(460px,calc(100vw - 32px));padding:24px;border:1px solid #d2dccf;border-radius:18px;background:#fcfcf7;color:#273d30;box-shadow:0 18px 60px #12251b44;font-family:inherit;box-sizing:border-box}
+.school-settings::backdrop{background:#152a2280}
+.school-settings>header{position:static;display:flex;justify-content:space-between;align-items:center;height:auto;background:none;padding:0 0 20px;border:0}
+.school-settings h2{margin:0;font-size:20px}
+.school-settings button{font:inherit;cursor:pointer;border:1px solid #d2dccf;border-radius:10px;background:#fff;color:inherit;padding:10px 14px}
+.school-settings .school-settings-option{width:100%;display:flex;align-items:center;gap:14px;text-align:left;margin-bottom:10px;min-height:82px}
+.school-settings-option span{display:grid;gap:7px}
+.school-settings-option small{font-size:13px;color:#65705f}
+.school-settings-option:hover{background:#edf3e9}

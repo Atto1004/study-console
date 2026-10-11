@@ -45,7 +45,7 @@ export function createMission(app){
     const count=c.total||c.lesson.steps.length,number=c.number||c.index+1;
     top.replaceChildren(node('span',c.step.kind==='quiz'?'문제 미션':'개념·수업 미션','mission-tag'),node('b',`${number} / ${count}`));
     const progress=node('progress');progress.max=count;progress.value=number;progress.setAttribute('aria-label','미션 진행');top.append(progress);document.getElementById('room').prepend(top);
-    let face=document.getElementById('missionTutorFace');if(!face){face=node('img');face.id='missionTutorFace';face.alt='김주영 스앵님';document.querySelector('#dialogue .speech').prepend(face);}face.src='../notes/classroom/assets/tutor/neutral.png';
+    let face=document.getElementById('missionTutorFace');if(!face){face=node('img');face.id='missionTutorFace';face.alt='김주영 스앵님';document.querySelector('#dialogue .speech').prepend(face);}face.src='../docs/demo/saeng/layers2/base.png';   // 강의실과 같은 웹툰 그림체(10/9)
     host.hidden=false;
     if(key===currentKey){draw();return;}
     if(dirty){try{await save();}catch{return;}}
@@ -102,5 +102,5 @@ export function createMission(app){
     section.append(node('small','AI 관찰입니다. 읽히지 않은 식은 확인하며 스킬 획득으로 자동 처리하지 않습니다.'));host.append(section);
   }
   window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
-  return {mount,setMode,get mode(){return mode;},save:()=>dirty?save():saveQueue.catch(()=>{}),hide:async()=>{if(dirty)await save();host.hidden=true;},feedback:(kind)=>{host.dataset.feedback=kind;window.dispatchEvent(new CustomEvent('saeng',{detail:{react:kind==='correct'?'correct':kind==='retry'?'wrong':'idle'}}));const face=document.getElementById('missionTutorFace');const expression='../notes/classroom/assets/tutor/'+(kind==='correct'?'proud':kind==='retry'?'sharp':'neutral')+'.png';if(face)face.src=expression;const teacher=document.getElementById('teacher');if(teacher)teacher.src=expression;}};
+  return {mount,setMode,get mode(){return mode;},save:()=>dirty?save():saveQueue.catch(()=>{}),hide:async()=>{if(dirty)await save();host.hidden=true;},feedback:(kind)=>{host.dataset.feedback=kind;window.dispatchEvent(new CustomEvent('saeng',{detail:{react:kind==='correct'?'correct':kind==='retry'?'wrong':'idle'}}));const face=document.getElementById('missionTutorFace');const expression='../docs/demo/saeng/layers2/base.png';   /* 정지 그림은 웹툰 기본 그림 하나(10/9) — 표정은 위 saeng 이벤트로 움직이는 그림이 맡음 */if(face)face.src=expression;const teacher=document.getElementById('teacher');if(teacher)teacher.src=expression;}};
 }

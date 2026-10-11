@@ -5,7 +5,7 @@ const OUT = 'C:/Users/user/.claude/jobs/a132f963/tmp/';
   const b = await webkit.launch();
   const all = {};
   for (const [name, dev] of [['land', devices['iPad Pro 11 landscape']], ['port', devices['iPad Pro 11']]]) {
-    for (const view of ['site', 'game']) {
+    for (const view of ['site']) {   // 3D 보기 전환 없앰(10/9)
       const ctx = await b.newContext({ ...dev }); const p = await ctx.newPage();
       const errors = []; p.on('pageerror', (e) => errors.push(e.message));
       const fail = []; const expect = (ok, m) => { if (!ok) fail.push(m); };
@@ -15,16 +15,20 @@ const OUT = 'C:/Users/user/.claude/jobs/a132f963/tmp/';
       await p.waitForTimeout(view === 'game' ? 6000 : 1200);
       const st = await p.evaluate(() => {
         const R = (id) => { const e = document.getElementById(id); const r = e.getBoundingClientRect(); return { top: Math.round(r.top), bottom: Math.round(r.bottom), h: Math.round(r.height) }; };
-        const sc = document.scrollingElement; const btns = [...document.querySelectorAll('.v3-bar button, .v3-bar summary, .v3-chat button')].map((x) => { const r = x.getBoundingClientRect(); return Math.round(Math.min(r.width, r.height)); });
+        const sc = document.scrollingElement; const btns = [...document.querySelectorAll('.v3-bar button, .v3-bar summary, .v3-chat button')].filter((x) => x.getClientRects().length).map((x) => { const r = x.getBoundingClientRect(); return Math.round(Math.min(r.width, r.height)); });
         const bd = document.getElementById('board').getBoundingClientRect(), su = document.getElementById('subtitle').getBoundingClientRect(), stg = document.getElementById('lectureStage').getBoundingClientRect();
         const ov = Math.max(0, Math.min(bd.right, su.right) - Math.max(bd.left, su.left)) * Math.max(0, Math.min(bd.bottom, su.bottom) - Math.max(bd.top, su.top));
         const strays = [...document.querySelectorAll('#workZone button, #workZone label')].filter((x) => x.getClientRects().length && getComputedStyle(x).position !== 'static').map((x) => (x.getAttribute('aria-label') || x.textContent).slice(0, 15));
         return { boardH: Math.round(bd.height), stageH: Math.round(stg.height), subOverBoard: Math.round(ov), strays, lecture: document.querySelector('.school').dataset.lecture, sub: !document.getElementById('subtitle').hidden, stage: R('lectureStage'), work: R('workZone'), dlg: R('dialogue'), vh: innerHeight, hscroll: sc.scrollWidth > innerWidth + 1, minBtn: Math.min(...btns), world: document.querySelector('.school').dataset.world };
       });
       expect(st.lecture === 'playing' && st.sub, '시작 자동 재생 아님');
-      expect(st.stage.bottom <= st.work.top + 1 && st.work.bottom <= st.dlg.top + 1 && st.dlg.bottom <= st.vh + 1, '세 칸 겹침/화면 밖 ' + JSON.stringify(st));
+      // 와이드 배치(room-wide.js, 사이트 보기): 판서 강의 중엔 문제 칸을 숨긴다(h 0) — 그때는 강의 칸과 아래 줄만 겹치지 않으면 됨
+      const workHidden = view === 'site' && st.work.h === 0;
+      expect((workHidden ? st.stage.bottom <= st.dlg.top + 1 : st.stage.bottom <= st.work.top + 1 && st.work.bottom <= st.dlg.top + 1) && st.dlg.bottom <= st.vh + 1, '세 칸 겹침/화면 밖 ' + JSON.stringify(st));
       expect(st.work.h <= 120, '강의 중 가운데 칸이 큼 ' + st.work.h);
-      if (view === 'site') expect(st.boardH >= st.stageH * 0.5, '칠판이 강의 칸의 절반보다 작음 ' + st.boardH + '/' + st.stageH);
+      // 착석 교실(room-seat.js, 10/9): 칠판은 장면 속 칠판 — 폭 55% 이상 · 대사창 위 · 스앵님이 글씨 칸을 안 가림
+      if (view === 'site') { const seat = await p.evaluate(() => { const r = (q) => document.querySelector(q)?.getBoundingClientRect(); const bd = r('#board'), sg = r('#lectureStage'), vn = r('.vn-box'), t = r('.v3-stage .teacher'); const pr = parseFloat(getComputedStyle(document.getElementById('board')).paddingRight); return { bw: bd.width / sg.width, above: !vn || !vn.height || bd.bottom <= vn.top + 1, cover: t && t.width ? Math.max(0, bd.right - pr - t.left) * (Math.min(bd.bottom, t.bottom) > Math.max(bd.top, t.top) ? 1 : 0) : 0 }; });
+        expect(seat.bw >= 0.55 && seat.above && seat.cover <= 1, '착석 교실 칠판 ' + JSON.stringify(seat)); }
       expect(st.subOverBoard < 2000, '자막이 칠판을 덮음 ' + st.subOverBoard);
       expect(!st.hscroll, '가로 스크롤 생김');
       expect(st.minBtn >= 44, '버튼 44px 미만 ' + st.minBtn);

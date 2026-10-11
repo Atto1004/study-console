@@ -1,0 +1,6 @@
+.school[data-layout=v3] #board .board-hierarchy{display:block;flex:none;width:100%;box-sizing:border-box;margin:0 0 12px;padding:0 0 10px;border-bottom:1px solid #adc2a24d;background:#173b2d;color:#f2f4e9}
+.school[data-layout=v3] #board .board-parent{font-size:clamp(12px,1vw,16px);font-weight:700;line-height:1.5;letter-spacing:.01em;color:#bdd4aa;overflow-wrap:anywhere}
+.school[data-board-only][data-layout=v3] #board .board-hierarchy h1{margin:5px 0!important;font-size:clamp(18px,1.5vw,26px)!important;line-height:1.4}
+.school[data-board-only][data-layout=v3] #board .board-hierarchy .caption{margin:4px 0 0!important;font-size:11px!important;color:#bacbac}
+.school[data-layout=v3] #board>.content{min-height:0;flex:1}
+.subject-chip[aria-expanded=true]::after{display:none!important}

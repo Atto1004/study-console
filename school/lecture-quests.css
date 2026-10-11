@@ -1,0 +1,20 @@
+.school[data-mode=classroom][data-view3=site] .lecture-quests{position:absolute;right:-240px;top:0;width:224px;padding:16px 12px;box-sizing:border-box;background:#fafcf7;border:1px solid #d6dfd2;border-radius:14px;color:#314a38}
+.lecture-quests[hidden],.school:not([data-mode=classroom]) .lecture-quests,.school:not([data-view3=site]) .lecture-quests{display:none!important}
+.lecture-quests h2{margin:0 0 8px;font-size:16px}
+.quest-lesson,.quest-count{margin:6px 0;font-size:12px;line-height:1.5}
+.quest-lesson{color:#6b7664}.quest-count{color:#477c52;font-weight:700}
+.quest-topic{font-size:11px;line-height:1.5;color:#61705c;margin:8px 0;overflow-wrap:anywhere}
+.lecture-quests ol{list-style:none;padding:0;margin:20px 0 12px}
+.quest-item{position:relative;padding-bottom:24px}
+.quest-item:not(:last-child)::after{content:'';position:absolute;top:28px;bottom:0;left:13px;width:2px;background:#cbd8c8}
+.quest-item:last-child{padding-bottom:0}
+.quest-item label{display:flex;gap:10px;align-items:flex-start;cursor:pointer;position:relative}
+.quest-item input{position:absolute;opacity:0;width:28px;height:28px;left:0;top:0;margin:0}
+.quest-circle{display:grid;place-items:center;width:28px;height:28px;border:2px solid #9db393;border-radius:50%;box-sizing:border-box;flex:none;background:#fff;color:#fff;font-size:16px;font-weight:700}
+.quest-item input:focus-visible+.quest-circle{outline:2px solid #447753;outline-offset:3px}
+.quest-text{display:grid;gap:7px;padding-top:3px;min-width:0}
+.quest-text strong{font-size:13px;line-height:1.5}.quest-text small{font-size:11px;line-height:1.6;color:#707a67}.quest-text em{font-size:10px;line-height:1.5;font-style:normal;color:#608255}
+.quest-item.done .quest-circle{background:#779a6b;border-color:#779a6b}.quest-item.done .quest-text strong{color:#969e90;text-decoration:line-through}.quest-item.done .quest-text small{color:#969e90}
+.quest-notice{font-size:10px;line-height:1.6;color:#7b8573;margin:12px 0 0}
+@media(min-width:901px) and (max-width:1749px){.school[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{max-width:calc(100% - 364px)!important;margin-left:140px!important;margin-right:224px!important}.school[data-mode=classroom][data-view3=site] .lecture-quests{right:-224px;width:208px}}
+@media(max-width:900px){.school[data-mode=classroom][data-view3=site] .lecture-quests{position:static;grid-column:1/-1;grid-row:4;width:100%;margin-top:8px}.lecture-quests ol{display:flex;gap:12px}.quest-item{flex:1;padding-bottom:0}.quest-item::after{display:none}.quest-text small,.quest-notice{display:none}}
