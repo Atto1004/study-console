@@ -333,7 +333,7 @@ function showLobby() {
   for (const [position, c] of catalog.courses
     .filter((c) => c.name !== "사회봉사")
     .entries()) {
-    const b = button("", () => showCourse(c.name), "door");
+    const b = button("", () => showCourse(c.name, true), "door");
     const info = node("span", undefined, "door-info");
     info.append(
       node("b", c.name),
@@ -2568,8 +2568,8 @@ new MutationObserver(()=>{const t=$('speech').textContent.trim();if(t&&!$('dialo
 $('dockTalk').onclick=()=>{if(document.querySelector('.school').dataset.mode==='classroom'){$('askToggle').click();return;}workspace.open('main').then(()=>document.querySelector('.main-tutor textarea')?.focus());};
 $('home').onclick=()=>workspace.open('main');
 $('mainArea').onclick=()=>workspace.open('main');
-// 교실 = 스앵님이 칠판에서 강의하는 공간으로 바로(대표님 10/9). 하던 수업이 있으면 이어서, 없으면 지난 과목(없으면 첫 과목)의 약한 회차. 과목은 왼쪽 레일에서 바꿈
-$('learningArea').onclick=async()=>{try{await mission?.save();}catch{return;}if(activeSession)return resumeSession();await sitDown(inFocus(course)?course:ROOMS.find(r=>inFocus(r.name))?.name);};
+// 교실에서는 과목을 고르고 단원·강의 목차를 확인한 뒤 시작한다. 진행 중인 수업은 이어하기로 복귀한다.
+$('learningArea').onclick=()=>workspace.open('learning');
 $('progressArea').onclick=()=>workspace.open('progress');
 $('materialsArea').onclick=()=>workspace.open('materials');
 $('attendanceArea').onclick=()=>workspace.open('attendance');
