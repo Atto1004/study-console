@@ -15,7 +15,7 @@ const mins = (hm) => { const [h, m] = String(hm || '0:0').split(':').map(Number)
 const hm = (n) => `${String(Math.floor(n / 60) % 24).padStart(2, '0')}:${String(Math.round(n % 60)).padStart(2, '0')}`;
 const dur = (n) => { n = Math.max(0, Math.round(n)); const h = Math.floor(n / 60), m = n % 60; return h ? `${h}시간${m ? ' ' + m + '분' : ''}` : `${m}분`; };
 const kst = (d = new Date()) => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul' }).format(d);
-const nowMin = () => { const p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date()); return mins(p); };
+const nowMin = () => { const p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date()); return mins(p); };   // 0~1439 (자정 직후 24:05 로 나오지 않게 h23)
 const addDays = (date, n) => { const d = new Date(date + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 const WD = ['일', '월', '화', '수', '목', '금', '토'];
 const wd = (date) => WD[new Date(date + 'T00:00:00Z').getUTCDay()];
@@ -64,6 +64,7 @@ export const BLOCK_COLORS = {
   'c-study': ['#e0efe5', '#14261f'], 'c-hw': ['#fbe4cc', '#3a1f0c'], 'c-plan': ['#f4f7f5', '#26352e'],
   'tag-study': ['#245a43', '#ffffff'], 'tag-hw': ['#86400c', '#ffffff'], 'tag-plan': ['#f4f7f5', '#34483d'],
   'small-class': ['#2c4a6e', '#ffffff'], 'small-plan-fixed': ['#4b3f72', '#ffffff'], 'small-cal': ['#48525e', '#ffffff'], 'small-work': ['#6e4609', '#ffffff'], 'small-exam': ['#8f2a18', '#ffffff'],
+  'sleep-text': ['#f4f7fb', '#1c2a3a'], 'sleep-small': ['#f4f7fb', '#3a4a5d'], 'sleep-btn': ['#22344a', '#ffffff'], 'sleep-ghost': ['#ffffff', '#22344a'], 'night-big': ['#0f1a22', '#e6edf3'], 'night-sub': ['#0f1a22', '#b4c0cc'], 'night-btn': ['#1d3040', '#ffffff'],
   'small-study': ['#e0efe5', '#2f4036'], 'small-hw': ['#fbe4cc', '#46290f'], 'small-plan': ['#f4f7f5', '#2f4036'], 'legend': ['#ffffff', '#2f4036'],
 };
 export const PAST_OPACITY = 0.8;
@@ -98,6 +99,81 @@ export function dedupeBlocks(list) {
     if (host) (host.also = host.also || []).push(b); else kept.push(b);
   }
   return list.filter((b) => kept.includes(b));
+}
+// ── 자기 전 접속 종료 → 수면 추정(대표님 10/12) ──
+// 기록: v60.sleep[기상일] = {bed:'HH:MM', wake?:'HH:MM', src:'app', bedAt, wakeAt?} — 옛 관제탑·서버 health() 와 같은 자리(새 저장소 없음).
+// 키 = 기상일(누른 때가 12:00 이후면 다음 날, 12:00 전이면 같은 날). bedAt·wakeAt 은 KST(+09:00) 전체 시각 — 서버는 앱 기록이면 이 둘의 차이로 계산하고, 하나라도 이상하면 무효로 둔다.
+// 정직성: 누른 시각은 「자러 간 시각」이지 잠든 시각이 아니다 — 입면 보정 없이 그대로의 간격만 보여 주고 「추정」이라 부른다.
+export const SLEEP = { lead: 120, end: 360, morningFrom: 240, shortcutUntil: 720, shortcutGapMs: 2 * 3600e3, confirmH: 16, maxH: 24 };
+const okHM = (v) => /^([01]\d|2[0-3]):[0-5]\d$/.test(String(v || ''));
+const p2 = (n) => String(n).padStart(2, '0');
+// 수면 시간대: 취침 목표(v60.cfg.bed, 기본 01:00) 2시간 전(포함)부터 06:00(제외). 목표가 06:00~18:00 같은 이상값이면 기본값
+export function sleepWindow(bedCfg) {
+  let b = okHM(bedCfg) ? mins(bedCfg) : 60;
+  if (b >= 360 && b < 1080) b = 60;
+  return { start: (b - SLEEP.lead + 1440) % 1440, end: SLEEP.end };
+}
+export function inSleepWindow(m, bedCfg) { const { start, end } = sleepWindow(bedCfg); return start > end ? (m >= start || m < end) : (m >= start && m < end); }
+export const sleepKeyFor = (date, m) => (m >= 720 ? addDays(date, 1) : date);   // 날짜 문자열 덧셈만(브라우저 현지 날짜 연산 안 섞음)
+export const kstStamp = (date, h, m, s = 0) => `${date}T${p2(h)}:${p2(m)}:${p2(s)}+09:00`;
+// KST 전체 시각 → 밀리초. 없는 날짜(2026-02-30)·없는 시각을 Date 가 다음 달·다음 날로 밀어 주는 것을 막으려고 부품으로 다시 만들어 왕복이 같은지 확인한다(서버 fromisoformat 과 같은 판정)
+const parseKst = (v) => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\+09:00$/.exec(String(v || '')); if (!m) return null;
+  const [y, mo, d, h, mi, sec] = m.slice(1).map(Number), u = new Date(Date.UTC(y, mo - 1, d, h, mi, sec));
+  if (u.getUTCFullYear() !== y || u.getUTCMonth() !== mo - 1 || u.getUTCDate() !== d || u.getUTCHours() !== h || u.getUTCMinutes() !== mi || u.getUTCSeconds() !== sec) return null;
+  return u.getTime() - 9 * 3600e3;
+};
+export function sleepHours(bedAt, wakeAt) { const a = parseKst(bedAt), b = parseKst(wakeAt); if (a == null || b == null) return null; const h = (b - a) / 36e5; return h > 0 && h <= SLEEP.maxH ? h : null; }
+// 앱 기록(src:'app')의 간격 — 서버 app_sleep_hours 와 같은 검증: 전체 시각이 유효하고, 기상일이 기록 키와 같고, HH:MM(bed·wake)이 전체 시각과 일치하고, 0 초과 24 이하
+export function appSleepHours(rec, key) {
+  if (!rec || rec.bed !== String(rec.bedAt || '').slice(11, 16) || rec.wake !== String(rec.wakeAt || '').slice(11, 16) || String(rec.wakeAt || '').slice(0, 10) !== key) return null;
+  return sleepHours(rec.bedAt, rec.wakeAt);
+}
+export const legacyHours = (bed, wake) => { if (!okHM(bed) || !okHM(wake)) return null; const d = (mins(wake) - mins(bed) + 1440) % 1440; return d ? d / 60 : null; };   // 옛 기록(HH:MM 만): 취침이 더 늦으면 전날로 본다
+export const fmtHours = (h) => dur(Math.round(h * 60));
+export const sleepCanon = canon;   // (canon 은 위에서 정의: 키 순서와 상관없이 같은 객체면 같은 문자열)
+// 화면에 보일 것 계산(순수 함수): 취침 버튼 · 기상 대기 줄(앱 기록 중 취침만 있는 것) · 어젯밤 요약
+export function sleepView({ sleep = {}, date, min, nowMs, bedCfg }) {
+  const inWin = inSleepWindow(min, bedCfg), key = sleepKeyFor(date, min), here = sleep[key];
+  const out = { inWin, key, button: inWin && !here, rows: [], more: 0, summary: null, lock: null };
+  if (inWin && here && !(here.src === 'app' && here.bed && !here.wake)) out.lock = here.bed ? `${here.bed} 취침 기록 있음` : null;   // 직접 입력·말로 준 기록·이미 끝난 기록은 건드리지 않는다
+  const pend = Object.entries(sleep).filter(([k, r]) => r && r.src === 'app' && r.bed && !r.wake && k <= addDays(date, 1)).sort((a, b) => b[0].localeCompare(a[0]));
+  out.more = Math.max(0, pend.length - 3);
+  for (const [k, r] of pend.slice(0, 3)) {
+    const t0 = parseKst(r.bedAt), night = k > date || (k === date && min < SLEEP.morningFrom);   // 아직 밤(기상 질문 전)
+    const gap = t0 != null && nowMs != null && nowMs - t0 >= SLEEP.shortcutGapMs;   // bedAt 이 없거나 이상하거나 미래면 지름길 없음
+    out.rows.push({ key: k, bed: r.bed, rec: r, night, wakeInput: k <= date, shortcut: k === date && min >= SLEEP.morningFrom && min < SLEEP.shortcutUntil && gap, again: inWin && k === key });
+  }
+  const t = sleep[date];
+  if (t && t.bed && t.wake) {
+    const app = t.src === 'app', h = app ? appSleepHours(t, date) : legacyHours(t.bed, t.wake);
+    out.summary = { bed: t.bed, wake: t.wake, hours: h, app };
+  }
+  return out;
+}
+// 저장 한 번에 하나씩 최신 상태에서 다시 검사하는 변경(409 재적용 때도 그대로 돈다). 결과: 'applied' 적용 · 'kept' 이미 기록이 있어 유지 · 'conflict' 그 사이 바뀌어 중단 · 'invalid' 값 이상
+export function applyBed(s, { key, bed, bedAt, force = false, seen = '' }) {
+  s.sleep = s.sleep || {}; const cur = s.sleep[key];
+  if (!force) { if (cur) return 'kept'; s.sleep[key] = { bed, src: 'app', bedAt }; return 'applied'; }   // 같은 밤 첫 기록 유지(있으면 안 덮음)
+  if (!cur || cur.src !== 'app' || cur.wake || canon(cur) !== seen) return 'conflict';   // 다시 기록: 사용자가 본 앱 기록 그대로이고 기상이 아직 없을 때만
+  s.sleep[key] = { bed, src: 'app', bedAt }; return 'applied';
+}
+export function applyWake(s, { key, wake, wakeAt, seen }) {
+  const cur = s.sleep?.[key];
+  if (!cur || cur.src !== 'app' || cur.wake || canon(cur) !== seen) return 'conflict';   // 사용자가 본 취침 기록이 그대로일 때만 기상을 붙인다
+  if (appSleepHours({ ...cur, wake, wakeAt }, key) == null) return 'invalid';   // 최신 취침 기준으로 서버와 같은 검증(전체 시각·기상일=키·HH:MM 일치·간격)
+  cur.wake = wake; cur.wakeAt = wakeAt; return 'applied';
+}
+export function applyClear(s, { key, seen }) {
+  const cur = s.sleep?.[key];
+  if (!cur || cur.src !== 'app' || cur.wake || canon(cur) !== seen) return 'conflict';
+  delete s.sleep[key]; return 'applied';
+}
+// 되돌리기: 이 작업이 저장한 값(saved)이 아직 그대로일 때만 이전 객체 전체(prev, 없었으면 없음)로 복원
+export function applyRestore(s, { key, prev, saved }) {
+  const cur = s.sleep?.[key];
+  if (canon(cur) !== saved) return 'conflict';
+  s.sleep = s.sleep || {}; if (prev) s.sleep[key] = JSON.parse(JSON.stringify(prev)); else delete s.sleep[key]; return 'applied';
 }
 const DAY = { start: 0, end: 24 * 60, wake: 8 * 60, bed: 24 * 60 };   // 시간표 0~24시, 자동 배치는 08~24시
 const BREAK = 10, MIN_SLOT = 25, DEFAULT_EST = 60;
@@ -240,6 +316,18 @@ button.pl-title.pl-edit:hover,button.pl-title.pl-edit:focus-visible{text-decorat
 .pl-tagline{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .pl-menu{width:300px}.pl-menu button{min-height:44px;text-align:left;padding:0 12px;background:#fff;color:#1f3d33;border:1px solid #d5ddd8;justify-content:flex-start}
 .pl-menu button:disabled{opacity:.5}
+.pl-sleep{display:flex;flex-direction:column;gap:6px;padding:10px 14px;border:1px solid #cfd8e3;border-radius:14px;background:#f4f7fb;color:#1c2a3a;font:500 13.5px/1.4 "Pretendard Variable",Pretendard,system-ui,sans-serif}
+.pl-sleep-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
+.pl-sleep-row.summary{flex-direction:column;align-items:flex-start;gap:2px}
+.pl-sleep-t{color:#1c2a3a}.pl-sleep-s{color:#3a4a5d;font:500 12px/1.4 "Pretendard Variable",Pretendard,system-ui,sans-serif}
+.pl-sleep .pl-sleepbtn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:12px;border:1px solid #22344a;background:#22344a;color:#fff;font:700 14px "Pretendard Variable",Pretendard,system-ui,sans-serif;cursor:pointer}   /* .workspace button 보다 우선 */
+.pl-sleep .pl-sleepbtn.ghost{background:#fff;color:#22344a}
+.pl-sleepbtn:focus-visible,.pl-night button:focus-visible{outline:3px solid #f2c94c;outline-offset:2px}
+.pl-sleep-edit{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.pl-sleep-edit input{height:44px;border:1px solid #9fb0c3;border-radius:10px;padding:0 10px;font:600 15px "Pretendard Variable",Pretendard,system-ui,sans-serif;background:#fff}
+.pl-night{position:fixed;inset:0;z-index:100;background:#0f1a22;color:#e6edf3;display:grid;place-items:center;padding:24px;font-family:"Pretendard Variable",Pretendard,system-ui,sans-serif}
+.pl-night-box{max-width:420px;text-align:center;display:flex;flex-direction:column;gap:12px}.pl-night h2{margin:0;font:700 34px/1.2 "Pretendard Variable",Pretendard,system-ui,sans-serif}
+.pl-night-big{margin:0;font:700 22px/1.3 "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#e6edf3;font-variant-numeric:tabular-nums}.pl-night-sub{margin:0;color:#b4c0cc;font:500 14.5px/1.55 "Pretendard Variable",Pretendard,system-ui,sans-serif}
+.pl-night-act{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px}.pl-night button{min-height:44px;padding:0 18px;border-radius:12px;border:1px solid #6b8197;background:#1d3040;color:#fff;font:700 14px "Pretendard Variable",Pretendard,system-ui,sans-serif;cursor:pointer}.pl-night button.ghost{background:transparent}
 .pl-also{display:flex;flex-direction:column;gap:6px}.pl-pop .pl-also button{min-height:44px;height:auto;text-align:left;padding:4px 10px}
 .pl-list{margin:10px 0 0;border:1px solid #edf1ee;border-radius:12px;padding:0 12px}
 .pl-list summary{min-height:44px;display:flex;align-items:center;gap:6px;cursor:pointer;font:700 13px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#4b6358}
@@ -1010,6 +1098,107 @@ export function createPlan(app) {
     return { card, fixed: todayFixed };
   }
 
+  // ── 수면 기록 줄(홈 맨 위): 수면 시간대엔 「자기 전 접속 종료」, 아침엔 기상 확인, 어젯밤 요약 ──
+  // 저장이 끝나기 전에는 「기록됨」·잘 자요 화면·아침 질문을 만들지 않는다(저장 중 → 실패면 다시 저장). 저장 성공과 변경 적용(applied)은 별개라 결과를 구분한다.
+  let sleepOp = null;   // {kind, status:'saving'|'failed', retry}
+  const kstNow = () => { const p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }).format(new Date()).split(':').map(Number); return { date: kst(), h: p[0], m: p[1], s: p[2], min: p[0] * 60 + p[1] }; };
+  const sleepCfgBed = () => v60?.cfg?.bed;
+  async function runSleep(kind, apply, done) {
+    if (sleepOp) return;   // 한 번에 하나(중복 클릭 차단)
+    let out = 'conflict';
+    const settle = (ok) => { if (!ok) { sleepOp = { kind, status: 'failed', retry }; paintSleep(); return; } sleepOp = null; paintSleep(); done(out); };
+    const retry = async () => { sleepOp = { kind, status: 'saving', retry }; paintSleep(); saveErr = ''; await flush(); settle(!pend.length && !saveErr); };
+    sleepOp = { kind, status: 'saving', retry }; paintSleep();
+    const ok = await save((s) => { out = apply(s); });   // 클릭 순간에 정한 값만 쓴다 — 409 재적용이 새 시각을 만들지 않음
+    settle(ok);
+  }
+  const OUT_MSG = { kept: '다른 화면에서 이미 취침을 기록했어요. 기존 기록을 유지했어요.', conflict: '그 사이 다른 화면에서 이 기록이 바뀌어 적용하지 않았어요. 줄을 확인해 주세요.', invalid: '취침과 기상 시각을 확인해 주세요.' };
+  const undoable = (key, prev, savedObj, label) => () => runSleep('undo', (s) => applyRestore(s, { key, prev, saved: sleepCanon(savedObj) }), (o) => { app.status?.(o === 'applied' ? `${label}을 되돌렸어요.` : OUT_MSG.conflict, o !== 'applied'); });
+  function recordBed(again) {
+    const n = kstNow(), key = sleepKeyFor(n.date, n.min), bed = hm(n.min), bedAt = kstStamp(n.date, n.h, n.m, n.s);
+    const prev = again ? JSON.parse(JSON.stringify(again)) : null, seen = again ? sleepCanon(again) : '', saved = { bed, src: 'app', bedAt };
+    runSleep('bed', (s) => applyBed(s, { key, bed, bedAt, force: !!again, seen }), (o) => {
+      if (o === 'applied') { goodnight(key, saved, () => undoable(key, prev, saved, again ? '다시 기록' : '취침 기록')(), again ? '이전 취침 기록으로 되돌리기' : '기록 취소'); return; }
+      app.status?.(OUT_MSG[o] || OUT_MSG.conflict, o !== 'kept');
+      if (o === 'kept' && v60.sleep?.[key]?.bed) goodnight(key, v60.sleep[key], null);
+    });
+  }
+  function clearBed(row) {
+    const prev = JSON.parse(JSON.stringify(row.rec)), seen = sleepCanon(row.rec);
+    runSleep('clear', (s) => applyClear(s, { key: row.key, seen }), (o) => {
+      if (o === 'applied') toast(`${row.bed} 취침 기록을 지웠어요`, '지운 기록 되돌리기', () => runSleep('undo', (s) => { if (s.sleep?.[row.key]) return 'conflict'; s.sleep = s.sleep || {}; s.sleep[row.key] = JSON.parse(JSON.stringify(prev)); return 'applied'; }, (o2) => app.status?.(o2 === 'applied' ? '기록을 되돌렸어요.' : OUT_MSG.conflict, o2 !== 'applied')));
+      else app.status?.(OUT_MSG[o] || OUT_MSG.conflict, true);
+    });
+  }
+  function setWake(row, wakeMin, nowSec) {
+    const n = kstNow(), wake = hm(wakeMin), wakeAt = kstStamp(row.key, Math.floor(wakeMin / 60), wakeMin % 60, nowSec ?? 0);
+    const h = sleepHours(row.rec.bedAt, wakeAt);
+    if (h == null) { app.status?.('기상 시각이 취침 기록보다 빨라요(또는 너무 멀어요). 시각을 확인해 주세요.', true); return; }
+    if (parseKst(wakeAt) > Date.now() + 60e3) { app.status?.('아직 오지 않은 시각이에요. 시각을 확인해 주세요.', true); return; }
+    if (h > SLEEP.confirmH && !confirm(`취침–기상 간격이 ${fmtHours(h)}이에요. 맞나요?`)) return;
+    const seen = sleepCanon(row.rec), prev = JSON.parse(JSON.stringify(row.rec)), saved = { ...row.rec, wake, wakeAt };
+    runSleep('wake', (s) => applyWake(s, { key: row.key, wake, wakeAt, seen }), (o) => {
+      if (o === 'applied') toast(`기상 ${wake} 기록 · 취침–기상 간격 ${fmtHours(h)}(수면 추정)`, '기상 기록 되돌리기', undoable(row.key, prev, saved, '기상 기록'));
+      else app.status?.(OUT_MSG[o] || OUT_MSG.conflict, true);
+    });
+  }
+  // 조용한 종료 화면: 소리·알림·진동 없음. 화면(앱)을 대신 닫아 주지는 못하므로 「이제 화면을 닫아 주세요」. 기록 취소는 이 화면에 계속 있다.
+  function goodnight(key, rec, undo, cancelLabel = '기록 취소') {
+    document.querySelector('.pl-night')?.remove();
+    const root = el('div', undefined, 'pl-night'); root.setAttribute('role', 'dialog'); root.setAttribute('aria-modal', 'true'); root.setAttribute('aria-labelledby', 'pl-night-t');
+    const box = el('div', undefined, 'pl-night-box'); const h = el('h2', '잘 자요'); h.id = 'pl-night-t';
+    box.append(h, el('p', `${rec.bed} 취침 기록`, 'pl-night-big'), el('p', '자러 간 시각이에요. 잠든 시각이 아니라서 실제 수면 시간과 다를 수 있어요.', 'pl-night-sub'), el('p', '아침에 이 앱을 열면 기상 시각을 물어볼게요. 이제 화면을 닫아 주세요.', 'pl-night-sub'));
+    const act = el('div', undefined, 'pl-night-act'), back = el('button', '앱으로 돌아가기'); back.type = 'button';
+    const others = [...document.body.children].filter((n) => n !== root), was = others.map((n) => !!n.inert); others.forEach((n) => { n.inert = true; });
+    const prevFocus = document.activeElement;
+    const close = () => { document.removeEventListener('keydown', key2, true); root.remove(); others.forEach((n, i) => { n.inert = was[i]; }); try { (prevFocus?.isConnected ? prevFocus : host?.querySelector('.pl-sleep button'))?.focus({ preventScroll: true }); } catch {} };
+    back.onclick = close;
+    if (undo) { const cancel = el('button', cancelLabel, 'ghost'); cancel.type = 'button'; cancel.onclick = async () => { cancel.disabled = true; await undo(); close(); }; act.append(cancel); }
+    act.append(back); box.append(act); root.append(box); document.body.append(root);
+    const key2 = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } else if (e.key === 'Tab') { const bs = [...root.querySelectorAll('button:not([disabled])')]; if (!bs.length) return; const i = bs.indexOf(document.activeElement); e.preventDefault(); bs[(i + (e.shiftKey ? bs.length - 1 : 1)) % bs.length].focus(); } };
+    document.addEventListener('keydown', key2, true); back.focus();
+  }
+  function sleepBar() {
+    if (!v60) return null;
+    const n = kstNow(), view = sleepView({ sleep: v60.sleep || {}, date: n.date, min: n.min, nowMs: Date.now(), bedCfg: sleepCfgBed() });
+    const box = el('section', undefined, 'pl-sleep'); box.setAttribute('aria-label', '수면 기록');
+    const line = (cls) => { const r = el('div', undefined, 'pl-sleep-row' + (cls ? ' ' + cls : '')); box.append(r); return r; };
+    let any = false; const sig = [];
+    if (sleepOp) { const r = line(); any = true; sig.push('op:' + sleepOp.status);
+      if (sleepOp.status === 'saving') r.append(el('span', '저장 중…', 'pl-sleep-t')); else { r.append(el('span', '수면 기록을 저장하지 못했어요. 누른 시각은 그대로 남아 있어요.', 'pl-sleep-t')); const b = el('button', '다시 저장', 'pl-sleepbtn ghost'); b.type = 'button'; b.onclick = () => sleepOp?.retry?.(); r.append(b); }
+    } else {
+      if (view.button) { const r = line(); any = true; sig.push('btn');
+        const b = el('button', undefined, 'pl-sleepbtn'); b.type = 'button'; b.innerHTML = svg(ICON.moon); b.append(el('span', '자기 전 접속 종료')); b.setAttribute('aria-label', '자기 전 접속 종료 — 지금 시각을 취침 기록으로 남겨요'); b.onclick = () => recordBed(null);
+        r.append(b, el('span', '누른 시각을 자러 간 시각으로 기록해요. 수면 시간은 추정이에요.', 'pl-sleep-t')); }
+      if (view.lock) { const r = line(); any = true; sig.push('lock:' + view.lock); r.append(el('span', `${view.lock} — 직접 입력·이미 끝난 기록은 여기서 바꾸지 않아요.`, 'pl-sleep-t')); }
+      for (const row of view.rows) {
+        const r = line(); any = true; sig.push(`row:${row.key}:${row.bed}:${row.night}:${row.shortcut}:${row.again}`);
+        const d = row.key; const when = `${d.slice(5).replace('-', '/')}(${wd(d)})`;
+        r.append(el('span', row.night ? `${row.bed} 취침 기록됨 — 잘 자요` : `${row.bed}에 자러 간 기록이 있어요 · 기상 시각 없음${row.key < n.date ? ` (${when} 기록)` : ''}`, 'pl-sleep-t'));
+        if (row.shortcut) { const b = el('button', '일어났어요', 'pl-sleepbtn'); b.type = 'button'; b.setAttribute('aria-label', `지금(${hm(n.min)})을 기상 시각으로 기록`); b.onclick = () => { const k = kstNow(); setWake(row, k.min, k.s); }; r.append(b); }
+        if (row.wakeInput) { const b = el('button', '시각 고치기', 'pl-sleepbtn ghost'); b.type = 'button'; b.setAttribute('aria-label', `${when} 기상 시각 직접 입력`); b.onclick = () => {
+          if (r.querySelector('.pl-sleep-edit')) return; const f = el('form', undefined, 'pl-sleep-edit'); const t = el('input'); t.type = 'time'; t.required = true; t.setAttribute('aria-label', `${when} 기상 시각`);
+          const ok = el('button', '저장', 'pl-sleepbtn'); ok.type = 'submit'; const no = el('button', '취소', 'pl-sleepbtn ghost'); no.type = 'button'; no.onclick = () => f.remove();
+          f.append(el('span', `기상 ${when}`, 'pl-sleep-t'), t, ok, no); f.onsubmit = (e) => { e.preventDefault(); if (!t.value) return; setWake(row, mins(t.value), 0); }; r.append(f); t.focus(); }; r.append(b); }
+        if (row.again) { const b = el('button', '다시 기록', 'pl-sleepbtn ghost'); b.type = 'button'; b.setAttribute('aria-label', '취침을 지금 시각으로 다시 기록'); b.onclick = () => recordBed(row.rec); r.append(b); }
+        const c = el('button', '기록 지우기', 'pl-sleepbtn ghost'); c.type = 'button'; c.onclick = () => clearBed(row); r.append(c);
+      }
+      if (view.more) { const r = line(); any = true; sig.push('more:' + view.more); r.append(el('span', `기상이 없는 오래된 취침 기록이 ${view.more}건 더 있어요. 위 기록을 처리하면 이어서 나와요.`, 'pl-sleep-t')); }
+      if (view.summary) { const r = line('summary'); any = true; const sm = view.summary;
+        sig.push(`sum:${sm.bed}:${sm.wake}:${sm.hours}`);
+        r.append(el('span', `어젯밤 취침 기록 ${sm.bed} · 기상 ${sm.wake} · ${sm.hours != null ? `취침–기상 간격 ${fmtHours(sm.hours)}(수면 추정, 실제와 다를 수 있어요)` : '간격을 계산할 수 없어요(기록을 확인해 주세요)'}${sm.app ? '' : ' · 수면 기록'}`, 'pl-sleep-t'));
+        r.append(el('small', 'Apple 건강 수면이 있는 날은 건강 점수에 그 값을 써요.', 'pl-sleep-s')); }
+    }
+    if (!any) return null; box.dataset.sig = sig.join('|'); return box;
+  }
+  // 1분 틱·저장 상태 바뀔 때: 문구가 같으면 그대로 두고(화면낭독이 같은 말을 되풀이하지 않게), 달라졌을 때만 줄을 바꾼다
+  function paintSleep() {
+    if (!host?.isConnected) return; const wrap = host.querySelector('.pl'); if (!wrap) return;
+    const old = host.querySelector('.pl-sleep'), nu = sleepBar();
+    if ((old?.dataset.sig || '') === (nu?.dataset.sig || '')) return;
+    if (old && nu) old.replaceWith(nu); else if (nu) wrap.prepend(nu); else old?.remove();
+  }
+
   function nums(all, fixed) {
     const open = all.filter((t) => !v60.done[t.key]);
     const free = freeSlots(ctx.today, ctx.today === day ? fixed : fixedBlocks(ctx.today)).reduce((n, [a, b]) => n + (b - a), 0);
@@ -1024,7 +1213,7 @@ export function createPlan(app) {
     if (!host || !v60 || !host.isConnected) return;
     const all = tasks();
     const sched = dayCard(all);
-    const wrap = el('div', undefined, 'pl'); wrap.append(taskCard(all), nums(all, sched.fixed), sched.card);
+    const wrap = el('div', undefined, 'pl'); const sleepRow = sleepBar(); wrap.append(...(sleepRow ? [sleepRow] : []), taskCard(all), nums(all, sched.fixed), sched.card);
     // 저장이 끝날 때마다 다시 그리면 입력 중이던 글자·커서가 날아갔다(10/9) → 할 일 넣기 칸 값과 지금 커서 칸을 새 화면에 옮긴다
     const keyOfField = (f) => `${f.closest('[data-key]')?.dataset.key || ''}|${f.closest('form')?.className || ''}|${f.name || ''}|${f.getAttribute('aria-label') || ''}`;
     const fields = (root) => [...root.querySelectorAll('input:not([type=checkbox]),select,textarea')];
@@ -1065,6 +1254,7 @@ export function createPlan(app) {
         if (!host?.isConnected) { clearInterval(tick); return; }
         for (const c2 of host.querySelectorAll('[data-clock]')) c2.textContent = clock(elapsed(c2.dataset.clock));
         if (kst() !== bootDay && !pend.length) { clearInterval(tick); ctx.reload?.(); return; }   // 자정 지나면 새 날짜로 다시(기록이 전날로 가지 않게)
+        if (sec % 60 === 59) paintSleep();   // 수면 시간대에 들어오거나 아침 확인 때가 되면 줄을 바꾼다(같은 문구면 그대로)
         if (++sec % 60 === 0 && followBox?.box?.isConnected) {   // 1분마다 지금 선을 옮기고, 직접 스크롤 안 했으면 화면이 따라감
           const now = nowMin(); if (followBox.line) { followBox.line.style.top = now * followBox.PX + 'px'; followBox.line.querySelector('span').textContent = hm(now); }
           scrollToNow(followBox.box, followBox.PX, false);
@@ -1072,5 +1262,6 @@ export function createPlan(app) {
       }, 1000);
     },
     destroy() { clearInterval(tick); host = null; toast.hide(); },
+    _repaintSleep() { paintSleep(); },   // 시험용: 1분 틱을 기다리지 않고 수면 줄을 다시 계산
   };
 }
