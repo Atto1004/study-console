@@ -39,4 +39,11 @@ const at2 = (index) => boardPage({ lesson: cram, index });
 assert.equal(at2(1).practice, true); assert.equal(at2(1).itemEnd, true);
 assert.equal(at2(3).asks, false);   // 문제 칸 바로 뒤 → 물음이어도 안 멈춤
 assert.equal(at2(5).asks, true);    // 앞 칸이 풀이 칸이면 물음에서 멈춤
+// 문제 칸 표시가 대사에만 있어도(칠판 줄 없음) 같은 판정
+const cram2 = { steps: [
+  step('s3-1:0', 'Ch.3', '과제 3.11 · 조건', '노트에 끝까지 직접 풀어 보세요.'), step('s3-1:1', 'Ch.3', '구할 것 : T', '노트에 끝까지 직접 풀어 보세요.'),
+  step('s3-2:0', 'Ch.3', '과제 3.11', 'sin일까요?'),
+] };
+assert.equal(boardPage({ lesson: cram2, index: 1 }).practice, true);
+assert.equal(boardPage({ lesson: cram2, index: 2 }).asks, false);
 console.log('board-page 전부 통과');

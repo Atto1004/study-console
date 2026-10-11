@@ -20,7 +20,7 @@ export function boardPage(c) {
   // 바로 앞 칸이 「직접 풀기」 칸(벼락치기 문제 칸)이면 이미 멈췄으니 이 칸의 물음에서는 다시 멈추지 않는다(오타 설계 10/11 · 이중 멈춤 방지)
   const prevBase = first > 0 ? PAGE.exec(String(steps[first - 1].id || ''))?.[1] : null;
   let prevStart = first - 1; while (prevBase && prevStart > 0 && PAGE.exec(String(steps[prevStart - 1].id || ''))?.[1] === prevBase) prevStart--;
-  const afterPractice = !!prevBase && PRACTICE.test(steps.slice(prevStart, first).map((s) => s.body || '').join('\n'));
+  const afterPractice = !!prevBase && PRACTICE.test(steps.slice(prevStart, first).map((s) => (s.body || '') + ' ' + (s.speech || '')).join('\n'));   // 문제 칸 표시는 칠판 줄 또는 대사(10/12: 칠판 자리 아끼려 대사로 옮김)
   return {
     base, k, n, first: i === first, itemEnd: i === last,
     sectionEnd: i === last && (!nextStep || nextStep.title !== step.title || !!nextStep.options),

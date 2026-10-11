@@ -9,7 +9,7 @@ const splitSentences = (text) => String(text || '')
   .replace(/\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]/g, (m) => m.replace(/[.!?。]/g, '․'))   // 수식 안 마침표로 자르지 않게
   .split(/(?<=[.!?。…])\s+|\n{1,}/).map((s) => s.replace(/․/g, '.').trim()).filter((s) => s.length > 1);
 import { readable } from './readable.js';
-import { boardPage, speechShare } from './board-page.js?v=3';
+import { boardPage, speechShare } from './board-page.js?v=4';
 const plain = (s) => s.replace(/\$\$?|\\\(|\\\)|\\\[|\\\]/g, '').replace(/\\[a-zA-Z]+/g, ' ').replace(/[{}_^]/g, '').replace(/\s+/g, ' ').trim();
 
 export function createLecture(app) {

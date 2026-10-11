@@ -28,7 +28,8 @@ export function fitBoard(host) {
     }
   };
   const max = Math.max(18, Math.min(32, width / 24));
-  for (let size = max; size >= 16; size -= .5) {
+  const min = +host.dataset.fitMin || 16;   // 판서 칸 한 화면(whole) 은 12px 까지 줄여 한 칸을 다 담는다(10/12 세로 잘림)
+  for (let size = max; size >= min; size -= .5) {
     content.style.setProperty('--board-text-size', `${size}px`);
     content.style.setProperty('font-size', `${size}px`, 'important');
     formulas();

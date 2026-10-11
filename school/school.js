@@ -1,5 +1,5 @@
 import { renderClassroomDirectory } from './classroom-directory.js?v=265';
-import { fitBoard } from './board-fit.js?v=265';
+import { fitBoard } from './board-fit.js?v=266';
 import { createLectureQuests } from './lecture-quests.js?v=233';
 import { mountSchoolRefresh } from './refresh.js?v=237';
 import { mountLectureActor } from './lecture-actor.js?v224';
@@ -20,12 +20,12 @@ import { createSpace, ROOMS } from "./space.js";
 import { pickLesson, pickQuestions } from "./metrics.js";
 import { createSetup } from "./setup.js";
 import { createWorldMap } from "./worldmap.js";
-import { createTutor } from "./tutor.js?v=4";
+import { createTutor } from "./tutor.js?v=5";
 import { createSubjectRail } from "./subject-rail.js?v=251";
 import { createSubjectScope } from "./subject-scope.js?v=240";
 import { boardHierarchy,createBoardHierarchy } from "./board-hierarchy.js?v=240";
 import { startSurfaces } from "./surface.js";
-import { createLecture } from "./lecture.js?v=4";
+import { createLecture } from "./lecture.js?v=5";
 import { loadPack, packRoute, packLines, label as packLabel } from "./lecture-pack.js";
 import { createDialog } from "./vn-dialog.js";
 import { createLectureUi } from "./lecture-ui.js";
@@ -817,7 +817,15 @@ function board(title, body, kind, annotation, whole = false) {   // whole: 판�
     if (v3 && choices) v3.response.append(choices);
     decorateChalk(host, current?.steps[index]);
     renderMath(host);
-    const boardFits = fitBoard(host);
+    host.dataset.fitMin = whole ? '12' : '16';
+    host.dataset.whole = whole ? '1' : '';   // 판서 칸 한 화면: 아래 강조 띠(칠판 줄 반복)를 숨기고 그 자리를 칠판 글에 쓴다(board-only.css)
+    let boardFits = fitBoard(host);
+    if (whole && !boardFits) {   // 12px 로도 넘치면 맨 위(칸 제목)는 두고 앞 줄부터 숨긴다 — 지금 줄은 늘 보이게, 앞 줄은 오른쪽 수업교재 칸에(10/12)
+      const content = host.querySelector('.content'), rows = [...content.children];
+      const note = node('p', '↑ 앞 줄은 오른쪽 수업교재 칸에', 'board-trim-note'); content.insertBefore(note, rows[1] || null);
+      for (let k = 1; k < rows.length - 1 && content.scrollHeight > content.clientHeight + 1; k++) rows[k].hidden = true;
+      boardFits = fitBoard(host);
+    }
     setTimeout(() => {
       if (
         !whole &&
