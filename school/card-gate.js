@@ -4,7 +4,8 @@
 //  · 게이트 중 Enter·Space·방향키로는 판정하지 않는다(마우스·터치만). Esc·닫기는 수업을 열지 않는다.
 //  · 통과는 이 화면을 연 동안만 기억한다. 서버에는 아무것도 저장하지 않는다.
 import { createEngine, optionsOf } from './card-engine.js?v=3';
-const CARDS_URL = '/docs/tools/lessons/cards/statics.json';
+// 모듈 위치 기준 상대 경로: 웹(/study/school/)과 아이패드(/school/) 어디서 열어도 같은 파일을 읽는다 (절대 경로 '/docs/…' 는 웹 쪽 /study/ 접두에서 404 였다)
+const CARDS_URL = new URL('../docs/tools/lessons/cards/statics.json', import.meta.url).href;
 let cache = null;
 let pending = false;     // 팝업이 열려 있는 동안 다른 수업의 게이트를 또 열지 않는다
 const passed = new Set();   // 이 화면을 연 동안 통과한 수업 (새로고침하면 다시 묻는다)
