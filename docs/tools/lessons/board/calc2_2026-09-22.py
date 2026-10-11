@@ -4,7 +4,7 @@ VERSION = "2026-10-02c"
 BOARD = {
  "s1": [
   {"b": ["# 정리 1 · [Th 2] 수직조건", r"= \cos\theta=\frac{\vec a\cdot\vec b}{|\vec a||\vec b|}"], "fig": "perp", "fs": 1,
-   "s": "9시 5분부터 45분까지, 대표님이 지각한 구간이에요. 대표님 연습노트로 채웠어요. 먼저 9/17 에 배운 정리 1 을 다시 써요. 코사인 세타는 a 점 b 나누기 두 크기의 곱."},
+   "s": "대표님 연습노트로 채웠어요. 먼저 9/17 에 배운 정리 1 을 다시 써요. 코사인 세타는 a 점 b 나누기 두 크기의 곱."},
   {"b": [r"= \vec a\perp\vec b\ \Leftrightarrow\ \theta=\frac\pi2\ \Leftrightarrow\ \vec a\cdot\vec b=0"], "fig": "perp", "fs": 2,
    "s": "정리 2, 수직조건. 코사인이 0 이 되는 각은 2분의 파이, 90도뿐이에요. 그래서 내적이 0 이면 수직, 수직이면 내적이 0. 각도를 몰라도 성분 곱의 합 하나로 수직을 판정해요."},
   {"b": ["• ex1 (교재 p.884) |a| = 4, |b| = 6, θ = π/3", r"= \vec a\cdot\vec b=4\cdot6\cdot\tfrac12=12"], "fig": "perp", "fs": 3,
