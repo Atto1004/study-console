@@ -40,8 +40,8 @@ import { createLessonTextbook } from "./lesson-textbook.js?v=256";
 import { startClassroomV3 } from "./classroom-v3.js?v=241";
 import { createGrowth } from "./growth.js?v=199";
 import { cardGate } from './card-gate.js?v=1';
-/* 정역학 2장 선수 수업(9/7·9/9·9/14)은 시험 범위 밖 — 강 목록과 강 번호에서 뺀다 (대표님 10/11) */
-const STATICS_HIDE = ["2026-09-07", "2026-09-09", "2026-09-14"];
+/* 정역학 9/2 오리엔테이션과 2장 선수 수업(9/7·9/9·9/14)은 시험 범위 밖 — 강 목록과 강 번호에서 뺀다 (대표님 10/11) */
+const STATICS_HIDE = ["2026-09-02", "2026-09-07", "2026-09-09", "2026-09-14"];   /* 9/2 오리엔테이션 · 2장 선수 */
 const hideLesson = (course, l) => course === "정역학" && STATICS_HIDE.includes(l.date);
 const $ = (id) => document.getElementById(id);
 const TEST = new URLSearchParams(location.search).get("test") === "1";
