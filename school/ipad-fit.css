@@ -1,0 +1,7 @@
+/* 아이패드 가로 화면 꽉 채우기 (교실 v3): 바깥 여백을 없애고 칠판·교재가 남는 세로 공간을 채운다 */
+@media (min-width:900px) and (orientation:landscape){
+  .school[data-layout=v3][data-mode=classroom] #scene{padding:6px 8px!important;overflow:hidden!important}
+  .school[data-layout=v3][data-mode=classroom] #room{max-width:none!important;margin:0!important;gap:6px!important;height:100%}
+  .school[data-layout=v3]:not([data-lecture=playing]) .v3-stage{flex:1 1 auto!important;height:auto!important;min-height:200px}
+  .school[data-layout=v3] .v3-work{flex:0 0 auto;max-height:30dvh;min-height:96px}
+}
