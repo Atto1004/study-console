@@ -49,7 +49,7 @@ const closePop = () => document.querySelector('.pl-pop')?.remove();
 // 1. 확정 모드: 유형 6개, 준비 고르면 길이 선택·이름 「준비」·과목 숨김
 if (pressed(pm())) click(pm());
 click(plus()); await flush();
-assert.deepEqual([...document.querySelectorAll('.pl-pop [aria-label="일정 종류"] button')].map((b) => b.textContent), ['고정', '공부', '과제', '이동', '준비', '밥']);
+assert.deepEqual([...document.querySelectorAll('.pl-pop [aria-label="일정 종류"] button')].map((b) => b.textContent), ['고정', '공부', '과제', '이동', '준비', '밥', '수면']);
 click(q('[data-bk="준비"]')); await flush();
 assert.equal(q('[aria-label="과목"]').hidden, true); assert.equal(q('[aria-label="길이"]').hidden, true); assert.equal(q('[aria-label="길이(분)"]').hidden, false);
 assert.deepEqual(opts('[aria-label="길이(분)"]'), ['15분', '30분', '45분', '60분', '90분', '직접 입력']); assert.equal(q('[aria-label="길이(분)"]').value, '30');

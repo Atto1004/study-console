@@ -45,7 +45,7 @@ const setTime = (v) => { document.querySelector('.pl-pop input[type=time]').valu
 if (pressed(pm())) { click(pm()); await flush(); }
 click(plus()); await flush();
 const kinds = [...document.querySelectorAll('.pl-pop [aria-label="일정 종류"] button')].map((b) => b.textContent);
-assert.deepEqual(kinds, ['고정', '공부', '과제', '이동', '준비', '밥']);
+assert.deepEqual(kinds, ['고정', '공부', '과제', '이동', '준비', '밥', '수면']);
 assert.equal(q('[aria-label="출발지"]').disabled, true, '이동이 아니면 입력 꺼짐');
 click(q('[data-bk="이동"]')); await flush();
 assert.equal(q('[aria-label="출발지"]').disabled, false); assert.equal(q('[aria-label="과목"]').hidden, true); assert.equal(q('[aria-label="길이"]').hidden, true);
