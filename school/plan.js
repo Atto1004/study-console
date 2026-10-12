@@ -507,6 +507,7 @@ button.pl-title.pl-edit:hover,button.pl-title.pl-edit:focus-visible{text-decorat
 .pl-pop.pl-info{width:300px}.pl-pop{max-height:calc(100dvh - 16px);overflow:auto;box-sizing:border-box}.pl-prow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.pl-prow > span:first-child{min-width:44px;font:600 12.5px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#4b6358}
 .pl-pick{display:flex;gap:4px;flex-wrap:wrap}.pl-pop .pl-pick button{background:#fff;color:#1f3d33;border:1px solid #cfd8d2;min-width:44px}.pl-pop .pl-pick button[aria-pressed=true]{background:#2e6b52;color:#fff;border-color:#2e6b52}.pl-pop .pl-pick button:disabled{opacity:.45}.pl-ptime{font:500 12.5px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#6b7c73}
 .pl-pop button.danger{background:#fff;color:#b23a22;border-color:#e6b4a8}
+body.pl-dragging,body.pl-dragging *{-webkit-user-select:none!important;user-select:none!important}.pl-blk{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}.pl-blk.dragging{opacity:.35}.pl-ghost{position:fixed!important;z-index:80;pointer-events:none;box-shadow:0 2px 8px #0005;margin:0;opacity:.95}.pl-ghost.bad{outline:3px solid #c0392b;background:#f6d5d1!important;color:#5a1a12!important}.pl-rsz{position:absolute;left:0;right:0;height:14px;touch-action:none;cursor:ns-resize;z-index:2}.pl-rsz.top{top:0}.pl-rsz.bot{bottom:0}.pl-rsz::after{content:"";position:absolute;left:50%;width:26px;height:4px;margin-left:-13px;border-radius:2px;background:currentColor;opacity:.4}.pl-rsz.top::after{top:3px}.pl-rsz.bot::after{bottom:3px}.pl-lpmenu button{min-height:44px}
 .pl-blk.edit{cursor:pointer}.pl-blk.edit:hover,.pl-blk.edit:focus-visible{outline:2px solid #2e6b52;outline-offset:1px}
 .pl-place{cursor:pointer}
 .pl-pop button.ghost{background:#fff;color:#1f3d33;border-color:#d5ddd8}
@@ -1604,6 +1605,127 @@ export function createPlan(app) {
     else blockPopup(b, anchor, at);
   }
   const WHAT = { plan: '고치기·삭제', class: '출석·이해도·시작·종료', cal: '시각 고치기', auto: '계획으로 넣기·숨기기', work: '내용 보기', exam: '내용 보기', sleep: '내용 보기·목표 바꾸기' };
+  // ── 꾹 누르기 메뉴 · 끌어 옮기기 · 가장자리 늘이기(대표님 10/12) ──
+  // 구글 캘린더 방식: 일정을 길게 누르면 선택돼 끌어서 시각·날짜를 옮기고, 위·아래 가장자리 핸들로 길이를 바꾸며, 놓으면 저장되고 되돌리기가 뜬다.
+  // 얼라이브위크식으로 바꾼 곳: 원본이 있는 일정(수업·캘린더·기본 시간표·시험)은 옮기지도 지우지도 않는다(구글 캘린더에 쓰지 않는 규칙). 저장된 계획 레코드만 옮긴다.
+  // 터치: 길게 누르기 전엔 스크롤을 막지 않고(조금 움직이면 취소), 눌린 뒤에만 touchmove 를 막아 끌기를 잡는다.
+  const LP = { ms: 500, slop: 8, snap: 5, minLen: 15 };
+  const NO_MOVE = { class: '수업은 학교 시간표 원본에서만 바꿔요.', cal: '구글 캘린더 일정은 캘린더 원본에서만 바꿔요.', work: '기본 시간표는 얼라이브위크 원본에서만 바꿔요.', exam: '시험 일정은 상담실에서만 바꿔요.', auto: '추천은 옮길 수 없어요. 「계획으로 넣기」로 먼저 넣어요.', sleep: '수면은 옮길 수 없어요.' };
+  function moveInfo(b) {
+    if (b.k === 'plan' && b.plan && !b.plan.allDay) {
+      if (b.plannedE) return { can: false, why: '지금 하는 일로 줄어든 블록이에요. 예정 시각으로 되돌린 뒤에 옮겨요.' };
+      const end = planEndMs(b.plan); if (end != null && end <= Date.now()) return { can: false, why: '지난 일정은 기록이라 옮길 수 없어요.' };
+      return { can: true, why: '' };
+    }
+    return { can: false, why: NO_MOVE[b.k] || '옮길 수 없는 일정이에요.' };
+  }
+  function dropReason(b, date, s, e) {
+    if (!(e > s) || s < 0) return '시간이 잘못됐어요.';
+    if (e > LAST) return '자정을 넘겨요.';
+    if (msOf(date, e) <= Date.now()) return '지난 시각으로는 옮길 수 없어요.';
+    if ((date !== b.date || s !== b.s) && msOf(date, s) < Date.now() - 60000) return '지난 시각으로는 옮길 수 없어요.';   // 시작이 바뀌는 이동은 시작도 지금 이후여야 한다(진행 중 블록의 길이만 바꿀 때는 시작이 그대로라 통과)
+    for (const x of fixedBlocks(date)) { if (x.k === 'sleep' || x.k === 'auto' || (x.k === 'plan' && x.plan?.id === b.plan?.id)) continue; if (x.s < e && s < x.e) return x.k === 'class' ? '그 시간에 수업이 있어요.' : x.k === 'exam' ? '그 시간에 시험이 있어요.' : `그 시간에 ${shortName(x)} 일정이 있어요.`; }
+    return '';
+  }
+  // 저장: 레코드의 다른 필드(bk·activity·src 등)는 그대로 두고 날짜·시각만 바꾼다. 낡은 리비전은 workspace.change 가 막고 알린다. 되돌리기는 내가 저장한 모습 그대로일 때만
+  async function commitMove(b, date, s, e, verb) {
+    const p = b.plan, name = shortName(b), orig = JSON.parse(JSON.stringify(p));
+    if (date === p.date && hm(s) === p.s && hm(e) === p.e) return false;
+    keepDay(); const body = { ...p, date, s: hm(s), e: hm(e) }; const keepDayVal = day; if (date !== p.date) day = date;
+    let ok; try { ok = await ctx.updatePlan?.(body); } catch { ok = false; app.status?.('저장하지 못했어요 · 원래 자리 그대로예요.', true); }
+    if (ok === false) { day = keepDayVal; return false; }
+    const stable = (o) => JSON.stringify(o, (k, v) => (v && typeof v === 'object' && !Array.isArray(v) ? Object.fromEntries(Object.keys(v).sort().map((x) => [x, v[x]])) : v)), saved = stable((ctx.plans || []).find((q) => q.id === p.id) || body);   // 저장 직후 레코드 전체(다른 필드 포함)
+    toast(`${verb} · ${name} ${hm(s)}–${hme(e)}`, '되돌리기', async () => {
+      const cur = (ctx.plans || []).find((q) => q.id === p.id);
+      if (!cur || stable(cur) !== saved) { app.status?.('그 사이 이 일정이 바뀌어 되돌리지 않았어요.', true); return false; }
+      keepDay(); const r = await ctx.updatePlan?.({ ...cur, date: orig.date, s: orig.s, e: orig.e });      // 시각만 되돌린다(그 사이 바뀐 다른 필드는 덮지 않음)
+      if (r === false) return false; app.status?.('원래 시각으로 되돌렸어요.'); return true;
+    });
+    return true;
+  }
+  function lpMenu(b, blk, at) {
+    const { pop, close } = mkPop('div', 'pl-menu pl-lpmenu', `${b.title} 메뉴`, blk); pop.setAttribute('role', 'menu');
+    const mv = moveInfo(b), isPlan = b.k === 'plan' && b.plan, item = (label, fn, dis) => { const x = el('button', label); x.type = 'button'; x.setAttribute('role', 'menuitem'); x.disabled = !!dis; x.onclick = () => { close(); fn(); }; pop.append(x); return x; };
+    pop.append(el('b', shortName(b)));
+    item('수정', () => openBlock(b, blk, at));
+    if (b.k === 'auto' && b.key) item('이 추천 숨기기', () => hideRec(b.date || ctx.today, b.key, b.title));
+    else item('삭제', () => removePlan(b.plan), !isPlan || !!b.plan?.allDay);
+    if (!(isPlan && mv.can)) { const m = item('이동', () => {}, true); m.title = mv.why; }
+    if (isPlan && mv.can) pop.append(el('small', '길게 누른 채 끌면 옮겨져요. 위·아래 가장자리를 끌면 길이가 바뀌어요.', 'pl-popnote'));
+    else pop.append(el('small', mv.why + (isPlan || b.k === 'auto' ? '' : ' 삭제도 원본에서 해요.'), 'pl-popnote'));
+    document.body.append(pop); placePop(pop, at.x, at.y); pop.querySelector('button')?.focus({ preventScroll: true });
+    return close;
+  }
+  function attachGestures(blk, b, PX) {
+    const mv = moveInfo(b), isPlan = b.k === 'plan' && b.plan && !b.plan.allDay, len = b.e - b.s;
+    let st = null, suppress = 0, closeMenu = null, rafId = 0, busy = false;
+    const reset = () => { blk.removeEventListener('touchmove', tm); if (st) clearTimeout(st.timer); cancelAnimationFrame(rafId); st?.ghost?.remove(); blk.classList.remove('dragging'); document.body.classList.remove('pl-dragging'); document.removeEventListener('keydown', escCancel, true); st = null; };
+    const escCancel = (e) => { if (e.key === 'Escape' && st?.drag) { e.stopPropagation(); reset(); } };
+    const geometry = () => { const g = blk.parentElement, gTop = g.getBoundingClientRect().top; return { g, gTop }; };
+    const targetOf = (e) => {   // 지금 포인터가 가리키는 (날짜, 시작/끝 분)
+      const { g, gTop } = geometry(), cols = [...blk.closest('.pl-day')?.querySelectorAll('.pl-wkcol') || []];
+      let col = null, date = b.date || ctx.today; if (cols.length && st.mode === 'move') {   // 길이 조절은 날짜를 바꾸지 않는다
+        col = cols.find((c) => { const r = c.getBoundingClientRect(); return e.clientX >= r.left && e.clientX < r.right; }) || (e.clientX < cols[0].getBoundingClientRect().left ? cols[0] : cols[cols.length - 1]); date = col.dataset.date || date; }
+      const m = (e.clientY - gTop) / PX; let s, e2;
+      if (st.mode === 'move') { s = Math.round((m - st.grab) / LP.snap) * LP.snap; s = Math.max(0, Math.min(LAST - len, s)); e2 = s + len; }
+      else if (st.mode === 'bot') { s = b.s; e2 = Math.round(m / LP.snap) * LP.snap; e2 = Math.max(s + LP.minLen, Math.min(LAST, e2)); }
+      else { e2 = b.e; s = Math.round(m / LP.snap) * LP.snap; s = Math.max(0, Math.min(e2 - LP.minLen, s)); }
+      return { date, s, e: e2, col, gTop, g };
+    };
+    const paintGhost = (e) => {
+      const t = targetOf(e); st.t = t; const r0 = st.r0, why = dropReason(b, t.date, t.s, t.e); st.why = why;
+      const left = t.col && st.mode === 'move' ? t.col.getBoundingClientRect().left + 2 : r0.left, width = t.col && st.mode === 'move' ? t.col.getBoundingClientRect().width - 4 : r0.width;
+      st.ghost.style.transform = `translate(${left - r0.left}px, ${t.gTop + t.s * PX - r0.top}px)`; st.ghost.style.width = width + 'px'; st.ghost.style.height = Math.max(14, (t.e - t.s) * PX - 2) + 'px';
+      let lab = st.ghost.querySelector('small'); if (!lab) { lab = el('small'); st.ghost.append(lab); } lab.textContent = `${hm(t.s)}–${hme(t.e)}${why ? ' · ' + why : ''}`;
+      st.ghost.classList.toggle('bad', !!why);
+    };
+    const edgeScroll = () => { if (!st?.drag) return; const sc = blk.closest('.pl-day'); if (sc && st.last) { const r = sc.getBoundingClientRect(), y = st.last.clientY; if (y < r.top + 36) sc.scrollTop -= 10; else if (y > r.bottom - 36) sc.scrollTop += 10; paintGhost(st.last); } rafId = requestAnimationFrame(edgeScroll); };
+    const begin = (mode, e) => {
+      const r0 = blk.getBoundingClientRect(), ghost = blk.cloneNode(true);
+      ghost.className = blk.className + ' pl-ghost'; ghost.removeAttribute('tabindex'); ghost.removeAttribute('role'); ghost.removeAttribute('aria-label'); ghost.removeAttribute('title'); ghost.querySelectorAll('.pl-rsz').forEach((x) => x.remove()); ghost.setAttribute('aria-hidden', 'true');
+      ghost.style.cssText = `left:${r0.left}px;top:${r0.top}px;width:${r0.width}px;height:${r0.height}px;right:auto`; document.body.append(ghost);
+      Object.assign(st, { mode, drag: true, ghost, r0, grab: (st.y0 - r0.top) / PX }); blk.classList.add('dragging'); document.body.classList.add('pl-dragging'); document.addEventListener('keydown', escCancel, true); st.last = e; paintGhost(e); rafId = requestAnimationFrame(edgeScroll);
+    };
+    const finish = async (commit) => {
+      const s0 = st; if (!s0) return; const t = s0.t, why = s0.why; reset();
+      if (!commit || !t) return; if (why) { app.status?.(why, true); return; }
+      busy = true; try { await commitMove(b, t.date, t.s, t.e, s0.mode === 'move' ? (t.date !== b.date ? '다른 날로 옮겼어요' : '옮겼어요') : '길이를 바꿨어요'); } finally { busy = false; }
+    };
+    blk.addEventListener('click', (e) => { if (suppress > Date.now()) { e.stopImmediatePropagation(); e.preventDefault(); } });   // 꾹 누른 뒤 손을 뗄 때 생기는 클릭이 창을 열지 않게(onclick 보다 먼저 등록)
+    blk.addEventListener('contextmenu', (e) => { if (st?.active || suppress > Date.now()) e.preventDefault(); });
+    const tm = (e) => { if (st?.active) e.preventDefault(); };   // 눌린 뒤에만 스크롤을 막는다. 터치가 이 블록에서 시작했을 때만 달아 두어(끝나면 뗌) 다른 곳의 스크롤을 늦추지 않는다
+    blk.addEventListener('pointerdown', (e) => {
+      if ((e.pointerType === 'mouse' && e.button !== 0) || busy || st || e.target.closest?.('.pl-rsz')) return;
+      st = { id: e.pointerId, x0: e.clientX, y0: e.clientY, active: false, drag: false, last: e }; if (e.pointerType !== 'mouse') blk.addEventListener('touchmove', tm, { passive: false });
+      st.timer = setTimeout(() => { if (!st) return; st.active = true; document.body.classList.add('pl-dragging'); suppress = Date.now() + 700; try { blk.setPointerCapture(st.id); } catch {} closeMenu = lpMenu(b, blk, { x: st.last.clientX, y: st.last.clientY }); }, LP.ms);
+    });
+    blk.addEventListener('pointermove', (e) => {
+      if (!st || e.pointerId !== st.id) return; st.last = e; const d = Math.hypot(e.clientX - st.x0, e.clientY - st.y0);
+      if (!st.active) { if (d > LP.slop) reset(); return; }   // 누르기 전에 움직이면 스크롤·일반 제스처로 돌려보냄
+      if (!st.drag && d > LP.slop && isPlan && mv.can) { closeMenu?.(); begin('move', e); return; }
+      if (st.drag) paintGhost(e);
+    });
+    const up = (e) => { if (!st || e.pointerId !== st.id) return; const was = st; clearTimeout(was.timer); if (was.drag) { suppress = Date.now() + 500; finish(e.type === 'pointerup'); } else { if (was.active) suppress = Date.now() + 500; reset(); } };
+    blk.addEventListener('pointerup', up); blk.addEventListener('pointercancel', up); blk.addEventListener('lostpointercapture', (e) => { if (!st || e.pointerId !== st.id) return; if (st.drag) up({ pointerId: e.pointerId, type: 'pointercancel' }); else reset(); });   // 메뉴만 열린 채 캡처를 잃어도 상태가 남아 다음 누르기를 막지 않게
+    // 가장자리 핸들: 위·아래를 끌어 길이 조절(저장된 계획만, 5분 단위, 최소 15분). 누르는 즉시 시작(핸들은 터치 스크롤을 점유)
+    if (isPlan && mv.can && (b.e - b.s) * PX >= 40) for (const mode of ['top', 'bot']) {
+      const h = el('i', undefined, `pl-rsz ${mode}`); h.setAttribute('aria-hidden', 'true');
+      h.addEventListener('pointerdown', (e) => { if (busy || st || (e.pointerType === 'mouse' && e.button !== 0)) return; e.preventDefault(); e.stopPropagation(); st = { id: e.pointerId, x0: e.clientX, y0: e.clientY, active: true, drag: false, last: e }; try { h.setPointerCapture(e.pointerId); } catch {} begin(mode, e); });
+      h.addEventListener('pointermove', (e) => { if (st?.drag && e.pointerId === st.id && st.mode === mode) { st.last = e; paintGhost(e); } });
+      const hup = (e) => { if (st?.drag && e.pointerId === st.id && st.mode === mode) { suppress = Date.now() + 500; finish(e.type === 'pointerup'); } };
+      h.addEventListener('pointerup', hup); h.addEventListener('pointercancel', hup); h.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+      blk.append(h);
+    }
+    // 키보드: Delete = 삭제(확인), ↑↓ = 5분, Alt+←→ = 하루(저장된 계획만). 모아서 한 번에 저장
+    let kd = { dm: 0, dd: 0, timer: 0 };
+    blk.addEventListener('keydown', (e) => {
+      if (!isPlan) return;
+      if ((e.key === 'Delete' || e.key === 'Backspace') && !e.repeat) { e.preventDefault(); const past = planState(b.plan) === 'confirmed' && (planEndMs(b.plan) ?? Infinity) <= Date.now(); if (past || confirm(`「${shortName(b)}」을(를) 삭제할까요?\n지운 뒤 10초 동안 되돌릴 수 있어요.`)) removePlan(b.plan); return; }   // 지난 확정은 removePlan 이 따로 한 번 더 묻는다
+      if (!mv.can) return; const dm = e.key === 'ArrowUp' ? -LP.snap : e.key === 'ArrowDown' ? LP.snap : 0, dd = e.altKey && e.key === 'ArrowLeft' ? -1 : e.altKey && e.key === 'ArrowRight' ? 1 : 0; if (!dm && !dd) return;
+      e.preventDefault(); kd.dm += dm; kd.dd += dd; clearTimeout(kd.timer);
+      kd.timer = setTimeout(async () => { const dM = kd.dm, dD = kd.dd; kd.dm = kd.dd = 0; const date = addDays(b.date || ctx.today, dD), s = b.s + dM, e2 = b.e + dM; const why = dropReason(b, date, s, e2); if (why) { app.status?.(why, true); return; } await commitMove(b, date, s, e2, '옮겼어요'); }, 450);
+    });
+  }
   function blockEl(b, PX, now) {
     const cat = blockCat(b), sub = b.k === 'auto' ? ' · 추천' : b.lapsed ? ' · 수행 확인 필요 · 했어요?' : b.k === 'sleep' ? (b.sleep.state === 'plan' ? ' · 목표' : '') + (b.sleep.contPrev ? ' · 전날에서 이어짐' : '') + (b.sleep.contNext ? ' · 다음 날로 이어짐' : '') : '';
     const blk = el('div', undefined, `pl-blk k-${b.k} ${cat ? CAT_CLASS[cat] : 'c-unknown'}` + (b.k === 'sleep' ? ` sleep-${b.sleep.state}` : '') + (b.lapsed ? ' lapsed' : '') + (now >= 0 && b.e <= now ? ' past' : '')); blk.style.top = b.s * PX + 'px'; blk.style.height = Math.max(14, (b.e - b.s) * PX - 2) + 'px';
@@ -1614,7 +1736,7 @@ export function createPlan(app) {
     // 누르면 종류별 창(대표님 10/9 「시간블럭 누르면 수정할 수가 없는데」): 계획 = 고치기·확정·삭제, 수업 = 출석·이해도·시작·종료, 캘린더 = 시각 고치기,
     // 추천 = 계획으로 넣기·숨기기, 고정 일정·시험 = 내용 보기
     const what = WHAT[b.k];
-    if (what) { blk.classList.add('edit'); blk.tabIndex = 0; blk.setAttribute('role', 'button'); blk.setAttribute('aria-label', `${cat ? CAT_NAME[cat] : '종류 모름'} ${b.title} ${hm(b.s)}–${hme(b.e)} ${what}`);
+    if (what) { attachGestures(blk, b, PX); blk.classList.add('edit'); blk.tabIndex = 0; blk.setAttribute('role', 'button'); blk.setAttribute('aria-label', `${cat ? CAT_NAME[cat] : '종류 모름'} ${b.title} ${hm(b.s)}–${hme(b.e)} ${what}`);
       const open = (e) => { e.stopPropagation(); openBlock(b, blk, e.clientX ? { x: e.clientX, y: e.clientY } : null); };
       blk.onclick = open; blk.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(e); } }; }
     return blk;
