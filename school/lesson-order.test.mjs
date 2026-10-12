@@ -92,3 +92,19 @@ test('수업 선택 창과 교실 탭 목록은 같은 이름·순서',()=>{
  assert.deepEqual(rows,orderedLessons(statics).map(orderedTitle));
  dom.window.close();
 });
+
+
+test('새 정역학 7강은 교실과 회독 순서에 포함되고 기존 제외 및 호환 규칙을 보존한다',async()=>{
+ const {canonicalLessonId}=await import('./lesson-order.js');
+ const recent={id:'statics-2026-10-12',date:'2026-10-12',title:'3차원 지점 반력과 두 힘·세 힘 부재'};
+ const raw={...statics,lessons:[...statics.lessons,recent]};
+ const before=JSON.stringify(raw), rows=scopeLessons(raw);
+ assert.equal(rows.length,8);assert.equal(rows.at(-2).id,recent.id);assert.equal(rows.at(-2).label,'7강');
+ assert.equal(rows.at(-1).label,'벼락치기');
+ assert.equal(JSON.stringify(raw),before);
+ assert.equal(canonicalLessonId('phys2-2026-09-04'),'phys2-reviewed-2026-09-04');
+ assert.equal(lessonHidden('일반물리학2',{id:'session:일반물리학2:2026-09-02'}),true);
+ const {sprintLessons}=await import('./study-sprint.js');
+ assert.ok(sprintLessons(raw,'2026-10-13').some(l=>l.id===recent.id));
+ assert.equal(sprintLessons(raw,'2026-10-11').some(l=>l.id===recent.id),false);
+});
