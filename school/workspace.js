@@ -37,7 +37,19 @@ export function nextRoundOnly(rows, today) {
 }
 export function pendingDeadlines(rows, today) {
   const day=Date.parse(today+'T00:00:00Z');
-  return nextRoundOnly(rows,today).filter(r=>!r.submitted&&!pastDue(r,today)).map(r=>{   // 지난 과제는 아예 안 보임(대표님 10/9)
+  let pending = nextRoundOnly(rows,today).filter(r=>!r.submitted&&!pastDue(r,today));
+  pending = pending.filter(r => {
+    if (r.course !== '사회봉사' || roundOf(r) !== null || !r.due) return true;
+    const days = (Date.parse(r.due.slice(0,10)+'T00:00:00Z') - day) / 86400000;
+    return !Number.isFinite(days) || days <= 7;
+  });
+  // 오늘 할 일은 다음 봉사 회차 하나만. 전체 과제실과 원본 기록은 그대로 둔다.
+  const service = pending.filter(r => r.course === '사회봉사' && roundOf(r) !== null);
+  if (service.length) {
+    const combined = service.find(r => /\(2회차 미제출분도 같이\)/.test(r.title || '') && r.source === '할 일 원본');
+    pending = pending.filter(r => r.course !== '사회봉사' || roundOf(r) === null || !combined || r === combined || roundOf(r) !== roundOf(combined));
+  }
+  return pending.map(r=>{   // 지난 과제는 아예 안 보임(대표님 10/9)
     const match=/^(\d{4}-\d{2}-\d{2})(?:T(\d{2}:\d{2})(?::\d{2})?)?$/.exec(r.due||'');
     const stamp=match?Date.parse(match[1]+'T'+(match[2]||'23:59')+':00Z'):NaN;
     const valid=match&&Number.isFinite(stamp)&&new Date(stamp).toISOString().slice(0,10)===match[1];
@@ -176,7 +188,7 @@ export function createWorkspace(app){
       const course=app.catalog().courses.find(c=>c.name===name);
       if(!exam&&!course)return null;
       const events=(app.events?.()||[]).filter(x=>x.course===name);
-      return {name,exam,m:courseMetrics({lessons:course?.lessons||[],events,exam,today:data.date})};
+      return {name,exam,m:courseMetrics({lessons:orderedLessons(course)||course?.lessons||[],events,exam,today:data.date})};
     }).filter(Boolean).sort((a,b)=>(a.exam?a.exam.dday:999)-(b.exam?b.exam.dday:999));
   }
   // 로비 = 복도 장면. 문 하나가 과목 하나, 문패가 진행판, 퀘스트 문이 빛난다. 문을 누르면 1인칭 교실로 들어간다.

@@ -1,5 +1,5 @@
 import { renderClassroomDirectory } from './classroom-directory.js?v=266';
-import { visibleCatalog, orderedLessons, orderedTitle } from './lesson-order.js';
+import { visibleCatalog, orderedLessons, orderedTitle, lessonHidden } from './lesson-order.js';
 import { fitBoard } from './board-fit.js?v=266';
 import { createLectureQuests } from './lecture-quests.js?v=233';
 import { mountSchoolRefresh } from './refresh.js?v=237';
@@ -14,7 +14,7 @@ import {
   splitText,
   learningPath,
 } from "./learning.js";
-import { createWorkspace } from "./workspace.js?v=218";
+import { createWorkspace } from "./workspace.js?v=219";
 import { createMission } from "./mission.js?v=199";
 import { attachSaeng } from "./saeng.js?v224";
 import { createSpace, ROOMS } from "./space.js";
@@ -32,7 +32,7 @@ import { createDialog } from "./vn-dialog.js";
 import { createLectureUi } from "./lecture-ui.js";
 import { setupWideRoom } from "./room-wide.js";
 import { setupSeatRoom } from "./room-seat.js";
-import { pastDue, nextRoundOnly } from "./workspace.js?v=218";
+import { pastDue, nextRoundOnly } from "./workspace.js?v=219";
 import { setupShell } from "./shell.js?v=232";
 import { createRig } from "./rig.js";
 import { createFace } from "./face.js";
@@ -669,6 +669,12 @@ $("resume").onclick = () => {
   else consult(course);
 };
 async function startLesson(id, options = {}) {
+  if (lessonHidden('정역학', {id})) {
+    if (options.follow && options.epoch !== sessionEpoch) return;
+    showCourse('정역학');
+    status('이 수업은 중간고사 대비 목록에서 제외됐습니다. 1강부터 선택해 주세요.');
+    return;
+  }
   /* 정역학 강 시작 암기카드: 새 수업을 열 때만(같은 수업 안 이동·다른 기기 따라가기는 제외) */
   if (!options.follow && id !== current?.id && !(await cardGate(id))) { status('암기카드를 통과해야 수업이 열립니다.'); return; }
   try { await mission?.save(); if (!options.follow && !isBoard()) await growth?.stop('pause'); } catch (error) { status(error.message, true); return; }
@@ -683,6 +689,17 @@ async function startLesson(id, options = {}) {
     let targetIndex = options.index ?? Math.min(state.progress[id]?.index || 0, lesson.steps.length - 1);
     if(options.stepId){const at=lesson.steps.findIndex(s=>s.id===options.stepId);if(at<0)throw new Error('이전 문제 위치를 확인해주세요.');targetIndex=at;}
     if (options.resume) { const restored = lesson.steps.findIndex(s=>s.id===options.resume.stepId); if(restored<0)throw new Error('이전 단계가 변경되었습니다. 수업 자료를 확인해주세요.'); targetIndex=restored; }
+    if (options.resume?.returnTo) {
+      const ref = options.resume.returnTo;
+      let restoredPause = null;
+      if (!lessonHidden('정역학', {id: ref.lessonId})) {
+        const base = await api('lesson?id=' + encodeURIComponent(ref.lessonId));
+        if (generation !== requestGeneration || stale()) return;
+        const at = base.steps.findIndex(s => s.id === ref.stepId);
+        if (at >= 0) restoredPause = {lesson: base.id, index: at, course: base.course};
+      }
+      pausedLesson = restoredPause;
+    }
     missionIndices = options.purpose !== "exam" ? null : pickQuestions({ steps: lesson.steps, events: [...state.events, ...pending], lessonId: lesson.id, n: 3 });
     // 시험 대비는 저장된 마지막 위치와 상관없이 고른 첫 문제(가장 약한 문제)부터. 이어 하기·특정 문제 지정은 그대로 둔다.
     if (options.follow) { if (missionIndices && !missionIndices.includes(targetIndex)) missionIndices = [targetIndex, ...missionIndices.filter(i => i !== targetIndex)].slice(0, missionIndices.length); }
@@ -772,7 +789,6 @@ async function sitDown(name) {
 async function resumeSession() {
   const saved = activeSession;
   if (!saved) return workspace.open('learning');
-  if(saved.returnTo){const base=await api('lesson?id='+encodeURIComponent(saved.returnTo.lessonId));const at=base.steps.findIndex(s=>s.id===saved.returnTo.stepId);if(at>=0)pausedLesson={lesson:base.id,index:at,course:base.course};}
   await startLesson(saved.lessonId, {resume: saved, purpose: saved.purpose, returnTo: saved.returnTo});
 }
 function returnReference() {
@@ -2335,7 +2351,6 @@ async function boot() {
     catalog = visibleCatalog(catalog);   // 정역학 범위 밖 수업(9/2~9/14·10/9 문제집·10/10 복습)은 화면 전체에서 뺀다
     if (TEST && !capabilities.testMode)
       throw new Error("검증 모드 서버 적용이 필요합니다.");
-    if(activeSession?.returnTo){const base=await api('lesson?id='+encodeURIComponent(activeSession.returnTo.lessonId));const at=base.steps.findIndex(s=>s.id===activeSession.returnTo.stepId);if(at>=0)pausedLesson={lesson:base.id,index:at,course:base.course};}
     const last = [...state.events]
       .reverse()
       .find((e) => e.course || e.plan?.course);

@@ -855,7 +855,7 @@ export function createPlan(app) {
     // 홈 할 일은 종류별 세 묶음만(대표님 10/12 「공부 / 과제 / 공모전」): 공부 = 시험 공부·복습, 과제 = 과목 과제·제출물(사회봉사 포함), 공모전 = 대회 일정·마감. 과목은 묶음 안에서 나눈다
     for (const kind of KINDS) {
       const list = open.filter((t) => t.kind === kind);
-      if (!list.length) { if (kind === '공부') card.append(el('div', '공부', 'pl-sub pl-sub-st'), el('p', '오늘 할 공부가 아직 없어요. 아래에서 넣거나 스앵님께 계획을 부탁하세요.', 'pl-empty')); continue; }
+      if (!list.length) { card.append(el('div', kind, 'pl-sub pl-sub-' + (kind === '과제' ? 'hw' : kind === '공부' ? 'st' : 'ct')), el('p', kind === '공부' ? '오늘 할 공부가 아직 없어요. 아래에서 넣거나 스앵님께 계획을 부탁하세요.' : `등록된 ${kind} 할 일이 없어요.`, 'pl-empty')); continue; }
       card.append(el('div', kind, 'pl-sub pl-sub-' + (kind === '과제' ? 'hw' : kind === '공부' ? 'st' : 'ct')));
       const groups = new Map(); for (const t of list) { if (!groups.has(t.c)) groups.set(t.c, []); groups.get(t.c).push(t); }
       const order = [...groups.entries()].sort((a, b) => Math.min(...a[1].map((t) => t.days ?? 999)) - Math.min(...b[1].map((t) => t.days ?? 999)));
@@ -2245,6 +2245,8 @@ export function createPlan(app) {
       if (old.closest('.pl-add') || old === active) f.value = old.value;
       if (old === active) queueMicrotask(() => { f.focus({ preventScroll: true }); try { f.setSelectionRange(old.selectionStart, old.selectionEnd); } catch {} });
     }
+    // 종류 값 복원 후 종속 입력칸 표시와 required도 함께 복원한다.
+    wrap.querySelector('.pl-add select[name="kind"]')?.onchange?.();
     // 다시 그려도 위치를 지킨다: 창(문서) 스크롤 · 시간표 격자 안 스크롤 · 열어 둔 「일정 목록」
     const sc = pageScroller(host), y0 = sc ? sc.scrollTop : 0, listOpen = !!host.querySelector('.pl-list')?.open;
     { const old = host.querySelector('.pl-schedule .pl-day'); if (!innerReset && old?.dataset.touched && old.dataset.ikey === view + '|' + day) { innerKey = old.dataset.ikey; innerTop = old.scrollTop; } }   // 교체 직전의 실제 위치(scroll 이벤트 전에 다시 그려도)

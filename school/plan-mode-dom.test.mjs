@@ -36,6 +36,20 @@ const viewBtn = (name) => [...host.querySelectorAll('.pl-seg button')].find((b) 
 const plus = () => document.getElementById('pl-fab');
 const fillForm = (text, st) => { const note = document.querySelector('.pl-pop input[aria-label="할 일"]'); note.value = text; if (st) document.querySelector('.pl-pop input[type=time]').value = st; };
 
+// A redraw must preserve the draft and its dependent visible/required fields.
+const draft = host.querySelector('.pl-add');
+draft.elements.kind.value = '공모전'; draft.elements.kind.dispatchEvent(new w.Event('change'));
+draft.elements.contest.value = '애스크톤'; draft.elements.t.value = '워크숍 3분 PT 준비';
+click(viewBtn('한 주')); await flush();
+const restored = host.querySelector('.pl-add');
+assert.equal(restored.elements.kind.value, '공모전');
+assert.equal(restored.elements.contest.hidden, false, 'redraw keeps contest name visible');
+assert.equal(restored.elements.contest.required, true);
+assert.equal(restored.elements.c.hidden, true);
+assert.equal(restored.elements.contest.value, '애스크톤');
+assert.equal(restored.elements.t.value, '워크숍 3분 PT 준비');
+restored.elements.kind.value = '공부'; restored.elements.kind.dispatchEvent(new w.Event('change'));
+
 // 1. 하루·한 주·시험까지 모두에 계획 모드 버튼이 있다(예전엔 한 주에서만)
 for (const name of ['하루', '한 주', '시험까지']) { click(viewBtn(name)); await flush(); assert.ok(pm(), `${name} 보기에 계획 모드 버튼`); }
 click(viewBtn('하루')); await flush();
