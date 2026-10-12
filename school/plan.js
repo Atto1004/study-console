@@ -9,7 +9,7 @@ const el = (tag, text, cls) => { const e = document.createElement(tag); if (text
 const svg = (d) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 const ICON = { play: '<path d="M7 5l12 7-12 7z" fill="currentColor"/>', pause: '<path d="M8 5v14M16 5v14"/>', stop: '<rect x="6" y="6" width="12" height="12" rx="1.5" fill="currentColor"/>', prev: '<path d="M15 6l-6 6 6 6"/>', next: '<path d="M9 6l6 6-6 6"/>', replan: '<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>', plus: '<path d="M12 5v14M5 12h14"/>', undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
   trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>', more: '<circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/>',
-  up: '<path d="M6 15l6-6 6 6"/>', down: '<path d="M6 9l6 6 6-6"/>', check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>', list: '<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>', moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>' };
+  up: '<path d="M6 15l6-6 6 6"/>', down: '<path d="M6 9l6 6 6-6"/>', check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>', list: '<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>', moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>', pin: '<path d="M12 21s-6.5-5.4-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.6 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.3"/>' };
 const ib = (icon, label, cls = '') => { const b = el('button', undefined, 'pl-ib ' + cls); b.type = 'button'; b.innerHTML = svg(ICON[icon]); b.setAttribute('aria-label', label); b.title = label; return b; };
 const mins = (hm) => { const [h, m] = String(hm || '0:0').split(':').map(Number); return h * 60 + (m || 0); };
 const hme = (n) => n >= 1440 ? '24:00' : hm(n);
@@ -46,6 +46,9 @@ export const hiddenTask = (x, today) => !!(x.off || x.mergedInto || (x.showFrom 
 // 저장된 계획(plan)의 state 가 없으면(옛 계획) 확정으로 읽는다 — 지금도 채우기·다시 짜기가 저장된 계획을 건드리지 않아 동작이 같고, 화면 변화가 가장 작다.
 export const CATS = ['고정', '공부', '과제', '이동', '수면', '계획'];
 export const planState = (p) => p?.state === 'tentative' ? 'tentative' : 'confirmed';
+// 끝 시각이 지났는지(KST). 계획(미확정)인데 끝이 지났으면 「계획대로 확정됨」으로 보여 준다 — 화면에서만 바꾸는 파생이고 서버 기록은 그대로(실제로 했는지는 모른다)
+export const planEndMs = (p) => /^\d{4}-\d{2}-\d{2}$/.test(p?.date || '') && /^\d{2}:\d{2}$/.test(p?.e || '') ? Date.UTC(+p.date.slice(0, 4), +p.date.slice(5, 7) - 1, +p.date.slice(8, 10)) + mins(p.e) * 60000 - 9 * 3600e3 : null;
+export const planLapsed = (p, nowMs) => planState(p) === 'tentative' && !p?.done && planEndMs(p) != null && planEndMs(p) <= nowMs;
 export function planBk(p) {   // 확정 계획의 종류: bk 가 있으면 그대로, 없으면 note 로 추정(채우기는 note 를 「과제 · 이름」「시험 공부 · …」 꼴로 씀)
   if (p?.bk === '고정' || p?.bk === '공부' || p?.bk === '과제' || p?.bk === '이동') return p.bk;
   return /^\s*(과제|공모전)\s*·/.test(p?.note || '') ? '과제' : '공부';
@@ -69,7 +72,7 @@ export const CAT_MEANS = { 고정: '움직이지 않는 일정 — 수업·약�
 // 글자색·배경색(대비 4.5:1 이상 — 테스트가 계산). 지난 블록은 opacity .8 로 흐리게 하므로 그 합성값도 검사한다
 export const BLOCK_COLORS = {
   'k-class': ['#2c4a6e', '#ffffff'], 'k-plan-fixed': ['#4b3f72', '#ffffff'], 'k-cal': ['#48525e', '#ffffff'], 'k-work': ['#6e4609', '#ffffff'], 'k-exam': ['#8f2a18', '#ffffff'],
-  'c-study': ['#e0efe5', '#14261f'], 'c-hw': ['#fbe4cc', '#3a1f0c'], 'c-plan': ['#f4f7f5', '#26352e'], 'c-move': ['#e8e4f4', '#2a1f4a'], 'c-sleep': ['#1d2340', '#f4f7fb'], 'c-sleep-stripe': ['#2a3260', '#f4f7fb'], 'c-sleep-plan': ['#e9ecf8', '#1d2340'], 'tag-sleep': ['#f4f7fb', '#1d2340'], 'small-sleep': ['#1d2340', '#e3e8f7'], 'small-sleep-plan': ['#e9ecf8', '#2b3566'],
+  'c-study': ['#e0efe5', '#14261f'], 'c-hw': ['#fbe4cc', '#3a1f0c'], 'c-plan': ['#f4f7f5', '#26352e'], 'c-move': ['#e8e4f4', '#2a1f4a'], 'c-sleep': ['#1d2340', '#f4f7fb'], 'c-sleep-stripe': ['#2a3260', '#f4f7fb'], 'c-sleep-plan': ['#e9ecf8', '#1d2340'], 'tag-sleep': ['#f4f7fb', '#1d2340'], 'small-sleep': ['#1d2340', '#e3e8f7'], 'lane-move': ['#e8e4f4', '#2a1f4a'], 'lane-group': ['#eef2f7', '#2f4254'], 'small-sleep-plan': ['#e9ecf8', '#2b3566'],
   'tag-study': ['#245a43', '#ffffff'], 'tag-hw': ['#86400c', '#ffffff'], 'tag-plan': ['#f4f7f5', '#34483d'], 'tag-move': ['#5a4a8a', '#ffffff'],
   'small-class': ['#2c4a6e', '#ffffff'], 'small-plan-fixed': ['#4b3f72', '#ffffff'], 'small-cal': ['#48525e', '#ffffff'], 'small-work': ['#6e4609', '#ffffff'], 'small-exam': ['#8f2a18', '#ffffff'],
   'sleep-text': ['#f4f7fb', '#1c2a3a'], 'sleep-small': ['#f4f7fb', '#3a4a5d'], 'sleep-btn': ['#22344a', '#ffffff'], 'sleep-ghost': ['#ffffff', '#22344a'], 'night-big': ['#0f1a22', '#e6edf3'], 'night-sub': ['#0f1a22', '#b4c0cc'], 'night-btn': ['#1d3040', '#ffffff'],
@@ -283,6 +286,35 @@ export function applyGoal(s, { bed, sleepH, seen }) {
   if (goalSeen(s.cfg) !== seen) return 'conflict';
   s.cfg = s.cfg || {}; s.cfg.bed = bed; s.cfg.sleepH = sleepH; return 'applied';
 }
+// ── 위치 열(대표님 10/12 「이동 일정이 등록되면 오른쪽 위치 영역에 서울 → 안산으로 뜨게 하고, 같은 지역 일정은 묶어서 안산 하나로」) ──
+// 위치 기록(v60.place)이 실제 위치라 우선이고, 이동 일정(출발지·도착지 글자)에서 계산한 막대는 보조다: 이동 막대(출발 → 도착) + 도착한 뒤 다음 이동 전까지 그 도착지 묶음 막대.
+// 첫 이동 앞 구간은 직전 이동의 도착지(prevTo)가 있을 때만 채운다(없으면 비움 — 지어내지 않음). 같은 지역인지는 입력한 글자가 같을 때만 본다(별칭 표 없음).
+// moves: [{s,e(분),from,to,tentative}] · recs: [{t:'HH:MM',p}] · 결과 rec(기록 막대) · derived(계산 막대, 기록과 겹치는 시간은 뺀다)
+export function placeSegments({ moves = [], recs = [], prevTo = '', prevTentative = false, nowM = null, isToday = false, dayEnd = 1440 }) {
+  const cap = isToday && nowM != null ? nowM : dayEnd;   // 오늘의 기록은 지금까지만(지금 이후 시각의 기록·구간은 없는 것으로)
+  const rs = recs.filter((r) => mins(r.t) <= cap).sort((a, b) => a.t.localeCompare(b.t)), rec = rs.map((r, i) => { const st = mins(r.t); return { s: st, e: Math.min(cap, i + 1 < rs.length ? mins(rs[i + 1].t) : cap), p: r.p, r }; }).filter((x) => x.e >= x.s);   // 지금 막 남긴 기록은 길이 0 이어도 남긴다(화면이 최소 높이로 그림)
+  const ms = moves.filter((m) => m.e > m.s).slice().sort((a, b) => a.s - b.s || a.e - b.e), raw = [];
+  const txt = (v) => String(v || '').trim();
+  if (ms.length) {
+    const f0 = txt(ms[0].from);
+    if (txt(prevTo) && ms[0].s > 0 && (!f0 || f0 === txt(prevTo))) raw.push({ s: 0, e: ms[0].s, kind: 'group', label: txt(prevTo), tentative: !!prevTentative, inferred: true });   // 직전 도착지와 첫 이동의 출발지 글자가 다르면 앞 구간을 단정하지 않고 비운다
+    ms.forEach((m, i) => {
+      const from = txt(m.from), to = txt(m.to), next = ms[i + 1], endAt = next ? next.s : dayEnd;
+      if (from || to) raw.push({ s: m.s, e: m.e, kind: 'move', from, to, label: from && to ? from + ' → ' + to : from ? from + ' →' : '→ ' + to, tentative: !!m.tentative });
+      const nf = next ? txt(next.from) : '';
+      if (to && endAt > m.e && (!next || !nf || nf === to)) raw.push({ s: m.e, e: endAt, kind: 'group', label: to, tentative: !!m.tentative });   // 다음 이동의 출발지 글자가 도착지와 다르면 그 사이는 비운다
+    });
+  }
+  const merged = [];   // 이어지는 같은 글자 묶음은 하나로
+  for (const x of raw.sort((a, b) => a.s - b.s)) { const l = merged[merged.length - 1]; if (l && l.kind === 'group' && x.kind === 'group' && l.label === x.label && l.e === x.s && l.tentative === x.tentative) l.e = x.e; else merged.push({ ...x }); }
+  const derived = [];
+  for (const x of merged) {   // 기록과 겹치는 시간을 뺀다(기록이 우선)
+    let pieces = [[x.s, x.e]];
+    for (const r of rec) pieces = pieces.flatMap(([a, b]) => r.e <= a || r.s >= b ? [[a, b]] : [[a, Math.max(a, r.s)], [Math.min(b, r.e), b]].filter(([p, q]) => q - p > 0));
+    for (const [a, b] of pieces) if (b - a >= 5) derived.push({ ...x, s: a, e: b });
+  }
+  return { rec, derived };
+}
 const DAY = { start: 0, end: 24 * 60, wake: 8 * 60, bed: 24 * 60 };   // 시간표 0~24시, 자동 배치는 08~24시
 const BREAK = 10, MIN_SLOT = 25, DEFAULT_EST = 60;
 const LAST = 24 * 60 - 1;   // 계획 끝은 23:59 까지(서버 시간 규격 HH:MM 은 24:00 이 없고 hm(1440) 은 00:00 이 된다 — 오타 검수 10/9)
@@ -425,6 +457,21 @@ button.pl-title.pl-edit:hover,button.pl-title.pl-edit:focus-visible{text-decorat
 .pl-sw.c-sleep{background:repeating-linear-gradient(0deg,#1d2340 0 3px,#2a3260 3px 4px);border:1px solid #1d2340}
 .pl-goal label{display:flex;flex-direction:column;gap:4px;font:600 13px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#26352e}
 .pl-goal input,.pl-goal select{height:44px;border:1px solid #9fb0c3;border-radius:10px;padding:0 10px;font:600 15px "Pretendard Variable",Pretendard,system-ui,sans-serif;background:#fff}
+.pl-wkcol.has-lane{--r:26px}.pl-wkcol.has-lane .pl-blk{right:26px}
+.pl-lane.narrow{right:0;width:22px;border-left:1px dashed #e3e8e4}
+.pl-lane.narrow .pl-place{left:2px;right:1px;padding:2px 1px;text-align:center;font-size:10px;line-height:1.1;display:flex;flex-direction:column;align-items:center;gap:2px}
+.pl-lane.narrow .pl-place span{display:flex;flex-direction:column;align-items:center;gap:2px}
+.pl-vtext{font-style:normal;writing-mode:vertical-rl;max-height:100%;overflow:hidden;white-space:nowrap;font-size:10.5px}
+.pl-pin{display:inline-flex;vertical-align:-1px}.pl-place.derived .pl-pin{margin-right:2px}
+.pl-place.derived{cursor:default;font-weight:600}
+.pl-place.derived.mv{background:#e8e4f4;border:1px solid #5a4a8a;border-top:2px double #5a4a8a;border-bottom:2px double #5a4a8a;color:#2a1f4a;border-radius:4px}
+.pl-place.derived.grp{background:#eef2f7;border:1px solid #c9d3de;color:#2f4254}
+.pl-place.derived.plan{border-style:dashed}
+.pl-place.derived.inferred{opacity:.9}
+.pl-place.derived b{margin:0 2px}
+.pl-flow{flex-basis:100%;order:5;color:#3a4a3f;font:500 12px/1.4 "Pretendard Variable",Pretendard,system-ui,sans-serif}
+.pl-legend .pl-ib{order:4}
+.pl-blk.c-plan.lapsed{border-color:#a1661a}
 .pl-legend-off{display:flex;justify-content:flex-end;margin:0 0 6px}
 .pl-legend-off .pl-ib{width:34px;height:34px}
 .pl-toast{position:fixed;z-index:90;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;max-width:min(92vw,520px);padding:8px 8px 8px 16px;border-radius:14px;background:#14261f;color:#fff;box-shadow:0 10px 28px #0004;font:600 14px/1.35 "Pretendard Variable",Pretendard,system-ui,sans-serif}
@@ -675,7 +722,7 @@ export function createPlan(app) {
       out.push({ s: mins(r.start), e: mins(r.end), title: r.title, k: 'work', routine: r });
     }
     for (const x of (ctx.exams || []).filter((x) => x.date === date)) { const s = x.time ? mins(x.time) : 9 * 60; out.push({ s, e: s + 90, title: `시험 · ${x.course}${x.assumed ? ' (예정)' : ''}`, k: 'exam' }); }
-    for (const p of (ctx.plans || []).filter((p) => p.date === date && (!p.activity || p.bk === '고정' || p.bk === '이동'))) out.push({ s: mins(p.s), e: mins(p.e), title: p.bk === '이동' ? (p.note || moveName(p.from, p.to) || '이동') + (p.est ? ' (추정)' : '') : p.bk === '고정' ? (p.note || '고정 일정') : (ctx.courseName?.(p.courseId) || '') + (p.note ? ' · ' + p.note : ''), k: 'plan', plan: p });   // 고정 일정(약속 등)은 activity 표식이 있어도 시간표엔 그린다
+    for (const p of (ctx.plans || []).filter((p) => p.date === date && (!p.activity || p.bk === '고정' || p.bk === '이동'))) out.push({ s: mins(p.s), e: mins(p.e), title: p.bk === '이동' ? (p.note || moveName(p.from, p.to) || '이동') + (p.est ? ' (추정)' : '') : p.bk === '고정' ? (p.note || '고정 일정') : (ctx.courseName?.(p.courseId) || '') + (p.note ? ' · ' + p.note : ''), k: 'plan', plan: p, lapsed: planLapsed(p, Date.now()) });   // 고정 일정(약속 등)은 activity 표식이 있어도 시간표엔 그린다
     for (const b of out) b.date = date;
     return [...dedupeBlocks(out.filter((b) => b.e > b.s)), ...sleepOn(date)].sort((a, b) => a.s - b.s);   // 수면 블록(기록=확정·목표=계획)은 채우기·다시 짜기도 피하도록 같은 목록에 둔다
   }
@@ -801,13 +848,31 @@ export function createPlan(app) {
   const examEnd = () => { const ds = (ctx.exams || []).map((e) => e.date).filter(Boolean).sort(); return ds.length ? ds[ds.length - 1] : addDays(ctx.today, 13); };
   // 위치 기록(오늘 하루 보기 오른쪽 줄): v60.place[날짜] = [{t:'HH:MM', p:'학교'}] — 기록한 때부터 다음 기록까지 그곳
   const PLACES = ['집', '학교', '도서관', '카페', '이동 중'];
-  function placeLane(date, PX, nowM) {
-    const lane = el('div', undefined, 'pl-lane'); lane.setAttribute('aria-label', '있던 곳');
-    const recs = (v60.place?.[date] || []).slice().sort((a, b) => a.t.localeCompare(b.t));
-    recs.forEach((r, i) => {
-      const s = mins(r.t), e = i + 1 < recs.length ? mins(recs[i + 1].t) : (date === ctx.today ? Math.max(s + 15, nowM) : 24 * 60);
+  const PIN = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON.pin + '</svg>';
+  // 이동 일정에서 위치 열 조각 계산: 그날 이동(확정·계획, 지난 계획은 확정으로 침) + 직전 이동(최근 7일)의 도착지
+  function placeInfo(date, nowM) {
+    const isMv = (p) => p.bk === '이동' && (p.from || p.to), all = (ctx.plans || []).filter(isMv);
+    const moves = all.filter((p) => p.date === date).map((p) => ({ s: mins(p.s), e: mins(p.e), from: p.from, to: p.to, tentative: planState(p) === 'tentative' }));   // 확정 전(지난 계획 포함)은 점선 — 실제로 갔는지 모르는 것을 실선으로 단정하지 않는다
+    const prev = all.filter((p) => p.date < date && p.date >= addDays(date, -7) && p.to).sort((a, b) => (a.date + a.e).localeCompare(b.date + b.e)).pop();
+    return placeSegments({ moves, recs: v60.place?.[date] || [], prevTo: prev?.to || '', prevTentative: !!prev && planState(prev) === 'tentative', nowM, isToday: date === ctx.today });
+  }
+  function placeLane(date, PX, nowM, narrow) {
+    const lane = el('div', undefined, 'pl-lane' + (narrow ? ' narrow' : '')); lane.setAttribute('aria-label', '있던 곳');
+    const info = placeInfo(date, nowM);
+    for (const d of info.derived) {   // 이동 일정에서 계산한 막대(고칠 수 없음 — 이동 일정 블록에서 고친다)
+      const seg = el('div', undefined, 'pl-place derived ' + (d.kind === 'move' ? 'mv' : 'grp') + (d.tentative ? ' plan' : '') + (d.inferred ? ' inferred' : '')); seg.style.top = d.s * PX + 'px'; seg.style.height = Math.max(16, (d.e - d.s) * PX - 2) + 'px';
+      const small = narrow || (d.e - d.s) * PX < 30, line = el('span');
+      const pin = () => { const i = el('i', undefined, 'pl-pin'); i.innerHTML = PIN; return i; };
+      if (d.kind === 'move') { line.append(pin()); if (!small) { line.append(document.createTextNode(d.from || ''), el('b', '→'), pin(), document.createTextNode(d.to || '')); } } else { line.append(pin()); if (!small) line.append(document.createTextNode(d.label)); }
+      if (small && narrow && (d.e - d.s) * PX >= 60) { const v = el('em', d.kind === 'move' ? d.label : d.label, 'pl-vtext'); line.append(v); }
+      seg.append(line);
+      const why = d.kind === 'move' ? '이동 일정' : d.inferred ? '직전 이동의 도착지' : '이동 일정의 도착지';
+      seg.title = `${hm(d.s)}–${hme(d.e)} ${d.label} — ${why}${d.tentative ? '(미확정)' : ''}에서 예상한 위치예요. 실제 위치는 「지금 위치」 기록이 우선이에요.`; seg.setAttribute('role', 'img'); seg.setAttribute('aria-label', seg.title); lane.append(seg);
+    }
+    const recs = info.rec;
+    recs.forEach(({ s, e, r }) => {
       const seg = el('div', undefined, 'pl-place' + (r.p === '이동 중' ? ' move' : '')); seg.style.top = s * PX + 'px'; seg.style.height = Math.max(16, (e - s) * PX - 2) + 'px';
-      seg.append(el('span', r.p)); seg.title = `${r.t}부터 ${r.p} — 누르면 이 기록 지우기`; seg.tabIndex = 0; seg.setAttribute('role', 'button'); seg.setAttribute('aria-label', `${r.t} ${r.p} 기록 지우기`);
+      seg.append(el('span', narrow ? '' : r.p)); if (narrow) { const i = el('i', undefined, 'pl-pin'); i.innerHTML = PIN; seg.firstChild.append(i); if ((e - s) * PX >= 60) seg.firstChild.append(el('em', r.p, 'pl-vtext')); } seg.title = `${r.t}부터 ${r.p} — 누르면 이 기록 지우기`; seg.tabIndex = 0; seg.setAttribute('role', 'button'); seg.setAttribute('aria-label', `${r.t} ${r.p} 기록 지우기`);
       const rm = () => { if (!confirm(`${r.t} ${r.p} 기록을 지울까요?`)) return; save((s) => { const list = s.place?.[date] || []; const i = list.findIndex((x) => x.t === r.t && x.p === r.p); if (i >= 0) list.splice(i, 1); }); };
       seg.onclick = rm; seg.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); rm(); } }; lane.append(seg);
     });
@@ -892,7 +957,8 @@ export function createPlan(app) {
     return { pop, close };
   }
   // 저장된 계획 지우기 — 한 번 누르면 지우고, 서버가 지운 뒤에 「되돌리기」 토스트(약 10초). 실패하면 아무 일도 없던 것으로 두고 이유만 알림(서버 메시지)
-  async function removePlan(p) {
+  async function removePlan(p, noAsk) {
+    if (!noAsk && planState(p) === 'confirmed' && (planEndMs(p) ?? Infinity) <= Date.now() && !confirm('이미 지난 확정 일정은 기록이에요. 정말 지울까요?\n지운 뒤 10초 동안은 되돌릴 수 있어요.')) return false;
     keepDay();
     const r = await ctx.deletePlan?.(p.id);
     if (r === false) return false;
@@ -937,7 +1003,7 @@ export function createPlan(app) {
   // 스위치 처음 값 = 계획 모드(켜짐 → 계획, 꺼짐 → 확정 — 추천에서 넣을 때도 같다), 스위치를 바꾸면 계획 모드도 같이 바뀐다. 계획은 점선 블록(미확정), 확정은 종류(고정·공부·과제)를 골라 그 모양으로.
   // 이미 있는 계획(미확정)은 [확정] 버튼으로 확정 일정이 된다 — 확정하면 채우기·다시 짜기가 건드리지 않는다.
   function planPopup(card, date, startMin, anchor, at, pickDate, existing, preset) {
-    const tentativeNow = existing && planState(existing) === 'tentative';
+    const tentativeNow = existing && planState(existing) === 'tentative', lapsed = !!existing && planLapsed(existing, Date.now());
     const { pop, close } = mkPop('form', '', existing ? '일정 고치기' : `${date} 일정 넣기`, anchor);
     let isTent = existing ? !!tentativeNow : planMode;   // 이 창에서 넣는 방식(새 일정만 바꿀 수 있음). 추천에서 넣을 때도 모드를 따른다(꺼짐 = 확정, 켜짐 = 계획)
     let bk = existing ? planBk(existing) : '공부';
@@ -949,7 +1015,7 @@ export function createPlan(app) {
     // 넣는 방식 스위치(새 일정만)
     const swRow = el('div', undefined, 'pl-prow'), swPick = el('div', undefined, 'pl-pick'), swBtns = [];
     swPick.setAttribute('role', 'group'); swPick.setAttribute('aria-label', '넣는 방식');
-    for (const k of ['계획', '확정']) { const b = el('button', k); b.type = 'button'; b.dataset.mode = k; b.onclick = () => { const was = isTent; isTent = k === '계획'; planMode = isTent; if (was !== isTent) { if (isTent) mvTent = bk === '이동'; else if (mvTent) bk = '이동'; } syncModeBtn(); paint(); }; swBtns.push(b); swPick.append(b); }
+    for (const k of ['계획', '확정']) { const b = el('button', k); b.type = 'button'; b.dataset.mode = k; b.onclick = () => { if (b.disabled) return; const was = isTent; isTent = k === '계획'; planMode = isTent; if (was !== isTent) { if (isTent) mvTent = bk === '이동'; else if (mvTent) bk = '이동'; } syncModeBtn(); paint(); }; swBtns.push(b); swPick.append(b); }
     swRow.append(el('span', '방식'), swPick); if (!existing) pop.append(swRow);
     const sel = el('select'); sel.setAttribute('aria-label', '과목'); for (const c of ctx.courses || []) sel.append(Object.assign(el('option', c), { value: c }));
     const note = el('input'); note.maxLength = 80; note.setAttribute('aria-label', '할 일');
@@ -986,8 +1052,16 @@ export function createPlan(app) {
     const autoName = () => { const n = moveName(fromIn.value, toIn.value); if (!note.value.trim() || note.value === noteAuto) { note.value = n; } noteAuto = n; };
     fromIn.oninput = autoName; toIn.oninput = autoName;
     if (existing?.bk === '이동') { fromIn.value = existing.from || ''; toIn.value = existing.to || ''; est.checked = existing.est === true; noteAuto = moveName(existing.from, existing.to); const l = mins(existing.e) - mins(existing.s); if (MOVE_LENS.includes(l)) mvLen.value = String(l); else { mvLen.value = 'x'; mvCustom.value = String(l); } } else mvLen.value = '10';
+    // 지난 시각: 끝 시각이 지났으면 계획으로 넣을 수 없다(서버도 같은 기준 — 이미 끝난 일은 확정=기록만)
+    const endPast = () => { const d = pickDate ? dIn.value || date : date; if (!d || !st.value) return false; const l = moveNow() ? Number(mvLen.value === 'x' ? mvCustom.value : mvLen.value) : Number(len.value); return msOf(d, mins(st.value) + (Number.isFinite(l) ? l : 0)) <= Date.now(); };
+    const movedFromSaved = () => { if (!existing) return true; const d = pickDate ? dIn.value || date : date, l = moveNow() ? Number(mvLen.value === 'x' ? mvCustom.value : mvLen.value) : Number(len.value), sNow = mins(st.value); return d !== existing.date || hm(sNow) !== existing.s || hm(sNow + (Number.isFinite(l) ? l : 0)) !== existing.e; };   // 서버와 같은 비교: 날짜·시각이 그대로면 지난 계획의 다른 칸은 고칠 수 있다
+    for (const x of [dIn, st, len, mvCustom]) { x.addEventListener('input', () => paint()); x.addEventListener('change', () => paint()); }
+    const pastNote = el('small', '', 'pl-popnote'); pastNote.setAttribute('role', 'status'); pastNote.setAttribute('aria-live', 'polite');
     const hint = el('small', '', 'pl-popnote'); hint.setAttribute('role', 'status'); hint.setAttribute('aria-live', 'polite');   // 스위치를 바꾸면 안내가 바뀐다 — 화면낭독도 읽게
     const paint = () => {
+      const past = endPast();
+      if (!existing && past && isTent) { isTent = false; if (mvTent) bk = '이동'; }   // 지난 시각은 계획 불가 → 확정으로(스위치도 따라 바뀐다)
+      swBtns[0].disabled = !existing && past;
       const isMove = moveNow();
       const showBk = true, fixed = !isMove && !(isTent && !existing) && bk === '고정';
       const newTent = isTent && !existing;
@@ -1006,13 +1080,15 @@ export function createPlan(app) {
       hint.textContent = isMove ? (isTent ? '이동 계획이에요 — 점선으로 보이고 눌러서 확정할 수 있어요. 채우기·다시 짜기는 이 자리를 피해서 짜요. 캘린더에는 넣지 않아요.' : '확정 이동 일정이에요 — 움직이지 않는 일정으로 보고 채우기·다시 짜기가 피해서 짜요. 소요를 모르면 추정을 켜요. 캘린더에는 넣지 않아요.') : isTent ? '계획이에요 — 점선으로 보이고 눌러서 확정할 수 있어요. 채우기·다시 짜기는 이 자리를 피해서 짜요. 지우려면 삭제.' : `확정 ${bk} 일정이에요 — 채우기·다시 짜기가 건드리지 않아요.`;
       for (const b of [fromIn, toIn, mvCustom]) b.disabled = !isMove;
       if (pop.isConnected && pos) placePop(pop, pos.x, pos.y);
-      if (ok) ok.textContent = existing ? '저장' : isTent ? '계획으로 넣기' : '확정으로 넣기';
+      if (ok) { ok.textContent = existing ? '저장' : isTent ? '계획으로 넣기' : '확정으로 넣기'; ok.disabled = !!existing && isTent && past && movedFromSaved(); }
+      pastNote.textContent = past ? (!existing ? '이미 지난 시각이라 계획으로 넣을 수 없어요 — 지난 일정은 확정(기록)으로만 넣어요.' : isTent ? (lapsed ? '지난 계획이에요. 실제로 했는지는 기록돼 있지 않아요 — 아래에서 정해 주세요.' : '지난 시각엔 계획으로 둘 수 없어요 — 시각을 고치거나 확정해 주세요.') : '지난 확정 일정은 기록이에요. 삭제하면 한 번 더 물어봐요.') : (isTent ? '' : '미래 확정은 바뀔 수 있어요 — 시각·길이·종류를 고치거나 삭제할 수 있어요.');
     };
     const ok = el('button', existing ? '저장' : '넣기'); ok.type = 'submit'; const no = el('button', '닫기', 'ghost'); no.type = 'button'; no.onclick = close;
-    pop.append(mvTop, sel, note, st, len, mvBot, hint);
+    pop.append(mvTop, sel, note, st, len, mvBot, hint, pastNote);
     const act = el('div', undefined, 'pl-act');
     let confirmBtn = null;
-    if (tentativeNow) { confirmBtn = el('button'); confirmBtn.type = 'button'; confirmBtn.innerHTML = svg(ICON.check); confirmBtn.append(el('span', '확정')); act.append(confirmBtn); ok.classList.add('ghost'); }
+    if (tentativeNow) { confirmBtn = el('button'); confirmBtn.type = 'button'; confirmBtn.innerHTML = svg(ICON.check); confirmBtn.append(el('span', lapsed ? '했어요' : '확정')); if (lapsed) confirmBtn.setAttribute('aria-label', '계획대로 했어요 — 확정으로 기록'); act.append(confirmBtn); ok.classList.add('ghost'); }
+    if (lapsed) { const nope = el('button'); nope.type = 'button'; nope.className = 'danger'; nope.innerHTML = svg(ICON.trash); nope.append(el('span', '안 했어요')); nope.setAttribute('aria-label', '안 했어요 — 이 계획 지우기'); nope.title = '지운 뒤 10초 동안 되돌릴 수 있어요'; nope.onclick = async () => { nope.disabled = true; const r = await removePlan(existing, true); if (r === false) nope.disabled = false; else close(); }; act.append(nope); }
     act.append(ok);
     if (existing) { const del = el('button'); del.type = 'button'; del.className = 'danger'; del.innerHTML = svg(ICON.trash); del.append(el('span', '삭제')); del.setAttribute('aria-label', '이 일정 삭제'); del.title = '삭제 — 지운 뒤 10초 동안 되돌릴 수 있어요';
       del.onclick = async () => { del.disabled = true; const r = await removePlan(existing); if (r === false) del.disabled = false; else close(); }; act.append(del); }
@@ -1161,10 +1237,10 @@ export function createPlan(app) {
   }
   const WHAT = { plan: '고치기·삭제', class: '출석·이해도·시작·종료', cal: '시각 고치기', auto: '계획으로 넣기·숨기기', work: '내용 보기', exam: '내용 보기', sleep: '내용 보기·목표 바꾸기' };
   function blockEl(b, PX, now) {
-    const cat = blockCat(b), sub = b.k === 'auto' ? ' · 추천' : b.k === 'sleep' ? (b.sleep.state === 'plan' ? ' · 목표' : '') + (b.sleep.contPrev ? ' · 전날에서 이어짐' : '') + (b.sleep.contNext ? ' · 다음 날로 이어짐' : '') : '';
-    const blk = el('div', undefined, `pl-blk k-${b.k} ${cat ? CAT_CLASS[cat] : 'c-unknown'}` + (b.k === 'sleep' ? ` sleep-${b.sleep.state}` : '') + (now >= 0 && b.e <= now ? ' past' : '')); blk.style.top = b.s * PX + 'px'; blk.style.height = Math.max(14, (b.e - b.s) * PX - 2) + 'px';
+    const cat = blockCat(b), sub = b.k === 'auto' ? ' · 추천' : b.lapsed ? ' · 수행 확인 필요 · 했어요?' : b.k === 'sleep' ? (b.sleep.state === 'plan' ? ' · 목표' : '') + (b.sleep.contPrev ? ' · 전날에서 이어짐' : '') + (b.sleep.contNext ? ' · 다음 날로 이어짐' : '') : '';
+    const blk = el('div', undefined, `pl-blk k-${b.k} ${cat ? CAT_CLASS[cat] : 'c-unknown'}` + (b.k === 'sleep' ? ` sleep-${b.sleep.state}` : '') + (b.lapsed ? ' lapsed' : '') + (now >= 0 && b.e <= now ? ' past' : '')); blk.style.top = b.s * PX + 'px'; blk.style.height = Math.max(14, (b.e - b.s) * PX - 2) + 'px';
     if (b.cols > 1) { blk.dataset.n = b.cols; blk.style.setProperty('--n', b.cols); blk.style.setProperty('--c', b.col); }   // 겹치는 무리는 열로 나눠 옆으로
-    const line = el('span'); line.append(el('i', cat || '?', 'pl-tag'), document.createTextNode(b.title)); blk.append(line);
+    const line = el('span'); line.append(el('i', b.lapsed ? '지난 계획' : cat || '?', 'pl-tag'), document.createTextNode(b.title)); blk.append(line);
     if ((b.e - b.s) * PX > 34) blk.append(el('small', `${hm(b.s)}–${hme(b.e)}${sub}`)); blk.title = `${cat ? CAT_NAME[cat] : '종류 모름'} · ${hm(b.s)}–${hme(b.e)} ${b.title}`;
     // 누르면 종류별 창(대표님 10/9 「시간블럭 누르면 수정할 수가 없는데」): 계획 = 고치기·확정·삭제, 수업 = 출석·이해도·시작·종료, 캘린더 = 시각 고치기,
     // 추천 = 계획으로 넣기·숨기기, 고정 일정·시험 = 내용 보기
@@ -1183,7 +1259,7 @@ export function createPlan(app) {
     if (!open) { box.className = 'pl-legend-off'; box.append(toggle); return box; }
     box.className = 'pl-legend'; box.setAttribute('role', 'group'); box.setAttribute('aria-label', '블록 종류 범례');
     for (const c of CATS) { const it = el('span', undefined, 'pl-leg'); it.title = CAT_MEANS[c]; it.append(el('i', undefined, 'pl-sw ' + CAT_CLASS[c]), el('span', `${CAT_NAME[c]} ${c === '계획' ? '(미확정)' : ''}`.trim())); box.append(it); }
-    box.append(toggle);
+    box.append(el('span', '계획 → 확정 → 지나면 기록 · 미래 확정은 바뀔 수 있어요', 'pl-flow'), toggle);
     return box;
   }
   // 일정 목록: 짧거나 겹쳐서 누르기 힘든 블록도 44px 줄로 누를 수 있게(터치·키보드·화면낭독 경로)
@@ -1269,7 +1345,7 @@ export function createPlan(app) {
       grid.onclick = (e) => {   // 빈칸 누르면 그 시각에 일정(공부 계획) 넣기(대표님 10/9)
         if (e.target.closest('.pl-blk, .pl-place, .pl-lane, .pl-now')) return;
         const r = grid.getBoundingClientRect(), m = Math.max(0, Math.min(23 * 60 + 30, Math.floor(((e.clientY - r.top) / PX) / 30) * 30));
-        if (day < ctx.today || (day === ctx.today && m + 30 <= nowMin())) { app.status?.('지난 시각엔 계획을 못 넣어요.', true); return; }
+        if (day < ctx.today || (day === ctx.today && m + 30 <= nowMin())) { app.status?.('지난 시각엔 계획을 못 넣어요. 지난 일정은 + 버튼으로 확정해 넣어요.', true); return; }
         planPopup(card, day, day === ctx.today ? Math.max(m, Math.ceil(nowMin() / 10) * 10) : m, grid, { x: e.clientX, y: e.clientY });
       };
       grid.append(placeLane(day, PX, now));   // 오른쪽 여백: 있던 곳
@@ -1305,11 +1381,12 @@ export function createPlan(app) {
       const col = el('div', undefined, 'pl-wkcol' + (isToday ? ' today' : '') + (exams.length ? ' exam' : '')); col.style.height = 24 * 60 * PX + 'px'; col.dataset.date = date;
       for (let hh = 1; hh < 24; hh++) { const l = el('div', undefined, 'pl-wkline'); l.style.top = hh * 60 * PX + 'px'; col.append(l); }
       for (const b of layoutColumns(isToday ? [...todayFixed, ...todayPlan.out] : fixedBlocks(date))) col.append(blockEl(b, PX, isToday ? nowM : (date < ctx.today ? 1e9 : -1)));
+      { const lane = placeLane(date, PX, nowM, true); if (lane.children.length) { col.classList.add('has-lane'); col.append(lane); } }
       if (isToday) { const n = el('div', undefined, 'pl-now'); n.style.top = nowM * PX + 'px'; col.append(n); }
       if (planMode && date >= ctx.today) col.onclick = (e) => {
-        if (e.target.closest('.pl-blk')) return;
+        if (e.target.closest('.pl-blk, .pl-lane')) return;
         const r = col.getBoundingClientRect(), m = Math.max(0, Math.min(23 * 60 + 30, Math.floor(((e.clientY - r.top) / PX) / 30) * 30));
-        if (date === ctx.today && m < nowMin()) { app.status?.('지난 시각엔 계획을 못 넣어요.', true); return; }
+        if (date === ctx.today && m + 30 <= nowMin()) { app.status?.('지난 시각엔 계획을 못 넣어요. 지난 일정은 + 버튼으로 확정해 넣어요.', true); return; }
         planPopup(card, date, m, col, { x: e.clientX, y: e.clientY });
       };
       body.append(col);
