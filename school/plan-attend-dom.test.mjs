@@ -124,11 +124,11 @@ attendImpl = async () => true;
   await plan.render(host, c3); await flush();
   const prev = () => host.querySelector('.pl-bar button[aria-label="전날"]');
   for (let i = 0; i < 3; i++) { click(prev()); await flush(); }   // 10/9(금)
-  assert.match(host.querySelector('.pl-schedule .pl-head small').textContent, /10\/09/);
+  assert.match(host.querySelector('.pl-bar .pl-today').textContent, /10\/9\(금\)/); assert.ok(host.querySelector('.pl-todaychip'), '오늘이 아닌 날엔 오늘 칩');
   await open(); assert.ok([...attBtns()].every((b) => !b.disabled), '지난날 출석 버튼 열림'); assert.ok(!document.querySelector('.pl-pop').textContent.includes('미래 수업'));
   attendImpl = async () => { await plan.render(host, c3); return true; };   // 저장하면 workspace 가 홈을 다시 그린다
   click(attBtns()[0]); await flush(); assert.deepEqual(lastAttend(), ['attend', 'c1', '2026-10-09', 'present']); assert.equal(msg().textContent, '출석 저장했어요');
-  assert.match(host.querySelector('.pl-schedule .pl-head small').textContent, /10\/09/, '저장 뒤에도 보던 날(지난날) 유지'); closePop(); attendImpl = async () => true;
+  assert.match(host.querySelector('.pl-bar .pl-today').textContent, /10\/9\(금\)/, '저장 뒤에도 보던 날(지난날) 유지'); closePop(); attendImpl = async () => true;
 }
 
 // 8. 내일(10/13 화) — 날짜가 미래라 닫혀 있고, 이유 안내가 날짜와 함께 보이며, 눌러도 요청이 가지 않음. 휴강 표시는 가능(실패하면 이유가 보임)

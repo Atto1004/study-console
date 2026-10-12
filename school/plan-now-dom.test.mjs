@@ -38,17 +38,21 @@ const workBlk = () => [...host.querySelectorAll('.pl-blk')].find((b) => b.textCo
 
 // 1. 근로 시간 안(14:00): 「근로 중」, 경과·남음, 버튼 3개(재생은 꺼짐)
 await show();
-assert.equal(st(), '근로 중'); assert.match(bar().querySelector('.pl-nowmeta').textContent, /1시간 경과.*1시간 남음/); assert.match(bar().textContent, /근로장학/);
-assert.equal(btn('재생').disabled, true); assert.equal(btn('정지').disabled, false); assert.equal(btn('종료').disabled, false);
+assert.equal(st(), '근로장학 근로 중'); assert.match(bar().querySelector('.pl-nowmeta').textContent, /1시간 경과.*1시간 남음/); assert.match(bar().textContent, /근로장학/);
+assert.equal(btn('재생'), undefined, '근무엔 재생 없음'); assert.equal(btn('정지'), undefined, '근무엔 정지 없음(쉬어도 근무 시간은 그대로)'); assert.equal(btn('종료').disabled, false);
 assert.equal(bar().querySelector('.pl-nowact').getAttribute('role'), 'group');
 for (const b of bar().querySelectorAll('.pl-nowib')) assert.ok(b.getAttribute('aria-label') && b.querySelector('svg'), '아이콘 버튼 + aria-label');
-// 2. 정지 → 「정지 중」, 쉰 시간 기록(앱 상태 v60.actual 에만), 재생 → 이어짐
+// 2. 공부 일정만 정지·재생(한 버튼이 토글): 정지 → 「정지 중」+ 재생 아이콘, 쉰 시간 기록(앱 상태 v60.actual 에만), 재생 → 이어짐
+const study = { routine: { grid: {} }, plans: [{ id: 'p1', date: '2026-10-12', s: '13:00', e: '15:00', courseId: 'c1', kind: '공부', state: 'confirmed', bk: '공부' }] };
+serverState = { v60: {} }; await show(study); const sst = () => st();
+assert.match(sst(), /공부 중$/); assert.equal(btn('재생'), undefined); assert.equal(bar().querySelectorAll('.pl-nowib').length, 2, '토글 1 + 종료 1');
 click(btn('정지')); await flush();
-assert.equal(st(), '정지 중'); const key = Object.keys(serverState.v60.actual)[0]; assert.match(key, /^work:w1\|2026-10-12$/, '키 = 종류:id|날짜');
-assert.deepEqual(serverState.v60.actual[key].pauses.map(({ from, to }) => ({ from, to })), [{ from: '14:00', to: null }]); assert.ok(serverState.v60.actual[key].pauses[0].id, '구간 id');
-assert.equal(btn('재생').disabled, false); assert.equal(btn('정지').disabled, true);
+assert.match(sst(), /정지 중$/); const skey = Object.keys(serverState.v60.actual)[0]; assert.match(skey, /^plan:p1\|2026-10-12$/, '키 = 종류:id|날짜');
+assert.deepEqual(serverState.v60.actual[skey].pauses.map(({ from, to }) => ({ from, to })), [{ from: '14:00', to: null }]); assert.ok(serverState.v60.actual[skey].pauses[0].id, '구간 id');
+assert.ok(btn('재생') && !btn('정지'), '같은 자리에서 정지↔재생 토글');
 at(14, 7); click(btn('재생')); await flush();
-assert.equal(st(), '근로 중'); assert.deepEqual(serverState.v60.actual[key].pauses.map(({ from, to }) => ({ from, to })), [{ from: '14:00', to: '14:07' }]); assert.match(bar().textContent, /쉰 시간 7분/);
+assert.match(sst(), /공부 중$/); assert.deepEqual(serverState.v60.actual[skey].pauses.map(({ from, to }) => ({ from, to })), [{ from: '14:00', to: '14:07' }]); assert.match(bar().textContent, /쉰 시간 7분/);
+at(14, 0); serverState = { v60: {} }; await show(); const key = 'work:w1|2026-10-12';
 // 3. 종료(14:20): 확인창 → 블록이 14:20 까지로 줄고 「예정 15:00 → 실제 14:20」 표식, 토스트 되돌리기
 at(14, 20); confirms = []; click(btn('종료')); await flush();
 assert.equal(confirms.length, 1); assert.match(confirms[0], /14:20/); assert.match(confirms[0], /15:00/);
@@ -59,19 +63,19 @@ assert.equal(st(), '지금은 일정이 없어요', '종료한 일정은 되살�
 assert.equal(document.querySelector('.pl-toast').textContent.includes('예정 시각으로 되돌리기'), true);
 // 4. 되돌리기(토스트): 예정 시각으로 복원
 click(document.querySelector('.pl-toast button')); await flush();
-assert.equal(serverState.v60.actual[key].endAt, undefined); assert.ok(!workBlk().classList.contains('cut')); assert.equal(st(), '근로 중');
+assert.equal(serverState.v60.actual[key].endAt, undefined); assert.ok(!workBlk().classList.contains('cut')); assert.equal(st(), '근로장학 근로 중');
 // 5. 시작 5분 이내 종료는 한 번 더 확인
 serverState = { v60: {} }; at(13, 3); await show(); confirms = []; click(btn('종료')); await flush(); assert.equal(confirms.length, 2, '5분 이내: 확인 2번');
 // 6. 자동 전환: 예정 끝(15:00)을 지나면 손 없이 「일정 없음」+ 다음 일정
 serverState = { v60: {} }; await show({ routine: { grid: { 월: [{ id: 'w1', title: '근로장학', start: '13:00', end: '15:00', kind: 'work' }, { id: 'w2', title: '저녁 알바', start: '18:00', end: '20:00', kind: 'work' }] } } });
-at(14, 59); plan._paintNow(); assert.equal(st(), '근로 중'); at(15, 1); plan._paintNow(); assert.equal(st(), '지금은 일정이 없어요'); assert.match(bar().textContent, /다음 18:00 저녁 알바까지 2시간 59분/);
+at(14, 59); plan._paintNow(); assert.equal(st(), '근로장학 근로 중'); at(15, 1); plan._paintNow(); assert.equal(st(), '지금은 일정이 없어요'); assert.match(bar().textContent, /다음 18:00 저녁 알바까지 2시간 59분/);
 at(18, 30); plan._paintNow(); assert.equal(st(), '저녁 알바 중');
 // 7. 수업: 출석 전엔 「출석 확인」 + 버튼, 정상출석·지각 뒤 「수업 중」, 결석이면 진행 아님
 const cls = (status) => ({ scheduled: [{ id: 'a', courseId: 'c1', course: '정역학', date: '2026-10-12', s: '15:00', e: '16:30', room: '1공 409', record: status ? { status } : {} }], routine: { grid: {} } });
-at(15, 30); await show(cls('')); assert.equal(st(), '출석 확인'); assert.ok(btn('정역학 출석 처리') && btn('정역학 지각 처리'));
+at(15, 30); await show(cls('')); assert.equal(st(), '정역학 출석 확인'); assert.ok(btn('정역학 출석 처리') && btn('정역학 지각 처리'));
 assert.equal(btn('종료'), undefined, '출석 전엔 종료 버튼 없음');
 click(btn('정역학 출석')); await flush(); assert.deepEqual(calls.filter((c) => c[0] === 'c1').pop(), ['c1', '2026-10-12', 'present']);
-await show(cls('present')); assert.equal(st(), '수업 중'); await show(cls('late')); assert.equal(st(), '수업 중'); await show(cls('absent')); assert.equal(st(), '결석 처리됨');
+await show(cls('present')); assert.equal(st(), '정역학 수업 중'); await show(cls('late')); assert.equal(st(), '정역학 수업 중'); await show(cls('absent')); assert.equal(st(), '정역학 결석 처리됨');
 // 8. 수업 종료 = classLog.endedAt (수업 창의 시작/종료 대신 한 곳)
 serverState = { v60: {} }; at(16, 0); await show(cls('present')); click(btn('종료')); await flush();
 assert.equal(serverState.v60.classLog.a.endedAt, '16:00'); assert.equal(serverState.v60.classLog.a.date, '2026-10-12');
@@ -79,9 +83,9 @@ assert.ok(!serverState.v60.actual || !Object.keys(serverState.v60.actual).some((
 assert.ok([...host.querySelectorAll('.pl-blk.k-class')][0].classList.contains('cut'));
 // 9. 겹침: 수업(15:00 시작)과 근로(13:00–17:00) → 시작이 늦은 수업이 대표, 나머지 +1
 serverState = { v60: {} }; at(15, 30); await show({ ...cls('present'), routine: { grid: { 월: [{ id: 'w1', title: '근로장학', start: '13:00', end: '17:00', kind: 'work' }] } } });
-assert.equal(st(), '수업 중'); assert.equal(bar().querySelector('.pl-nowmore').textContent, '+1');
+assert.equal(st(), '정역학 수업 중'); assert.equal(bar().querySelector('.pl-nowmore').textContent, '+1');
 // 10. 낡은 리비전(409) 뒤 다시 적용: 정지는 한 구간만(겹침·중복 없음)
-serverState = { v60: {} }; at(14, 0); await show(); conflictOnce = true; click(btn('정지')); await flush(20);
+serverState = { v60: {} }; at(14, 0); await show(study); conflictOnce = true; click(btn('정지')); await flush(20);
 { const k = Object.keys(serverState.v60.actual)[0]; assert.equal(serverState.v60.actual[k].pauses.length, 1, '409 재적용 뒤에도 정지 구간 1개'); assert.equal(serverState.v60.actual[k].pauses[0].to, null); }
 // 11. 다른 화면이 먼저 다른 시각(14:10)으로 끝냈으면 덮어쓰지 않고 알리며, 되돌리기 토스트도 만들지 않는다
 serverState = { v60: {} }; at(14, 5); await show(); calls.length = 0; document.querySelector('.pl-toast')?.remove();
@@ -92,9 +96,9 @@ serverState = { v60: {} }; at(14, 20); await show(); click(btn('종료')); await
 serverState.v60.actual['work:w1|2026-10-12'].endAt = '14:30'; conflictOnce = true; calls.length = 0; click(document.querySelector('.pl-toast button')); await flush(20);
 assert.equal(serverState.v60.actual['work:w1|2026-10-12'].endAt, '14:30', '남의 기록은 되돌리기가 지우지 않음');
 // 13. 결석·공결: 상태 문구만, 정지·종료 버튼 없음
-at(15, 30); await show(cls('absent')); assert.equal(st(), '결석 처리됨'); assert.equal(bar().querySelectorAll('button').length, 0, '결석엔 버튼 없음'); await show(cls('excused')); assert.equal(st(), '공결 처리됨'); assert.equal(bar().querySelectorAll('button').length, 0);
+at(15, 30); await show(cls('absent')); assert.equal(st(), '정역학 결석 처리됨'); assert.equal(bar().querySelectorAll('button').length, 0, '결석엔 버튼 없음'); await show(cls('excused')); assert.equal(st(), '정역학 공결 처리됨'); assert.equal(bar().querySelectorAll('button').length, 0);
 // 14. 출석 → 정지 → 결석·공결로 바뀌어도(열린 정지 구간이 남아도) 문구는 결석·공결
 serverState = { v60: { actual: { 'class:a|2026-10-12': { pauses: [{ id: 'p', from: '15:10', to: null }] } } } };
-for (const [s, label] of [['absent', '결석 처리됨'], ['excused', '공결 처리됨']]) { await show(cls(s)); assert.equal(st(), label, label + ' 가 정지 중보다 우선'); assert.equal(bar().querySelectorAll('button').length, 0); }
-await show(cls('present')); assert.equal(st(), '정지 중', '출석 상태면 정지 중');
+for (const [s, label] of [['absent', '결석 처리됨'], ['excused', '공결 처리됨']]) { await show(cls(s)); assert.equal(st(), '정역학 ' + label, label + ' 가 정지 중보다 우선'); assert.equal(bar().querySelectorAll('button').length, 0); }
+await show(cls('present')); assert.equal(st(), '정역학 수업 중', '수업은 정지할 수 없어 옛 정지 기록이 남아도 수업 중'); assert.ok(!/쉰 시간/.test(bar().textContent)); assert.equal(btn('재생'), undefined);
 console.log('plan-now-dom ok'); plan.destroy(); process.exit(0);

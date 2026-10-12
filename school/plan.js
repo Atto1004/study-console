@@ -441,7 +441,7 @@ button.pl-title.pl-edit:hover,button.pl-title.pl-edit:focus-visible{text-decorat
 .pl-num small{display:block;color:#6b7c73;font:500 12.5px "Pretendard Variable",Pretendard,system-ui,sans-serif}
 .pl-num b{display:block;margin-top:4px;font:800 19px/1.2 "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#14261f}
 .pl-bar{display:flex;align-items:center;gap:6px;margin-left:auto}
-.pl-bar .pl-today{height:40px;padding:0 14px;border-radius:10px;border:1px solid #d5ddd8;background:#fff;font:600 14px "Pretendard Variable",Pretendard,system-ui,sans-serif;cursor:pointer}
+.pl-bar .pl-todaychip{height:40px;padding:0 12px;border-radius:999px;border:1px solid #2e6b52;background:#eaf3ee;color:#1f4d3a;font:700 13px "Pretendard Variable",Pretendard,system-ui,sans-serif;cursor:pointer}.pl-bar .pl-today{min-width:84px;height:40px;padding:0 14px;border-radius:10px;border:1px solid #d5ddd8;background:#fff;font:600 14px "Pretendard Variable",Pretendard,system-ui,sans-serif;cursor:pointer}
 .pl-day{position:relative;height:min(62dvh,620px);overflow:auto;border:1px solid #edf1ee;border-radius:12px;overscroll-behavior:contain}
 .pl-grid{position:relative;margin-left:52px}
 .pl-hour{position:absolute;left:-52px;right:0;border-top:1px solid #f0f3f1;font:600 11.5px/1 "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#8a9a92}
@@ -897,13 +897,17 @@ export function createPlan(app) {
   }
   const nextBlock = (nowM) => fixedBlocks(ctx.today).filter((b) => !notDoable(b) && b.s > nowM).sort((a, b) => a.s - b.s)[0] || null;
   const shortName = (b) => String(b.title).replace(/\s*수업\s*$/, '');
+  // 상태 문구는 일정 이름이 앞에(대표님 10/12): 「정역학 수업 중」「근로장학 근로 중」「미적분 공부 중」. 이름이 이미 그 낱말로 끝나면 겹치지 않게 「중」만 붙인다
+  const withWord = (name, word) => (name.endsWith(word) ? `${name} 중` : `${name} ${word} 중`);
   function doingLabel(b, att) {
-    const cat = blockCat(b);
-    if (b.k === 'class') return att === 'present' || att === 'late' ? '수업 중' : att === 'absent' ? '결석 처리됨' : att === 'excused' ? '공결 처리됨' : '출석 확인';
-    if (cat === '이동') return '이동 중'; if (cat === '밥') return '식사 중'; if (cat === '준비') return '준비 중'; if (cat === '공부') return '공부 중'; if (cat === '과제') return '과제 중';
-    if (b.k === 'exam') return '시험 중'; if (/근로/.test(b.title)) return '근로 중';
-    return `${shortName(b)} 중`;
+    const cat = blockCat(b), name = shortName(b);
+    if (b.k === 'class') return att === 'present' || att === 'late' ? `${name} 수업 중` : att === 'absent' ? `${name} 결석 처리됨` : att === 'excused' ? `${name} 공결 처리됨` : `${name} 출석 확인`;
+    if (cat === '이동') return b.plan?.from || b.plan?.to ? `이동 중 · ${b.plan.from || '?'} → ${b.plan.to || '?'}` : '이동 중'; if (cat === '밥') return withWord(name, '식사'); if (cat === '준비') return withWord(name, '준비'); if (cat === '공부') return withWord(name, '공부'); if (cat === '과제') return withWord(name, '과제');
+    if (b.k === 'exam') return withWord(name, '시험'); if (/근로/.test(b.title)) return withWord(name, '근로');
+    return `${name} 중`;
   }
+  // 정지·재생은 공부·과제 일정에서만 뜻이 있다(수업·근무·이동은 멈춘다고 시간이 쉬지 않음)
+  const canPause = (b) => b.k === 'plan' && (blockCat(b) === '공부' || blockCat(b) === '과제');
   const lastPause = (b) => (b.pauses || [])[(b.pauses || []).length - 1];
   const openPause = (b) => { const l = lastPause(b); return l && l.to == null ? l : null; };
   const restMin = (b, nowM) => (b.pauses || []).reduce((n, p) => n + Math.max(0, (p.to == null ? nowM : mins(p.to)) - mins(p.from)), 0);
@@ -950,8 +954,8 @@ export function createPlan(app) {
       box.append(el('b', '지금은 일정이 없어요', 'pl-nowst'), el('span', nx ? `다음 ${hm(nx.s)} ${shortName(nx)}까지 ${dur(nx.s - nowM)}` : '오늘 남은 일정이 없어요', 'pl-nowmeta'));
       return box;
     }
-    const b = main, att = b.k === 'class' ? (b.cls.record?.status || '') : '', paused = !!openPause(b), attended = att === 'present' || att === 'late', notOn = b.k === 'class' && (att === 'absent' || att === 'excused'), label = paused && !notOn ? '정지 중' : doingLabel(b, att);
-    const el1 = nowM - b.s, left = b.e - nowM, rest = restMin(b, nowM), name = shortName(b), span = Math.max(1, b.e - b.s);
+    const b = main, att = b.k === 'class' ? (b.cls.record?.status || '') : '', paused = canPause(b) && !!openPause(b), attended = att === 'present' || att === 'late', notOn = b.k === 'class' && (att === 'absent' || att === 'excused'), label = paused && !notOn ? `${shortName(b)} 정지 중` : doingLabel(b, att);
+    const el1 = nowM - b.s, left = b.e - nowM, rest = canPause(b) ? restMin(b, nowM) : 0, name = shortName(b), span = Math.max(1, b.e - b.s);
     box.dataset.state = paused && !notOn ? 'paused' : b.k === 'class' && !attended ? 'wait' : 'run';
     const st = el('b', label, 'pl-nowst'); st.setAttribute('role', 'status'); st.setAttribute('aria-live', 'polite');
     const meta = el('span', `${name} · ${hm(b.s)}–${hme(b.e)}${b.plannedE ? ` (예정 ${hme(b.plannedE)})` : ''} · ${dur(el1)} 경과 · ${dur(left)} 남음${rest ? ` · 쉰 시간 ${dur(rest)}` : ''}`, 'pl-nowmeta');
@@ -977,9 +981,8 @@ export function createPlan(app) {
     const mk = (icon, lab, tip, fn, dis) => { const x = el('button', undefined, 'pl-ib pl-nowib'); x.type = 'button'; x.innerHTML = svg(ICON[icon]); x.setAttribute('aria-label', lab); x.title = tip; x.disabled = !!dis; x.onclick = () => { if (nowBusy) return; nowBusy = true; Promise.resolve(fn()).finally(() => { nowBusy = false; }); }; return x; };
     const act = el('span', undefined, 'pl-nowact'); act.setAttribute('role', 'group'); act.setAttribute('aria-label', '재생 · 정지 · 종료');
     const can = b.k !== 'exam' && !!b.akey;
-    act.append(mk('play', '재생 — 정지했던 것을 이어요', '재생 — 정지했던 것을 이어요', () => doResume(b), !can || !paused),
-      mk('pause', '정지 — 잠깐 쉬어요(쉰 시간으로 기록, 블록은 그대로)', '정지 — 잠깐 쉬어요. 블록 시간은 줄지 않아요', () => doPause(b), !can || paused),
-      mk('stop', '종료 — 지금 끝내요(시간표 블록이 지금까지로 줄어요)', '종료 — 지금을 실제 끝으로 기록하고 블록을 줄여요', () => doEnd(b), !can));
+    if (canPause(b)) act.append(paused ? mk('play', '재생 — 정지했던 것을 이어요', '재생 — 정지했던 것을 이어요(쉰 시간은 기록돼요)', () => doResume(b), !can) : mk('pause', '정지 — 잠깐 쉬어요(쉰 시간으로 기록, 블록은 그대로)', '정지 — 딴짓·자리 비움. 블록 시간은 줄지 않아요', () => doPause(b), !can));
+    act.append(mk('stop', '종료 — 지금 끝내요(시간표 블록이 지금까지로 줄어요)', '종료 — 지금을 실제 끝으로 기록하고 블록을 줄여요', () => doEnd(b), !can));
     box.append(act, msg); return box;
   }
   function paintNow() {
@@ -1721,9 +1724,14 @@ export function createPlan(app) {
     const card = el('section', undefined, 'pl-card pl-schedule'); card.setAttribute('aria-label', '시간표');
     const isWeek = view === 'week', isExam = view === 'exam', ws = weekStart(day), end = examEnd();
     const head = el('div', undefined, 'pl-head');
-    head.append(el('h2', '시간표'), el('small', isExam ? `오늘 ~ ${end.slice(5).replace('-', '/')}(${wd(end)}) 시험 끝까지` : isWeek ? `${ws.slice(5).replace('-', '/')}(월) ~ ${addDays(ws, 6).slice(5).replace('-', '/')}(일)${ws === weekStart(ctx.today) ? ' · 이번 주' : ''}` : `${day.slice(5).replace('-', '/')}(${wd(day)})${day === ctx.today ? ' · 오늘' : ''}`));
+    head.append(el('h2', 'ALiVEWEEK'));
     const bar = el('div', undefined, 'pl-bar');
-    const prev = ib('prev', isWeek ? '지난주' : '전날'), next = ib('next', isWeek ? '다음 주' : '다음 날'), today = el('button', '오늘', 'pl-today'); today.type = 'button';
+    const prev = ib('prev', isWeek ? '지난주' : '전날'), next = ib('next', isWeek ? '다음 주' : '다음 날'), today = el('button', undefined, 'pl-today'); today.type = 'button';
+    // 가운데 버튼 = 보고 있는 날짜(구글 캘린더의 날짜 표시줄 + 「오늘」 칩). 오늘이 아닌 날을 볼 때만 옆에 「오늘」 칩이 떠서 바로 돌아간다
+    const dl = (d) => `${Number(d.slice(5, 7))}/${Number(d.slice(8))}(${wd(d)})`, rl = (a, b2) => `${Number(a.slice(5, 7))}/${Number(a.slice(8))}–${Number(b2.slice(5, 7))}/${Number(b2.slice(8))}`;
+    const shown = isExam ? rl(ctx.today, end) : isWeek ? rl(ws, addDays(ws, 6)) : dl(day), onToday = isExam || (isWeek ? ws === weekStart(ctx.today) : day === ctx.today);
+    today.textContent = shown; today.setAttribute('aria-label', `${isExam ? '시험 끝까지' : isWeek ? '이번 주로' : '오늘로'} 가기 · 지금 보는 곳 ${shown}`); today.title = isExam ? '시험 끝까지 보는 중' : isWeek ? '눌러 이번 주로' : '눌러 오늘로';
+    const chip = el('button', isWeek ? '이번 주' : '오늘', 'pl-todaychip'); chip.type = 'button'; chip.setAttribute('aria-label', isWeek ? '이번 주로 돌아가기' : '오늘로 돌아가기');
     const seg = el('div', undefined, 'pl-seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', '보기');
     for (const v of ['day', 'week', 'exam']) {
       const b = el('button', undefined, 'pl-ib'); b.type = 'button'; b.innerHTML = svg(ICON_VIEW[v]); b.setAttribute('aria-label', VIEW_NAME[v]); b.title = VIEW_NAME[v]; b.setAttribute('aria-pressed', String(view === v));
@@ -1731,14 +1739,14 @@ export function createPlan(app) {
     }
     const replan = ib('replan', '다시 짜기 — 과제를 빈 시간에 다시 배치', 'go');
     prev.onclick = () => { day = addDays(day, isWeek ? -7 : -1); draw(); }; next.onclick = () => { day = addDays(day, isWeek ? 7 : 1); draw(); };
-    today.onclick = () => { day = ctx.today; userScroll = 0; innerKey = ''; innerReset = true; draw(); };
+    today.onclick = chip.onclick = () => { day = ctx.today; userScroll = 0; innerKey = ''; innerReset = true; draw(); };
     replan.onclick = () => { draw(); app.status?.('빈 시간에 다시 짰어요.'); };
     const fill = el('button', '채우기', 'pl-mode pl-fill'); fill.type = 'button'; fill.title = '고정 일정은 그대로, 빈 시간에만 공부 계획 자동 계산해 넣기';
     fill.onclick = () => { const ds = []; if (isExam) { for (let d = ctx.today; d <= end; d = addDays(d, 1)) ds.push(d); } else if (isWeek) { for (let i = 0; i < 7; i++) ds.push(addDays(ws, i)); } else ds.push(day); runFill(ds, all); };
     const pm = el('button', '계획 모드', 'pl-mode'); pm.type = 'button'; pm.setAttribute('aria-pressed', String(planMode)); pm.title = '켜면 새로 넣는 일정이 계획(미확정, 점선)이 되고 끄면 확정 일정이 돼요. 한 주·시험까지 보기에서는 켠 채로 빈 칸을 눌러 넣어요.';
     pm.onclick = () => { planMode = !planMode; modeBtn = pm; draw(); }; modeBtn = pm;
     const more = ib('more', '시간표 메뉴 — 채운 것 지우기·숨긴 추천'); more.setAttribute('aria-haspopup', 'dialog'); more.onclick = (e) => menuPopup(more, ws, e);
-    bar.append(...(isExam ? [today, seg] : [prev, today, next, seg]), pm, fill, replan, more);
+    bar.append(...(isExam ? [today, seg] : onToday ? [prev, today, next, seg] : [prev, today, next, chip, seg]), pm, fill, replan, more);
     head.append(bar); card.append(head);
     if (!isWeek && !isExam) card.append(weekStrip());
     card.append(legend());
