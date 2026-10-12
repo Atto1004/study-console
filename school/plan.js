@@ -573,6 +573,11 @@ button.pl-title.pl-edit:hover,button.pl-title.pl-edit:focus-visible{text-decorat
 .pl-night-act{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px}.pl-night button{min-height:44px;padding:0 18px;border-radius:12px;border:1px solid #6b8197;background:#1d3040;color:#fff;font:700 14px "Pretendard Variable",Pretendard,system-ui,sans-serif;cursor:pointer}.pl-night button.ghost{background:transparent}
 .pl-mv{display:flex;flex-direction:column;gap:6px}.pl-mvest{display:flex;align-items:center;gap:6px;min-height:44px;font:500 13px/1.3 "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#2f4036}.pl-pop .pl-mvest input{width:22px!important;height:22px!important;padding:0!important;flex:none}.pl-pop .pl-mvplaces button{min-height:38px}
 .pl-pop .pl-attmsg.bad{color:#b3261e;font-weight:600}.pl-pick button[aria-busy=true]{opacity:.6}
+.pl-nowdo{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px;padding:6px 12px;min-height:56px;border:1px solid #cfdcd5;border-radius:12px;background:#fff}
+.pl-nowdo.idle{background:#f6f8f7;border-color:#e1e8e4}.pl-nowst{font:800 15px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#14261f}.pl-nowdo[data-state=paused] .pl-nowst{color:#8a5a00}.pl-nowdo[data-state=wait] .pl-nowst{color:#2c4a6e}
+.pl-nowmeta{font:500 13px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#3d4f46}.pl-nowprog{flex:1 1 120px;min-width:80px;height:6px;border-radius:3px;background:#e4ece7;overflow:hidden}.pl-nowprog>i{display:block;height:100%;background:#2f7d5b}
+.pl-nowmore{font:700 12px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#4b6358;background:#eef2ef;border-radius:999px;padding:3px 8px}.pl-nowact,.pl-nowatt{display:inline-flex;gap:6px;margin-left:auto}.pl-nowdo .pl-nowib{width:44px;height:44px}.pl-nowbtn{min-height:44px;min-width:56px;padding:0 14px;border-radius:999px;border:1px solid #2f7d5b;background:#fff;color:#14261f;font:700 13.5px "Pretendard Variable",Pretendard,system-ui,sans-serif}.pl-nowmsg{flex-basis:100%;color:#8f2a18;font:500 12px "Pretendard Variable",Pretendard,system-ui,sans-serif}.pl-nowmsg:empty{display:none}
+.pl-blk.cut{border-bottom:2px dashed #6b7c73}
 .pl-more{margin:2px 0}.pl-more>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;color:#4b6358;font:600 12.5px "Pretendard Variable",Pretendard,system-ui,sans-serif}.pl-more>.pl-moreb{display:flex;flex-direction:column;gap:6px;padding:2px 0 6px}
 .pl-also{display:flex;flex-direction:column;gap:6px}.pl-pop .pl-also button{min-height:44px;height:auto;text-align:left;padding:4px 10px}
 .pl-list{margin:10px 0 0;border:1px solid #edf1ee;border-radius:12px;padding:0 12px}
@@ -788,6 +793,133 @@ export function createPlan(app) {
     return card;
   }
 
+  // ── 지금 하는 일 · 실제 종료(대표님 10/12) ──
+  // 기록은 앱 상태에만: 수업 = v60.classLog[수업id].endedAt, 그 밖(캘린더·기본 시간표·계획) = v60.actual[종류:id|날짜] = {endAt, plannedEnd, pauses:[{from,to}]}.
+  // 구글 캘린더·서버 계획 레코드에는 쓰지 않는다. 시간표의 끝 시각은 fixedBlocks 한 곳에서 이 기록으로 줄여서 만들어, 하루·주·시험까지·목록·빈 시간 계산이 모두 같은 끝을 쓴다.
+  const hhmm = (v) => /^([01]\d|2[0-3]):[0-5]\d$/.test(String(v || ''));
+  function actKey(b) {   // 블록의 안정적인 id(없으면 null = 실제 종료 대상 아님)
+    const d = b.date || ctx.today;
+    if (b.k === 'class') return b.cls?.id ? `class:${b.cls.id}|${d}` : null;
+    if (b.k === 'cal') return b.ev?.id ? `cal:${b.ev.id}|${d}` : null;
+    if (b.k === 'work') return b.routine?.id ? `work:${b.routine.id}|${d}` : null;
+    if (b.k === 'plan') return b.plan?.id && !b.plan.allDay ? `plan:${b.plan.id}|${d}` : null;
+    return null;
+  }
+  function actualOf(b) {
+    const key = actKey(b); if (!key) return null; const r = v60?.actual?.[key], pauses = Array.isArray(r?.pauses) ? r.pauses : [];
+    if (b.k === 'class') { const l = (v60?.classLog || {})[b.cls.id]; return { key, endAt: l && l.date === (b.date || ctx.today) && hhmm(l.endedAt) ? mins(l.endedAt) : null, pauses }; }
+    return { key, endAt: hhmm(r?.endAt) ? mins(r.endAt) : null, pauses };
+  }
+  function applyActual(list) {
+    for (const b of list) {
+      const a = actualOf(b); if (!a) continue;
+      b.akey = a.key; b.pauses = a.pauses;
+      if (a.endAt != null && a.endAt > b.s && a.endAt < b.e) { b.plannedE = b.e; b.e = a.endAt; }
+    }
+    return list;
+  }
+  const actEndOfPlan = (p) => { const a = actualOf({ k: 'plan', plan: p, date: p.date, s: mins(p.s), e: mins(p.e), title: '' }); return a?.endAt != null && a.endAt > mins(p.s) && a.endAt < mins(p.e) ? a.endAt : null; };
+  const doingRank = (b) => ({ 고정: 0, 이동: 1, 준비: 2, 밥: 2, 공부: 3, 과제: 3 }[blockCat(b)] ?? 4);
+  const notDoable = (b) => b.k === 'sleep' || b.k === 'auto' || (b.plan && planState(b.plan) === 'tentative');
+  // 지금 시각에 걸친 일정 하나(대표) + 나머지. 수면·종일·추천·미확정 계획은 「하고 있는 일」이 아니라서 뺀다.
+  // 규칙: 고정 > 이동 > 준비·밥 > 공부·과제, 같은 순위면 시작이 더 늦은 것, 그래도 같으면 더 짧은 것
+  function nowDoing(nowM) {
+    const all = fixedBlocks(ctx.today).filter((b) => !notDoable(b) && b.s <= nowM && nowM < b.e);
+    all.sort((x, y) => doingRank(x) - doingRank(y) || y.s - x.s || (x.e - x.s) - (y.e - y.s));
+    return { main: all[0] || null, others: all.slice(1) };
+  }
+  const nextBlock = (nowM) => fixedBlocks(ctx.today).filter((b) => !notDoable(b) && b.s > nowM).sort((a, b) => a.s - b.s)[0] || null;
+  const shortName = (b) => String(b.title).replace(/\s*수업\s*$/, '');
+  function doingLabel(b, att) {
+    const cat = blockCat(b);
+    if (b.k === 'class') return att === 'present' || att === 'late' ? '수업 중' : att === 'absent' ? '결석 처리됨' : att === 'excused' ? '공결 처리됨' : '출석 확인';
+    if (cat === '이동') return '이동 중'; if (cat === '밥') return '식사 중'; if (cat === '준비') return '준비 중'; if (cat === '공부') return '공부 중'; if (cat === '과제') return '과제 중';
+    if (b.k === 'exam') return '시험 중'; if (/근로/.test(b.title)) return '근로 중';
+    return `${shortName(b)} 중`;
+  }
+  const lastPause = (b) => (b.pauses || [])[(b.pauses || []).length - 1];
+  const openPause = (b) => { const l = lastPause(b); return l && l.to == null ? l : null; };
+  const restMin = (b, nowM) => (b.pauses || []).reduce((n, p) => n + Math.max(0, (p.to == null ? nowM : mins(p.to)) - mins(p.from)), 0);
+  const mutActual = (key, fn) => (s) => { s.actual = s.actual || {}; fn((s.actual[key] = s.actual[key] || {}), s); };
+  const closeOpen = (r, at) => { const l = (r.pauses || [])[(r.pauses || []).length - 1]; if (l && l.to == null) l.to = at; };
+  // 정지·재생: 클릭 순간에 구간 id·시각을 정해 둔다 — 낡은 리비전 뒤 다시 적용돼도 구간이 겹치거나 뒤집히지 않는다(같은 id 가 있으면 건너뜀, 재생은 그 id 의 열린 구간만 닫음)
+  function doPause(b) { const at = hm(nowMin()), id = opId(); return save(mutActual(b.akey, (r) => { r.pauses = r.pauses || []; if (r.pauses.some((p) => p.id === id)) return; const l = r.pauses[r.pauses.length - 1]; if (l && l.to == null) return; r.pauses.push({ id, from: at, to: null }); })); }
+  function doResume(b) { const at = hm(nowMin()), open = openPause(b); if (!open) return Promise.resolve(false); return save(mutActual(b.akey, (r) => { const p = (r.pauses || []).find((x) => (open.id ? x.id === open.id : x.from === open.from && x.to == null)); if (p && p.to == null && mins(at) >= mins(p.from)) p.to = at; })); }
+  // 되돌리기: 내가 저장한 끝 시각(at)이 그대로일 때만 — 그 사이 다른 화면이 다른 시각으로 끝냈으면 그 기록을 지우지 않는다
+  function undoEnd(b, name, at) {
+    return async () => {
+      let done = false; const d = b.date || ctx.today;
+      const ok = await save((s) => { done = false; if (b.k === 'class') { const l = s.classLog?.[b.cls.id]; if (l && l.date === d && (!at || l.endedAt === at)) { delete l.endedAt; done = true; } } else { const r = s.actual?.[b.akey]; if (r && (!at || r.endAt === at)) { delete r.endAt; delete r.plannedEnd; done = true; } } });
+      if (!ok) return false; if (!done) { app.status?.('그 사이 다른 화면에서 끝 시각이 바뀌어 되돌리지 않았어요.', true); return false; }
+      app.status?.(`${name} 예정 시각으로 되돌렸어요.`); return true;
+    };
+  }
+  async function doEnd(b) {
+    const nowM = nowMin(), planned = b.plannedE ?? b.e, at = hm(nowM), name = shortName(b), d = b.date || ctx.today;
+    if (!(nowM > b.s && nowM < planned)) { app.status?.('지금은 끝낼 수 있는 시간이 아니에요(시작 뒤 ~ 예정 끝 앞).', true); return false; }
+    if (nowM - b.s < 5 && !confirm('시작한 지 5분이 안 됐어요. 그래도 지금 끝낼까요?')) return false;
+    if (!confirm(`${name} 을(를) 지금(${at})에 끝낼까요?\n예정 ${hme(planned)}보다 ${dur(planned - nowM)} 일찍 끝나고, 시간표 블록이 ${at}까지로 줄어요. 되돌릴 수 있어요.`)) return false;
+    let applied = false;   // 실제로 내 끝 시각이 기록됐는가(다른 화면이 먼저 다른 시각으로 끝냈으면 건너뛰고 그 기록을 유지)
+    const ok = await save((s) => {
+      applied = false;
+      if (b.k === 'class') {
+        s.classLog = s.classLog || {}; const l = (s.classLog[b.cls.id] = s.classLog[b.cls.id] || {});
+        if (hhmm(l.endedAt) && l.endedAt !== at && l.date === d) return;
+        Object.assign(l, { endedAt: at, course: b.cls.course, date: d }); applied = true; if (b.akey) mutActual(b.akey, (r) => closeOpen(r, at))(s); return;
+      }
+      mutActual(b.akey, (r) => { if (hhmm(r.endAt) && r.endAt !== at) return; r.endAt = at; r.plannedEnd = hm(planned); closeOpen(r, at); applied = true; })(s);
+    });
+    if (!ok) return false;
+    if (!applied) { app.status?.('다른 화면에서 이미 다른 시각으로 끝냈어요. 그 기록을 그대로 뒀어요.', true); return false; }
+    toast(`${name} ${at}에 끝냈어요 · 예정 ${hme(planned)}`, '예정 시각으로 되돌리기', undoEnd({ ...b }, name, at));
+    return true;
+  }
+  // 시간표 위 「지금 하는 일」 한 줄: 상태 · 경과/남은 시간 · 진행 막대 · 재생·정지·종료. 수업은 출석(정상·지각)을 누른 뒤에만 「수업 중」
+  let nowBusy = false;
+  function nowBar() {
+    const nowM = nowMin(), { main, others } = nowDoing(nowM), box = el('div', undefined, 'pl-nowdo'); box.setAttribute('role', 'group'); box.setAttribute('aria-label', '지금 하는 일');
+    if (!main) {
+      const nx = nextBlock(nowM); box.classList.add('idle'); box.dataset.state = 'idle';
+      box.append(el('b', '지금은 일정이 없어요', 'pl-nowst'), el('span', nx ? `다음 ${hm(nx.s)} ${shortName(nx)}까지 ${dur(nx.s - nowM)}` : '오늘 남은 일정이 없어요', 'pl-nowmeta'));
+      return box;
+    }
+    const b = main, att = b.k === 'class' ? (b.cls.record?.status || '') : '', paused = !!openPause(b), attended = att === 'present' || att === 'late', notOn = b.k === 'class' && (att === 'absent' || att === 'excused'), label = paused && !notOn ? '정지 중' : doingLabel(b, att);
+    const el1 = nowM - b.s, left = b.e - nowM, rest = restMin(b, nowM), name = shortName(b), span = Math.max(1, b.e - b.s);
+    box.dataset.state = paused && !notOn ? 'paused' : b.k === 'class' && !attended ? 'wait' : 'run';
+    const st = el('b', label, 'pl-nowst'); st.setAttribute('role', 'status'); st.setAttribute('aria-live', 'polite');
+    const meta = el('span', `${name} · ${hm(b.s)}–${hme(b.e)}${b.plannedE ? ` (예정 ${hme(b.plannedE)})` : ''} · ${dur(el1)} 경과 · ${dur(left)} 남음${rest ? ` · 쉰 시간 ${dur(rest)}` : ''}`, 'pl-nowmeta');
+    const prog = el('span', undefined, 'pl-nowprog'); prog.setAttribute('role', 'progressbar'); prog.setAttribute('aria-label', '진행'); prog.setAttribute('aria-valuemin', '0'); prog.setAttribute('aria-valuemax', '100'); prog.setAttribute('aria-valuenow', String(Math.round(100 * el1 / span)));
+    const fill = el('i'); fill.style.width = Math.min(100, Math.max(0, 100 * el1 / span)) + '%'; prog.append(fill);
+    box.append(st, meta, prog);
+    if (others.length) { const more = el('small', `+${others.length}`, 'pl-nowmore'); const names = others.map((x) => x.title).join(', '); more.title = '같은 시각의 다른 일정: ' + names; more.setAttribute('aria-label', `같은 시각 일정 ${others.length}개 더 있음: ${names}`); box.append(more); }
+    const msg = el('small', '', 'pl-nowmsg'); msg.setAttribute('role', 'status'); msg.setAttribute('aria-live', 'polite');
+    if (b.k === 'class' && !attended && att !== 'absent' && att !== 'excused') {
+      const row = el('span', undefined, 'pl-nowatt');
+      for (const [v, tx] of [['present', '출석'], ['late', '지각']]) {
+        const x = el('button', tx, 'pl-nowbtn'); x.type = 'button'; x.setAttribute('aria-label', `${name} ${tx} 처리`);
+        x.onclick = async () => {
+          if (nowBusy) return; nowBusy = true; for (const y of row.children) y.disabled = true; msg.textContent = '저장 중…'; keepDay(); let r;
+          try { r = ctx.attend ? await ctx.attend(b.cls.courseId, ctx.today, v) : { error: '이 화면에서는 출석을 저장할 수 없어요' }; } catch { r = { error: '저장 여부를 확인하지 못했어요 · 새로고침해서 확인해요' }; } finally { nowBusy = false; }
+          if (r === false || r?.error) { msg.textContent = r?.error || '저장하지 못했어요 · 다시 눌러요'; for (const y of row.children) y.disabled = false; }
+        };
+        row.append(x);
+      }
+      box.append(row, msg); return box;
+    }
+    if (b.k === 'class' && (att === 'absent' || att === 'excused')) { box.append(msg); return box; }   // 결석·공결은 하고 있는 일이 아니라 문구만(정지·종료 없음)
+    const mk = (icon, lab, tip, fn, dis) => { const x = el('button', undefined, 'pl-ib pl-nowib'); x.type = 'button'; x.innerHTML = svg(ICON[icon]); x.setAttribute('aria-label', lab); x.title = tip; x.disabled = !!dis; x.onclick = () => { if (nowBusy) return; nowBusy = true; Promise.resolve(fn()).finally(() => { nowBusy = false; }); }; return x; };
+    const act = el('span', undefined, 'pl-nowact'); act.setAttribute('role', 'group'); act.setAttribute('aria-label', '재생 · 정지 · 종료');
+    const can = b.k !== 'exam' && !!b.akey;
+    act.append(mk('play', '재생 — 정지했던 것을 이어요', '재생 — 정지했던 것을 이어요', () => doResume(b), !can || !paused),
+      mk('pause', '정지 — 잠깐 쉬어요(쉰 시간으로 기록, 블록은 그대로)', '정지 — 잠깐 쉬어요. 블록 시간은 줄지 않아요', () => doPause(b), !can || paused),
+      mk('stop', '종료 — 지금 끝내요(시간표 블록이 지금까지로 줄어요)', '종료 — 지금을 실제 끝으로 기록하고 블록을 줄여요', () => doEnd(b), !can));
+    box.append(act, msg); return box;
+  }
+  function paintNow() {
+    if (!host?.isConnected || document.hidden) return; const old = host.querySelector('.pl-nowdo'); if (!old || old.contains(document.activeElement) || nowBusy) return;
+    const nu = nowBar(); if (old.textContent === nu.textContent && old.dataset.state === nu.dataset.state) return; old.replaceWith(nu);
+  }
+
   // 하루 고정 블록: 수업(오늘은 학교 시간표) · 캘린더 · 고정 일정(근로 등 routine) · 공부 계획(workspace plans)
   function fixedBlocks(date) {
     const out = [];
@@ -801,7 +933,7 @@ export function createPlan(app) {
     for (const x of (ctx.exams || []).filter((x) => x.date === date)) { const s = x.time ? mins(x.time) : 9 * 60; out.push({ s, e: s + 90, title: `시험 · ${x.course}${x.assumed ? ' (예정)' : ''}`, k: 'exam' }); }
     for (const p of (ctx.plans || []).filter((p) => !p.allDay && p.date === date && (!p.activity || p.bk === '고정' || NONSTUDY_BK.includes(p.bk)))) out.push({ s: mins(p.s), e: mins(p.e), title: SIMPLE_BK.includes(p.bk) ? (p.note || p.bk) : p.bk === '이동' ? (p.note || moveName(p.from, p.to) || '이동') + (p.est ? ' (추정)' : '') : p.bk === '고정' ? (p.note || '고정 일정') : (ctx.courseName?.(p.courseId) || '') + (p.note ? ' · ' + p.note : ''), k: 'plan', plan: p, lapsed: planLapsed(p, Date.now()) });   // 고정 일정(약속 등)은 activity 표식이 있어도 시간표엔 그린다
     for (const b of out) b.date = date;
-    return [...dedupeBlocks(out.filter((b) => b.e > b.s)), ...sleepOn(date)].sort((a, b) => a.s - b.s);   // 수면 블록(기록=확정·목표=계획)은 채우기·다시 짜기도 피하도록 같은 목록에 둔다
+    return [...applyActual(dedupeBlocks(out.filter((b) => b.e > b.s))), ...sleepOn(date)].sort((a, b) => a.s - b.s);   // 수면 블록(기록=확정·목표=계획)은 채우기·다시 짜기도 피하도록 같은 목록에 둔다
   }
   // 빈 칸: 깨어 있는 시간(08~24시, 오늘이면 지금부터)에서 고정 블록을 빼고, 앞뒤 쉬는 10분, 25분 이상만
   function freeSlots(date, fixed) {
@@ -930,7 +1062,7 @@ export function createPlan(app) {
   // 이동 일정에서 위치 열 조각 계산: 그날 이동(확정·계획, 지난 계획은 확정으로 침) + 직전 이동(최근 7일)의 도착지
   function placeInfo(date, nowM) {
     const isMv = (p) => p.bk === '이동' && (p.from || p.to), all = (ctx.plans || []).filter(isMv);
-    const moves = all.filter((p) => p.date === date).map((p) => ({ s: mins(p.s), e: mins(p.e), from: p.from, to: p.to, tentative: planState(p) === 'tentative' }));   // 확정 전(지난 계획 포함)은 점선 — 실제로 갔는지 모르는 것을 실선으로 단정하지 않는다
+    const moves = all.filter((p) => p.date === date).map((p) => ({ s: mins(p.s), e: actEndOfPlan(p) ?? mins(p.e), from: p.from, to: p.to, tentative: planState(p) === 'tentative' }));   // 확정 전(지난 계획 포함)은 점선 — 실제로 갔는지 모르는 것을 실선으로 단정하지 않는다
     const prev = all.filter((p) => p.date < date && p.date >= addDays(date, -7) && p.to).sort((a, b) => (a.date + a.e).localeCompare(b.date + b.e)).pop();
     return placeSegments({ moves, recs: v60.place?.[date] || [], prevTo: prev?.to || '', prevTentative: !!prev && planState(prev) === 'tentative', nowM, isToday: date === ctx.today });
   }
@@ -1087,6 +1219,7 @@ export function createPlan(app) {
     let bk = existing ? planBk(existing) : '공부', forcedConfirm = false;   // forcedConfirm = 지난 시각이라 계획에서 확정으로 바뀐 것(시각을 다시 미래로 고치면 계획으로 되돌린다)
     let allDay = !!existing?.allDay, adBk = existing?.allDay ? planBk(existing) : '고정';   // 종일: 시간 칸 대신 날짜(+종료일)만. 종류는 고정·과제
     const titleEl = el('b'); pop.append(titleEl);
+    { const pe = existing ? actEndOfPlan(existing) : null; if (pe != null) { const u = el('button'); u.type = 'button'; u.innerHTML = svg(ICON.undo); u.append(el('span', '예정 시각으로 되돌리기')); const key = `plan:${existing.id}|${existing.date}`; u.onclick = async () => { u.disabled = true; const ok = await save((s) => { const r = s.actual?.[key]; if (r && r.endAt === hm(pe)) { delete r.endAt; delete r.plannedEnd; } }); if (ok) close(); else u.disabled = false; }; pop.append(el('small', `예정 ${existing.e} → 실제 ${hm(pe)}`, 'pl-popnote'), u); } }
     const snap = existing ? canon(existing) : '';   // 열 때의 모습(고치는 사이 다른 곳에서 바뀌었는지 확인용)
     const catLine = el('div', undefined, 'pl-tagline'), catTag = el('span', '', 'pl-tag'), catTxt = el('small', '', 'pl-popnote'); catLine.append(catTag, catTxt);
     const dIn = el('input'); dIn.type = 'date'; dIn.value = date; dIn.setAttribute('aria-label', '날짜'); if (pickDate) pop.append(dIn);
@@ -1278,6 +1411,7 @@ export function createPlan(app) {
       moreKids.push(box);
     }
     const row = (label, ...kids) => { const r = el('div', undefined, 'pl-prow'); r.append(el('span', label), ...kids); return r; };
+    if (b.plannedE) { const u = el('button'); u.type = 'button'; u.innerHTML = svg(ICON.undo); u.append(el('span', '예정 시각으로 되돌리기')); u.onclick = async () => { u.disabled = true; const ok = await undoEnd(b, shortName(b), hm(b.e))(); if (ok) close(); else u.disabled = false; }; pop.append(el('small', `예정 ${hme(b.plannedE)} → 실제 ${hme(b.e)}`, 'pl-popnote'), u); }
     const pick = (opts, cur, onPick) => { const g = el('div', undefined, 'pl-pick'); for (const [v, t] of opts) { const x = el('button', t); x.type = 'button'; x.setAttribute('aria-pressed', String(cur === v)); x.onclick = () => onPick(v, x); g.append(x); } return g; };
     if (b.k === 'class') {
       const c = b.cls, key = c.id, log = () => (v60.classLog || {})[key] || {}, future = date > ctx.today;
@@ -1311,11 +1445,6 @@ export function createPlan(app) {
       if (future) pop.append(el('small', `미래 수업은 출석을 정할 수 없어요 · ${date.slice(5).replace('-', '/')}(${wd(date)}) 그날부터 눌러요.`, 'pl-popnote'));
       const und = pick([1, 2, 3, 4, 5].map((n) => [n, String(n)]), log().und ?? null, (v, x) => { setLog({ und: v }); for (const y of und.children) y.setAttribute('aria-pressed', String(y === x)); });
       und.setAttribute('aria-label', '이해도 1~5'); pop.append(row('이해도', und));
-      const t = el('span', '', 'pl-ptime'); const paint = () => { const l = log(); t.textContent = `${l.startedAt ? '시작 ' + l.startedAt : ''}${l.endedAt ? ' · 끝 ' + l.endedAt : ''}` || '기록 없음'; };
-      const sb = el('button', '시작'), eb = el('button', '종료'); sb.type = eb.type = 'button'; sb.setAttribute('aria-label', '수업 시작 기록'); eb.setAttribute('aria-label', '수업 종료 기록');
-      sb.onclick = () => { setLog({ startedAt: hm(nowMin()) }); paint(); }; eb.onclick = () => { setLog({ endedAt: hm(nowMin()) }); paint(); };
-      if (date !== ctx.today) sb.disabled = eb.disabled = true;
-      paint(); pop.append(row('수업', sb, eb, t));
       const cancel = el('button', '휴강으로 표시', 'danger'); cancel.type = 'button'; let armed = false;
       cancel.onclick = async () => {
         if (busy) return;
@@ -1406,7 +1535,8 @@ export function createPlan(app) {
     const blk = el('div', undefined, `pl-blk k-${b.k} ${cat ? CAT_CLASS[cat] : 'c-unknown'}` + (b.k === 'sleep' ? ` sleep-${b.sleep.state}` : '') + (b.lapsed ? ' lapsed' : '') + (now >= 0 && b.e <= now ? ' past' : '')); blk.style.top = b.s * PX + 'px'; blk.style.height = Math.max(14, (b.e - b.s) * PX - 2) + 'px';
     if (b.cols > 1) { blk.dataset.n = b.cols; blk.style.setProperty('--n', b.cols); blk.style.setProperty('--c', b.col); }   // 겹치는 무리는 열로 나눠 옆으로
     const line = el('span'); line.append(el('i', b.lapsed ? '지난 계획' : cat || '?', 'pl-tag'), document.createTextNode(b.title)); blk.append(line);
-    if ((b.e - b.s) * PX > 34) blk.append(el('small', `${hm(b.s)}–${hme(b.e)}${sub}`)); blk.title = `${cat ? CAT_NAME[cat] : '종류 모름'} · ${hm(b.s)}–${hme(b.e)} ${b.title}`;
+    const cut = b.plannedE ? ` · 예정 ${hme(b.plannedE)} → 실제 ${hme(b.e)}` : ''; if (b.plannedE) blk.classList.add('cut');
+    if ((b.e - b.s) * PX > 34) blk.append(el('small', `${hm(b.s)}–${hme(b.e)}${sub}${cut}`)); blk.title = `${cat ? CAT_NAME[cat] : '종류 모름'} · ${hm(b.s)}–${hme(b.e)} ${b.title}${cut}`;
     // 누르면 종류별 창(대표님 10/9 「시간블럭 누르면 수정할 수가 없는데」): 계획 = 고치기·확정·삭제, 수업 = 출석·이해도·시작·종료, 캘린더 = 시각 고치기,
     // 추천 = 계획으로 넣기·숨기기, 고정 일정·시험 = 내용 보기
     const what = WHAT[b.k];
@@ -1563,7 +1693,7 @@ export function createPlan(app) {
       };
       grid.append(placeLane(day, PX, now));   // 오른쪽 여백: 있던 곳
       if (now >= 0) { const n = el('div', undefined, 'pl-now'); n.style.top = now * PX + 'px'; n.append(el('span', hm(now))); grid.append(n); }
-      if (day === ctx.today) card.append(placeBar(day));
+      if (day === ctx.today) { card.append(placeBar(day)); card.append(nowBar()); }
       box.append(grid); card.append(box);
       if (dayBlocks.length) card.append(blockList(dayBlocks));
       { const mn = el('p', modeText(), 'pl-note pl-modenote'); mn.setAttribute('role', 'status'); mn.setAttribute('aria-live', 'polite'); card.append(mn); }
@@ -1781,6 +1911,7 @@ export function createPlan(app) {
         for (const c2 of host.querySelectorAll('[data-clock]')) c2.textContent = clock(elapsed(c2.dataset.clock));
         if (kst() !== bootDay && !pend.length) { clearInterval(tick); ctx.reload?.(); return; }   // 자정 지나면 새 날짜로 다시(기록이 전날로 가지 않게)
         if (sec % 60 === 59 && ctx && appleMissing(addDays(ctx.today, -1), ctx.today).length) ensureApple(addDays(ctx.today, -1), ctx.today).then(() => { if (host?.isConnected && !document.querySelector('.pl-pop') && !pend.length) draw(); });   // 워치 동기화로 늦게 채워지는 어젯밤·오늘 아침
+        if (sec % 30 === 29) paintNow();
         if (sec % 60 === 59) { paintSleep(); if (ctx && v60 && lastSleepSig && sleepSig() !== lastSleepSig && !document.querySelector('.pl-pop') && !pend.length) draw(); }   // 목표 시각을 지나 계획이 바뀌면 시간표를 다시 그린다(열린 창이 있으면 미룸)   // 수면 시간대에 들어오거나 아침 확인 때가 되면 줄을 바꾼다(같은 문구면 그대로)
         if (++sec % 60 === 0 && followBox?.box?.isConnected) {   // 1분마다 지금 선을 옮기고, 직접 스크롤 안 했으면 화면이 따라감
           const now = nowMin(); if (followBox.line) { followBox.line.style.top = now * followBox.PX + 'px'; followBox.line.querySelector('span').textContent = hm(now); }
@@ -1789,6 +1920,7 @@ export function createPlan(app) {
       }, 1000);
     },
     destroy() { clearInterval(tick); host = null; toast.hide(); },
-    _repaintSleep() { paintSleep(); },   // 시험용: 1분 틱을 기다리지 않고 수면 줄을 다시 계산
+    _repaintSleep() { paintSleep(); },
+    _paintNow() { paintNow(); },   // 시험용: 30초 틱을 기다리지 않고 지금 하는 일 줄을 다시 계산   // 시험용: 1분 틱을 기다리지 않고 수면 줄을 다시 계산
   };
 }
