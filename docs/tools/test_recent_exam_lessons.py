@@ -24,6 +24,13 @@ def verify_math():
     assert s.limit(s.sin(2*t)/t,t,0) == 2
     assert s.Matrix([1,-1,2]) + s.Rational(1,2)*(s.Matrix([5,3,-2])-s.Matrix([1,-1,2])) == s.Matrix([3,1,0])
     # 2.10 판서 특수해를 원식에 직접 미분 대입한다. 양의 로그 진수 구간 사용.
+    # 물리 첫 수업: SI 환산, 힘의 벡터 합, 유전율 모델의 반비례를 독립 계산한다.
+    assert s.Rational(9)*10**9*(2*s.Rational(1,10**6))*(3*s.Rational(1,10**6))/s.Rational(3,10)**2 == s.Rational(3,5)
+    assert -4*s.Rational(1,10**6)*300 == -s.Rational(12,10000)
+    assert 2*6*s.cos(s.pi/3) == 6
+    assert 6*s.sin(s.pi/3)+6*s.sin(-s.pi/3) == 0
+    assert s.sqrt(3**2+4**2) == 5
+    assert 2*s.Rational(1,10**6)*s.Rational(1,2) == s.Rational(1,10**6)
     sec_example=s.cos(x)*s.log(s.cos(x))+x*s.sin(x)
     csc_example=-x*s.cos(x)+s.sin(x)*s.log(s.sin(x))
     assert s.trigsimp(s.diff(sec_example,x,2)+sec_example-1/s.cos(x)) == 0
@@ -70,7 +77,8 @@ def verify_material(root, runtime_root):
     put=lambda key,value:memory.__setitem__(key,value)
     for course,slug,dates in [('미분적분학2','calc2',['2026-10-06','2026-10-08']),
                               ('공업수학1','em1',['2026-10-02','2026-10-07']),
-                              ('일반물리학2','phys2',['2026-10-02'])]:
+                              ('일반물리학2','phys2',['2026-10-02']),
+                              ('일반물리학2','phys2-reviewed',['2026-09-04'])]:
         for date in dates:
             lesson_id=slug+'-'+date
             entry=index['courses'][course][date]
@@ -95,6 +103,23 @@ def verify_material(root, runtime_root):
                     assert state['events'][-1]['sourceHash']
             assert not parsed['warnings']
             report.append(dict(id=lesson_id,steps=len(ids),questions=len(quizzes),maxBody=max(len(st['body']) for st in parsed['steps']),routeComplete=True,serverGrading=True))
+    # 옛 기기의 저장은 옛 자료로 판정하고 새 수업 기록을 만들지 않는다.
+    old_id='phys2-2026-09-04';new_id='phys2-reviewed-2026-09-04'
+    old=school_runtime.lesson(root,old_id)
+    old_quiz=next(step for step in old['steps'] if step['kind']=='quiz')
+    catalog_ids=[lesson['id'] for course in school_runtime.catalog(root)['courses'] for lesson in course['lessons']]
+    assert old_id not in catalog_ids and catalog_ids.count(new_id)==1
+    compatibility={};legacy_get=lambda key,default='':compatibility.get(key,default)
+    legacy_put=lambda key,value:compatibility.__setitem__(key,value)
+    for event in [dict(id='old-position',kind='position',lesson=old_id,index=1),
+                  dict(id='old-answer',kind='answer',lesson=old_id,step=old_quiz['id'],choice=old_quiz['answer']),
+                  dict(id='new-position',kind='position',lesson=new_id,index=2)]:
+        saved=school_runtime.apply_event(legacy_get,legacy_put,event,root=root)
+    assert saved['progress'][old_id]['index']==1 and saved['progress'][new_id]['index']==2
+    assert saved['events'][1]['correct'] is True
+    assert not any(event.get('lesson')==new_id and event['kind']=='answer' for event in saved['events'])
+    assert not any(event['kind']=='review' for event in saved['events'])
+    report.append(dict(legacySave='PASS',oldAnswersRemainOld=True,catalogShowsNewOnly=True))
     return report
 
 

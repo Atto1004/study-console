@@ -2,10 +2,14 @@
  "courses": {
   "일반물리학2": {
    "2026-09-04": {
-    "id": "phys2-2026-09-04",
-    "file": "notes/lessons/phys2/2026-09-04.html",
-    "title": "전하와 전기장 — \"전기와 자기는 똑같다\"",
-    "minutes": 18,
+    "id": "phys2-reviewed-2026-09-04",
+    "title": "전하와 전기장 — 단위·쿨롱 법칙·힘의 성분",
+    "classroom": "notes/classroom/phys2-reviewed/2026-09-04.html",
+    "file": "notes/classroom/phys2-reviewed/2026-09-04.html",
+    "originalClassroom": "notes/classroom/phys2/2026-09-04.html",
+    "week": 1,
+    "chapters": 6,
+    "steps": 20,
     "sids": [
      "s1",
      "s2",
@@ -20,12 +24,10 @@
      "q3",
      "q4",
      "q5",
-     "q6"
-    ],
-    "week": 1,
-    "classroom": "notes/classroom/phys2/2026-09-04.html",
-    "chapters": 6,
-    "steps": 35
+     "q6",
+     "ws1",
+     "ws2"
+    ]
    },
    "2026-09-09": {
     "id": "phys2-2026-09-09",
@@ -1005,5 +1007,12 @@
    }
   }
  },
- "generated": "2026-10-12T01:01:56"
+ "generated": "2026-10-12T01:01:56",
+ "legacyLessons": {
+  "phys2-2026-09-04": {
+   "id": "phys2-2026-09-04",
+   "classroom": "notes/classroom/phys2/2026-09-04.html",
+   "file": "notes/classroom/phys2/2026-09-04.html"
+  }
+ }
 }

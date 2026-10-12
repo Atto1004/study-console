@@ -14,13 +14,14 @@ export const EXCLUDED_LESSONS = {
   'session:정역학:2026-10-12': {course:'정역학', reason:'공지 기록이며 새 수업 내용은 확인되지 않았습니다.'}
 };
 export const LESSON_ALIASES = {
+  'phys2-2026-09-04':'phys2-reviewed-2026-09-04',
   'session:미분적분학2:2026-10-06':'calc2-2026-10-06',
   'session:미분적분학2:2026-10-08':'calc2-2026-10-08',
   'session:공업수학1:2026-10-02':'em1-2026-10-02',
   'session:공업수학1:2026-10-07':'em1-2026-10-07',
   'session:일반물리학2:2026-10-02':'phys2-2026-10-02'
 };
-export const canonicalLessonId = id => LESSON_ALIASES[id] || id;
+export const canonicalLessonId = id => Object.hasOwn(LESSON_ALIASES,id) ? LESSON_ALIASES[id] : id;
 export const lessonHidden = (course, l) => (course === '정역학' && HIDDEN_IDS.has(l?.id)) || (!!EXCLUDED_LESSONS[l?.id] && EXCLUDED_LESSONS[l.id].course === course);
 // 순서표가 있는 과목이면 [{...lesson,label}] 학습 순서 목록, 없으면 null
 export function orderedLessons(course) {

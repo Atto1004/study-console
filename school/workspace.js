@@ -3,8 +3,8 @@ import { courseMetrics, sourceKind, pickQuest, KINDS } from "./metrics.js";
 import { attachSaeng } from "./saeng.js";
 import { officeHref } from "./worldmap.js";
 import { inFocus, focusCourses, isInClass } from "./focus.js";
-import { lessonHidden, orderedLessons, orderedTitle, sourceHidden, lmsHidden, scopeLessons } from "./lesson-order.js";
-import { renderSprint } from './study-sprint.js?v=289';
+import { lessonHidden, orderedLessons, orderedTitle, sourceHidden, lmsHidden, scopeLessons } from "./lesson-order.js?v=290";
+import { renderSprint } from './study-sprint.js?v=290';
 // 수업 선택 창에서 숨길 수업 — 정역학 10/10 복습·10/9 문제집은 벼락치기와 같은 과제 풀이 중복(10/11 「꼭 필요한 구성만」, 파일은 그대로)
 // 과목별 수업 선택 창 순서 — 정역학은 강 번호(아이패드 기준: 9/16 = 1강) 순서, 벼락치기 마지막(10/12 「1강이 첫 진입점에 없다」)
 // 시험 범위 문구에서 제작 경위 괄호(「(대표님 전달 …)」)는 빼고, 시험 조건은 짧게
