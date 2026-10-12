@@ -96,7 +96,7 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
     }).observe(body);
   }
 
-  function render(lesson, index = 0) {
+  function render(lesson, index = 0, pack = null) {
     const steps = Array.isArray(lesson?.steps) ? lesson.steps : [];
     const entries = [];
     /* 유사 문제 답은 그 쪽에 도착하기 전까지 교재에 보이지 않게 한다(먼저 풀어 보게) */
@@ -113,7 +113,12 @@ export function createLessonTextbook({ math = () => {}, onStep = () => {} } = {}
         prior.parts.push(part); prior.endIndex = stepIndex;
       } else entries.push({step,stepIndex,endIndex:stepIndex,parts:[part]});
     });
-    const selected = entries.find(entry => entry.stepIndex <= index && entry.endIndex >= index)
+    // 확인 문제는 원자료 배열 끝에 있어도 강의안에서 연결한 단원의 교재를 보여준다.
+    const checkedSection = pack?.lessonId === lesson?.id && Array.isArray(pack?.sections)
+      ? pack.sections.find(section => section?.check === steps[index]?.id) : null;
+    const checkedIds = new Set(Object.keys(checkedSection?.script || {}));
+    const selected = entries.find(entry => entry.parts.some(part => checkedIds.has(steps[part.i]?.id)))
+      || entries.find(entry => entry.stepIndex <= index && entry.endIndex >= index)
       || entries.filter(entry => entry.stepIndex <= index).at(-1);
     metadata.textContent = [lesson?.date, lesson?.title].filter(Boolean).join(' · ');
     contents.replaceChildren();

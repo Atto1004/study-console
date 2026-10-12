@@ -40,7 +40,7 @@ import { createFace } from "./face.js";
 import { readable, cleanTitle } from "./readable.js";
 import { createPlan } from "./plan.js";
 import { inFocus } from "./focus.js";
-import { createLessonTextbook } from "./lesson-textbook.js?v=268";
+import { createLessonTextbook } from "./lesson-textbook.js?v=288";
 import { startClassroomV3 } from "./classroom-v3.js?v=241";
 import { createGrowth } from "./growth.js?v=199";
 import { cardGate } from './card-gate.js?v=4';
@@ -1026,7 +1026,7 @@ async function renderStep(camera) {
   // 교실 v3: 게임 보기면 3D 교실을 위 강의 칸에 앉혀 붙이고, 사이트 보기면 3D 를 쓰지 않는다
   await stage3d(step.kind,camera);
   if (!isBoard()) await growth?.step(activeSession);
-  textbook?.render(current, index);
+  textbook?.render(current, index, pack);
   quests?.render(current,[...state.events,...pending]);
 }
 async function returnToQuestion() {
