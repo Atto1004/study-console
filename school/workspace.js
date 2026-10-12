@@ -62,7 +62,7 @@ export function recommendPlans(data, calendar, now=new Date(), budget, preferred
     result.push({courseId:c.id,course:c.name,date:today,kind:exam?'시험 대비':'복습',note,reason:exam?`${ddayLabel(exam.dday)} · 시험 가까운 순`:unresolved?'미복습 회차':'수업 자료 확인',duration:budget&&budget<45?Math.max(5,budget):45});
   }
   if(!calendar?.verified){const preview=[];for(const p of result){if(left<p.duration)break;preview.push({...p,unscheduled:true});left-=p.duration;if(preview.length===3)break;}return preview;}
-  const blocks=[...data.scheduled.filter(x=>!x.record?.cancelled).map(x=>({s:x.s,e:x.e})),...data.plans.filter(p=>p.date===today),...(calendar.events||[]).filter(e=>!e.allDay&&e.start&&e.end).map(e=>({s:e.start,e:e.end}))].sort((a,b)=>minutes(a.s)-minutes(b.s));
+  const blocks=[...data.scheduled.filter(x=>!x.record?.cancelled).map(x=>({s:x.s,e:x.e})),...data.plans.filter(p=>p.date===today&&!p.allDay),...(calendar.events||[]).filter(e=>!e.allDay&&e.start&&e.end).map(e=>({s:e.start,e:e.end}))].sort((a,b)=>minutes(a.s)-minutes(b.s));
   let cursor=Math.max(480,minutes(current)+5), end=1380, gaps=[];
   for(const b of blocks){const start=minutes(b.s),stop=minutes(b.e);if(start>cursor)gaps.push([cursor,Math.min(start,end)]);cursor=Math.max(cursor,stop);}
   if(cursor<end)gaps.push([cursor,end]);
