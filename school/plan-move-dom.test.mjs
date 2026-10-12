@@ -45,7 +45,7 @@ const setTime = (v) => { document.querySelector('.pl-pop input[type=time]').valu
 if (pressed(pm())) { click(pm()); await flush(); }
 click(plus()); await flush();
 const kinds = [...document.querySelectorAll('.pl-pop [aria-label="일정 종류"] button')].map((b) => b.textContent);
-assert.deepEqual(kinds, ['고정', '공부', '과제', '이동']);
+assert.deepEqual(kinds, ['고정', '공부', '과제', '이동', '준비', '밥']);
 assert.equal(q('[aria-label="출발지"]').disabled, true, '이동이 아니면 입력 꺼짐');
 click(q('[data-bk="이동"]')); await flush();
 assert.equal(q('[aria-label="출발지"]').disabled, false); assert.equal(q('[aria-label="과목"]').hidden, true); assert.equal(q('[aria-label="길이"]').hidden, true);
@@ -76,7 +76,7 @@ document.querySelector('.pl-pop').remove();
 
 // 3. 계획 모드: 새 계획 종류줄 [공부·과제 | 이동] — 이동을 고르면 tentative + bk 이동
 click(pm()); await flush(); click(plus()); await flush();
-assert.deepEqual([...document.querySelectorAll('.pl-pop [aria-label="계획 종류"] button')].map((b) => b.textContent), ['공부·과제', '이동']);
+assert.deepEqual([...document.querySelectorAll('.pl-pop [aria-label="계획 종류"] button')].map((b) => b.textContent), ['공부·과제', '이동', '준비', '밥']);
 assert.equal(q('[aria-label="출발지"]').disabled, true);
 click(q('[data-mv="true"]')); await flush(); assert.equal(q('[aria-label="출발지"]').disabled, false);
 assert.ok(q('').textContent.includes('이동 계획이에요'));
@@ -108,7 +108,7 @@ a = lastAdd(); assert.deepEqual([a.state, a.bk, a.from, a.est], ['tentative', un
   assert.ok(m2.classList.contains('c-plan') && !m2.classList.contains('c-move'), '미확정 이동 = 계획(점선)');
   assert.ok(!blks.some((b) => b.textContent.includes('다른 활동')), 'bk 없는 activity 기록은 시간표에 안 그림');
   const legend = [...host.querySelectorAll('.pl-legend .pl-leg')].map((x) => x.textContent.trim());
-  assert.deepEqual(legend, ['고정일정', '공부블록', '과제블록', '이동', '수면', '계획일정 (미확정)']);
+  assert.deepEqual(legend, ['고정일정', '공부블록', '과제블록', '이동', '준비', '밥', '수면', '계획일정 (미확정)']);
   // 5. 고치기: 확정 이동을 열면 값이 채워져 있고, 이동 → 공부로 바꾸면 이동 필드를 떼서 보낸다
   click(m1); await flush();
   assert.equal(q('[aria-label="출발지"]').value, '집'); assert.equal(q('[aria-label="도착지(선택)"]').value, '학교'); assert.equal(q('.pl-mvest input').checked, true);
@@ -131,7 +131,7 @@ a = lastAdd(); assert.deepEqual([a.state, a.bk, a.from, a.est], ['tentative', un
 // 7. 채우기 상한: 이동 블록은 공부 시간(하루 상한)으로 세지 않는다
 {
   const src = (await import('node:fs')).readFileSync(new URL('./plan.js', import.meta.url), 'utf8');
-  assert.ok(/bk !== '고정' && b\.plan\?\.bk !== '이동'\)\.reduce/.test(src), '하루 공부 상한 계산에서 고정·이동 제외');
+  assert.ok(/bk !== '고정' && !NONSTUDY_BK\.includes\(b\.plan\?\.bk\)\)\.reduce/.test(src), '하루 공부 상한 계산에서 고정·이동·준비·밥 제외');
 }
 console.log('plan-move-dom ok');
 process.exit(0);

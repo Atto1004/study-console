@@ -39,7 +39,7 @@ assert.deepEqual(sleepsIn('2026-10-12'), ['done']);
 assert.deepEqual(sleepsIn('2026-10-13'), ['plan']); assert.deepEqual(sleepsIn('2026-10-18'), ['plan']);
 assert.ok(fetched.some((u) => u.startsWith('/api/health/sleep?from=')), 'Apple 건강 읽기 요청');
 assert.ok([...host.querySelectorAll('.pl-wkcol .c-sleep .pl-tag')].every((t) => t.textContent === '수면'));
-assert.deepEqual([...host.querySelectorAll('.pl-legend .pl-leg')].map((x) => x.textContent.trim()), ['고정일정', '공부블록', '과제블록', '이동', '수면', '계획일정 (미확정)']);
+assert.deepEqual([...host.querySelectorAll('.pl-legend .pl-leg')].map((x) => x.textContent.trim()), ['고정일정', '공부블록', '과제블록', '이동', '준비', '밥', '수면', '계획일정 (미확정)']);
 // 지난 주: Apple 확정(10/11) · 취침만(10/10) · 모호한 옛 기록(10/9)은 안 그림
 click(ib('지난주')); await flush(20);
 assert.ok(sleepsIn('2026-10-11').includes('done'));
