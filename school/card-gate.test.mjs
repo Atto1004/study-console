@@ -33,8 +33,8 @@ const optOrder = () => opts().map((b) => b.textContent).join('|');
 
 // ---- 0) 카드 데이터: 모든 카드에 보기 4개(정답 1 + 오답 3), 서로 다름, 오답이 원문 정답과 같지 않음
 const norm = (s) => String(s).normalize('NFKC').toLowerCase().replace(/[\s·,()\[\]{}:;'"]+/g, '');
-ok(allCards.length === 37, '카드 37장 (6개 강에 겹침 없이)');
-{ const ids = allCards.map((c) => c.id); ok(new Set(ids).size === ids.length, '카드 ID 중복 없음'); const ds = Object.values(raw.lectures).flatMap((l) => l.dates); ok(ds.length === 6 && new Set(ds).size === 6 && Object.values(raw.lectures).every((l) => l.dates.length === 1), '강 6개 = 날짜 6개, 한 날짜는 정확히 한 강'); }
+ok(allCards.length === 41, '카드 41장 (7개 강에 겹침 없이)');
+{ const ids = allCards.map((c) => c.id); ok(new Set(ids).size === ids.length, '카드 ID 중복 없음'); const ds = Object.values(raw.lectures).flatMap((l) => l.dates); ok(ds.length === 7 && new Set(ds).size === 7 && Object.values(raw.lectures).every((l) => l.dates.length === 1), '강 7개 = 날짜 7개, 한 날짜는 정확히 한 강'); }
 ok(allCards.every((c) => c.mc && c.mc.right && c.mc.wrong.length === 3), '모든 카드에 정답 1 + 오답 3');
 ok(allCards.every((c) => new Set([c.mc.right, ...c.mc.wrong].map(norm)).size === 4), '모든 카드의 보기 4개가 서로 다르다');
 ok(allCards.every((c) => c.mc.wrong.every((w) => norm(w) !== norm(c.a))), '오답이 원문 정답과 같은 카드가 없다');
