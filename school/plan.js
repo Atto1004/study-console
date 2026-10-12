@@ -7,9 +7,11 @@
 // 저장은 예전과 같은 원장 S.v60(/api/study/state: est·done·act·run·extra)이라 기록이 이어진다. 저장 충돌(409)이면 새로 읽고 다시.
 import { createLayerKit } from './aw-layers-panel.js';
 import { adBlock } from './aw-layers.js';
+import { describeFix, suggestPlace, stillNow, getPosition, fetchLast, postFix, secureOk, ERR_TEXT, AUTO_MIN } from './aw-gps.js';
+import { classRuns, endComparison, transitState, arrivalChips, eventPlaceItems } from './aw-progress.js';
 const el = (tag, text, cls) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (cls) e.className = cls; return e; };
 const svg = (d) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
-const ICON = { play: '<path d="M7 5l12 7-12 7z" fill="currentColor"/>', pause: '<path d="M8 5v14M16 5v14"/>', stop: '<rect x="6" y="6" width="12" height="12" rx="1.5" fill="currentColor"/>', prev: '<path d="M15 6l-6 6 6 6"/>', next: '<path d="M9 6l6 6-6 6"/>', replan: '<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>', plus: '<path d="M12 5v14M5 12h14"/>', undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
+const ICON = { locate: '<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>', play: '<path d="M7 5l12 7-12 7z" fill="currentColor"/>', pause: '<path d="M8 5v14M16 5v14"/>', stop: '<rect x="6" y="6" width="12" height="12" rx="1.5" fill="currentColor"/>', prev: '<path d="M15 6l-6 6 6 6"/>', next: '<path d="M9 6l6 6-6 6"/>', replan: '<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>', plus: '<path d="M12 5v14M5 12h14"/>', undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
   trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>', more: '<circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/>',
   up: '<path d="M6 15l6-6 6 6"/>', down: '<path d="M6 9l6 6 6-6"/>', check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>', list: '<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>', moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>', pin: '<path d="M12 21s-6.5-5.4-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.6 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.3"/>' };
 const ib = (icon, label, cls = '') => { const b = el('button', undefined, 'pl-ib ' + cls); b.type = 'button'; b.innerHTML = svg(ICON[icon]); b.setAttribute('aria-label', label); b.title = label; return b; };
@@ -325,7 +327,7 @@ export function applyGoal(s, { bed, sleepH, seen }) {
 // 위치 기록(v60.place)이 실제 위치라 우선이고, 이동 일정(출발지·도착지 글자)에서 계산한 막대는 보조다: 이동 막대(출발 → 도착) + 도착한 뒤 다음 이동 전까지 그 도착지 묶음 막대.
 // 첫 이동 앞 구간은 직전 이동의 도착지(prevTo)가 있을 때만 채운다(없으면 비움 — 지어내지 않음). 같은 지역인지는 입력한 글자가 같을 때만 본다(별칭 표 없음).
 // moves: [{s,e(분),from,to,tentative}] · recs: [{t:'HH:MM',p}] · 결과 rec(기록 막대) · derived(계산 막대, 기록과 겹치는 시간은 뺀다)
-export function placeSegments({ moves = [], recs = [], prevTo = '', prevTentative = false, nowM = null, isToday = false, dayEnd = 1440 }) {
+export function placeSegments({ moves = [], recs = [], prevTo = '', prevTentative = false, nowM = null, isToday = false, dayEnd = 1440, extra = [] }) {
   const cap = isToday && nowM != null ? nowM : dayEnd;   // 오늘의 기록은 지금까지만(지금 이후 시각의 기록·구간은 없는 것으로)
   const rs = recs.filter((r) => mins(r.t) <= cap).sort((a, b) => a.t.localeCompare(b.t)), rec = rs.map((r, i) => { const st = mins(r.t); return { s: st, e: Math.min(cap, i + 1 < rs.length ? mins(rs[i + 1].t) : cap), p: r.p, r }; }).filter((x) => x.e >= x.s);   // 지금 막 남긴 기록은 길이 0 이어도 남긴다(화면이 최소 높이로 그림)
   const ms = moves.filter((m) => m.e > m.s).slice().sort((a, b) => a.s - b.s || a.e - b.e), raw = [];
@@ -342,8 +344,12 @@ export function placeSegments({ moves = [], recs = [], prevTo = '', prevTentativ
   }
   const merged = [];   // 이어지는 같은 글자 묶음은 하나로
   for (const x of raw.sort((a, b) => a.s - b.s)) { const l = merged[merged.length - 1]; if (l && l.kind === 'group' && x.kind === 'group' && l.label === x.label && l.e === x.s && l.tentative === x.tentative) l.e = x.e; else merged.push({ ...x }); }
+  // 장소가 있는 일정(수업 강의실·캘린더 location)의 시간대(extra): 이동 일정에서 계산한 도착지 묶음 위에 우선 놓는다(그 시간엔 그 일정의 장소). 이동 막대 자신은 건드리지 않는다
+  const ex = extra.filter((x) => x.e > x.s).sort((a, b) => a.s - b.s), cut = (list, by) => list.flatMap(([a, b]) => by.reduce((ps, r) => ps.flatMap(([p, q]) => r.e <= p || r.s >= q ? [[p, q]] : [[p, Math.max(p, r.s)], [Math.min(q, r.e), q]].filter(([u, v]) => v - u > 0)), [[a, b]]));
+  const base = []; for (const x of merged) { if (x.kind !== 'group' || !ex.length) { base.push(x); continue; } for (const [a, b] of cut([[x.s, x.e]], ex)) base.push({ ...x, s: a, e: b }); }
+  for (const x of ex) base.push({ ...x, kind: 'group', event: true });
   const derived = [];
-  for (const x of merged) {   // 기록과 겹치는 시간을 뺀다(기록이 우선)
+  for (const x of base) {   // 기록과 겹치는 시간을 뺀다(기록이 우선)
     let pieces = [[x.s, x.e]];
     for (const r of rec) pieces = pieces.flatMap(([a, b]) => r.e <= a || r.s >= b ? [[a, b]] : [[a, Math.max(a, r.s)], [Math.min(b, r.e), b]].filter(([p, q]) => q - p > 0));
     for (const [a, b] of pieces) if (b - a >= 5) derived.push({ ...x, s: a, e: b });
@@ -491,7 +497,7 @@ button.pl-title.pl-edit:hover,button.pl-title.pl-edit:focus-visible{text-decorat
 .pl-placebar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 10px}
 .pl-placelabel{font:700 13px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#4b6358;margin-right:2px}
 .pl-chip{height:34px;padding:0 12px;border-radius:999px;border:1px solid #d5ddd8;background:#fff;font:600 13px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#1f3d33;cursor:pointer}
-.pl-chip:hover{border-color:#2e6b52}
+.pl-chip:hover{border-color:#2e6b52}.pl-gpswrap{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}.pl-gps{font:600 12.5px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#2c4a6e;background:#eef3f9;border:1px solid #cbd9e8;border-radius:999px;padding:6px 10px}.pl-gps[data-state=stale],.pl-gps[data-state=lowacc]{color:#8a5a00;background:#fbf4e4;border-color:#ecd9a6}.pl-gps[data-state=off],.pl-gps[data-state=unknown]{color:#6b7c73;background:#f2f4f3;border-color:#dfe5e1}.pl-gpsnote{font:500 12px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#8a5a00}.pl-chip.gps-suggest{border-style:dashed;border-color:#2c4a6e;box-shadow:0 0 0 2px #dfe9f4}.pl-gpsauto[aria-pressed=true]{background:#2e6b52;color:#fff;border-color:#2e6b52}
 .pl-placein{width:90px!important;height:34px!important;min-height:0!important;margin:0!important;padding:0 10px!important;border:1px solid #d5ddd8!important;border-radius:999px!important;font:500 13px "Pretendard Variable",Pretendard,system-ui,sans-serif!important}
 .pl-placebar .pl-ib{width:34px;height:34px}
 .pl-mode{height:40px;padding:0 12px;border-radius:10px;border:1px solid #d5ddd8;background:#fff;font:600 13.5px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#1f3d33;cursor:pointer}
@@ -578,7 +584,7 @@ body.pl-dragging,body.pl-dragging *{-webkit-user-select:none!important;user-sele
 .pl-legend-off{display:flex;justify-content:flex-end;margin:0 0 6px}
 .pl-legend-off .pl-ib{width:34px;height:34px}
 .pl-toast{position:fixed;z-index:90;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;max-width:min(92vw,520px);padding:8px 8px 8px 16px;border-radius:14px;background:#14261f;color:#fff;box-shadow:0 10px 28px #0004;font:600 14px/1.35 "Pretendard Variable",Pretendard,system-ui,sans-serif}
-.pl-toast button{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:10px;border:1px solid #9fd4b9;background:#1f3d33;color:#e9f6ee;font:700 14px "Pretendard Variable",Pretendard,system-ui,sans-serif;cursor:pointer}
+.pl-toast span{white-space:pre-line}.pl-toast button{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:10px;border:1px solid #9fd4b9;background:#1f3d33;color:#e9f6ee;font:700 14px "Pretendard Variable",Pretendard,system-ui,sans-serif;cursor:pointer}
 .pl-toast button:disabled{opacity:.6}
 .pl-toast button:focus-visible{outline:3px solid #f2c94c;outline-offset:2px}
 .pl-act{display:flex;gap:8px;flex-wrap:wrap}.pl-pop .pl-act button{flex:1 1 auto;min-height:44px;height:auto;display:inline-flex;align-items:center;justify-content:center;gap:6px}
@@ -604,7 +610,7 @@ body.pl-dragging,body.pl-dragging *{-webkit-user-select:none!important;user-sele
 .pl-fab{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:128px;z-index:65;width:56px;height:56px;padding:0;border-radius:50%;border:0;background:#2f7d5b;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px #0004;cursor:pointer}.pl-fab[hidden]{display:none}.pl-fab:focus-visible{outline:3px solid #14261f;outline-offset:2px}.pl-fab .dot{position:absolute;top:6px;right:6px;width:11px;height:11px;border-radius:50%;background:#e0a526;border:2px solid #fff;display:none}.pl-fab[data-plan="1"] .dot{display:block}body:has(.pl-pop) .pl-fab,body:has(.pl-night) .pl-fab{display:none}
 .pl-num.pl-sleepcard{grid-column:1 / -1;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}.pl-sleepcard>small:first-child{flex-basis:100%;display:flex;align-items:center;gap:4px}.pl-sleepcard>b{margin-top:0}.pl-sleepcard .pl-sleeplack{flex-basis:100%;margin:2px 0 0;font:600 13.5px/1.45 "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#7a4a00}.pl-sleepcard .pl-sleepnote{flex-basis:100%;display:block}.pl-sleepcard .pl-sleepfine{color:#7b8a82;font-size:12px}.pl-sleepcard .pl-sleepbtn{min-height:44px}
 .pl-nowdo{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px;padding:6px 12px;min-height:56px;border:1px solid #cfdcd5;border-radius:12px;background:#fff}
-.pl-nowdo.idle{background:#f6f8f7;border-color:#e1e8e4}.pl-nowst{font:800 15px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#14261f}.pl-nowdo[data-state=paused] .pl-nowst{color:#8a5a00}.pl-nowdo[data-state=wait] .pl-nowst{color:#2c4a6e}
+.pl-nowdo.idle{background:#f6f8f7;border-color:#e1e8e4}.pl-nowst{font:800 15px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#14261f}.pl-nowdo[data-state=paused] .pl-nowst{color:#8a5a00}.pl-nowdo[data-state=wait] .pl-nowst,.pl-nowdo[data-state=transit] .pl-nowst{color:#2c4a6e}.pl-nowdo[data-state=transit]{background:#f3f7fb;border-color:#cbd9e8}.pl-arrive{width:300px}.pl-arrive input{width:100%;box-sizing:border-box;margin:6px 0}
 .pl-nowmeta{font:500 13px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#3d4f46}.pl-nowprog{flex:1 1 120px;min-width:80px;height:6px;border-radius:3px;background:#e4ece7;overflow:hidden}.pl-nowprog>i{display:block;height:100%;background:#2f7d5b}
 .pl-nowmore{font:700 12px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#4b6358;background:#eef2ef;border-radius:999px;padding:3px 8px}.pl-nowact,.pl-nowatt{display:inline-flex;gap:6px;margin-left:auto}.pl-nowdo .pl-nowib{width:44px;height:44px}.pl-nowbtn{min-height:44px;min-width:56px;padding:0 14px;border-radius:999px;border:1px solid #2f7d5b;background:#fff;color:#14261f;font:700 13.5px "Pretendard Variable",Pretendard,system-ui,sans-serif}.pl-nowmsg{flex-basis:100%;color:#8f2a18;font:500 12px "Pretendard Variable",Pretendard,system-ui,sans-serif}.pl-nowmsg:empty{display:none}
 .pl-blk.cut{border-bottom:2px dashed #6b7c73}
@@ -944,37 +950,94 @@ export function createPlan(app) {
   function undoEnd(b, name, at) {
     return async () => {
       let done = false; const d = b.date || ctx.today;
-      const ok = await save((s) => { done = false; if (b.k === 'class') { const l = s.classLog?.[b.cls.id]; if (l && l.date === d && (!at || l.endedAt === at)) { delete l.endedAt; done = true; } } else { const r = s.actual?.[b.akey]; if (r && (!at || r.endAt === at)) { delete r.endAt; delete r.plannedEnd; done = true; } } });
+      const ok = await save((s) => { done = false; if (b.k === 'class') { const l = s.classLog?.[b.cls.id]; if (l && l.date === d && (!at || l.endedAt === at)) { for (const k of ['endedAt', 'endedAtISO', 'actualSec', 'plannedStart', 'plannedEnd']) delete l[k]; done = true; } } else { const r = s.actual?.[b.akey]; if (r && (!at || r.endAt === at)) { delete r.endAt; delete r.plannedEnd; done = true; } } });
       if (!ok) return false; if (!done) { app.status?.('그 사이 다른 화면에서 끝 시각이 바뀌어 되돌리지 않았어요.', true); return false; }
       app.status?.(`${name} 예정 시각으로 되돌렸어요.`); return true;
     };
+  }
+  // 옛 수업 기록(예정 시각 없이 종료 시각만 있는 것)의 예정 시각을 학교 시간표(과목 요일 슬롯)에서 찾는다
+  function plannedOfLog(l) {
+    const dow = new Date(l.date + 'T00:00:00Z').getUTCDay(), c = (ctx.classSlots || []).find((x) => x.name === l.course), sl = (c?.slots || []).find((x) => x.d === dow);
+    return sl ? { s: sl.s, e: sl.e } : null;
   }
   async function doEnd(b) {
     const nowM = nowMin(), planned = b.plannedE ?? b.e, at = hm(nowM), name = shortName(b), d = b.date || ctx.today;
     if (!(nowM > b.s && nowM < planned)) { app.status?.('지금은 끝낼 수 있는 시간이 아니에요(시작 뒤 ~ 예정 끝 앞).', true); return false; }
     if (nowM - b.s < 5 && !confirm('시작한 지 5분이 안 됐어요. 그래도 지금 끝낼까요?')) return false;
     if (!confirm(`${name} 을(를) 지금(${at})에 끝낼까요?\n예정 ${hme(planned)}보다 ${dur(planned - nowM)} 일찍 끝나고, 시간표 블록이 ${at}까지로 줄어요. 되돌릴 수 있어요.`)) return false;
+    const nowMs = Date.now(), actualSec = b.k === 'class' ? Math.max(1, Math.round((nowMs - msOf(d, b.s)) / 1000)) : 0;   // 예정 시작부터 지금까지(초) — 제시간에 시작했다고 보는 근사
     let applied = false;   // 실제로 내 끝 시각이 기록됐는가(다른 화면이 먼저 다른 시각으로 끝냈으면 건너뛰고 그 기록을 유지)
     const ok = await save((s) => {
       applied = false;
       if (b.k === 'class') {
         s.classLog = s.classLog || {}; const l = (s.classLog[b.cls.id] = s.classLog[b.cls.id] || {});
         if (hhmm(l.endedAt) && l.endedAt !== at && l.date === d) return;
-        Object.assign(l, { endedAt: at, course: b.cls.course, date: d }); applied = true; if (b.akey) mutActual(b.akey, (r) => closeOpen(r, at))(s); return;
+        Object.assign(l, { endedAt: at, endedAtISO: new Date(nowMs).toISOString(), actualSec, plannedStart: hm(b.s), plannedEnd: hm(planned), course: b.cls.course, date: d }); applied = true; if (b.akey) mutActual(b.akey, (r) => closeOpen(r, at))(s); return;
       }
       mutActual(b.akey, (r) => { if (hhmm(r.endAt) && r.endAt !== at) return; r.endAt = at; r.plannedEnd = hm(planned); closeOpen(r, at); applied = true; })(s);
     });
     if (!ok) return false;
     if (!applied) { app.status?.('다른 화면에서 이미 다른 시각으로 끝냈어요. 그 기록을 그대로 뒀어요.', true); return false; }
-    toast(`${name} ${at}에 끝냈어요 · 예정 ${hme(planned)}`, '예정 시각으로 되돌리기', undoEnd({ ...b }, name, at));
+    let extra = ''; if (b.k === 'class') { try { extra = '\n' + endComparison({ date: d, sec: actualSec, plannedSec: Math.max(1, (planned - b.s) * 60) }, classRuns(v60.classLog, b.cls.course, plannedOfLog)).lines.join('\n'); } catch { extra = ''; } }
+    toast(`${name} ${at}에 끝냈어요 · 예정 ${hme(planned)}${extra}`, '예정 시각으로 되돌리기', undoEnd({ ...b }, name, at), extra ? 16000 : 10000);
     return true;
+  }
+  // ── 이동 중 · 도착(대표님 10/12): 일정이 끝나면(예정대로든 종료를 눌렀든) 자동으로 「이동 중」, 도착하면 한 버튼(정지)으로 「어디로 갔어요?」 칩 → 위치 기록(v60.place) + 이동 시간 기록(v60.transitLog) ──
+  // 화면에서 계산만 하고(저장 없음), 도착을 눌렀을 때에만 쓴다 — 누르지 않으면 위치를 추정으로 채우지 않는다. 「이동 아니에요」는 그 끝 시각을 기억해 이 판정을 끈다(v60.moveOff).
+  const blockPlace = (b) => eventPlaceItems([b])[0]?.label || '';
+  function transitNow(nowM) {
+    const ended = fixedBlocks(ctx.today).filter((b) => !notDoable(b) && LY.ok(b) && b.e <= nowM && !(b.k === 'class' && ['absent', 'excused'].includes(b.cls?.record?.status))).map((b) => ({ e: b.e, name: shortName(b), isMove: blockCat(b) === '이동' }));
+    return transitState({ ended, nowM, placeRecs: v60.place?.[ctx.today] || [], dismissed: v60.moveOff?.[ctx.today] || [] });
+  }
+  function arrivalPopup(anchor, since, name, startHM) {
+    const { pop, close } = mkPop('div', 'pl-arrive', '어디로 갔어요?', anchor); pop.setAttribute('role', 'dialog');
+    const nowM = nowMin(), nxt = fixedBlocks(ctx.today).filter((b) => !notDoable(b) && b.s > nowM).sort((a, b) => a.s - b.s).slice(0, 3).map((b) => ({ name: shortName(b), place: blockPlace(b) }));
+    const rec = []; for (const d of Object.keys(v60.place || {}).sort().reverse()) for (const r of (v60.place[d] || []).slice().reverse()) rec.push(r.p);
+    const chips = arrivalChips({ next: nxt, recents: rec.slice(0, 12), base: PLACES.filter((p) => p !== '이동 중') });
+    let what = ''; pop.append(el('b', '어디로 갔어요?'));
+    const msg = el('small', '', 'pl-popnote'); msg.setAttribute('role', 'status');
+    const finish = async (p) => {
+      p = String(p || '').trim(); if (!p) return; for (const x of pop.querySelectorAll('button,input')) x.disabled = true; msg.textContent = '저장 중…';
+      what = whatIn.value.trim();
+      const t = hm(nowMin()), date = ctx.today, sinceHM = since != null ? hm(since) : startHM || t, opId = `${date}|${sinceHM}|${t}`;
+      const ok = await save((s) => {
+        s.place = s.place || {}; const list = (s.place[date] = s.place[date] || []);
+        if (since != null && !list.some((r) => r.t === sinceHM && r.p === '이동 중')) list.push({ t: sinceHM, p: '이동 중' });
+        const last = list[list.length - 1]; if (last && last.t === t) last.p = p; else if (!list.some((r) => r.t === t && r.p === p)) list.push({ t, p });
+        list.sort((a, b2) => a.t.localeCompare(b2.t));
+        s.transitLog = s.transitLog || []; if (!s.transitLog.some((x) => x.id === opId)) { s.transitLog.push({ id: opId, date, s: sinceHM, e: t, after: name || '', to: p, ...(what ? { what } : {}) }); if (s.transitLog.length > 300) s.transitLog.splice(0, s.transitLog.length - 300); }
+      });
+      if (ok) { close(); app.status?.(`${p} 도착을 기록했어요 · 이동 ${dur(mins(t) - mins(sinceHM))}`); } else { msg.textContent = '저장하지 못했어요 · 다시 눌러요'; for (const x of pop.querySelectorAll('button,input')) x.disabled = false; }
+    };
+    pop.append(el('small', '뭐 하러 왔어요? (선택)', 'pl-popnote'));
+    const whatIn = el('input'); whatIn.placeholder = chips.what.length ? '직접 입력' : '예: 공부, 점심'; whatIn.maxLength = 24; whatIn.setAttribute('aria-label', '뭐 하러 왔어요');
+    if (chips.what.length) {
+      const g = el('div', undefined, 'pl-pick');
+      for (const w of chips.what) { const x = el('button', w); x.type = 'button'; x.setAttribute('aria-pressed', 'false'); x.onclick = () => { whatIn.value = whatIn.value === w ? '' : w; for (const y of g.children) y.setAttribute('aria-pressed', String(y === x && whatIn.value === w)); }; g.append(x); }
+      pop.append(g);
+    }
+    pop.append(whatIn);
+    pop.append(el('small', '어디예요?', 'pl-popnote')); const g2 = el('div', undefined, 'pl-pick');
+    for (const w of chips.where) { const x = el('button', w.p); x.type = 'button'; if (w.why) x.title = w.why; x.onclick = () => finish(w.p); g2.append(x); }
+    pop.append(g2);
+    const other = el('input'); other.placeholder = '직접 입력'; other.maxLength = 24; other.setAttribute('aria-label', '도착한 곳 직접 입력'); other.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); finish(other.value); } };
+    const no = el('button', '닫기', 'ghost'); no.type = 'button'; no.onclick = close; pop.append(other, msg, no);
+    document.body.append(pop); const r = anchor.getBoundingClientRect(); placePop(pop, r.left, r.bottom + 8); other.focus({ preventScroll: true });
   }
   // 시간표 위 「지금 하는 일」 한 줄: 상태 · 경과/남은 시간 · 진행 막대 · 재생·정지·종료. 수업은 출석(정상·지각)을 누른 뒤에만 「수업 중」
   let nowBusy = false;
   function nowBar() {
     const nowM = nowMin(), { main, others } = nowDoing(nowM), box = el('div', undefined, 'pl-nowdo'); box.setAttribute('role', 'group'); box.setAttribute('aria-label', '지금 하는 일');
     if (!main) {
-      const nx = nextBlock(nowM), hid = fixedBlocks(ctx.today).filter((b) => !notDoable(b) && !LY.ok(b) && b.s <= nowM && nowM < b.e).length; box.classList.add('idle'); box.dataset.state = 'idle';
+      const nx = nextBlock(nowM), tr = transitNow(nowM), hid = fixedBlocks(ctx.today).filter((b) => !notDoable(b) && !LY.ok(b) && b.s <= nowM && nowM < b.e).length;
+      if (tr) {   // 일정이 끝났다 → 자동으로 이동 중. 도착하면 같은 버튼(정지)으로
+        box.dataset.state = 'transit'; const st0 = el('b', `이동 중 · ${tr.name} 끝난 뒤`, 'pl-nowst'); st0.setAttribute('role', 'status'); st0.setAttribute('aria-live', 'polite');
+        const still = gpsStill() && gpsDesc?.state === 'fresh', meta0 = el('span', `${hm(tr.since)}부터 ${dur(nowM - tr.since)} · ${nx ? `다음 ${hm(nx.s)} ${shortName(nx)}` : '다음 일정 없음'}${still ? ' · GPS 로 보니 멈춰 있어요 — 도착했다면 정지를 눌러요' : ''}`, 'pl-nowmeta'), act0 = el('span', undefined, 'pl-nowact'); act0.setAttribute('role', 'group'); act0.setAttribute('aria-label', '도착 · 이동 아님');
+        const arrive = el('button', undefined, 'pl-ib pl-nowib'); arrive.type = 'button'; arrive.innerHTML = svg(ICON.stop); arrive.setAttribute('aria-label', '정지 — 도착했어요(어디로 갔는지 남겨요)'); arrive.title = '정지 — 도착했어요'; arrive.onclick = () => arrivalPopup(arrive, tr.since, tr.name);
+        const no0 = el('button', '이동 아니에요', 'pl-nowbtn'); no0.type = 'button'; no0.onclick = () => { const k = hm(tr.since); save((s) => { s.moveOff = s.moveOff || {}; const l = (s.moveOff[ctx.today] = s.moveOff[ctx.today] || []); if (!l.includes(k)) l.push(k); }); };
+        act0.append(arrive, no0); box.append(st0, meta0, act0); return box;
+      }
+      box.classList.add('idle'); box.dataset.state = 'idle';
       box.append(el('b', hid ? '보이는 일정이 없어요' : '지금은 일정이 없어요', 'pl-nowst'), el('span', (hid ? `숨긴 레이어 일정 ${hid}개가 진행 중이에요 · ` : '') + (nx ? `다음 ${hm(nx.s)} ${shortName(nx)}까지 ${dur(nx.s - nowM)}` : '오늘 남은 일정이 없어요'), 'pl-nowmeta'));
       return box;
     }
@@ -1005,7 +1068,8 @@ export function createPlan(app) {
     const mk = (icon, lab, tip, fn, dis) => { const x = el('button', undefined, 'pl-ib pl-nowib'); x.type = 'button'; x.innerHTML = svg(ICON[icon]); x.setAttribute('aria-label', lab); x.title = tip; x.disabled = !!dis; x.onclick = () => { if (nowBusy) return; nowBusy = true; Promise.resolve(fn()).finally(() => { nowBusy = false; }); }; return x; };
     const act = el('span', undefined, 'pl-nowact'); act.setAttribute('role', 'group'); act.setAttribute('aria-label', '재생 · 정지 · 종료');
     const can = b.k !== 'exam' && !!b.akey;
-    if (canPause(b)) act.append(paused ? mk('play', '재생 — 정지했던 것을 이어요', '재생 — 정지했던 것을 이어요(쉰 시간은 기록돼요)', () => doResume(b), !can) : mk('pause', '정지 — 잠깐 쉬어요(쉰 시간으로 기록, 블록은 그대로)', '정지 — 딴짓·자리 비움. 블록 시간은 줄지 않아요', () => doPause(b), !can));
+    if (blockCat(b) === '이동') { const arrive = mk('stop', '정지 — 도착했어요(어디로 갔는지 남겨요)', '정지 — 도착했어요', () => { arrivalPopup(act, null, shortName(b), hm(b.s)); return Promise.resolve(); }, false); act.append(arrive); }
+    else if (canPause(b)) act.append(paused ? mk('play', '재생 — 정지했던 것을 이어요', '재생 — 정지했던 것을 이어요(쉰 시간은 기록돼요)', () => doResume(b), !can) : mk('pause', '정지 — 잠깐 쉬어요(쉰 시간으로 기록, 블록은 그대로)', '정지 — 딴짓·자리 비움. 블록 시간은 줄지 않아요', () => doPause(b), !can));
     act.append(mk('stop', '종료 — 지금 끝내요(시간표 블록이 지금까지로 줄어요)', '종료 — 지금을 실제 끝으로 기록하고 블록을 줄여요', () => doEnd(b), !can));
     box.append(act, msg); return box;
   }
@@ -1158,7 +1222,7 @@ export function createPlan(app) {
     const isMv = (p) => p.bk === '이동' && (p.from || p.to), all = (ctx.plans || []).filter((p) => isMv(p) && LY.ok({ k: 'plan', plan: p, date: p.date, title: p.note || '' }));   // 숨긴 레이어의 이동은 위치 열에서도 뺀다(직접 찍은 위치 기록은 그대로)
     const moves = all.filter((p) => p.date === date).map((p) => ({ s: mins(p.s), e: actEndOfPlan(p) ?? mins(p.e), from: p.from, to: p.to, tentative: planState(p) === 'tentative' }));   // 확정 전(지난 계획 포함)은 점선 — 실제로 갔는지 모르는 것을 실선으로 단정하지 않는다
     const prev = all.filter((p) => p.date < date && p.date >= addDays(date, -7) && p.to).sort((a, b) => (a.date + a.e).localeCompare(b.date + b.e)).pop();
-    return placeSegments({ moves, recs: v60.place?.[date] || [], prevTo: prev?.to || '', prevTentative: !!prev && planState(prev) === 'tentative', nowM, isToday: date === ctx.today });
+    return placeSegments({ moves, recs: v60.place?.[date] || [], prevTo: prev?.to || '', prevTentative: !!prev && planState(prev) === 'tentative', nowM, isToday: date === ctx.today, extra: eventPlaceItems(fixedBlocks(date)) });
   }
   function placeLane(date, PX, nowM, narrow) {
     const lane = el('div', undefined, 'pl-lane' + (narrow ? ' narrow' : '')); lane.setAttribute('aria-label', '있던 곳');
@@ -1170,7 +1234,7 @@ export function createPlan(app) {
       if (d.kind === 'move') { line.append(pin()); if (!small) { line.append(document.createTextNode(d.from || ''), el('b', '→'), pin(), document.createTextNode(d.to || '')); } } else { line.append(pin()); if (!small) line.append(document.createTextNode(d.label)); }
       if (small && narrow && (d.e - d.s) * PX >= 60) { const v = el('em', d.kind === 'move' ? d.label : d.label, 'pl-vtext'); line.append(v); }
       seg.append(line);
-      const why = d.kind === 'move' ? '이동 일정' : d.inferred ? '직전 이동의 도착지' : '이동 일정의 도착지';
+      const why = d.kind === 'move' ? '이동 일정' : d.event ? '일정에 적힌 장소' : d.inferred ? '직전 이동의 도착지' : '이동 일정의 도착지';
       seg.title = `${hm(d.s)}–${hme(d.e)} ${d.label} — ${why}${d.tentative ? '(미확정)' : ''}에서 예상한 위치예요. 실제 위치는 「지금 위치」 기록이 우선이에요.`; seg.setAttribute('role', 'img'); seg.setAttribute('aria-label', seg.title); lane.append(seg);
     }
     const recs = info.rec;
@@ -1182,11 +1246,55 @@ export function createPlan(app) {
     });
     return lane;
   }
+  // ── GPS 칩(대표님 10/12 E): 서버가 가진 마지막 위치(장소·정확도·시각만)를 칩으로, 「지금 위치 갱신」을 누를 때만 이 기기 위치를 받아 서버로(src:'study'). 제안일 뿐 위치 기록(v60.place)에는 쓰지 않는다. 좌표는 화면·상태에 남기지 않는다. ──
+  let gpsDesc = null, gpsAt = 0, gpsBusy = false, gpsMsg = '', gpsPts = [], gpsAutoAt = 0, gpsLoading = false;
+  const gpsStill = () => { try { return stillNow(gpsPts); } catch { return false; } };
+  function paintGps() {
+    if (!host?.isConnected) return; const chip = host.querySelector('.pl-gps'); if (!chip) return;
+    const d = gpsDesc, secure = secureOk(), txt = gpsLoading && !d ? 'GPS 확인 중…' : d ? d.text : 'GPS 상태를 못 읽었어요';
+    chip.textContent = txt; chip.dataset.state = d?.state || 'unknown'; chip.title = d?.place ? `서버가 아는 마지막 위치: ${d.place}` : 'GPS 상태';
+    const b = host.querySelector('.pl-gpsbtn'); if (b) { b.disabled = gpsBusy || !secure; b.title = !secure ? 'GPS 는 HTTPS 주소(또는 localhost)에서만 켜져요' : '지금 위치 갱신 — 이 기기의 GPS 로 한 번 확인해요(누를 때 위치 권한을 물어요)'; b.setAttribute('aria-label', b.title); }
+    const note = host.querySelector('.pl-gpsnote'); if (note) { note.textContent = !secure ? 'HTTPS 주소에서만 켜져요' : gpsBusy ? '위치 확인 중…' : gpsMsg; note.hidden = !note.textContent; }
+    const au = host.querySelector('.pl-gpsauto'); if (au) { au.setAttribute('aria-pressed', String(!!v60?.cfg?.gpsAuto)); au.disabled = !secure; }
+    const sg = suggestPlace(d, PLACES); for (const x of host.querySelectorAll('.pl-placebar .pl-chip[data-p]')) { const on = x.dataset.p === sg; x.classList.toggle('gps-suggest', on); if (on) x.title = 'GPS 제안 — 눌러서 확정해요'; else x.removeAttribute('title'); }
+  }
+  async function loadGps(force) {
+    if (gpsLoading) return; if (!force && Date.now() - gpsAt < 20000) { paintGps(); return; } gpsLoading = true; paintGps();
+    try { gpsDesc = describeFix(await fetchLast()); } catch { gpsDesc = null; } finally { gpsLoading = false; gpsAt = Date.now(); paintGps(); }
+  }
+  async function gpsRefresh(silent) {
+    if (gpsBusy) return; gpsBusy = true; gpsMsg = ''; paintGps();
+    try {
+      const pos = await getPosition(globalThis.navigator?.geolocation); gpsPts.push({ t: Date.now(), la: pos.la, lo: pos.lo, acc: pos.acc }); gpsPts = gpsPts.slice(-6);
+      await postFix(pos); gpsDesc = describeFix(await fetchLast()); gpsAt = Date.now();
+    } catch (e) {
+      gpsMsg = ERR_TEXT[e?.kind] || ERR_TEXT.unavailable;
+      if (e?.kind === 'denied' && v60?.cfg?.gpsAuto) save((s) => { s.cfg = s.cfg || {}; s.cfg.gpsAuto = false; });   // 권한이 거부되면 자동은 스스로 끈다
+    } finally { gpsBusy = false; paintGps(); }
+    void silent;
+  }
+  // 자동 갱신은 권한이 이미 「허용」으로 확인된 때만 한다 — 미결정이거나 확인할 수 없으면 사용자가 버튼을 누를 때까지 기다린다(클릭 없이 권한 창을 띄우지 않음)
+  async function gpsAutoTick() {   // 화면이 보이는 동안만, 켜 둔 경우에만 AUTO_MIN 분마다 한 번
+    try {
+      if (!v60?.cfg?.gpsAuto || document.hidden || !host?.isConnected || gpsBusy || !secureOk() || Date.now() - gpsAutoAt < AUTO_MIN * 60000) return;
+      const perm = await globalThis.navigator?.permissions?.query?.({ name: 'geolocation' }).catch(() => null); if (perm?.state !== 'granted') return;
+      if (gpsBusy || document.hidden || !host?.isConnected) return; gpsAutoAt = Date.now(); gpsRefresh(true);
+    } catch { /* 자동 갱신 실패는 조용히 */ }
+  }
+  function gpsChips() {
+    const wrap = el('span', undefined, 'pl-gpswrap'), chip = el('span', 'GPS 확인 중…', 'pl-gps'); chip.setAttribute('role', 'status'); chip.setAttribute('aria-live', 'polite');
+    const b = ib('locate', '지금 위치 갱신'); b.classList.add('pl-gpsbtn'); b.onclick = () => gpsRefresh(false);
+    const au = el('button', 'GPS 자동', 'pl-chip pl-gpsauto'); au.type = 'button'; au.setAttribute('aria-pressed', 'false'); au.title = `켜면 화면이 보이는 동안 ${AUTO_MIN}분마다 위치를 갱신해요(백그라운드·화면 꺼짐에서는 안 돼요)`;
+    au.onclick = () => { const on = !v60?.cfg?.gpsAuto; if (on) { gpsAutoAt = Date.now(); gpsRefresh(false); }   /* 위치 요청은 사용자 제스처 안에서 바로(저장을 기다리지 않음) */
+      save((s) => { s.cfg = s.cfg || {}; s.cfg.gpsAuto = on; }); };
+    const note = el('small', '', 'pl-gpsnote'); note.hidden = true; note.setAttribute('role', 'status');
+    wrap.append(chip, b, au, note); return wrap;
+  }
   function placeBar(date) {
     const box = el('div', undefined, 'pl-placebar'); box.setAttribute('role', 'group'); box.setAttribute('aria-label', '지금 위치 기록');
-    box.append(el('span', '지금 위치', 'pl-placelabel'));
+    box.append(el('span', '지금 위치', 'pl-placelabel'), gpsChips()); Promise.resolve().then(() => loadGps(false));   // 칩이 화면에 붙은 뒤에 칠한다
     const add = (p) => { const t = hm(nowMin()); save((s) => { s.place = s.place || {}; const list = (s.place[date] = s.place[date] || []); const last = list[list.length - 1]; if (last && last.t === t) last.p = p; else if (!last || last.p !== p) list.push({ t, p }); }); };
-    for (const p of PLACES) { const b = el('button', p, 'pl-chip'); b.type = 'button'; b.onclick = () => add(p); box.append(b); }
+    for (const p of PLACES) { const b = el('button', p, 'pl-chip'); b.type = 'button'; b.dataset.p = p; b.onclick = () => add(p); box.append(b); }
     const other = el('input', undefined, 'pl-placein'); other.placeholder = '직접'; other.maxLength = 20; other.setAttribute('aria-label', '다른 장소');
     other.onkeydown = (e) => { if (e.key === 'Enter' && other.value.trim()) { add(other.value.trim()); other.value = ''; } };
     box.append(other);
@@ -2183,7 +2291,7 @@ export function createPlan(app) {
     // 할 일 목록은 공부·과제·공모전 세 묶음, 자동 배치는 집중 과목 밖이면 마감 오늘·내일일 때만
     async render(target, c) {
       const sameDay = ctx && ctx.today === c.today && Date.now() < keepDayUntil;
-      host = target; ctx = c; day = sameDay ? day : c.today; bootDay = kst(); if (c.calendarOk) cache.set(c.today, c.calendar || []); else cache.delete(c.today);   // 확인 못 한 오늘 캘린더는 다시 받기
+      gpsAutoAt = Date.now(); host = target; ctx = c; day = sameDay ? day : c.today; bootDay = kst(); if (c.calendarOk) cache.set(c.today, c.calendar || []); else cache.delete(c.today);   // 확인 못 한 오늘 캘린더는 다시 받기
       host.replaceChildren(el('p', '공부 계획을 불러오는 중…', 'pl-empty'));
       try { await load(); } catch (e) { host.replaceChildren(el('p', e.message, 'pl-empty')); ctx.afterDraw?.(); return; }
       LY.init(); draw(); ctx.afterDraw?.();
@@ -2195,6 +2303,7 @@ export function createPlan(app) {
         if (sec % 60 === 59 && ctx && appleMissing(addDays(ctx.today, -1), ctx.today).length) ensureApple(addDays(ctx.today, -1), ctx.today).then(() => { if (host?.isConnected && !document.querySelector('.pl-pop') && !pend.length) draw(); });   // 워치 동기화로 늦게 채워지는 어젯밤·오늘 아침
         fabPlace();
         if (sec % 30 === 29) paintNow();
+        if (sec % 30 === 14) gpsAutoTick();
         if (sec % 60 === 59) { paintSleep(); if (ctx && v60 && lastSleepSig && sleepSig() !== lastSleepSig && !document.querySelector('.pl-pop') && !pend.length) draw(); }   // 목표 시각을 지나 계획이 바뀌면 시간표를 다시 그린다(열린 창이 있으면 미룸)   // 수면 시간대에 들어오거나 아침 확인 때가 되면 줄을 바꾼다(같은 문구면 그대로)
         if (++sec % 60 === 0 && followBox?.box?.isConnected) {   // 1분마다 지금 선을 옮기고, 직접 스크롤 안 했으면 화면이 따라감
           const now = nowMin(); if (followBox.line) { followBox.line.style.top = now * followBox.PX + 'px'; followBox.line.querySelector('span').textContent = hm(now); }

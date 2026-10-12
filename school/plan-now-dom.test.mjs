@@ -59,7 +59,7 @@ assert.equal(confirms.length, 1); assert.match(confirms[0], /14:20/); assert.mat
 assert.deepEqual([serverState.v60.actual[key].endAt, serverState.v60.actual[key].plannedEnd], ['14:20', '15:00']);
 assert.ok(workBlk().classList.contains('cut')); assert.match(workBlk().textContent + workBlk().title, /예정 15:00 → 실제 14:20/);
 assert.equal(Math.round(parseFloat(workBlk().style.height)), Math.round((14 * 60 + 20 - 13 * 60) * 54 / 60 - 2), '블록 높이가 실제 끝까지');
-assert.equal(st(), '지금은 일정이 없어요', '종료한 일정은 되살아나지 않음');
+assert.equal(st(), '이동 중 · 근로장학 끝난 뒤', '종료한 일정은 되살아나지 않고 자동으로 이동 중');
 assert.equal(document.querySelector('.pl-toast').textContent.includes('예정 시각으로 되돌리기'), true);
 // 4. 되돌리기(토스트): 예정 시각으로 복원
 click(document.querySelector('.pl-toast button')); await flush();
@@ -68,7 +68,8 @@ assert.equal(serverState.v60.actual[key].endAt, undefined); assert.ok(!workBlk()
 serverState = { v60: {} }; at(13, 3); await show(); confirms = []; click(btn('종료')); await flush(); assert.equal(confirms.length, 2, '5분 이내: 확인 2번');
 // 6. 자동 전환: 예정 끝(15:00)을 지나면 손 없이 「일정 없음」+ 다음 일정
 serverState = { v60: {} }; await show({ routine: { grid: { 월: [{ id: 'w1', title: '근로장학', start: '13:00', end: '15:00', kind: 'work' }, { id: 'w2', title: '저녁 알바', start: '18:00', end: '20:00', kind: 'work' }] } } });
-at(14, 59); plan._paintNow(); assert.equal(st(), '근로장학 근로 중'); at(15, 1); plan._paintNow(); assert.equal(st(), '지금은 일정이 없어요'); assert.match(bar().textContent, /다음 18:00 저녁 알바까지 2시간 59분/);
+at(14, 59); plan._paintNow(); assert.equal(st(), '근로장학 근로 중'); at(15, 1); plan._paintNow(); assert.equal(st(), '이동 중 · 근로장학 끝난 뒤'); assert.match(bar().textContent, /다음 18:00 저녁 알바/);
+at(17, 10); plan._paintNow(); assert.equal(st(), '지금은 일정이 없어요', '끝난 지 2시간이 넘으면 이동 중이라 단정하지 않음'); assert.match(bar().textContent, /다음 18:00 저녁 알바까지 50분/); at(15, 1);
 at(18, 30); plan._paintNow(); assert.equal(st(), '저녁 알바 중');
 // 7. 수업: 출석 전엔 「출석 확인」 + 버튼, 정상출석·지각 뒤 「수업 중」, 결석이면 진행 아님
 const cls = (status) => ({ scheduled: [{ id: 'a', courseId: 'c1', course: '정역학', date: '2026-10-12', s: '15:00', e: '16:30', room: '1공 409', record: status ? { status } : {} }], routine: { grid: {} } });
