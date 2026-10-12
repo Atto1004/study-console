@@ -274,18 +274,43 @@ export function splitByDate(from, to) {
 }
 export const hmAbs = (ms) => { const { min } = dateMinOf(ms); return hm(min); };
 // 그 날짜에 보일 수면 블록(조각). 그 날 아침의 밤(K=date)과 그 날 저녁에 자러 가는 밤(K=date+1)
-export function sleepBlocksOn(date, { sleep, appleFor, appleFail, cfg, nowMs }) {
-  const goal = sleepGoal(cfg), out = [];
+export function sleepBlocksOn(date, { sleep, appleFor, appleFail, cfg, nowMs, override }) {
+  const goal0 = sleepGoal(cfg), out = [];
   for (const K of [date, addDays(date, 1)]) {
+    const ov = override?.[K], goal = ov ? { ...goal0, bed: ov.bed, hours: ov.hours, wake: (ov.bed + Math.round(ov.hours * 60)) % 1440 } : goal0;   // 보충 수면: 그 밤의 목표를 이번만 바꿔 계산(저장 없음)
     const night = sleepNight(K, { sleep, apple: appleFor ? appleFor(K) : undefined, goal, nowMs, appleFailed: !!appleFail?.(K) });
     for (const p of night.parts) for (const seg of splitByDate(p.from, p.to)) {
       if (seg.date !== date) continue;
       const bedS = night.bedMs != null ? hmAbs(night.bedMs) : null, wakeS = night.wakeMs != null ? hmAbs(night.wakeMs) : null;
-      const title = p.kind === 'done' ? `취침 ${bedS} – 기상 ${wakeS}` : p.kind === 'mark' ? `취침 ${bedS} · 기상 기록 없음` : `목표 ${hmAbs(night.goalSpan[0])} – ${hmAbs(night.goalSpan[1])}`;
-      out.push({ k: 'sleep', s: seg.s, e: seg.e, title, date, sleep: { key: K, state: p.kind, src: night.src, bedMs: night.bedMs, wakeMs: night.wakeMs, goal: night.goalSpan, goalHours: goal.hours, goalNotes: goal.notes, notes: night.notes, contPrev: seg.contPrev, contNext: seg.contNext, from: p.from, to: p.to } });
+      const title = p.kind === 'done' ? `취침 ${bedS} – 기상 ${wakeS}` : p.kind === 'mark' ? `취침 ${bedS} · 기상 기록 없음` : `${ov ? '보충' : '목표'} ${hmAbs(night.goalSpan[0])} – ${hmAbs(night.goalSpan[1])}`;
+      out.push({ k: 'sleep', s: seg.s, e: seg.e, title, date, sleep: { key: K, state: p.kind, src: night.src, bedMs: night.bedMs, wakeMs: night.wakeMs, goal: night.goalSpan, goalHours: goal.hours, goalNotes: goal0.notes, supp: p.kind === 'plan' && ov ? ov.supp : null, notes: night.notes, contPrev: seg.contPrev, contNext: seg.contNext, from: p.from, to: p.to } });
     }
   }
   return out;
+}
+// ── 오늘의 수면 카드 · 보충 수면(대표님 10/12 「수면등록되면 오늘의 수면시간이 뜨고, 전날 수면이 부족하면 최소 몇 시간은 자야 하는지 표시해서 다음날 계획수면으로」) ──
+// 규칙 기반 추정이다(의학적 판단 아님): 목표(v60.cfg.sleepH, 기본 8)보다 1시간 넘게 모자란 날만 「부족」. 수면 부채는 하루에 1:1 로 갚아지지 않으므로
+// 권장 = 목표 + min(부족분의 절반을 30분 단위로 올림, 2시간), 10시간 상한. 기록이 모호하면(기상 없음·간격 3~14시간 밖) 부족 계산을 하지 않는다.
+export const SUPP = { shortBy: 1, cap: 2, max: 10, okMin: 3, okMax: 14 };
+export function sleepCardInfo(night, goalHours) {
+  if (!night || !night.src || night.bedMs == null) return null;   // 기록이 없으면 카드 없음(지어내지 않음)
+  const out = { src: night.src, bedMs: night.bedMs, wakeMs: night.wakeMs, hours: null, complete: false, lack: false, deficit: 0, rec: null, reason: '' };
+  if (night.wakeMs == null) { out.reason = 'nowake'; return out; }
+  const h = (night.wakeMs - night.bedMs) / 36e5; out.hours = h;
+  if (h < SUPP.okMin || h > SUPP.okMax) { out.reason = 'odd'; return out; }
+  out.complete = true;
+  if (h < goalHours - SUPP.shortBy) { out.lack = true; out.deficit = goalHours - h; out.rec = Math.min(SUPP.max, goalHours + Math.min(SUPP.cap, Math.ceil((out.deficit * 60) / 2 / 30) * 30 / 60)); }
+  return out;
+}
+// 오늘 밤(기상일 nightK)의 보충 계획: 기상은 목표 기상과 「내일 첫 일정 시작 − 준비 60분」 중 이른 쪽으로 고정하고 취침을 앞당긴다. 이미 지난 시각이면 지금부터 가능한 만큼만
+export function suppPlan({ nightK, firstStart, goal, rec, nowMs, prep = 60 }) {
+  let wake = goal.wake, basis = 'goal';
+  if (firstStart != null && firstStart - prep >= 0) { const cand = firstStart - prep; if (cand < goal.wake) { wake = cand; basis = 'first'; } else basis = 'goalEarly'; }   // 이른 일정도 반영(오타 1차), 첫 일정이 늦으면 목표 기상 그대로
+  const wakeMs = msOf(nightK, wake); let bedMs = wakeMs - Math.round(rec * 60) * 60000, truncated = false;
+  if (bedMs < nowMs) { bedMs = Math.ceil(nowMs / 600000) * 600000; truncated = true; }
+  const hours = (wakeMs - bedMs) / 36e5; if (!(hours >= SUPP.okMin)) return null;
+  const bed = dateMinOf(bedMs).min; if (!okBedGoal(hm(bed))) return null;
+  return { bed, hours, wake, rec, basis, truncated, first: firstStart, bedMs, wakeMs };
 }
 // 취침 목표 저장 한 번(저장 충돌 뒤 다시 적용돼도 같은 결과): 열 때 본 두 값(seen)이 그대로일 때만 바꾼다. 'applied' · 'conflict' · 'invalid'
 export const goalSeen = (cfg) => canon({ bed: cfg?.bed ?? null, sleepH: cfg?.sleepH ?? null });
@@ -574,6 +599,7 @@ button.pl-title.pl-edit:hover,button.pl-title.pl-edit:focus-visible{text-decorat
 .pl-mv{display:flex;flex-direction:column;gap:6px}.pl-mvest{display:flex;align-items:center;gap:6px;min-height:44px;font:500 13px/1.3 "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#2f4036}.pl-pop .pl-mvest input{width:22px!important;height:22px!important;padding:0!important;flex:none}.pl-pop .pl-mvplaces button{min-height:38px}
 .pl-pop .pl-attmsg.bad{color:#b3261e;font-weight:600}.pl-pick button[aria-busy=true]{opacity:.6}
 .pl-fab{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:128px;z-index:65;width:56px;height:56px;padding:0;border-radius:50%;border:0;background:#2f7d5b;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px #0004;cursor:pointer}.pl-fab[hidden]{display:none}.pl-fab:focus-visible{outline:3px solid #14261f;outline-offset:2px}.pl-fab .dot{position:absolute;top:6px;right:6px;width:11px;height:11px;border-radius:50%;background:#e0a526;border:2px solid #fff;display:none}.pl-fab[data-plan="1"] .dot{display:block}body:has(.pl-pop) .pl-fab,body:has(.pl-night) .pl-fab{display:none}
+.pl-num.pl-sleepcard{grid-column:1 / -1;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}.pl-sleepcard>small:first-child{flex-basis:100%;display:flex;align-items:center;gap:4px}.pl-sleepcard>b{margin-top:0}.pl-sleepcard .pl-sleeplack{flex-basis:100%;margin:2px 0 0;font:600 13.5px/1.45 "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#7a4a00}.pl-sleepcard .pl-sleepnote{flex-basis:100%;display:block}.pl-sleepcard .pl-sleepfine{color:#7b8a82;font-size:12px}.pl-sleepcard .pl-sleepbtn{min-height:44px}
 .pl-nowdo{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 10px;padding:6px 12px;min-height:56px;border:1px solid #cfdcd5;border-radius:12px;background:#fff}
 .pl-nowdo.idle{background:#f6f8f7;border-color:#e1e8e4}.pl-nowst{font:800 15px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#14261f}.pl-nowdo[data-state=paused] .pl-nowst{color:#8a5a00}.pl-nowdo[data-state=wait] .pl-nowst{color:#2c4a6e}
 .pl-nowmeta{font:500 13px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#3d4f46}.pl-nowprog{flex:1 1 120px;min-width:80px;height:6px;border-radius:3px;background:#e4ece7;overflow:hidden}.pl-nowprog>i{display:block;height:100%;background:#2f7d5b}
@@ -636,7 +662,47 @@ export function createPlan(app) {
       } catch { const at = Date.now(); for (const d of win) appleFailAt.set(d, at); }   // 실패 = 모름(없음 아님)
     }
   }
-  const sleepOn = (date) => sleepBlocksOn(date, { sleep: v60?.sleep || {}, appleFor, appleFail, cfg: v60?.cfg, nowMs: Date.now() });
+  // 보충 수면 상태: draw 때마다 한 번 계산(수면 블록이 같은 값을 쓴다). 계산 중에는 보충을 적용하지 않아 되돌이 호출이 없다
+  let suppInfo = { card: null, plan: null, off: false }, suppOverride = null, suppBusy = false; const suppFetched = new Set();
+  function computeSupp() {
+    suppBusy = true; suppInfo = { card: null, plan: null, off: false };
+    try {
+      if (!v60 || !ctx) return;
+      const K = ctx.today, goal = sleepGoal(v60.cfg), nowMs = Date.now();
+      const night = sleepNight(K, { sleep: v60.sleep || {}, apple: appleFor(K), goal, nowMs, appleFailed: appleFail(K) });
+      const card = sleepCardInfo(night, goal.hours); suppInfo = { card, plan: null, off: false, goal };
+      if (!card?.lack) return;
+      if (v60.suppOff?.[K]) { suppInfo.off = true; return; }
+      const T = addDays(K, 1);
+      if (!calOk(T) && !suppFetched.has(T)) { suppFetched.add(T); ensureCal(T, T).then(() => { if (host?.isConnected) draw(); }); }
+      const cands = fixedBlocks(T).filter((b) => b.k !== 'sleep' && b.k !== 'auto' && !(b.plan && planState(b.plan) === 'tentative') && ['고정', '이동'].includes(blockCat(b))).sort((a, b) => a.s - b.s), firstB = cands[0] || null;
+      const plan = suppPlan({ nightK: T, firstStart: firstB ? firstB.s : null, goal, rec: card.rec, nowMs });
+      suppInfo.plan = plan ? { ...plan, tomorrowKnown: calOk(T), firstTitle: firstB ? String(firstB.title).replace(/\s*수업\s*$/, '') : '' } : null;
+    } finally { suppBusy = false; suppOverride = suppInfo.plan ? { [addDays(ctx.today, 1)]: { bed: suppInfo.plan.bed, hours: suppInfo.plan.hours, supp: suppInfo.plan } } : null; }
+  }
+  const suppOffSave = (on) => save((s) => { s.suppOff = s.suppOff || {}; for (const d of Object.keys(s.suppOff)) if (d < addDays(ctx.today, -3)) delete s.suppOff[d]; if (on) s.suppOff[ctx.today] = true; else delete s.suppOff[ctx.today]; });
+  function sleepCard() {
+    const c = suppInfo.card; if (!c) return null;
+    const box = el('section', undefined, 'pl-num pl-sleepcard'); box.setAttribute('aria-label', '오늘의 수면');
+    const head = el('small'); head.innerHTML = svg(ICON.moon); head.append(el('span', ' 오늘의 수면')); box.append(head);
+    const when = `취침 ${hmAbs(c.bedMs)}${c.wakeMs != null ? ` · 기상 ${hmAbs(c.wakeMs)}` : ' · 기상 기록 없음'}`;
+    if (c.reason === 'nowake') { box.append(el('b', when), el('small', `출처 ${c.src}`)); return box; }
+    box.append(el('b', `약 ${fmtHours(c.hours)} (추정)`), el('small', `${when} · 출처 ${c.src}`));
+    if (c.reason === 'odd') { box.append(el('small', '기록이 불완전해서 보충 계산을 안 해요.', 'pl-sleepnote')); return box; }
+    if (!c.lack) return box;
+    const gh = suppInfo.goal.hours;
+    box.append(el('p', `목표 ${fmtHours(gh)}보다 ${fmtHours(c.deficit)} 부족해요. 오늘 밤은 ${fmtHours(c.rec)} 정도 자면 좋아요(추정치).`, 'pl-sleeplack'));
+    const p = suppInfo.plan;
+    if (suppInfo.off) { const b = el('button', '보충 수면 다시 보기', 'pl-sleepbtn ghost'); b.type = 'button'; b.onclick = () => suppOffSave(false); box.append(el('small', '보충 수면은 오늘 숨겨 뒀어요.', 'pl-sleepnote'), b); }
+    else if (p) {
+      const basis = p.basis === 'first' ? `내일 첫 일정 ${hm(p.first)}${p.firstTitle ? ' ' + p.firstTitle : ''}(준비 60분)에 맞춰 기상을 잡았어요.` : p.basis === 'goalEarly' ? `내일 첫 일정이 ${hm(p.first)}로 늦어 목표 기상을 그대로 썼어요.` : p.tomorrowKnown ? '내일 이른 일정이 없어 목표 기상을 그대로 썼어요.' : '내일 일정을 확인하지 못해 목표 기상으로 계산했어요.';
+      box.append(el('small', `보충 수면 계획 ${hm(p.bed)}–${hm(p.wake)}(점선 · 저장하지 않아요) · ${basis}${p.truncated ? ` 이미 늦어서 지금부터 가능한 ${fmtHours(p.hours)}만 잡았어요.` : ''}`, 'pl-sleepnote'));
+      const b = el('button', '그대로 둘게요', 'pl-sleepbtn ghost'); b.type = 'button'; b.setAttribute('aria-label', '보충 수면을 오늘은 숨기기'); b.onclick = () => suppOffSave(true); box.append(b);
+    } else box.append(el('small', '오늘 밤 보충 수면을 잡을 시간이 부족해 계획은 만들지 않았어요.', 'pl-sleepnote'));
+    box.append(el('small', '목표 대비 부족분의 절반(최대 2시간, 10시간 상한)으로 잡은 규칙 기반 추정이에요. 의학적 판단이 아니에요.', 'pl-sleepnote pl-sleepfine'));
+    return box;
+  }
+  const sleepOn = (date) => sleepBlocksOn(date, { sleep: v60?.sleep || {}, appleFor, appleFail, cfg: v60?.cfg, nowMs: Date.now(), override: suppBusy ? null : suppOverride });
 
   async function load() {
     const r = await fetch('/api/study/state', { credentials: 'same-origin', cache: 'no-store' });
@@ -1490,9 +1556,10 @@ export function createPlan(app) {
     const { pop, close } = mkPop('div', 'pl-info', '', anchor), n = b.sleep, sleepMore = [];
     pop.setAttribute('aria-label', b.title);
     if (n.state === 'plan') {
-      pop.append(el('b', '계획 수면'), el('small', `취침 ${hmAbs(n.goal[0])} · 기상 ${hmAbs(n.goal[1])}(목표 수면 ${fmtHours(n.goalHours)} 기준)`, 'pl-popnote'));
+      pop.append(el('b', n.supp ? '보충 수면(계획)' : '계획 수면'), el('small', `취침 ${hmAbs(n.goal[0])} · 기상 ${hmAbs(n.goal[1])}(목표 수면 ${fmtHours(n.goalHours)} 기준)`, 'pl-popnote'));
       sleepMore.push(el('small', '저장하지 않는 계산 블록이에요. 삭제할 수 없고, 목표를 바꾸면 앞으로 올 모든 밤의 계획이 같이 바뀌어요.' + (n.bedMs != null ? ' 이 밤은 취침 기록이 있어 그 뒤 목표 기상까지만 계획으로 이어 보여요.' : n.from > n.goal[0] ? ' 지금 진행 중인 밤이라 지금부터 목표 기상까지만 보여요.' : ''), 'pl-popnote'));
       const go = el('button', '목표 바꾸기'); go.type = 'button'; go.onclick = () => { close(); goalPopup(anchor); }; pop.append(go);
+      if (n.supp) { sleepMore.push(el('small', `어젯밤 부족분을 반영해 ${fmtHours(n.supp.rec)}로 늘린 규칙 기반 추정이에요(목표 대비 부족분의 절반, 최대 2시간). 의학적 판단이 아니에요.`, 'pl-popnote')); const off = el('button', '그대로 둘게요(오늘 보충 숨김)', 'ghost'); off.type = 'button'; off.onclick = () => { close(); suppOffSave(true); }; pop.append(off); }
     } else if (n.state === 'mark') {
       pop.append(el('b', '취침 기록'), el('small', `${absLabel(n.bedMs)} 취침 · 기상 기록 없음`, 'pl-popnote'));
       sleepMore.push(el('small', `출처: ${n.src}. 기상 시각을 목표값으로 채워 넣지 않았어요. 앱 기록이면 홈 위쪽 수면 줄에서 기상을 남겨요.`, 'pl-popnote'));
@@ -1854,6 +1921,7 @@ export function createPlan(app) {
       + Object.entries(v60.run).reduce((n, [k, r]) => n + ((r?.day || ctx.today) === ctx.today ? Math.round(elapsed(k) / 60000) : 0), 0);
     const box = el('div', undefined, 'pl-nums');
     for (const [label, value] of [['지금부터 빈 시간', dur(free)], ['남은 과제 예상', dur(open.reduce((n, t) => n + t.est.min, 0))], ['오늘 실제', dur(actual)]]) { const c = el('div', undefined, 'pl-num'); c.append(el('small', label), el('b', value)); box.append(c); }
+    { const sc = sleepCard(); if (sc) box.append(sc); }
     return box;
   }
 
@@ -1861,6 +1929,7 @@ export function createPlan(app) {
   function pageScroller(from) { for (let n = from?.parentElement; n && n !== document.body && n !== document.documentElement; n = n.parentElement) { const o = getComputedStyle(n).overflowY; if ((o === 'auto' || o === 'scroll') && n.scrollHeight > n.clientHeight + 1) return n; } return document.scrollingElement; }
   function draw(keepScroll) {
     if (!host || !v60 || !host.isConnected) return;
+    computeSupp();
     const all = tasks();
     const sched = dayCard(all);
     const wrap = el('div', undefined, 'pl'); const sleepRow = sleepBar(); wrap.append(...(sleepRow ? [sleepRow] : []), taskCard(all), nums(all, sched.fixed), sched.card);
