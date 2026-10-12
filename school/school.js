@@ -5,7 +5,7 @@ import { fitBoard } from './board-fit.js?v=266';
 import { createLectureQuests } from './lecture-quests.js?v=233';
 import { mountSchoolRefresh } from './refresh.js?v=237';
 import { mountLectureActor } from './lecture-actor.js?v224';
-import { decorateChalk, chalkBoardText, chalkPages } from './lecture-chalk.js?v236';
+import { decorateChalk, chalkBoardText, chalkPages } from './lecture-chalk.js?v=237';
 import { groupCourseLessons, groupLessonTopics } from './course-scope.js?v=212';
 import "./uuid-polyfill.js";   // 보안 컨텍스트 아닌 주소(tailscale http)에서 crypto.randomUUID 대체 — 맨 먼저
 import {
@@ -43,7 +43,7 @@ import { inFocus } from "./focus.js";
 import { createLessonTextbook } from "./lesson-textbook.js?v=288";
 import { startClassroomV3 } from "./classroom-v3.js?v=241";
 import { createGrowth } from "./growth.js?v=199";
-import { cardGate } from './card-gate.js?v=4';
+import { cardGate } from './card-gate.js?v=5';
 /* 정역학 9/2 오리엔테이션과 2장 선수 수업(9/7·9/9·9/14)은 시험 범위 밖 — 강 목록과 강 번호에서 뺀다 (대표님 10/11) */
 const STATICS_HIDE = ["2026-09-02", "2026-09-07", "2026-09-09", "2026-09-14", "2026-10-10"];   /* 9/2 오리엔테이션 · 2장 선수 · 10/10 복습(벼락치기와 같은 과제 풀이 중복, 10/11 「꼭 필요한 구성만」) */
 const hideLesson = (course, l) => course === "정역학" && STATICS_HIDE.includes(l.date);

@@ -1,7 +1,7 @@
 // 암기카드 객관식 게이트 엔진 (화면 없음, 순수 로직)
 //  · 학교 화면(school/card-gate.js)은 import 하고, 교실 페이지는 build_classroom.py 가 줄머리 `export ` 를 떼어 통째로 끼워 넣는다.
-//  · 흐름: 객관식(보기 4 + 몰라요) → 틀림·몰라요만 외우기 → 그 카드만 다시 객관식 → 전부 맞히면
-//          한 번이라도 못 맞힌 카드는 「써서 확인」 → 그것까지 통과하면 끝.
+//  · 흐름: 객관식(보기 4 + 몰라요) → 틀림·몰라요만 외우기 → 그 카드만 다시 객관식 → 전부 맞히면 끝.
+//          (「써서 확인」 단계는 없다 — 대표님 10/12 「두 번째 과정은 삭제」. 첫 판을 다 맞히면 바로 끝난다.)
 //  · 보기 순서는 (seed, 카드 id, 판 번호)로 정해져 시험에서 재현된다. 같은 카드가 다시 나오면 직전 순서와 다르게 바꾼다.
 
 export function hashSeed(s) { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
@@ -25,16 +25,13 @@ export function createEngine(cards, opts = {}) {
     miss: [],                   // 이번 판에서 틀림·몰라요 낸 카드
     first: {},                  // 카드 id → 처음 낸 결과 ok | wrong | unknown
     ever: new Set(),            // 한 번이라도 못 맞힌 카드 id
-    wrote: new Set(),           // 써서 확인을 통과한 카드 id
-    writeFail: [], shown: false, answered: null, opts: null, lastOrder: {},
+    answered: null, opts: null, lastOrder: {},
   };
   const rand = rng(hashSeed(seed + '|q'));
-  function prepare() { E.answered = null; E.shown = false; E.opts = null;
+  function prepare() { E.answered = null; E.opts = null;
     if (E.phase === 'quiz') { const c = E.queue[E.i]; E.opts = optionsOf(c, seed, E.round, E.lastOrder[c.id]); if (!E.opts) throw new Error('보기 없는 카드: ' + c.id); E.lastOrder[c.id] = E.opts.map((o) => o.text).join('\u0001'); } }
   function afterQuiz() {
     if (E.miss.length) { E.phase = 'study'; E.queue = E.miss; E.miss = []; E.i = 0; return; }
-    const need = cards.filter((c) => E.ever.has(c.id) && !E.wrote.has(c.id));
-    if (need.length) { E.phase = 'write'; E.queue = need; E.i = 0; E.writeFail = []; return; }
     E.phase = 'done';
   }
   prepare();
@@ -44,7 +41,6 @@ export function createEngine(cards, opts = {}) {
       const c = E.queue[E.i], total = E.queue.length;
       if (E.phase === 'quiz') return { kind: 'quiz', card: c, q: (c.mc && c.mc.q) || c.q, options: E.opts.map((o) => o.text), pos: E.i + 1, total, round: E.round, answered: E.answered };
       if (E.phase === 'study') return { kind: 'study', card: c, pos: E.i + 1, total, last: E.i === total - 1 };
-      if (E.phase === 'write') return { kind: 'write', card: c, pos: E.i + 1, total, shown: E.shown };
       return { kind: 'done', summary: E2.summary() };
     },
     // 보기 번호(0~3)로 답하기. 이미 답했으면 무시.
@@ -54,13 +50,6 @@ export function createEngine(cards, opts = {}) {
     next() { if (E.phase !== 'quiz' || !E.answered) return; E.i++; if (E.i >= E.queue.length) { E.round++; afterQuiz(); } prepare(); },
     // 외우기 화면 다음
     studied() { if (E.phase !== 'study') return; E.i++; if (E.i >= E.queue.length) { E.phase = 'quiz'; E.queue = shuffle(E.queue, rand); E.i = 0; } prepare(); },
-    reveal() { if (E.phase === 'write') E.shown = true; },
-    // 써서 확인: 본인 판정
-    judge(ok) { if (E.phase !== 'write' || !E.shown) return;
-      const c = E.queue[E.i]; if (ok) E.wrote.add(c.id); else E.writeFail.push(c);
-      E.i++; E.shown = false;
-      if (E.i >= E.queue.length) { if (E.writeFail.length) { E.phase = 'study'; E.queue = E.writeFail; E.writeFail = []; E.i = 0; } else E.phase = 'done'; }
-      prepare(); },
     summary() { const f = Object.values(E.first); return { total: cards.length, ok: f.filter((x) => x === 'ok').length, wrong: f.filter((x) => x === 'wrong').length, unknown: f.filter((x) => x === 'unknown').length, missed: E.ever.size }; },
     state() { return E; },
   };

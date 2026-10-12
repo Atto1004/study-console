@@ -53,7 +53,7 @@ const ok = (cond, msg) => { out.push((cond ? "ok   " : "FAIL ") + msg); if (!con
   ok(!gateOn(d) && X.S.mode === "intro", "Esc 는 게이트만 닫고 시작하지 않는다");
   ok(X.L.pos === null || X.L.pos === undefined, "닫기 뒤에도 L.pos 불변");
 
-  // 2) 다시 열고 1번째 카드를 몰라요 → 그 카드만 외우기 → 다시 객관식 → 써서 확인 → 끝 화면 → 수업 열기
+  // 2) 다시 열고 1번째 카드를 몰라요 → 그 카드만 외우기 → 다시 객관식 → 끝 화면(써서 확인 없음) → 수업 열기
   X.boot();
   ok(gateOn(d), "다시 열면 게이트가 다시 열린다(열 때마다)");
   const total = X.D.gate.cards.length;
@@ -69,8 +69,7 @@ const ok = (cond, msg) => { out.push((cond ? "ok   " : "FAIL ") + msg); if (!con
   gbtn("다시 풀기").click();
   ok(d.querySelector("#gProg").textContent.startsWith("1 / 1"), "그 1장만 다시 객관식");
   pickRight(); gbtn("다음").click();
-  ok(d.querySelector("#gTitle").textContent === "써서 확인", "못 맞힌 적 있는 카드는 써서 확인");
-  gbtn("적었어요 · 정답 보기").click(); gbtn("맞았어요").click();
+  ok(d.querySelector("#gTitle").textContent !== "써서 확인", "다시 맞힌 뒤 「써서 확인」 단계가 없다 (대표님 10/12)");
   ok(gateOn(d) && d.querySelector("#gBody").textContent.includes("모르던 카드 1개 · 다시 맞힘"), "끝 화면: 모르던 카드 1개 · 다시 맞힘 (아직 안 열림)");
   ok(X.S.mode === "intro", "끝 화면에서도 S 불변");
   gbtn("수업 열기").click();

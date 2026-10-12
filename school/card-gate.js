@@ -1,9 +1,9 @@
 // 정역학 강 시작 암기카드 (교실 페이지 게이트와 같은 규칙, 최종본.md §20)
 //  · 카드 원본 = docs/tools/lessons/cards/statics.json (날짜 → 강 연결, 공통 + 강별 카드, 카드마다 mc 보기 4개와 tip)
-//  · 흐름(로직은 card-engine.js): 객관식 4지선다 + 「몰라요」 → 틀림·몰라요만 외우기 → 그 카드만 다시 → 못 맞힌 적 있는 카드는 「써서 확인」 → 수업이 열린다.
+//  · 흐름(로직은 card-engine.js): 객관식 4지선다 + 「몰라요」 → 틀림·몰라요만 외우기 → 그 카드만 다시 → 전부 맞히면 수업이 열린다(「써서 확인」 단계 없음, 대표님 10/12).
 //  · 게이트 중 Enter·Space·방향키로는 판정하지 않는다(마우스·터치만). Esc·닫기는 수업을 열지 않는다.
 //  · 통과는 이 화면을 연 동안만 기억한다. 서버에는 아무것도 저장하지 않는다.
-import { createEngine, optionsOf } from './card-engine.js?v=3';
+import { createEngine, optionsOf } from './card-engine.js?v=4';
 // 모듈 위치 기준 상대 경로: 웹(/study/school/)과 아이패드(/school/) 어디서 열어도 같은 파일을 읽는다 (절대 경로 '/docs/…' 는 웹 쪽 /study/ 접두에서 404 였다)
 const CARDS_URL = new URL('../docs/tools/lessons/cards/statics.json', import.meta.url).href;
 let cache = null;
@@ -71,7 +71,7 @@ function showGate(info) {
       body.replaceChildren(); row.replaceChildren(); prog.textContent = '';
       if (!eng) { body.append(el('p', 'card-gate-note', '이 수업의 암기카드를 불러오지 못해 수업을 열 수 없어요. 아톰에게 알려 주세요.')); btn('닫기', 'ghost', () => done(false)); return; }
       const v = eng.view();
-      title.textContent = v.kind === 'study' ? '외우기' : v.kind === 'write' ? '써서 확인' : '암기카드 확인';
+      title.textContent = v.kind === 'study' ? '외우기' : '암기카드 확인';
       if (v.kind === 'done') {
         const s = v.summary;
         body.append(el('div', 'card-gate-q', '암기카드 끝'));
@@ -110,18 +110,6 @@ function showGate(info) {
         body.append(box('정답', v.card.a)); why(v.card);
         if (v.card.tip) body.append(box('요령', v.card.tip));
         btn(v.last ? '다시 풀기' : '다음 카드', 'primary', () => { eng.studied(); view(); });
-      } else if (v.kind === 'write') {
-        prog.textContent = v.pos + ' / ' + v.total;
-        body.append(el('div', 'card-gate-q', v.card.q));
-        if (!v.shown) {
-          body.append(el('p', 'card-gate-note', '보기 없이 종이나 화면에 답을 먼저 적은 뒤 정답을 보세요.'));
-          btn('적었어요 · 정답 보기', 'primary', () => { eng.reveal(); view(); });
-        } else {
-          body.append(box('정답', v.card.a));
-          body.append(el('p', 'card-gate-note', '적은 답과 비교해서 판정하세요. 핵심 식·방향·조건을 모두 썼으면 맞음.'));
-          btn('틀렸어요', 'wrong', () => { eng.judge(false); view(); });
-          btn('맞았어요', 'ghost', () => { eng.judge(true); view(); });
-        }
       }
       btn('닫기', 'ghost', () => done(false));
     }

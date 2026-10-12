@@ -10,6 +10,10 @@ export function textbookEmphasis(text) {
   const key=/★|암기|기억|외우|반드시|중요|핵심|키 포인트/.test(cues);
   const kind=classify(cues);return {kind:kind==='concept'&&key?'memory':kind,star:key};
 }
+// 칠판 수식 안의 \qquad·\quad 는 식 한가운데를 크게 비워 「들여쓴 것처럼」 보인다(대표님 9/29 「수식 중간에 들여쓰기 안 되게」, 10/12 「글자가 들여써짐」).
+// 칠판에서는 한 칸(\ )만 띄운다. 칠판 원문(서버·판서 원본)은 건드리지 않고 그리는 쪽에서만 바꾼다.
+const TEX = /\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|(?<!\$)\$(?!\$)[^$]*\$/g;   // 수식 구간만(글줄 본문은 건드리지 않는다)
+export const chalkTight = text => String(text || '').replace(TEX, tex => tex.replace(/\\qquad(?![A-Za-z])/g, '\\ \\ ').replace(/\\quad(?![A-Za-z])/g, '\\ '));
 export function chalkLines(value) {
   const formulas=[];
   const protectedText=String(value || '').replace(/\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)|\$\$[\s\S]*?\$\$|(?<!\$)\$(?!\$)[^$]*\$/g, text=>{formulas.push(text);return '\uE000'+(formulas.length-1)+'\uE001';});
@@ -79,7 +83,7 @@ export function decorateChalk(host, step) {
       const star = host.ownerDocument.createElement('span'); star.className='chalk-star'; star.textContent='★ '; star.setAttribute('aria-hidden','true'); row.append(star);
     }
     // Keep equations and every source word intact for the existing math renderer.
-    row.append(host.ownerDocument.createTextNode(text)); content.append(row);
+    row.append(host.ownerDocument.createTextNode(chalkTight(text))); content.append(row);
   }
   const caption = host.querySelector('.caption');
   if (caption) {

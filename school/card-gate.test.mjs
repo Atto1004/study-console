@@ -74,7 +74,7 @@ ok(!document.querySelector('.card-gate-res') && prog().startsWith('1 / '), 'Ente
 ok((await cardGate('statics-2026-09-21', fetcher)) === false && document.querySelectorAll('.card-gate').length === 1, '팝업이 열려 있는 동안 다른 수업 게이트를 또 열지 않는다');
 key('Escape'); ok((await p) === false && !open(), 'Esc 는 수업을 열지 않는다');
 
-// ---- 4) 전체 흐름: 1번 몰라요, 2번 틀림, 나머지 맞힘 → 두 장만 외우기 → 다시 풀기 → 쓰기 확인
+// ---- 4) 전체 흐름: 1번 몰라요, 2번 틀림, 나머지 맞힘 → 두 장만 외우기 → 다시 풀기 → 끝(써서 확인 없음)
 p = cardGate('statics-2026-09-16', fetcher); await tick(); await tick();
 const first2 = []; const firstOrder = {};
 for (let i = 0; i < n16; i++) {
@@ -93,18 +93,7 @@ btn('다시 풀기').click();
 ok(title() === '암기카드 확인' && prog() === '1 / 2 · 2차', '그 2장만 다시 객관식 (2차)');
 const again = []; for (let i = 0; i < 2; i++) { const c = cur(); again.push(c.id); ok(optOrder() !== firstOrder[c.id], '다시 낸 보기 순서는 처음과 다르다 ' + c.id); rightBtn().click(); btn('다음').click(); }
 ok(again.slice().sort().join() === first2.slice().sort().join(), '다시 나온 카드 = 처음 못 맞힌 카드');
-ok(title() === '써서 확인' && prog() === '1 / 2', '못 맞힌 적 있는 카드는 써서 확인');
-const wq = qText(); const wc = allCards.find((c) => c.q === wq);
-ok(!text().includes(wc.a) && !!btn('적었어요 · 정답 보기'), '쓰기 확인: 정답을 먼저 가리고 시작');
-btn('적었어요 · 정답 보기').click(); ok(text().includes(wc.a), '정답 공개');
-btn('틀렸어요').click();   // 첫 카드 쓰기 실패
-ok(prog() === '2 / 2' && title() === '써서 확인', '쓰기 실패 뒤 다음 쓰기 카드로');
-btn('적었어요 · 정답 보기').click(); btn('맞았어요').click();
-ok(title() === '외우기' && prog() === '1 / 1', '쓰기에서 틀린 카드는 다시 외우기로');
-btn('다시 풀기').click(); ok(title() === '암기카드 확인' && prog().startsWith('1 / 1'), '그 카드만 다시 객관식');
-rightBtn().click(); btn('다음').click();
-ok(title() === '써서 확인' && prog() === '1 / 1' && qText() === wq, '그 카드만 다시 써서 확인');
-btn('적었어요 · 정답 보기').click(); ok(open(), '아직 열리지 않았다 (완료 전)'); btn('맞았어요').click();
+ok(title() !== '써서 확인' && !btn('적었어요 · 정답 보기') && !btn('틀렸어요'), '다시 맞힌 뒤에는 「써서 확인」이 없다 (대표님 10/12)');
 ok(text().includes('모르던 카드 2개 · 다시 맞힘'), '끝 화면 한 줄: 모르던 카드 2개 · 다시 맞힘');
 ok(text().includes('맞음 ' + (n16 - 2) + ' · 틀림 1 · 몰라요 1'), '처음 결과 요약');
 let settled = false; p.then(() => { settled = true; }); await tick(); ok(!settled && open(), '「수업 열기」를 눌러야 열린다');
@@ -112,10 +101,10 @@ btn('수업 열기').click();
 ok((await p) === true && !open(), '전부 통과하면 수업이 열린다');
 ok((await cardGate('statics-2026-09-16', fetcher)) === true && !open(), '통과한 수업은 다시 묻지 않는다');
 
-// ---- 5) 전부 처음부터 맞히면 외우기·쓰기 없이 끝
+// ---- 5) 전부 처음부터 맞히면 외우기 없이 끝
 p = cardGate('statics-2026-09-21', fetcher); await tick(); await tick();
 let guard = 0; while (title() === '암기카드 확인' && !btn('수업 열기') && guard++ < 50) { rightBtn().click(); btn('다음').click(); }
-ok(text().includes('다 맞혔어요') && !text().includes('모르던'), '전부 맞힘: 외우기·쓰기 없이 끝 화면');
+ok(text().includes('다 맞혔어요') && !text().includes('모르던'), '전부 맞힘: 외우기 없이 끝 화면');
 btn('수업 열기').click(); ok((await p) === true, '수업이 열린다');
 
 // ---- 6) 닫기 후 다시 열면 처음부터 (상태 비저장), 무게이트 날짜
@@ -138,7 +127,6 @@ function trace(mod, script) {
     const v = e.view(); t.push(v.kind + ':' + v.card.id + ':' + (v.options || []).join('/'));
     if (v.kind === 'quiz') { const k = script(v, n); if (k < 0) e.unknown(); else e.pick(k); const a = e.view().answered; t.push('r:' + a.result); e.next(); }
     else if (v.kind === 'study') e.studied();
-    else { e.reveal(); e.judge(n % 3 !== 0); }
   }
   return t.join('\n') + '\n' + JSON.stringify(e.summary());
 }
