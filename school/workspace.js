@@ -1,6 +1,5 @@
 import { renderMaterialStudio } from './material-studio.js?v=216';
 import { courseMetrics, sourceKind, pickQuest, KINDS } from "./metrics.js";
-import { renderExamPeriodPlan } from './exam-period-plan.js?v=20261013';
 import { attachSaeng } from "./saeng.js";
 import { officeHref } from "./worldmap.js";
 import { inFocus, focusCourses, isInClass } from "./focus.js";
@@ -293,7 +292,9 @@ export function createWorkspace(app){
     root.append(top);
     renderSprint(root,{catalog:app.catalog(),events:app.events(),today:data.date,exams:data.exams,start:app.start,resume:app.resume,session:app.session?.()});
     const host=el('div',undefined,'db-plan'),examHost=el('section');root.append(examHost,host);
-    renderExamPeriodPlan(examHost,data.date);
+    import('./exam-period-plan.js?v=20261013-2').then(({renderExamPeriodPlan})=>{
+      if(examHost.isConnected)return renderExamPeriodPlan(examHost,data.date);
+    }).catch(()=>{if(examHost.isConnected)examHost.textContent='시험기간 계획을 불러오지 못했습니다. 회독과 시간표는 계속 사용할 수 있습니다.';});
     const deadlines=assignments?pendingDeadlines(assignments.rows||[],data.date):[];
     loadRoutine().then(rt=>{if(!host.isConnected)return;app.plan?.render(host,{today:data.date,courses:focusCourses().filter(n=>data.courses.some(c=>c.name===n)),focus:inFocus,inClass:isInClass,scheduled:data.scheduled,classSlots:data.courses.filter(c=>Array.isArray(c.slots)),holidays:Array.isArray(data.holidays)?data.holidays:null,term:data.term||null,sessions:data.sessions||[],plans:data.plans,deadlines,calendar:calendar?.events||[],calendarOk:!!calendar?.verified,reload:()=>open('main'),afterDraw:()=>releaseHold(),routine:rt,courseName:id=>data.courses.find(c=>c.id===id)?.name||'',courseId:name=>data.courses.find(c=>c.name===name)?.id,exams:data.exams.filter(e=>e.written&&inFocus(e.course)&&e.date>=data.date).map(e=>({course:e.course,date:e.date,time:e.time||'',assumed:!!e.assumed})),addPlan:async(item,many)=>(await change({op:'plan-add',plans:many?item:[item]}))?(data.createdIds||[]):false,/* 만든 계획 id 목록(채우기 되돌리기용), 실패는 false */dailyCap:Number(data.profile?.dailyCap)||4,updatePlan:item=>change({op:'plan-update',plan:item}),deletePlan:id=>change({op:'plan-delete',id}),deletePlans:async(ids,guard)=>(await change({op:'plan-delete',ids,...(guard?{guard}:{})}))?(data.deletedIds||[]):false,restorePlans:ids=>change({op:'plan-restore',ids}),attend,calChange:async({ev,date,start,end})=>{/* 구글 캘린더 시각 바꾸기(대표님 10/9): 그날 캘린더를 새로 읽고 → 최신 원본 버전으로 변경 대기열에 넣는다. 원본이 바뀌었으면 서버가 409 로 막음 */
   try{const j=(u)=>fetch(u,{credentials:'same-origin',cache:'no-store'}).then(r=>r.json());await j(`/api/cal?from=${date}&to=${date}&force=1`);const cx=await j(`/api/aliveweek/context?from=${date}&to=${date}`);
