@@ -573,6 +573,7 @@ button.pl-title.pl-edit:hover,button.pl-title.pl-edit:focus-visible{text-decorat
 .pl-night-act{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px}.pl-night button{min-height:44px;padding:0 18px;border-radius:12px;border:1px solid #6b8197;background:#1d3040;color:#fff;font:700 14px "Pretendard Variable",Pretendard,system-ui,sans-serif;cursor:pointer}.pl-night button.ghost{background:transparent}
 .pl-mv{display:flex;flex-direction:column;gap:6px}.pl-mvest{display:flex;align-items:center;gap:6px;min-height:44px;font:500 13px/1.3 "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#2f4036}.pl-pop .pl-mvest input{width:22px!important;height:22px!important;padding:0!important;flex:none}.pl-pop .pl-mvplaces button{min-height:38px}
 .pl-pop .pl-attmsg.bad{color:#b3261e;font-weight:600}.pl-pick button[aria-busy=true]{opacity:.6}
+.pl-more{margin:2px 0}.pl-more>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;color:#4b6358;font:600 12.5px "Pretendard Variable",Pretendard,system-ui,sans-serif}.pl-more>.pl-moreb{display:flex;flex-direction:column;gap:6px;padding:2px 0 6px}
 .pl-also{display:flex;flex-direction:column;gap:6px}.pl-pop .pl-also button{min-height:44px;height:auto;text-align:left;padding:4px 10px}
 .pl-list{margin:10px 0 0;border:1px solid #edf1ee;border-radius:12px;padding:0 12px}
 .pl-list summary{min-height:44px;display:flex;align-items:center;gap:6px;cursor:pointer;font:700 13px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#4b6358}
@@ -1088,7 +1089,6 @@ export function createPlan(app) {
     const titleEl = el('b'); pop.append(titleEl);
     const snap = existing ? canon(existing) : '';   // 열 때의 모습(고치는 사이 다른 곳에서 바뀌었는지 확인용)
     const catLine = el('div', undefined, 'pl-tagline'), catTag = el('span', '', 'pl-tag'), catTxt = el('small', '', 'pl-popnote'); catLine.append(catTag, catTxt);
-    if (existing) pop.append(catLine);
     const dIn = el('input'); dIn.type = 'date'; dIn.value = date; dIn.setAttribute('aria-label', '날짜'); if (pickDate) pop.append(dIn);
     // 넣는 방식 스위치(새 일정만)
     const swRow = el('div', undefined, 'pl-prow'), swPick = el('div', undefined, 'pl-pick'), swBtns = [];
@@ -1200,7 +1200,7 @@ export function createPlan(app) {
       pastNote.textContent = past ? (!existing ? '이미 지난 시각이라 계획으로 넣을 수 없어요 — 지난 일정은 확정(기록)으로만 넣어요.' : isTent ? (lapsed ? '지난 계획이에요. 실제로 했는지는 기록돼 있지 않아요 — 아래에서 정해 주세요.' : '지난 시각엔 계획으로 둘 수 없어요 — 시각을 고치거나 확정해 주세요.') : '지난 확정 일정은 기록이에요. 삭제하면 한 번 더 물어봐요.') : (isTent ? '' : '미래 확정은 바뀔 수 있어요 — 시각·길이·종류를 고치거나 삭제할 수 있어요.');
     };
     const ok = el('button', existing ? '저장' : '넣기'); ok.type = 'submit'; const no = el('button', '닫기', 'ghost'); no.type = 'button'; no.onclick = close;
-    pop.append(mvTop, sel, note, adBox, st, len, mvBot, pBox, hint, adErr, pastNote);
+    pop.append(mvTop, sel, note, adBox, st, len, mvBot, pBox, adErr, pastNote);
     const act = el('div', undefined, 'pl-act');
     let confirmBtn = null;
     if (tentativeNow) { confirmBtn = el('button'); confirmBtn.type = 'button'; confirmBtn.innerHTML = svg(ICON.check); confirmBtn.append(el('span', lapsed ? '했어요' : '확정')); if (lapsed) confirmBtn.setAttribute('aria-label', '계획대로 했어요 — 확정으로 기록'); act.append(confirmBtn); ok.classList.add('ghost'); }
@@ -1211,7 +1211,7 @@ export function createPlan(app) {
     pop.append(act);
     if (preset?.key) { const hide = el('button', '이 추천 숨기기(오늘)', 'ghost'); hide.type = 'button'; hide.onclick = async () => { hide.disabled = true; const r = await hideRec(preset.date || date, preset.key, preset.label || ''); if (r === false) hide.disabled = false; else close(); }; pop.append(hide); }
     pop.append(no);
-    if (pickDate) pop.append(el('small', existing ? '구글 캘린더 일정은 캘린더에서 고쳐 주세요.' : '구글 캘린더 일정(약속 등)은 캘린더에서 넣으면 여기 시간표에 같이 보여요.', 'pl-popnote'));
+    { const mb = moreBox(hint, pickDate ? el('small', existing ? '구글 캘린더 일정은 캘린더에서 고쳐 주세요.' : '구글 캘린더 일정(약속 등)은 캘린더에서 넣으면 여기 시간표에 같이 보여요.', 'pl-popnote') : null); if (mb) pop.append(mb); }
     paint();
     adBtn.onclick = () => { if (adBtn.disabled) return; allDay = !allDay; if (allDay) { if (ALLDAY_BK.includes(bk)) adBk = bk; } else if (st.value === '00:00') { st.value = '09:00'; len.value = '60'; } paint(); };
     const send = async (confirming) => {
@@ -1260,21 +1260,22 @@ export function createPlan(app) {
   // 수업·캘린더·고정 일정·시험 블록 창. 화면(body)에 띄우고 바깥 누르기·Esc 로 닫힘.
   //  수업: 출석(서버 attendance — 미래는 서버가 막음) · 이해도 1~5 · 시작/종료 시각(공부 기록 v60.classLog) · 휴강(두 번 확인)
   //  캘린더: 시각 고치기 → 확인 → 구글 캘린더 변경 대기열(/api/aliveweek/changes, 원본 버전이 맞을 때만). 「운선」 일정은 제목을 보이지 않음
+  // 접힌 「자세히」(기본 접힘): 원본 안내·합쳐진 원본 열기 같은 평소엔 필요 없는 것. 눈에 안 보이게 하되 원본에 닿는 길은 둔다
+  function moreBox(...kids) { const k = kids.flat().filter(Boolean); if (!k.length) return null; const d = el('details', undefined, 'pl-more'), b = el('div', undefined, 'pl-moreb'); d.append(el('summary', '자세히')); b.append(...k); d.append(b); return d; }
   function blockPopup(b, anchor, at) {
     const { pop, close } = mkPop('div', 'pl-info', '', anchor);
     const date = b.date || ctx.today, when = `${date.slice(5).replace('-', '/')}(${wd(date)}) ${hm(b.s)}–${hme(b.e)}`, cat = blockCat(b);
     pop.setAttribute('aria-label', `${b.title} ${when}`);
     pop.append(el('b', b.title), el('small', when + (b.cls?.room ? ` · ${b.cls.room}` : ''), 'pl-popnote'));
-    if (cat) { const line = el('div', undefined, 'pl-tagline'); line.append(el('span', cat, 'pl-tag'), el('small', `${CAT_NAME[cat]} — ${CAT_MEANS[cat]}`, 'pl-popnote')); pop.append(line); }
     // 지우기: 시간표에서 지우지 않는다 — 원본(캘린더·학교 시간표·얼라이브위크·상담실)에서만 바꾼다는 것을 버튼 자리에 안내
     const ORIGIN = { cal: '시간표에서 지우지 않아요 — 구글 캘린더 원본에서만 지우고 바꿔요.', class: '시간표에서 지우지 않아요 — 학교 시간표(수업) 원본이에요. 안 하는 날은 아래 「휴강으로 표시」.', work: '시간표에서 지우지 않아요 — 얼라이브위크 기본 시간표에서만 바꿔요.', exam: '시간표에서 지우지 않아요 — 시험 일정은 상담실에서만 바꿔요.' };
-    if (ORIGIN[b.k]) pop.append(el('small', ORIGIN[b.k], 'pl-popnote pl-origin'));
+    const moreKids = []; if (ORIGIN[b.k]) moreKids.push(el('small', ORIGIN[b.k], 'pl-popnote pl-origin'));
     // 같은 시각·같은 이름이라 한 칸으로 합친 다른 출처(캘린더·기본 시간표·수업)는 여기서 눌러 열 수 있다 — 합치면서 원본에 닿는 길을 잃지 않게
     if (b.also?.length) {
       const NAME = { class: '학교 시간표 수업', cal: '구글 캘린더', work: '얼라이브위크 기본 시간표' }, box = el('div', undefined, 'pl-also');
-      box.append(el('small', '같은 시간에 이 일정이 다른 곳에도 있어서 한 칸으로 합쳤어요.', 'pl-popnote'));
+      box.append(el('small', '같은 시간에 같은 일정이 다른 곳에도 있어서 한 칸으로 합쳤어요.', 'pl-popnote'));
       for (const x of b.also) { const r = el('button', `${NAME[x.k] || x.k} · ${x.title}`, 'ghost'); r.type = 'button'; r.onclick = (e) => openBlock({ ...x, date: b.date }, anchor, { x: e.clientX || 0, y: e.clientY || 0 }); box.append(r); }
-      pop.append(box);
+      moreKids.push(box);
     }
     const row = (label, ...kids) => { const r = el('div', undefined, 'pl-prow'); r.append(el('span', label), ...kids); return r; };
     const pick = (opts, cur, onPick) => { const g = el('div', undefined, 'pl-pick'); for (const [v, t] of opts) { const x = el('button', t); x.type = 'button'; x.setAttribute('aria-pressed', String(cur === v)); x.onclick = () => onPick(v, x); g.append(x); } return g; };
@@ -1331,7 +1332,7 @@ export function createPlan(app) {
       const st = el('input'); st.type = 'time'; st.step = 300; st.value = hm(b.s); st.setAttribute('aria-label', '시작');
       const en = el('input'); en.type = 'time'; en.step = 300; en.value = hm(b.e); en.setAttribute('aria-label', '끝');
       const ok = el('button', '시각 바꾸기'); ok.type = 'button';
-      pop.append(row('시각', st, el('span', '–'), en), ok, el('small', '구글 캘린더 원본을 바꿔요. 다른 기기에서 먼저 바뀌었으면 막고 알려 줘요.', 'pl-popnote'));
+      pop.append(row('시각', st, el('span', '–'), en), ok); moreKids.push(el('small', '시각 바꾸기는 구글 캘린더 원본을 바꿔요. 다른 기기에서 먼저 바뀌었으면 막고 알려 줘요.', 'pl-popnote'));
       if (!ev.id || !ctx.calChange) { ok.disabled = true; pop.append(el('small', '이 일정은 여기서 바꿀 수 없어요(원본 정보 없음). 캘린더에서 고쳐 주세요.', 'pl-popnote')); }
       ok.onclick = async () => {
         const s2 = mins(st.value), e2 = mins(en.value); if (!(e2 > s2)) { app.status?.('끝이 시작보다 늦어야 해요.', true); return; }
@@ -1340,10 +1341,10 @@ export function createPlan(app) {
         if (r === false) ok.disabled = false; else { cache.delete(date); close(); draw(); }
       };
     } else if (b.k === 'work') {
-      pop.append(el('small', '고정 일정(얼라이브위크 기본 시간표)이에요. 바꾸려면 얼라이브위크에서 고쳐 주세요.', 'pl-popnote'));
     } else if (b.k === 'exam') {
-      pop.append(el('small', b.title.includes('(예정)') ? '날짜·시각이 확정되지 않은 시험이에요. 확인되면 상담실에서 고쳐 주세요.' : '시험 일정이에요.', 'pl-popnote'));
+      if (b.title.includes('(예정)')) pop.append(el('small', '날짜·시각이 아직 확정되지 않았어요.', 'pl-popnote'));
     }
+    { const mb = moreBox(moreKids); if (mb) pop.append(mb); }
     const no = el('button', '닫기', 'ghost'); no.type = 'button'; no.onclick = close; pop.append(no);
     document.body.append(pop);
     const x = at?.x ?? anchor.getBoundingClientRect().left, y = at?.y ?? anchor.getBoundingClientRect().top;
@@ -1353,20 +1354,20 @@ export function createPlan(app) {
   // 수면 블록 창: 확정(출처·간격) · 취침만(기상 기록 없음) · 계획(목표 기준, 삭제 불가)
   const absLabel = (ms) => { const d = dateMinOf(ms); return `${d.date.slice(5).replace('-', '/')}(${wd(d.date)}) ${hm(d.min)}`; };
   function sleepPopup(b, anchor, at) {
-    const { pop, close } = mkPop('div', 'pl-info', '', anchor), n = b.sleep;
+    const { pop, close } = mkPop('div', 'pl-info', '', anchor), n = b.sleep, sleepMore = [];
     pop.setAttribute('aria-label', b.title);
     if (n.state === 'plan') {
       pop.append(el('b', '계획 수면'), el('small', `취침 ${hmAbs(n.goal[0])} · 기상 ${hmAbs(n.goal[1])}(목표 수면 ${fmtHours(n.goalHours)} 기준)`, 'pl-popnote'));
-      pop.append(el('small', '저장하지 않는 계산 블록이에요. 삭제할 수 없고, 목표를 바꾸면 앞으로 올 모든 밤의 계획이 같이 바뀌어요.' + (n.bedMs != null ? ' 이 밤은 취침 기록이 있어 그 뒤 목표 기상까지만 계획으로 이어 보여요.' : n.from > n.goal[0] ? ' 지금 진행 중인 밤이라 지금부터 목표 기상까지만 보여요.' : ''), 'pl-popnote'));
+      sleepMore.push(el('small', '저장하지 않는 계산 블록이에요. 삭제할 수 없고, 목표를 바꾸면 앞으로 올 모든 밤의 계획이 같이 바뀌어요.' + (n.bedMs != null ? ' 이 밤은 취침 기록이 있어 그 뒤 목표 기상까지만 계획으로 이어 보여요.' : n.from > n.goal[0] ? ' 지금 진행 중인 밤이라 지금부터 목표 기상까지만 보여요.' : ''), 'pl-popnote'));
       const go = el('button', '목표 바꾸기'); go.type = 'button'; go.onclick = () => { close(); goalPopup(anchor); }; pop.append(go);
     } else if (n.state === 'mark') {
       pop.append(el('b', '취침 기록'), el('small', `${absLabel(n.bedMs)} 취침 · 기상 기록 없음`, 'pl-popnote'));
-      pop.append(el('small', `출처: ${n.src}. 기상 시각을 목표값으로 채워 넣지 않았어요. 앱 기록이면 홈 위쪽 수면 줄에서 기상을 남겨요.`, 'pl-popnote'));
+      sleepMore.push(el('small', `출처: ${n.src}. 기상 시각을 목표값으로 채워 넣지 않았어요. 앱 기록이면 홈 위쪽 수면 줄에서 기상을 남겨요.`, 'pl-popnote'));
     } else {
       pop.append(el('b', '수면 기록'), el('small', `${absLabel(n.bedMs)} 취침 → ${absLabel(n.wakeMs)} 기상`, 'pl-popnote'));
-      pop.append(el('small', `취침–기상 간격 ${fmtHours((n.wakeMs - n.bedMs) / 36e5)}(실제 잔 시간과 다를 수 있어요) · 출처: ${n.src}`, 'pl-popnote'));
+      sleepMore.push(el('small', `취침–기상 간격 ${fmtHours((n.wakeMs - n.bedMs) / 36e5)}(실제 잔 시간과 다를 수 있어요) · 출처: ${n.src}`, 'pl-popnote'));
     }
-    for (const t of [...(n.notes || []), ...(n.state === 'plan' ? n.goalNotes || [] : [])]) pop.append(el('small', t, 'pl-popnote'));
+    { const mb = moreBox(sleepMore, [...(n.notes || []), ...(n.state === 'plan' ? n.goalNotes || [] : [])].map((t) => el('small', t, 'pl-popnote'))); if (mb) pop.append(mb); }
     const no = el('button', '닫기', 'ghost'); no.type = 'button'; no.onclick = close; pop.append(no);
     document.body.append(pop);
     placePop(pop, at?.x ?? anchor.getBoundingClientRect().left, at?.y ?? anchor.getBoundingClientRect().top);
@@ -1446,8 +1447,7 @@ export function createPlan(app) {
     const { pop, close } = mkPop('div', 'pl-info', '', anchor); pop.setAttribute('aria-label', `종일 ${it.title}`);
     const span = it.from === it.to ? `${adMD(it.from)}(${wd(it.from)})` : `${adMD(it.from)}(${wd(it.from)}) – ${adMD(it.to)}(${wd(it.to)})`;
     pop.append(el('b', it.title), el('small', span, 'pl-popnote'));
-    const line = el('div', undefined, 'pl-tagline'); line.append(el('span', '종일', 'pl-tag'), el('small', `구글 캘린더 종일 일정${it.ev?.cal ? ' · ' + it.ev.cal : ''}`, 'pl-popnote')); pop.append(line);
-    pop.append(el('small', '여기서 고치지 않아요 — 구글 캘린더에서 고쳐요.', 'pl-popnote pl-origin'));
+    { const mb = moreBox(el('small', `구글 캘린더 종일 일정${it.ev?.cal ? ' · ' + it.ev.cal : ''}이에요. 여기서 고치지 않고 구글 캘린더에서 고쳐요.`, 'pl-popnote pl-origin')); if (mb) pop.append(mb); }
     const no = el('button', '닫기', 'ghost'); no.type = 'button'; no.onclick = close; pop.append(no);
     document.body.append(pop); placePop(pop, at?.x ?? anchor.getBoundingClientRect().left, at?.y ?? anchor.getBoundingClientRect().top); no.focus();
   }
