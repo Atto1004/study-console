@@ -123,5 +123,6 @@ export function createSleepForm(deps) {
   exEdit.onclick = consent;
   for (const i of [bed.i, wake.i]) { i.addEventListener('input', sync); i.addEventListener('change', sync); }
   const ensure = () => { const K = keyNow(); if (K && deps.ensureApple) Promise.resolve(deps.ensureApple(K)).then(() => { if (root.isConnected) sync(); }).catch(() => {}); };
-  return { root, read, sync, consent, ensure, cancelBtn: exNo, inputs: { bed: bed.i, wake: wake.i } };
+  const reset = () => { consented = null; sync(); };   // 저장 충돌 뒤: 수정 동의를 풀고 최신 기록으로 다시 안내(오타 2차)
+  return { root, read, sync, consent, reset, ensure, cancelBtn: exNo, inputs: { bed: bed.i, wake: wake.i } };
 }

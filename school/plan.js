@@ -1594,13 +1594,14 @@ export function createPlan(app) {
       if (r.needConsent) { app.status?.('이미 기록이 있어요. 덮어쓰지 않아요 — 「이 기록 수정」을 먼저 눌러 주세요.', true); return; }
       if (r.confirm && !confirm(`취침–기상 간격이 ${fmtHours(r.hours)}이에요. 맞나요?`)) return;
       ok.disabled = true; keepDay();
-      let outcome = 'conflict';
-      const good = await runSleep('manual', (st2) => applyManual(st2, { key: r.key, rec: r.rec, seen: r.seen }), (o) => { outcome = o; });
-      if (!good) { ok.disabled = false; return; }   // 저장 실패: 입력은 그대로, 수면 줄에 「다시 저장」이 뜬다
-      if (outcome === 'applied' || outcome === 'kept') {
-        const saved = JSON.parse(JSON.stringify(v60.sleep?.[r.key] || r.rec));
-        close(); toast(`수면 ${r.rec.bed}–${r.rec.wake} 기록 · 간격 ${fmtHours(r.hours)}(직접 입력, 수면 추정)`, '수면 기록 취소', undoable(r.key, r.prev, saved, '수면 기록'));
-      } else { app.status?.(OUT_MSG.conflict, true); ok.disabled = false; sleepForm.sync(); }
+      // 성공 처리는 runSleep 의 done 콜백에 둔다 — 첫 저장이 실패하고 수면 줄의 「다시 저장」으로 성공해도 창 닫기·되돌리기 안내가 똑같이 실행되게(오타 2차)
+      const good = await runSleep('manual', (st2) => applyManual(st2, { key: r.key, rec: r.rec, seen: r.seen }), (o) => {
+        if (o === 'applied' || o === 'kept') {
+          const saved = JSON.parse(JSON.stringify(v60.sleep?.[r.key] || r.rec));
+          close(); toast(`수면 ${r.rec.bed}–${r.rec.wake} 기록 · 간격 ${fmtHours(r.hours)}(직접 입력, 수면 추정)`, '수면 기록 취소', undoable(r.key, r.prev, saved, '수면 기록'));
+        } else { app.status?.(OUT_MSG.conflict, true); ok.disabled = false; sleepForm.reset(); }   // 충돌: 동의를 풀어 최신 기록을 다시 보고 「이 기록 수정」을 다시 누르게 한다(같은 낡은 값으로 충돌이 되풀이되지 않게)
+      });
+      if (!good) ok.disabled = false;   // 저장 실패: 입력은 그대로, 수면 줄에 「다시 저장」이 뜬다
     };
     const send = async (confirming) => {
       if (sleepNow()) { await sendSleep(); return; }

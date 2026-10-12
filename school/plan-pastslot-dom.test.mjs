@@ -140,7 +140,11 @@ assert.match(pop().querySelector('.pl-sl-exist').textContent, /이미 기록이 
 setIn(bed, '2026-10-11T23:30'); setIn(wake, '2026-10-12T07:00');
 conflictOnce = { v60: { cfg: { bed: '01:00', sleepH: 8 }, sleep: { '2026-10-12': { ...said, bed: '22:00' } }, workspaceRevision: 2 } };   // 저장하려는 순간 다른 화면이 기록을 바꿈
 click(popBtn('수면 기록 저장')); await flush(24);
-assert.deepEqual(serverState.v60.sleep['2026-10-12'], { ...said, bed: '22:00' }, '바뀐 기록을 덮지 않는다'); assert.match(lastStatus()[1], /그 사이 다른 화면에서/); await closePop();
+assert.deepEqual(serverState.v60.sleep['2026-10-12'], { ...said, bed: '22:00' }, '바뀐 기록을 덮지 않는다'); assert.match(lastStatus()[1], /그 사이 다른 화면에서/);
+// 충돌 뒤: 동의가 풀리고 최신 기록(22:00–06:30)으로 안내가 다시 뜬다 — 같은 낡은 값으로 충돌이 되풀이되지 않는다(오타 2차)
+assert.ok(pop(), '창은 그대로'); assert.match(pop().querySelector('.pl-sl-exist').textContent, /이미 기록이 있어요 · 22:00–06:30/); assert.equal(popBtn('수면 기록 저장').disabled, true); assert.ok(popBtn('이 기록 수정'));
+click(popBtn('이 기록 수정')); await flush(); setIn(sleepIn().bed, '2026-10-11T23:30'); setIn(sleepIn().wake, '2026-10-12T07:00'); click(popBtn('수면 기록 저장')); await flush(24);
+assert.deepEqual(serverState.v60.sleep['2026-10-12'], { bed: '23:30', wake: '07:00', src: 'app', bedAt: '2026-10-11T23:30:00+09:00', wakeAt: '2026-10-12T07:00:00+09:00', via: 'manual', note: '말로 준 기록' }, '다시 동의한 뒤에는 최신 기록 위에 저장'); await closePop();
 // 같은 상황이지만 다른 화면이 다른 날만 바꾼 경우: 재적용으로 저장된다
 serverState = { v60: { cfg: { bed: '01:00', sleepH: 8 }, sleep: { '2026-10-12': { ...said } } } }; await fresh();
 tapDay(420); await flush(); click(chip('수면')); await flush(); ({ bed, wake } = sleepIn()); click(popBtn('이 기록 수정')); await flush(); setIn(bed, '2026-10-11T23:30'); setIn(wake, '2026-10-12T07:00');
@@ -156,6 +160,9 @@ tapDay(420); await flush(); click(chip('수면')); await flush(30);
 assert.match(document.querySelector('.pl-sl-apple').textContent, /건강 앱 기록이 우선이에요/); assert.ok(!document.querySelector('.pl-sl-apple').hidden);
 postFail = true; click(popBtn('수면 기록 저장')); await flush(30); postFail = false;
 assert.ok(pop(), '실패하면 창 유지'); assert.equal(popBtn('수면 기록 저장').disabled, false, '다시 누를 수 있다'); assert.match(host.querySelector('.pl-sleep')?.textContent || '', /수면 기록을 저장하지 못했어요/);
+// 수면 줄의 「다시 저장」으로 성공해도 창 닫기·되돌리기 토스트가 똑같이 나온다(오타 2차)
+click([...host.querySelectorAll('.pl-sleep button')].find((b) => b.textContent === '다시 저장')); await flush(30);
+assert.ok(serverState.v60.sleep?.['2026-10-12']?.via === 'manual', '다시 저장 성공'); assert.ok(!pop(), '재시도 성공 뒤 창이 닫힌다'); assert.ok(/수면 기록 취소/.test(document.querySelector('.pl-toast')?.textContent || ''), '되돌리기 토스트');
 await closePop(); appleBody = { sleep: {}, tz: 'Asia/Seoul' };
 
 // 10. 지난 날짜 칸: 하루 보기 전날, 한 주 보기의 어제 칸 — 자정 직전(23:30) 칸도 열리고, 일반 유형은 「자정을 넘겨요」 검증 유지, 수면은 가능
