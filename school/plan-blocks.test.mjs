@@ -1,6 +1,6 @@
 // node school/plan-blocks.test.mjs — 시간표 블록 4종 구분(대표님 10/12): 종류 매핑 · 옛 계획 호환 · 겹침 열 배치 · 글자 대비 4.5:1
 import assert from 'node:assert/strict';
-import { dedupeBlocks, CATS, blockCat, planState, planBk, layoutColumns, BLOCK_COLORS, PAST_OPACITY, CAT_CLASS, CAT_NAME } from './plan.js';
+import { dedupeBlocks, isMoveEvent, moveName, MOVE_LENS, CATS, blockCat, planState, planBk, layoutColumns, BLOCK_COLORS, PAST_OPACITY, CAT_CLASS, CAT_NAME } from './plan.js';
 
 // ── 매핑표: 기존 종류 → 새 4종 ──
 const plan = (extra = {}) => ({ k: 'plan', plan: { id: 'p', note: '12.3 연습문제', ...extra } });
@@ -29,7 +29,7 @@ assert.equal(blockCat({ k: 'mystery' }), null);
 assert.equal(blockCat(null), null);
 // 모든 알려진 종류가 4종 안에, 전부 화면용 클래스·이름이 있다
 for (const k of ['class', 'cal', 'work', 'exam', 'auto', 'plan']) { const c = blockCat(k === 'plan' ? plan() : { k }); assert.ok(CATS.includes(c), k); assert.ok(CAT_CLASS[c] && CAT_NAME[c]); }
-assert.deepEqual(CATS, ['고정', '공부', '과제', '계획']);
+assert.deepEqual(CATS, ['고정', '공부', '과제', '이동', '계획']);
 
 // ── 겹침: 무리 전체를 열로 나눈다. 순위 고정 > 공부·과제 > 계획 ──
 const B = (k, s, e, title, extra = {}) => ({ k, s, e, title, ...(k === 'plan' ? { plan: { note: title, ...extra } } : {}) });
@@ -84,5 +84,35 @@ const blend = (c, alpha) => c.map((v) => v * alpha + 255 * (1 - alpha));   // �
 for (const [name, [bg, fg]] of Object.entries(BLOCK_COLORS)) {
   const r = ratio(rgb(bg), rgb(fg)); assert.ok(r >= 4.5, `${name} ${r.toFixed(2)}`);
   const rp = ratio(blend(rgb(bg), PAST_OPACITY), blend(rgb(fg), PAST_OPACITY)); assert.ok(rp >= 4.5, `${name} 지난 블록 ${rp.toFixed(2)}`);
+}
+// ── 이동(대표님 10/12 「일정추가할 때 유형을 이동유형으로」) ──
+{
+  const pm = (extra) => plan({ note: '집 → 학교', ...extra });
+  assert.equal(blockCat(pm({ state: 'confirmed', bk: '이동', activity: true })), '이동');        // 확정 이동
+  assert.equal(blockCat(pm({ state: 'tentative', bk: '이동', activity: true })), '계획');         // 미확정 이동 = 점선 계획
+  assert.equal(planBk({ bk: '이동', note: '과제 · x' }), '이동');
+  assert.equal(CAT_CLASS['이동'], 'c-move'); assert.equal(CAT_NAME['이동'], '이동');
+  // 캘린더에서 온 이동: 색 1 만. 제목 글자로는 추정하지 않는다
+  assert.equal(isMoveEvent({ color: '1' }), true); assert.equal(isMoveEvent({ color: 1 }), true);
+  assert.equal(isMoveEvent({ color: '10' }), false); assert.equal(isMoveEvent({ color: '' }), false); assert.equal(isMoveEvent(null), false);
+  assert.equal(blockCat({ k: 'cal', ev: { color: '1', title: '🚇 이동: 집 → 학교' } }), '이동');
+  assert.equal(blockCat({ k: 'cal', ev: { color: '9', title: '이동 수업 정리' } }), '고정');       // 제목만 「이동」이어도 색이 다르면 고정
+  assert.equal(blockCat({ k: 'cal', ev: { title: '치과' } }), '고정');
+  assert.equal(blockCat({ k: 'class', ev: { color: '1' } }), '고정');                              // 수업은 색을 안 본다
+  assert.equal(moveName('집', '학교'), '집 → 학교'); assert.equal(moveName('집', ''), '집에서 출발'); assert.equal(moveName('', '학교'), '→ 학교'); assert.equal(moveName('', ''), ''); assert.equal(moveName(' 집 ', ' 학교 '), '집 → 학교');
+  assert.deepEqual(MOVE_LENS, [5, 10, 15, 20, 30, 45, 60]);
+  // 겹침 순위: 확정 이동 = 고정과 같은 순위(둘 다 공부·과제·계획보다 앞), 미확정 이동 = 계획
+  const mv = B('plan', 540, 600, '집 → 학교', { state: 'confirmed', bk: '이동' }), fx = B('cal', 570, 630, '약속'), st = B('plan', 560, 620, '공부', { state: 'confirmed', bk: '공부' }), tm = B('plan', 580, 640, '이동계획', { state: 'tentative', bk: '이동' });
+  layoutColumns([tm, st, fx, mv]);
+  assert.ok(mv.col < st.col && fx.col < st.col && st.col < tm.col, `이동·고정이 공부보다 앞, 미확정 이동은 맨 뒤 (${mv.col},${fx.col},${st.col},${tm.col})`);
+  assert.equal(mv.col, 0);   // 같은 순위는 시작 시각 순: 이동(540) 먼저
+  // 중복 정리: 분류가 다르면 이름·시각이 같아도 합치지 않는다(이동이 수업 블록에 묻히지 않게)
+  const cl = { k: 'class', s: 540, e: 600, title: '집 → 학교 수업' }, mc = { k: 'cal', s: 540, e: 600, title: '집 → 학교', ev: { color: '1' } };
+  assert.equal(dedupeBlocks([cl, mc]).length, 2);
+  const c1 = { k: 'cal', s: 540, e: 600, title: '집', ev: { color: '1' } }, c2 = { k: 'work', s: 540, e: 600, title: '집' };
+  assert.equal(dedupeBlocks([c1, c2]).length, 2);
+  assert.equal(dedupeBlocks([{ k: 'cal', s: 540, e: 600, title: '집', ev: {} }, c2]).length, 1);   // 분류가 같으면 합침(기존 동작)
+  // 색이 겹치지 않는 모양 구분: 이동 CSS 는 이중선(위아래) — 다른 종류와 같은 모양이 아님
+  assert.ok(BLOCK_COLORS['c-move'] && BLOCK_COLORS['tag-move'] && BLOCK_COLORS['small-move']);
 }
 console.log('plan-blocks ok');

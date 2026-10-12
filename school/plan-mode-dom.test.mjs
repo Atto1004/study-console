@@ -58,7 +58,7 @@ click(pm()); await flush(); assert.equal(pressed(pm()), true);
 assert.ok(host.querySelector('.pl-modenote').textContent.includes('켜짐'));
 click(plus()); await flush(); pop = document.querySelector('.pl-pop');
 assert.equal(modeBtns().find((b) => b.dataset.mode === '계획').getAttribute('aria-pressed'), 'true'); assert.ok(pop.textContent.includes('점선'));
-assert.equal(pop.querySelector('[aria-label="일정 종류"]').closest('.pl-prow').hidden, true, '계획이면 종류 줄 숨김');
+assert.equal(pop.querySelector('[aria-label="일정 종류"]').hidden, true, '계획이면 공부·과제 종류는 확정 때 고름(숨김)'); assert.equal(pop.querySelector('[aria-label="계획 종류"]').hidden, false, '대신 [공부·과제 | 이동] 두 버튼');
 fillForm('시험 대비 계획', '15:00'); click(popBtn('계획으로 넣기')); await flush();
 add = calls.filter((c) => c[0] === 'add').pop()[1];
 assert.equal(add.state, 'tentative'); assert.equal(add.bk, undefined); assert.equal(add.src, 'manual');
@@ -67,7 +67,7 @@ assert.equal(add.state, 'tentative'); assert.equal(add.bk, undefined); assert.eq
 click(plus()); await flush(); pop = document.querySelector('.pl-pop');
 click(modeBtns().find((b) => b.dataset.mode === '확정')); await flush();
 assert.equal(pressed(pm()), false, '스위치가 모드를 끔'); assert.ok(host.querySelector('.pl-modenote').textContent.includes('꺼짐'));
-assert.equal(pop.querySelector('[aria-label="일정 종류"]').closest('.pl-prow').hidden, false);
+assert.equal(pop.querySelector('[aria-label="일정 종류"]').hidden, false); assert.equal(pop.querySelector('[aria-label="계획 종류"]').hidden, true);
 click(modeBtns().find((b) => b.dataset.mode === '계획')); await flush(); assert.equal(pressed(pm()), true);
 document.querySelector('.pl-pop').remove();
 click(viewBtn('한 주')); await flush(); assert.equal(pressed(pm()), true, '보기를 바꿔도 유지');
