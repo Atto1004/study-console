@@ -146,8 +146,19 @@ export function createWorkspace(app){
     }catch{return {error:m||'연결하지 못했어요',unknown:true};}
   }
   function card(title,cls=''){const c=el('section',undefined,'workspace-card '+cls);if(title)c.append(el('h2',title));return c;}
+  /* 시간표를 고치면 홈 전체가 다시 그려져 스크롤이 맨 위로 튀던 것(대표님 10/12): 다시 그리기 전에 스크롤 위치와 홈 높이를 잡아 두고,
+     시간표가 다 그려진 뒤(plan 의 afterDraw) 같은 위치로 돌려놓는다. 높이는 그 사이 최소 높이로 붙들어 문서가 줄어 위치가 잘리지 않게 한다. */
+  let hold=null,holdGen=0;
+  function scrollerOf(){let n=root.parentElement;while(n&&n!==document.body&&n!==document.documentElement){const o=getComputedStyle(n).overflowY;if((o==='auto'||o==='scroll')&&n.scrollHeight>n.clientHeight+1)return n;n=n.parentElement;}return document.scrollingElement||document.documentElement;}
+  function holdView(){releaseHold(true);if(area!=='main'||!root.querySelector('.db-plan'))return;const sc=scrollerOf();hold={sc,top:sc.scrollTop,gen:++holdGen,timer:setTimeout(()=>releaseHold(),4000)};root.style.minHeight=root.offsetHeight+'px';}
+  function releaseHold(drop){const h=hold;if(!h)return;hold=null;clearTimeout(h.timer);if(drop){root.style.minHeight='';return;}
+    const put=()=>{if(h.sc.isConnected&&Math.abs(h.sc.scrollTop-h.top)>1)h.sc.scrollTop=h.top;};put();
+    /* 뒤따르는 렌더가 새로 붙들었으면(gen 이 바뀜) 이 정리는 아무것도 건드리지 않는다(오타 검수 10/12) */
+    requestAnimationFrame(()=>{if(h.gen!==holdGen)return;put();requestAnimationFrame(()=>{if(h.gen!==holdGen)return;put();setTimeout(()=>{if(h.gen!==holdGen||hold)return;put();root.style.minHeight='';},700);});});}
   function render(){
     if(!data)return;
+    holdView();
+    
     if(area==='learning'){root.hidden=true;app.lobby();document.getElementById('studyOverview').hidden=true;decorateDoors();return;}
     root.replaceChildren();
     const session=app.session?.();
@@ -265,7 +276,7 @@ export function createWorkspace(app){
     if(!exams.length)top.append(el('p','등록된 시험이 없어요.','db-empty'));
     const host=el('div',undefined,'db-plan');root.append(top,host);
     const deadlines=assignments?pendingDeadlines(assignments.rows||[],data.date):[];
-    loadRoutine().then(rt=>{if(!host.isConnected)return;app.plan?.render(host,{today:data.date,courses:focusCourses().filter(n=>data.courses.some(c=>c.name===n)),focus:inFocus,inClass:isInClass,scheduled:data.scheduled,classSlots:data.courses.filter(c=>Array.isArray(c.slots)),holidays:Array.isArray(data.holidays)?data.holidays:null,term:data.term||null,sessions:data.sessions||[],plans:data.plans,deadlines,calendar:calendar?.events||[],calendarOk:!!calendar?.verified,reload:()=>open('main'),routine:rt,courseName:id=>data.courses.find(c=>c.id===id)?.name||'',courseId:name=>data.courses.find(c=>c.name===name)?.id,exams:data.exams.filter(e=>e.written&&inFocus(e.course)&&e.date>=data.date).map(e=>({course:e.course,date:e.date,time:e.time||'',assumed:!!e.assumed})),addPlan:async(item,many)=>(await change({op:'plan-add',plans:many?item:[item]}))?(data.createdIds||[]):false,/* 만든 계획 id 목록(채우기 되돌리기용), 실패는 false */dailyCap:Number(data.profile?.dailyCap)||4,updatePlan:item=>change({op:'plan-update',plan:item}),deletePlan:id=>change({op:'plan-delete',id}),deletePlans:async(ids,guard)=>(await change({op:'plan-delete',ids,...(guard?{guard}:{})}))?(data.deletedIds||[]):false,restorePlans:ids=>change({op:'plan-restore',ids}),attend,calChange:async({ev,date,start,end})=>{/* 구글 캘린더 시각 바꾸기(대표님 10/9): 그날 캘린더를 새로 읽고 → 최신 원본 버전으로 변경 대기열에 넣는다. 원본이 바뀌었으면 서버가 409 로 막음 */
+    loadRoutine().then(rt=>{if(!host.isConnected)return;app.plan?.render(host,{today:data.date,courses:focusCourses().filter(n=>data.courses.some(c=>c.name===n)),focus:inFocus,inClass:isInClass,scheduled:data.scheduled,classSlots:data.courses.filter(c=>Array.isArray(c.slots)),holidays:Array.isArray(data.holidays)?data.holidays:null,term:data.term||null,sessions:data.sessions||[],plans:data.plans,deadlines,calendar:calendar?.events||[],calendarOk:!!calendar?.verified,reload:()=>open('main'),afterDraw:()=>releaseHold(),routine:rt,courseName:id=>data.courses.find(c=>c.id===id)?.name||'',courseId:name=>data.courses.find(c=>c.name===name)?.id,exams:data.exams.filter(e=>e.written&&inFocus(e.course)&&e.date>=data.date).map(e=>({course:e.course,date:e.date,time:e.time||'',assumed:!!e.assumed})),addPlan:async(item,many)=>(await change({op:'plan-add',plans:many?item:[item]}))?(data.createdIds||[]):false,/* 만든 계획 id 목록(채우기 되돌리기용), 실패는 false */dailyCap:Number(data.profile?.dailyCap)||4,updatePlan:item=>change({op:'plan-update',plan:item}),deletePlan:id=>change({op:'plan-delete',id}),deletePlans:async(ids,guard)=>(await change({op:'plan-delete',ids,...(guard?{guard}:{})}))?(data.deletedIds||[]):false,restorePlans:ids=>change({op:'plan-restore',ids}),attend,calChange:async({ev,date,start,end})=>{/* 구글 캘린더 시각 바꾸기(대표님 10/9): 그날 캘린더를 새로 읽고 → 최신 원본 버전으로 변경 대기열에 넣는다. 원본이 바뀌었으면 서버가 409 로 막음 */
   try{const j=(u)=>fetch(u,{credentials:'same-origin',cache:'no-store'}).then(r=>r.json());await j(`/api/cal?from=${date}&to=${date}&force=1`);const cx=await j(`/api/aliveweek/context?from=${date}&to=${date}`);
     const cur=(cx.calendar?.[date]||[]).find(e=>e.id===ev.id);if(!cur){app.status('원본 일정을 다시 찾지 못했어요. 잠시 뒤 다시 해 주세요.',true);return false;}
     const body={operationId:crypto.randomUUID(),action:'reschedule',source:'calendar',calendarId:cur.calendarId||cur.cal,eventId:cur.id,date,after:{title:cur.title||'',location:cur.location||'',start:`${date}T${start}:00+09:00`,end:`${date}T${end}:00+09:00`},expectedSourceVersion:cur.sourceVersion};

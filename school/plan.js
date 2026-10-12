@@ -909,6 +909,7 @@ export function createPlan(app) {
   // 화면이 따라간다(직접 스크롤하면 2분 동안은 그대로).
   let view = (() => { try { return localStorage.getItem('school-plan-view') === 'week' ? 'week' : 'day'; } catch { return 'day'; } })();
   let followBox = null, userScroll = 0, programmatic = false;
+  let innerKey = '', innerTop = 0, innerReset = false;   // 시간표 격자 안 세로 스크롤: 다시 그려도(저장·출석 등) 보던 자리를 유지한다. 보기·날짜가 바뀌거나 「오늘」을 누르면 처음 규칙(지금 시각)으로
   const weekStart = (date) => { const n = new Date(date + 'T00:00:00Z').getUTCDay(); return addDays(date, -((n + 6) % 7)); };   // 그 주 월요일
   const ICON_VIEW = {
     day: '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M9 3v4M15 3v4M12 13v4"/>',
@@ -1510,7 +1511,7 @@ export function createPlan(app) {
       const d = addDays(ws, i), b = el('button', undefined, 'pl-sday' + (d === day ? ' on' : '') + (d === ctx.today ? ' today' : '') + ((ctx.exams || []).some((x) => x.date === d) ? ' exam' : '')); b.type = 'button';
       b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', String(d === day)); b.setAttribute('aria-label', `${d} ${wd(d)}요일`);
       b.append(el('small', wd(d)), el('b', String(Number(d.slice(8)))));
-      b.onclick = () => { day = d; userScroll = 0; draw(); };
+      b.onclick = () => { day = d; userScroll = 0; innerKey = ''; innerReset = true; draw(); };
       box.append(b);
     }
     return box;
@@ -1529,7 +1530,7 @@ export function createPlan(app) {
     }
     const replan = ib('replan', '다시 짜기 — 과제를 빈 시간에 다시 배치', 'go');
     prev.onclick = () => { day = addDays(day, isWeek ? -7 : -1); draw(); }; next.onclick = () => { day = addDays(day, isWeek ? 7 : 1); draw(); };
-    today.onclick = () => { day = ctx.today; userScroll = 0; draw(); };
+    today.onclick = () => { day = ctx.today; userScroll = 0; innerKey = ''; innerReset = true; draw(); };
     replan.onclick = () => { draw(); app.status?.('빈 시간에 다시 짰어요.'); };
     const plus = ib('plus', '일정 추가', 'go'); plus.onclick = (e) => { const d = isWeek || isExam ? (day >= ctx.today ? day : ctx.today) : day; const m = d === ctx.today ? Math.ceil((nowMin() + 10) / 30) * 30 : 9 * 60; planPopup(card, d, Math.min(m, 23 * 60), plus, { x: e.clientX - 260, y: e.clientY + 24 }, true); };
     const fill = el('button', '채우기', 'pl-mode pl-fill'); fill.type = 'button'; fill.title = '고정 일정은 그대로, 빈 시간에만 공부 계획 자동 계산해 넣기';
@@ -1566,9 +1567,9 @@ export function createPlan(app) {
       box.append(grid); card.append(box);
       if (dayBlocks.length) card.append(blockList(dayBlocks));
       { const mn = el('p', modeText(), 'pl-note pl-modenote'); mn.setAttribute('role', 'status'); mn.setAttribute('aria-live', 'polite'); card.append(mn); }
-      box.addEventListener('scroll', () => { if (!programmatic) userScroll = Date.now(); }, { passive: true });
+      const ikey = view + '|' + day; box.dataset.ikey = ikey; box.addEventListener('scroll', () => { box.dataset.touched = '1'; innerKey = ikey; innerTop = box.scrollTop; if (!programmatic) userScroll = Date.now(); }, { passive: true });
       followBox = now >= 0 ? { box, PX, line: grid.querySelector('.pl-now') } : null;
-      requestAnimationFrame(() => { if (now >= 0) scrollToNow(box, PX, true); else setScroll(box, DAY.wake * PX); });
+      requestAnimationFrame(() => { if (innerKey === ikey) return; if (now >= 0) scrollToNow(box, PX, true); else setScroll(box, DAY.wake * PX); });
       if (plan.blocked) { const n = el('p', '캘린더를 확인하지 못해 자동 배치를 미뤘어요. ', 'pl-left'); const again = el('button', '다시 확인', 'pl-today'); again.type = 'button'; again.onclick = () => { calFail.delete(day); draw(); }; n.append(again); card.append(n); }
       if (plan.left.length) card.append(el('p', `오늘 빈 시간에 다 못 넣은 과제 ${plan.left.length}개 · ${dur(plan.left.reduce((n, x) => n + x.need, 0))}`, 'pl-left'));
       return { card, fixed };
@@ -1606,7 +1607,8 @@ export function createPlan(app) {
     const stick = el('div', undefined, 'pl-wkstick'); stick.append(headRow); { const adg = allDayGrid(dates, adItemsFor(dates), cols); if (adg) stick.append(adg); }
     box.append(stick, body); card.append(box);
     followBox = null;
-    requestAnimationFrame(() => setScroll(box, ((isExam || ws === weekStart(ctx.today)) ? nowM - 120 : DAY.wake) * PX));
+    const wkey = view + '|' + day; box.dataset.ikey = wkey; box.addEventListener('scroll', () => { box.dataset.touched = '1'; innerKey = wkey; innerTop = box.scrollTop; }, { passive: true });
+    requestAnimationFrame(() => { if (innerKey === wkey) return; setScroll(box, ((isExam || ws === weekStart(ctx.today)) ? nowM - 120 : DAY.wake) * PX); });
     const wn = el('p', '', 'pl-note pl-modenote'); wn.setAttribute('role', 'status'); wn.setAttribute('aria-live', 'polite'); wn.dataset.week = '1'; wn.dataset.tail = ctx.holidays ? '수업은 학교 시간표(휴일·휴강 빼고)에서 가져와요.' : '수업은 오늘 칸만 학교 시간표에서 가져와요(휴일 정보가 없어 다른 날은 안 그려요).'; wn.textContent = noteText(wn); card.append(wn);
     return { card, fixed: todayFixed };
   }
@@ -1722,6 +1724,8 @@ export function createPlan(app) {
     return box;
   }
 
+  // 홈이 스크롤되는 칸(학교 화면은 main#scene, 아니면 문서)
+  function pageScroller(from) { for (let n = from?.parentElement; n && n !== document.body && n !== document.documentElement; n = n.parentElement) { const o = getComputedStyle(n).overflowY; if ((o === 'auto' || o === 'scroll') && n.scrollHeight > n.clientHeight + 1) return n; } return document.scrollingElement; }
   function draw(keepScroll) {
     if (!host || !v60 || !host.isConnected) return;
     const all = tasks();
@@ -1737,7 +1741,14 @@ export function createPlan(app) {
       if (old.closest('.pl-add') || old === active) f.value = old.value;
       if (old === active) queueMicrotask(() => { f.focus({ preventScroll: true }); try { f.setSelectionRange(old.selectionStart, old.selectionEnd); } catch {} });
     }
+    // 다시 그려도 위치를 지킨다: 창(문서) 스크롤 · 시간표 격자 안 스크롤 · 열어 둔 「일정 목록」
+    const sc = pageScroller(host), y0 = sc ? sc.scrollTop : 0, listOpen = !!host.querySelector('.pl-list')?.open;
+    { const old = host.querySelector('.pl-schedule .pl-day'); if (!innerReset && old?.dataset.touched && old.dataset.ikey === view + '|' + day) { innerKey = old.dataset.ikey; innerTop = old.scrollTop; } }   // 교체 직전의 실제 위치(scroll 이벤트 전에 다시 그려도)
+    innerReset = false;
     host.replaceChildren(wrap);
+    if (listOpen) { const l = host.querySelector('.pl-list'); if (l) l.open = true; }
+    const gb = host.querySelector('.pl-schedule .pl-day'); if (gb && innerKey === view + '|' + day) { programmatic = true; gb.scrollTop = innerTop; requestAnimationFrame(() => { programmatic = false; }); }
+    if (sc && Math.abs(sc.scrollTop - y0) > 1) sc.scrollTop = y0;
   }
   // 캘린더: 보이는 날(하루 = 그날, 한 주 = 월~일)을 한 번에 받아 날짜별로 기억
   async function ensureCal(from, to) {
@@ -1762,8 +1773,8 @@ export function createPlan(app) {
       const sameDay = ctx && ctx.today === c.today && Date.now() < keepDayUntil;
       host = target; ctx = c; day = sameDay ? day : c.today; bootDay = kst(); if (c.calendarOk) cache.set(c.today, c.calendar || []); else cache.delete(c.today);   // 확인 못 한 오늘 캘린더는 다시 받기
       host.replaceChildren(el('p', '공부 계획을 불러오는 중…', 'pl-empty'));
-      try { await load(); } catch (e) { host.replaceChildren(el('p', e.message, 'pl-empty')); return; }
-      draw();
+      try { await load(); } catch (e) { host.replaceChildren(el('p', e.message, 'pl-empty')); ctx.afterDraw?.(); return; }
+      draw(); ctx.afterDraw?.();
       clearInterval(tick); let sec = 0;
       tick = setInterval(() => {
         if (!host?.isConnected) { clearInterval(tick); return; }
