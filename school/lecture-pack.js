@@ -18,6 +18,10 @@ export function loadPack(lessonId) {
 
 // 레슨 단계 번호 순서. 강의안이 가리키는 id 가 레슨에 하나라도 없으면(판서가 바뀜) 강의안을 쓰지 않는다.
 export function packRoute(pack, steps) {
+  if(!Array.isArray(pack?.sections)||!Array.isArray(steps)||!Array.isArray(pack.goals)||!Array.isArray(pack.worksheet||[]))return null;
+  if(!pack.sections.every(sec=>sec&&typeof sec==='object'&&sec.script&&typeof sec.script==='object'&&!Array.isArray(sec.script)&&typeof sec.check==='string'))return null;
+  const lines=value=>Array.isArray(value)&&value.every(line=>line&&typeof line==='object'&&typeof line.say==='string');
+  if(!lines(pack.recap||[])||!pack.sections.every(sec=>Object.values(sec.script).every(lines)))return null;
   const at = new Map(steps.map((s, i) => [s.id, i]));
   const ids = [...pack.sections.flatMap((sec) => [...Object.keys(sec.script || {}), sec.check]), ...sheetIds(pack)];
   const out = ids.map((id) => at.get(id));

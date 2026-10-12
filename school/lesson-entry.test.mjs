@@ -35,6 +35,13 @@ test('stale hidden follow cannot replace the current screen', async () => {
   assert.equal(calls.length,0);
 });
 const lesson = {id:'visible',course:'정역학',steps:[{id:'step'}]};
+test('이어하기는 시험 모드와 보충 전 원래 수업 참조를 보존한다',async()=>{
+ const {context,calls}=harness(()=>lesson);let saved;
+ context.pickQuestions=()=>[0];context.saveSession=async(l,i,options)=>{saved=options;throw new Error('stop before UI');};
+ const ref={lessonId:'base',stepId:'step'};
+ await context.startLesson('visible',{resume:{id:'session',stepId:'step',purpose:'exam',returnTo:ref}});
+ assert.equal(saved.purpose,'exam');assert.equal(saved.returnTo,ref);assert.equal(calls.includes('stop before rendering'),false);
+});
 test('visible resume restores reference and skips hidden reference API', async () => {
   for (const hidden of [false,true]) {
     const ref = hidden ? [...HIDDEN_LESSON_IDS][0] : 'base';

@@ -1,5 +1,6 @@
 import { renderClassroomDirectory } from './classroom-directory.js?v=266';
 import { visibleCatalog, orderedLessons, orderedTitle, lessonHidden, scopeLessons } from './lesson-order.js';
+import { currentRun, runComplete, passCount, sprintCourses } from './study-sprint.js';
 import { fitBoard } from './board-fit.js?v=266';
 import { createLectureQuests } from './lecture-quests.js?v=233';
 import { mountSchoolRefresh } from './refresh.js?v=237';
@@ -14,7 +15,7 @@ import {
   splitText,
   learningPath,
 } from "./learning.js";
-import { createWorkspace } from "./workspace.js?v=220";
+import { createWorkspace } from "./workspace.js?v=221";
 import { createMission } from "./mission.js?v=199";
 import { attachSaeng } from "./saeng.js?v224";
 import { createSpace, ROOMS } from "./space.js";
@@ -32,7 +33,7 @@ import { createDialog } from "./vn-dialog.js";
 import { createLectureUi } from "./lecture-ui.js";
 import { setupWideRoom } from "./room-wide.js";
 import { setupSeatRoom } from "./room-seat.js";
-import { pastDue, nextRoundOnly } from "./workspace.js?v=220";
+import { pastDue, nextRoundOnly } from "./workspace.js?v=221";
 import { setupShell } from "./shell.js?v=232";
 import { createRig } from "./rig.js";
 import { createFace } from "./face.js";
@@ -189,6 +190,10 @@ function status(text, error = false) {
   $("status").className = error ? "error" : "";
 }
 function record(event) {
+  if(['position','read','answer'].includes(event.kind)&&event.lesson===activeSession?.lessonId){
+    const run=currentRun([...state.events,...pending],event.lesson,activeSession.id);
+    event={...event,sessionId:activeSession.id,...(run?{runId:run.runId}:{})};
+  }
   pending.push({ id: eventId(), ...event });
   flush();
 }
@@ -673,6 +678,7 @@ async function startLesson(id, options = {}) {
     status('이 수업은 중간고사 대비 목록에서 제외됐습니다. 1강부터 선택해 주세요.');
     return;
   }
+  options={...options,purpose:options.purpose??options.resume?.purpose??'tutoring',returnTo:Object.hasOwn(options,'returnTo')?options.returnTo:options.resume?.returnTo??null};
   /* 정역학 강 시작 암기카드: 새 수업을 열 때만(같은 수업 안 이동·다른 기기 따라가기는 제외) */
   if (!options.follow && id !== current?.id && !(await cardGate(id))) { status('암기카드를 통과해야 수업이 열립니다.'); return; }
   try { await mission?.save(); if (!options.follow && !isBoard()) await growth?.stop('pause'); } catch (error) { status(error.message, true); return; }
@@ -714,6 +720,10 @@ async function startLesson(id, options = {}) {
     if (options.follow) activeSession = options.resume;
     else await saveSession(lesson, targetIndex, {newSession: !options.resume, purpose: options.purpose || 'tutoring', assisted: options.assisted ?? !!options.resume?.assisted, returnTo: options.returnTo || null});
     if (generation !== requestGeneration) return;
+    if (inFocus(lesson.course) && (options.studyPass || (!options.resume && options.purpose !== 'exam')) && !options.follow && targetIndex === (lr?.[0] ?? 0)) {
+      const required=(lr||lesson.steps.map((_,i)=>i)).map(i=>lesson.steps[i].id);
+      record({kind:'review',action:'study-pass-start',course:lesson.course,lesson:id,sessionId:activeSession?.id,runId:eventId(),pass:Math.min(2,passCount([...state.events,...pending],id)+1),required});
+    }
   workspace?.hide();
   for (const id of ['mainArea','learningArea','progressArea','materialsArea','attendanceArea','assignmentArea']) $(id)?.setAttribute('aria-pressed',String(id==='learningArea'));
   if ($("integratedWorkspace")) $("integratedWorkspace").hidden = true;
@@ -1158,9 +1168,19 @@ $("next").onclick = async () => {
     } else finish();
   } finally { stepping = false; }
 };
+let finishing=false;
 async function finish() {
+  if(finishing)return;
+  finishing=true;
+  try{
   const seen=[...state.events,...pending];
+  const run=currentRun(seen,current.id,activeSession?.id);
+  if(run&&runComplete(seen,run,current.steps)&&!seen.some(e=>e.action==='study-pass-complete'&&e.runId===run.runId)){
+    record({kind:'review',action:'study-pass-complete',course,lesson:current.id,runId:run.runId,pass:run.pass});
+  }
   if(!missionIndices && current.steps.every((s,i)=>seen.some(e=>e.lesson===current.id&&((e.kind==='position'&&e.index===i)||(['read','answer'].includes(e.kind)&&e.step===s.id)))) && !seen.some(e=>e.lesson===current.id&&e.kind==='review'&&e.action==='lecture-complete'))record({kind:'review',action:'lecture-complete',course,lesson:current.id});
+  await flush();
+  if(pending.length)return;
   try{await growth?.stop('finish');}catch(e){status(e.message,true);}
   const host = panel(curPack() ? "수업 완료 · 학습지 결과" : "미션 완료 · 다음 도전");
   const answers = evidenceSummary(
@@ -1192,6 +1212,12 @@ async function finish() {
     button("복습 계획 보기", showReviews),
     button("과목 교실로", () => showCourse(course)),
   );
+  if(inFocus(course)){
+    const row=sprintCourses(catalog,[...state.events,...pending],new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul'}).format(new Date()),workspace?.data?.exams||[]).find(c=>c.name===course);
+    if(row?.next){
+      host.append(button(`${row.pass}회독 · ${row.next.id===current.id?'처음부터 다시 확인':'다음 수업 계속'}`,()=>startLesson(row.next.id,{index:0,studyPass:true}),'primary'));
+    }else host.append(button('다른 과목 이어서 공부',()=>workspace.open('main'),'primary'));
+  }
   const path = state.plans[course]?.path || [],
     position = path.indexOf(current.id),
     next = path[position + 1];
@@ -1211,12 +1237,14 @@ async function finish() {
   }
   if (answers.retry || answers.assisted)
     host.append(
+      button('막힌 확인 문제 바로 다시 풀기',()=>startLesson(current.id,{purpose:'exam'})),
       node(
         "p",
         "도움받거나 막힌 문제는 다음 내용을 배우기 전에 다시 설명해보세요. 복습 기록도 따로 남습니다.",
         "notice",
       ),
     );
+  }finally{finishing=false;}
 }
 async function consult(name = course) {
   if ($("integratedWorkspace")) $("integratedWorkspace").hidden = true;
