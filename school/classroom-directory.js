@@ -1,7 +1,7 @@
 import { groupCourseLessons } from './course-scope.js?v=212';
 import { lectureStatus } from './subject-scope.js?v=238';
 import { focusCourses } from './focus.js';
-import { orderedLessons, orderedTitle, scopeLessons } from './lesson-order.js?v=293';
+import { orderedLessons, orderedTitle, scopeLessons } from './lesson-order.js?v=297';
 
 export function renderClassroomDirectory({doors,courses,events=[],session,onLesson,onOther}) {
   const doc=doors.ownerDocument;

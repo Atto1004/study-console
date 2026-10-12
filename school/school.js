@@ -1,6 +1,6 @@
-import { renderClassroomDirectory } from './classroom-directory.js?v=293';
-import { visibleCatalog, orderedLessons, orderedTitle, lessonHidden, scopeLessons, canonicalLessonId, EXCLUDED_LESSONS } from './lesson-order.js?v=293';
-import { currentRun, runComplete, passCount, sprintCourses } from './study-sprint.js?v=293';
+import { renderClassroomDirectory } from './classroom-directory.js?v=297';
+import { visibleCatalog, orderedLessons, orderedTitle, lessonHidden, scopeLessons, canonicalLessonId, EXCLUDED_LESSONS } from './lesson-order.js?v=297';
+import { currentRun, runComplete, passCount, sprintCourses } from './study-sprint.js?v=297';
 import { fitBoard } from './board-fit.js?v=266';
 import { createLectureQuests } from './lecture-quests.js?v=233';
 import { mountSchoolRefresh } from './refresh.js?v=237';
@@ -15,7 +15,7 @@ import {
   splitText,
   learningPath,
 } from "./learning.js";
-import { createWorkspace } from "./workspace.js?v=293";
+import { createWorkspace } from "./workspace.js?v=297";
 import { createMission } from "./mission.js?v=199";
 import { attachSaeng } from "./saeng.js?v224";
 import { createSpace, ROOMS } from "./space.js";
@@ -33,7 +33,7 @@ import { createDialog } from "./vn-dialog.js";
 import { createLectureUi } from "./lecture-ui.js";
 import { setupWideRoom } from "./room-wide.js";
 import { setupSeatRoom } from "./room-seat.js";
-import { pastDue, nextRoundOnly } from "./workspace.js?v=293";
+import { pastDue, nextRoundOnly } from "./workspace.js?v=297";
 import { setupShell } from "./shell.js?v=232";
 import { createRig } from "./rig.js";
 import { createFace } from "./face.js";

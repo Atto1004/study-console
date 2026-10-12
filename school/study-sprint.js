@@ -1,4 +1,4 @@
-import { scopeLessons } from './lesson-order.js?v=293';
+import { scopeLessons } from './lesson-order.js?v=297';
 import { focusCourses } from './focus.js';
 
 export function sprintLessons(course, today, exam) {

@@ -3,8 +3,8 @@ import { courseMetrics, sourceKind, pickQuest, KINDS } from "./metrics.js";
 import { attachSaeng } from "./saeng.js";
 import { officeHref } from "./worldmap.js";
 import { inFocus, focusCourses, isInClass } from "./focus.js";
-import { lessonHidden, orderedLessons, orderedTitle, sourceHidden, lmsHidden, scopeLessons } from "./lesson-order.js?v=293";
-import { renderSprint } from './study-sprint.js?v=293';
+import { lessonHidden, orderedLessons, orderedTitle, sourceHidden, lmsHidden, scopeLessons } from "./lesson-order.js?v=297";
+import { renderSprint } from './study-sprint.js?v=297';
 // 수업 선택 창에서 숨길 수업 — 정역학 10/10 복습·10/9 문제집은 벼락치기와 같은 과제 풀이 중복(10/11 「꼭 필요한 구성만」, 파일은 그대로)
 // 과목별 수업 선택 창 순서 — 정역학은 강 번호(아이패드 기준: 9/16 = 1강) 순서, 벼락치기 마지막(10/12 「1강이 첫 진입점에 없다」)
 // 시험 범위 문구에서 제작 경위 괄호(「(대표님 전달 …)」)는 빼고, 시험 조건은 짧게
@@ -291,9 +291,9 @@ export function createWorkspace(app){
     if(!exams.length)top.append(el('p','등록된 시험이 없어요.','db-empty'));
     root.append(top);
     renderSprint(root,{catalog:app.catalog(),events:app.events(),today:data.date,exams:data.exams,start:app.start,resume:app.resume,session:app.session?.()});
-    const host=el('div',undefined,'db-plan'),examHost=el('section');root.append(examHost,host);
+    const host=el('div',undefined,'db-plan'),examHost=el('section');root.prepend(examHost);root.append(host);
     import('./exam-period-plan.js?v=20261013-2').then(({renderExamPeriodPlan})=>{
-      if(examHost.isConnected)return renderExamPeriodPlan(examHost,data.date);
+      if(examHost.isConnected)return renderExamPeriodPlan(examHost,data.date,{catalog:app.catalog(),events:app.events(),start:app.start,timeline:date=>app.plan?.timeline?.(date)});
     }).catch(()=>{if(examHost.isConnected)examHost.textContent='시험기간 계획을 불러오지 못했습니다. 회독과 시간표는 계속 사용할 수 있습니다.';});
     const deadlines=assignments?pendingDeadlines(assignments.rows||[],data.date):[];
     loadRoutine().then(rt=>{if(!host.isConnected)return;app.plan?.render(host,{today:data.date,courses:focusCourses().filter(n=>data.courses.some(c=>c.name===n)),focus:inFocus,inClass:isInClass,scheduled:data.scheduled,classSlots:data.courses.filter(c=>Array.isArray(c.slots)),holidays:Array.isArray(data.holidays)?data.holidays:null,term:data.term||null,sessions:data.sessions||[],plans:data.plans,deadlines,calendar:calendar?.events||[],calendarOk:!!calendar?.verified,reload:()=>open('main'),afterDraw:()=>releaseHold(),routine:rt,courseName:id=>data.courses.find(c=>c.id===id)?.name||'',courseId:name=>data.courses.find(c=>c.name===name)?.id,exams:data.exams.filter(e=>e.written&&inFocus(e.course)&&e.date>=data.date).map(e=>({course:e.course,date:e.date,time:e.time||'',assumed:!!e.assumed})),addPlan:async(item,many)=>(await change({op:'plan-add',plans:many?item:[item]}))?(data.createdIds||[]):false,/* 만든 계획 id 목록(채우기 되돌리기용), 실패는 false */dailyCap:Number(data.profile?.dailyCap)||4,updatePlan:item=>change({op:'plan-update',plan:item}),deletePlan:id=>change({op:'plan-delete',id}),deletePlans:async(ids,guard)=>(await change({op:'plan-delete',ids,...(guard?{guard}:{})}))?(data.deletedIds||[]):false,restorePlans:ids=>change({op:'plan-restore',ids}),attend,calChange:async({ev,date,start,end})=>{/* 구글 캘린더 시각 바꾸기(대표님 10/9): 그날 캘린더를 새로 읽고 → 최신 원본 버전으로 변경 대기열에 넣는다. 원본이 바뀌었으면 서버가 409 로 막음 */

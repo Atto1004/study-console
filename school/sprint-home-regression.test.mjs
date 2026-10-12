@@ -1,0 +1,21 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import {JSDOM} from '../.test-tools/node_modules/jsdom/lib/api.js';
+import {renderSprint} from './study-sprint.js';
+import {focusCourses} from './focus.js';
+const text=fs.readFileSync(new URL('./workspace.js',import.meta.url),'utf8');
+const prefix=text.slice(text.indexOf('function renderDashboard(){'),text.indexOf("    const host=el('div',undefined,'db-plan'),examHost"))+'}';
+for(const date of ['2026-10-13','2026-10-18'])test(`시험기간 ${date}에도 네 과목 두 회독 시작점이 남는다`,()=>{
+ const dom=new JSDOM('<main></main>'),root=dom.window.document.querySelector('main');
+ const catalog={courses:focusCourses().map((name,i)=>({name,lessons:[{id:i===0?'statics-2026-09-16':'course'+i,date:'2026-09-16',title:'핵심 수업'}]}))};
+ const el=(tag,t,c)=>{const n=dom.window.document.createElement(tag);if(t!==undefined)n.textContent=t;if(c)n.className=c;return n;};
+ const context=vm.createContext({root,el,btn:(t,go,c)=>{const n=el('button',t,c);n.onclick=go;return n;},examMetrics:()=>[],inFocus:()=>true,renderSprint,EXAM_DAYS:[{date}],data:{date,exams:[]},app:{catalog:()=>catalog,events:()=>[],start:()=>{},resume:()=>{},session:()=>null}});
+ vm.runInContext(prefix,context);context.renderDashboard();
+ const section=root.querySelector('.study-sprint');assert.ok(section);
+ assert.equal(section.querySelectorAll('.sprint-course').length,4);
+ assert.equal(section.querySelectorAll('.sprint-course button:not([disabled])').length,4);
+ assert.match(section.textContent,/6일/);assert.match(section.textContent,/오늘 남은 목표/);
+ dom.window.close();
+});
