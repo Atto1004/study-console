@@ -3,7 +3,7 @@ import { courseMetrics, sourceKind, pickQuest, KINDS } from "./metrics.js";
 import { attachSaeng } from "./saeng.js";
 import { officeHref } from "./worldmap.js";
 import { inFocus, focusCourses, isInClass } from "./focus.js";
-import { lessonHidden, orderedLessons, orderedTitle, sourceHidden, lmsHidden } from "./lesson-order.js";
+import { lessonHidden, orderedLessons, orderedTitle, sourceHidden, lmsHidden, scopeLessons } from "./lesson-order.js";
 import { renderSprint } from './study-sprint.js';
 // 수업 선택 창에서 숨길 수업 — 정역학 10/10 복습·10/9 문제집은 벼락치기와 같은 과제 풀이 중복(10/11 「꼭 필요한 구성만」, 파일은 그대로)
 // 과목별 수업 선택 창 순서 — 정역학은 강 번호(아이패드 기준: 9/16 = 1강) 순서, 벼락치기 마지막(10/12 「1강이 첫 진입점에 없다」)
@@ -191,7 +191,7 @@ export function createWorkspace(app){
       const course=app.catalog().courses.find(c=>c.name===name);
       if(!exam&&!course)return null;
       const events=(app.events?.()||[]).filter(x=>x.course===name);
-      return {name,exam,m:courseMetrics({lessons:orderedLessons(course)||course?.lessons||[],events,exam,today:data.date})};
+      return {name,exam,m:courseMetrics({lessons:scopeLessons(course).filter(l=>l.date<=data.date),events,exam,today:data.date})};
     }).filter(Boolean).sort((a,b)=>(a.exam?a.exam.dday:999)-(b.exam?b.exam.dday:999));
   }
   // 로비 = 복도 장면. 문 하나가 과목 하나, 문패가 진행판, 퀘스트 문이 빛난다. 문을 누르면 1인칭 교실로 들어간다.
