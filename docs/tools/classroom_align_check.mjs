@@ -33,6 +33,9 @@ const JJ = jobs.filter((_, i) => i % stride === 0);
 const vps = (process.env.VPS || 'l1366,p1024,i1180,d1280').split(',');
 const browser = await webkit.launch();
 async function run(job, k) {
+  for (let tr = 0; tr < 3; tr++) { const r = await run1(job, k); if (!r.error || tr === 2) return r; }   // 일시적 시간 초과(동시 실행 부하)는 두 번까지 다시 잰다
+}
+async function run1(job, k) {
   const v = VP[k]; const o = { viewport: { width: v.w, height: v.h }, hasTouch: !!v.t, reducedMotion: 'reduce' }; if (v.ua) o.userAgent = v.ua;
   const ctx = await browser.newContext(o); await ctx.addCookies([{ name: 'atom_auth', value: TOKEN, url: BASE }]);
   await ctx.route('**/docs/tools/lessons/cards/statics.json', (r) => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ free: Object.fromEntries(DATES.map((d) => [d, '검사'])), lectures: {}, common: [], expect: {} }) }));
