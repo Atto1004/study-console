@@ -72,3 +72,15 @@ test('home shows combined service round once without changing source or submissi
   assert.equal(pendingDeadlines([rows[3]],'2026-11-23').length,1);
   assert.equal(pendingDeadlines([rows[3]],'2026-11-30').length,1);
 });
+test('current narrative assignment replaces only its same-date initial reminder on home', () => {
+  const rows = [
+    {course:'아카데믹글쓰기',source:'할 일 원본',title:'8주차 자기서사 완성본(중간고사 대체)',due:'2026-10-20T12:00'},
+    {course:'아카데믹글쓰기',source:'1주차 기록',title:'자기서사 글쓰기 (중간 대체, 8주차 제출·그 주 수업 없음)',due:'2026-10-20'},
+    {course:'아카데믹글쓰기',source:'LMS',title:'다른 자기서사 활동지 과제',due:'2026-10-20'},
+  ];
+  const before=JSON.stringify(rows);
+  assert.equal(pendingDeadlines(rows,'2026-10-13').length,2);
+  assert.equal(JSON.stringify(rows),before);
+  assert.equal(pendingDeadlines(rows.slice(1),'2026-10-13').length,2);
+  assert.equal(pendingDeadlines([rows[0],{...rows[1],due:'2026-10-21'}],'2026-10-13').length,2);
+});

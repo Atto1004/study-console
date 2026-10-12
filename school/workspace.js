@@ -49,6 +49,8 @@ export function pendingDeadlines(rows, today) {
     const combined = service.find(r => /\(2회차 미제출분도 같이\)/.test(r.title || '') && r.source === '할 일 원본');
     pending = pending.filter(r => r.course !== '사회봉사' || roundOf(r) === null || !combined || r === combined || roundOf(r) !== roundOf(combined));
   }
+  const narrative = pending.find(r => r.course === '아카데믹글쓰기' && r.source === '할 일 원본' && /^8주차 자기서사 완성본/.test(r.title || ''));
+  if (narrative?.due) pending = pending.filter(r => !(r.course === narrative.course && r.source === '1주차 기록' && /^자기서사 글쓰기 \(중간 대체, 8주차 제출/.test(r.title || '') && r.due?.slice(0,10) === narrative.due.slice(0,10)));
   return pending.map(r=>{   // 지난 과제는 아예 안 보임(대표님 10/9)
     const match=/^(\d{4}-\d{2}-\d{2})(?:T(\d{2}:\d{2})(?::\d{2})?)?$/.exec(r.due||'');
     const stamp=match?Date.parse(match[1]+'T'+(match[2]||'23:59')+':00Z'):NaN;
