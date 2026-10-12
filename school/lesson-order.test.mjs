@@ -3,9 +3,20 @@ import assert from 'node:assert/strict';
 import { JSDOM } from '../.test-tools/node_modules/jsdom/lib/api.js';
 import { renderClassroomDirectory } from './classroom-directory.js';
 import { courseMetrics } from './metrics.js';
-import { orderedLessons, orderedTitle, visibleCatalog, sourceHidden, lmsHidden, lessonHidden, HIDDEN_LESSON_IDS, HIDDEN_LESSON_DATES } from './lesson-order.js';
+import { scopeLessons, orderedLessons, orderedTitle, visibleCatalog, sourceHidden, lmsHidden, lessonHidden, HIDDEN_LESSON_IDS, HIDDEN_LESSON_DATES } from './lesson-order.js';
 const ids=['statics-2026-09-02','statics-2026-09-07','statics-2026-09-09','statics-2026-09-14','statics-2026-09-16','statics-2026-09-21','statics-2026-09-23','statics-2026-09-28','statics-2026-09-30','statics-2026-10-07','exam-statics-2026-10-09','statics-2026-10-10','statics-2026-10-11'];
 const statics={name:'정역학',units:[{title:'Ch.1 Introduction',dates:['2026-09-02','2026-09-07']}],lessons:ids.map(id=>({id:id==='statics-2026-09-02'?'session:정역학:2026-09-02':id,title:'주제 '+id,date:id.replace(/^(exam-)?statics-/,'')}))};   // 9/2 는 실제 카탈로그처럼 session: id
+test('수업 옆 목차도 정역학 7개 공통 순서를 사용하고 원본은 보존한다',()=>{
+ assert.deepEqual(scopeLessons(statics),orderedLessons(statics));
+ assert.equal(scopeLessons(statics).at(-1).label,'벼락치기');
+ assert.equal(statics.lessons.length,13);
+ for(const name of ['일반물리학2','미분적분학2','공업수학1']){
+  const lessons=[{id:'b',date:'2026-09-09'},{id:'exam-x',date:'2026-09-08'},{id:'generated',date:'2026-09-06',generated:true},{id:'a',date:'2026-09-04'}];
+  assert.deepEqual(scopeLessons({name,lessons}).map(l=>l.id),['a','b']);
+  assert.equal(lessons[0].id,'b');
+ }
+ assert.deepEqual(scopeLessons(),[]);
+});
 test('정역학 순서표는 1강~6강+벼락치기만, 숨김 수업은 제외',()=>{
  const o=orderedLessons(statics);
  assert.deepEqual(o.map(l=>l.label),['1강','2강','3강','4강','5강','6강','벼락치기']);

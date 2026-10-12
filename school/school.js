@@ -1,5 +1,5 @@
 import { renderClassroomDirectory } from './classroom-directory.js?v=266';
-import { visibleCatalog, orderedLessons, orderedTitle, lessonHidden } from './lesson-order.js';
+import { visibleCatalog, orderedLessons, orderedTitle, lessonHidden, scopeLessons } from './lesson-order.js';
 import { fitBoard } from './board-fit.js?v=266';
 import { createLectureQuests } from './lecture-quests.js?v=233';
 import { mountSchoolRefresh } from './refresh.js?v=237';
@@ -23,7 +23,7 @@ import { createSetup } from "./setup.js";
 import { createWorldMap } from "./worldmap.js";
 import { createTutor } from "./tutor.js?v=5";
 import { createSubjectRail } from "./subject-rail.js?v=251";
-import { createSubjectScope } from "./subject-scope.js?v=240";
+import { createSubjectScope } from "./subject-scope.js?v=241";
 import { boardHierarchy,createBoardHierarchy } from "./board-hierarchy.js?v=240";
 import { startSurfaces } from "./surface.js";
 import { createLecture } from "./lecture.js?v=5";
@@ -2508,7 +2508,7 @@ function staticsWhere(lesson,title){
   const ch=m?+m[1]:memo?{'①':3,'②':4,'③':5}[memo[1]]:0;
   return ch?`Ch.${ch} · 학교 진도 ${STATICS_CHAPTER[ch]}`:'시험 범위 Ch.3·4·5 공통';
 }
-const subjectScope=createSubjectScope({fallback:name=>showCourse(name,true),lessons:name=>(catalog?.courses.find(c=>c.name===name)?.lessons||[]).filter(l=>!l.generated&&!String(l.id).startsWith('exam-')).sort((a,b)=>a.date.localeCompare(b.date)),current:()=>current?{lesson:current.id,index}:null,events:()=>[...state.events,...pending],topics:async summary=>{const lesson=summary.id===current?.id?current:await api('lesson?id='+encodeURIComponent(summary.id));return groupLessonTopics(lesson.steps).map((t,i,all)=>({...t,current:summary.id===current?.id&&t.index<=index&&(!all[i+1]||all[i+1].index>index)}));},select:(id,stepId)=>startLesson(id,{stepId}),onOpen:()=>{scopePause={lesson:current,index,playing:!!lecture?.playing};if(scopePause.playing)lecture.toggle();},onClose:()=>{const paused=scopePause;scopePause=null;if(paused?.playing&&current===paused.lesson&&index===paused.index&&!lecture?.playing&&!lecture?.ended)lecture?.toggle();}});
+const subjectScope=createSubjectScope({fallback:name=>showCourse(name,true),lessons:name=>scopeLessons(catalog?.courses.find(c=>c.name===name)),current:()=>current?{lesson:current.id,index}:null,events:()=>[...state.events,...pending],topics:async summary=>{const lesson=summary.id===current?.id?current:await api('lesson?id='+encodeURIComponent(summary.id));return groupLessonTopics(lesson.steps).map((t,i,all)=>({...t,current:summary.id===current?.id&&t.index<=index&&(!all[i+1]||all[i+1].index>index)}));},select:(id,stepId)=>startLesson(id,{stepId}),onOpen:()=>{scopePause={lesson:current,index,playing:!!lecture?.playing};if(scopePause.playing)lecture.toggle();},onClose:()=>{const paused=scopePause;scopePause=null;if(paused?.playing&&current===paused.lesson&&index===paused.index&&!lecture?.playing&&!lecture?.ended)lecture?.toggle();}});
 const rail = createSubjectRail({subjects:ROOMS,available:name=>inFocus(name)&&!!catalog?.courses?.find(c=>c.name===name)?.lessons?.length,position:lecturePosition,current:()=>course,openScope:(name,anchor)=>subjectScope.open(name,anchor),choose:async name=>{try{await mission?.save();}catch{return;}const seated=document.querySelector('.school').dataset.world==='seated';await sitDown(name);space?.setSubject?.(name);rail.update();if(seated)await space?.seated(name);}});
 new MutationObserver(()=>rail.update()).observe($('roomLabel'),{childList:true,characterData:true,subtree:true});
 new MutationObserver(()=>rail.update()).observe($('stepLabel'),{childList:true,characterData:true,subtree:true});

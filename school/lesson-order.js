@@ -14,6 +14,10 @@ export function orderedLessons(course) {
 }
 // 「N강 · 9/16 · 주제」
 export const orderedTitle = l => `${l.label} · ${+l.date.slice(5,7)}/${+l.date.slice(8)} · ${l.title}`;
+// 수업 옆 목차도 교실과 같은 순서를 사용한다. 다른 과목은 기존 정규 수업만 표시한다.
+export function scopeLessons(course) {
+  return orderedLessons(course) || (course?.lessons || []).filter(l => !l.generated && !String(l.id).startsWith('exam-')).sort((a,b) => a.date.localeCompare(b.date));
+}
 // 숨긴 수업을 학교 화면 전체에서 빼는 한 곳 — 카탈로그 수업·자료실 자료·LMS 항목. 원본 파일·서버 자료는 그대로.
 export function visibleCatalog(catalog) {
   if (!catalog?.courses) return catalog;
