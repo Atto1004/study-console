@@ -11,7 +11,7 @@ globalThis.window = dom.window; globalThis.document = dom.window.document;
 const CARDS = process.env.CARDS || path.join(here, '..', 'docs', 'tools', 'lessons', 'cards', 'statics.json');
 const raw = JSON.parse(fs.readFileSync(CARDS, 'utf8'));
 const fetcher = async () => ({ ok: true, json: async () => raw });
-const { cardGate, cardsFor } = await import('./card-gate.js');
+const { cardGate, cardsFor, gateSkipped } = await import('./card-gate.js');
 const engMod = await import('./card-engine.js');
 
 let fail = 0; const ok = (c, m) => { console.log((c ? 'ok   ' : 'FAIL ') + m); if (!c) fail++; };
@@ -33,7 +33,8 @@ const optOrder = () => opts().map((b) => b.textContent).join('|');
 
 // ---- 0) 카드 데이터: 모든 카드에 보기 4개(정답 1 + 오답 3), 서로 다름, 오답이 원문 정답과 같지 않음
 const norm = (s) => String(s).normalize('NFKC').toLowerCase().replace(/[\s·,()\[\]{}:;'"]+/g, '');
-ok(allCards.length === 35, '카드 35장');
+ok(allCards.length === 37, '카드 37장 (6개 강에 겹침 없이)');
+{ const ids = allCards.map((c) => c.id); ok(new Set(ids).size === ids.length, '카드 ID 중복 없음'); const ds = Object.values(raw.lectures).flatMap((l) => l.dates); ok(ds.length === 6 && new Set(ds).size === 6 && Object.values(raw.lectures).every((l) => l.dates.length === 1), '강 6개 = 날짜 6개, 한 날짜는 정확히 한 강'); }
 ok(allCards.every((c) => c.mc && c.mc.right && c.mc.wrong.length === 3), '모든 카드에 정답 1 + 오답 3');
 ok(allCards.every((c) => new Set([c.mc.right, ...c.mc.wrong].map(norm)).size === 4), '모든 카드의 보기 4개가 서로 다르다');
 ok(allCards.every((c) => c.mc.wrong.every((w) => norm(w) !== norm(c.a))), '오답이 원문 정답과 같은 카드가 없다');
@@ -116,6 +117,30 @@ ok(prog().startsWith('1 / ') && title() === '암기카드 확인', '다시 열�
 key('Escape'); await p;
 ok((await cardGate('statics-2026-09-14', fetcher)) === true && !open(), '9/14 는 바로 열린다');
 ok((await cardGate('em1-2026-09-16', fetcher)) === true && !open(), '다른 과목은 바로 열린다');
+
+// ---- 6b) 건너뛰고 수업 열기
+{
+  const skipBtn = () => document.querySelector('.card-gate-skip');
+  p = cardGate('statics-2026-09-28', fetcher); await tick(); await tick();
+  ok(skipBtn() && skipBtn().textContent === '건너뛰고 수업 열기', '문제 화면에 건너뛰기 버튼');
+  ok(!skipBtn().closest('.card-gate-row') && skipBtn().textContent !== '닫기', '판정·닫기 줄과 따로(하단 보조 영역)');
+  document.querySelector('.card-gate-unknown').click(); ok(!!skipBtn(), '답한 뒤 화면에도 있다');
+  btn('다음').click();
+  const n28 = cardsFor(raw, '2026-09-28').cards.length;
+  for (let i = 1; i < n28; i++) { document.querySelector('.card-gate-unknown').click(); btn('다음').click(); }
+  ok(title() === '외우기' && !!skipBtn(), '외우기 화면에도 있다');
+  skipBtn().click();
+  ok((await p) === true && !open(), '건너뛰기 한 번에 확인 없이 수업이 열린다');
+  ok(gateSkipped('statics-2026-09-28'), '건너뜀으로 기억');
+  ok((await cardGate('statics-2026-09-28', fetcher)) === true && !open(), '건너뛴 수업은 이 화면을 연 동안 다시 묻지 않는다');
+  ok(!gateSkipped('statics-2026-09-16') && gateSkipped('statics-2026-09-16') === false, '통과한 수업은 건너뜀으로 세지 않는다');
+  p = cardGate('statics-2026-09-30', fetcher); await tick(); await tick();
+  key('Escape'); ok((await p) === false && !gateSkipped('statics-2026-09-30'), '닫기·Esc 는 건너뛰기가 아니다(수업 안 열림)');
+  p = cardGate('statics-2026-10-07', fetcher); await tick(); await tick();
+  skipBtn().focus(); const e3 = new window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }); skipBtn().dispatchEvent(e3);
+  ok(e3.defaultPrevented && open(), '건너뛰기도 키보드 Enter 로는 실행되지 않는다(마우스·터치만)');
+  key('Escape'); await p;
+}
 
 // ---- 7) 교실 인라인판 = 학교 모듈 (줄머리 export 를 뗀 같은 소스가 같은 결과)
 const src = fs.readFileSync(path.join(here, 'card-engine.js'), 'utf8');

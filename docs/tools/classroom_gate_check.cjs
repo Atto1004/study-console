@@ -78,6 +78,46 @@ const ok = (cond, msg) => { out.push((cond ? "ok   " : "FAIL ") + msg); if (!con
   ok(Array.isArray(X.L.gateLog) && X.L.gateLog.length === 1, "통과 이력이 L.gateLog 에 1건");
   ok(r.errs.length === 0, "페이지 오류 0 (" + r.errs.join(" | ") + ")");
 
+  // 2b) 첫 판을 전부 맞히면 곧바로 끝 화면 → 수업 열기 (두 번째 과정 없음)
+  r = await open("notes/classroom/statics/2026-09-21.html", "#ch=1");
+  {
+    const X2 = r.w.__cr, d2 = r.doc, tot = X2.D.gate.cards.length;
+    for (let i = 0; i < tot; i++) { const c = X2.D.gate.cards.find(c => (c.mc.q || c.q) === d2.querySelector("#gBody .gq").textContent); [...d2.querySelectorAll("#gBody .gopt")].find(b => b.textContent.startsWith(c.mc.right)).click(); btn(d2, "다음").click(); }
+    ok(d2.querySelector("#gBody").textContent.includes("처음부터 다 맞혔어요") && !/써서|몰라요|맞았어요 *$/.test(d2.querySelector("#gTitle").textContent), "첫 판 전부 맞히면 바로 끝 화면 (두 번째 과정 없음)");
+    ok(!d2.querySelector("#gFoot .gskip"), "끝 화면에는 건너뛰기가 없다(수업 열기만)");
+    btn(d2, "수업 열기").click(); ok(X2.S.mode === "step", "수업 열림");
+  }
+
+  // 2c) 건너뛰고 수업 열기: 모든 화면에 있고, 확인 없이 열리며, 통과 집계에 섞이지 않고, 다시 묻지 않는다
+  r = await open("notes/classroom/statics/2026-09-23.html", "#ch=1");
+  {
+    const X3 = r.w.__cr, d3 = r.doc;
+    const sk = () => d3.querySelector("#gFoot .gskip");
+    ok(sk() && sk().textContent === "건너뛰고 수업 열기", "문제 화면에 건너뛰기 버튼");
+    d3.querySelector("#gBody .gunk").click(); ok(!!sk(), "답한 뒤 화면에도 있다");
+    btn(d3, "다음").click();
+    const tot3 = X3.D.gate.cards.length; for (let i = 1; i < tot3; i++) { d3.querySelector("#gBody .gunk") ? d3.querySelector("#gBody .gunk").click() : 0; btn(d3, "다음").click(); }
+    ok(d3.querySelector("#gTitle").textContent === "외우기" && !!sk(), "외우기 화면에도 있다");
+    sk().click();
+    ok(!gateOn(d3) && X3.S.mode === "step", "건너뛰기 한 번에 수업이 열린다(확인 없음)");
+    ok(X3.L.gateLog.length === 1 && X3.L.gateLog[0].skip === 1 && X3.L.gateLog[0].r === undefined, "gateLog 에 「건너뜀」으로만 남고 통과 횟수(r)는 없다");
+    X3.S.mode = "intro"; X3.boot(); ok(!gateOn(d3), "건너뛴 뒤 이 화면에서는 다시 묻지 않는다");
+  }
+  r = await open("notes/classroom/statics/2026-09-23.html", "#ch=1");
+  key(r.doc, "Escape"); ok(!gateOn(r.doc) && r.w.__cr.S.mode === "intro", "닫기는 건너뛰기와 다르다: 수업 안 열림");
+
+  // 2d) 강(날짜)마다 카드 세트가 다르다: 겹치는 카드 0
+  {
+    const seen = {};
+    const J = JSON.parse(fs.readFileSync(path.join(ROOT, "docs/tools/lessons/cards/statics.json"), "utf8"));
+    const want = d => (Object.values(J.lectures).find(l => l.dates.includes(d)).cards.map(c => c.id)).join(" ");
+    for (const f of ["2026-09-16", "2026-09-21", "2026-09-23", "2026-09-28", "2026-09-30", "2026-10-07"]) {
+      const q = await open("notes/classroom/statics/" + f + ".html", ""); const ids = q.w.__cr.D.gate.cards.map(c => c.id);
+      ok(ids.join(" ") === want(f), f + " 교실 페이지 카드 = statics.json(학교 화면과 같은 날짜-카드)"); ok(ids.length > 0 && ids.every(i => !(i in seen)), f + " 카드 " + ids.length + "장 [" + ids.join(" ") + "] 다른 강과 겹침 0"); ids.forEach(i => seen[i] = f);
+    }
+    ok(Object.keys(seen).length === 37, "6개 강에 카드 37장 전부 배치");
+  }
+
   // 3) 무게이트 날짜: 10/10 은 바로 열린다
   r = await open("notes/classroom/statics/2026-10-10.html", "#ch=1");
   ok(!gateOn(r.doc) && r.w.__cr.S.mode === "step", "10/10(무게이트)은 게이트 없이 바로 열린다");

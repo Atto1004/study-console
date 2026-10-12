@@ -26,6 +26,12 @@ def check(g):
     for k, lec in g.get("lectures", {}).items():
         if len(lec.get("cards", [])) != exp.get(k): err.append(f"{k}강 카드 수 {len(lec.get('cards', []))} != expect {exp.get(k)}")
     cards = all_cards(g); ids = [c["id"] for _, c in cards]
+    seen = {}
+    for k, lec in g.get("lectures", {}).items():
+        for dt in lec.get("dates", []):
+            if dt in seen: err.append(f"날짜 {dt} 가 {seen[dt]}강과 {k}강에 중복 연결")
+            seen[dt] = k
+        if len(lec.get("dates", [])) != 1: err.append(f"{k}강 날짜가 정확히 1개여야 함 (화면 강 하나 = 날짜 하나)")
     if len(set(ids)) != len(ids): err.append("카드 ID 중복: " + ", ".join(sorted({i for i in ids if ids.count(i) > 1})))
     for grp, c in cards:
         cid = c.get("id"); mc = c.get("mc")
@@ -52,11 +58,14 @@ def table(g):
         rows.append(f"| {c['id']} {q} | {mc['right']} | " + " ／ ".join(mc["wrong"]) + " |")
     return "\n".join(rows) + "\n"
 
+def first(g):
+    return (g.get("common") or next(iter(g["lectures"].values()))["cards"])[0]
+
 def selftest(g):
     """검사기가 나쁜 데이터를 실제로 잡는지 확인한다(손상본을 만들어 오류가 나와야 통과)."""
     import copy
     def broken(f):
-        h = copy.deepcopy(g); f(h["common"][0]); return check(h)[0]
+        h = copy.deepcopy(g); f(first(h)); return check(h)[0]
     cases = {
         "오답 2개": lambda c: c["mc"]["wrong"].pop(),
         "오답 4개": lambda c: c["mc"]["wrong"].append("추가 오답"),
@@ -68,7 +77,7 @@ def selftest(g):
         "tip 없음": lambda c: c.pop("tip"),
     }
     bad = [k for k, f in cases.items() if not broken(f)]
-    h = copy.deepcopy(g); h["common"].append(copy.deepcopy(h["common"][0]))
+    h = copy.deepcopy(g); h["common"].append(copy.deepcopy(first(h)))
     if not check(h)[0]: bad.append("카드 수·ID 중복")
     return bad
 

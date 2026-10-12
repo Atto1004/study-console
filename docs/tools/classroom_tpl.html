@@ -340,8 +340,10 @@ main{max-width:1040px;margin:0 auto;padding:14px 20px 18px}
 #gate .gres.ok{color:#7ADBA8}#gate .gres.bad{color:#FF9C8A}#gate .gres.unk{color:#FFE27A}
 #gate .gsum{font-size:18px;font-weight:700;margin:6px 0}
 #gate .gbx:focus{outline:none}
+#gate .gfoot{display:flex;justify-content:flex-end;margin-top:22px;padding-top:10px;border-top:1px dashed rgba(255,255,255,.18)}#gate .gfoot:empty{display:none}
+#gate .gskip{min-height:44px;min-width:44px;padding:8px 14px;border:0;background:transparent;color:#A9BDB0;font:500 14px inherit;font-family:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer;touch-action:manipulation}
 </style>
-<div id="gate" role="dialog" aria-modal="true" aria-labelledby="gTitle"><div class="gbx"><div class="gh"><b id="gTitle">암기카드 확인</b><span id="gProg"></span></div><div id="gBody"></div><div class="row" id="gRow"></div></div></div>
+<div id="gate" role="dialog" aria-modal="true" aria-labelledby="gTitle"><div class="gbx"><div class="gh"><b id="gTitle">암기카드 확인</b><span id="gProg"></span></div><div id="gBody"></div><div class="row" id="gRow"></div><div class="gfoot" id="gFoot"></div></div></div>
 <div id="ov"><div class="pn"><h2>목차</h2><div class="mt" id="ovMeta"></div><ul id="ovList"></ul><div class="row"><button class="cbt g" id="ovClose" type="button">닫기</button><span style="flex:1"></span><button class="cbt g" id="ovMemo" type="button">암기노트</button><button class="cbt g" id="ovBook" type="button">교재 보기</button><button class="cbt g" id="ovReset" type="button">이 회차 기록 지우기</button></div></div></div>
 <div id="figov" hidden role="dialog" aria-modal="true" aria-label="그림 크게 보기"><div class="fzh"><span>그림 크게 보기</span><button type="button" id="figovX" aria-keyshortcuts="Escape">닫기</button></div><div class="fz"></div></div>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
@@ -857,7 +859,8 @@ setInterval(()=>{ const t=$("#tutor"); if(t) t.classList.toggle("talking",!!typi
    로직은 school/card-engine.js 와 같은 소스(빌드가 아래 마커에 끼워 넣는다) — 학교 화면 게이트와 규칙이 한 벌이다. */
 /*__CARDENGINE__*/
 let GATE=null;
-function gateNeeded(){ return !!(D.gate&&D.gate.state==="gate"); }
+let GATE_SKIP=false;   /* 「건너뛰고 수업 열기」 — 이 화면을 연 동안만 다시 묻지 않는다. 통과·맞음 집계에 섞지 않는다 */
+function gateNeeded(){ return !GATE_SKIP&&!!(D.gate&&D.gate.state==="gate"); }
 function gateGo(fn){ if(!gateNeeded()) return fn(); openGate(fn); }
 function openGate(fn){ const el=$("#gate"); if(!el) return fn(); if(GATE) return; const all=(D.gate&&D.gate.cards)||[]; let eng=null;
   try{ if(all.length&&all.every(c=>optionsOf(c,"x",1))) eng=createEngine(all,{seed:String(Date.now())}); }catch(e){ eng=null; }
@@ -867,7 +870,8 @@ function gateBtn(row,label,f,cls){ const b=document.createElement("button"); b.t
 function gateBox(label,text){ return '<div class="ga"><i>'+label+'</i>'+esc(text)+'</div>'; }
 function gateWhy(c){ const w=c.why; if(!w) return ""; return (w.hw&&!/^확인 중/.test(w.hw)?gateBox("과제",w.hw):"")+(w.flow?gateBox("왜",w.flow):""); }
 function gateView(){ const G=GATE, body=$("#gBody"), row=$("#gRow"), prog=$("#gProg"), ttl=$("#gTitle"); if(!G||!body) return;
-  row.innerHTML=""; prog.textContent="";
+  row.innerHTML=""; prog.textContent=""; const ft=$("#gFoot"); if(ft) ft.innerHTML="";
+  if(ft&&!G.err&&G.eng.view().kind!=="done"){ const sk=document.createElement("button"); sk.type="button"; sk.className="gskip"; sk.textContent="건너뛰고 수업 열기"; sk.onclick=gateSkip; ft.appendChild(sk); }
   if(G.err){ body.innerHTML='<p class="gp">이 날짜의 암기카드를 불러오지 못해 수업을 열 수 없어요. 아톰에게 알려 주세요.</p>'; gateBtn(row,"닫기",gateClose,"g"); return; }
   const E=G.eng, v=E.view();
   ttl.textContent=v.kind==="study"?"외우기":"암기카드 확인";
@@ -893,6 +897,9 @@ function gateView(){ const G=GATE, body=$("#gBody"), row=$("#gRow"), prog=$("#gP
   gateBtn(row,"닫기",gateClose,"g"); }
 function gatePass(){ const G=GATE, fn=G.fn, rd=G.eng.state().round; GATE=null; $("#gate").classList.remove("on");
   try{ L.gateLog=(Array.isArray(L.gateLog)?L.gateLog:[]).concat([{t:Date.now(),n:G.n,r:Math.max(1,rd-1)}]).slice(-60); save(); }catch(e){}   /* 통과 이력만 — 면제 조건으로 쓰지 않는다 */
+  fn(); }
+function gateSkip(){ const G=GATE, fn=G.fn; GATE=null; GATE_SKIP=true; $("#gate").classList.remove("on");
+  try{ L.gateLog=(Array.isArray(L.gateLog)?L.gateLog:[]).concat([{t:Date.now(),n:G.n,skip:1}]).slice(-60); save(); }catch(e){}   /* 「건너뜀」만 남긴다 — 통과(r)·맞음 집계 아님 */
   fn(); }
 function gateClose(){ GATE=null; $("#gate").classList.remove("on"); }   /* 닫기·Esc: 목적지 폐기, S·L.pos 는 그대로 */
 function gateTab(e){ const bs=[...$$("#gate button")]; if(!bs.length) return; const a=document.activeElement, i=bs.indexOf(a);   /* 포커스를 팝업 안에 가둔다 */

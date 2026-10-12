@@ -2,13 +2,16 @@
 //  · 카드 원본 = docs/tools/lessons/cards/statics.json (날짜 → 강 연결, 공통 + 강별 카드, 카드마다 mc 보기 4개와 tip)
 //  · 흐름(로직은 card-engine.js): 객관식 4지선다 + 「몰라요」 → 틀림·몰라요만 외우기 → 그 카드만 다시 → 전부 맞히면 수업이 열린다(「써서 확인」 단계 없음, 대표님 10/12).
 //  · 게이트 중 Enter·Space·방향키로는 판정하지 않는다(마우스·터치만). Esc·닫기는 수업을 열지 않는다.
+//  · 「건너뛰고 수업 열기」(모든 화면, 하단 오른쪽): 확인 없이 한 번에 수업을 연다. 통과가 아니라 「건너뜀」으로만 기억한다(대표님 10/12). 「닫기」는 수업을 열지 않는다.
 //  · 통과는 이 화면을 연 동안만 기억한다. 서버에는 아무것도 저장하지 않는다.
 import { createEngine, optionsOf } from './card-engine.js?v=4';
 // 모듈 위치 기준 상대 경로: 웹(/study/school/)과 아이패드(/school/) 어디서 열어도 같은 파일을 읽는다 (절대 경로 '/docs/…' 는 웹 쪽 /study/ 접두에서 404 였다)
 const CARDS_URL = new URL('../docs/tools/lessons/cards/statics.json', import.meta.url).href;
 let cache = null;
 let pending = false;     // 팝업이 열려 있는 동안 다른 수업의 게이트를 또 열지 않는다
-const passed = new Set();   // 이 화면을 연 동안 통과한 수업 (새로고침하면 다시 묻는다)
+const passed = new Set();   // 이 화면을 연 동안 통과하거나 건너뛴 수업 (새로고침하면 다시 묻는다)
+const skipped = new Set();  // 그중 「건너뛰고 수업 열기」로 연 수업 — 통과·맞음 집계에 섞지 않는다(서버 저장 없음)
+export const gateSkipped = (id) => skipped.has(id);
 
 async function load(fetcher) {
   if (!cache) {
@@ -41,11 +44,11 @@ function showGate(info) {
     // 수업 선택 창(showModal)은 최상위 층이라 z-index 로는 못 덮는다 → 먼저 닫는다.
     document.querySelectorAll('dialog[open]').forEach((d) => { try { d.close(); } catch {} });
     const wrap = el('div', 'card-gate'); wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true');
-    const panel = el('div', 'card-gate-box');
+    const panel = el('div', 'card-gate-box'); const foot = el('div', 'card-gate-foot');
     const head = el('div', 'card-gate-head'); const title = el('b', null, '암기카드 확인'); const prog = el('span', 'card-gate-prog');
     head.append(title, prog);
     const body = el('div', 'card-gate-body'); const row = el('div', 'card-gate-row');
-    panel.append(head, body, row); wrap.append(panel); document.body.append(wrap);
+    panel.append(head, body, row, foot); wrap.append(panel); document.body.append(wrap);
     const eng = info.state === 'gate' ? createEngine(info.cards, { seed: info.seed }) : null;
     const keys = (e) => {
       if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); done(false); return; }
@@ -68,7 +71,10 @@ function showGate(info) {
       if (w.flow) body.append(box('왜', w.flow));
     }
     function view() {
-      body.replaceChildren(); row.replaceChildren(); prog.textContent = '';
+      body.replaceChildren(); row.replaceChildren(); foot.replaceChildren(); prog.textContent = '';
+      if (info.state === 'gate' && eng && eng.view().kind !== 'done') {   // 끝 화면에는 이미 「수업 열기」가 있다
+        const sk = el('button', 'card-gate-skip', '건너뛰고 수업 열기'); sk.type = 'button'; sk.onclick = () => done('skip'); foot.append(sk);
+      }
       if (!eng) { body.append(el('p', 'card-gate-note', '이 수업의 암기카드를 불러오지 못해 수업을 열 수 없어요. 아톰에게 알려 주세요.')); btn('닫기', 'ghost', () => done(false)); return; }
       const v = eng.view();
       title.textContent = v.kind === 'study' ? '외우기' : '암기카드 확인';
@@ -128,6 +134,6 @@ export async function cardGate(lessonId, fetcher = fetch) {
   pending = true;
   let ok = false;
   try { ok = await showGate(info); } finally { pending = false; }
-  if (ok) passed.add(lessonId);
-  return ok;
+  if (ok) { passed.add(lessonId); if (ok === 'skip') skipped.add(lessonId); }
+  return !!ok;
 }

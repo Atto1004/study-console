@@ -24,3 +24,7 @@
 .card-gate-res.ok{color:#21745a}.card-gate-res.bad{color:#c9583f}.card-gate-res.unk{color:#8a6d1f}
 .card-gate-sum{font-size:18px;font-weight:700;margin:6px 0}
 .card-gate-box:focus{outline:none}
+/* 「건너뛰고 수업 열기」: 판정 버튼들(몰라요·다음)과 멀리 두어 실수로 누르지 않게 — 하단 오른쪽 보조 글자 버튼, 터치 44px 이상 */
+.card-gate-foot{display:flex;justify-content:flex-end;margin-top:22px;padding-top:10px;border-top:1px dashed #d9d2bd}
+.card-gate-foot:empty{display:none}
+.card-gate-skip{min-height:44px;min-width:44px;padding:8px 14px;border-radius:10px;border:0;background:transparent;color:#5c6f65;font:500 14px inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer;touch-action:manipulation}
