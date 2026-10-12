@@ -3,9 +3,21 @@ import assert from 'node:assert/strict';
 import { JSDOM } from '../.test-tools/node_modules/jsdom/lib/api.js';
 import { renderClassroomDirectory } from './classroom-directory.js';
 import { courseMetrics } from './metrics.js';
-import { scopeLessons, orderedLessons, orderedTitle, visibleCatalog, sourceHidden, lmsHidden, lessonHidden, HIDDEN_LESSON_IDS, HIDDEN_LESSON_DATES } from './lesson-order.js';
+import { scopeLessons, orderedLessons, orderedTitle, visibleCatalog, sourceHidden, lmsHidden, lessonHidden, HIDDEN_LESSON_IDS, HIDDEN_LESSON_DATES, EXCLUDED_LESSONS } from './lesson-order.js';
 const ids=['statics-2026-09-02','statics-2026-09-07','statics-2026-09-09','statics-2026-09-14','statics-2026-09-16','statics-2026-09-21','statics-2026-09-23','statics-2026-09-28','statics-2026-09-30','statics-2026-10-07','exam-statics-2026-10-09','statics-2026-10-10','statics-2026-10-11'];
 const statics={name:'정역학',units:[{title:'Ch.1 Introduction',dates:['2026-09-02','2026-09-07']}],lessons:ids.map(id=>({id:id==='statics-2026-09-02'?'session:정역학:2026-09-02':id,title:'주제 '+id,date:id.replace(/^(exam-)?statics-/,'')}))};   // 9/2 는 실제 카탈로그처럼 session: id
+test('출결·미확인 자료는 공부 분량에서 빠지고 제외 이유와 원본은 보존한다',()=>{
+ const raw={name:'일반물리학2',lessons:[{id:'session:일반물리학2:2026-09-02',date:'2026-09-02'}, {id:'phys2-2026-09-04',date:'2026-09-04'}, {id:'session:일반물리학2:2026-10-07',date:'2026-10-07'}, {id:'exam-phys',date:'2026-10-09',generated:true}]};
+ const before=JSON.stringify(raw), c=visibleCatalog({courses:[raw]}).courses[0];
+ assert.deepEqual(scopeLessons(c).map(l=>l.id),['phys2-2026-09-04']);
+ assert.equal(c.excludedLessons.length,2);assert.match(c.excludedLessons[0].reason,/출결/);
+ assert.equal(JSON.stringify(raw),before);assert.equal(lessonHidden(undefined,{}),false);
+ const dom=new JSDOM('<section class="class-directory"><h2></h2><div id="courseDoors"></div></section>');
+ renderClassroomDirectory({doors:dom.window.document.querySelector('#courseDoors'),courses:[c],onLesson:()=>{},onOther:()=>{}});
+ assert.match(dom.window.document.body.textContent,/1회 수업/);
+ assert.match(dom.window.document.body.textContent,/회독에서 제외한 기록 · 2건/);
+ assert.equal(dom.window.document.querySelectorAll('.classroom-progress-lesson').length,1);dom.window.close();
+});
 test('수업 옆 목차도 정역학 7개 공통 순서를 사용하고 원본은 보존한다',()=>{
  assert.deepEqual(scopeLessons(statics),orderedLessons(statics));
  assert.equal(scopeLessons(statics).at(-1).label,'벼락치기');

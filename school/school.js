@@ -1,5 +1,5 @@
-import { renderClassroomDirectory } from './classroom-directory.js?v=266';
-import { visibleCatalog, orderedLessons, orderedTitle, lessonHidden, scopeLessons } from './lesson-order.js';
+import { renderClassroomDirectory } from './classroom-directory.js?v=267';
+import { visibleCatalog, orderedLessons, orderedTitle, lessonHidden, scopeLessons, canonicalLessonId, EXCLUDED_LESSONS } from './lesson-order.js';
 import { currentRun, runComplete, passCount, sprintCourses } from './study-sprint.js';
 import { fitBoard } from './board-fit.js?v=266';
 import { createLectureQuests } from './lecture-quests.js?v=233';
@@ -15,7 +15,7 @@ import {
   splitText,
   learningPath,
 } from "./learning.js";
-import { createWorkspace } from "./workspace.js?v=222";
+import { createWorkspace } from "./workspace.js?v=223";
 import { createMission } from "./mission.js?v=199";
 import { attachSaeng } from "./saeng.js?v224";
 import { createSpace, ROOMS } from "./space.js";
@@ -33,7 +33,7 @@ import { createDialog } from "./vn-dialog.js";
 import { createLectureUi } from "./lecture-ui.js";
 import { setupWideRoom } from "./room-wide.js";
 import { setupSeatRoom } from "./room-seat.js";
-import { pastDue, nextRoundOnly } from "./workspace.js?v=222";
+import { pastDue, nextRoundOnly } from "./workspace.js?v=223";
 import { setupShell } from "./shell.js?v=232";
 import { createRig } from "./rig.js";
 import { createFace } from "./face.js";
@@ -672,6 +672,24 @@ $("resume").onclick = () => {
   else consult(course);
 };
 async function startLesson(id, options = {}) {
+  const upgraded=canonicalLessonId(id);
+  if(upgraded!==id){
+    // 기존 단락 번호를 새 확인 문제의 위치나 회독 완료로 옮기지 않는다.
+    // 다른 기기가 옛 세션을 전송하는 동안은 현재 화면을 덮어쓰지 않는다.
+    if(options.follow)return;
+    if(options.resume){
+      const host=panel('수업 내용 보완');
+      host.append(node('p','이 수업에 판서 대조 설명과 확인 문제가 추가됐습니다. 이전 읽음 기록은 보존하고, 새 학습본은 처음부터 시작합니다.'),
+        button('보완된 수업 시작',()=>startLesson(upgraded,{index:0,purpose:'tutoring',studyPass:true})));
+      return;
+    }
+    id=upgraded;options={...options,index:0,stepId:undefined};
+  }
+  const excluded=EXCLUDED_LESSONS[id];
+  if(excluded){
+    if(options.follow)return;
+    showCourse(excluded.course);status(excluded.reason+' 검증된 수업을 선택해 주세요.');return;
+  }
   if (lessonHidden('정역학', {id})) {
     if (options.follow && options.epoch !== sessionEpoch) return;
     showCourse('정역학');
@@ -679,6 +697,7 @@ async function startLesson(id, options = {}) {
     return;
   }
   options={...options,purpose:options.purpose??options.resume?.purpose??'tutoring',returnTo:Object.hasOwn(options,'returnTo')?options.returnTo:options.resume?.returnTo??null};
+  let legacyReturnRef=null, returnNotice='';
   /* 정역학 강 시작 암기카드: 새 수업을 열 때만(같은 수업 안 이동·다른 기기 따라가기는 제외) */
   if (!options.follow && id !== current?.id && !(await cardGate(id))) { status('암기카드를 통과해야 수업이 열립니다.'); return; }
   try { await mission?.save(); if (!options.follow && !isBoard()) await growth?.stop('pause'); } catch (error) { status(error.message, true); return; }
@@ -696,11 +715,16 @@ async function startLesson(id, options = {}) {
     if (options.resume?.returnTo) {
       const ref = options.resume.returnTo;
       let restoredPause = null;
-      if (!lessonHidden('정역학', {id: ref.lessonId})) {
+      const removed=canonicalLessonId(ref.lessonId)!==ref.lessonId||EXCLUDED_LESSONS[ref.lessonId]||lessonHidden('정역학',{id:ref.lessonId});
+      if(!removed)try{
         const base = await api('lesson?id=' + encodeURIComponent(ref.lessonId));
         if (generation !== requestGeneration || stale()) return;
         const at = base.steps.findIndex(s => s.id === ref.stepId);
         if (at >= 0) restoredPause = {lesson: base.id, index: at, course: base.course};
+      }catch{if(generation!==requestGeneration||stale())return;}
+      if(!restoredPause){
+        legacyReturnRef=ref;options={...options,returnTo:null,resume:{...options.resume,returnTo:null}};
+        returnNotice='이전 보충 수업의 복귀 위치가 변경됐습니다. 현재 수업은 이어서 진행하고, 원래 회차는 교실에서 다시 선택해 주세요.';
       }
       pausedLesson = restoredPause;
     }
@@ -717,6 +741,13 @@ async function startLesson(id, options = {}) {
       lr.splice(next < 0 ? lr.length : next, 0, targetIndex);
     }
     if (lr) { missionIndices = lr; if (!lr.includes(targetIndex)) targetIndex = lr.find(i => i >= targetIndex) ?? lr[0]; }
+    if(legacyReturnRef&&!options.follow&&!isBoard()){
+      // 활성 복귀 참조를 바꾸기 전에 원래 참조를 서버 로그에 보존한다.
+      record({kind:'review',action:'return-reference-preserved',course:lesson.course,lesson:lesson.id,reference:legacyReturnRef});
+      await flush();
+      if(pending.length)throw new Error('이전 복귀 위치의 기록 저장을 확인해 주세요.');
+      if(generation!==requestGeneration)return;
+    }
     if (options.follow) activeSession = options.resume;
     else await saveSession(lesson, targetIndex, {newSession: !options.resume, purpose: options.purpose || 'tutoring', assisted: options.assisted ?? !!options.resume?.assisted, returnTo: options.returnTo || null});
     if (generation !== requestGeneration) return;
@@ -749,7 +780,7 @@ async function startLesson(id, options = {}) {
     $("location").textContent = course;
     $("roomLabel").textContent = lesson.title;
     await renderStep(options.camera);
-    status("수업 준비 완료");
+    status(returnNotice||"수업 준비 완료");
   } catch (error) {
     status(error.message, true);
   }

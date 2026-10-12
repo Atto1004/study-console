@@ -1,0 +1,194 @@
+{
+  "schemaVersion": 1,
+  "lessonId": "em1-2026-10-02",
+  "course": "공업수학1",
+  "date": "2026-10-02",
+  "title": "2.9~3.1 RLC와 매개변수변환법 — 표준형·론스키안",
+  "goals": [
+    "비제차 해를 두 부분으로 나누기",
+    "RLC 모델을 표준형으로",
+    "론스키안과 공식의 조건",
+    "상수를 함수로 바꾸기",
+    "sec x 예제 완성",
+    "csc x 예제와 방법 선택"
+  ],
+  "recap": [],
+  "sections": [
+    {
+      "title": "비제차 해를 두 부분으로 나누기",
+      "script": {
+        "s1-1:0": [
+          {
+            "say": "선형 비제차 미분방정식의 일반해는 \\(y=y_h+y_p\\)입니다.",
+            "mood": "neutral"
+          },
+          {
+            "say": "제차해는 우변 0의 일반해, 특수해는 주어진 우변을 만족하는 해 하나입니다.",
+            "mood": "neutral"
+          }
+        ],
+        "s1-2:0": [
+          {
+            "say": "\\(y^{\\prime\\prime}+y=\\sec x\\)에서 제차해는 \\(c_1\\cos x+c_2\\sin x\\).",
+            "mood": "neutral"
+          },
+          {
+            "say": "우변 sec x는 미정계수법의 지수·다항식·sin/cos 표에 없으므로 매개변수변환법을 씁니다.",
+            "mood": "neutral"
+          }
+        ]
+      },
+      "check": "q1"
+    },
+    {
+      "title": "RLC 모델을 표준형으로",
+      "script": {
+        "s2-1:0": [
+          {
+            "say": "전류 i(t)에 대한 RLC 식은 \\(Li^{\\prime\\prime}+Ri^{\\prime}+i/C=E^{\\prime}(t)\\)입니다.",
+            "mood": "neutral"
+          },
+          {
+            "say": "L>0으로 나누면 최고차 미분의 계수가 1이 됩니다.",
+            "mood": "neutral"
+          }
+        ],
+        "s2-2:0": [
+          {
+            "say": "L=2, R=4, C=1/8, E′(t)=6cos t이면 2i″+4i′+8i=6cos t.",
+            "mood": "neutral"
+          },
+          {
+            "say": "표준형은 i″+2i′+4i=3cos t입니다.",
+            "mood": "neutral"
+          }
+        ]
+      },
+      "check": "q2"
+    },
+    {
+      "title": "론스키안과 공식의 조건",
+      "script": {
+        "s3-1:0": [
+          {
+            "say": "\\(y^{\\prime\\prime}+p(x)y^{\\prime}+q(x)y=r(x)\\)에서 p,q,r가 한 구간에서 연속이고 y₁,y₂가 제차해의 기저이면 \\(W=y_1y_2^{\\prime}-y_2y_1^{\\prime}\\neq0\\).",
+            "mood": "neutral"
+          },
+          {
+            "say": "p,q가 상수일 필요는 없습니다.",
+            "mood": "neutral"
+          }
+        ],
+        "s3-2:0": [
+          {
+            "say": "y₁=cos x, y₂=sin x이면 W=cos²x+sin²x=1.",
+            "mood": "neutral"
+          },
+          {
+            "say": "단, sec x가 우변이면 cos x=0인 점을 가로지르지 않는 구간에서 풉니다.",
+            "mood": "neutral"
+          }
+        ]
+      },
+      "check": "q3"
+    },
+    {
+      "title": "상수를 함수로 바꾸기",
+      "script": {
+        "s4-1:0": [
+          {
+            "say": "\\(y_p=u(x)y_1+v(x)y_2\\)로 두고 \\(u^{\\prime}y_1+v^{\\prime}y_2=0\\), \\(u^{\\prime}y_1^{\\prime}+v^{\\prime}y_2^{\\prime}=r\\)를 풉니다.",
+            "mood": "neutral"
+          },
+          {
+            "say": "따라서 \\(u^{\\prime}=-y_2r/W\\), \\(v^{\\prime}=y_1r/W\\).",
+            "mood": "neutral"
+          }
+        ],
+        "s4-2:0": [
+          {
+            "say": "y″+y=sec x, y₁=cos x, y₂=sin x, W=1: u′=−tan x, v′=1.",
+            "mood": "neutral"
+          },
+          {
+            "say": "적분해 u=ln|cos x|, v=x로 선택할 수 있습니다.",
+            "mood": "neutral"
+          }
+        ]
+      },
+      "check": "q4"
+    },
+    {
+      "title": "sec x 예제 완성",
+      "script": {
+        "s5-1:0": [
+          {
+            "say": "\\(y_p=\\cos x\\ln|\\cos x|+x\\sin x\\).",
+            "mood": "neutral"
+          },
+          {
+            "say": "일반해에는 제차해의 상수 두 개를 반드시 남깁니다.",
+            "mood": "neutral"
+          }
+        ],
+        "s5-2:0": [
+          {
+            "say": "일반해: \\(y=c_1\\cos x+c_2\\sin x+\\cos x\\ln|\\cos x|+x\\sin x\\).",
+            "mood": "neutral"
+          },
+          {
+            "say": "검산은 \\(y_p^{\\prime\\prime}+y_p=\\sec x\\).",
+            "mood": "neutral"
+          },
+          {
+            "say": "로그의 절댓값을 빠뜨리지 않습니다.",
+            "mood": "neutral"
+          }
+        ]
+      },
+      "check": "q5"
+    },
+    {
+      "title": "csc x 예제와 방법 선택",
+      "script": {
+        "s6-1:0": [
+          {
+            "say": "\\(y^{\\prime\\prime}+y=\\csc x\\)의 특수해는 \\(-x\\cos x+\\sin x\\ln|\\sin x|\\).",
+            "mood": "neutral"
+          },
+          {
+            "say": "sin x=0을 포함하지 않는 구간에서 적용합니다.",
+            "mood": "neutral"
+          }
+        ],
+        "s6-2:0": [
+          {
+            "say": "u=−x, v=ln|sin x|를 uy₁+vy₂에 넣습니다.",
+            "mood": "neutral"
+          },
+          {
+            "say": "일반해는 이 식에 c₁cos x+c₂sin x를 더합니다.",
+            "mood": "neutral"
+          },
+          {
+            "say": "cosh 2x는 (e²ˣ+e⁻²ˣ)/2라 미정계수법도 가능합니다.",
+            "mood": "neutral"
+          }
+        ]
+      },
+      "check": "q6"
+    }
+  ],
+  "worksheet": [
+    {
+      "id": "ws1",
+      "kind": "변형",
+      "section": 6
+    },
+    {
+      "id": "ws2",
+      "kind": "변형",
+      "section": 6
+    }
+  ]
+}

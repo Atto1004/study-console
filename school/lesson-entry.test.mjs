@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
-import { lessonHidden, HIDDEN_LESSON_IDS } from './lesson-order.js';
+import { lessonHidden, HIDDEN_LESSON_IDS, canonicalLessonId, EXCLUDED_LESSONS, LESSON_ALIASES } from './lesson-order.js';
 import { pendingDeadlines } from './workspace.js';
 
 // Run the actual entry function with instrumented boundaries; no learner records are written.
@@ -10,7 +10,7 @@ const source = fs.readFileSync(new URL('./school.js', import.meta.url), 'utf8');
 const entry = source.slice(source.indexOf('async function startLesson('), source.indexOf('\nfunction saveSession('));
 function harness(api) {
   const calls = [];
-  const context = vm.createContext({lessonHidden, sessionEpoch: 4, requestGeneration: 0,
+  const context = vm.createContext({lessonHidden, canonicalLessonId, EXCLUDED_LESSONS, sessionEpoch: 4, requestGeneration: 0,
     current: null, pausedLesson: {lesson: 'old'}, state: {progress: {}, events: []}, pending: [],
     mission: {save: async () => calls.push('save')}, growth: null, isBoard: () => true,
     cardGate: async () => {calls.push('card'); return true;},
@@ -21,6 +21,37 @@ function harness(api) {
   vm.runInContext(entry, context);
   return {context, calls};
 }
+test('최근 수업의 옛 URL은 새 학습본을 열며 옛 읽음 위치를 복사하지 않는다',async()=>{
+  for(const [oldId,newId] of Object.entries(LESSON_ALIASES)){
+    const {context,calls}=harness(()=>({id:newId,course:'공업수학1',steps:[{id:'s1-1:0'}]}));
+    context.state.progress[oldId]={index:90};
+    await context.startLesson(oldId,{index:90,stepId:'line:99:0'});
+    assert.ok(calls.includes('lesson?id='+encodeURIComponent(newId)));
+    assert.ok(!calls.includes('lesson?id='+encodeURIComponent(oldId)));
+    assert.equal(context.state.events.length,0);
+    assert.equal(context.state.progress[oldId].index,90);
+  }
+});
+test('옛 세션 이어하기는 안내 후 명시적으로 새 수업을 시작하며 다른 기기 전송은 무시한다',async()=>{
+  for(const oldId of Object.keys(LESSON_ALIASES)){
+    const {context,calls}=harness();let host=[];
+    context.panel=()=>({append:(...nodes)=>host.push(...nodes)});
+    context.node=(tag,text)=>({tag,text});context.button=(text,action)=>({text,action});
+    await context.startLesson(oldId,{resume:{stepId:'line:1:0'}});
+    assert.equal(calls.length,0);assert.equal(host.length,2);
+    assert.match(host[0].text,/이전 읽음 기록은 보존/);
+    await context.startLesson(oldId,{follow:true,epoch:4});
+    assert.equal(calls.length,0);
+  }
+});
+test('미확인 내용·출결 메모는 직접 URL로 열어도 카드·저장·학습 API를 호출하지 않는다',async()=>{
+  for(const id of Object.keys(EXCLUDED_LESSONS)){
+    const {context,calls}=harness();
+    await context.startLesson(id);
+    assert.equal(calls.some(x=>x==='card'||x==='save'||x.startsWith('lesson?id=')),false);
+    assert.ok(calls.includes(EXCLUDED_LESSONS[id].course));
+  }
+});
 test('hidden URL/resume/follow entry never reaches cards, save or lesson API', async () => {
   for (const id of HIDDEN_LESSON_IDS) for (const options of [{}, {resume: {returnTo: {lessonId:'base'}}}, {follow:true, epoch:4}]) {
     const {context, calls} = harness();
@@ -59,6 +90,36 @@ test('late reference response cannot overwrite paused lesson after navigation', 
   });
   await context.startLesson('visible',{resume:{stepId:'step',returnTo:{lessonId:'base',stepId:'step'}}});
   assert.equal(context.pausedLesson.lesson,'old');
+});
+test('보충 전 옛·제외·실패한 복귀 참조가 현재 수업의 이어하기를 막지 않는다',async()=>{
+ for(const ref of [Object.keys(LESSON_ALIASES)[0],Object.keys(EXCLUDED_LESSONS)[0],'missing-base']){
+  const {context,calls}=harness(path=>{
+   if(path.endsWith('visible'))return lesson;
+   throw new Error('없는 복귀 회차');
+  });
+  await context.startLesson('visible',{resume:{stepId:'step',returnTo:{lessonId:ref,stepId:'old-line'}}});
+  assert.equal(context.pausedLesson,null);
+  assert.ok(calls.includes('stop before rendering'));
+  assert.ok(!calls.includes('없는 복귀 회차'));
+  if(ref!=='missing-base')assert.ok(!calls.includes('lesson?id='+encodeURIComponent(ref)));
+ }
+});
+test('복귀 참조는 렌더링보다 먼저 서버에 보존하고 보존 실패 시 세션을 바꾸지 않는다',async()=>{
+ for(const archiveFails of [false,true]){
+  const {context,calls}=harness(()=>lesson);const persisted=[];
+  context.isBoard=()=>false;context.loadPack=async()=>null;context.inFocus=()=>false;
+  context.record=e=>context.pending.push(e);
+  context.flush=async()=>{if(!archiveFails)persisted.push(...context.pending.splice(0));};
+  context.saveSession=async(l,i,opts)=>{assert.equal(persisted.length,1);assert.equal(opts.returnTo,null);calls.push('session-saved');};
+  context.workspace=null;context.closeDialogs=()=>{};context.document={querySelector:()=>({dataset:{}})};
+  context.$=()=>({setAttribute:()=>{},className:'',hidden:false,textContent:''});
+  context.renderStep=async()=>{throw new Error('render-failed');};
+  const reference={lessonId:Object.keys(LESSON_ALIASES)[0],stepId:'old-line'};
+  await context.startLesson('visible',{resume:{stepId:'step',returnTo:reference}});
+  assert.equal(calls.includes('session-saved'),!archiveFails);
+  if(archiveFails){assert.equal(persisted.length,0);assert.equal(context.pending[0].reference,reference);}
+  else{assert.equal(persisted[0].reference,reference);assert.ok(calls.includes('render-failed'));}
+ }
 });
 test('home shows combined service round once without changing source or submission state', () => {
   const rows = [

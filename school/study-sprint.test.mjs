@@ -46,3 +46,12 @@ test('홈 버튼은 처음부터 회독 시작하며 완료한 세션을 이어�
  renderSprint(host,{catalog:other,events:[run,complete(1)],today:'2026-10-13',exams:[],session:{id:'s1',course:'미분적분학2',lessonId:'one'},start:()=>{},resume:()=>{}});
  assert.match(host.textContent,/2회독 시작/);assert.doesNotMatch(host.textContent,/회독 이어가기/);dom.window.close();
 });
+test('회독에서 제외한 세션이 진행 중이어도 검증된 다음 수업을 시작한다',()=>{
+ const dom=new JSDOM('<main></main>'),host=dom.window.document.querySelector('main');let called;
+ const excluded='session:일반물리학2:2026-10-07';
+ const catalog={courses:[{name:'일반물리학2',lessons:[{id:'phys2-2026-09-04',date:'2026-09-04'},{id:excluded,date:'2026-10-07'}]}]};
+ renderSprint(host,{catalog,events:[{...run,lesson:excluded}],today:'2026-10-13',exams:[],session:{id:'s1',course:'일반물리학2',lessonId:excluded},start:id=>called=id,resume:()=>{throw new Error('제외 회차 이어하기');}});
+ assert.doesNotMatch(host.textContent,/회독 이어가기/);
+ [...host.querySelectorAll('.sprint-course')].find(row=>row.textContent.includes('일반물리학2')).querySelector('button').click();
+ assert.equal(called,'phys2-2026-09-04');dom.window.close();
+});

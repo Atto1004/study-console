@@ -60,7 +60,7 @@ export function renderSprint(host, {catalog, events, today, exams, start, resume
   for(const c of courses){
     const row=make('div');row.className='sprint-course';row.append(make('strong',c.name),make('span',`1회독 ${c.completed[0]}/${c.lessons.length} · 2회독 ${c.completed[1]}/${c.lessons.length}`));
     const action=make('button');action.type='button';
-    const active=session?.course===c.name&&currentRun(events,session.lessonId,session.id);
+    const active=session?.course===c.name&&c.lessons.some(l=>l.id===session.lessonId)&&currentRun(events,session.lessonId,session.id);
     const unfinished=active&&!events.some(e=>e.action==='study-pass-complete'&&e.runId===active.runId);
     action.textContent=unfinished?'회독 이어가기':c.next?`${c.pass}회독 시작 · ${c.next.label || c.next.date.slice(5)}`:c.lessons.length?'두 번 완료 · 복습하기':'수업 연결 확인';
     action.disabled=!c.lessons.length;
