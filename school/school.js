@@ -38,7 +38,7 @@ import { setupShell } from "./shell.js?v=232";
 import { createRig } from "./rig.js";
 import { createFace } from "./face.js";
 import { readable, cleanTitle } from "./readable.js";
-import { createPlan } from "./plan.js";
+import { createPlan } from "./plan.js?v=291";
 import { inFocus } from "./focus.js";
 import { createLessonTextbook } from "./lesson-textbook.js?v=288";
 import { startClassroomV3 } from "./classroom-v3.js?v=241";

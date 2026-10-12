@@ -7,6 +7,7 @@
 // 저장은 예전과 같은 원장 S.v60(/api/study/state: est·done·act·run·extra)이라 기록이 이어진다. 저장 충돌(409)이면 새로 읽고 다시.
 import { createLayerKit } from './aw-layers-panel.js';
 import { adBlock } from './aw-layers.js';
+import { mergeExamTimeline, periodEditable, readExamPeriod } from './exam-timeline.js?v=291';
 import { describeFix, suggestPlace, stillNow, getPosition, fetchLast, postFix, secureOk, ERR_TEXT, AUTO_MIN } from './aw-gps.js';
 import { classRuns, endComparison, transitState, arrivalChips, eventPlaceItems } from './aw-progress.js';
 const el = (tag, text, cls) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (cls) e.className = cls; return e; };
@@ -72,6 +73,7 @@ export const moveName = (from, to) => { const a = String(from || '').trim(), b =
 export const MOVE_LENS = [5, 10, 15, 20, 30, 45, 60];
 export function blockCat(b) {   // 시간표 블록 → 4종. 모르는 종류는 null(화면은 「?」 표식 — 분류 불명을 조용히 숨기지 않는다)
   if (!b) return null;
+  if (b.k === 'exam-period') return periodEditable(b.periodEntry) ? '계획' : b.category;
   if (b.k === 'auto') return '계획';
   if (b.k === 'plan') return planState(b.plan) === 'tentative' ? '계획' : planBk(b.plan);
   if (b.k === 'sleep') return '수면';
@@ -647,7 +649,7 @@ toast.hide = () => { clearTimeout(toastTimer); toastEl?.remove(); toastEl = null
 
 export function createPlan(app) {
   if (!document.getElementById('plan-css')) { const s = document.createElement('style'); s.id = 'plan-css'; s.textContent = CSS; document.head.append(s); }
-  let st = null, v60 = null, host = null, ctx = null, day = kst(), tick = null, gen = 0, saving = Promise.resolve();
+  let st = null, v60 = null, host = null, ctx = null, day = kst(), tick = null, gen = 0, renderEpoch = 0, saving = Promise.resolve(), examPeriod = null;
   let keepDayUntil = 0;   // 계획을 넣고 지우면 workspace 가 홈을 다시 그린다 — 그 직후엔 보던 날을 유지한다(그 밖엔 늘 오늘부터)
   const keepDay = () => { keepDayUntil = Date.now() + 8000; };
   const cache = new Map(), calFail = new Map();   // 날짜별 캘린더(확인된 것만) · 받기 실패 시각
@@ -713,13 +715,16 @@ export function createPlan(app) {
   }
   const sleepOn = (date) => sleepBlocksOn(date, { sleep: v60?.sleep || {}, appleFor, appleFail, cfg: v60?.cfg, nowMs: Date.now(), override: suppBusy ? null : suppOverride });
 
-  async function load() {
+  async function load(current=()=>true) {
     const r = await fetch('/api/study/state', { credentials: 'same-origin', cache: 'no-store' });
     if (!r.ok) throw new Error('공부 계획 기록을 불러오지 못했어요.');
-    st = (await r.json()).state || {};
+    const loaded=(await r.json()).state || {};
+    if(!current())return false;
+    st = loaded;
     v60 = st.v60 || (st.v60 = {});
     for (const k of ['est', 'done', 'act', 'run']) if (!v60[k] || typeof v60[k] !== 'object') v60[k] = {};
     if (!Array.isArray(v60.extra)) v60.extra = [];
+    return true;
   }
   // 바꾸기(오타 검수 10/9 반영): 바꾸기 함수를 「아직 저장 안 된 목록」(pend)에 쌓고, 저장은 한 줄로(직렬).
   // 보낸 만큼 성공하면 그만큼 목록에서 뺀다. 다른 화면이 먼저 바꿨으면(409) 새로 읽고 「안 된 것 전부」를 차례로 다시 적용해 재시도.
@@ -1091,7 +1096,8 @@ export function createPlan(app) {
     for (const x of (ctx.exams || []).filter((x) => x.date === date)) { const s = x.time ? mins(x.time) : 9 * 60; out.push({ s, e: s + 90, title: `시험 · ${x.course}${x.assumed ? ' (예정)' : ''}`, k: 'exam' }); }
     for (const p of (ctx.plans || []).filter((p) => !p.allDay && p.date === date && (!p.activity || p.bk === '고정' || NONSTUDY_BK.includes(p.bk)))) out.push({ s: mins(p.s), e: mins(p.e), title: SIMPLE_BK.includes(p.bk) ? (p.note || p.bk) : p.bk === '이동' ? (p.note || moveName(p.from, p.to) || '이동') + (p.est ? ' (추정)' : '') : p.bk === '고정' ? (p.note || '고정 일정') : (ctx.courseName?.(p.courseId) || '') + (p.note ? ' · ' + p.note : ''), k: 'plan', plan: p, lapsed: planLapsed(p, Date.now()) });   // 고정 일정(약속 등)은 activity 표식이 있어도 시간표엔 그린다
     for (const b of out) { b.date = date; if (b.k === 'plan' && /^\s*운선/.test(b.plan?.note || '')) b.title = '개인 일정'; }   // 앱에서 넣은 계획도 운선으로 시작하면 제목을 가린다(고치기 창에서만 보임)
-    return [...applyActual(dedupeBlocks(out.filter((b) => b.e > b.s))), ...sleepOn(date)].sort((a, b) => a.s - b.s);   // 수면 블록(기록=확정·목표=계획)은 채우기·다시 짜기도 피하도록 같은 목록에 둔다
+    const base=[...dedupeBlocks(out.filter((b) => b.e > b.s)), ...sleepOn(date)];
+    return applyActual(mergeExamTimeline(base,examPeriod?.days?.find(d=>d.date===date),v60.examPeriodDismissed||{})).sort((a,b)=>a.s-b.s);
   }
   // 빈 칸: 깨어 있는 시간(08~24시, 오늘이면 지금부터)에서 고정 블록을 빼고, 앞뒤 쉬는 10분, 25분 이상만
   function freeSlots(date, fixed) {
@@ -1606,6 +1612,22 @@ export function createPlan(app) {
     const date = b.date || ctx.today, when = `${date.slice(5).replace('-', '/')}(${wd(date)}) ${hm(b.s)}–${hme(b.e)}`, cat = blockCat(b);
     pop.setAttribute('aria-label', `${b.title} ${when}`);
     pop.append(el('b', b.title), el('small', when + (b.cls?.room ? ` · ${b.cls.room}` : ''), 'pl-popnote'));
+    if(b.periodEntry){
+      pop.append(el('p',b.periodEntry.detail||'시험기간 계획 배정 · 실제 수행 기록과 별도'));
+      if(periodEditable(b.periodEntry)){
+        pop.append(el('small',`${b.category} 계획 · 수행 여부는 아직 확인되지 않았어요. 삭제하면 다른 기기에서도 이 계획을 빼요.`, 'pl-popnote'));
+        const remove=el('button','이 계획 삭제','danger');remove.type='button';
+        remove.onclick=async()=>{
+          remove.disabled=true;
+          const ok=await save(s=>{s.examPeriodDismissed=s.examPeriodDismissed||{};s.examPeriodDismissed[b.periodKey]=true;});
+          if(!ok){remove.disabled=false;app.status?.('계획 삭제를 아직 저장하지 못했어요. 저장 안 된 변경에서 다시 저장해 주세요.',true);return;}
+          close();toast('계획을 지웠어요','지운 계획 되돌리기',()=>save(s=>{if(s.examPeriodDismissed)delete s.examPeriodDismissed[b.periodKey];}));
+        };pop.append(remove);
+      }else pop.append(el('small','확정한 일정이에요. 원본 일정은 이 창에서 삭제하지 않아요.','pl-popnote'));
+      if(b.periodEntry.kind==='study'){
+        const a=el('a','이 날짜 학습지 열기');a.href=new URL(`../notes/exam-daily/${date}.html`,import.meta.url).href;pop.append(a);
+      }
+    }
     // 지우기: 시간표에서 지우지 않는다 — 원본(캘린더·학교 시간표·얼라이브위크·상담실)에서만 바꾼다는 것을 버튼 자리에 안내
     const ORIGIN = { cal: '시간표에서 지우지 않아요 — 구글 캘린더 원본에서만 지우고 바꿔요.', class: '시간표에서 지우지 않아요 — 학교 시간표(수업) 원본이에요. 안 하는 날은 아래 「휴강으로 표시」.', work: '시간표에서 지우지 않아요 — 얼라이브위크 기본 시간표에서만 바꿔요.', exam: '시간표에서 지우지 않아요 — 시험 일정은 상담실에서만 바꿔요.' };
     const moreKids = []; if (ORIGIN[b.k]) moreKids.push(el('small', ORIGIN[b.k], 'pl-popnote pl-origin'));
@@ -1737,7 +1759,7 @@ export function createPlan(app) {
     else if (b.k === 'auto') planPopup(null, b.date || ctx.today, b.s, anchor, at, true, null, { course: b.title.split(' · ')[0], note: b.title.split(' · ').slice(1).join(' · '), len: b.e - b.s, key: b.key, date: b.date || ctx.today, label: b.title });
     else blockPopup(b, anchor, at);
   }
-  const WHAT = { plan: '고치기·삭제', class: '출석·이해도·시작·종료', cal: '시각 고치기', auto: '계획으로 넣기·숨기기', work: '내용 보기', exam: '내용 보기', sleep: '내용 보기·목표 바꾸기' };
+  const WHAT = { plan: '고치기·삭제', class: '출석·이해도·시작·종료', cal: '시각 고치기', auto: '계획으로 넣기·숨기기', work: '내용 보기', exam: '내용 보기', sleep: '내용 보기·목표 바꾸기', 'exam-period':'내용 보기·계획 삭제' };
   // ── 꾹 누르기 메뉴 · 끌어 옮기기 · 가장자리 늘이기(대표님 10/12) ──
   // 구글 캘린더 방식: 일정을 길게 누르면 선택돼 끌어서 시각·날짜를 옮기고, 위·아래 가장자리 핸들로 길이를 바꾸며, 놓으면 저장되고 되돌리기가 뜬다.
   // 얼라이브위크식으로 바꾼 곳: 원본이 있는 일정(수업·캘린더·기본 시간표·시험)은 옮기지도 지우지도 않는다(구글 캘린더에 쓰지 않는 규칙). 저장된 계획 레코드만 옮긴다.
@@ -1868,7 +1890,7 @@ export function createPlan(app) {
     if ((b.e - b.s) * PX > 34) blk.append(el('small', `${hm(b.s)}–${hme(b.e)}${sub}${cut}`)); blk.title = `${cat ? CAT_NAME[cat] : '종류 모름'} · ${hm(b.s)}–${hme(b.e)} ${b.title}${cut}`;
     // 누르면 종류별 창(대표님 10/9 「시간블럭 누르면 수정할 수가 없는데」): 계획 = 고치기·확정·삭제, 수업 = 출석·이해도·시작·종료, 캘린더 = 시각 고치기,
     // 추천 = 계획으로 넣기·숨기기, 고정 일정·시험 = 내용 보기
-    const what = WHAT[b.k];
+    const what = b.k==='exam-period' ? (periodEditable(b.periodEntry)?'내용 보기·계획 삭제':'내용 보기') : WHAT[b.k];
     if (what) { attachGestures(blk, b, PX); blk.classList.add('edit'); blk.tabIndex = 0; blk.setAttribute('role', 'button'); blk.setAttribute('aria-label', `${cat ? CAT_NAME[cat] : '종류 모름'} ${b.title} ${hm(b.s)}–${hme(b.e)} ${what}`);
       const open = (e) => { e.stopPropagation(); openBlock(b, blk, e.clientX ? { x: e.clientX, y: e.clientY } : null); };
       blk.onclick = open; blk.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(e); } }; }
@@ -2222,7 +2244,7 @@ export function createPlan(app) {
     const actual = Object.values(v60.act).reduce((n, a) => n + (a?.days ? (a.days[ctx.today] || 0) : a?.date === ctx.today ? (a.min || 0) : 0), 0)
       + Object.entries(v60.run).reduce((n, [k, r]) => n + ((r?.day || ctx.today) === ctx.today ? Math.round(elapsed(k) / 60000) : 0), 0);
     const box = el('div', undefined, 'pl-nums');
-    for (const [label, value] of [['지금부터 빈 시간', dur(free)], ['남은 과제 예상', dur(open.reduce((n, t) => n + t.est.min, 0))], ['오늘 실제', dur(actual)]]) { const c = el('div', undefined, 'pl-num'); c.append(el('small', label), el('b', value)); box.append(c); }
+    for (const [label, value] of [['아직 배정하지 않은 빈 시간', dur(free)], ['남은 과제 예상', dur(open.reduce((n, t) => n + t.est.min, 0))], ['오늘 실제', dur(actual)]]) { const c = el('div', undefined, 'pl-num'); c.append(el('small', label), el('b', value)); box.append(c); }
     { const sc = sleepCard(); if (sc) box.append(sc); }
     return box;
   }
@@ -2257,6 +2279,7 @@ export function createPlan(app) {
     if (sc && Math.abs(sc.scrollTop - y0) > 1) sc.scrollTop = y0;
     LY.afterDraw();
     ensureFab();
+    if(typeof globalThis.CustomEvent==='function')globalThis.dispatchEvent?.(new CustomEvent('school-timeline-changed'));
   }
   // 일정 추가 버튼: 구글 캘린더처럼 우측 하단에 떠 있는 둥근 버튼(대표님 10/12). 홈에서만 보이고(홈이 안 보이면 숨김), 질문 입력줄(.sb) 바로 위·안전영역 안.
   // 눌렀을 때 동작은 예전 툴바의 + 와 같다(보던 날짜·시각 기본값). 창이 열려 있으면 숨겨 바깥 누르기 닫힘과 겹치지 않게 한다.
@@ -2276,7 +2299,7 @@ export function createPlan(app) {
     if (addDays(from, 61) < to) { for (let d = from; d <= to; d = addDays(d, 60)) await ensureCal(d, addDays(d, 59) < to ? addDays(d, 59) : to); return; }   // 서버는 한 번에 62일까지 — 시험까지 보기가 길면 60일씩 나눠 받는다(예전엔 400 으로 통째로 못 받았다)
     const dates = []; for (let d = from; d <= to; d = addDays(d, 1)) dates.push(d);
     if (dates.every((d) => cache.has(d))) return;
-    try { const r = await fetch(`/api/cal?from=${from}&to=${to}`, { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(5000) }); const j = await r.json(); if (!j?.ok) throw new Error('cal'); for (const d of dates) if (!cache.has(d)) cache.set(d, j.days?.[d] || []); }
+    try { const r = await fetch(`/api/cal?from=${from}&to=${to}`, { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(5000) }); const j = await r.json(); if (!r.ok||!j?.ok) throw new Error('cal'); for (const d of dates) if (!cache.has(d)) {if(Object.hasOwn(j.days||{},d)&&Array.isArray(j.days[d]))cache.set(d,j.days[d]);else calFail.set(d,Date.now());} }
     catch { const at = Date.now(); for (const d of dates) if (!cache.has(d)) calFail.set(d, at); }   // 실패 = 모름(빈 일정 아님)
   }
   const sleepSig = () => [ctx.today, addDays(ctx.today, 1)].map((d) => sleepOn(d).map((b) => `${b.s}-${b.e}-${b.sleep.state}`).join(',')).join('|');
@@ -2291,11 +2314,20 @@ export function createPlan(app) {
   return {
     // host 에 그리기. c = { today, courses[](집중 과목), focus(name)→bool, scheduled[], plans[], deadlines[](pendingDeadlines 결과), calendar[](오늘), routine, courseName(id) }
     // 할 일 목록은 공부·과제·공모전 세 묶음, 자동 배치는 집중 과목 밖이면 마감 오늘·내일일 때만
+    timeline(date){
+      if(!ctx||!v60)return null;
+      return {verified:cache.has(date),blocks:fixedBlocks(date).map(b=>({s:b.s,e:b.e,reserved:(b.k==='exam-period'?b.category:blockCat(b))!=='공부'}))};
+    },
     async render(target, c) {
+      const renderGen=++renderEpoch;
       const sameDay = ctx && ctx.today === c.today && Date.now() < keepDayUntil;
       gpsAutoAt = Date.now(); host = target; ctx = c; day = sameDay ? day : c.today; bootDay = kst(); if (c.calendarOk) cache.set(c.today, c.calendar || []); else cache.delete(c.today);   // 확인 못 한 오늘 캘린더는 다시 받기
       host.replaceChildren(el('p', '공부 계획을 불러오는 중…', 'pl-empty'));
-      try { await load(); } catch (e) { host.replaceChildren(el('p', e.message, 'pl-empty')); ctx.afterDraw?.(); return; }
+      try { if(!await load(()=>renderGen===renderEpoch))return; } catch (e) { if(renderGen!==renderEpoch)return;host.replaceChildren(el('p', e.message, 'pl-empty')); ctx.afterDraw?.(); return; }
+      examPeriod=null;
+      const loadedPeriod=await readExamPeriod(fetch,new URL('../_private/plan.json',import.meta.url));
+      if(renderGen!==renderEpoch)return;
+      examPeriod=loadedPeriod;
       LY.init(); draw(); ctx.afterDraw?.();
       clearInterval(tick); let sec = 0;
       tick = setInterval(() => {
@@ -2313,7 +2345,7 @@ export function createPlan(app) {
         }
       }, 1000);
     },
-    destroy() { clearInterval(tick); LY.destroy(); host = null; toast.hide(); globalThis.removeEventListener?.('resize', fabPlace); fab?.remove(); fab = null; },
+    destroy() { ++renderEpoch;++gen;clearInterval(tick); LY.destroy(); host = null; toast.hide(); globalThis.removeEventListener?.('resize', fabPlace); fab?.remove(); fab = null; },
     layers: LY,
     _repaintSleep() { paintSleep(); },
     _paintNow() { paintNow(); },   // 시험용: 30초 틱을 기다리지 않고 지금 하는 일 줄을 다시 계산   // 시험용: 1분 틱을 기다리지 않고 수면 줄을 다시 계산
