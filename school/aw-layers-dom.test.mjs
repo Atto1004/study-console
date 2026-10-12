@@ -51,6 +51,7 @@ const chk = (name) => rowOf(name).querySelector('[role=checkbox]');
 const titles = () => [...host.querySelectorAll('.pl-blk')].map((b) => b.textContent);
 const ads = () => [...host.querySelectorAll('.pl-ad')].map((b) => b.textContent);
 const lastPost = () => posts[posts.length - 1];
+const openPick = async (li) => { const b = li.querySelector('[aria-label$="레이어 옮기기"]'); if (b.getAttribute('aria-expanded') !== 'true') { click(b); await flush(4); } };
 
 // 처음: 읽기만 해서는 아무것도 저장하지 않음, 도구줄에 레이어 아이콘(표준 SVG, 터치 44px 규칙은 CSS)
 assert.equal(posts.length, 0, '렌더만으로는 저장 없음(옛 데이터 호환)');
@@ -167,6 +168,38 @@ click(rowOf('기타').querySelector('.awl-main')); await flush(12);
   assert.ok(!Object.values(server.v60.layers.assign || {}).includes(uid), '지워진 레이어로 지정이 저장되지 않음');
 }
 click(panel().querySelector('[aria-label="레이어 목록으로"]')); await flush();
+
+// 장소 저장도 서버 확정 뒤에만 「저장했어요」(409 뒤 거부되면 입력은 그대로)
+{
+  click(panel().querySelector('[aria-label="레이어 추가"]')); await flush(); const wid = lastPost().state.v60.layers.items.filter((x) => x.user).at(-1).id;
+  click([...panel().querySelectorAll('.awl-link')].find((b) => b.textContent === '장소 추가')); await flush();
+  const card = panel().querySelector('.awl-place'); card.querySelector('input[aria-label="장소 이름"]').value = '충돌 장소'; card.querySelectorAll('.awl-hr input')[0].value = '10:00-12:00';
+  nextConflict = (srv) => { const it = srv.v60.layers.items.find((x) => x.id === wid); it.del = 1; it.vis = false; }; statusMsg = '';
+  click([...card.querySelectorAll('button')].find((b) => b.textContent === '저장')); await flush(30);
+  assert.ok(!panel().textContent.includes('저장했어요'), '거부됐는데 저장했어요가 나오면 안 됨'); assert.match(statusMsg, /적용하지 못했어요/); assert.ok(panel().querySelector('.awl-place input[aria-label="장소 이름"]').value === '충돌 장소', '입력은 그대로');
+  click(panel().querySelector('[aria-label="레이어 목록으로"]')); await flush();
+}
+// @auto 회차를 다시 열면 이 날만이 켜져 있고 선택값은 자동
+{
+  click(rowOf('동아리').querySelector('.awl-main')); await flush(12);
+  const rowW = () => [...panel().querySelectorAll('.awl-it')].find((r) => r.textContent.includes('근로장학'));
+  let li = rowW(); await openPick(li);
+  li = rowW(); let one = li.querySelector('.awl-pick button'), sel = li.querySelector('select');
+  assert.equal(one.getAttribute('aria-pressed'), 'true', '회차 지정이 있으면 이 날만이 켜져 있음');
+  click(one); sel.value = 'appt'; sel.dispatchEvent(new w.Event('change', { bubbles: true })); await flush(10);   // 반복 전체를 약속으로(이 회차 예외는 풀림)
+  assert.equal(lastPost().state.v60.layers.assign['cal:wk1'], 'appt'); assert.equal(lastPost().state.v60.layers.assign['cal:wk1_20261012T003000Z'], undefined);
+  click(panel().querySelector('[aria-label="레이어 목록으로"]')); await flush(); click(rowOf('약속').querySelector('.awl-main')); await flush(12); li = rowW(); await openPick(li);
+  li = rowW(); one = li.querySelector('.awl-pick button'); sel = li.querySelector('select'); assert.equal(one.getAttribute('aria-pressed'), 'false');
+  click(one); sel.value = ''; sel.dispatchEvent(new w.Event('change', { bubbles: true })); await flush(10);   // 이 회차만 자동
+  assert.equal(lastPost().state.v60.layers.assign['cal:wk1_20261012T003000Z'], '@auto');
+  click(panel().querySelector('[aria-label="레이어 목록으로"]')); await flush(); click(rowOf('노동').querySelector('.awl-main')); await flush(12); li = rowW(); await openPick(li);
+  li = rowW(); one = li.querySelector('.awl-pick button'); sel = li.querySelector('select');
+  assert.equal(one.getAttribute('aria-pressed'), 'true', '@auto 회차를 다시 열면 이 날만이 켜짐'); assert.equal(sel.value, '', '선택값은 자동'); assert.match(sel.options[0].textContent, /^자동 · /);
+  sel.value = 'club'; sel.dispatchEvent(new w.Event('change', { bubbles: true })); await flush(10);
+  assert.equal(lastPost().state.v60.layers.assign['cal:wk1_20261012T003000Z'], 'club', '다음 선택도 이 회차만'); assert.equal(lastPost().state.v60.layers.assign['cal:wk1'], 'appt', '반복 지정은 그대로');
+  click(panel().querySelector('[aria-label="레이어 목록으로"]')); await flush();
+}
+
 // 보이기 체크를 누른 뒤에도 같은 자리에 초점
 { const c = chk('운동'); c.focus(); click(c); await flush(); assert.equal(document.activeElement?.getAttribute('aria-label'), '운동 보이기', '다시 그린 뒤에도 초점이 그 체크에'); click(chk('운동')); await flush(); }
 // 일정 창이 열려 있으면 Tab·Esc 는 창이 쓴다(레이어 패널로 튕기지 않음)

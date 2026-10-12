@@ -1,7 +1,7 @@
 // ALiVEWEEK 레이어 패널(화면). 프로크리에이트 레이어 패널 구조 — 행마다 색·이름·항목 수·보이기 체크, 누르면 선택(모아보기), + 로 추가 —
 // 에 구글 캘린더 「내 캘린더」 목록(색 체크박스로 켜고 끄기)을 합쳤다. 1366 가로·아이패드는 오른쪽 패널, 폰 세로는 아래서 올라오는 시트.
 // plan.js 와는 createLayerKit(h) 의 h(저장·그리기·항목 목록·열기·이동) 로만 닿는다.
-import { DAYS, BASE, SWATCH, layerModel, classify, blockKeys, labelOf, isSecret, tally, LM, layerHoursAt, legacyPlaces, hmMin, minHm, mergedPlaces, filterBlocks, showBlock, adBlock } from './aw-layers.js';
+import { DAYS, BASE, AUTO, SWATCH, layerModel, classify, blockKeys, labelOf, isSecret, tally, LM, layerHoursAt, legacyPlaces, hmMin, minHm, mergedPlaces, filterBlocks, showBlock, adBlock } from './aw-layers.js';
 
 const el = (tag, text, cls) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (cls) e.className = cls; return e; };
 const svg = (d, n = 20) => `<svg width="${n}" height="${n}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
@@ -140,10 +140,11 @@ export function createLayerKit(h) {
   function picker(blk, after) {
     const M = model(), c = classify(blk, M), keys = blockKeys(blk), box = el('span', undefined, 'awl-pick');
     const sel = el('select'); sel.setAttribute('aria-label', '레이어');
-    const has = (k) => k && M.assign[k] && M.byId[M.assign[k]], pinned = !!(has(keys.inst) || has(keys.series));
+    const iv = keys.inst ? M.assign[keys.inst] : undefined, instExc = iv === AUTO || !!(iv && M.byId[iv]);   // 이 회차의 따로 지정(자동 표식 @auto 포함)
+    const pinned = instExc ? iv !== AUTO : !!(keys.series && M.assign[keys.series] && M.byId[M.assign[keys.series]]);
     sel.append(Object.assign(el('option', pinned ? '자동 분류로 되돌리기' : `자동 · ${M.byId[c.id].name}`), { value: '' }));
     for (const L of M.items) sel.append(Object.assign(el('option', L.name), { value: L.id }));
-    let inst = !!(keys.inst && has(keys.inst));
+    let inst = instExc;
     sel.value = pinned ? c.id : '';
     sel.title = (isSecret(blk) ? WHY.secret : WHY[c.why] || '') + ' · ' + M.byId[c.id].name;
     box.append(sel);
@@ -212,7 +213,7 @@ export function createLayerKit(h) {
     panel.append(...body);
     const b = panel.querySelector('.awl-body'); if (b && view === ui.viewPainted) b.scrollTop = keep; ui.viewPainted = view;
     // 다시 그려도 눌렀던 자리에 초점을 돌려준다(보이기 체크 뒤 키보드 사용자가 처음으로 튕기지 않게)
-    let n = 0; for (const x of panel.querySelectorAll('button,select,input,textarea')) x.dataset.fk = `${view}:${n++}`;
+    const seen = {}; for (const x of panel.querySelectorAll('button,select,input,textarea')) { const base = `${view}:${x.getAttribute('aria-label') || x.name || x.textContent.trim().slice(0, 20) || x.tagName}`; seen[base] = (seen[base] || 0) + 1; x.dataset.fk = `${base}#${seen[base]}`; }   // 라벨과 같은 라벨 안의 순번으로 — 목록 길이가 바뀌어도 같은 버튼으로 돌아간다
     if (fk && fk.startsWith(view + ':')) { const x = [...panel.querySelectorAll('[data-fk]')].find((y) => y.dataset.fk === fk); try { x?.focus({ preventScroll: true }); } catch {} }
   }
   const say = (t) => { ui.msg = t || ''; const m = panel?.querySelector('.awl-msg'); if (m) m.textContent = ui.msg; };
@@ -313,12 +314,13 @@ export function createLayerKit(h) {
     const blk = e.blk, c = classify(blk, M), li = el('div', undefined, 'awl-it'), m = el('button', undefined, 'awl-itmain'); m.type = 'button';
     const when = e.allDay ? '종일' : `${hm(e.s)}–${hme(e.e)}`, title = labelOf(blk), subTxt = blk.k === 'auto' ? '추천' : c.sub || '';
     m.append(el('b', when), el('span', title)); if (subTxt) m.append(el('small', subTxt));
-    m.setAttribute('aria-label', `${when} ${title}${subTxt ? ' ' + subTxt : ''} 열어서 고치기`);
+    const who = `${md(e.date)} ${when} ${title}`;   // 날짜·시각·이름이 들어가 같은 이름의 다른 항목과 라벨이 겹치지 않는다(초점 복구 키)
+    m.setAttribute('aria-label', `${who}${subTxt ? ' ' + subTxt : ''} 열어서 고치기`);
     m.onclick = (ev) => h.openEntry(e, m, { x: ev.clientX || m.getBoundingClientRect().left, y: ev.clientY || m.getBoundingClientRect().top });
-    const go = el('button', undefined, 'awl-ib'); go.type = 'button'; go.innerHTML = svg(IC.go, 18); go.setAttribute('aria-label', `시간표에서 보기 ${md(e.date)}`); go.title = '시간표에서 보기';
+    const go = el('button', undefined, 'awl-ib'); go.type = 'button'; go.innerHTML = svg(IC.go, 18); go.setAttribute('aria-label', `시간표에서 보기 ${who}`); go.title = '시간표에서 보기';
     go.onclick = () => { h.goto(e.date); if (globalThis.matchMedia?.('(max-width:600px)')?.matches) close(); };
     const key = JSON.stringify([e.date, blk.k, blockKeys(blk).inst, e.s ?? 'ad']), isOpen = ui.pickOpen.has(key);
-    const mv = el('button', undefined, 'awl-ib'); mv.type = 'button'; mv.innerHTML = svg(IC.layers, 18); mv.setAttribute('aria-expanded', String(isOpen)); mv.setAttribute('aria-label', `${title} 레이어 옮기기`); mv.title = `레이어 옮기기 · 지금 ${M.byId[c.id].name}`;
+    const mv = el('button', undefined, 'awl-ib'); mv.type = 'button'; mv.innerHTML = svg(IC.layers, 18); mv.setAttribute('aria-expanded', String(isOpen)); mv.setAttribute('aria-label', `${who} 레이어 옮기기`); mv.title = `레이어 옮기기 · 지금 ${M.byId[c.id].name}`;
     mv.onclick = () => { if (ui.pickOpen.has(key)) ui.pickOpen.delete(key); else ui.pickOpen.add(key); paint(); };
     li.append(m, mv, go); if (isOpen) li.append(picker(blk, () => {})); return li;
   }
@@ -392,8 +394,8 @@ export function createLayerKit(h) {
       let classes; const raw = cl.value.trim();
       if (raw) { classes = {}; for (const seg of raw.split('/')) { const m = /^\s*([월화수목금토일])\s+(.+)$/.exec(seg); if (!m) { say('수업 시작 시각은 「월 07:10 10:00 / 수 오픈짐」 꼴로 적어 주세요.'); cl.focus(); return; } const v = parseClasses(m[2]); if (v === null) { say('수업 시작 시각 형식을 확인해 주세요.'); cl.focus(); return; } if (v !== undefined) classes[m[1]] = v; } }
       let brk; if (br.value.trim()) { const r = parseRs(br.value); if (!r || r.length !== 1) { say('쉬는 시간은 12:30-13:20 처럼 한 구간으로 적어 주세요.'); br.focus(); return; } brk = r[0]; }
-      let done = false; const id = isNew ? draft.id : p.id, at = new Date().toISOString().slice(0, 16);
-      commit((s) => (done = LM.setPlace(s, id, { layer: L.id, name: nm.value.trim() || '이름 없음', week, classes, brk }, at)), { fail: '저장하지 못했어요.' }); if (done) { say('저장했어요.'); draft = null; ui.dirty = false; paint(); }
+      const id = isNew ? draft.id : p.id, at = new Date().toISOString().slice(0, 16); save.disabled = true;
+      commit((s) => LM.setPlace(s, id, { layer: L.id, name: nm.value.trim() || '이름 없음', week, classes, brk }, at), { fail: '저장하지 못했어요.', done: () => { say('저장했어요.'); draft = null; ui.dirty = false; paint(); } }).then((okk) => { if (!okk) save.disabled = false; });   // 서버 확정 뒤에만 「저장했어요」
     };
     act.append(copy, save);
     if (isNew) { const x = el('button', '취소'); x.type = 'button'; x.onclick = () => { draft = null; paint(); }; act.append(x); }

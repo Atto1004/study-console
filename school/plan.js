@@ -750,7 +750,7 @@ export function createPlan(app) {
       return out;
     },
     tasksDue: (dates) => tasks().filter((t) => t.due && t.due >= dates[0] && t.due <= dates[dates.length - 1] && !v60.done[t.key]).sort((a, b) => a.due.localeCompare(b.due)),
-    ensure: async (a, b) => { for (let d = a; d <= b; d = addDays(d, 60)) await ensureCal(d, addDays(d, 59) < b ? addDays(d, 59) : b); },   // 서버는 한 번에 62일까지라 60일씩 나눠 받는다
+    ensure: (a, b) => ensureCal(a, b),
     missing: (dates) => dates.filter((d) => !cache.has(d)).length,
     openEntry: (e, anchor, at) => { if (e.b) openBlock(e.b, anchor, at); else if (e.it.kind === 'cal') allDayInfoPopup(e.it, anchor, at); else planPopup(null, e.it.plan.date, 0, anchor, at, true, e.it.plan); },
     goto: (date) => { day = date; view = 'day'; try { localStorage.setItem('school-plan-view', 'day'); } catch {} userScroll = 0; innerKey = ''; innerReset = true; draw(); },
@@ -2163,6 +2163,7 @@ export function createPlan(app) {
   }
   // 캘린더: 보이는 날(하루 = 그날, 한 주 = 월~일)을 한 번에 받아 날짜별로 기억
   async function ensureCal(from, to) {
+    if (addDays(from, 61) < to) { for (let d = from; d <= to; d = addDays(d, 60)) await ensureCal(d, addDays(d, 59) < to ? addDays(d, 59) : to); return; }   // 서버는 한 번에 62일까지 — 시험까지 보기가 길면 60일씩 나눠 받는다(예전엔 400 으로 통째로 못 받았다)
     const dates = []; for (let d = from; d <= to; d = addDays(d, 1)) dates.push(d);
     if (dates.every((d) => cache.has(d))) return;
     try { const r = await fetch(`/api/cal?from=${from}&to=${to}`, { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(5000) }); const j = await r.json(); if (!j?.ok) throw new Error('cal'); for (const d of dates) if (!cache.has(d)) cache.set(d, j.days?.[d] || []); }
