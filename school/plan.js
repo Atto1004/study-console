@@ -513,6 +513,7 @@ button.pl-title.pl-edit:hover,button.pl-title.pl-edit:focus-visible{text-decorat
 .pl-night-big{margin:0;font:700 22px/1.3 "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#e6edf3;font-variant-numeric:tabular-nums}.pl-night-sub{margin:0;color:#b4c0cc;font:500 14.5px/1.55 "Pretendard Variable",Pretendard,system-ui,sans-serif}
 .pl-night-act{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px}.pl-night button{min-height:44px;padding:0 18px;border-radius:12px;border:1px solid #6b8197;background:#1d3040;color:#fff;font:700 14px "Pretendard Variable",Pretendard,system-ui,sans-serif;cursor:pointer}.pl-night button.ghost{background:transparent}
 .pl-mv{display:flex;flex-direction:column;gap:6px}.pl-mvest{display:flex;align-items:center;gap:6px;min-height:44px;font:500 13px/1.3 "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#2f4036}.pl-pop .pl-mvest input{width:22px!important;height:22px!important;padding:0!important;flex:none}.pl-pop .pl-mvplaces button{min-height:38px}
+.pl-pop .pl-attmsg.bad{color:#b3261e;font-weight:600}.pl-pick button[aria-busy=true]{opacity:.6}
 .pl-also{display:flex;flex-direction:column;gap:6px}.pl-pop .pl-also button{min-height:44px;height:auto;text-align:left;padding:4px 10px}
 .pl-list{margin:10px 0 0;border:1px solid #edf1ee;border-radius:12px;padding:0 12px}
 .pl-list summary{min-height:44px;display:flex;align-items:center;gap:6px;cursor:pointer;font:700 13px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#4b6358}
@@ -1181,10 +1182,32 @@ export function createPlan(app) {
       const c = b.cls, key = c.id, log = () => (v60.classLog || {})[key] || {}, future = date > ctx.today;
       const setLog = (patch) => save((st) => { st.classLog = st.classLog || {}; st.classLog[key] = { ...(st.classLog[key] || {}), ...patch, course: c.course, date }; });
       const ATT = [['present', '출석'], ['late', '지각'], ['absent', '결석'], ['excused', '공결']];
-      const att = pick(ATT, c.record?.status || null, async (v, x) => { x.disabled = true; const r = await ctx.attend?.(c.courseId, date, v); x.disabled = false; if (r !== false) { c.record = { ...(c.record || {}), status: v }; for (const y of att.children) y.setAttribute('aria-pressed', String(y === x)); } });
+      // 출석(대표님 10/12 「출석이 안 눌러짐」): 눌러도 반응 없는 상태를 없앤다 — 저장 중 표시, 성공/실패는 창 안 한 줄로, 어떤 경로에서도(finally) 버튼을 다시 연다.
+      // 미래 날짜만 서버가 막는다(날짜 기준 · 오늘은 시작 전이어도 가능). 막힌 이유는 서버 문구를 그대로 쓰지 않고 풀어서 보여 준다.
+      const attMsg = el('small', '', 'pl-popnote pl-attmsg'); attMsg.setAttribute('role', 'status'); attMsg.setAttribute('aria-live', 'polite'); attMsg.hidden = true;
+      const say = (t, bad) => { attMsg.textContent = t || ''; attMsg.hidden = !t; attMsg.classList.toggle('bad', !!bad); };
+      const why = (r) => { const m = String(r?.error || '');
+        if (r?.unknown) return '저장 여부를 확인하지 못했어요 · 새로고침해서 확인해요';
+        if (/미래/.test(m)) return '아직 오지 않은 날의 수업이라 출석을 정할 수 없어요.';
+        if (/여러 회차|^그 사이|^현재 출결|^학기가 바뀌/.test(m)) return m;
+        return '저장하지 못했어요 · 다시 눌러요' + (/[가-힣]/.test(m) && m !== '저장하지 못했어요' ? ` (${m})` : ''); };
+      // 출석·휴강은 같은 잠금 하나를 쓴다(오타 검수 10/12): 저장 중엔 둘 다 못 누르고, 끝나면(성공이든 실패든 예외든) 함께 풀린다
+      let busy = false;
+      const lock = (on) => { busy = on; for (const y of att.children) y.disabled = on || future; cancel.disabled = on; };
+      const att = pick(ATT, c.record?.status || null, async (v, x) => {
+        if (busy || future) return;
+        lock(true); x.setAttribute('aria-busy', 'true'); say('저장 중…');
+        try {
+          keepDay();   // 저장하면 홈이 다시 그려진다 — 보던 날(지난날)이 오늘로 튀지 않게(try 안: 예외가 나도 finally 로 풀린다)
+          const r = ctx.attend ? await ctx.attend(c.courseId, date, v) : { error: '이 화면에서는 출석을 저장할 수 없어요' };
+          if (r === false || r?.error) say(why(r), true);
+          else { c.record = { ...(c.record || {}), status: v }; for (const y of att.children) y.setAttribute('aria-pressed', String(y === x)); say(`${ATT.find((q) => q[0] === v)[1]} 저장했어요`); }
+        } catch { say('저장 여부를 확인하지 못했어요 · 새로고침해서 확인해요', true); }
+        finally { x.removeAttribute('aria-busy'); lock(false); }
+      });
       if (future) for (const y of att.children) y.disabled = true;
-      pop.append(row('출석', att));
-      if (future) pop.append(el('small', '미래 수업은 출석을 정할 수 없어요.', 'pl-popnote'));
+      pop.append(row('출석', att), attMsg);
+      if (future) pop.append(el('small', `미래 수업은 출석을 정할 수 없어요 · ${date.slice(5).replace('-', '/')}(${wd(date)}) 그날부터 눌러요.`, 'pl-popnote'));
       const und = pick([1, 2, 3, 4, 5].map((n) => [n, String(n)]), log().und ?? null, (v, x) => { setLog({ und: v }); for (const y of und.children) y.setAttribute('aria-pressed', String(y === x)); });
       und.setAttribute('aria-label', '이해도 1~5'); pop.append(row('이해도', und));
       const t = el('span', '', 'pl-ptime'); const paint = () => { const l = log(); t.textContent = `${l.startedAt ? '시작 ' + l.startedAt : ''}${l.endedAt ? ' · 끝 ' + l.endedAt : ''}` || '기록 없음'; };
@@ -1193,7 +1216,15 @@ export function createPlan(app) {
       if (date !== ctx.today) sb.disabled = eb.disabled = true;
       paint(); pop.append(row('수업', sb, eb, t));
       const cancel = el('button', '휴강으로 표시', 'danger'); cancel.type = 'button'; let armed = false;
-      cancel.onclick = async () => { if (!armed) { armed = true; cancel.textContent = '정말 휴강'; return; } cancel.disabled = true; const r = await ctx.attend?.(c.courseId, date, 'cancelled'); if (r === false) { cancel.disabled = false; armed = false; cancel.textContent = '휴강으로 표시'; } else close(); };
+      cancel.onclick = async () => {
+        if (busy) return;
+        if (!armed) { armed = true; cancel.textContent = '정말 휴강'; return; }
+        lock(true); say('저장 중…'); let ok = false;
+        try { keepDay(); const r = ctx.attend ? await ctx.attend(c.courseId, date, 'cancelled') : { error: '이 화면에서는 저장할 수 없어요' }; if (r === false || r?.error) say(why(r), true); else ok = true; }
+        catch { say('저장 여부를 확인하지 못했어요 · 새로고침해서 확인해요', true); }
+        finally { lock(false); if (!ok) { armed = false; cancel.textContent = '휴강으로 표시'; } }
+        if (ok) close();
+      };
       pop.append(cancel);
     } else if (b.k === 'cal') {
       const ev = b.ev || {}, secret = /^\s*운선/.test(ev.title || '');

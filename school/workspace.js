@@ -115,8 +115,35 @@ export function createWorkspace(app){
     const token=++navigation;filter='';try{if(!await activate(which,token))return;}catch(error){app.status(error.message,true);return;}root.replaceChildren(el('p','불러오는 중…','loading'));
     try{await refresh();if(token!==navigation||area!==which)return;render();}catch(e){if(token===navigation)root.replaceChildren(el('p',e.message,'error'),btn('다시 불러오기',()=>open(which)));}
   }
-  async function change(request){
-    try{data=await app.api('workspace',{...request,termId:data.termId,revision:data.revision});render();return true;}catch(e){app.status(e.message,true);return false;}
+  async function change(request,{quiet=false,fail}={}){
+    try{data=await app.api('workspace',{...request,termId:data.termId,revision:data.revision});render();return true;}catch(e){if(fail)fail.message=e.message||'';if(!quiet)app.status(e.message,true);return false;}
+  }
+  /* 출석 저장(대표님 10/12 「출석이 안 눌러짐」): 공부 기록 저장·다른 기기·학습 기록이 서버 리비전을 올리면 이 화면의 data.revision 이 낡아
+     서버가 「다른 화면에서 기록이 바뀌었습니다」로 막는다 — 하단 한 줄에만 떠서 누른 쪽에선 아무 일도 없어 보였다.
+     (오타 검수 10/12) 새 리비전을 받아 한 번 다시 보내되, 그 사이 같은 학기·같은 수업의 출결이 그대로일 때만 — 다른 곳에서 같은 수업을 먼저 바꿨으면 덮지 않고 알린다.
+     응답이 없던 실패는 저장됐는지 새로 읽어 확인한다. 끝내 못 하면 {error, unknown?} 을 돌려 수업 창이 창 안에 보여 준다(하단 줄은 건드리지 않음). */
+  const attState=(d,courseId,date)=>{const r=(d?.sessions||[]).find(x=>x.courseId===courseId&&x.date===date)||{};return `${r.cancelled?'cancelled':r.status||''}`;};
+  const noReply=m=>!/[가-힣]/.test(m||'')||/읽지 못했|연결하지 못했/.test(m||'');
+  async function attend(courseId,date,status){
+    const req={op:'attendance',courseId,date,status},fail={},termId=data.termId,was=attState(data,courseId,date),want=status==='unknown'?'':status;
+    if(await change(req,{quiet:true,fail}))return true;
+    const msg=fail.message||'';
+    if(/다른 화면에서 기록이 바뀌었/.test(msg)){
+      let fresh;try{fresh=await app.api('workspace');}catch(e){return {error:e.message||'연결하지 못했어요',unknown:noReply(e.message)};}
+      if(fresh.termId!==termId||attState(fresh,courseId,date)!==was){data=fresh;render();return {error:'그 사이 다른 곳에서 이 수업의 출결이 바뀌었어요. 새로 불러왔으니 확인하고 다시 눌러요.'};}
+      data=fresh;const again={};if(await change(req,{quiet:true,fail:again}))return true;
+      return noReply(again.message)?await attConfirm(courseId,date,want,termId,again.message):{error:again.message||'저장하지 못했어요'};
+    }
+    return noReply(msg)?await attConfirm(courseId,date,want,termId,msg):{error:msg||'저장하지 못했어요'};
+  }
+  // 응답 없이 끊겼을 때: 서버에 실제로 저장됐는지 새로 읽어 본다(같은 학기에서 요청한 값이면 성공, 아니면 관측한 사실만 알림, 읽기도 실패면 모른다고 알림)
+  async function attConfirm(courseId,date,want,termId,m){
+    try{
+      const fresh=await app.api('workspace');data=fresh;render();
+      if(fresh.termId!==termId)return {error:'학기가 바뀌었어요. 새로 불러왔으니 확인하고 다시 눌러요.'};
+      if(attState(fresh,courseId,date)===want)return true;
+      return {error:'현재 출결이 요청한 값과 달라요. 확인하고 다시 눌러요.'};   // 조회로 확인한 건 현재 값뿐 — 안 저장된 건지, 저장 뒤 누가 되돌린 건지 구별하지 않는다(오타 3차)
+    }catch{return {error:m||'연결하지 못했어요',unknown:true};}
   }
   function card(title,cls=''){const c=el('section',undefined,'workspace-card '+cls);if(title)c.append(el('h2',title));return c;}
   function render(){
@@ -238,7 +265,7 @@ export function createWorkspace(app){
     if(!exams.length)top.append(el('p','등록된 시험이 없어요.','db-empty'));
     const host=el('div',undefined,'db-plan');root.append(top,host);
     const deadlines=assignments?pendingDeadlines(assignments.rows||[],data.date):[];
-    loadRoutine().then(rt=>{if(!host.isConnected)return;app.plan?.render(host,{today:data.date,courses:focusCourses().filter(n=>data.courses.some(c=>c.name===n)),focus:inFocus,inClass:isInClass,scheduled:data.scheduled,classSlots:data.courses.filter(c=>Array.isArray(c.slots)),holidays:Array.isArray(data.holidays)?data.holidays:null,term:data.term||null,sessions:data.sessions||[],plans:data.plans,deadlines,calendar:calendar?.events||[],calendarOk:!!calendar?.verified,reload:()=>open('main'),routine:rt,courseName:id=>data.courses.find(c=>c.id===id)?.name||'',courseId:name=>data.courses.find(c=>c.name===name)?.id,exams:data.exams.filter(e=>e.written&&inFocus(e.course)&&e.date>=data.date).map(e=>({course:e.course,date:e.date,time:e.time||'',assumed:!!e.assumed})),addPlan:async(item,many)=>(await change({op:'plan-add',plans:many?item:[item]}))?(data.createdIds||[]):false,/* 만든 계획 id 목록(채우기 되돌리기용), 실패는 false */dailyCap:Number(data.profile?.dailyCap)||4,updatePlan:item=>change({op:'plan-update',plan:item}),deletePlan:id=>change({op:'plan-delete',id}),deletePlans:async(ids,guard)=>(await change({op:'plan-delete',ids,...(guard?{guard}:{})}))?(data.deletedIds||[]):false,restorePlans:ids=>change({op:'plan-restore',ids}),attend:(courseId,date,status)=>change({op:'attendance',courseId,date,status}),calChange:async({ev,date,start,end})=>{/* 구글 캘린더 시각 바꾸기(대표님 10/9): 그날 캘린더를 새로 읽고 → 최신 원본 버전으로 변경 대기열에 넣는다. 원본이 바뀌었으면 서버가 409 로 막음 */
+    loadRoutine().then(rt=>{if(!host.isConnected)return;app.plan?.render(host,{today:data.date,courses:focusCourses().filter(n=>data.courses.some(c=>c.name===n)),focus:inFocus,inClass:isInClass,scheduled:data.scheduled,classSlots:data.courses.filter(c=>Array.isArray(c.slots)),holidays:Array.isArray(data.holidays)?data.holidays:null,term:data.term||null,sessions:data.sessions||[],plans:data.plans,deadlines,calendar:calendar?.events||[],calendarOk:!!calendar?.verified,reload:()=>open('main'),routine:rt,courseName:id=>data.courses.find(c=>c.id===id)?.name||'',courseId:name=>data.courses.find(c=>c.name===name)?.id,exams:data.exams.filter(e=>e.written&&inFocus(e.course)&&e.date>=data.date).map(e=>({course:e.course,date:e.date,time:e.time||'',assumed:!!e.assumed})),addPlan:async(item,many)=>(await change({op:'plan-add',plans:many?item:[item]}))?(data.createdIds||[]):false,/* 만든 계획 id 목록(채우기 되돌리기용), 실패는 false */dailyCap:Number(data.profile?.dailyCap)||4,updatePlan:item=>change({op:'plan-update',plan:item}),deletePlan:id=>change({op:'plan-delete',id}),deletePlans:async(ids,guard)=>(await change({op:'plan-delete',ids,...(guard?{guard}:{})}))?(data.deletedIds||[]):false,restorePlans:ids=>change({op:'plan-restore',ids}),attend,calChange:async({ev,date,start,end})=>{/* 구글 캘린더 시각 바꾸기(대표님 10/9): 그날 캘린더를 새로 읽고 → 최신 원본 버전으로 변경 대기열에 넣는다. 원본이 바뀌었으면 서버가 409 로 막음 */
   try{const j=(u)=>fetch(u,{credentials:'same-origin',cache:'no-store'}).then(r=>r.json());await j(`/api/cal?from=${date}&to=${date}&force=1`);const cx=await j(`/api/aliveweek/context?from=${date}&to=${date}`);
     const cur=(cx.calendar?.[date]||[]).find(e=>e.id===ev.id);if(!cur){app.status('원본 일정을 다시 찾지 못했어요. 잠시 뒤 다시 해 주세요.',true);return false;}
     const body={operationId:crypto.randomUUID(),action:'reschedule',source:'calendar',calendarId:cur.calendarId||cur.cal,eventId:cur.id,date,after:{title:cur.title||'',location:cur.location||'',start:`${date}T${start}:00+09:00`,end:`${date}T${end}:00+09:00`},expectedSourceVersion:cur.sourceVersion};
