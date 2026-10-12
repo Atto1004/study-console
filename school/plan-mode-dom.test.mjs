@@ -33,7 +33,7 @@ const pm = () => host.querySelector('.pl-mode:not(.pl-fill)');
 const popBtn = (t) => [...document.querySelectorAll('.pl-pop button')].find((b) => b.textContent.trim() === t);
 const pressed = (b) => b.getAttribute('aria-pressed') === 'true';
 const viewBtn = (name) => [...host.querySelectorAll('.pl-seg button')].find((b) => b.getAttribute('aria-label') === name);
-const plus = () => [...host.querySelectorAll('.pl-ib')].find((b) => b.getAttribute('aria-label') === '일정 추가');
+const plus = () => document.getElementById('pl-fab');
 const fillForm = (text, st) => { const note = document.querySelector('.pl-pop input[aria-label="할 일"]'); note.value = text; if (st) document.querySelector('.pl-pop input[type=time]').value = st; };
 
 // 1. 하루·한 주·시험까지 모두에 계획 모드 버튼이 있다(예전엔 한 주에서만)

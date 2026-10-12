@@ -32,7 +32,7 @@ const click = (el) => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true
 const pm = () => host.querySelector('.pl-mode:not(.pl-fill)');
 const popBtn = (t) => [...document.querySelectorAll('.pl-pop button')].find((b) => b.textContent.trim() === t);
 const pressed = (b) => b.getAttribute('aria-pressed') === 'true';
-const plus = () => [...host.querySelectorAll('.pl-ib')].find((b) => b.getAttribute('aria-label') === '일정 추가');
+const plus = () => document.getElementById('pl-fab');
 const q = (sel) => document.querySelector(('.pl-pop ' + sel).trim());
 const typeIn = (sel, v) => { const i = q(sel); i.value = v; i.dispatchEvent(new w.Event('input', { bubbles: true })); };
 const lastAdd = () => calls.filter((c) => c[0] === 'add').pop()[1];

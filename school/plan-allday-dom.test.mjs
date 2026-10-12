@@ -34,7 +34,7 @@ await plan.render(host, ctx()); await flush(14);
 const click = (el) => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true, clientX: 200, clientY: 300 }));
 const q = (sel) => document.querySelector(('.pl-pop ' + sel).trim());
 const popBtn = (t) => [...document.querySelectorAll('.pl-pop button')].find((b) => b.textContent.trim() === t);
-const plus = () => [...host.querySelectorAll('.pl-ib')].find((b) => b.getAttribute('aria-label') === '일정 추가');
+const plus = () => document.getElementById('pl-fab');
 const pm = () => host.querySelector('.pl-mode:not(.pl-fill)');
 const pressed = (b) => b.getAttribute('aria-pressed') === 'true';
 const lastAdd = () => calls.filter((c) => c[0] === 'add').pop()[1];

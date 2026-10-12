@@ -70,7 +70,7 @@ click(blk('저녁 공부')); await flush(); assert.match(document.querySelector(
 click(document.querySelector('.pl-pop .danger')); await flush(); assert.equal(asked.length, 0, '미래 확정 삭제는 확인 없이'); assert.deepEqual(calls.filter((c) => c[0] === 'delete'), [['delete', 'cfut']]);
 closePop(); calls.length = 0;
 // 5. 새 일정 창: 계획 모드에서 지난 시각이면 계획 비활성 + 확정으로, 미래로 고치면 다시 선택 가능
-const plus = [...host.querySelectorAll('.pl-ib')].find((b) => b.getAttribute('aria-label') === '일정 추가');
+const plus = document.getElementById('pl-fab');
 const pm = host.querySelector('.pl-mode:not(.pl-fill)'); if (pm.getAttribute('aria-pressed') !== 'true') click(pm); await flush();
 click(plus); await flush();
 const mode = (k) => [...document.querySelectorAll('.pl-pop [aria-label="넣는 방식"] button')].find((b) => b.dataset.mode === k);
