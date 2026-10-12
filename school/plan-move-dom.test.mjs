@@ -108,7 +108,7 @@ a = lastAdd(); assert.deepEqual([a.state, a.bk, a.from, a.est], ['tentative', un
   assert.ok(m2.classList.contains('c-plan') && !m2.classList.contains('c-move'), '미확정 이동 = 계획(점선)');
   assert.ok(!blks.some((b) => b.textContent.includes('다른 활동')), 'bk 없는 activity 기록은 시간표에 안 그림');
   const legend = [...host.querySelectorAll('.pl-legend .pl-leg')].map((x) => x.textContent.trim());
-  assert.deepEqual(legend, ['고정일정', '공부블록', '과제블록', '이동', '계획일정 (미확정)']);
+  assert.deepEqual(legend, ['고정일정', '공부블록', '과제블록', '이동', '수면', '계획일정 (미확정)']);
   // 5. 고치기: 확정 이동을 열면 값이 채워져 있고, 이동 → 공부로 바꾸면 이동 필드를 떼서 보낸다
   click(m1); await flush();
   assert.equal(q('[aria-label="출발지"]').value, '집'); assert.equal(q('[aria-label="도착지(선택)"]').value, '학교'); assert.equal(q('.pl-mvest input').checked, true);

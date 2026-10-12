@@ -29,7 +29,7 @@ assert.equal(blockCat({ k: 'mystery' }), null);
 assert.equal(blockCat(null), null);
 // 모든 알려진 종류가 4종 안에, 전부 화면용 클래스·이름이 있다
 for (const k of ['class', 'cal', 'work', 'exam', 'auto', 'plan']) { const c = blockCat(k === 'plan' ? plan() : { k }); assert.ok(CATS.includes(c), k); assert.ok(CAT_CLASS[c] && CAT_NAME[c]); }
-assert.deepEqual(CATS, ['고정', '공부', '과제', '이동', '계획']);
+assert.deepEqual(CATS, ['고정', '공부', '과제', '이동', '수면', '계획']);
 
 // ── 겹침: 무리 전체를 열로 나눈다. 순위 고정 > 공부·과제 > 계획 ──
 const B = (k, s, e, title, extra = {}) => ({ k, s, e, title, ...(k === 'plan' ? { plan: { note: title, ...extra } } : {}) });

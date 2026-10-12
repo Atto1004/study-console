@@ -12,6 +12,7 @@ const ICON = { play: '<path d="M7 5l12 7-12 7z" fill="currentColor"/>', pause: '
   up: '<path d="M6 15l6-6 6 6"/>', down: '<path d="M6 9l6 6 6-6"/>', check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>', list: '<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>', moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>' };
 const ib = (icon, label, cls = '') => { const b = el('button', undefined, 'pl-ib ' + cls); b.type = 'button'; b.innerHTML = svg(ICON[icon]); b.setAttribute('aria-label', label); b.title = label; return b; };
 const mins = (hm) => { const [h, m] = String(hm || '0:0').split(':').map(Number); return h * 60 + (m || 0); };
+const hme = (n) => n >= 1440 ? '24:00' : hm(n);
 const hm = (n) => `${String(Math.floor(n / 60) % 24).padStart(2, '0')}:${String(Math.round(n % 60)).padStart(2, '0')}`;
 const dur = (n) => { n = Math.max(0, Math.round(n)); const h = Math.floor(n / 60), m = n % 60; return h ? `${h}시간${m ? ' ' + m + '분' : ''}` : `${m}분`; };
 const kst = (d = new Date()) => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul' }).format(d);
@@ -43,7 +44,7 @@ export const hiddenTask = (x, today) => !!(x.off || x.mergedInto || (x.showFrom 
 // ── 시간표 블록 종류 구분(대표님 10/12 「고정일정·공부블럭·과제블럭·계획일정 구분이 안 가서 기준 필요」) ──
 // 4종: 고정일정(움직이지 않음: 수업·캘린더·근로·시험·확정한 고정 약속) · 공부블록(확정한 공부) · 과제블록(확정한 과제·제출물 작업) · 계획일정(아직 확정 안 한 것: 계획 모드로 넣은 것·채우기가 만든 것·저장 안 된 추천)
 // 저장된 계획(plan)의 state 가 없으면(옛 계획) 확정으로 읽는다 — 지금도 채우기·다시 짜기가 저장된 계획을 건드리지 않아 동작이 같고, 화면 변화가 가장 작다.
-export const CATS = ['고정', '공부', '과제', '이동', '계획'];
+export const CATS = ['고정', '공부', '과제', '이동', '수면', '계획'];
 export const planState = (p) => p?.state === 'tentative' ? 'tentative' : 'confirmed';
 export function planBk(p) {   // 확정 계획의 종류: bk 가 있으면 그대로, 없으면 note 로 추정(채우기는 note 를 「과제 · 이름」「시험 공부 · …」 꼴로 씀)
   if (p?.bk === '고정' || p?.bk === '공부' || p?.bk === '과제' || p?.bk === '이동') return p.bk;
@@ -58,16 +59,17 @@ export function blockCat(b) {   // 시간표 블록 → 4종. 모르는 종류�
   if (!b) return null;
   if (b.k === 'auto') return '계획';
   if (b.k === 'plan') return planState(b.plan) === 'tentative' ? '계획' : planBk(b.plan);
+  if (b.k === 'sleep') return '수면';
   if (b.k === 'cal' && isMoveEvent(b.ev)) return '이동';
   return ['class', 'cal', 'work', 'exam'].includes(b.k) ? '고정' : null;
 }
-export const CAT_CLASS = { 고정: 'c-fixed', 공부: 'c-study', 과제: 'c-hw', 이동: 'c-move', 계획: 'c-plan' };
-export const CAT_NAME = { 고정: '고정일정', 공부: '공부블록', 과제: '과제블록', 이동: '이동', 계획: '계획일정' };
-export const CAT_MEANS = { 고정: '움직이지 않는 일정 — 수업·약속·시험', 공부: '확정한 공부 시간', 과제: '확정한 과제·제출물 작업 시간', 이동: '움직이지 않는 이동 시간 — 출발지 → 도착지', 계획: '아직 확정 안 한 자리 — 눌러서 확정' };
+export const CAT_CLASS = { 고정: 'c-fixed', 공부: 'c-study', 과제: 'c-hw', 이동: 'c-move', 수면: 'c-sleep', 계획: 'c-plan' };
+export const CAT_NAME = { 고정: '고정일정', 공부: '공부블록', 과제: '과제블록', 이동: '이동', 수면: '수면', 계획: '계획일정' };
+export const CAT_MEANS = { 고정: '움직이지 않는 일정 — 수업·약속·시험', 공부: '확정한 공부 시간', 과제: '확정한 과제·제출물 작업 시간', 이동: '움직이지 않는 이동 시간 — 출발지 → 도착지', 수면: '잔 시간(기록은 채움) · 앞으로 올 밤은 목표로 계산한 점선', 계획: '아직 확정 안 한 자리 — 눌러서 확정' };
 // 글자색·배경색(대비 4.5:1 이상 — 테스트가 계산). 지난 블록은 opacity .8 로 흐리게 하므로 그 합성값도 검사한다
 export const BLOCK_COLORS = {
   'k-class': ['#2c4a6e', '#ffffff'], 'k-plan-fixed': ['#4b3f72', '#ffffff'], 'k-cal': ['#48525e', '#ffffff'], 'k-work': ['#6e4609', '#ffffff'], 'k-exam': ['#8f2a18', '#ffffff'],
-  'c-study': ['#e0efe5', '#14261f'], 'c-hw': ['#fbe4cc', '#3a1f0c'], 'c-plan': ['#f4f7f5', '#26352e'], 'c-move': ['#e8e4f4', '#2a1f4a'],
+  'c-study': ['#e0efe5', '#14261f'], 'c-hw': ['#fbe4cc', '#3a1f0c'], 'c-plan': ['#f4f7f5', '#26352e'], 'c-move': ['#e8e4f4', '#2a1f4a'], 'c-sleep': ['#1d2340', '#f4f7fb'], 'c-sleep-stripe': ['#2a3260', '#f4f7fb'], 'c-sleep-plan': ['#e9ecf8', '#1d2340'], 'tag-sleep': ['#f4f7fb', '#1d2340'], 'small-sleep': ['#1d2340', '#e3e8f7'], 'small-sleep-plan': ['#e9ecf8', '#2b3566'],
   'tag-study': ['#245a43', '#ffffff'], 'tag-hw': ['#86400c', '#ffffff'], 'tag-plan': ['#f4f7f5', '#34483d'], 'tag-move': ['#5a4a8a', '#ffffff'],
   'small-class': ['#2c4a6e', '#ffffff'], 'small-plan-fixed': ['#4b3f72', '#ffffff'], 'small-cal': ['#48525e', '#ffffff'], 'small-work': ['#6e4609', '#ffffff'], 'small-exam': ['#8f2a18', '#ffffff'],
   'sleep-text': ['#f4f7fb', '#1c2a3a'], 'sleep-small': ['#f4f7fb', '#3a4a5d'], 'sleep-btn': ['#22344a', '#ffffff'], 'sleep-ghost': ['#ffffff', '#22344a'], 'night-big': ['#0f1a22', '#e6edf3'], 'night-sub': ['#0f1a22', '#b4c0cc'], 'night-btn': ['#1d3040', '#ffffff'],
@@ -76,15 +78,19 @@ export const BLOCK_COLORS = {
 export const PAST_OPACITY = 0.8;
 // 같은 시간에 여러 종류가 겹칠 때: 위에 쌓지 않고(터치로 아래 것을 못 누른다) 겹치는 무리 전체를 열로 나눠 옆으로 늘어놓는다.
 // 열 순서 = 고정 > 공부·과제 > 계획, 같은 순위는 시작 시각 → 제목 순. 안 겹치는 블록은 한 열(전체 폭).
-const RANK = { 고정: 0, 이동: 0, 공부: 1, 과제: 1, 계획: 2 };   // 이동 = 고정과 같은 순위(움직이지 않는 약속). 미확정 이동은 blockCat 이 「계획」이라 2
+const RANK = { 고정: 0, 이동: 0, 수면: 0, 공부: 1, 과제: 1, 계획: 2 };
+// 수면: 기록(확정·취침 표식)은 고정과 같은 0, 목표로 계산한 계획 수면은 계획(2)보다 뒤 3 — 다른 블록이 수면 시간대에 들어오면 수면이 가장 오른쪽 열로 간다
+export const rankOf = (b) => b?.k === 'sleep' && b.sleep?.state === 'plan' ? 3 : (RANK[blockCat(b)] ?? 0);   // (이동 = 고정과 같은 순위. 미확정 이동은 blockCat 이 「계획」이라 2)
 export function layoutColumns(blocks) {
   const list = blocks.filter((b) => b.e > b.s).slice().sort((a, b) => a.s - b.s || a.e - b.e);
   const clusters = []; let cur = null, end = -1;
   for (const b of list) { if (!cur || b.s >= end) { cur = []; clusters.push(cur); end = b.e; } else end = Math.max(end, b.e); cur.push(b); }
   for (const cl of clusters) {
     const cols = [];
-    for (const b of cl.slice().sort((a, b) => (RANK[blockCat(a)] ?? 0) - (RANK[blockCat(b)] ?? 0) || a.s - b.s || String(a.title).localeCompare(String(b.title), 'ko'))) {
-      let i = cols.findIndex((c) => c.every((x) => x.e <= b.s || x.s >= b.e)); if (i < 0) { cols.push([]); i = cols.length - 1; }
+    for (const b of cl.slice().sort((a, b) => rankOf(a) - rankOf(b) || a.s - b.s || String(a.title).localeCompare(String(b.title), 'ko'))) {
+      const lo = rankOf(b) === 3 ? Math.max(0, ...cols.flatMap((c) => c).filter((x) => x.e > b.s && x.s < b.e).map((x) => x.col + 1)) : 0;   // 계획 수면: 겹치는 다른 블록이 있으면 그 오른쪽 열부터(순위만으로는 왼쪽 빈 열에 들어갈 수 있다)
+      let i = cols.findIndex((c, k) => k >= lo && c.every((x) => x.e <= b.s || x.s >= b.e)); if (i < 0) { cols.push([]); i = cols.length - 1; }
+      while (i < lo) { cols.push([]); i = cols.length - 1; }
       cols[i].push(b); b.col = i;
     }
     for (const b of cl) b.cols = cols.length;
@@ -180,6 +186,102 @@ export function applyRestore(s, { key, prev, saved }) {
   const cur = s.sleep?.[key];
   if (canon(cur) !== saved) return 'conflict';
   s.sleep = s.sleep || {}; if (prev) s.sleep[key] = JSON.parse(JSON.stringify(prev)); else delete s.sleep[key]; return 'applied';
+}
+// ── 수면 블록(대표님 10/12 「취침시간도 넣어줘. 과거는 확정, 미래는 계획으로 자동설정」) ──
+// 밤 하나 = 기상일 키 K. 저장된 기록(Apple 건강 > 앱 기록 > 직접 입력)이 있으면 확정, 없으면 목표(v60.cfg.bed·sleepH)로 계산한 계획. 계획은 저장하지 않는다(렌더 때마다 계산).
+// 모든 시각은 KST 절대 시각(ms)으로 다루고, 날짜 경계에서만 잘라 날짜별 조각으로 만든다.
+export const SLEEP_GOAL = { minH: 4, maxH: 12, defBed: 60, defH: 8 };
+const okBedGoal = (v) => okHM(v) && (mins(v) >= 1080 || mins(v) < 360);   // 취침 목표 허용: 18:00~23:59(전날 밤) · 00:00~05:59(그날 새벽)
+export const okSleepH = (h) => typeof h === 'number' && Number.isFinite(h) && h >= SLEEP_GOAL.minH && h <= SLEEP_GOAL.maxH && Math.round(h * 2) === h * 2;
+export function sleepGoal(cfg) {
+  const bedOk = okBedGoal(cfg?.bed), hN = cfg?.sleepH == null || cfg?.sleepH === '' ? null : Number(cfg.sleepH);
+  const hOk = hN != null && Number.isFinite(hN) && hN >= SLEEP_GOAL.minH && hN <= SLEEP_GOAL.maxH;
+  const bed = bedOk ? mins(cfg.bed) : SLEEP_GOAL.defBed, hours = hOk ? hN : SLEEP_GOAL.defH, notes = [];
+  if (cfg?.bed != null && !bedOk) notes.push('취침 목표가 범위(18:00~05:59) 밖이라 기본 01:00 을 써요.');
+  if (cfg?.sleepH != null && !hOk) notes.push('수면 목표 시간이 범위(4~12시간) 밖이라 기본 8시간을 써요.');
+  return { bed, hours, wake: (bed + Math.round(hours * 60)) % 1440, bedHM: hm(bed), notes };
+}
+const msOf = (date, m) => { const [y, mo, d] = date.split('-').map(Number); return Date.UTC(y, mo - 1, d) + m * 60000 - 9 * 3600e3; };
+const dateMinOf = (ms) => { const t = new Date(ms + 9 * 3600e3); return { date: t.toISOString().slice(0, 10), min: t.getUTCHours() * 60 + t.getUTCMinutes() }; };
+// 목표 구간(밤 K 의 목표 취침~기상) 절대 시각. 취침 목표가 18시 이후면 전날 밤
+export function goalSpan(K, goal) { const bedDate = goal.bed >= 720 ? addDays(K, -1) : K, b = msOf(bedDate, goal.bed); return [b, b + Math.round(goal.hours * 60) * 60000]; }
+// 한 밤의 기록 해석. apple: undefined=조회 못 함/아직, null=없음, {main}=있음. 결과 {key, parts:[{kind:'done'|'mark'|'plan', from, to}], src, notes[], bedMs, wakeMs, goalWake}
+export function sleepNight(K, { sleep = {}, apple, goal, nowMs, appleFailed = false }) {
+  const out = { key: K, parts: [], src: null, notes: [], bedMs: null, wakeMs: null, goalSpan: null };
+  let bedMs = null, wakeMs = null, src = null;
+  const am = apple?.main;
+  if (am) {
+    const b = parseKst(`${am.bed}:00+09:00`), w = parseKst(`${am.wake}:00+09:00`), ok = b != null && w != null && w > b && (w - b) / 36e5 <= 24 && String(am.wake).slice(0, 10) === K && w <= nowMs;
+    if (ok) { bedMs = b; wakeMs = w; src = 'Apple 건강'; } else out.notes.push('Apple 건강 기록의 시각이 이상해 쓰지 않았어요.');
+  }
+  const r = sleep[K];
+  if (src == null && r && typeof r === 'object') {
+    if (r.src === 'app') {
+      const b = parseKst(r.bedAt), bd = b != null ? dateMinOf(b) : null;
+      if (b == null || r.bed !== String(r.bedAt).slice(11, 16) || b > nowMs || ![K, addDays(K, -1)].includes(bd.date)) out.notes.push('앱 취침 기록의 시각이 이상해 표시하지 않았어요.');
+      else {
+        bedMs = b; src = '앱 기록';
+        if (r.wake || r.wakeAt) { const w = parseKst(r.wakeAt); if (appSleepHours(r, K) != null && w != null && w <= nowMs) wakeMs = w; else { out.notes.push('앱 기상 기록이 이상해 기상 없음으로 봐요.'); } }
+      }
+    } else if (r.bed || r.wake) {
+      src = '직접 입력'; out.notes.push('직접 입력 · 날짜는 시각으로 추정했어요.');
+      if (r.wake && r.bed) {
+        if (!okHM(r.bed) || !okHM(r.wake) || r.bed === r.wake) { src = null; out.notes = ['시각이 모호해 표시하지 않음 (직접 입력 기록).']; }
+        else {
+          const wb = mins(r.wake), bb = mins(r.bed), w = msOf(K, wb), b = msOf(bb > wb ? addDays(K, -1) : K, bb), h = (w - b) / 36e5;
+          if (h < 3 || h > 14 || w > nowMs) { src = null; out.notes = ['시각이 모호해 표시하지 않음 (직접 입력 기록 — 간격이 3~14시간 밖이거나 아직 오지 않은 시각).']; } else { bedMs = b; wakeMs = w; }
+        }
+      } else if (r.bed && !r.wake) {
+        const bb = okHM(r.bed) ? mins(r.bed) : null;
+        if (bb == null || (bb >= 360 && bb < 1080)) { src = null; out.notes = ['시각이 모호해 표시하지 않음 (취침만 있는 직접 입력 기록).']; }
+        else { const b = msOf(bb >= 720 ? addDays(K, -1) : K, bb); if (b > nowMs) { src = null; out.notes = []; } else bedMs = b; }
+      } else { src = null; out.notes = ['기상만 있는 직접 입력 기록이라 표시하지 않아요.']; }
+    }
+  }
+  if (src == null && !r && appleFailed) out.notes.push('Apple 건강을 확인하지 못했어요.');
+  if (src && appleFailed && src !== 'Apple 건강') out.notes.push('Apple 건강 조회 실패 · 저장된 기록을 썼어요.');
+  out.src = src; out.bedMs = bedMs; out.wakeMs = wakeMs;
+  const gs = goal ? goalSpan(K, goal) : null; out.goalSpan = gs;
+  if (bedMs != null && wakeMs != null) { out.parts.push({ kind: 'done', from: bedMs, to: wakeMs }); return out; }
+  if (bedMs != null) {
+    out.parts.push({ kind: 'mark', from: bedMs, to: bedMs + 60000 });
+    if (gs && gs[1] > nowMs && gs[1] > bedMs + 60000) out.parts.push({ kind: 'plan', from: Math.max(nowMs, bedMs + 60000), to: gs[1] });
+    return out;
+  }
+  if (src == null && gs && gs[1] > nowMs) out.parts.push({ kind: 'plan', from: Math.max(gs[0], nowMs), to: gs[1] });
+  return out;
+}
+// 절대 구간 → KST 날짜별 조각. [from,to) 이고 날짜 경계에서 자름(길이 0 조각은 만들지 않음)
+export function splitByDate(from, to) {
+  const out = []; let cur = from;
+  while (cur < to) {
+    const { date, min } = dateMinOf(cur), dayEnd = msOf(addDays(date, 1), 0), end = Math.min(to, dayEnd);
+    out.push({ date, s: min, e: end === dayEnd ? 1440 : dateMinOf(end).min, contPrev: cur !== from, contNext: end < to || false });
+    cur = end;
+  }
+  return out.filter((x) => x.e > x.s);
+}
+export const hmAbs = (ms) => { const { min } = dateMinOf(ms); return hm(min); };
+// 그 날짜에 보일 수면 블록(조각). 그 날 아침의 밤(K=date)과 그 날 저녁에 자러 가는 밤(K=date+1)
+export function sleepBlocksOn(date, { sleep, appleFor, appleFail, cfg, nowMs }) {
+  const goal = sleepGoal(cfg), out = [];
+  for (const K of [date, addDays(date, 1)]) {
+    const night = sleepNight(K, { sleep, apple: appleFor ? appleFor(K) : undefined, goal, nowMs, appleFailed: !!appleFail?.(K) });
+    for (const p of night.parts) for (const seg of splitByDate(p.from, p.to)) {
+      if (seg.date !== date) continue;
+      const bedS = night.bedMs != null ? hmAbs(night.bedMs) : null, wakeS = night.wakeMs != null ? hmAbs(night.wakeMs) : null;
+      const title = p.kind === 'done' ? `취침 ${bedS} – 기상 ${wakeS}` : p.kind === 'mark' ? `취침 ${bedS} · 기상 기록 없음` : `목표 ${hmAbs(night.goalSpan[0])} – ${hmAbs(night.goalSpan[1])}`;
+      out.push({ k: 'sleep', s: seg.s, e: seg.e, title, date, sleep: { key: K, state: p.kind, src: night.src, bedMs: night.bedMs, wakeMs: night.wakeMs, goal: night.goalSpan, goalHours: goal.hours, goalNotes: goal.notes, notes: night.notes, contPrev: seg.contPrev, contNext: seg.contNext, from: p.from, to: p.to } });
+    }
+  }
+  return out;
+}
+// 취침 목표 저장 한 번(저장 충돌 뒤 다시 적용돼도 같은 결과): 열 때 본 두 값(seen)이 그대로일 때만 바꾼다. 'applied' · 'conflict' · 'invalid'
+export const goalSeen = (cfg) => canon({ bed: cfg?.bed ?? null, sleepH: cfg?.sleepH ?? null });
+export function applyGoal(s, { bed, sleepH, seen }) {
+  if (!okBedGoal(bed) || !(okSleepH(sleepH) || (Number.isFinite(sleepH) && sleepH >= SLEEP_GOAL.minH && sleepH <= SLEEP_GOAL.maxH && sleepH === Number(s.cfg?.sleepH)))) return 'invalid';   // 0.5 간격이 아닌 기존 값은 그 값 그대로일 때만
+  if (goalSeen(s.cfg) !== seen) return 'conflict';
+  s.cfg = s.cfg || {}; s.cfg.bed = bed; s.cfg.sleepH = sleepH; return 'applied';
 }
 const DAY = { start: 0, end: 24 * 60, wake: 8 * 60, bed: 24 * 60 };   // 시간표 0~24시, 자동 배치는 08~24시
 const BREAK = 10, MIN_SLOT = 25, DEFAULT_EST = 60;
@@ -313,6 +415,16 @@ button.pl-title.pl-edit:hover,button.pl-title.pl-edit:focus-visible{text-decorat
 .pl-leg{display:inline-flex;align-items:center;gap:6px}
 .pl-sw{display:inline-block;width:20px;height:14px;border-radius:4px;flex:none}
 .pl-sw.c-fixed{background:#2c4a6e}.pl-sw.c-study{background:#e0efe5;border:1.5px solid #2e6b52;box-shadow:inset 4px 0 0 #2e6b52}.pl-sw.c-hw{background:#fbe4cc;border:1.5px solid #9a4a10;box-shadow:inset 4px 0 0 #9a4a10}.pl-sw.c-move{background:#e8e4f4;border:1px solid #5a4a8a;border-top:3px double #5a4a8a;border-bottom:3px double #5a4a8a;border-radius:2px}.pl-sw.c-plan{background:#f4f7f5;border:2px dashed #4f6b5c}
+.pl-blk.c-sleep{background:repeating-linear-gradient(0deg,#1d2340 0 6px,#2a3260 6px 7px);border:1px solid #1d2340;box-shadow:none;border-radius:5px;color:#f4f7fb}
+.pl-blk.c-sleep small{color:#e3e8f7}
+.c-sleep .pl-tag{background:#f4f7fb;color:#1d2340}
+.pl-blk.c-sleep.sleep-plan{background:#e9ecf8;border:2px dashed #1d2340;color:#1d2340}
+.pl-blk.c-sleep.sleep-plan small{color:#2b3566}
+.c-sleep.sleep-plan .pl-tag{background:transparent;border:1px dashed #1d2340;color:#1d2340}
+.pl-blk.c-sleep.sleep-mark{border-top:3px solid #f4f7fb;border-bottom:1px solid #1d2340;border-radius:0 0 5px 5px}
+.pl-sw.c-sleep{background:repeating-linear-gradient(0deg,#1d2340 0 3px,#2a3260 3px 4px);border:1px solid #1d2340}
+.pl-goal label{display:flex;flex-direction:column;gap:4px;font:600 13px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#26352e}
+.pl-goal input,.pl-goal select{height:44px;border:1px solid #9fb0c3;border-radius:10px;padding:0 10px;font:600 15px "Pretendard Variable",Pretendard,system-ui,sans-serif;background:#fff}
 .pl-legend-off{display:flex;justify-content:flex-end;margin:0 0 6px}
 .pl-legend-off .pl-ib{width:34px;height:34px}
 .pl-toast{position:fixed;z-index:90;top:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;max-width:min(92vw,520px);padding:8px 8px 8px 16px;border-radius:14px;background:#14261f;color:#fff;box-shadow:0 10px 28px #0004;font:600 14px/1.35 "Pretendard Variable",Pretendard,system-ui,sans-serif}
@@ -376,6 +488,25 @@ export function createPlan(app) {
   const cache = new Map(), calFail = new Map();   // 날짜별 캘린더(확인된 것만) · 받기 실패 시각
   let bootDay = kst();
   const calOk = (date) => cache.has(date);
+  // Apple 건강 수면(읽기 전용 /api/health/sleep): 기상일별로 기억. apple.get(K) = 기록 객체 · null(조회했고 없음), 없으면 아직/실패. 실패한 날은 30초 뒤 다시
+  const apple = new Map(), appleFailAt = new Map(), appleAt = new Map(); let lastSleepSig = '';
+  const APPLE_TTL = 120000;   // 어제·오늘 기상일은 워치 동기화로 나중에 채워질 수 있어 2분 뒤 다시 받는다(지난 날은 한 번이면 충분)
+  const appleFor = (K) => apple.has(K) ? apple.get(K) : undefined;
+  const appleFail = (K) => appleFailAt.has(K) && !(apple.has(K) && (appleAt.get(K) || 0) > appleFailAt.get(K));
+  const appleMissing = (a, b) => { const out = []; for (let d = a; d <= b; d = addDays(d, 1)) { const stale = apple.has(d) && d >= addDays(ctx.today, -1) && Date.now() - (appleAt.get(d) || 0) > APPLE_TTL; if ((!apple.has(d) || stale) && !(Date.now() - (appleFailAt.get(d) || 0) < 30000)) out.push(d); } return out; };
+  async function ensureApple(from, to) {   // 기상일 from~to(오늘까지만). 서버는 한 번에 62일까지라 60일 창으로 나눠 받는다
+    const need = appleMissing(from, to > ctx.today ? ctx.today : to); let i = 0;
+    while (i < need.length) {
+      const a = need[i], lim = addDays(a, 59); let j = i; while (j < need.length && need[j] <= lim) j++;
+      const win = need.slice(i, j), b = win[win.length - 1]; i = j;
+      try {
+        const r = await fetch(`/api/health/sleep?from=${a}&to=${b}`, { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(6000) }); const jj = await r.json();
+        if (!r.ok || !jj || typeof jj.sleep !== 'object' || jj.sleep === null || (jj.tz && jj.tz !== 'Asia/Seoul')) throw new Error('sleep');
+        for (const d of win) { apple.set(d, jj.sleep[d] || null); appleAt.set(d, Date.now()); appleFailAt.delete(d); }
+      } catch { const at = Date.now(); for (const d of win) appleFailAt.set(d, at); }   // 실패 = 모름(없음 아님)
+    }
+  }
+  const sleepOn = (date) => sleepBlocksOn(date, { sleep: v60?.sleep || {}, appleFor, appleFail, cfg: v60?.cfg, nowMs: Date.now() });
 
   async function load() {
     const r = await fetch('/api/study/state', { credentials: 'same-origin', cache: 'no-store' });
@@ -546,7 +677,7 @@ export function createPlan(app) {
     for (const x of (ctx.exams || []).filter((x) => x.date === date)) { const s = x.time ? mins(x.time) : 9 * 60; out.push({ s, e: s + 90, title: `시험 · ${x.course}${x.assumed ? ' (예정)' : ''}`, k: 'exam' }); }
     for (const p of (ctx.plans || []).filter((p) => p.date === date && (!p.activity || p.bk === '고정' || p.bk === '이동'))) out.push({ s: mins(p.s), e: mins(p.e), title: p.bk === '이동' ? (p.note || moveName(p.from, p.to) || '이동') + (p.est ? ' (추정)' : '') : p.bk === '고정' ? (p.note || '고정 일정') : (ctx.courseName?.(p.courseId) || '') + (p.note ? ' · ' + p.note : ''), k: 'plan', plan: p });   // 고정 일정(약속 등)은 activity 표식이 있어도 시간표엔 그린다
     for (const b of out) b.date = date;
-    return dedupeBlocks(out.filter((b) => b.e > b.s)).sort((a, b) => a.s - b.s);
+    return [...dedupeBlocks(out.filter((b) => b.e > b.s)), ...sleepOn(date)].sort((a, b) => a.s - b.s);   // 수면 블록(기록=확정·목표=계획)은 채우기·다시 짜기도 피하도록 같은 목록에 둔다
   }
   // 빈 칸: 깨어 있는 시간(08~24시, 오늘이면 지금부터)에서 고정 블록을 빼고, 앞뒤 쉬는 10분, 25분 이상만
   function freeSlots(date, fixed) {
@@ -796,7 +927,8 @@ export function createPlan(app) {
     const unhide = el('button', `숨긴 추천 되살리기 (${hid}개)`); unhide.type = 'button'; unhide.disabled = !hid;
     unhide.onclick = async () => { unhide.disabled = true; const today = ctx.today; const ok = await save((s) => { if (s.hideAuto) delete s.hideAuto[today]; }); if (ok) { app.status?.('숨긴 추천을 되살렸어요.'); close(); } else unhide.disabled = false; };
     const no = el('button', '닫기', 'ghost'); no.type = 'button'; no.onclick = close;
-    pop.append(erase, unhide, el('small', '확정한 계획·직접 넣은 계획·예전 계획은 지우지 않아요. 개별 계획은 블록을 눌러 삭제.', 'pl-popnote'), no);
+    const gl = sleepGoal(v60.cfg), goalBtn = el('button', `취침 목표 · ${gl.bedHM} 취침, 수면 ${gl.hours}시간`); goalBtn.type = 'button'; goalBtn.onclick = () => { close(); goalPopup(anchor); };
+    pop.append(erase, unhide, goalBtn, el('small', '확정한 계획·직접 넣은 계획·예전 계획은 지우지 않아요. 개별 계획은 블록을 눌러 삭제.', 'pl-popnote'), no);
     document.body.append(pop);
     const r = anchor.getBoundingClientRect(); placePop(pop, (ev?.clientX || r.left) - 240, (ev?.clientY || r.bottom) + 16);
     erase.focus();
@@ -920,7 +1052,7 @@ export function createPlan(app) {
   //  캘린더: 시각 고치기 → 확인 → 구글 캘린더 변경 대기열(/api/aliveweek/changes, 원본 버전이 맞을 때만). 「운선」 일정은 제목을 보이지 않음
   function blockPopup(b, anchor, at) {
     const { pop, close } = mkPop('div', 'pl-info', '', anchor);
-    const date = b.date || ctx.today, when = `${date.slice(5).replace('-', '/')}(${wd(date)}) ${hm(b.s)}–${hm(b.e)}`, cat = blockCat(b);
+    const date = b.date || ctx.today, when = `${date.slice(5).replace('-', '/')}(${wd(date)}) ${hm(b.s)}–${hme(b.e)}`, cat = blockCat(b);
     pop.setAttribute('aria-label', `${b.title} ${when}`);
     pop.append(el('b', b.title), el('small', when + (b.cls?.room ? ` · ${b.cls.room}` : ''), 'pl-popnote'));
     if (cat) { const line = el('div', undefined, 'pl-tagline'); line.append(el('span', cat, 'pl-tag'), el('small', `${CAT_NAME[cat]} — ${CAT_MEANS[cat]}`, 'pl-popnote')); pop.append(line); }
@@ -978,23 +1110,66 @@ export function createPlan(app) {
     placePop(pop, x, y);
     pop.querySelector('button:not([disabled])')?.focus();
   }
+  // 수면 블록 창: 확정(출처·간격) · 취침만(기상 기록 없음) · 계획(목표 기준, 삭제 불가)
+  const absLabel = (ms) => { const d = dateMinOf(ms); return `${d.date.slice(5).replace('-', '/')}(${wd(d.date)}) ${hm(d.min)}`; };
+  function sleepPopup(b, anchor, at) {
+    const { pop, close } = mkPop('div', 'pl-info', '', anchor), n = b.sleep;
+    pop.setAttribute('aria-label', b.title);
+    if (n.state === 'plan') {
+      pop.append(el('b', '계획 수면'), el('small', `취침 ${hmAbs(n.goal[0])} · 기상 ${hmAbs(n.goal[1])}(목표 수면 ${fmtHours(n.goalHours)} 기준)`, 'pl-popnote'));
+      pop.append(el('small', '저장하지 않는 계산 블록이에요. 삭제할 수 없고, 목표를 바꾸면 앞으로 올 모든 밤의 계획이 같이 바뀌어요.' + (n.bedMs != null ? ' 이 밤은 취침 기록이 있어 그 뒤 목표 기상까지만 계획으로 이어 보여요.' : n.from > n.goal[0] ? ' 지금 진행 중인 밤이라 지금부터 목표 기상까지만 보여요.' : ''), 'pl-popnote'));
+      const go = el('button', '목표 바꾸기'); go.type = 'button'; go.onclick = () => { close(); goalPopup(anchor); }; pop.append(go);
+    } else if (n.state === 'mark') {
+      pop.append(el('b', '취침 기록'), el('small', `${absLabel(n.bedMs)} 취침 · 기상 기록 없음`, 'pl-popnote'));
+      pop.append(el('small', `출처: ${n.src}. 기상 시각을 목표값으로 채워 넣지 않았어요. 앱 기록이면 홈 위쪽 수면 줄에서 기상을 남겨요.`, 'pl-popnote'));
+    } else {
+      pop.append(el('b', '수면 기록'), el('small', `${absLabel(n.bedMs)} 취침 → ${absLabel(n.wakeMs)} 기상`, 'pl-popnote'));
+      pop.append(el('small', `취침–기상 간격 ${fmtHours((n.wakeMs - n.bedMs) / 36e5)}(실제 잔 시간과 다를 수 있어요) · 출처: ${n.src}`, 'pl-popnote'));
+    }
+    for (const t of [...(n.notes || []), ...(n.state === 'plan' ? n.goalNotes || [] : [])]) pop.append(el('small', t, 'pl-popnote'));
+    const no = el('button', '닫기', 'ghost'); no.type = 'button'; no.onclick = close; pop.append(no);
+    document.body.append(pop);
+    placePop(pop, at?.x ?? anchor.getBoundingClientRect().left, at?.y ?? anchor.getBoundingClientRect().top);
+    pop.querySelector('button')?.focus();
+  }
+  // 취침 목표 창(시간표 메뉴): v60.cfg.bed · sleepH 에 저장(옛 관제탑이 같은 값을 읽음). 열 때 본 값이 그대로일 때만 바꾼다
+  function goalPopup(anchor) {
+    const g = sleepGoal(v60.cfg), seen = goalSeen(v60.cfg), { pop, close } = mkPop('form', 'pl-goal', '취침 목표', anchor);
+    pop.append(el('b', '취침 목표'));
+    const l1 = el('label', '취침 시각 (18:00 ~ 다음 날 05:59)'), t = el('input'); t.type = 'time'; t.required = true; t.value = g.bedHM; t.setAttribute('aria-label', '취침 시각'); l1.append(t);
+    const l2 = el('label', '수면 시간'), sel = el('select'); sel.setAttribute('aria-label', '수면 시간');
+    const hs = []; for (let h = SLEEP_GOAL.minH; h <= SLEEP_GOAL.maxH; h += 0.5) hs.push(h); if (!hs.includes(g.hours)) { hs.push(g.hours); hs.sort((a, b) => a - b); }   // 기존 값이 0.5 간격이 아니어도 그 값을 보여 준다
+    for (const h of hs) { const o = el('option', `${h}시간`); o.value = String(h); if (h === g.hours) o.selected = true; sel.append(o); }
+    l2.append(sel);
+    const wake = el('small', '', 'pl-popnote'), paint = () => { const b = okBedGoal(t.value) ? mins(t.value) : null; wake.textContent = b == null ? '취침 시각을 18:00 ~ 05:59 사이로 정해 주세요.' : `기상 목표 ${hm((b + Math.round(Number(sel.value) * 60)) % 1440)}`; };
+    t.oninput = paint; sel.onchange = paint; paint();
+    const ok = el('button', '저장'); ok.type = 'submit'; const no = el('button', '취소', 'ghost'); no.type = 'button'; no.onclick = close;
+    pop.append(l1, l2, wake, el('small', '앞으로 올 모든 밤의 계획 수면에 적용돼요. 기록된 밤은 그대로예요.', 'pl-popnote'), ok, no);
+    pop.onsubmit = (e) => {
+      e.preventDefault(); const bed = t.value, sleepH = Number(sel.value); if (!okBedGoal(bed) || !Number.isFinite(sleepH)) { paint(); return; }
+      close();
+      runSleep('goal', (s) => applyGoal(s, { bed, sleepH, seen }), (o) => app.status?.(o === 'applied' ? `취침 목표를 ${bed}, 수면 ${sleepH}시간으로 바꿨어요.` : o === 'invalid' ? '취침 목표 값을 확인해 주세요.' : '그 사이 다른 화면에서 취침 목표가 바뀌어 적용하지 않았어요. 다시 열어 주세요.', o !== 'applied'));
+    };
+    document.body.append(pop); const r = anchor.getBoundingClientRect(); placePop(pop, r.left - 200, r.bottom + 16); t.focus();
+  }
   // 블록을 누르면 종류별 창 — 시간표 블록과 아래 「일정 목록」이 같은 길을 쓴다
   function openBlock(b, anchor, at) {
-    if (b.plan) planPopup(null, b.plan.date, b.s, anchor, at, true, b.plan);
+    if (b.k === 'sleep') sleepPopup(b, anchor, at);
+    else if (b.plan) planPopup(null, b.plan.date, b.s, anchor, at, true, b.plan);
     else if (b.k === 'auto') planPopup(null, b.date || ctx.today, b.s, anchor, at, true, null, { course: b.title.split(' · ')[0], note: b.title.split(' · ').slice(1).join(' · '), len: b.e - b.s, key: b.key, date: b.date || ctx.today, label: b.title });
     else blockPopup(b, anchor, at);
   }
-  const WHAT = { plan: '고치기·삭제', class: '출석·이해도·시작·종료', cal: '시각 고치기', auto: '계획으로 넣기·숨기기', work: '내용 보기', exam: '내용 보기' };
+  const WHAT = { plan: '고치기·삭제', class: '출석·이해도·시작·종료', cal: '시각 고치기', auto: '계획으로 넣기·숨기기', work: '내용 보기', exam: '내용 보기', sleep: '내용 보기·목표 바꾸기' };
   function blockEl(b, PX, now) {
-    const cat = blockCat(b), sub = b.k === 'auto' ? ' · 추천' : '';
-    const blk = el('div', undefined, `pl-blk k-${b.k} ${cat ? CAT_CLASS[cat] : 'c-unknown'}` + (now >= 0 && b.e <= now ? ' past' : '')); blk.style.top = b.s * PX + 'px'; blk.style.height = Math.max(14, (b.e - b.s) * PX - 2) + 'px';
+    const cat = blockCat(b), sub = b.k === 'auto' ? ' · 추천' : b.k === 'sleep' ? (b.sleep.state === 'plan' ? ' · 목표' : '') + (b.sleep.contPrev ? ' · 전날에서 이어짐' : '') + (b.sleep.contNext ? ' · 다음 날로 이어짐' : '') : '';
+    const blk = el('div', undefined, `pl-blk k-${b.k} ${cat ? CAT_CLASS[cat] : 'c-unknown'}` + (b.k === 'sleep' ? ` sleep-${b.sleep.state}` : '') + (now >= 0 && b.e <= now ? ' past' : '')); blk.style.top = b.s * PX + 'px'; blk.style.height = Math.max(14, (b.e - b.s) * PX - 2) + 'px';
     if (b.cols > 1) { blk.dataset.n = b.cols; blk.style.setProperty('--n', b.cols); blk.style.setProperty('--c', b.col); }   // 겹치는 무리는 열로 나눠 옆으로
     const line = el('span'); line.append(el('i', cat || '?', 'pl-tag'), document.createTextNode(b.title)); blk.append(line);
-    if ((b.e - b.s) * PX > 34) blk.append(el('small', `${hm(b.s)}–${hm(b.e)}${sub}`)); blk.title = `${cat ? CAT_NAME[cat] : '종류 모름'} · ${hm(b.s)}–${hm(b.e)} ${b.title}`;
+    if ((b.e - b.s) * PX > 34) blk.append(el('small', `${hm(b.s)}–${hme(b.e)}${sub}`)); blk.title = `${cat ? CAT_NAME[cat] : '종류 모름'} · ${hm(b.s)}–${hme(b.e)} ${b.title}`;
     // 누르면 종류별 창(대표님 10/9 「시간블럭 누르면 수정할 수가 없는데」): 계획 = 고치기·확정·삭제, 수업 = 출석·이해도·시작·종료, 캘린더 = 시각 고치기,
     // 추천 = 계획으로 넣기·숨기기, 고정 일정·시험 = 내용 보기
     const what = WHAT[b.k];
-    if (what) { blk.classList.add('edit'); blk.tabIndex = 0; blk.setAttribute('role', 'button'); blk.setAttribute('aria-label', `${cat ? CAT_NAME[cat] : '종류 모름'} ${b.title} ${hm(b.s)}–${hm(b.e)} ${what}`);
+    if (what) { blk.classList.add('edit'); blk.tabIndex = 0; blk.setAttribute('role', 'button'); blk.setAttribute('aria-label', `${cat ? CAT_NAME[cat] : '종류 모름'} ${b.title} ${hm(b.s)}–${hme(b.e)} ${what}`);
       const open = (e) => { e.stopPropagation(); openBlock(b, blk, e.clientX ? { x: e.clientX, y: e.clientY } : null); };
       blk.onclick = open; blk.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(e); } }; }
     return blk;
@@ -1016,7 +1191,7 @@ export function createPlan(app) {
     const d = el('details', undefined, 'pl-list'); d.append(el('summary', `이 날 일정 목록 (${blocks.length})`));
     for (const b of blocks.slice().sort((x, y) => x.s - y.s || x.e - y.e)) {
       if (!WHAT[b.k]) continue; const cat = blockCat(b);
-      const r = el('button'); r.type = 'button'; r.append(el('i', cat || '?', 'pl-tag'), el('span', `${hm(b.s)}–${hm(b.e)}`, 'pl-tt'), el('span', b.title)); r.setAttribute('aria-label', `${cat ? CAT_NAME[cat] : '종류 모름'} ${b.title} ${hm(b.s)}–${hm(b.e)} ${WHAT[b.k]}`);
+      const r = el('button'); r.type = 'button'; r.append(el('i', cat || '?', 'pl-tag'), el('span', `${hm(b.s)}–${hme(b.e)}`, 'pl-tt'), el('span', b.title)); r.setAttribute('aria-label', `${cat ? CAT_NAME[cat] : '종류 모름'} ${b.title} ${hm(b.s)}–${hme(b.e)} ${WHAT[b.k]}`);
       r.onclick = (e) => openBlock(b, r, { x: e.clientX || r.getBoundingClientRect().left, y: e.clientY || r.getBoundingClientRect().top }); d.append(r);
     }
     return d;
@@ -1079,6 +1254,9 @@ export function createPlan(app) {
     head.append(bar); card.append(head);
     if (!isWeek && !isExam) card.append(weekStrip());
     card.append(legend());
+    { const a0 = isExam ? ctx.today : isWeek ? ws : day, a1 = isExam ? end : isWeek ? addDays(ws, 6) : day; let bad = false; for (let d = a0; d <= addDays(a1, 1) && d <= ctx.today; d = addDays(d, 1)) if (appleFail(d)) bad = true;
+      if (bad) { const n = el('p', '건강앱(Apple) 수면 조회에 실패했어요. 저장된 수면 기록만 보여 줘요.', 'pl-note pl-applefail'); n.setAttribute('role', 'status'); card.append(n); } }
+    lastSleepSig = sleepSig();
     const todayFixed = fixedBlocks(ctx.today), todayPlan = autoPlan(ctx.today, all, todayFixed);
     if (!isWeek && !isExam) {
       const fixed = day === ctx.today ? todayFixed : fixedBlocks(day), plan = day === ctx.today ? todayPlan : { out: [], left: [] };
@@ -1278,11 +1456,13 @@ export function createPlan(app) {
     try { const r = await fetch(`/api/cal?from=${from}&to=${to}`, { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(5000) }); const j = await r.json(); if (!j?.ok) throw new Error('cal'); for (const d of dates) if (!cache.has(d)) cache.set(d, j.days?.[d] || []); }
     catch { const at = Date.now(); for (const d of dates) if (!cache.has(d)) calFail.set(d, at); }   // 실패 = 모름(빈 일정 아님)
   }
+  const sleepSig = () => [ctx.today, addDays(ctx.today, 1)].map((d) => sleepOn(d).map((b) => `${b.s}-${b.e}-${b.sleep.state}`).join(',')).join('|');
   const origDraw = draw;
   draw = function (keep) {
     const my = ++gen, from = view === 'week' ? weekStart(day) : view === 'exam' ? ctx.today : day, to = view === 'week' ? addDays(from, 6) : view === 'exam' ? examEnd() : day;
     let missing = false; for (let d = from; d <= to; d = addDays(d, 1)) if (!cache.has(d) && !(Date.now() - (calFail.get(d) || 0) < 30000)) missing = true;
-    origDraw(keep); if (missing) ensureCal(from, to).then(() => { if (my === gen) origDraw(keep); });
+    const aTo = addDays(to, 1) > ctx.today ? ctx.today : addDays(to, 1), aMissing = appleMissing(from, aTo).length > 0;   // 마지막 날 저녁에 자러 가는 밤은 다음 날 기상일이라 하루 더
+    origDraw(keep); if (missing || aMissing) Promise.all([missing ? ensureCal(from, to) : null, aMissing ? ensureApple(from, aTo) : null]).then(() => { if (my === gen) origDraw(keep); });
   };
 
   return {
@@ -1299,7 +1479,8 @@ export function createPlan(app) {
         if (!host?.isConnected) { clearInterval(tick); return; }
         for (const c2 of host.querySelectorAll('[data-clock]')) c2.textContent = clock(elapsed(c2.dataset.clock));
         if (kst() !== bootDay && !pend.length) { clearInterval(tick); ctx.reload?.(); return; }   // 자정 지나면 새 날짜로 다시(기록이 전날로 가지 않게)
-        if (sec % 60 === 59) paintSleep();   // 수면 시간대에 들어오거나 아침 확인 때가 되면 줄을 바꾼다(같은 문구면 그대로)
+        if (sec % 60 === 59 && ctx && appleMissing(addDays(ctx.today, -1), ctx.today).length) ensureApple(addDays(ctx.today, -1), ctx.today).then(() => { if (host?.isConnected && !document.querySelector('.pl-pop') && !pend.length) draw(); });   // 워치 동기화로 늦게 채워지는 어젯밤·오늘 아침
+        if (sec % 60 === 59) { paintSleep(); if (ctx && v60 && lastSleepSig && sleepSig() !== lastSleepSig && !document.querySelector('.pl-pop') && !pend.length) draw(); }   // 목표 시각을 지나 계획이 바뀌면 시간표를 다시 그린다(열린 창이 있으면 미룸)   // 수면 시간대에 들어오거나 아침 확인 때가 되면 줄을 바꾼다(같은 문구면 그대로)
         if (++sec % 60 === 0 && followBox?.box?.isConnected) {   // 1분마다 지금 선을 옮기고, 직접 스크롤 안 했으면 화면이 따라감
           const now = nowMin(); if (followBox.line) { followBox.line.style.top = now * followBox.PX + 'px'; followBox.line.querySelector('span').textContent = hm(now); }
           scrollToNow(followBox.box, followBox.PX, false);
