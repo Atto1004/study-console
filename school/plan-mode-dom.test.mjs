@@ -87,12 +87,14 @@ fillForm('병원 예약', '16:00'); click(popBtn('확정으로 넣기')); await 
 assert.equal(calls.filter((c) => c[0] === 'add').length, nAdds + 1);
 add = calls.filter((c) => c[0] === 'add').pop()[1]; assert.deepEqual([add.state, add.bk, add.courseId, add.note], ['confirmed', '고정', '', '병원 예약']);
 
-// 6. 한 주 보기: 모드가 꺼져 있으면 빈 칸을 눌러도 안 열리고, 켜면 열린다(계획으로)
+// 6. 한 주 보기: 빈 칸을 누르면(모드와 무관하게) 그 칸이 선택되고 창이 열린다 — 꺼짐 = 확정, 켜짐 = 계획이 기본값
 click(viewBtn('한 주')); await flush();
 const col = host.querySelector('.pl-wkcol[data-date="2026-10-14"]');
 col.getBoundingClientRect = () => ({ top: 0, left: 0, width: 100, height: 960, right: 100, bottom: 960 });
 col.dispatchEvent(new w.MouseEvent('click', { bubbles: true, clientX: 50, clientY: 400 })); await flush();
-assert.ok(!document.querySelector('.pl-pop'), '꺼짐: 안 열림');
+pop = document.querySelector('.pl-pop'); assert.ok(pop, '꺼짐에도 열림'); assert.ok(host.querySelector('.pl-wkcol[data-date="2026-10-14"] .pl-selbox'), '누른 칸 강조 박스');
+assert.equal([...pop.querySelectorAll('[data-mode]')].find((b) => b.dataset.mode === '확정').getAttribute('aria-pressed'), 'true', '꺼짐 = 확정 기본');
+pop.remove(); await new Promise((r) => setTimeout(r, 600)); assert.equal(host.querySelectorAll('.pl-selbox').length, 0, '창이 닫히면 선택도 풀림');
 click(pm()); await flush();
 const col2 = host.querySelector('.pl-wkcol[data-date="2026-10-14"]'); col2.getBoundingClientRect = col.getBoundingClientRect;
 col2.dispatchEvent(new w.MouseEvent('click', { bubbles: true, clientX: 50, clientY: 400 })); await flush();

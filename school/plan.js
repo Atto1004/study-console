@@ -507,7 +507,7 @@ button.pl-title.pl-edit:hover,button.pl-title.pl-edit:focus-visible{text-decorat
 .pl-pop.pl-info{width:300px}.pl-pop{max-height:calc(100dvh - 16px);overflow:auto;box-sizing:border-box}.pl-prow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.pl-prow > span:first-child{min-width:44px;font:600 12.5px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#4b6358}
 .pl-pick{display:flex;gap:4px;flex-wrap:wrap}.pl-pop .pl-pick button{background:#fff;color:#1f3d33;border:1px solid #cfd8d2;min-width:44px}.pl-pop .pl-pick button[aria-pressed=true]{background:#2e6b52;color:#fff;border-color:#2e6b52}.pl-pop .pl-pick button:disabled{opacity:.45}.pl-ptime{font:500 12.5px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#6b7c73}
 .pl-pop button.danger{background:#fff;color:#b23a22;border-color:#e6b4a8}
-body.pl-dragging,body.pl-dragging *{-webkit-user-select:none!important;user-select:none!important}.pl-blk{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}.pl-blk.dragging{opacity:.35}.pl-ghost{position:fixed!important;z-index:80;pointer-events:none;box-shadow:0 2px 8px #0005;margin:0;opacity:.95}.pl-ghost.bad{outline:3px solid #c0392b;background:#f6d5d1!important;color:#5a1a12!important}.pl-rsz{position:absolute;left:0;right:0;height:14px;touch-action:none;cursor:ns-resize;z-index:2}.pl-rsz.top{top:0}.pl-rsz.bot{bottom:0}.pl-rsz::after{content:"";position:absolute;left:50%;width:26px;height:4px;margin-left:-13px;border-radius:2px;background:currentColor;opacity:.4}.pl-rsz.top::after{top:3px}.pl-rsz.bot::after{bottom:3px}.pl-lpmenu button{min-height:44px}
+body.pl-dragging,body.pl-dragging *{-webkit-user-select:none!important;user-select:none!important}.pl-selbox{position:absolute;left:var(--l,6px);right:var(--r,8px);border:2px solid #2e6b52;background:rgba(46,107,82,.14);border-radius:6px;pointer-events:none;z-index:3}.pl-selbox small{position:absolute;left:4px;top:1px;font:700 11px "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#1f4d3a}.pl-blk{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}.pl-blk.dragging{opacity:.35}.pl-ghost{position:fixed!important;z-index:80;pointer-events:none;box-shadow:0 2px 8px #0005;margin:0;opacity:.95}.pl-ghost.bad{outline:3px solid #c0392b;background:#f6d5d1!important;color:#5a1a12!important}.pl-rsz{position:absolute;left:0;right:0;height:14px;touch-action:none;cursor:ns-resize;z-index:2}.pl-rsz.top{top:0}.pl-rsz.bot{bottom:0}.pl-rsz::after{content:"";position:absolute;left:50%;width:26px;height:4px;margin-left:-13px;border-radius:2px;background:currentColor;opacity:.4}.pl-rsz.top::after{top:3px}.pl-rsz.bot::after{bottom:3px}.pl-lpmenu button{min-height:44px}
 .pl-blk.edit{cursor:pointer}.pl-blk.edit:hover,.pl-blk.edit:focus-visible{outline:2px solid #2e6b52;outline-offset:1px}
 .pl-place{cursor:pointer}
 .pl-pop button.ghost{background:#fff;color:#1f3d33;border-color:#d5ddd8}
@@ -552,7 +552,7 @@ body.pl-dragging,body.pl-dragging *{-webkit-user-select:none!important;user-sele
 .pl-sw.c-prep{background:#d9f0f0;border:1px solid #155456;border-left:3px double #155456;border-right:3px double #155456;border-radius:2px}
 .pl-sw.c-meal{background:#fdeccf;border:1.5px solid #8a5412;border-radius:7px;box-shadow:inset 0 -3px 0 #e6b566}
 .pl-wkstick{position:sticky;top:0;z-index:4;background:#fff}.pl-wkstick .pl-wkhead{position:static}
-.pl-adrow{display:flex;gap:8px;align-items:flex-start;margin:0 0 8px}
+.pl-adadd{display:flex;align-items:center;justify-content:center;min-height:30px;width:100%;padding:0;border:1px dashed #b9c8bf;border-radius:8px;background:rgba(255,255,255,.55);color:#6b7c73;opacity:.85;cursor:pointer}.pl-adadd:hover,.pl-adadd:focus-visible{background:#eef4f0;opacity:1}.pl-adgrid .pl-adadd{min-height:22px}.pl-adrow{display:flex;gap:8px;align-items:flex-start;margin:0 0 8px}
 .pl-adlabel{flex:none;min-width:44px;padding-top:12px;font:700 12px/1.2 "Pretendard Variable",Pretendard,system-ui,sans-serif;color:#3a4a3f}
 .pl-adlist{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
 .pl-adgrid{display:grid;gap:3px 2px;padding:3px 0 4px;border-bottom:1px solid #edf1ee;background:#fff}
@@ -1124,7 +1124,7 @@ export function createPlan(app) {
   let planMode = false;   // 계획 모드(대표님 10/12): 켜면 새로 넣는 일정이 「계획」(미확정), 끄면 「확정 일정」. 하루·한 주·시험까지 모두에서 켜고 끄며 보기를 바꿔도 유지. 한 주·시험까지에서는 켠 채로 빈 칸을 눌러 넣는다
   let modeBtn = null;   // 툴바의 계획 모드 버튼 — 일정 창의 스위치가 모드를 바꾸면 같이 맞춘다
   const syncModeBtn = () => { fabPlace(); if (modeBtn?.isConnected) modeBtn.setAttribute('aria-pressed', String(planMode)); for (const n of host?.querySelectorAll('.pl-modenote') || []) n.textContent = noteText(n); };
-  const noteText = (n) => modeText() + (n.dataset.week ? (planMode ? ' 빈 칸을 누르면 그 시각에 넣어요. ' : ' 빈 칸 누르기는 계획 모드에서만 돼요. 확정 일정은 + 버튼으로 넣어요. ') + n.dataset.tail : '');
+  const noteText = (n) => modeText() + (n.dataset.week ? ' 빈 칸을 누르면 그 시각에 넣어요. ' + n.dataset.tail : '');
   const modeText = () => planMode ? '계획 모드 켜짐 — 새로 넣는 일정은 계획(미확정)이에요.' : '계획 모드 꺼짐 — 새로 넣는 일정은 확정 일정이에요.';
   const examEnd = () => { const ds = (ctx.exams || []).map((e) => e.date).filter(Boolean).sort(); return ds.length ? ds[ds.length - 1] : addDays(ctx.today, 13); };
   // 위치 기록(오늘 하루 보기 오른쪽 줄): v60.place[날짜] = [{t:'HH:MM', p:'학교'}] — 기록한 때부터 다음 기록까지 그곳
@@ -1286,12 +1286,12 @@ export function createPlan(app) {
   // 일정 넣기·고치기 창. 새로 넣을 때는 「계획 | 확정」 스위치 하나(대표님 10/12 「플랜모드 켜고 일정 추가하면 계획블럭으로, 끄고 추가하면 확정일정으로」):
   // 스위치 처음 값 = 계획 모드(켜짐 → 계획, 꺼짐 → 확정 — 추천에서 넣을 때도 같다), 스위치를 바꾸면 계획 모드도 같이 바뀐다. 계획은 점선 블록(미확정), 확정은 종류(고정·공부·과제)를 골라 그 모양으로.
   // 이미 있는 계획(미확정)은 [확정] 버튼으로 확정 일정이 된다 — 확정하면 채우기·다시 짜기가 건드리지 않는다.
-  function planPopup(card, date, startMin, anchor, at, pickDate, existing, preset) {
+  function planPopup(card, date, startMin, anchor, at, pickDate, existing, preset, opts) {
     const tentativeNow = existing && planState(existing) === 'tentative', lapsed = !!existing && planLapsed(existing, Date.now());
     const { pop, close } = mkPop('form', '', existing ? '일정 고치기' : `${date} 일정 넣기`, anchor);
     let isTent = existing ? !!tentativeNow : planMode;   // 이 창에서 넣는 방식(새 일정만 바꿀 수 있음). 추천에서 넣을 때도 모드를 따른다(꺼짐 = 확정, 켜짐 = 계획)
-    let bk = existing ? planBk(existing) : '공부', forcedConfirm = false;   // forcedConfirm = 지난 시각이라 계획에서 확정으로 바뀐 것(시각을 다시 미래로 고치면 계획으로 되돌린다)
-    let allDay = !!existing?.allDay, adBk = existing?.allDay ? planBk(existing) : '고정';   // 종일: 시간 칸 대신 날짜(+종료일)만. 종류는 고정·과제
+    let bk = existing ? planBk(existing) : opts?.allDay ? '고정' : '공부', forcedConfirm = false;   // forcedConfirm = 지난 시각이라 계획에서 확정으로 바뀐 것(시각을 다시 미래로 고치면 계획으로 되돌린다)
+    let allDay = !!existing?.allDay || (!existing && !!opts?.allDay), adBk = existing?.allDay ? planBk(existing) : '고정';   // 종일: 시간 칸 대신 날짜(+종료일)만. 종류는 고정·과제
     const titleEl = el('b'); pop.append(titleEl);
     { const pe = existing ? actEndOfPlan(existing) : null; if (pe != null) { const u = el('button'); u.type = 'button'; u.innerHTML = svg(ICON.undo); u.append(el('span', '예정 시각으로 되돌리기')); const key = `plan:${existing.id}|${existing.date}`; u.onclick = async () => { u.disabled = true; const ok = await save((s) => { const r = s.actual?.[key]; if (r && r.endAt === hm(pe)) { delete r.endAt; delete r.plannedEnd; } }); if (ok) close(); else u.disabled = false; }; pop.append(el('small', `예정 ${existing.e} → 실제 ${hm(pe)}`, 'pl-popnote'), u); } }
     const snap = existing ? canon(existing) : '';   // 열 때의 모습(고치는 사이 다른 곳에서 바뀌었는지 확인용)
@@ -1766,7 +1766,8 @@ export function createPlan(app) {
     const what = it.kind === 'cal' ? '구글 캘린더 일정 — 내용 보기' : '고치기·삭제';
     const kindTxt = it.kind === 'cal' ? '캘린더' : `${it.cat}${it.tentative ? (it.lapsed ? ' 지난 계획' : ' 계획') : ''}`;
     b.title = `종일 · ${kindTxt} · ${it.title} (${span})`; b.setAttribute('aria-label', `종일 ${kindTxt} ${it.title} ${span} ${what}`);
-    b.onclick = (e) => { e.stopPropagation(); const at = { x: e.clientX || b.getBoundingClientRect().left, y: e.clientY || b.getBoundingClientRect().top }; if (it.kind === 'cal') allDayInfoPopup(it, b, at); else planPopup(null, it.plan.date, 0, b, at, true, it.plan); };
+    const openIt = (at) => { if (it.kind === 'cal') allDayInfoPopup(it, b, at); else planPopup(null, it.plan.date, 0, b, at, true, it.plan); };
+    b.onclick = (e) => { e.stopPropagation(); openIt({ x: e.clientX || b.getBoundingClientRect().left, y: e.clientY || b.getBoundingClientRect().top }); }; onHold(b, (x, y) => openIt({ x, y }));
     return b;
   }
   function allDayInfoPopup(it, anchor, at) {
@@ -1777,26 +1778,42 @@ export function createPlan(app) {
     const no = el('button', '닫기', 'ghost'); no.type = 'button'; no.onclick = close; pop.append(no);
     document.body.append(pop); placePop(pop, at?.x ?? anchor.getBoundingClientRect().left, at?.y ?? anchor.getBoundingClientRect().top); no.focus();
   }
-  function allDayDay(items) {   // 하루 보기: 격자 위 세로 목록
-    if (!items.length) return null;
+  // 종일 줄 아래의 「+」 빈 박스(약간 투명): 누르면 그 날짜에 종일 일정 추가 창(구글 캘린더의 종일 줄 누르기)
+  function adAddBtn(date, grid) {
+    const b = el('button', undefined, 'pl-adadd'); b.type = 'button'; b.innerHTML = svg(ICON.plus); b.setAttribute('aria-label', `${adMD(date)}(${wd(date)}) 종일 일정 추가`); b.title = '종일 일정 추가';
+    b.onclick = (e) => { e.stopPropagation(); const r = b.getBoundingClientRect(); planPopup(host.querySelector('.pl-schedule'), date, 0, b, { x: e.clientX || r.left, y: e.clientY || r.top }, true, null, undefined, { allDay: true }); };
+    return b;
+  }
+  // 터치·펜을 꾹(500ms) 누르면 fn — 손을 뗄 때 이어지는 클릭은 한 번 막는다
+  function onHold(node, fn) {
+    let t = null, eat = false;   // eat = 꾹으로 이미 열었으니 손 뗄 때 이어지는 클릭 한 번을 먹는다(몇 초를 눌렀든)
+    node.addEventListener('click', (e) => { if (eat) { eat = false; e.stopImmediatePropagation(); e.preventDefault(); } }, true);
+    node.addEventListener('pointerdown', (e) => {
+      eat = false; if (e.pointerType === 'mouse') return; const x0 = e.clientX, y0 = e.clientY; clearTimeout(t); t = setTimeout(() => { t = null; eat = true; fn(x0, y0); }, 500);
+      const stop = (ev) => { if (ev.type === 'pointermove' && Math.hypot(ev.clientX - x0, ev.clientY - y0) <= 8) return; clearTimeout(t); t = null; for (const k of ['pointermove', 'pointerup', 'pointercancel']) node.removeEventListener(k, stop); };
+      for (const k of ['pointermove', 'pointerup', 'pointercancel']) node.addEventListener(k, stop);
+    });
+    node.addEventListener('contextmenu', (e) => { if (eat) e.preventDefault(); });
+  }
+  function allDayDay(items, date) {   // 하루 보기: 격자 위 세로 목록(비어 있어도 줄과 + 박스는 있다)
     const row = el('div', undefined, 'pl-adrow'); row.setAttribute('role', 'group'); row.setAttribute('aria-label', '종일 일정');
     const list = el('div', undefined, 'pl-adlist'); row.append(el('span', '종일', 'pl-adlabel'), list);
     const shown = adOpen ? items : items.slice(0, AD_LIM);
     for (const it of shown) list.append(adEl(it, false));
     if (items.length > AD_LIM) { const m = el('button', adOpen ? '접기' : `+${items.length - AD_LIM}개`, 'pl-admore'); m.type = 'button'; m.setAttribute('aria-expanded', String(adOpen)); m.setAttribute('aria-label', adOpen ? '종일 일정 접기' : `종일 일정 ${items.length - AD_LIM}개 더 보기`); m.onclick = () => { adOpen = !adOpen; draw(true); }; list.append(m); }
-    return row;
+    list.append(adAddBtn(date)); return row;
   }
-  function allDayGrid(dates, items, cols) {   // 한 주·시험까지: 날짜 열에 맞춰 가로 막대
-    if (!items.length) return null;
+  function allDayGrid(dates, items, cols) {   // 한 주·시험까지: 날짜 열에 맞춰 가로 막대(+ 박스는 날짜마다 한 칸)
     const g = el('div', undefined, 'pl-adgrid'); g.style.gridTemplateColumns = cols; g.setAttribute('role', 'group'); g.setAttribute('aria-label', '종일 일정');
     g.append(el('span', '종일', 'pl-adlabel'));
-    const lanes = Math.max(...items.map((i) => i.lane)) + 1, vis = adOpen ? lanes : Math.min(lanes, AD_LIM), hidden = new Array(dates.length).fill(0);
+    const lanes = items.length ? Math.max(...items.map((i) => i.lane)) + 1 : 0, vis = adOpen ? lanes : Math.min(lanes, AD_LIM), hidden = new Array(dates.length).fill(0);
     for (const it of items) {
       if (it.lane >= vis) { for (let c = it.c0; c <= it.c1; c++) hidden[c]++; continue; }
       const b = adEl(it, true); b.style.gridColumn = `${it.c0 + 2} / ${it.c1 + 3}`; b.style.gridRow = String(it.lane + 1); g.append(b);
     }
     if (!adOpen && lanes > AD_LIM) hidden.forEach((n, c) => { if (!n) return; const m = el('button', `+${n}개`, 'pl-admore'); m.type = 'button'; m.setAttribute('aria-expanded', 'false'); m.setAttribute('aria-label', `${dates[c]} 종일 일정 ${n}개 더 보기`); m.style.gridColumn = String(c + 2); m.style.gridRow = String(AD_LIM + 1); m.onclick = () => { adOpen = true; draw(true); }; g.append(m); });
     if (adOpen && lanes > AD_LIM) { const m = el('button', '접기', 'pl-admore'); m.type = 'button'; m.setAttribute('aria-expanded', 'true'); m.setAttribute('aria-label', '종일 일정 접기'); m.style.gridColumn = '2 / 4'; m.style.gridRow = String(lanes + 1); m.onclick = () => { adOpen = false; draw(true); }; g.append(m); }
+    const addRow = vis + (lanes > AD_LIM ? 1 : 0) + 1; dates.forEach((d, c) => { const a = adAddBtn(d); a.style.gridColumn = String(c + 2); a.style.gridRow = String(addRow); g.append(a); });
     return g;
   }
   const adItemsFor = (dates) => allDayItems({ dates, plans: ctx.plans || [], calDay: (d) => cache.get(d), nowMs: Date.now() });
@@ -1842,6 +1859,37 @@ export function createPlan(app) {
     }
     return box;
   }
+  // 빈 시간 칸 누르기(구글 캘린더 방식): 누른 칸(30분)이 강조 박스로 선택되고, 그 시각에 일정 추가 창이 뜬다. 창이 닫히면 선택도 풀린다.
+  // 계획 모드 켜짐 = 계획(미확정), 꺼짐 = 확정 일정이 기본값(창의 스위치로 바꿈). 터치·펜은 꾹(500ms) 눌러도 같다(손을 떼도 클릭이 안 생기는 기기 대비).
+  // 끌어서 길이를 정하는 것은 하지 않는다(길이는 창에서 정하고, 만든 뒤에는 가장자리 핸들로 조절).
+  let sel = null;   // {date, m} 선택된 칸
+  const selEl = (m, PX, len = 30) => { const x = el('div', undefined, 'pl-selbox'); x.style.top = m * PX + 'px'; x.style.height = Math.max(16, len * PX - 2) + 'px'; x.append(el('small', hm(m))); x.setAttribute('aria-hidden', 'true'); return x; };
+  const clearSel = () => { sel = null; for (const x of document.querySelectorAll('.pl-selbox')) x.remove(); };
+  function watchPop() {
+    if (typeof MutationObserver === 'undefined') { const t = setInterval(() => { if (!document.querySelector('.pl-pop')) { clearSel(); clearInterval(t); } }, 250); return; }
+    const mo = new MutationObserver(() => { if (!document.querySelector('.pl-pop')) { clearSel(); mo.disconnect(); } }); mo.observe(document.body, { childList: true });
+  }
+  function bindEmpty(box, date, PX, card) {
+    const skip = '.pl-blk, .pl-place, .pl-lane, .pl-now, .pl-rsz', open = (cx, cy) => {
+      const r = box.getBoundingClientRect(), m = Math.max(0, Math.min(23 * 60 + 30, Math.floor(((cy - r.top) / PX) / 30) * 30));
+      const nm = nowMin();   // 한 번만 읽는다(자정 경계에서 판정과 계산이 어긋나지 않게)
+      if (date < ctx.today || (date === ctx.today && m + 30 <= nm)) { app.status?.('지난 시각엔 계획을 못 넣어요. 지난 일정은 + 버튼으로 확정해 넣어요.', true); return; }
+      // 지금 진행 중인 칸(오늘, 이미 시작한 30분)은 이미 지난 시각부터는 못 넣으니 시작을 지금 다음 10분으로 미루고, 강조 박스도 실제로 넣을 구간(그 칸의 끝까지)만 칠한다
+      const at0 = date === ctx.today ? Math.max(m, Math.ceil(nm / 10) * 10) : m, slen = Math.max(10, m + 30 - at0);
+      if (at0 > LAST - 9) { app.status?.('오늘은 이 시각 뒤로 넣을 시간이 없어요. 내일 칸을 눌러요.', true); return; }
+      clearSel(); sel = { date, m: at0, len: slen }; box.append(selEl(at0, PX, slen));
+      planPopup(card, date, at0, box, { x: cx, y: cy }); watchPop();
+    };
+    if (sel && sel.date === date) box.append(selEl(sel.m, PX, sel.len));
+    let eat = false, lp = null;   // eat = 꾹으로 이미 열었으니 손을 뗄 때 이어지는 클릭 한 번을 먹는다(몇 초를 눌렀든)
+    box.addEventListener('click', (e) => { if (eat) { eat = false; return; } if (e.target.closest(skip)) return; open(e.clientX, e.clientY); });
+    box.addEventListener('pointerdown', (e) => {
+      eat = false; if (e.pointerType === 'mouse' || e.target.closest(skip)) return; const x0 = e.clientX, y0 = e.clientY; clearTimeout(lp);
+      lp = setTimeout(() => { lp = null; eat = true; open(x0, y0); }, 500);
+      const cancel = (ev) => { if (ev.type === 'pointermove' && Math.hypot(ev.clientX - x0, ev.clientY - y0) <= 8) return; clearTimeout(lp); lp = null; box.removeEventListener('pointermove', cancel); box.removeEventListener('pointerup', cancel); box.removeEventListener('pointercancel', cancel); };
+      box.addEventListener('pointermove', cancel); box.addEventListener('pointerup', cancel); box.addEventListener('pointercancel', cancel);
+    });
+  }
   function dayCard(all) {
     const card = el('section', undefined, 'pl-card pl-schedule'); card.setAttribute('aria-label', '시간표');
     const isWeek = view === 'week', isExam = view === 'exam', ws = weekStart(day), end = examEnd();
@@ -1878,19 +1926,14 @@ export function createPlan(app) {
     const todayFixed = fixedBlocks(ctx.today), todayPlan = autoPlan(ctx.today, all, todayFixed);
     if (!isWeek && !isExam) {
       const fixed = day === ctx.today ? todayFixed : fixedBlocks(day), plan = day === ctx.today ? todayPlan : { out: [], left: [] };
-      { const adr = allDayDay(adItemsFor([day])); if (adr) card.append(adr); }
+      card.append(allDayDay(adItemsFor([day]), day));
       const box = el('div', undefined, 'pl-day'), grid = el('div', undefined, 'pl-grid has-lane'), PX = 54 / 60;
       grid.style.height = 24 * 60 * PX + 'px';
       for (let h = 0; h < 24; h++) { const line = el('div', undefined, 'pl-hour'); line.style.top = h * 60 * PX + 'px'; line.append(el('span', String(h).padStart(2, '0'))); grid.append(line); }
       const now = day === ctx.today ? nowMin() : -1;
       const dayBlocks = layoutColumns([...fixed, ...plan.out]);
       for (const b of dayBlocks) grid.append(blockEl(b, PX, now));
-      grid.onclick = (e) => {   // 빈칸 누르면 그 시각에 일정(공부 계획) 넣기(대표님 10/9)
-        if (e.target.closest('.pl-blk, .pl-place, .pl-lane, .pl-now')) return;
-        const r = grid.getBoundingClientRect(), m = Math.max(0, Math.min(23 * 60 + 30, Math.floor(((e.clientY - r.top) / PX) / 30) * 30));
-        if (day < ctx.today || (day === ctx.today && m + 30 <= nowMin())) { app.status?.('지난 시각엔 계획을 못 넣어요. 지난 일정은 + 버튼으로 확정해 넣어요.', true); return; }
-        planPopup(card, day, day === ctx.today ? Math.max(m, Math.ceil(nowMin() / 10) * 10) : m, grid, { x: e.clientX, y: e.clientY });
-      };
+      bindEmpty(grid, day, PX, card);   // 빈 칸 누르면 그 칸이 선택되고 그 시각에 일정 넣기(구글 캘린더 방식)
       grid.append(placeLane(day, PX, now));   // 오른쪽 여백: 있던 곳
       if (now >= 0) { const n = el('div', undefined, 'pl-now'); n.style.top = now * PX + 'px'; n.append(el('span', hm(now))); grid.append(n); }
       if (day === ctx.today) { card.append(placeBar(day)); card.append(nowBar()); }
@@ -1926,12 +1969,7 @@ export function createPlan(app) {
       for (const b of layoutColumns(isToday ? [...todayFixed, ...todayPlan.out] : fixedBlocks(date))) col.append(blockEl(b, PX, isToday ? nowM : (date < ctx.today ? 1e9 : -1)));
       { const lane = placeLane(date, PX, nowM, true); if (lane.children.length) { col.classList.add('has-lane'); col.append(lane); } }
       if (isToday) { const n = el('div', undefined, 'pl-now'); n.style.top = nowM * PX + 'px'; col.append(n); }
-      if (planMode && date >= ctx.today) col.onclick = (e) => {
-        if (e.target.closest('.pl-blk, .pl-lane')) return;
-        const r = col.getBoundingClientRect(), m = Math.max(0, Math.min(23 * 60 + 30, Math.floor(((e.clientY - r.top) / PX) / 30) * 30));
-        if (date === ctx.today && m + 30 <= nowMin()) { app.status?.('지난 시각엔 계획을 못 넣어요. 지난 일정은 + 버튼으로 확정해 넣어요.', true); return; }
-        planPopup(card, date, m, col, { x: e.clientX, y: e.clientY });
-      };
+      bindEmpty(col, date, PX, card);
       body.append(col);
     }
     const stick = el('div', undefined, 'pl-wkstick'); stick.append(headRow); { const adg = allDayGrid(dates, adItemsFor(dates), cols); if (adg) stick.append(adg); }
