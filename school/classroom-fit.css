@@ -71,31 +71,4 @@
 .school.tablet-layout[data-mode=classroom] .subject-textbook-toc .lesson-textbook-contents button{min-height:44px!important}
 .school.tablet-layout[data-board-only][data-layout=v3] .lesson-textbook-body{font-size:16px!important}
 
-/* ---------- 3. 가로 12.9인치(1366×1024) 기준 비율 ---------- */
-@media (min-width:641px) and (orientation:landscape){
-  /* 자막 높이: 1024 높이에서 176(세 줄), 820 높이에서 144(두 줄) — 칠판 높이를 남기려고 화면 높이에 비례 */
-  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site]{--fit-vn:clamp(144px,calc(var(--tablet-viewport-height,100vh)*.172),176px)}
-  /* 칠판 폭을 넓히고(2.4 : 1), 칸 높이 = 칠판 1fr · 자막 176 · 조작줄 108 */
-  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{grid-template-columns:minmax(0,2.4fr) minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) var(--fit-vn) 108px!important;gap:8px 12px!important}
-  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #dialogue .v3-bar{height:108px!important;padding:4px 12px!important}
-  /* 스앵님: 칠판 위가 아니라 자막 영역 오른쪽 옆에 선다 (칠판 가운데 정렬을 가리지 않게) */
-  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room .v3-guide{left:calc((100% - 12px)*2.4/3.4 - 116px)!important;right:auto!important;top:auto!important;bottom:calc(108px + 8px)!important;width:116px!important;height:var(--fit-vn)!important;align-items:flex-end;justify-content:center}
-  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room .v3-guide #dockFace.has-lecture-actor{width:108px!important;height:144px!important}
-  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #dialogue .v3-vn{width:calc(100% - 124px)!important;justify-self:start;height:var(--fit-vn)!important;border-radius:0 0 12px 12px!important}
-  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room .v3-stage #board .content{font-size:var(--board-text-size,26px)!important}
-  /* 연습 문제 선택지: 팔 길이에서 읽는 크기 */
-  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room #board #choices button{font-size:18px!important;min-height:56px!important;padding:8px 14px!important}
-  /* 계산기 버튼이 오른쪽 조작줄(힌트·대화·더보기)을 가리던 것: 교실에서는 왼쪽 레일 아래로 옮긴다 */
-  .school[data-mode=classroom]~.calc-fab{left:16px!important;right:auto!important;bottom:128px!important}
-}
-
-/* ---------- 4. 세로 12.9인치(1024×1366): 칠판 1.8 · 자막 176 · 교재 1 · 조작줄 108 · 도전 92 ---------- */
-@media (min-width:641px) and (orientation:portrait){
-  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room{grid-template-rows:minmax(0,1.8fr) 176px minmax(0,1fr) 108px 92px!important;gap:8px!important}
-  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #dialogue .v3-bar{height:108px!important;padding:4px 12px!important}
-  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #dialogue .v3-vn{width:calc(100% - 124px)!important;justify-self:start;height:176px!important;border-radius:0 0 12px 12px!important}
-  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room .v3-guide{left:auto!important;right:0!important;top:calc(var(--class-board-height) + 8px)!important;bottom:auto!important;width:116px!important;height:176px!important;align-items:flex-end;justify-content:center}
-  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room .v3-guide #dockFace.has-lecture-actor{width:100px!important;height:134px!important}
-  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room .v3-stage #board .content{font-size:var(--board-text-size,26px)!important}
-  .school.tablet-layout[data-board-only][data-layout=v3][data-mode=classroom][data-view3=site] #room #board #choices button{font-size:18px!important;min-height:56px!important;padding:8px 14px!important}
-}
+/* 3·4. 가로·세로 화면 구성(칠판 비율·스앵님·대사창·서랍)은 classroom-stage.css 로 옮겼다 (대표님 10/12 밤 화면 구성 개편) */

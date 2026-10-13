@@ -1,7 +1,7 @@
 // 강의실 정렬·비율 자동 검사 (대표님 2026-10-12 「칠판 글자 들여써짐·중앙정렬 규칙」「스앵님 자막 중앙정렬」「12.9인치 아이패드 프로 기준」)
 // 규칙(school/classroom-fit.css 와 같은 말):
 //   칠판 : 좌우 padding 같음 · 모든 줄(상위 단원·캡션·본문·수식·도형)의 글자 중심 = 칠판 가로 중심(±2px) · text-align:center · text-indent 0 · 줄 왼쪽 막대 0 · 세로 잘림 0
-//   자막 : 대사 가로 중심 ±2px · 세로 중심 ±4px(이름표 아래~버튼줄 위) · 이름표 왼쪽 위 · 이전/다음 버튼 줄 가운데 · 대사와 버튼 안 겹침
+//   자막 : 대사 가로 중심 ±2px · 세로 중심 ±8px(이름표 아래~버튼줄 위) · 이름표 왼쪽 위 · 이전/다음 버튼 줄 가운데 · 대사와 버튼 안 겹침
 //   터치 : 조작줄·경로 버튼·자막 버튼·교재 목차·도전 항목 44px 이상
 // 실행(서버 켜진 PC): node docs/tools/classroom_align_check.mjs
 //   환경변수 BASE=http://127.0.0.1:8787/study  API=http://127.0.0.1:8787  VPS=l1366,p1024,i1180,d1280  STRIDE=1  DATES=...  PW_DIR=playwright-core 가 있는 폴더
@@ -74,6 +74,10 @@ for (const r of out) {
     if (w.ta !== 'center' && w.kind !== 'math') note('text-align 이 가운데 아님', `${id} ${w.kind} ${w.ta}`);
     if (w.kind === 'row' && parseFloat(w.bl) !== parseFloat(w.br)) note('줄 왼쪽·오른쪽 테두리 비대칭(왼쪽 막대)', `${id} ${w.cls}`);
   }
+  if (m.vc && m.vc.fill < 0.92 && Math.abs(m.vc.dev) > 8) note('칠판 글 블록 세로 가운데 아님', `${id} 편차${m.vc.dev} 채움${m.vc.fill}`);
+  { const L = r.l, port = L.vh > L.vw, B = L.board; if (B) { const asp = B[2] / B[3]; if (asp < 1.75) note('칠판 비율이 와이드(가로:세로 1.75 이상)가 아님', `${id} ${asp.toFixed(2)}`); if (asp > 2.8) note('칠판 비율이 너무 납작(2.8 초과)', `${id} ${asp.toFixed(2)}`); }
+    if (L.tutor && L.tutor[3] < (port ? 0.28 : 0.38) * L.vh) note('스앵님이 화면 높이 대비 작음', `${id} ${L.tutor[3]}/${L.vh}`);
+    if (!L.drawerTab) note('왼쪽 서랍 탭 없음', id); if (L.hiddenParts && Object.values(L.hiddenParts).some(Boolean)) note('수업 도전·교재 목차·수업교재가 서랍 밖에 보임', `${id} ${JSON.stringify(L.hiddenParts)}`); }
   const v = m.vn;
   if (v) {
     if (v.inkL != null && Math.abs((v.inkL - v.inkR) / 2) > TOL) note('자막 가로 중심 편차', `${id} ${((v.inkL - v.inkR) / 2).toFixed(1)}`);

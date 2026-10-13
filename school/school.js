@@ -41,9 +41,10 @@ import { readable, cleanTitle } from "./readable.js";
 import { createPlan } from "./plan.js?v=291";
 import { inFocus } from "./focus.js";
 import { createLessonTextbook } from "./lesson-textbook.js?v=288";
-import { startClassroomV3 } from "./classroom-v3.js?v=241";
+import { startClassroomV3 } from "./classroom-v3.js?v=244";
 import { createGrowth } from "./growth.js?v=199";
 import { cardGate } from './card-gate.js?v=6';
+import { mountClassDrawer } from './class-drawer.js?v=2';
 /* 정역학 9/2 오리엔테이션과 2장 선수 수업(9/7·9/9·9/14)은 시험 범위 밖 — 강 목록과 강 번호에서 뺀다 (대표님 10/11) */
 const STATICS_HIDE = ["2026-09-02", "2026-09-07", "2026-09-09", "2026-09-14", "2026-10-10"];   /* 9/2 오리엔테이션 · 2장 선수 · 10/10 복습(벼락치기와 같은 과제 풀이 중복, 10/11 「꼭 필요한 구성만」) */
 const hideLesson = (course, l) => course === "정역학" && STATICS_HIDE.includes(l.date);
@@ -699,7 +700,11 @@ async function startLesson(id, options = {}) {
   options={...options,purpose:options.purpose??options.resume?.purpose??'tutoring',returnTo:Object.hasOwn(options,'returnTo')?options.returnTo:options.resume?.returnTo??null};
   let legacyReturnRef=null, returnNotice='';
   /* 정역학 강 시작 암기카드: 새 수업을 열 때만(같은 수업 안 이동·다른 기기 따라가기는 제외) */
-  if (!options.follow && id !== current?.id && !(await cardGate(id))) { status('암기카드를 통과해야 수업이 열립니다.'); return; }
+  /* 수업 원자료가 없어 어차피 못 여는 수업(카탈로그에만 먼저 올라온 새 강)에는 카드를 먼저 묻지 않는다 — 먼저 받아 보고, 못 받으면 카드 없이 아래 일반 경로가 같은 오류를 보인다(오타 4차 10/13) */
+  const gateNew = !options.follow && id !== current?.id;
+  let preloaded = null;
+  if (gateNew) { try { preloaded = await api('lesson?id=' + encodeURIComponent(id)); } catch { preloaded = null; } }
+  if (gateNew && preloaded && !(await cardGate(id))) { status('암기카드를 통과해야 수업이 열립니다.'); return; }
   try { await mission?.save(); if (!options.follow && !isBoard()) await growth?.stop('pause'); } catch (error) { status(error.message, true); return; }
   // 받기 경로: 기다리는 동안 이 기기에서 이동했으면 받은(이제 오래된) 세션을 적용하지 않는다.
   const stale = () => options.follow && options.epoch !== sessionEpoch;
@@ -707,7 +712,7 @@ async function startLesson(id, options = {}) {
   const generation = ++requestGeneration;
   try {
     status("수업을 준비하고 있습니다.");
-    const lesson = await api("lesson?id=" + encodeURIComponent(id));
+    const lesson = preloaded ?? await api("lesson?id=" + encodeURIComponent(id));
     if (generation !== requestGeneration || stale()) return;
     let targetIndex = options.index ?? Math.min(state.progress[id]?.index || 0, lesson.steps.length - 1);
     if(options.stepId){const at=lesson.steps.findIndex(s=>s.id===options.stepId);if(at<0)throw new Error('이전 문제 위치를 확인해주세요.');targetIndex=at;}
@@ -2576,7 +2581,7 @@ const MOOD={smile:'smile',serious:'strict',think:'neutral',neutral:'neutral'};
 // 강의 자막은 연애 시뮬레이션식 대사창으로(vn-dialog.js). 창을 누르면 ⏭ 와 같다.
 const vn = v3?.stage ? createDialog(v3.stage, { onNext: () => advance() }) : null;
 lectureUi = createLectureUi({ goRoute });
-setupWideRoom(v3);   // 강의실 배치 A: 와이드 칠판·대사창·버튼 한 줄·대화 서랍(대표님 10/9)
+setupWideRoom(v3);   mountClassDrawer();   // 강의실 배치 A: 와이드 칠판·대사창·버튼 한 줄·대화 서랍(대표님 10/9)
 setupSeatRoom();   // 교실 = 내 자리에서 본 장면: 칠판·교탁 앞 스앵님·책상 위 대사창(대표님 10/9 「착석 시점, 연애 시뮬 느낌」)
 // 화면 틀(10/9 「초심으로」): 위 고정 줄(GREENLIGHT | SCHOOL·탭·비서 토큰·대표실) + 아래 고정 스앵님·채팅 바
 const shell = setupShell({ api, eventId, openArea: a => workspace.open(a), course: () => course || '', history: () => (state?.events || []).filter(e => e.kind === 'question' && e.mode === 'consultation'), status });

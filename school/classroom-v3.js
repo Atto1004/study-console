@@ -4,6 +4,7 @@
 import { splitText } from './learning.js';
 import { groupLessonTopics } from './course-scope.js';
 import { chalkNote, chalkBoardText } from './lecture-chalk.js';
+import { typeInto } from './vn-type.js?v=1';
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
 const ICON = {
   game: 'M12 2 3 7v10l9 5 9-5V7zM3 7l9 5 9-5M12 12v10',
@@ -60,7 +61,8 @@ export function startClassroomV3(app) {
   const logPages = el('nav', 'v3-log-pages'); logPages.setAttribute('aria-label', '대화 내용 넘기기');
   const earlier = el('button', '', '이전 대화'), later = el('button', '', '다음 대화'), pageLabel = el('span');
   earlier.type = later.type = 'button';
-  let messagePage = 0;
+  let messagePage = 0, typer = null;
+  const tabletSite = () => school.classList.contains('tablet-layout') && school.dataset.view3 === 'site' && school.dataset.mode === 'classroom';   // 쯔꾸르식 타이핑·누르면 넘기기는 태블릿 사이트 교실에서만(데스크톱 폭은 예전 그대로)
   const visualDialogue = el('section', 'v3-vn');
   visualDialogue.setAttribute('aria-label', '수업 대화');
   const speakerName = el('strong', 'v3-vn-name', '김주영 스앵님');
@@ -83,9 +85,12 @@ export function startClassroomV3(app) {
     earlier.disabled = messagePage === 0; later.disabled = messagePage >= rows.length - 1;
     pageLabel.textContent = rows.length ? `${messagePage + 1} / ${rows.length}` : '';
     logPages.hidden = !rows.length;
+    // 새 스앵님 대사는 한 글자씩 쓴다(대표님 10/12 쯔꾸르·연애 시뮬 자막). 쓰는 동안 ▼ 는 숨기고, 다 쓰면 깜박인다.
+    if (!tabletSite()) { typer?.finish(); delete visualDialogue.dataset.typing; if (row) delete row.dataset.fresh; }
+    else if (row?.dataset.fresh && !row.hidden) { delete row.dataset.fresh; typer?.finish(); visualDialogue.dataset.typing = '1'; typer = typeInto(body, () => { delete visualDialogue.dataset.typing; }); }
   }
-  earlier.onclick = () => { messagePage--; showMessage(); };
-  later.onclick = () => { messagePage++; showMessage(); };
+  earlier.onclick = () => { typer?.finish(); messagePage--; showMessage(); };
+  later.onclick = () => { typer?.finish(); messagePage++; showMessage(); };
   logPages.append(earlier, pageLabel, later); logPages.hidden = true;
   const chat = el('form', 'v3-chat'); const input = el('input'); input.id = 'chatInput'; input.placeholder = '스앵님께 말하기 · 답변이나 질문을 적어주세요'; input.autocomplete = 'off'; input.maxLength = 600; input.setAttribute('aria-label', '스앵님께 답변·질문 보내기');
   const send = iconBtn('send', '보내기', 'v3-send'); send.type = 'submit'; chat.append(input, send);
@@ -110,7 +115,15 @@ export function startClassroomV3(app) {
   ]) { const b = el('button', 'v3-menu-item'); b.type = 'button'; b.innerHTML = svg(icon); b.append(label); b.onclick = () => { more.open = false; go(); }; menu.append(b); }
   more.append(sum, menu);
   bar.append(journey, progress, restart, play, skip, hint, simpler, more);
-  visualDialogue.append(speakerName, log, logPages);
+  const vnNext = el('i', 'v3-vn-next'); vnNext.setAttribute('aria-hidden', 'true');   // 문장 끝 ▼ (CSS 로 모양·깜박임)
+  visualDialogue.append(speakerName, log, logPages, vnNext);
+  // 대사창을 누르면: 쓰는 중이면 다 보이기 → 다 썼으면 다음 대사(쪽이 더 있으면 다음 쪽, 없으면 ⏭ 와 같다)
+  visualDialogue.addEventListener('click', (e) => {
+    if (!tabletSite() || e.target.closest('button,a,input')) return;
+    if (typer?.active) { typer.finish(); return; }
+    if (!later.disabled) { messagePage++; showMessage(); return; }
+    app.onSkip?.();
+  });
   dialogue.prepend(visualDialogue); dialogue.append(chat, bar); room.append(dialogue);
   const placeDialogue = () => {
     if (school.dataset.mode !== 'classroom' || dialogue.hidden) return;
@@ -125,7 +138,9 @@ export function startClassroomV3(app) {
     const observer = new ResizeObserver(placeDialogue);
     observer.observe(room); observer.observe(stage); observer.observe(visualDialogue); observer.observe(bar);
   }
-  window.addEventListener('resize', placeDialogue);
+  window.addEventListener('resize', () => { placeDialogue(); if (!tabletSite()) typer?.finish(); });
+  // 크기 변경 없이 보기(사이트↔게임)·교실 모드·태블릿 레이아웃이 바뀌어 조건이 풀리면 쓰던 문장을 바로 끝낸다(오타 5차)
+  new MutationObserver(() => { if (!tabletSite()) { typer?.finish(); delete visualDialogue.dataset.typing; } }).observe(school, { attributes: true, attributeFilter: ['class', 'data-mode', 'data-view3'] });
   if (globalThis.ResizeObserver) new ResizeObserver(showMessage).observe(log);
   new MutationObserver(placeDialogue).observe(school, { attributes: true, attributeFilter: ['data-mode'] });
 
@@ -145,7 +160,7 @@ export function startClassroomV3(app) {
     else { guide.dataset.pose='explain'; guide.dataset.direction='student'; }
     const first = log.children.length;
     for (const part of splitText(text, 140)) {
-      const row = el('div', 'v3-msg v3-' + who); /* 'saeng' 그대로 쓰면 기존 초상 스타일과 겹친다 */ const b = el('p', undefined, part); row.append(b); log.append(row);
+      const row = el('div', 'v3-msg v3-' + who); if (who === 'saeng') row.dataset.fresh = '1'; /* 'saeng' 그대로 쓰면 기존 초상 스타일과 겹친다 */ const b = el('p', undefined, part); row.append(b); log.append(row);
     }
     messagePage = first; showMessage();
   }
